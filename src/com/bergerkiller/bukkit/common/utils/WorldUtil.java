@@ -18,10 +18,10 @@ public class WorldUtil {
 	
 	public static List<WorldServer> getWorlds() {
 		try {
-			return CommonUtil.getMCServer().worlds;
-		} catch (NullPointerException ex) {
-			return new ArrayList<WorldServer>();
-		}
+			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
+			if (worlds != null) return worlds;
+		} catch (NullPointerException ex) {}
+		return new ArrayList<WorldServer>();
 	}
 	public static WorldServer getNative(org.bukkit.World world) {
 		return ((CraftWorld) world).getHandle();

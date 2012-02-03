@@ -81,6 +81,21 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 	}
+	public final void registerNextTick(Class<? extends Listener> listener) {
+		try {
+			this.registerNextTick(listener.newInstance());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public final void registerNextTick(final Listener listener) {
+		final PluginBase me = this;
+		new Task() {
+			public void run() {
+				me.register(listener);
+			}
+		}.start();
+	}
 			
 	public final void onEnable() {
 		if (cbBuild == 0) {

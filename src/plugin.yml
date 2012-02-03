@@ -1,6 +1,6 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.Common
-version: 1.0
+version: 1.01
 author: bergerkiller
 load: startup
 description: Is used in all of my plugins to re-use common functions

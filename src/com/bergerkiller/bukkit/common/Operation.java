@@ -40,7 +40,9 @@ public abstract class Operation extends ParameterWrapper {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
 				handle(player);
-				handle((CraftPlayer) player.getBukkitEntity());
+				if (player.netServerHandler == null) continue;
+				if (player.netServerHandler.player != player) continue;
+				handle(player.netServerHandler.getPlayer());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("server player list");
@@ -60,9 +62,11 @@ public abstract class Operation extends ParameterWrapper {
 
 	public final void doPlayers(World world) {
 		try {
-			for (EntityPlayer ep : (List<EntityPlayer>) world.players) {
-				handle(ep);
-				handle((CraftPlayer) ep.getBukkitEntity());
+			for (EntityPlayer player : (List<EntityPlayer>) world.players) {
+				handle(player);
+				if (player.netServerHandler == null) continue;
+				if (player.netServerHandler.player != player) continue;
+				handle(player.netServerHandler.getPlayer());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world player list of world '" + world.getWorld().getName() + "'");

@@ -68,6 +68,47 @@ public class CommonUtil {
 		return (CraftServer) Bukkit.getServer();
 	}
 	
+	public static boolean contains(int value, int... values) {
+		for (int v : values) {
+			if (v == value) return true;
+		}
+		return false;
+	}
+	public static boolean contains(byte value, byte... values) {
+		for (int v : values) {
+			if (v == value) return true;
+		}
+		return false;
+	}
+	public static <T> boolean contains(T value, T... values) {
+		if (value == null) {
+			for (T v : values) {
+				if (v == null) return true;
+			}
+		} else {
+			for (T v : values) {
+				if (v == value || value.equals(v)) return true;
+			}
+		}
+		return false;
+	}
+	
+    /**
+     * Shuffle an array of type T
+     *
+     * @param <T> The type contained in the array
+     * @param array The array to be shuffled
+     */
+	public static <T> void shuffle(T[] array) {
+		int random;
+		for (int i = 1; i < array.length; i++) {
+			random = (int) (Math.random() * i);
+			T temp = array[i - 1];
+			array[i - 1] = array[random];
+			array[random] = temp;
+		}
+	}
+	
 	public static ServerConfigurationManager getServerConfig() {
 		return getCraftServer().getHandle();
 	}

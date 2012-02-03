@@ -45,7 +45,7 @@ public class EnumUtil {
 		return parse(DyeColor.class, name, def);
 	}
 	public static Material parseMaterial(String name, Material def) {
-    	name = name.trim().toUpperCase().replace(" ", "_").toUpperCase().replace("SHOVEL", "SPADE").replace("SLAB", "STEP").replace("GOLDEN", "GOLD");       	
+    	name = name.trim().toUpperCase().replace(" ", "_").replace("SHOVEL", "SPADE").replace("SLAB", "STEP").replace("GOLDEN", "GOLD");       	
     	Material m = parse(Material.class, name, null);
     	if (m != null) return m;
     	if (name.equals("CROP")) m = Material.CROPS;

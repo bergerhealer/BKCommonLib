@@ -5,6 +5,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class Task extends ParameterWrapper implements Runnable {
 	
+	public Task(Object... arguments) {
+		this(Common.plugin, arguments);
+	}
 	public Task(final JavaPlugin plugin, Object... arguments) {
 		super(arguments);
 		this.plugin = plugin;

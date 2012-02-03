@@ -3,24 +3,30 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.server.EntityCreature;
+import net.minecraft.server.EntityFallingBlock;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.IAnimal;
+import net.minecraft.server.IMonster;
 import net.minecraft.server.MathHelper;
+import net.minecraft.server.NPC;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.Common;
 
 public class EntityUtil {
 	
@@ -69,17 +75,70 @@ public class EntityUtil {
 		}
 		return null;
 	}
-				
+					
 	/* 
 	 * States
 	 */
-	public static boolean isMob(Entity e) {
-		if (e instanceof LivingEntity) {
-			if (!(e instanceof HumanEntity)) {
-				return true;
-			}
+	public static final String[] animalNames = new String[] {
+		"cow", "pig", "sheep", "chicken", "wolf", "squid", 
+		"snowman", "mushroomcow"};
+	public static final String[] monsterNames = new String[] {
+		"creeper", "skeleton", "zombie", "slime", "skeleton", 
+		"pigzombie", "spider", "giant", "ghast", "enderman", "cavespider", 
+		"enderdragon", "blaze", "magmacube", "silverfish"};
+	
+	public static boolean isMob(Entity entity) {
+		return isMob(getNative(entity));
+	}
+	public static boolean isAnimal(Entity entity) {
+		return isAnimal(getNative(entity));
+	}
+	public static boolean isMonster(Entity entity) {
+		return isMonster(getNative(entity));
+	}
+	public static boolean isNPC(Entity entity) {
+		return isNPC(getNative(entity));
+	}
+	
+	public static boolean isMob(net.minecraft.server.Entity entity) {
+		return entity instanceof EntityCreature;
+	}
+	public static boolean isNPC(net.minecraft.server.Entity entity) {
+		return entity instanceof NPC;
+	}
+	public static boolean isAnimal(net.minecraft.server.Entity entity) {
+		return entity instanceof IAnimal;
+	}
+	public static boolean isMonster(net.minecraft.server.Entity entity) {
+		return entity instanceof IMonster;
+	}
+	
+	public static boolean isMob(String name) {
+		return isAnimal(name) || isMonster(name);
+	}
+	public static boolean isAnimal(String name) {
+		return StringUtil.isIn(name, animalNames);
+	}
+	public static boolean isMonster(String name) {
+		return StringUtil.isIn(name, monsterNames);
+	}
+	public static String getName(Entity entity) {
+		return getName(getNative(entity));
+	}
+	public static String getName(net.minecraft.server.Entity entity) {
+		if (entity == null) return "";
+		if (entity instanceof EntityItem) {
+			Material mat = Material.getMaterial(((EntityItem) entity).itemStack.id);
+			return mat == null ? "item" : "item" + mat.toString().toLowerCase();
+		} else if (entity instanceof EntityFallingBlock) {
+			Material mat = Material.getMaterial(((EntityFallingBlock) entity).id);
+			return mat == null ? "falling" : "falling" + mat.toString().toLowerCase();
+		} else {
+			String name = entity.getClass().getSimpleName().toLowerCase();
+			if (name.startsWith("entity")) name = name.substring(6);
+			if (name.contains("tnt")) return "tnt";
+			return name;
 		}
-		return false;
 	}
 	
 	/*
@@ -117,7 +176,7 @@ public class EntityUtil {
 				passenger.vehicle = null;
 				entity.passenger = null;
 				if (teleport(plugin, passenger, to)) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+					Bukkit.getScheduler().scheduleSyncDelayedTask(Common.plugin, new Runnable() {
 						public void run() {
 							passenger.setPassengerOf(entity);
 						}

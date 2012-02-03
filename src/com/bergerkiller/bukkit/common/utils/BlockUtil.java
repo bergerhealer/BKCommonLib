@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.material.Attachable;
@@ -143,45 +144,54 @@ public class BlockUtil {
     	}
     }
         
-    public static boolean isRails(Material type) {
-    	switch (type) {
-    	case RAILS :
-    	case POWERED_RAIL :
-    	case DETECTOR_RAIL : return true;
-    	default : return false;
-    	}
+    public static boolean isType(int material, int... types) {
+    	return CommonUtil.contains(material, types);
     }
-    public static boolean isRails(int type) {
-    	return type == Material.RAILS.getId() || type == Material.POWERED_RAIL.getId() || type == Material.DETECTOR_RAIL.getId();
+    public static boolean isType(Material material, Material... types) {
+    	return CommonUtil.contains(material, types);
     }
-    public static boolean isRails(Block b) {
-    	if (b == null) return false;
-    	return isRails(b.getTypeId());
+    public static boolean isType(Block block, Material... types) {
+    	return CommonUtil.contains(block.getType(), types);
     }
-
-	public static Rails getRails(Block railsblock) {
-		if (railsblock == null) return null;
-		return getRails(getData(railsblock));
-	}
-	public static Rails getRails(MaterialData data) {
-		if (data != null && data instanceof Rails) {
-			return (Rails) data;
-		}
-		return null;
-	}
-	
+    public static boolean isType(Block block, int... types) {
+    	return CommonUtil.contains(block.getTypeId(), types);
+    }
+    
 	public static boolean isSign(Material material) {
-		return material == Material.WALL_SIGN || material == Material.SIGN_POST;
+		return isType(material, Material.WALL_SIGN, Material.SIGN_POST);
 	}
     public static boolean isSign(Block b) {
-    	if (b == null) return false;
-    	return isSign(b.getType());
+    	return b == null ? false : isSign(b.getType());
     }
+    public static boolean isRails(Material type) {
+    	return isType(type, Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL);
+    }
+    public static boolean isRails(int type) {
+    	return isType(type, Material.RAILS.getId(), Material.POWERED_RAIL.getId(), Material.DETECTOR_RAIL.getId());
+    }
+    public static boolean isRails(Block b) {
+    	return b == null ? false : isRails(b.getTypeId());
+    }
+    
+    public static <T extends MaterialData> T getData(Block block, Class<T> type) {
+    	try {
+    		return type.cast(getData(block));
+    	} catch (Exception ex) {
+    		return null;
+    	}
+    }
+	public static <T extends BlockState> T getState(Block block, Class<T> type) {
+    	try {
+    		return type.cast(block.getState());
+    	} catch (Exception ex) {
+    		return null;
+    	}
+	}
+	public static Rails getRails(Block railsblock) {
+		return getData(railsblock, Rails.class);
+	}
 	public static Sign getSign(Block signblock) {
-		if (isSign(signblock)) {
-			return (Sign) signblock.getState();
-		}
-		return null;
+		return getState(signblock, Sign.class);
 	}
 		
 	public static Block getRailsAttached(Block signblock) {

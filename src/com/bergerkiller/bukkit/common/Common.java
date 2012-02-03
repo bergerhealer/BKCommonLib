@@ -7,6 +7,7 @@ public class Common extends PluginBase {
 	public static boolean isShowcaseEnabled = false;
 	public static boolean isSCSEnabled = false;
 	public static Plugin bleedingMobsInstance = null;
+	public static Common plugin;
 	
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (pluginName.equals("Showcase")) {
@@ -23,7 +24,9 @@ public class Common extends PluginBase {
 	}
 	
 	public void disable() {}
-	public void enable() {}
+	public void enable() {
+		plugin = this;
+	}
 
 	@Override
 	public boolean command(CommandSender sender, String command, String[] args) {

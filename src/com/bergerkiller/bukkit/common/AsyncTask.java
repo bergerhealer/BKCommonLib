@@ -55,7 +55,7 @@ public abstract class AsyncTask extends ParameterWrapper implements Runnable {
 	}
 	
 	public AsyncTask start() {
-		return this.start(true);
+		return this.start(false);
 	}
 	public AsyncTask start(boolean looped) {
 		this.stoprequested = false;
