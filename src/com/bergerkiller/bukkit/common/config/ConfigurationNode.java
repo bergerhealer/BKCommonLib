@@ -1,8 +1,11 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.MemorySection;
@@ -11,12 +14,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 @SuppressWarnings({"unchecked","rawtypes"})
 public class ConfigurationNode {
 	private final MemorySection source;
+	private final Map<String, String> headers;
 	private final Set<String> readkeys;
 	public ConfigurationNode() {
-		this(new HashSet<String>(), new YamlConfiguration());
+		this(new HashSet<String>(), new HashMap<String, String>(), new YamlConfiguration());
 	}
 	private ConfigurationNode(ConfigurationNode source, String root) {
 		this.readkeys = source.readkeys;
+		this.headers = source.headers;
 		MemorySection sect = (MemorySection) source.source.getConfigurationSection(root);
 		if (sect == null) {
 			this.source = (MemorySection) source.source.createSection(root);
@@ -25,9 +30,10 @@ public class ConfigurationNode {
 		}
 		this.setRead();
 	}
-	private ConfigurationNode(final Set<String> readkeys, final MemorySection source) {
+	private ConfigurationNode(final Set<String> readkeys, final Map<String, String> headers, final MemorySection source) {
 		this.readkeys = readkeys;
 		this.source = source;
+		this.headers = headers;
 	}
 	
 	public boolean hasParent() {
@@ -36,7 +42,7 @@ public class ConfigurationNode {
 	public ConfigurationNode getParent() {
 		MemorySection sec = (MemorySection) this.source.getParent();
 		if (sec == null) return null;
-		return new ConfigurationNode(this.readkeys, sec);
+		return new ConfigurationNode(this.readkeys, this.headers, sec);
 	}
 	public String getPath(String append) {
 		String p = this.getPath();
@@ -49,6 +55,69 @@ public class ConfigurationNode {
 	}
 	public String getName() {
 		return this.source.getName();
+	}
+	
+	public String getHeader() {
+		return this.headers.get(this.getPath());
+	}
+	public String getHeader(String path) {
+		return this.headers.get(this.getPath(path));
+	}
+	public void removeHeader() {
+		this.setHeader(null);
+	}
+	public void removeHeader(String path) {
+		this.setHeader(path, null);
+	}
+	public void setHeader(String header) {
+		this.setHeader(null, header);
+	}
+	public void setHeader(String path, String header) {
+		if (header == null) {
+			this.headers.remove(this.getPath(path));
+		} else {
+			this.headers.put(this.getPath(path), header);
+		}
+	}
+	public void addHeader(String header) {
+		this.addHeader(null, header);
+	}
+	public void addHeader(String path, String header) {
+		String oldheader = this.getHeader(path);
+		if (oldheader == null) {
+			this.setHeader(path, header);
+		} else {
+			this.setHeader(path, oldheader + "\n" + header);
+		}
+	}
+	
+	public Map<String, String> getHeaders() {
+		String root = this.getPath();
+		Map<String, String> rval = new HashMap<String, String>(this.headers.size());
+		if (root == null || root.length() == 0) {
+			rval.putAll(this.headers);
+		} else {
+			for (Map.Entry<String, String> entry : this.headers.entrySet()) {
+				if (entry.getKey().startsWith(root)) {
+					rval.put(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+		return rval;
+	}
+	public void clearHeaders() {
+		String root = this.getPath();
+		if (root == null || root.length() == 0) {
+			this.headers.clear();
+		} else {
+			Iterator<Map.Entry<String, String>> iter = this.headers.entrySet().iterator();
+			while (iter.hasNext()) {
+				if (iter.next().getKey().startsWith(root)) {
+					iter.remove();
+				}
+			}
+		}
+		
 	}
 	
 	public MemorySection getSection() {
@@ -72,6 +141,23 @@ public class ConfigurationNode {
 			}
 		}
 		return rval;
+	}
+	public Map<String, Object> getValues() {
+		return this.source.getValues(false);
+	}
+	public <T> Map<String, T> getValues(Class<T> type) {
+		Map<String, Object> values = this.getValues();
+		Iterator<Map.Entry<String, Object>> iter = values.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<String, Object> entry = iter.next();
+			T newvalue = convert(entry.getValue(), type);
+			if (newvalue == null) {
+				iter.remove();
+			} else {
+				entry.setValue(newvalue);
+			}
+		}
+		return (Map<String, T>) values;
 	}
 	public Set<String> getKeys() {
 		return this.source.getKeys(false);

@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import me.Perdog.BleedingMobs.BleedingMobs;
+import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.IInventory;
 
 import org.bukkit.Bukkit;

@@ -6,7 +6,9 @@ import net.minecraft.server.Chunk;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet;
 import net.minecraft.server.World;
+import net.minecraft.server.WorldServer;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -57,5 +59,15 @@ public class PacketUtil {
 		for (EntityPlayer ep : CommonUtil.getOnlinePlayers()) {
 			sendPacket(ep, packet, throughListeners);
 		}
+	}
+	
+	public static void broadcastPacketNearby(Location location, double radius, Packet packet) {
+		broadcastPacketNearby(location.getWorld(), location.getX(), location.getY(), location.getZ(), radius, packet);
+	}
+	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Packet packet) {
+		broadcastPacketNearby(WorldUtil.getNative(world), x, y, z, radius, packet);
+	}
+	public static void broadcastPacketNearby(World world, double x, double y, double z, double radius, Packet packet) {
+		CommonUtil.getServerConfig().sendPacketNearby(x, y, z, radius, ((WorldServer) world).dimension, packet);
 	}
 }

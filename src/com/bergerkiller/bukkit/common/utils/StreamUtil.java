@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,6 +24,10 @@ public class StreamUtil {
 		stream.writeInt(coordinates.x);
 		stream.writeInt(coordinates.y);
 		stream.writeInt(coordinates.z);
+	}
+	
+	public static void writeIndent(BufferedWriter writer, int indent) throws IOException {
+		for (; indent > 0; --indent) writer.write(' ');
 	}
 	
 }

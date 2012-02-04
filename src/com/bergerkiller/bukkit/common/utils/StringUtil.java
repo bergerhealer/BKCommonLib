@@ -81,7 +81,18 @@ public class StringUtil {
     public static String combine(String separator, String... lines) {
     	StringBuilder builder = new StringBuilder();
     	for (String line : lines) {
-    		if (line != null && !line.equals("")) {
+    		if (line != null && line.length() > 0) {
+        		if (builder.length() != 0) builder.append(separator);
+        		builder.append(line);
+    		}
+    	}
+    	return builder.toString();
+    }
+    
+    public static String combine(String separator, Collection<String> lines) {
+    	StringBuilder builder = new StringBuilder();
+    	for (String line : lines) {
+    		if (line != null && line.length() > 0) {
         		if (builder.length() != 0) builder.append(separator);
         		builder.append(line);
     		}
@@ -176,6 +187,24 @@ public class StringUtil {
 			if (item.equalsIgnoreCase(i)) return true;
 		}
 		return false;
+	}
+	
+	public static int getSuccessiveCharCount(String value, char character) {
+		return getSuccessiveCharCount(value, character, 0, value.length() - 1);
+	}
+	public static int getSuccessiveCharCount(String value, char character, int startindex) {
+		return getSuccessiveCharCount(value, character, startindex, value.length() - startindex - 1);
+	}
+	public static int getSuccessiveCharCount(String value, char character, int startindex, int endindex) {
+		int count = 0;
+		for (int i = startindex; i <= endindex; i++) {
+			if (value.charAt(i) == character) {
+				count++;
+			} else {
+				break;
+			}
+		}
+		return count;
 	}
 	
 }
