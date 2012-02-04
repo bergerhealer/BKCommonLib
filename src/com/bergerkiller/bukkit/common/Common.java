@@ -33,4 +33,9 @@ public class Common extends PluginBase {
 		return true;
 	}
 
+	@Override
+	public void permissions() {
+		
+	}
+
 }

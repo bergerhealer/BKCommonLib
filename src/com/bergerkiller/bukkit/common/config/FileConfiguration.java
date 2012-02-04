@@ -36,7 +36,7 @@ public class FileConfiguration extends ConfigurationNode {
 	public boolean exists() {
 		return this.file.exists();
 	}
-	
+
 	private void writeHeader(int indent, String header, BufferedWriter writer) throws IOException {
 		if (header == null) return;
 		for (String line : header.split("\n", -1)) {

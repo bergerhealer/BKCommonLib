@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
 import org.bukkit.World.Environment;
+import org.bukkit.permissions.PermissionDefault;
 
 public class EnumUtil {
 	public static <E extends Enum<E>> E parse(Class<E> enumeration, String name, E def) {
@@ -29,6 +30,9 @@ public class EnumUtil {
 		return def;
 	}
 	
+	public static PermissionDefault parsePermissionDefault(String name, PermissionDefault def) {
+		return parse(PermissionDefault.class, name, def);
+	}
 	public static GameMode parseGameMode(String name, GameMode def) {
 		return parse(GameMode.class, name, def);
 	}

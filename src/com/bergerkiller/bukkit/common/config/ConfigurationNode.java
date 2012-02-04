@@ -39,6 +39,9 @@ public class ConfigurationNode {
 	public boolean hasParent() {
 		return this.source.getParent() != null;
 	}
+	public boolean isEmpty() {
+		return this.getKeys().isEmpty();
+	}
 	public ConfigurationNode getParent() {
 		MemorySection sec = (MemorySection) this.source.getParent();
 		if (sec == null) return null;

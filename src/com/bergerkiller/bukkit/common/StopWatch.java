@@ -10,17 +10,40 @@ public class StopWatch {
 		this.prevtime = System.nanoTime();
 		return this;
 	}
-	public double get() {
-		return (double) prevdur / 1E6;
+	public StopWatch clear() {
+		this.prevtime = 0;
+		this.prevdur = 0;
+		return this;
 	}
+	public double get() {
+		return (double) prevdur / 1E6D;
+	}
+	public double get(int scale) {
+		return (double) prevdur / 1E6D / (double) scale;
+	}
+	public StopWatch set(long elapsednanotime, double strength) {
+		elapsednanotime += (1.0 - strength) * (this.prevdur - elapsednanotime);
+		this.prevdur = elapsednanotime;
+		return this;
+	}
+	public StopWatch set(long elapsednanotime) {
+		return this.set(elapsednanotime, 1.0);
+	}
+	
 	public StopWatch next() {
-		this.prevdur += System.nanoTime() - prevtime;
-		return this.start();
+		return this.next(1.0);
 	}
 	public StopWatch stop() {
-		this.prevdur = System.nanoTime() - prevtime;
-		return this.start();
+		return this.stop(1.0);
 	}
+	public StopWatch next(double strength) {
+		return this.set(this.prevdur - prevtime + System.nanoTime(), strength).start();
+	}
+	public StopWatch stop(double strength) {
+		return this.set(System.nanoTime() - this.prevtime, strength).start();
+	}
+	
+	
 	public StopWatch log(final String name) {
 		System.out.println(name + ": " + this.get() + " ms");
 		return this;
