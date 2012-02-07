@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
@@ -79,7 +80,7 @@ public class EntityUtil {
 	/* 
 	 * States
 	 */
-	public static final String[] animalNames = new String[] {
+		public static final String[] animalNames = new String[] {
 		"cow", "pig", "sheep", "chicken", "wolf", "squid", 
 		"snowman", "mushroomcow"};
 	public static final String[] monsterNames = new String[] {
@@ -112,6 +113,16 @@ public class EntityUtil {
 	public static boolean isMonster(net.minecraft.server.Entity entity) {
 		return entity instanceof IMonster;
 	}
+		
+	public static boolean isMob(CreatureType type) {
+		return isAnimal(type) || isMonster(type);
+	}
+	public static boolean isAnimal(CreatureType type) {
+		return isAnimal(getName(type));
+	}
+	public static boolean isMonster(CreatureType type) {
+		return isMonster(getName(type));
+	}
 	
 	public static boolean isMob(String name) {
 		return isAnimal(name) || isMonster(name);
@@ -124,6 +135,9 @@ public class EntityUtil {
 	}
 	public static String getName(Entity entity) {
 		return getName(getNative(entity));
+	}
+	public static String getName(CreatureType type) {
+		return type.toString().toLowerCase().replace("_", "");
 	}
 	public static String getName(net.minecraft.server.Entity entity) {
 		if (entity == null) return "";

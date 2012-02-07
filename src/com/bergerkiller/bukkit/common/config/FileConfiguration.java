@@ -134,8 +134,8 @@ public class FileConfiguration extends ConfigurationNode {
 								header = null;
 							}
 						}
-						builder.append(line).append('\n');
 					}
+					builder.append(line).append('\n');
 				}
 			} finally {
 				input.close();

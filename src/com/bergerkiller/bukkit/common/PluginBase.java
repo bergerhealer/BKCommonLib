@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.utils.EnumUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -27,6 +29,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 public abstract class PluginBase extends JavaPlugin implements Listener { 
 	private final int minbuild;
 	private final int maxbuild;
+	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
 	private static final int cbBuild;
 	static {
@@ -49,6 +52,9 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 			} catch (NumberFormatException ex) {}	    	
 		}
 		cbBuild = build;
+		if (build == 0) {
+			Bukkit.getLogger().log(Level.WARNING, "This CraftBukkit version may not be compatible with some plugins!");
+		}
 	}
 	public static int getCraftBukkitBuild() {
 		return cbBuild;
@@ -120,16 +126,32 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 	public final ConfigurationNode getPermissionNode(String path) {
 		return this.permissionconfig.getNode(path);
 	}
-	public final void loadPermission(String permissionnode, PermissionDefault def, String description) {
-		this.loadPermission(getPermissionNode(permissionnode), def, description);
+	
+	public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
+		for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
+			this.loadPermission(perm);
+		}
 	}
-	public final void loadPermission(ConfigurationNode permissionnode, PermissionDefault def, String description) {
+	public final void loadPermission(IPermissionDefault permissionDefault) {
+		this.loadPermission(permissionDefault.getName(), permissionDefault.getDefault(), permissionDefault.getDescription());
+	}
+
+	public final Permission loadPermission(String permissionnode) {
+		return this.loadPermission(getPermission(permissionnode));
+	}
+	public final Permission loadPermission(Permission permission) {
+		return this.loadPermission(permission.getName(), permission.getDefault(), permission.getDescription());
+	}
+	public final Permission loadPermission(String permissionnode, PermissionDefault def, String description) {
+		return this.loadPermission(getPermissionNode(permissionnode), def, description);
+	}
+	public final Permission loadPermission(ConfigurationNode permissionnode, PermissionDefault def, String description) {
 		description = permissionnode.get("description", description);
 		//permission default can be true/false too!
 		Object setvalue = permissionnode.get("default");
 		if (setvalue != null) {
 			if (setvalue instanceof String) {
-				def = EnumUtil.parsePermissionDefault((String) setvalue, def);
+				def = EnumUtil.parse((String) setvalue, def);
 				permissionnode.set("default", def.toString());
 			} else if (setvalue instanceof Boolean) {
 				boolean val = (Boolean) setvalue;
@@ -151,33 +173,39 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 				permissionnode.set("default", def.toString());
 			}
 		}
-		setPermission(permissionnode.getPath(), def, description);
+		return setPermission(permissionnode.getPath(), def, description);
 	}
-	public static final void setPermission(String permissionnode, PermissionDefault def, String description) {
-		setPermission(getPermission(permissionnode), def, description);
+	public static Permission setPermission(String permissionnode, PermissionDefault def, String description) {
+		Permission perm = getPermission(permissionnode);
+		setPermission(perm, def, description);
+		return perm;
 	}
-	public static final void setPermission(Permission permission, PermissionDefault def, String description) {
+	public static void setPermission(Permission permission, PermissionDefault def, String description) {
 		if (def != null) permission.setDefault(def);
 		if (description != null) permission.setDescription(description);
 	}
 
 	public abstract void permissions();
 
+	public final String getDisableMessage() {
+		return this.disableMessage;
+	}
+	public void setDisableMessage(String msg) {
+		this.disableMessage = msg;
+	}
+	
 	public final void onEnable() {
+		this.setDisableMessage(this.getName() + " disabled!");
 		if (cbBuild == 0) {
-			Bukkit.getLogger().log(Level.WARNING, this.getName() + " version " + this.getVersion() + " may not be compatible: Unknown CraftBukkit version");
+			//unknown
 		} else if (cbBuild < this.minbuild) {
-			Bukkit.getLogger().log(Level.SEVERE, "Plugin has not been enabled!");
-			Bukkit.getLogger().log(Level.SEVERE, "CraftBukkit build " + cbBuild + " is too old for plugin '" + this.getName() + "' v" + this.getVersion());
-			Bukkit.getLogger().log(Level.SEVERE, "Update CraftBukkit to a newer build or look for an older version of " + this.getName());
+			Bukkit.getLogger().log(Level.WARNING, "CraftBukkit build " + cbBuild + " is too old for plugin '" + this.getName() + "' v" + this.getVersion());
+			Bukkit.getLogger().log(Level.WARNING, "Update CraftBukkit to a newer build or look for an older version of " + this.getName());
 			//cb is too old
-			return;
 		} else if (cbBuild > this.maxbuild) {
-			Bukkit.getLogger().log(Level.SEVERE, "Plugin has not been enabled!");
-			Bukkit.getLogger().log(Level.SEVERE, "Plugin '" + this.getName() + "' v" + this.getVersion() + " is too old to run on CraftBukkit build " + cbBuild);
-			Bukkit.getLogger().log(Level.SEVERE, "Update " + this.getName() + " to a newer version or look for an older build of CraftBukkit");
+			Bukkit.getLogger().log(Level.WARNING, "Plugin '" + this.getName() + "' v" + this.getVersion() + " is too old to run on CraftBukkit build " + cbBuild);
+			Bukkit.getLogger().log(Level.WARNING, "Update " + this.getName() + " to a newer version or look for an older build of CraftBukkit");
 			//this plugin is too old
-			return;
 		}
 		//update dependencies
 		Bukkit.getPluginManager().registerEvents(this, this);
@@ -201,10 +229,22 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 		this.enable();
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
 	}
+	
+	@SuppressWarnings("unchecked")
 	public final void onDisable() {
-		if (cbBuild == 0 || (this.minbuild >= cbBuild && this.maxbuild <= cbBuild)) {
-			this.disable();
-			Bukkit.getLogger().log(Level.INFO, this.getName() + " disabled!");
+		//are there any plugins that depend on me?
+		List<String> depend;
+		for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
+			if (!plugin.isEnabled()) continue;
+			depend = (List<String>) plugin.getDescription().getDepend();
+			if (depend != null && depend.contains(this.getName())) {
+				Bukkit.getServer().getPluginManager().disablePlugin(plugin);
+			}
+		}
+		
+		this.disable();
+		if (this.disableMessage != null) {
+			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
 	}
 	public final boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {

@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
 import org.bukkit.World.Environment;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.permissions.PermissionDefault;
 
 public class EnumUtil {
@@ -14,11 +15,11 @@ public class EnumUtil {
 	}
 	public static <E extends Enum<E>> E parse(E[] values, String name, E def) {
 		if (name == null) return def;
-		name = name.toUpperCase();
+		name = name.toUpperCase().replace("_", "").replace(" ", "");
 		String[] enumNames = new String[values.length];
 		int i;
 		for (i = 0; i < enumNames.length; i++) {
-			enumNames[i] = values[i].toString().toUpperCase();
+			enumNames[i] = values[i].toString().toUpperCase().replace("_", "");
 			if (enumNames[i].equals(name)) return values[i];
 		}
 		for (i = 0; i < enumNames.length; i++) {
@@ -28,6 +29,10 @@ public class EnumUtil {
 			if (name.contains(enumNames[i])) return values[i];
 		}
 		return def;
+	}
+	@SuppressWarnings("unchecked")
+	public static <E extends Enum<E>> E parse(String name, E def) {
+		return parse((Class<E>) def.getClass(), name, def);
 	}
 	
 	public static PermissionDefault parsePermissionDefault(String name, PermissionDefault def) {
@@ -47,6 +52,9 @@ public class EnumUtil {
 	}
 	public static DyeColor parseDyeColor(String name, DyeColor def) {
 		return parse(DyeColor.class, name, def);
+	}
+	public static CreatureType parseCreatureType(String name, CreatureType def) {
+		return parse(CreatureType.class, name, def);
 	}
 	public static Material parseMaterial(String name, Material def) {
     	name = name.trim().toUpperCase().replace(" ", "_").replace("SHOVEL", "SPADE").replace("SLAB", "STEP").replace("GOLDEN", "GOLD");       	

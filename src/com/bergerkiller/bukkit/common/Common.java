@@ -23,6 +23,8 @@ public class Common extends PluginBase {
 		super(1818, 3000);
 	}
 	
+	public void setDisableMessage(String message) {};
+	
 	public void disable() {}
 	public void enable() {
 		plugin = this;

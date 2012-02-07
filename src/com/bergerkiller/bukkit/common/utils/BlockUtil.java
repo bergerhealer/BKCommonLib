@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
-
 import net.minecraft.server.ChunkCoordinates;
 
 import org.bukkit.Location;
@@ -61,22 +59,6 @@ public class BlockUtil {
     	return world.getBlockAt(at.x, at.y, at.z);
     }
     
-    public static Block getRailsBlockFromSign(final Block signblock) {
-		//try to find out where the rails block is located
-		Block above = signblock.getRelative(0, 2, 0);
-		if (BlockUtil.isRails(above)) {
-			return above;
-		} else {
-			//rail located above the attached face?
-			BlockFace face = BlockUtil.getAttachedFace(signblock);
-			above = signblock.getRelative(face.getModX(), 1, face.getModZ());
-			if (BlockUtil.isRails(above)) {
-				return above;
-			} else {
-				return null;
-			}
-		}
-    }
     public static BlockFace getAttachedFace(Block attachable) {
     	MaterialData data = getData(attachable);
     	if (data != null && data instanceof Attachable) {
@@ -104,11 +86,18 @@ public class BlockUtil {
     }
     
     public static void setLeversAroundBlock(Block block, boolean down) {
+    	setLeversAroundBlock(block, down, true);
+    }
+    public static void setLeversAroundBlock(Block block, boolean down, boolean update) {
 		for (Block b : BlockUtil.getRelative(block, FaceUtil.attachedFaces)) {
-			BlockUtil.setLever(b, down);
+			BlockUtil.setLever(b, down, update);
 		}
     }
+    
     public static void setLever(Block lever, boolean down) {
+    	setLever(lever, down, true);
+    }
+    public static void setLever(Block lever, boolean down, boolean update) {
     	if (lever.getTypeId() == Material.LEVER.getId()) {
 			byte data = lever.getData();
 	        int newData;
@@ -119,6 +108,9 @@ public class BlockUtil {
 	        }
 	        if (newData != data) {
 	            lever.setData((byte) newData, true);
+	        }
+	        if (update) {
+	        	WorldUtil.getNative(lever.getWorld()).notify(lever.getX(), lever.getY(), lever.getZ());
 	        }
     	}
     }
@@ -193,34 +185,7 @@ public class BlockUtil {
 	public static Sign getSign(Block signblock) {
 		return getState(signblock, Sign.class);
 	}
-		
-	public static Block getRailsAttached(Block signblock) {
-		Material type = signblock.getType();
-		Block rail = null;
-		if (type == Material.WALL_SIGN) {
-			rail = getAttachedBlock(signblock).getRelative(BlockFace.UP);
-			if (isRails(rail)) return rail;
-		}
-		if (isSign(type)) {
-			rail = signblock.getRelative(0, 2, 0);
-			if (isRails(rail)) return rail;
-		}
-		return null;
-	}
-	public static Block[] getSignsAttached(Block rails) {
-		ArrayList<Block> rval = new ArrayList<Block>(3);
-		Block under = rails.getRelative(0, -2, 0);
-		if (BlockUtil.isSign(under)) rval.add(under);
-		for (BlockFace face : FaceUtil.axis) {
-			Block side = rails.getRelative(face.getModX(), -1, face.getModZ());
-			if (!BlockUtil.isSign(side)) continue;
-			if (BlockUtil.getAttachedFace(side) == face.getOppositeFace()) {
-				rval.add(side);
-			}
-		}
-		return rval.toArray(new Block[0]);
-	}
-		
+				
 	public static void breakBlock(Block block) {
 		int x = block.getX();
 		int y = block.getY();

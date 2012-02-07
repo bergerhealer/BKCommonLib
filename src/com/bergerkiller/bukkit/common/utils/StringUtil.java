@@ -52,10 +52,9 @@ public class StringUtil {
 		}
 	}
     
-	@SuppressWarnings("unchecked")
-	public static <T> T[] remove(T[] input, int index) {
+	public static String[] remove(String[] input, int index) {
 		if (index < 0 || index >= input.length) return input;
-		T[] rval = (T[]) new Object[input.length - 1];
+		String[] rval = new String[input.length - 1];
 		System.arraycopy(input, 0, rval, 0, index);
 		System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
 		return rval;
