@@ -233,7 +233,7 @@ public class ItemUtil {
 			return dat.getData();
 		}
 	}
-
+	
 	public static Inventory[] getChests(Block attached) {
 		ArrayList<Inventory> invs = new ArrayList<Inventory>();
 		Block c1, c2;

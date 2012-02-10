@@ -21,9 +21,17 @@ public class BlockUtil {
      * Prevents the need to read the lighting when using getState()
      * Can be a little bit faster :)
      */
-    public static MaterialData getData(Block b) {
-    	return b.getType().getNewData(b.getData());
+    public static MaterialData getData(Block block) {
+    	return block.getType().getNewData(block.getData());
     }
+    public static <T extends MaterialData> T getData(Block block, Class<T> type) {
+    	try {
+    		return type.cast(getData(block));
+    	} catch (Exception ex) {
+    		return null;
+    	}
+    }
+    
     public static int getBlockSteps(Location b1, Location b2, boolean checkY) {
     	int d = Math.abs(b1.getBlockX() - b2.getBlockX());
     	d += Math.abs(b1.getBlockZ() - b2.getBlockZ());
@@ -86,19 +94,22 @@ public class BlockUtil {
     }
     
     public static void setLeversAroundBlock(Block block, boolean down) {
-    	setLeversAroundBlock(block, down, true);
-    }
-    public static void setLeversAroundBlock(Block block, boolean down, boolean update) {
-		for (Block b : BlockUtil.getRelative(block, FaceUtil.attachedFaces)) {
-			BlockUtil.setLever(b, down, update);
+    	Block b;
+		for (BlockFace dir : FaceUtil.attachedFaces) {
+			if (isType(b = block.getRelative(dir), Material.LEVER)) {
+				//attached?
+				if (getAttachedFace(b) == dir.getOppositeFace()) {
+					setLever(b, down, false);
+				}
+			}
 		}
     }
     
     public static void setLever(Block lever, boolean down) {
     	setLever(lever, down, true);
     }
-    public static void setLever(Block lever, boolean down, boolean update) {
-    	if (lever.getTypeId() == Material.LEVER.getId()) {
+    public static void setLever(Block lever, boolean down, boolean checktype) {
+    	if (!checktype || lever.getTypeId() == Material.LEVER.getId()) {
 			byte data = lever.getData();
 	        int newData;
 	        if (down) {
@@ -108,11 +119,16 @@ public class BlockUtil {
 	        }
 	        if (newData != data) {
 	            lever.setData((byte) newData, true);
-	        }
-	        if (update) {
-	        	WorldUtil.getNative(lever.getWorld()).notify(lever.getX(), lever.getY(), lever.getZ());
+		        applyPhysics(getAttachedBlock(lever), Material.LEVER);
 	        }
     	}
+    }
+    
+    public static void applyPhysics(Block block, Material callertype) {
+    	applyPhysics(block, callertype.getId());
+    }
+    public static void applyPhysics(Block block, int callertypeid) {
+    	WorldUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
     }
     
     public static void setRails(Block rails, BlockFace from, BlockFace to) {
@@ -142,8 +158,13 @@ public class BlockUtil {
     public static boolean isType(Material material, Material... types) {
     	return CommonUtil.contains(material, types);
     }
+    public static boolean isType(int material, Material... types) {
+    	int[] inttypes = new int[types.length];
+    	for (int i = 0; i < types.length; i++) inttypes[i] = types[i].getId();
+    	return CommonUtil.contains(material, inttypes);
+    }
     public static boolean isType(Block block, Material... types) {
-    	return CommonUtil.contains(block.getType(), types);
+    	return isType(block.getTypeId(), types);
     }
     public static boolean isType(Block block, int... types) {
     	return CommonUtil.contains(block.getTypeId(), types);
@@ -165,13 +186,6 @@ public class BlockUtil {
     	return b == null ? false : isRails(b.getTypeId());
     }
     
-    public static <T extends MaterialData> T getData(Block block, Class<T> type) {
-    	try {
-    		return type.cast(getData(block));
-    	} catch (Exception ex) {
-    		return null;
-    	}
-    }
 	public static <T extends BlockState> T getState(Block block, Class<T> type) {
     	try {
     		return type.cast(block.getState());
