@@ -19,8 +19,8 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-@SuppressWarnings("unchecked")
-public abstract class Operation extends ParameterWrapper {
+@SuppressWarnings({"unchecked", "rawtypes"})
+public abstract class Operation extends Task {
 	
 	public Operation() {
 		this(true);
@@ -35,64 +35,93 @@ public abstract class Operation extends ParameterWrapper {
 	private void multiAccess(final String location) {
 		System.out.println("The " + location + " got accessed by more than one thread or got modified while operating on it!");
 	}
-	
-	public final void doPlayers() {
-		try {
-			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
-				handle(player);
-				if (player.netServerHandler == null) continue;
-				if (player.netServerHandler.player != player) continue;
-				handle(player.netServerHandler.getPlayer());
-			}
-		} catch (ConcurrentModificationException ex) {
-			multiAccess("server player list");
-		}
-	}
-	
+		
 	public final void doWorlds() {
 		try {
 			for (WorldServer world : WorldUtil.getWorlds()) {
-				handle(world);
-				handle(world.getWorld());
+				this.handle(world);
+				this.handle(world.getWorld());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("server world list");
 		}
 	}
 
+	public final void doPlayers() {
+		try {
+			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
+				this.handle(player);
+				if (player.netServerHandler == null) continue;
+				if (player.netServerHandler.player != player) continue;
+				this.handle(player.netServerHandler.getPlayer());
+			}
+		} catch (ConcurrentModificationException ex) {
+			multiAccess("server player list");
+		}
+	}
 	public final void doPlayers(World world) {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) world.players) {
-				handle(player);
+				this.handle(player);
 				if (player.netServerHandler == null) continue;
 				if (player.netServerHandler.player != player) continue;
-				handle(player.netServerHandler.getPlayer());
+				this.handle(player.netServerHandler.getPlayer());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world player list of world '" + world.getWorld().getName() + "'");
 		}
 	}
 
+	public final void doEntities() {
+		try {
+			for (WorldServer world : WorldUtil.getWorlds()) {
+				this.doEntities(world);
+			}
+		} catch (ConcurrentModificationException ex) {
+			multiAccess("server world list");
+		}
+	}
 	public final void doEntities(World world) {
 		try {
 			for (Entity e : (List<Entity>) world.entityList) {
-				handle(e);
-				handle((CraftEntity) e.getBukkitEntity());
+				this.handle(e);
+				this.handle((CraftEntity) e.getBukkitEntity());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world entity list of world '" + world.getWorld().getName() + "'");
 		}
 	}
+	public final void doEntities(Chunk chunk) {
+		try {
+			for (List list : chunk.entitySlices) {
+				for (Entity e : (List<Entity>) list) {
+					this.handle(e);
+					this.handle((CraftEntity) e.getBukkitEntity());
+				}
+			}
+		} catch (ConcurrentModificationException ex) {
+			multiAccess("chunk entity list of world '" + chunk.world.getWorld().getName() + "'");
+		}
+	}
 
+	public final void doChunks() {
+		try {
+			for (WorldServer world : WorldUtil.getWorlds()) {
+				this.doChunks(world);
+			}
+		} catch (ConcurrentModificationException ex) {
+			multiAccess("server world list");
+		}
+	}
 	public final void doChunks(World world) {
 		this.doChunks(((WorldServer) world).chunkProviderServer);
 	}
 	public final void doChunks(ChunkProviderServer chunkProvider) {
 		try {
 			for (Chunk chunk : (List<Chunk>) chunkProvider.chunkList) {
-				handle(chunk);
+				this.handle(chunk);
 				if (chunk.bukkitChunk == null) continue;
-				handle((CraftChunk) chunk.bukkitChunk);
+				this.handle((CraftChunk) chunk.bukkitChunk);
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world chunk list of world '" + chunkProvider.world.getWorld().getName() + "'");

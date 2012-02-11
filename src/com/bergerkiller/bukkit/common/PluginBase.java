@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.Permission;
@@ -26,7 +27,7 @@ import com.bergerkiller.bukkit.common.utils.EnumUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 @SuppressWarnings("unused")
-public abstract class PluginBase extends JavaPlugin implements Listener { 
+public abstract class PluginBase extends JavaPlugin { 
 	private final int minbuild;
 	private final int maxbuild;
 	private String disableMessage = null;
@@ -208,7 +209,8 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 			//this plugin is too old
 		}
 		//update dependencies
-		Bukkit.getPluginManager().registerEvents(this, this);
+		this.register(new PluginListener(this));
+		
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 			if (!plugin.isEnabled()) continue;
 			this.updateDependency(plugin, true);
@@ -266,14 +268,20 @@ public abstract class PluginBase extends JavaPlugin implements Listener {
 		this.updateDependency(plugin, plugin.getDescription().getName(), enabled);
 	}
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {};
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	private void onPluginEnable(final PluginEnableEvent event) {
-		this.updateDependency(event.getPlugin(), true);
+	
+	private class PluginListener implements Listener {
+		private final PluginBase plugin;
+		public PluginListener(final PluginBase plugin) {
+			this.plugin = plugin;
+		}
+		@EventHandler(priority = EventPriority.MONITOR)
+		private void onPluginEnable(final PluginEnableEvent event) {
+			this.plugin.updateDependency(event.getPlugin(), true);
+		}
+		@EventHandler(priority = EventPriority.MONITOR)
+		private void onPluginDisable(PluginDisableEvent event) {
+			this.plugin.updateDependency(event.getPlugin(), false);
+		}
 	}
-	@EventHandler(priority = EventPriority.MONITOR)
-	private void onPluginDisable(PluginDisableEvent event) {
-		this.updateDependency(event.getPlugin(), false);
-	}
-
+	
 }

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.LinkedHashSet;
+
 import net.minecraft.server.ChunkCoordinates;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.TileEntityChest;
@@ -221,9 +223,26 @@ public class BlockUtil {
 		return getTile(block, TileEntityChest.class);
 	}
 	
+	public static TileEntityChest[] getChestTiles(Block middle, final int radius) {
+		LinkedHashSet<TileEntityChest> rvalchests = new LinkedHashSet<TileEntityChest>();
+		TileEntityChest[] chests;
+		for (int dx = -radius; dx <= radius; dx++) {
+			for (int dy = -radius; dy <= radius; dy++) {
+				for (int dz = -radius; dz <= radius; dz++) {
+					chests = getChestTiles(middle.getRelative(dx, dy, dz));
+					if (chests != null) {
+						for (TileEntityChest tec : chests) {
+							rvalchests.add(tec);
+						}
+					}
+				}
+			}
+		}
+		return rvalchests.toArray(new TileEntityChest[0]);
+	}
 	public static TileEntityChest[] getChestTiles(Block chest) {
 		if (chest.getTypeId() == Material.CHEST.getId()) {
-			TileEntityChest main = BlockUtil.getTileChest(chest);
+			TileEntityChest main = getTileChest(chest);
 		    if (main != null) {
 				Block next;
 				for (BlockFace sface : FaceUtil.axis) {
@@ -232,7 +251,12 @@ public class BlockUtil {
 						//return a merged inventory if applicable
 						TileEntityChest part = BlockUtil.getTileChest(next);
 						if (part != null) {
-							return new TileEntityChest[] {main, part};
+							//which one is at index 0?
+							if (main.z > part.z || main.x > part.x) {
+								return new TileEntityChest[] {part, main};
+							} else {
+								return new TileEntityChest[] {main, part};
+							}
 						}
 					}
 				}
@@ -242,7 +266,6 @@ public class BlockUtil {
 		}
 		return null;
 	}
-	
 	
  	public static void breakBlock(Block block) {
 		int x = block.getX();

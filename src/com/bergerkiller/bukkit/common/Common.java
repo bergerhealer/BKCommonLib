@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class Common extends PluginBase {
+	
 	public static boolean isShowcaseEnabled = false;
 	public static boolean isSCSEnabled = false;
 	public static Plugin bleedingMobsInstance = null;
@@ -12,10 +15,13 @@ public class Common extends PluginBase {
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (pluginName.equals("Showcase")) {
 			isShowcaseEnabled = enabled;
+			log(Level.INFO, "Showcase detected: Showcased items will be ignored");
 		} else if (pluginName.equals("ShowCaseStandalone")) {
 			isSCSEnabled = enabled;
+			log(Level.INFO, "Showcase Standalone detected: Showcased items will be ignored");
 		} else if (pluginName.equals("BleedingMobs")) {
 			bleedingMobsInstance = enabled ? plugin : null;
+			log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
 		}
 	}
 	
