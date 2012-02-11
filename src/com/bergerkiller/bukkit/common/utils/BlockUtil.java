@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import net.minecraft.server.ChunkCoordinates;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.TileEntityChest;
+import net.minecraft.server.TileEntityDispenser;
+import net.minecraft.server.TileEntityFurnace;
 import net.minecraft.server.TileEntitySign;
 
 import org.bukkit.Location;
@@ -14,6 +16,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.material.Attachable;
@@ -216,11 +220,38 @@ public class BlockUtil {
 			return null;
 		}
 	}
+	public static <T extends TileEntity> T getTile(BlockState block, Class<T> type) {
+		try {
+			return type.cast(WorldUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	
+	public static TileEntitySign getTile(Sign sign) {
+		return getTile(sign, TileEntitySign.class);
+	}
+	public static TileEntityFurnace getTile(Furnace furnace) {
+		return getTile(furnace, TileEntityFurnace.class);
+	}
+	public static TileEntityChest getTile(Chest chest) {
+		return getTile(chest, TileEntityChest.class);
+	}
+	public static TileEntityDispenser getTile(Dispenser dispenser) {
+		return getTile(dispenser, TileEntityDispenser.class);
+	}
+	
 	public static TileEntitySign getTileSign(Block block) {
 		return getTile(block, TileEntitySign.class);
 	}
 	public static TileEntityChest getTileChest(Block block) {
 		return getTile(block, TileEntityChest.class);
+	}
+	public static TileEntityFurnace getTileFurnace(Block block) {
+		return getTile(block, TileEntityFurnace.class);
+	}
+	public static TileEntityDispenser getTileDispenser(Block block) {
+		return getTile(block, TileEntityDispenser.class);
 	}
 	
 	public static TileEntityChest[] getChestTiles(Block middle, final int radius) {

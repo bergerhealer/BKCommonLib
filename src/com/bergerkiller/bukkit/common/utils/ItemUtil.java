@@ -34,6 +34,18 @@ public class ItemUtil {
 		Item item = (Item) itementity;
 		if (Common.isShowcaseEnabled) {
 			try {
+				// Placeholder for a possible new function
+				// if (!Common.showCaseUseOldMode) {
+				// 	try {
+				// 		//TODO: USE NEWER VERSION
+				// 	} catch (Throwable t) {
+				// 		Common.showCaseUseOldMode = true;
+				// 	}
+				// }
+				if (Common.showCaseUseOldMode) { 
+					if (Showcase.instance.getItemByDrop(item) != null) return true;
+				}
+				
 				if (Showcase.instance.getItemByDrop(item) != null) return true;
 			} catch (Throwable t) {
 				Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
