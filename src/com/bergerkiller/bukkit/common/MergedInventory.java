@@ -64,6 +64,7 @@ public class MergedInventory implements IInventory {
 			for (IInventory inv : this.inv) {
 				for (ItemStack stack : inv.getContents()) {
 					rval[i] = stack;
+					i++;
 				}
 			}
 			return rval;
@@ -127,6 +128,21 @@ public class MergedInventory implements IInventory {
 			}
 		}
 		return null;
+	}
+	
+	public static Inventory convert(Inventory... inventories) {
+		if (inventories.length == 1) {
+			return inventories[0];
+		} else {
+			return new MergedInventory(inventories).getInventory();
+		}
+	}
+	public static Inventory convert(IInventory... inventories) {
+		if (inventories.length == 1) {
+			return new CraftInventory(inventories[0]);
+		} else {
+			return new MergedInventory(inventories).getInventory();
+		}
 	}
 
 }

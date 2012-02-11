@@ -185,7 +185,15 @@ public class MathUtil {
 		if (value > max) return max;
 		return value;
 	}
-	
+	public static int limit(int value, int limit) {
+		return limit(value, -limit, limit);
+	}
+	public static int limit(int value, int min, int max) {
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
+	}
+
 	public static void setVectorLength(Vector vector, double length) {
 		if (length >= 0) {
 			setVectorLengthSquared(vector, length * length);

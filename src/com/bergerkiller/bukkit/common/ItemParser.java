@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.EnumUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class ItemParser {
 	
@@ -16,12 +17,27 @@ public class ItemParser {
 	private int amount = 1;
 	private boolean hasdata, hasamount;
 	
+	/**
+	 * Supported formats:
+	 * typedata:
+	 *   [type]:[data]
+	 *   [typeid]:[data]
+	 *   [typeid]
+	 *   
+	 * Amount/name relationship:
+	 * [amount]x[typedata]
+	 * [amount]*[typedata]
+	 * [amount] [typedata]
+	 * [amount]@[typedata]
+	 * [typedata]
+	 */
 	public static ItemParser parse(String fullname) {
-		int index = fullname.lastIndexOf(' ');
+		fullname = fullname.trim();
+		int index = StringUtil.firstIndexOf(fullname, "x", "X", "*", " ", "@");
 		if (index == -1) {
 			return parse(fullname, null);
 		} else {
-			return parse(fullname.substring(0, index), fullname.substring(index + 1));
+			return parse(fullname.substring(index + 1), fullname.substring(0, index));
 		}
 	}
 	public static ItemParser parse(String name, String amount) {

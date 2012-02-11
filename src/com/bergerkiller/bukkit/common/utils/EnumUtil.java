@@ -14,7 +14,7 @@ public class EnumUtil {
 		return parse(enumeration.getEnumConstants(), name, def);
 	}
 	public static <E extends Enum<E>> E parse(E[] values, String name, E def) {
-		if (name == null) return def;
+		if (name == null || name.length() == 0) return def;
 		name = name.toUpperCase().replace("_", "").replace(" ", "");
 		String[] enumNames = new String[values.length];
 		int i;
@@ -57,6 +57,13 @@ public class EnumUtil {
 		return parse(CreatureType.class, name, def);
 	}
 	public static Material parseMaterial(String name, Material def) {
+		//from ID
+	    try {
+	    	Material m = Material.getMaterial(Integer.parseInt(name));
+	    	return m == null ? def : m;
+	    } catch (Exception ex) {}
+	    
+	    //from name
     	name = name.trim().toUpperCase().replace(" ", "_").replace("SHOVEL", "SPADE").replace("SLAB", "STEP").replace("GOLDEN", "GOLD");       	
     	Material m = parse(Material.class, name, null);
     	if (m != null) return m;
@@ -91,10 +98,7 @@ public class EnumUtil {
     	} else if (name.endsWith("S")) {  	
     		return parseMaterial(name.substring(0, name.length() - 1), def);
     	} else {
-    	    try {
-    	    	m = Material.getMaterial(Integer.parseInt(name));
-    	    } catch (Exception ex) {}
-    	    return m == null ? def : m;
+    		return def;
     	}
 	}
 }

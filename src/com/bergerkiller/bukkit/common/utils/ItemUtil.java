@@ -1,17 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.IInventory;
+import net.minecraft.server.TileEntityChest;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
@@ -23,6 +23,7 @@ import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.ItemParser;
+import com.bergerkiller.bukkit.common.MergedInventory;
 import com.miykeal.showCaseStandalone.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -76,22 +77,8 @@ public class ItemUtil {
 		}
 		for (int i = 0;i < items.length;i++) from.setItem(i, null);
 	}
-	
+		
 	public static int transfer(Inventory from, Inventory to, ItemParser parser, int limit) {
-		return transfer(from, new Inventory[] {to}, parser, limit);
-	}
-	public static int transfer(Inventory[] from, Inventory to, ItemParser parser, int limit) {
-		return transfer(from, new Inventory[] {to}, parser, limit);
-	}
-	public static int transfer(Inventory[] from, Inventory[] to, ItemParser parser, int limit) {
-		if (limit == 0) return 0;
-		int transferred = 0;
-		for (Inventory ifrom : from) {
-			transferred += transfer(ifrom, to, parser, limit - transferred);
-		}
-		return transferred;
-	}
-	public static int transfer(Inventory from, Inventory[] to, ItemParser parser, int limit) {
 		if (limit == 0) return 0;
 		ItemStack item;
 		int transferred = 0;
@@ -101,16 +88,6 @@ public class ItemUtil {
 			if (parser != null && !parser.match(item)) continue;
 			transferred += transfer(item, to, limit - transferred);
 			if (item.getAmount() == 0) from.setItem(i, null);
-		}
-		return transferred;
-	}
-	
-	public static int transfer(ItemStack item, Inventory[] inventories, int limit) {
-		if (limit == 0) return 0;
-		int transferred = 0;
-		for (Inventory inv : inventories) {
-			transferred += transfer(item, inv, limit - transferred);
-			if (item.getAmount() <= 0) break;
 		}
 		return transferred;
 	}
@@ -151,7 +128,7 @@ public class ItemUtil {
 	public static int transfer(ItemStack from, ItemStack to, int limit) {
 		if (limit == 0) return 0;
 		final int max = getMaxSize(from);
-		if (!canTransfer(from, to, max)) return 0;
+		if (!canTransfer(from, to)) return 0;
 		final int newamount, remainder, trans;
 		if (from.getAmount() <= limit) {
 			newamount = from.getAmount() + to.getAmount();
@@ -172,27 +149,24 @@ public class ItemUtil {
 		return trans;
 	}
 	
+	
 	public static int getMaxSize(ItemStack stack) {
 		if (stack == null) return 0;
 		int max = stack.getMaxStackSize();
-		if (max == -1) max = 64;
-		return max;
+		return max == -1 ? 64 : max;
 	}
 	
 	public static boolean canTransfer(ItemStack from, Inventory to) {
-		final int max = getMaxSize(from);
 		for (ItemStack item : to.getContents()) {
-			if (item == null) return true;
-			if (item.getTypeId() == 0) return true;
-			if (canTransfer(from, item, max)) return true;
+			if (item == null || item.getTypeId() == 0) return true;
+			if (canTransfer(from, item)) return true;
 		}
 		return false;
 	}
 	public static boolean canTransfer(ItemStack from, ItemStack to) {
-		return canTransfer(from, to, getMaxSize(from));
-	}
-	public static boolean canTransfer(ItemStack from, ItemStack to, final int maxstacksize) {
+		int maxstacksize = getMaxSize(from);
 		if (from == null || to == null) return false;
+		if (to.getTypeId() == 0) return true;
 		if (to.getTypeId() != from.getTypeId()) return false;
 		if (to.getDurability() != from.getDurability()) return false;
 		if (from.getAmount() <= 0) return false;
@@ -234,20 +208,39 @@ public class ItemUtil {
 		}
 	}
 	
-	public static Inventory[] getChests(Block attached) {
-		ArrayList<Inventory> invs = new ArrayList<Inventory>();
-		Block c1, c2;
-		for (BlockFace face : FaceUtil.axis) {
-			c1 = attached.getRelative(face);
-			if (c1.getType() != Material.CHEST) continue;
-			invs.add(((Chest) c1.getState()).getInventory());
-			for (BlockFace sface : FaceUtil.axis) { 
-				c2 = c1.getRelative(sface);
-				if (c2.getType() != Material.CHEST) continue;
-				invs.add(((Chest) c2.getState()).getInventory());
+	public static Inventory getChestInventory(Block middle, int radius) {
+		HashSet<IInventory> invs = new HashSet<IInventory>();
+		TileEntityChest[] chests;
+		for (int dx = -radius; dx <= radius; dx++) {
+			for (int dy = -radius; dy <= radius; dy++) {
+				for (int dz = -radius; dz <= radius; dz++) {
+					Block block = middle.getRelative(dx, dy, dz);
+					if (Math.abs(dx) == radius || Math.abs(dy) == radius || Math.abs(dz) == radius) {
+						//check for double chests
+						chests = BlockUtil.getChestTiles(block);
+						if (chests == null) continue;
+						for (TileEntityChest tec : chests) {
+							invs.add(tec);
+						}
+					} else {
+						//single chests only
+						TileEntityChest chest = BlockUtil.getTileChest(block);
+						if (chest != null) invs.add(chest);
+					}
+				}
 			}
-		}	
-		return invs.toArray(new Inventory[0]);
+		}
+		return new MergedInventory(invs.toArray(new IInventory[0])).getInventory();
+	}
+	
+	public static Inventory getChestInventory(Block chest) {
+		TileEntityChest[] source = BlockUtil.getChestTiles(chest);
+		if (source == null || source.length == 0) return null;
+		if (source.length == 1) {
+			return new CraftInventory(source[0]);
+		} else {
+			return new MergedInventory(source).getInventory();
+		}
 	}
 
 }

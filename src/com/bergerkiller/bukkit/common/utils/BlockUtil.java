@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import net.minecraft.server.ChunkCoordinates;
+import net.minecraft.server.TileEntity;
+import net.minecraft.server.TileEntityChest;
+import net.minecraft.server.TileEntitySign;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.material.Attachable;
@@ -199,8 +203,48 @@ public class BlockUtil {
 	public static Sign getSign(Block signblock) {
 		return getState(signblock, Sign.class);
 	}
-				
-	public static void breakBlock(Block block) {
+	public static Chest getChest(Block chestblock) {
+		return getState(chestblock, Chest.class);
+	}
+			
+	public static <T extends TileEntity> T getTile(Block block, Class<T> type) {
+		try {
+			return type.cast(WorldUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+	public static TileEntitySign getTileSign(Block block) {
+		return getTile(block, TileEntitySign.class);
+	}
+	public static TileEntityChest getTileChest(Block block) {
+		return getTile(block, TileEntityChest.class);
+	}
+	
+	public static TileEntityChest[] getChestTiles(Block chest) {
+		if (chest.getTypeId() == Material.CHEST.getId()) {
+			TileEntityChest main = BlockUtil.getTileChest(chest);
+		    if (main != null) {
+				Block next;
+				for (BlockFace sface : FaceUtil.axis) {
+					next = chest.getRelative(sface);
+					if (next.getTypeId() == Material.CHEST.getId()) {
+						//return a merged inventory if applicable
+						TileEntityChest part = BlockUtil.getTileChest(next);
+						if (part != null) {
+							return new TileEntityChest[] {main, part};
+						}
+					}
+				}
+				//return a single inventory
+				return new TileEntityChest[] {main};
+		    }
+		}
+		return null;
+	}
+	
+	
+ 	public static void breakBlock(Block block) {
 		int x = block.getX();
 		int y = block.getY();
 		int z = block.getZ();

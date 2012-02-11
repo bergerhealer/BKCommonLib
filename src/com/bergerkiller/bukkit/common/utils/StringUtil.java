@@ -51,7 +51,22 @@ public class StringUtil {
 			return null;
 		}
 	}
-    
+	
+	public static int firstIndexOf(String text, String... values) {
+		return firstIndexOf(text, 0, values);
+	}
+	public static int firstIndexOf(String text, int startindex, String... values) {
+		int i = -1;
+		int index;
+		for (String value : values) {
+			if ((index = text.indexOf(value, startindex)) == -1) continue;
+			if (i == -1 || index < i) {
+				i = index;
+			}
+		}
+		return i;
+	}
+	
 	public static String[] remove(String[] input, int index) {
 		if (index < 0 || index >= input.length) return input;
 		String[] rval = new String[input.length - 1];
