@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.minecraft.server.ChunkCoordinates;
 import net.minecraft.server.TileEntity;
@@ -254,50 +256,68 @@ public class BlockUtil {
 		return getTile(block, TileEntityDispenser.class);
 	}
 	
-	public static TileEntityChest[] getChestTiles(Block middle, final int radius) {
-		LinkedHashSet<TileEntityChest> rvalchests = new LinkedHashSet<TileEntityChest>();
-		TileEntityChest[] chests;
-		for (int dx = -radius; dx <= radius; dx++) {
-			for (int dy = -radius; dy <= radius; dy++) {
-				for (int dz = -radius; dz <= radius; dz++) {
-					chests = getChestTiles(middle.getRelative(dx, dy, dz));
-					if (chests != null) {
-						for (TileEntityChest tec : chests) {
-							rvalchests.add(tec);
+	public static Set<TileEntity> getTileEntities(Block middle) {
+		return getTileEntities(middle, 0, 0, 0);
+	}
+	public static Set<TileEntity> getTileEntities(Block middle, int radius) {
+		return getTileEntities(middle, radius, radius, radius);
+	}
+	public static Set<TileEntity> getTileEntities(Block middle, int radiusX, int radiusY, int radiusZ) {
+		return getTileEntities(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
+	}
+	public static Set<TileEntity> getTileEntities(World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
+		return getTileEntities(WorldUtil.getNative(world), x, y, z, radiusX, radiusY, radiusZ);
+	}
+	
+	private static LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
+	@SuppressWarnings("unchecked")
+	public static Set<TileEntity> getTileEntities(net.minecraft.server.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
+		tilebuff.clear();
+		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
+			//simplified coding instead
+			TileEntity tile = world.getTileEntity(x, y, z);
+			if (tile != null) offerTile(tile);
+		} else {
+			//loop through tile entity list
+			x -= radiusX;
+			y -= radiusY;
+			z -= radiusZ;
+			radiusX = x + radiusX * 2;
+			radiusY = y + radiusY * 2;
+			radiusZ = z + radiusZ * 2;
+			for (TileEntity tile : (List<TileEntity>) world.tileEntityList) {
+				if (tile.x < x || tile.y < y || tile.z < z) continue;
+				if (tile.x > radiusX || tile.y > radiusY || tile.z > radiusZ) continue;
+				offerTile(tile);
+			}
+		}
+		return tilebuff;
+	}
+	private static void offerTile(TileEntity tile) {
+		if (tile instanceof TileEntityChest) {
+			//find a possible double chest as well
+			int tmpx, tmpz;
+			for (BlockFace sface : FaceUtil.axis) {
+				tmpx = tile.x + sface.getModX();
+				tmpz = tile.z + sface.getModZ();
+				if (tile.world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {
+					TileEntity next = tile.world.getTileEntity(tmpx, tile.y, tmpz);
+					if (next != null && next instanceof TileEntityChest) {
+						if (sface == BlockFace.NORTH || sface == BlockFace.EAST) {
+							tilebuff.add(next);
+							tilebuff.add(tile);
+						} else {
+							tilebuff.add(tile);
+							tilebuff.add(next);
 						}
+						return;
 					}
 				}
 			}
 		}
-		return rvalchests.toArray(new TileEntityChest[0]);
+		tilebuff.add(tile);
 	}
-	public static TileEntityChest[] getChestTiles(Block chest) {
-		if (chest.getTypeId() == Material.CHEST.getId()) {
-			TileEntityChest main = getTileChest(chest);
-		    if (main != null) {
-				Block next;
-				for (BlockFace sface : FaceUtil.axis) {
-					next = chest.getRelative(sface);
-					if (next.getTypeId() == Material.CHEST.getId()) {
-						//return a merged inventory if applicable
-						TileEntityChest part = BlockUtil.getTileChest(next);
-						if (part != null) {
-							//which one is at index 0?
-							if (main.z > part.z || main.x > part.x) {
-								return new TileEntityChest[] {part, main};
-							} else {
-								return new TileEntityChest[] {main, part};
-							}
-						}
-					}
-				}
-				//return a single inventory
-				return new TileEntityChest[] {main};
-		    }
-		}
-		return null;
-	}
-	
+			
  	public static void breakBlock(Block block) {
 		int x = block.getX();
 		int y = block.getY();

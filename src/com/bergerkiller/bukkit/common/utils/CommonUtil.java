@@ -27,7 +27,7 @@ public class CommonUtil {
 					if (!(sender instanceof Player)) {
 						message = ChatColor.stripColor(msg);
 					}
-					for (String line : msg.split("\n")) {
+					for (String line : msg.split("\n", -1)) {
 						((CommandSender) sender).sendMessage(line);
 					}
 				}

@@ -9,6 +9,17 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class ItemParser {
 	
+	public ItemParser(Material type) {
+		this(null, type);
+	}
+	public ItemParser(Integer amount, Material type) {
+		this(amount, type, null);
+	}
+	public ItemParser(Integer amount, Material type, Byte data) {
+		this.amount = (this.hasamount = amount != null) ? amount : 0;
+		this.data = (this.hasdata = data != null) ? data : 0;
+		this.type = type;
+	}
 	private ItemParser(boolean hasdata) {
 		this.hasdata = hasdata;
 	}
@@ -124,4 +135,19 @@ public class ItemParser {
 		}
 	}
 
+	public String toString() {
+		StringBuilder rval = new StringBuilder();
+		if (this.hasamount) {
+			rval.append(this.amount).append(" of ");
+		}
+		if (this.type == null) {
+			rval.append("any type");
+		} else {
+			rval.append(this.type.toString().toLowerCase());
+			if (this.hasdata) {
+				rval.append(':').append(this.data);
+			}
+		}
+		return rval.toString();
+	}
 }

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.Collection;
+
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.inventory.Inventory;
 
@@ -130,6 +132,9 @@ public class MergedInventory implements IInventory {
 		return null;
 	}
 	
+	public static Inventory convert(Collection<IInventory> inventories) {
+		return convert(inventories.toArray(new IInventory[0]));
+	}
 	public static Inventory convert(Inventory... inventories) {
 		if (inventories.length == 1) {
 			return inventories[0];

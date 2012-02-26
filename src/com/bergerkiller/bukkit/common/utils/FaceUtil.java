@@ -77,7 +77,33 @@ public class FaceUtil {
 		}
 	}
 	public static BlockFace rotate(BlockFace from, int notchCount) {
-		return yawToFace(faceToYaw(from) + notchCount * 45);
+		while (notchCount > 0) {
+			switch (from) {
+			case NORTH : from = BlockFace.NORTH_EAST; break;
+			case NORTH_EAST : from = BlockFace.EAST; break;
+			case EAST : from = BlockFace.SOUTH_EAST; break;
+			case SOUTH_EAST : from = BlockFace.SOUTH; break;
+			case SOUTH : from = BlockFace.SOUTH_WEST; break;
+			case SOUTH_WEST : from = BlockFace.WEST; break;
+			case WEST : from = BlockFace.NORTH_WEST; break;
+			case NORTH_WEST : from = BlockFace.NORTH; break;
+			default : return from;
+			}
+		}
+		while (notchCount < 0) {
+			switch (from) {
+			case NORTH : from = BlockFace.NORTH_WEST; break;
+			case NORTH_WEST : from = BlockFace.WEST; break;
+			case WEST : from = BlockFace.SOUTH_WEST; break;
+			case SOUTH_WEST : from = BlockFace.SOUTH; break;
+			case SOUTH : from = BlockFace.SOUTH_EAST; break;
+			case SOUTH_EAST : from = BlockFace.EAST; break;
+			case EAST : from = BlockFace.NORTH_EAST; break;
+			case NORTH_EAST : from = BlockFace.NORTH; break;
+			default : return from;
+			}
+		}
+		return from;
 	}
 	
 	public static BlockFace getRailsCartDirection(final BlockFace raildirection) {
@@ -90,19 +116,14 @@ public class FaceUtil {
 		}
 	}
 	
-//	public static float getRailsYaw(final BlockFace direction) {
-//		switch (direction) {
-//		case NORTH : return 0;
-//		case EAST : return 90;
-//		case WEST : return -90;
-//		case SOUTH : return 180;
-//		case SOUTH_WEST : return 135;
-//		case NORTH_WEST : return 45;
-//		case NORTH_EAST : return 135;
-//		case SOUTH_EAST : return 45;
-//		default : return 0;
-//		}
-//	}
+	public static BlockFace toRailsDirection(BlockFace direction) {
+		switch (direction) {
+		case NORTH : return BlockFace.SOUTH;
+		case EAST : return BlockFace.WEST;
+		default : return direction;
+		}
+	}
+	
 	public static boolean isSubCardinal(final BlockFace face) {
 		switch (face) {
 		case NORTH_EAST : return true;

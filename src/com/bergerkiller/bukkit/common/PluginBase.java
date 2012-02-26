@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -200,12 +201,14 @@ public abstract class PluginBase extends JavaPlugin {
 		if (cbBuild == 0) {
 			//unknown
 		} else if (cbBuild < this.minbuild) {
-			Bukkit.getLogger().log(Level.WARNING, "CraftBukkit build " + cbBuild + " is too old for plugin '" + this.getName() + "' v" + this.getVersion());
-			Bukkit.getLogger().log(Level.WARNING, "Update CraftBukkit to a newer build or look for an older version of " + this.getName());
+			Bukkit.getLogger().log(Level.INFO, "CraftBukkit build " + cbBuild + " is too old for plugin '" + this.getName() + "' v" + this.getVersion());
+			Bukkit.getLogger().log(Level.INFO, "Update CraftBukkit to a newer build or look for an older version of " + this.getName());
+			Bukkit.getLogger().log(Level.INFO, "The plugin will still function, but may be instable.");
 			//cb is too old
 		} else if (cbBuild > this.maxbuild) {
-			Bukkit.getLogger().log(Level.WARNING, "Plugin '" + this.getName() + "' v" + this.getVersion() + " is too old to run on CraftBukkit build " + cbBuild);
-			Bukkit.getLogger().log(Level.WARNING, "Update " + this.getName() + " to a newer version or look for an older build of CraftBukkit");
+			Bukkit.getLogger().log(Level.INFO, "Plugin '" + this.getName() + "' v" + this.getVersion() + " is too old to run on CraftBukkit build " + cbBuild);
+			Bukkit.getLogger().log(Level.INFO, "Update " + this.getName() + " to a newer version or look for an older build of CraftBukkit");
+			Bukkit.getLogger().log(Level.INFO, "The plugin will still function, but may be instable.");
 			//this plugin is too old
 		}
 		//update dependencies
@@ -250,7 +253,16 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 	public final boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
-		return command(sender, command, StringUtil.convertArgs(args));
+		try {
+			return command(sender, command, StringUtil.convertArgs(args));
+		} catch (Throwable t) {
+			StringBuilder msg = new StringBuilder("Unhandled exception executing command '");
+			msg.append(command).append("' in plugin ").append(this.getName()).append(" v").append(this.getVersion());
+			Bukkit.getLogger().log(Level.SEVERE, msg.toString());
+			t.printStackTrace();
+			sender.sendMessage(ChatColor.RED + "An internal error occured while executing this command");
+			return true;
+		}
 	}
 
 	public abstract void enable();

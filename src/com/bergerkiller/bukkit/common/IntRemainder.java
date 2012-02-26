@@ -7,13 +7,14 @@ import net.minecraft.server.MathHelper;
 public class IntRemainder {
 	
 	private double contained = 0;
-	private int counter = 0;
+	private final CircularInteger counter;
 	private final int[] values;
 	public IntRemainder(double initialvalue, int decimals) {
 		if (decimals < 1) {
 			throw new IllegalArgumentException("Decimal count needs to be higher than 0");
 		}
 		this.values = new int[10 * decimals];
+		this.counter = new CircularInteger(this.values.length);
 		this.set(initialvalue);
 	}
 	
@@ -30,11 +31,7 @@ public class IntRemainder {
 	}
 	
 	public int next() {
-		counter++;
-		if (counter > this.values.length - 1) {
-			counter = 0;
-		}
-		return this.values[counter];
+		return this.values[this.counter.next()];
 	}
 	
 	public double get() {

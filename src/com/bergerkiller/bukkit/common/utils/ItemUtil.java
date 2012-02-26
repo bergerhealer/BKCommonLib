@@ -4,11 +4,11 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.IInventory;
-import net.minecraft.server.TileEntityChest;
+import net.minecraft.server.NBTTagCompound;
+import net.minecraft.server.NBTTagList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -23,7 +23,6 @@ import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.ItemParser;
-import com.bergerkiller.bukkit.common.MergedInventory;
 import com.miykeal.showCaseStandalone.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -93,6 +92,9 @@ public class ItemUtil {
 		}
 		return rval;
 	}
+	public static IInventory getNative(Inventory inv) {
+		return ((CraftInventory) inv).getInventory();
+	}
 
 	public static void transfer(IInventory from, IInventory to) {
 		net.minecraft.server.ItemStack[] items = from.getContents();
@@ -109,6 +111,56 @@ public class ItemUtil {
 			item = null;
 		}
 		inv.setItem(index, item);
+	}
+	
+	public static ItemStack findItem(Inventory inventory, int typeid, Integer data) {
+		 net.minecraft.server.ItemStack item = findItem(getNative(inventory), typeid, data);
+		 return item == null ? null : new CraftItemStack(item);
+	}
+	public static net.minecraft.server.ItemStack findItem(IInventory inventory, int typeid, Integer data) {
+		net.minecraft.server.ItemStack rval = null;
+		for (net.minecraft.server.ItemStack item : inventory.getContents()) {
+			if (item == null || item.id != typeid) continue;
+			if (data == null) {
+				data = item.getData();
+			} else if (data != item.getData()) {
+				continue;
+			}
+			//addition
+			if (rval == null) {
+				rval = item.cloneItemStack();
+			} else {
+				rval.count += item.count;
+			}
+		}
+		return rval;
+	}
+	
+	public static void removeItem(Inventory inventory, ItemStack item) {
+		removeItem(inventory, item.getTypeId(), (int) item.getDurability(), item.getAmount());
+	}
+	public static void removeItem(Inventory inventory, int itemid, Integer data, int count) {
+		removeItem(getNative(inventory), itemid, data, count);
+	}
+	public static void removeItem(IInventory inventory, net.minecraft.server.ItemStack item) {
+		removeItem(inventory, item.id, item.getData() == -1 ? null : item.getData(), item.count);
+	}
+	public static void removeItem(IInventory inventory, int itemid, Integer data, int count) {
+		for (int i = 0; i < inventory.getSize(); i++) {
+			net.minecraft.server.ItemStack item = inventory.getItem(i);
+			if (item == null) continue;
+			if (item.id != itemid) continue;
+			if (data != null && item.getData() != data) continue;
+			if (item.count < count) {
+				count -= item.count;
+				inventory.setItem(i, null);
+			} else {
+				item.count -= count;
+				count = 0;
+				inventory.setItem(i, item.count == 0 ? null : item);
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -262,11 +314,18 @@ public class ItemUtil {
 		if (maxCount == 0) {
 			//nothing to stack
 			return 0;
-		} else if (to.id== 0 || to.count == 0) {
+		} else if (to.id == 0 || to.count == 0) {
 			//fully copy data over
 			to.id = from.id;
 			to.setData(from.getData());
 			final int transferred = Math.min(maxCount, from.count);
+			//enchantments
+			if (from.hasEnchantments()) {
+				if (to.tag == null) {
+					to.tag = new NBTTagCompound();
+				}
+				to.tag.set("ench", from.getEnchantments().clone());
+			}
 			to.count = transferred;
 			from.count -= transferred;
 			return transferred;
@@ -277,12 +336,52 @@ public class ItemUtil {
 			//different items - can't stack
 			return 0;
 		} else {
+			//can we stack (enchantments)
+			NBTTagList efrom = from.getEnchantments();
+			NBTTagList eto = to.getEnchantments();
+			if (efrom != null && eto != null && efrom.size() == eto.size()) {
+				//same enchantments?
+				if (!hasEnchantments(efrom, eto) || !hasEnchantments(eto, efrom)) {
+					return 0;
+				}
+			} else if (efrom != null || eto != null) {
+				return 0;
+			}
+			
 			//stack the items
 			final int transferred = Math.min(maxCount - to.count, from.count);
 			to.count += transferred;
 			from.count -= transferred;
 			return transferred;
 		}
+	}
+	
+	public static boolean hasEnchantments(NBTTagList enchantments, NBTTagList enchantmentsToCheck) {
+		try {
+			for (int i = 0; i < enchantmentsToCheck.size(); i++) {
+				if (!hasEnchantment(enchantments, (NBTTagCompound) enchantmentsToCheck.get(i))) {
+					return false;
+				}
+			}
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	public static boolean hasEnchantment(NBTTagList enchantments, NBTTagCompound enchantment) {
+		return hasEnchantment(enchantments, enchantment.getShort("id"), enchantment.getShort("lvl"));
+	}
+	public static boolean hasEnchantment(NBTTagList enchantments, short id, short level) {
+		NBTTagCompound comp;
+		for (int i = 0; i < enchantments.size(); i++) {
+			try {
+				comp = (NBTTagCompound) enchantments.get(i);
+				if (comp.getShort("id") == id && comp.getShort("lvl") == level) {
+					return true;
+				}
+			} catch (Exception ex) {}
+		}
+		return false;
 	}
 
 	/**
@@ -313,6 +412,7 @@ public class ItemUtil {
 					to.setTypeId(item.getTypeId());
 					to.setDurability(item.getDurability());
 				}
+				getNative(to).count = 0;
 				all = true;
 			}
 			if (item.getTypeId() == to.getTypeId()) {
@@ -323,11 +423,9 @@ public class ItemUtil {
 				if (item.getDurability() == to.getDurability()) {
 					if (all) {
 						//we need to fake zero count
-						net.minecraft.server.ItemStack nmsTo = getNative(to);
-						nmsTo.count = 0;
-						trans += transfer(getNative(item), nmsTo, maxAmount - trans);
-						setItem(from, i, item);
-						if (nmsTo.count > 0) {
+						trans += transfer(item, to, maxAmount - trans);
+						if (to.getAmount() > 0) {
+							setItem(from, i, item);
 							all = false;
 						}
 					} else {
@@ -340,7 +438,7 @@ public class ItemUtil {
 		}
 		return trans;
 	}
-
+	
 	public static net.minecraft.server.ItemStack transferItem(IInventory inventory, ItemParser parser, int limit) {
 		net.minecraft.server.ItemStack rval = null;
 		for (int i = 0; i < inventory.getSize(); i++) {
@@ -385,18 +483,6 @@ public class ItemUtil {
 			}
 			return dat.getData();
 		}
-	}
-
-	public static Inventory getChestInventory(TileEntityChest[] chests) {
-		if (chests == null || chests.length == 0) return null;
-		return MergedInventory.convert(chests);
-	}
-
-	public static Inventory getChestInventory(Block middle, int radius) {
-		return getChestInventory(BlockUtil.getChestTiles(middle, radius));
-	}
-	public static Inventory getChestInventory(Block chest) {
-		return getChestInventory(BlockUtil.getChestTiles(chest));
 	}
 
 }
