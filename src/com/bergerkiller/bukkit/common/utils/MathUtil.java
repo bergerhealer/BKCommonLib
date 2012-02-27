@@ -88,28 +88,46 @@ public class MathUtil {
 	public static float atan(double value) {
 		return RADTODEG * (float) Math.atan(value);
 	}
+	
 	public static Location move(Location loc, Vector offset) {
 		return move(loc, offset.getX(), offset.getY(), offset.getZ());
 	}
 	public static Location move(Location loc, double dx, double dy, double dz) {
-        // Convert rotation to radians
-        float ryaw = -loc.getYaw() * DEGTORAD;
-        float rpitch = loc.getPitch() * DEGTORAD;
-
-        //Conversions found by (a lot of) testing
-        double x = loc.getX();
-        double y = loc.getY();
-        double z = loc.getZ();
-        z -= dx * Math.sin(ryaw);
-        z += dy * Math.cos(ryaw) * Math.sin(rpitch);
-        z += dz * Math.cos(ryaw) * Math.cos(rpitch);
-        x += dx * Math.cos(ryaw);
-        x += dy * Math.sin(rpitch) * Math.sin(ryaw);
-        x += dz * Math.sin(ryaw) * Math.cos(rpitch);
-        y += dy * Math.cos(rpitch);
-        y -= dz * Math.sin(rpitch);
+		Vector off = rotate(loc.getYaw(), loc.getPitch(), dx, dy, dz);
+        double x = loc.getX() + off.getX();
+        double y = loc.getY() + off.getY();
+        double z = loc.getZ() + off.getZ();
         return new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
-    }
+    }	
+	public static Vector rotate(float yaw, float pitch, Vector value) {
+		return rotate(yaw, pitch, value.getX(), value.getY(), value.getZ());
+	}
+	public static Vector rotate(float yaw, float pitch, double x, double y, double z) {
+        //Conversions found by (a lot of) testing
+		float angle;
+        angle = yaw * DEGTORAD;
+		double sinyaw = Math.sin(angle);
+		double cosyaw = Math.cos(angle);
+		
+		angle = pitch * DEGTORAD;
+		double sinpitch = Math.sin(angle);
+		double cospitch = Math.cos(angle);
+		
+        double newx = 0.0;
+        double newy = 0.0;
+        double newz = 0.0;
+        newz -= x * cosyaw;
+        newz -= y * sinyaw * sinpitch;
+        newz -= z * sinyaw * cospitch;
+        newx += x * sinyaw;
+        newx -= y * cosyaw * sinpitch;
+        newx -= z * cosyaw * cospitch;
+        newy += y * cospitch;
+        newy -= z * sinpitch;
+        
+        return new Vector(newx, newy, newz);
+	}
+	
     public static double round(double Rval, int Rpl) {
   	  double p = Math.pow(10, Rpl);
   	  return Math.round(Rval * p) / p;
@@ -127,7 +145,7 @@ public class MathUtil {
     public static long toLong(int msw, int lsw) {
         return ((long) msw << 32) + lsw - Integer.MIN_VALUE;
     }
-    
+       
 	public static double useOld(double oldvalue, double newvalue) {
 		return useOld(oldvalue, newvalue, 0.2);
 	}
@@ -226,6 +244,4 @@ public class MathUtil {
 		return dbefore > velocity.subtract(offset).lengthSquared();
 	}
 	
-	
-
 }

@@ -89,6 +89,7 @@ public class FaceUtil {
 			case NORTH_WEST : from = BlockFace.NORTH; break;
 			default : return from;
 			}
+			if (notchCount-- == 0) return from;
 		}
 		while (notchCount < 0) {
 			switch (from) {
@@ -102,6 +103,7 @@ public class FaceUtil {
 			case NORTH_EAST : from = BlockFace.NORTH; break;
 			default : return from;
 			}
+			if (notchCount++ == 0) return from;
 		}
 		return from;
 	}

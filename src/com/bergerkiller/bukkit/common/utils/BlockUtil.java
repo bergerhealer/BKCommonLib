@@ -288,7 +288,10 @@ public class BlockUtil {
 			for (TileEntity tile : (List<TileEntity>) world.tileEntityList) {
 				if (tile.x < x || tile.y < y || tile.z < z) continue;
 				if (tile.x > radiusX || tile.y > radiusY || tile.z > radiusZ) continue;
-				offerTile(tile);
+				tile = world.getTileEntity(tile.x, tile.y, tile.z);
+				if (tile != null) {
+					offerTile(tile);
+				}
 			}
 		}
 		return tilebuff;
