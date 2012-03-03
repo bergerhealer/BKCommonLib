@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,6 +63,9 @@ public abstract class PluginBase extends JavaPlugin {
 		return cbBuild;
 	}
 
+	public PluginBase() {
+		this(Integer.MIN_VALUE, Integer.MAX_VALUE);
+	}
 	public PluginBase(final int minbuild, final int maxbuild) {
 		super();
 		this.minbuild = minbuild;
@@ -75,15 +79,13 @@ public abstract class PluginBase extends JavaPlugin {
 	public final String getVersion() {
 		return this.getDescription().getVersion();
 	}
-	public final String getName() {
-		return this.getDescription().getName();
-	}
 	public final void register(String... commands) {
 		this.register(this, commands);
 	}
 	public final void register(CommandExecutor executor, String... commands) {
 		for (String command : commands) {
-			this.getCommand(command).setExecutor(executor);
+			PluginCommand cmd = this.getCommand(command);
+			if (cmd != null) cmd.setExecutor(executor);
 		}
 	}
 	public final void register(Listener listener) {
@@ -235,7 +237,6 @@ public abstract class PluginBase extends JavaPlugin {
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
 	}
 	
-	@SuppressWarnings("unchecked")
 	public final void onDisable() {
 		//are there any plugins that depend on me?
 		List<String> depend;

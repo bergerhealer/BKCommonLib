@@ -10,23 +10,26 @@ import net.minecraft.server.ShapelessRecipes;
 
 public class CraftRecipe {
 	
-	private static SafeField<ItemStack[]> sf1 = new SafeField<ItemStack[]>(ShapedRecipes.class, "d");
-	private static SafeField<List<ItemStack>> sf2 = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "b");
+	private static SafeField<ItemStack[]> sf1 = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
+	private static SafeField<List<ItemStack>> sf2 = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "ingredients");
 	
 	private CraftRecipe(ItemStack[] input, ItemStack output) {
 		List<ItemStack> newinput = new ArrayList<ItemStack>(input.length);
 		boolean create;
 		for (ItemStack item : input) {
+			if (item == null) continue;
 			create = true;
 			for (ItemStack newitem : newinput) {
 				if (newitem.id == item.id && newitem.getData() == item.getData()) {
-					newitem.count += item.count;
+					newitem.count++;
 					create = false;
 					break;
 				}
 			}
 			if (create) {
-				newinput.add(item.cloneItemStack());
+				item = item.cloneItemStack();
+				item.count = 1;
+				newinput.add(item);
 			}
 		}
 		this.input = newinput.toArray(new ItemStack[0]);

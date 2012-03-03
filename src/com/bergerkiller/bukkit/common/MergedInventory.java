@@ -1,9 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.IInventory;
@@ -148,6 +152,28 @@ public class MergedInventory implements IInventory {
 		} else {
 			return new MergedInventory(inventories).getInventory();
 		}
+	}
+	@Override
+	public InventoryHolder getOwner() {
+		return this.inv[0].getOwner();
+	}
+	
+	@Override
+	public List<HumanEntity> getViewers() {
+		return this.inv[0].getViewers();
+	}
+	@Override
+	public void onClose(CraftHumanEntity arg0) {
+		this.inv[0].onClose(arg0);
+	}
+	@Override
+	public void onOpen(CraftHumanEntity arg0) {
+		this.inv[0].onOpen(arg0);
+	}
+	
+	@Override
+	public ItemStack splitWithoutUpdate(int arg0) {
+		return this.inv[0].splitWithoutUpdate(arg0);
 	}
 
 }

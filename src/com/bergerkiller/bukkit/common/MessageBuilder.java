@@ -137,10 +137,6 @@ public class MessageBuilder {
 		}
 		return this.append(color, newtext);
 	}	
-	public MessageBuilder append(Object object) {
-		if (object == null) return this;
-		return this.append(object.toString());
-	}
 
 	public MessageBuilder append(Object... text) {
 		String[] newtext = new String[text.length];

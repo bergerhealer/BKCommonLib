@@ -62,11 +62,11 @@ public class RecipeUtil {
 		return getFurnaceResult(cooked.id);
 	}
 	public static ItemStack getFurnaceResult(int itemid) {
-		return FurnaceRecipes.getInstance().a(itemid);
+		return FurnaceRecipes.getInstance().getResult(itemid);
 	}
 	@SuppressWarnings("unchecked")
 	public static Map<Integer, ItemStack> getFurnaceResults() {
-		return (Map<Integer, ItemStack>) FurnaceRecipes.getInstance().b();
+		return (Map<Integer, ItemStack>) FurnaceRecipes.getInstance().getRecipies();
 	}
 	public static Set<Integer> getHeatableItems() {
 		return getFurnaceResults().keySet();
@@ -146,6 +146,6 @@ public class RecipeUtil {
 		
 	@SuppressWarnings("unchecked")
 	public static List<CraftingRecipe> getCraftRecipes() {
-		return (List<CraftingRecipe>) CraftingManager.getInstance().b();
+		return (List<CraftingRecipe>) CraftingManager.getInstance().getRecipies();
 	}
 }

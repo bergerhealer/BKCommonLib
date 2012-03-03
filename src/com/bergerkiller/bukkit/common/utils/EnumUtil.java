@@ -9,6 +9,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.permissions.PermissionDefault;
 
+@SuppressWarnings("deprecation")
 public class EnumUtil {
 	public static <E extends Enum<E>> E parse(Class<E> enumeration, String name, E def) {
 		return parse(enumeration.getEnumConstants(), name, def);
@@ -65,6 +66,8 @@ public class EnumUtil {
 	    
 	    //from name
     	name = name.trim().toUpperCase().replace(" ", "_").replace("SHOVEL", "SPADE").replace("SLAB", "STEP").replace("GOLDEN", "GOLD");       	
+    	name = name.replace("WOODEN", "WOOD");
+    	
     	Material m = parse(Material.class, name, null);
     	if (m != null) return m;
     	if (name.equals("CROP")) m = Material.CROPS;

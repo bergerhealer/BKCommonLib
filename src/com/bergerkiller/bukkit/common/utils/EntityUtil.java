@@ -27,8 +27,10 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.bergerkiller.bukkit.common.Common;
 
+@SuppressWarnings("deprecation")
 public class EntityUtil {
 	
 	/*
@@ -114,8 +116,11 @@ public class EntityUtil {
 		return entity instanceof IMonster;
 	}
 		
+	public static boolean isMob(EntityType type) {
+		return isMob(getName(type));
+	}
 	public static boolean isMob(CreatureType type) {
-		return isAnimal(type) || isMonster(type);
+		return isMob(getName(type));
 	}
 	public static boolean isAnimal(CreatureType type) {
 		return isAnimal(getName(type));
@@ -135,6 +140,9 @@ public class EntityUtil {
 	}
 	public static String getName(Entity entity) {
 		return getName(getNative(entity));
+	}
+	public static String getName(EntityType type) {
+		return type.toString().toLowerCase().replace("_", "");
 	}
 	public static String getName(CreatureType type) {
 		return type.toString().toLowerCase().replace("_", "");

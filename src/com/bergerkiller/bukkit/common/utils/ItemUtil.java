@@ -273,6 +273,9 @@ public class ItemUtil {
 			ItemStack toitem;
 			for (int i = 0; i < to.getSize(); i++) {
 				toitem = to.getItem(i);
+				if (toitem == null) {
+					toitem = new CraftItemStack(0);
+				}
 				if (toitem.getTypeId() == 0) {
 					tmptrans = transfer(from, toitem, maxAmount);
 					maxAmount -= tmptrans;
