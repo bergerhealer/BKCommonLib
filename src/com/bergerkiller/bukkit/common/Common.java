@@ -25,11 +25,7 @@ public class Common extends PluginBase {
 			log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
 		}
 	}
-	
-	public Common() {
-		super(1818, 3000);
-	}
-	
+		
 	public void setDisableMessage(String message) {};
 	
 	public void disable() {}

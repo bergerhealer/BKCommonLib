@@ -30,48 +30,17 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 @SuppressWarnings("unused")
 public abstract class PluginBase extends JavaPlugin { 
-	private final int minbuild;
-	private final int maxbuild;
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
-	private static final int cbBuild;
-	static {
-		int build = 0;
-		String ver = Bukkit.getVersion();
-		int idx = ver.lastIndexOf('-');
-		if (idx != -1 && (ver.length() - idx) > 2) {
-			ver = ver.substring(idx + 2);
-			StringBuilder builder = new StringBuilder(4);
-			for (byte b : ver.getBytes()) {
-				if (b < 48 || b > 57) {
-					break;
-				} else {
-					builder.append((char) b);
-				}
-			}
-			ver = builder.toString();
-			try {
-				build = Integer.parseInt(ver);
-			} catch (NumberFormatException ex) {}	    	
-		}
-		cbBuild = build;
-		if (build == 0) {
-			Bukkit.getLogger().log(Level.WARNING, "This CraftBukkit version may not be compatible with some plugins!");
-		}
-	}
-	public static int getCraftBukkitBuild() {
-		return cbBuild;
-	}
 
 	public PluginBase() {
-		this(Integer.MIN_VALUE, Integer.MAX_VALUE);
-	}
-	public PluginBase(final int minbuild, final int maxbuild) {
 		super();
-		this.minbuild = minbuild;
-		this.maxbuild = maxbuild;
 	}
-
+	@Deprecated
+	public PluginBase(int minbuild, int maxbuild) {
+		super();
+	}
+	
 	public void log(Level level, String message) {
 		Bukkit.getLogger().log(level, "[" + this.getName() + "] " + message);
 	}
@@ -107,12 +76,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 	public final void registerNextTick(final Listener listener) {
-		final PluginBase me = this;
-		new Task() {
-			public void run() {
-				me.register(listener);
-			}
-		}.start();
+		new PluginDelayedRegister(this, listener).start();
 	}
 	
 	public static Permission getPermission(String permissionnode) {
@@ -200,19 +164,6 @@ public abstract class PluginBase extends JavaPlugin {
 	
 	public final void onEnable() {
 		this.setDisableMessage(this.getName() + " disabled!");
-		if (cbBuild == 0) {
-			//unknown
-		} else if (cbBuild < this.minbuild) {
-			Bukkit.getLogger().log(Level.INFO, "CraftBukkit build " + cbBuild + " is too old for plugin '" + this.getName() + "' v" + this.getVersion());
-			Bukkit.getLogger().log(Level.INFO, "Update CraftBukkit to a newer build or look for an older version of " + this.getName());
-			Bukkit.getLogger().log(Level.INFO, "The plugin will still function, but may be instable.");
-			//cb is too old
-		} else if (cbBuild > this.maxbuild) {
-			Bukkit.getLogger().log(Level.INFO, "Plugin '" + this.getName() + "' v" + this.getVersion() + " is too old to run on CraftBukkit build " + cbBuild);
-			Bukkit.getLogger().log(Level.INFO, "Update " + this.getName() + " to a newer version or look for an older build of CraftBukkit");
-			Bukkit.getLogger().log(Level.INFO, "The plugin will still function, but may be instable.");
-			//this plugin is too old
-		}
 		//update dependencies
 		this.register(new PluginListener(this));
 		
@@ -281,20 +232,5 @@ public abstract class PluginBase extends JavaPlugin {
 		this.updateDependency(plugin, plugin.getDescription().getName(), enabled);
 	}
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {};
-	
-	private class PluginListener implements Listener {
-		private final PluginBase plugin;
-		public PluginListener(final PluginBase plugin) {
-			this.plugin = plugin;
-		}
-		@EventHandler(priority = EventPriority.MONITOR)
-		private void onPluginEnable(final PluginEnableEvent event) {
-			this.plugin.updateDependency(event.getPlugin(), true);
-		}
-		@EventHandler(priority = EventPriority.MONITOR)
-		private void onPluginDisable(PluginDisableEvent event) {
-			this.plugin.updateDependency(event.getPlugin(), false);
-		}
-	}
-	
+		
 }
