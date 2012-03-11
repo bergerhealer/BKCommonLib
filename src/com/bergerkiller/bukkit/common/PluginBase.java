@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -33,6 +34,8 @@ public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
 
+	static List<PluginBase> plugins = new ArrayList<PluginBase>();
+	
 	public PluginBase() {
 		super();
 	}
@@ -67,16 +70,6 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	public final void registerNextTick(Class<? extends Listener> listener) {
-		try {
-			this.registerNextTick(listener.newInstance());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	public final void registerNextTick(final Listener listener) {
-		new PluginDelayedRegister(this, listener).start();
 	}
 	
 	public static Permission getPermission(String permissionnode) {
@@ -164,13 +157,6 @@ public abstract class PluginBase extends JavaPlugin {
 	
 	public final void onEnable() {
 		this.setDisableMessage(this.getName() + " disabled!");
-		//update dependencies
-		this.register(new PluginListener(this));
-		
-		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-			if (!plugin.isEnabled()) continue;
-			this.updateDependency(plugin, true);
-		}
 		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
 		if (this.permissionconfig.exists()) {
 			this.loadPermissions();
@@ -179,12 +165,20 @@ public abstract class PluginBase extends JavaPlugin {
 		this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
 		this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
 		this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
-		
 		this.permissions();
 		if (!this.permissionconfig.isEmpty()) {
 			this.savePermissions();
 		}
+				
 		this.enable();
+			
+		//update dependencies
+		plugins.add(this);
+		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+			if (!plugin.isEnabled()) continue;
+			this.updateDependency(plugin, true);
+		}
+		
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
 	}
 	
@@ -199,7 +193,8 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 		}
 		
-		this.disable();
+		plugins.remove(this);
+
 		if (this.disableMessage != null) {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
