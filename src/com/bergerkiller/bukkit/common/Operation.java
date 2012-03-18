@@ -16,14 +16,18 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public abstract class Operation extends Task {
+public abstract class Operation extends ParameterWrapper {
 	
 	public Operation() {
-		this(true);
+		this.run();
+	}
+	public Operation(final Object... arguments) {
+		this(true, arguments);
 	}
 	public Operation(boolean run, final Object... arguments) {
 		super(arguments);
@@ -126,6 +130,14 @@ public abstract class Operation extends Task {
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world chunk list of world '" + chunkProvider.world.getWorld().getName() + "'");
 		}
+	}
+	public Task createTask(JavaPlugin plugin) {
+		final Operation op = this;
+		return new Task(plugin) {
+			public void run() {
+				op.run();
+			}
+		};
 	}
 		
 	public void handle(WorldServer world) {};

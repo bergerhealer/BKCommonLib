@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.bergerkiller.bukkit.common.Common;
 
 @SuppressWarnings("deprecation")
 public class EntityUtil {
@@ -198,7 +197,7 @@ public class EntityUtil {
 				passenger.vehicle = null;
 				entity.passenger = null;
 				if (teleport(plugin, passenger, to)) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(Common.plugin, new Runnable() {
+					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 						public void run() {
 							passenger.setPassengerOf(entity);
 						}

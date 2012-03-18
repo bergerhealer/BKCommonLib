@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.plugin.Plugin;
 
 public class CommonUtil {
 	public static final int view = Bukkit.getServer().getViewDistance();
@@ -128,6 +129,14 @@ public class CommonUtil {
 				ep.netServerHandler.sendMessage(message.toString());
 			}
 		}
+	}
+	
+	public static Plugin[] getPlugins() {
+		return Bukkit.getServer().getPluginManager().getPlugins();
+	}
+	
+	public static Plugin getPlugin(String name) {
+		return Bukkit.getServer().getPluginManager().getPlugin(name);
 	}
 	
 }

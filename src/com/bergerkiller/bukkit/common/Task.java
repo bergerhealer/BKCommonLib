@@ -4,10 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class Task extends ParameterWrapper implements Runnable {
-	
-	public Task(Object... arguments) {
-		this(Common.plugin, arguments);
-	}
+
 	public Task(final JavaPlugin plugin, Object... arguments) {
 		super(arguments);
 		this.plugin = plugin;
@@ -50,5 +47,4 @@ public abstract class Task extends ParameterWrapper implements Runnable {
 		this.id = this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(this.plugin, this, delay, interval);
 		return this;
 	}
-	
 }

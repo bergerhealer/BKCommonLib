@@ -1,0 +1,61 @@
+package com.bergerkiller.bukkit.common;
+
+import java.util.logging.Level;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
+
+public class CommonPlugin extends PluginBase {
+		
+	@Override
+	public void permissions() {}
+	
+	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
+		if (pluginName.equals("Showcase")) {
+			Common.isShowcaseEnabled = enabled;
+			log(Level.INFO, "Showcase detected: Showcased items will be ignored");
+		} else if (pluginName.equals("ShowCaseStandalone")) {
+			Common.isSCSEnabled = enabled;
+			log(Level.INFO, "Showcase Standalone detected: Showcased items will be ignored");
+		} else if (pluginName.equals("BleedingMobs")) {
+			Common.bleedingMobsInstance = enabled ? plugin : null;
+			log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
+		}
+	}
+		
+	public void setDisableMessage(String message) {};
+
+	public void disable() {}
+	public void enable() {
+		this.register(new PluginListener());
+	}
+
+	private class PluginListener implements Listener {
+		@SuppressWarnings("unused")
+		@EventHandler(priority = EventPriority.MONITOR)
+		private void onPluginEnable(final PluginEnableEvent event) {
+			for (PluginBase pb : PluginBase.plugins) {
+				pb.updateDependency(event.getPlugin(), true);
+			}
+		}
+		@SuppressWarnings("unused")
+		@EventHandler(priority = EventPriority.MONITOR)
+		private void onPluginDisable(PluginDisableEvent event) {
+			for (PluginBase pb : PluginBase.plugins) {
+				pb.updateDependency(event.getPlugin(), false);
+			}
+		}
+	}
+	
+	@Override
+	public boolean command(CommandSender sender, String command, String[] args) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}

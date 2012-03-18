@@ -80,6 +80,9 @@ public class ItemUtil {
 	}
 	
 	public static net.minecraft.server.ItemStack getNative(ItemStack stack) {
+		if (!(stack instanceof CraftItemStack)) {
+			stack = new CraftItemStack(stack);
+		}
 		net.minecraft.server.ItemStack rval = ((CraftItemStack) stack).getHandle();
 		if (rval == null) {
 			stack.setTypeId(1); //force the creation of a new native itemstack

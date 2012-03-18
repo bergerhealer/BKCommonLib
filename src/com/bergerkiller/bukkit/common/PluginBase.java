@@ -193,6 +193,8 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 		}
 		
+		this.disable();
+		
 		plugins.remove(this);
 
 		if (this.disableMessage != null) {
