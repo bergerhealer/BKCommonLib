@@ -35,23 +35,6 @@ public class CommonPlugin extends PluginBase {
 		this.register(new PluginListener());
 	}
 
-	private class PluginListener implements Listener {
-		@SuppressWarnings("unused")
-		@EventHandler(priority = EventPriority.MONITOR)
-		private void onPluginEnable(final PluginEnableEvent event) {
-			for (PluginBase pb : PluginBase.plugins) {
-				pb.updateDependency(event.getPlugin(), true);
-			}
-		}
-		@SuppressWarnings("unused")
-		@EventHandler(priority = EventPriority.MONITOR)
-		private void onPluginDisable(PluginDisableEvent event) {
-			for (PluginBase pb : PluginBase.plugins) {
-				pb.updateDependency(event.getPlugin(), false);
-			}
-		}
-	}
-	
 	@Override
 	public boolean command(CommandSender sender, String command, String[] args) {
 		// TODO Auto-generated method stub

@@ -96,9 +96,11 @@ public class BlockUtil {
 		}
 	}
 	public static void setFacing(Block block, BlockFace facing) {
-		org.bukkit.material.Sign sign = new org.bukkit.material.Sign();
-		sign.setFacingDirection(facing);
-		block.setData(sign.getData(), true);
+		MaterialData data = getData(block);
+		if (data != null && data instanceof Directional) {
+			((Directional) data).setFacingDirection(facing);
+			block.setData(data.getData(), true);
+		}
 	}
 	
     public static Block getAttachedBlock(Block b) {

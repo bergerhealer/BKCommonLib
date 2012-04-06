@@ -176,4 +176,10 @@ public class MergedInventory implements IInventory {
 		return this.inv[0].splitWithoutUpdate(arg0);
 	}
 
+	@Override
+	public void setMaxStackSize(int arg0) {
+		for (IInventory inv : this.inv) {
+			inv.setMaxStackSize(arg0);
+		}
+	}
 }
