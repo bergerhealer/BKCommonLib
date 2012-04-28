@@ -8,7 +8,10 @@ import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.GrassSpecies;
 import org.bukkit.Material;
+import org.bukkit.TreeSpecies;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -16,6 +19,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Leaves;
+import org.bukkit.material.LongGrass;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.TexturedMaterial;
 import org.bukkit.material.Tree;
@@ -23,6 +28,7 @@ import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.ItemParser;
+import com.bergerkiller.bukkit.common.SimpleInventory;
 import com.miykeal.showCaseStandalone.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -33,18 +39,6 @@ public class ItemUtil {
 		Item item = (Item) itementity;
 		if (Common.isShowcaseEnabled) {
 			try {
-				// Placeholder for a possible new function
-				// if (!Common.showCaseUseOldMode) {
-				// 	try {
-				// 		//TODO: USE NEWER VERSION
-				// 	} catch (Throwable t) {
-				// 		Common.showCaseUseOldMode = true;
-				// 	}
-				// }
-				if (Common.showCaseUseOldMode) { 
-					if (Showcase.instance.getItemByDrop(item) != null) return true;
-				}
-				
 				if (Showcase.instance.getItemByDrop(item) != null) return true;
 			} catch (Throwable t) {
 				Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
@@ -52,7 +46,7 @@ public class ItemUtil {
 				Common.isShowcaseEnabled = false;
 			}
 		}
-		if (Common.isSCSEnabled) { 
+		if (Common.isSCSEnabled) {
 			try {
 				if (ShowCaseStandalone.get().isShowCaseItem(item)) return true;
 			} catch (Throwable t) {
@@ -138,6 +132,32 @@ public class ItemUtil {
 		}
 		return rval;
 	}
+	public static int getItemCount(Inventory inventory, Integer typeid, Integer data) {
+		if (typeid == null) {
+			int count = 0;
+			for (ItemStack item : inventory.getContents()) {
+				if (item == null) continue;
+				count += item.getAmount();
+			}
+			return count;
+		} else {
+			ItemStack rval = findItem(inventory, typeid, data);
+			return rval == null ? 0 : rval.getAmount();
+		}
+	}
+	public static int getItemCount(IInventory inventory, Integer typeid, Integer data) {
+		if (typeid == null) {
+			int count = 0;
+			for (net.minecraft.server.ItemStack item : inventory.getContents()) {
+				if (item == null) continue;
+				count += item.count;
+			}
+			return count;
+		} else {
+			net.minecraft.server.ItemStack rval = findItem(inventory, typeid, data);
+			return rval == null ? 0 : rval.count;
+		}
+	}
 	
 	public static void removeItem(Inventory inventory, ItemStack item) {
 		removeItem(inventory, item.getTypeId(), (int) item.getDurability(), item.getAmount());
@@ -166,6 +186,45 @@ public class ItemUtil {
 		}
 	}
 	
+	public static ItemStack[] cloneItems(ItemStack[] input) {
+		ItemStack[] cloned = new ItemStack[input.length];
+		for (int i = 0; i < cloned.length; i++) {
+			cloned[i] = input[i] == null ? null : input[i].clone();
+		}
+		return cloned;
+	}
+	public static net.minecraft.server.ItemStack[] cloneItems(net.minecraft.server.ItemStack[] input) {
+		net.minecraft.server.ItemStack[] cloned = new net.minecraft.server.ItemStack[input.length];
+		for (int i = 0; i < cloned.length; i++) {
+			cloned[i] = input[i] == null ? null : input[i].cloneItemStack();
+		}
+		return cloned;
+	}
+	
+	/**
+	 * Tests if the given ItemStacks can be transferred to the Inventory
+	 * @return Whether it was possible
+	 */
+	public static boolean testTransfer(net.minecraft.server.ItemStack[] from, IInventory to) {
+		return testTransfer(from, to.getContents());
+	}
+	
+	/**
+	 * Tests if the given ItemStacks can be transferred to the Inventory
+	 * @return Whether it was possible
+	 */
+	public static boolean testTransfer(net.minecraft.server.ItemStack[] from, net.minecraft.server.ItemStack[] to) {
+		Inventory invto = new SimpleInventory(cloneItems(to)).getInventory();
+		for (net.minecraft.server.ItemStack nitem : cloneItems(from)) {
+			ItemStack item = new CraftItemStack(nitem);
+			transfer(item, invto, Integer.MAX_VALUE);
+			if (item.getAmount() > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Tests if the given ItemStack can be transferred to the Inventory
 	 * @return The amount that could be transferred
@@ -474,20 +533,49 @@ public class ItemUtil {
 		try {
 			return Byte.parseByte(name);
 		} catch (NumberFormatException ex) {
-			MaterialData dat = type.getNewData((byte) 0);
-			if (dat instanceof TexturedMaterial) {
-				TexturedMaterial tdat = (TexturedMaterial) dat;
-				tdat.setMaterial(EnumUtil.parseMaterial(name, null));
-			} else if (dat instanceof Wool) {
-				Wool wdat = (Wool) dat;
-				wdat.setColor(EnumUtil.parseDyeColor(name, null));
-			} else if (dat instanceof Tree) {
-				Tree tdat = (Tree) dat;
-				tdat.setSpecies(EnumUtil.parseTreeSpecies(name, null));
-			} else {
+			if (type == Material.WOOD) {
+				TreeSpecies ts = EnumUtil.parseTreeSpecies(name, null);
+				if (ts != null) {
+					switch (ts) {
+					case GENERIC : return 0;
+					case REDWOOD : return 1;
+					case BIRCH : return 2;
+					case JUNGLE : return 3;
+					}
+				}
 				return null;
+			} else {
+				MaterialData dat = type.getNewData((byte) 0);
+				if (dat instanceof TexturedMaterial) {
+					TexturedMaterial tdat = (TexturedMaterial) dat;
+					Material mat = EnumUtil.parseMaterial(name, null);
+					if (mat == null) return null;
+					tdat.setMaterial(mat);
+				} else if (dat instanceof Wool) {
+					Wool wdat = (Wool) dat;
+					DyeColor color = EnumUtil.parseDyeColor(name, null);
+					if (color == null) return null;
+					wdat.setColor(color);
+				} else if (dat instanceof Tree) {
+					Tree tdat = (Tree) dat;
+					TreeSpecies species = EnumUtil.parseTreeSpecies(name, null);
+					if (species == null) return null;
+					tdat.setSpecies(species);
+				} else if (dat instanceof Leaves) {
+					Leaves tdat = (Leaves) dat;
+					TreeSpecies species = EnumUtil.parseTreeSpecies(name, null);
+					if (species == null) return null;
+					tdat.setSpecies(species);
+				} else if (dat instanceof LongGrass) {
+					LongGrass ldat = (LongGrass) dat;
+					GrassSpecies species = EnumUtil.parse(GrassSpecies.class, name, null);
+					if (species == null) return null;
+					ldat.setSpecies(species);
+				} else {
+					return null;
+				}
+				return dat.getData();
 			}
-			return dat.getData();
 		}
 	}
 

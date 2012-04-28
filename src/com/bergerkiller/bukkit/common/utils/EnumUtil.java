@@ -49,7 +49,14 @@ public class EnumUtil {
 		return parse(Difficulty.class, name, def);
 	}
 	public static TreeSpecies parseTreeSpecies(String name, TreeSpecies def) {
-		return parse(TreeSpecies.class, name, def);
+		name = name.toLowerCase();
+		if (name.contains("oak")) {
+			return TreeSpecies.GENERIC;
+		} else if (name.contains("pine") || name.contains("spruce")) {
+			return TreeSpecies.REDWOOD;
+		} else {
+			return parse(TreeSpecies.class, name, def);
+		}
 	}
 	public static DyeColor parseDyeColor(String name, DyeColor def) {
 		return parse(DyeColor.class, name, def);

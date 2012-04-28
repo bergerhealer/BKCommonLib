@@ -2,11 +2,11 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
+import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.utils.EnumUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -33,6 +34,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 public abstract class PluginBase extends JavaPlugin { 
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
+	private ArrayList<Command> commands = new ArrayList<Command>();
 
 	static List<PluginBase> plugins = new ArrayList<PluginBase>();
 	
@@ -70,6 +72,10 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	public final <T extends Command> T register(T command) {
+		this.commands.add(command);
+		return command;
 	}
 	
 	public static Permission getPermission(String permissionnode) {
@@ -201,9 +207,29 @@ public abstract class PluginBase extends JavaPlugin {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
 	}
-	public final boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
+	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
-			return command(sender, command, StringUtil.convertArgs(args));
+			args = StringUtil.convertArgs(args);
+			if (!this.commands.isEmpty()) {
+				ArrayList<String> arglist = new ArrayList<String>(args.length + 1);
+				arglist.add(command);
+				for (String arg : args) {
+					arglist.add(arg);
+				}
+				for (Command ccc : this.commands) {
+					if (ccc.execute(sender, arglist)) {
+						return true;
+					}
+				}
+			}
+			return command(sender, command, args);
+		} catch (NoPermissionException ex) {
+			if (sender instanceof Player) {
+				sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+			} else {
+				sender.sendMessage("This command is only for players!");
+			}
+			return true;
 		} catch (Throwable t) {
 			StringBuilder msg = new StringBuilder("Unhandled exception executing command '");
 			msg.append(command).append("' in plugin ").append(this.getName()).append(" v").append(this.getVersion());

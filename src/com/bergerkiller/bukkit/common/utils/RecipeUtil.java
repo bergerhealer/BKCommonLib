@@ -11,7 +11,6 @@ import net.minecraft.server.FurnaceRecipes;
 import net.minecraft.server.CraftingManager;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.ItemStack;
-import net.minecraft.server.MathHelper;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -23,12 +22,23 @@ import com.bergerkiller.bukkit.common.ItemParser;
 public class RecipeUtil {
 	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
 	static {
-		fuelTimes.put(Material.WOOD.getId(), 300);
 		fuelTimes.put(Material.STICK.getId(), 100);
-		fuelTimes.put(Material.COAL.getId(), 1600);
-		fuelTimes.put(Material.LAVA_BUCKET.getId(), 20000);
 		fuelTimes.put(Material.SAPLING.getId(), 100);
+		fuelTimes.put(Material.LOG.getId(), 300);
+		fuelTimes.put(Material.WOOD.getId(), 300);
+		fuelTimes.put(Material.FENCE.getId(), 300);
+		fuelTimes.put(Material.WOOD_STAIRS.getId(), 300);
+		fuelTimes.put(Material.TRAP_DOOR.getId(), 300);
+		fuelTimes.put(Material.WORKBENCH.getId(), 300);
+		fuelTimes.put(Material.BOOKSHELF.getId(), 300);
+		fuelTimes.put(Material.CHEST.getId(), 300);
+		fuelTimes.put(Material.JUKEBOX.getId(), 300);
+		fuelTimes.put(Material.NOTE_BLOCK.getId(), 300);
+		fuelTimes.put(Material.HUGE_MUSHROOM_1.getId(), 300);
+		fuelTimes.put(Material.HUGE_MUSHROOM_2.getId(), 300);
+		fuelTimes.put(Material.COAL.getId(), 1600);
 		fuelTimes.put(Material.BLAZE_ROD.getId(), 2400);
+		fuelTimes.put(Material.LAVA_BUCKET.getId(), 20000);
 	}
 	public static Map<Integer, Integer> getFuelTimes() {
 		return fuelTimes;
@@ -96,51 +106,14 @@ public class RecipeUtil {
 			craftItems(parser.getTypeId(), data, source, limit);
 		}
 	}
+	
 	public static void craftItems(int itemid, Integer data, Inventory source, int limit) {
-		int count = 1;
-		IInventory nativesource = ItemUtil.getNative(source);
-		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {			
-			//try to craft until no longer possible
-			ItemStack[] from = new ItemStack[rec.getInput().length];
-			while (from != null) {
-				count = (int) Math.floor((double) limit / (double) rec.getOutput().count);
-				for (int i = 0; i < from.length; i++) {
-					ItemStack inp = rec.getInput(i);
-					data = inp.getData() == -1 ? null : inp.getData();
-				    from[i] = ItemUtil.findItem(nativesource, inp.id, data);
-					if (from[i] == null) {
-						from = null;
-						break;
-					} else {
-						count = Math.min(count, MathHelper.floor((double) from[i].count / (double) inp.count));
-						if (count == 0) {
-							from = null;
-							break;
-						}
-					}
-				}
-				if (count == 0) {
-					from = null;
-				} else if (from != null) {
-					CraftItemStack out = new CraftItemStack(rec.getOutput().cloneItemStack());
-					for (int i = 0; i < from.length; i++) {
-						from[i].count = rec.getInput(i).count;
-					}
-					for (int i = 0; i < count; i++) {
-						//try to add a new item - possible?
-						if (ItemUtil.testTransfer(out, source) == out.getAmount()) {
-							//transfer items
-							for (ItemStack item : from) {
-								ItemUtil.removeItem(nativesource, item);
-							}
-							limit -= ItemUtil.transfer(out.clone(), source, Integer.MAX_VALUE);
-						} else {
-							from = null;
-							break;
-						}
-					}
-				}
-			}
+		craftItems(itemid, data, ItemUtil.getNative(source), limit);
+	}
+	
+	public static void craftItems(int itemid, Integer data, IInventory source, int limit) {
+		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
+			limit -= rec.craftItems(source, limit);
 		}
 	}
 		
