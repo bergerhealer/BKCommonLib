@@ -259,7 +259,7 @@ public class FaceUtil {
 		case SOUTH_EAST : return 135;
 		default : return 0;
 		}
-	}	
+	}
 	public static BlockFace yawToFace (float yaw) {
 		return yawToFace(yaw, true);
 	}

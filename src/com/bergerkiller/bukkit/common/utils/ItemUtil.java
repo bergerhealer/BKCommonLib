@@ -97,7 +97,7 @@ public class ItemUtil {
 		net.minecraft.server.ItemStack[] items = from.getContents();
 		for (int i = 0;i < items.length;i++) {
 			if (items[i] != null) {
-				to.setItem(i, new net.minecraft.server.ItemStack(items[i].id, items[i].count, items[i].b));
+				to.setItem(i, new net.minecraft.server.ItemStack(items[i].id, items[i].count, items[i].getData()));
 			}
 		}
 		for (int i = 0;i < items.length;i++) from.setItem(i, null);

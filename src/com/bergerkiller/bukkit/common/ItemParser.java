@@ -72,7 +72,14 @@ public class ItemParser {
 			}
 		}
 		//match material from name
+		if (name == null || name.isEmpty()) {
+			parser.type = null;
+			return parser;
+		}
 		parser.type = EnumUtil.parseMaterial(name, null);
+		if (parser.type == null) {
+			parser.type = Material.AIR;
+		}
 		//match data name if needed
 		if (parser.hasdata) {
 			Byte dat = ItemUtil.getData(parser.type, dataname);

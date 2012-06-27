@@ -48,13 +48,13 @@ public class WorldListener implements IWorldAccess {
 
 	@Override
 	public final void a(Entity arg0) {
-		if (arg0 == null || arg0.dead) return; 
+		if (arg0 == null) return;
 		this.onEntityAdd(arg0);
 	}
 
 	@Override
 	public final void b(Entity arg0) {
-		if (arg0 == null || arg0.dead) return; 
+		if (arg0 == null) return;
 		this.onEntityRemove(arg0);
 	}
 

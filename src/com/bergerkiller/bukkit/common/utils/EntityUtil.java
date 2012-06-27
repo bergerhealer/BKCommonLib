@@ -81,13 +81,15 @@ public class EntityUtil {
 	/* 
 	 * States
 	 */
-		public static final String[] animalNames = new String[] {
+	public static final String[] animalNames = new String[] {
 		"cow", "pig", "sheep", "chicken", "wolf", "squid", 
-		"snowman", "mushroomcow"};
+		"snowman", "mushroomcow", "ocelot", "snowman"};
 	public static final String[] monsterNames = new String[] {
 		"creeper", "skeleton", "zombie", "slime", "skeleton", 
 		"pigzombie", "spider", "giant", "ghast", "enderman", "cavespider", 
 		"enderdragon", "blaze", "magmacube", "silverfish"};
+	public static final String[] npcNames = new String[] {
+		"villager", "irongolem"};
 	
 	public static boolean isMob(Entity entity) {
 		return isMob(getNative(entity));
@@ -129,13 +131,16 @@ public class EntityUtil {
 	}
 	
 	public static boolean isMob(String name) {
-		return isAnimal(name) || isMonster(name);
+		return isAnimal(name) || isMonster(name) || isNPC(name);
 	}
 	public static boolean isAnimal(String name) {
 		return StringUtil.isIn(name, animalNames);
 	}
 	public static boolean isMonster(String name) {
 		return StringUtil.isIn(name, monsterNames);
+	}
+	public static boolean isNPC(String name) {
+		return StringUtil.isIn(name, npcNames);
 	}
 	public static String getName(Entity entity) {
 		return getName(getNative(entity));
@@ -154,6 +159,8 @@ public class EntityUtil {
 		} else if (entity instanceof EntityFallingBlock) {
 			Material mat = Material.getMaterial(((EntityFallingBlock) entity).id);
 			return mat == null ? "falling" : "falling" + mat.toString().toLowerCase();
+		} else if (entity instanceof EntityMinecart) {
+			return "minecart";
 		} else {
 			String name = entity.getClass().getSimpleName().toLowerCase();
 			if (name.startsWith("entity")) name = name.substring(6);
