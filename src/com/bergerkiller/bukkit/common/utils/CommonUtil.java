@@ -19,7 +19,8 @@ public class CommonUtil {
 	public static final int viewWidth = view + view + 1;
 	public static final int chunkArea = viewWidth * viewWidth;
 	public static final int blockView = 32 + (view << 4);
-	
+	public static final Thread MAIN_THREAD = Thread.currentThread();
+
 	public static void sendMessage(Object sender, Object message) {
 		if (message != null) {
 			String msg = message.toString();
@@ -125,8 +126,7 @@ public class CommonUtil {
 	public static void broadcast(Object message) {
 		if (message != null) {
 			for (EntityPlayer ep : getOnlinePlayers()) {
-				if (ep.netServerHandler == null) continue;
-				ep.netServerHandler.sendMessage(message.toString());
+				ep.getBukkitEntity().sendMessage(message.toString());
 			}
 		}
 	}

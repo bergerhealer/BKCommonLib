@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.server.ChunkCoordinates;
+import net.minecraft.server.Packet;
 import net.minecraft.server.TileEntity;
 import net.minecraft.server.TileEntityChest;
 import net.minecraft.server.TileEntityDispenser;
@@ -26,6 +27,8 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
+
+import com.bergerkiller.bukkit.common.SafeField;
 
 public class BlockUtil {
     
@@ -298,15 +301,23 @@ public class BlockUtil {
 		}
 		return tilebuff;
 	}
+	private static final SafeField<net.minecraft.server.World> tileWorldField = new SafeField<net.minecraft.server.World>(TileEntity.class, "world");
+	public static net.minecraft.server.World getWorld(TileEntity tile) {
+		return tileWorldField.get(tile);
+	}
+	public static Packet getUpdatePacket(TileEntity tile) {
+		return tile.e();
+	}
 	private static void offerTile(TileEntity tile) {
 		if (tile instanceof TileEntityChest) {
 			//find a possible double chest as well
+			net.minecraft.server.World world = getWorld(tile);
 			int tmpx, tmpz;
 			for (BlockFace sface : FaceUtil.axis) {
 				tmpx = tile.x + sface.getModX();
 				tmpz = tile.z + sface.getModZ();
-				if (tile.world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {
-					TileEntity next = tile.world.getTileEntity(tmpx, tile.y, tmpz);
+				if (world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {
+					TileEntity next = world.getTileEntity(tmpx, tile.y, tmpz);
 					if (next != null && next instanceof TileEntityChest) {
 						if (sface == BlockFace.NORTH || sface == BlockFace.EAST) {
 							tilebuff.add(next);

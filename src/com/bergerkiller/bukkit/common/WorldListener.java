@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.IWorldAccess;
-import net.minecraft.server.TileEntity;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
@@ -16,7 +15,7 @@ public class WorldListener implements IWorldAccess {
 		this.world = (WorldServer) world;
 	}
 
-	private static SafeField<List<IWorldAccess>> accesslist = new SafeField<List<IWorldAccess>>(World.class, "u");
+	private static SafeField<List<IWorldAccess>> accesslist = new SafeField<List<IWorldAccess>>(World.class, "x");
 
 	public static boolean isValid() {
 		return accesslist.isValid();
@@ -64,8 +63,7 @@ public class WorldListener implements IWorldAccess {
 	}
 
 	@Override
-	public final void a(int arg0, int arg1, int arg2, TileEntity arg3) {
-		this.onTileEntityAdd(arg3, arg0, arg1, arg2);
+	public void a(int arg0, int arg1, int arg2, int arg3, int arg4) {
 	}
 
 	@Override
@@ -86,7 +84,6 @@ public class WorldListener implements IWorldAccess {
 	@Override
 	public void a(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {}
 
-	public void onTileEntityAdd(TileEntity tile, int x, int y, int z) {}
 	public void onEntityAdd(Entity entity) {}
 	public void onEntityRemove(Entity entity) {}
 	public void onNotify(int x, int y, int z) {}

@@ -49,10 +49,10 @@ public class MergedInventory implements IInventory {
 	}
 
 	@Override
-	public void g() {
-		for (IInventory i : this.inv) i.g(); 
+	public void startOpen() {
+		for (IInventory i : this.inv) i.startOpen();
 	}
-	
+
 	@Override
 	public void update() {
 		for (IInventory i : this.inv) i.update(); 

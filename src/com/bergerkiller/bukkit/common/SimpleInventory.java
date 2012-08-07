@@ -67,10 +67,6 @@ public class SimpleInventory implements IInventory {
 	}
 
 	@Override
-	public void g() {
-	}
-
-	@Override
 	public ItemStack[] getContents() {
 		return this.items;
 	}
@@ -93,6 +89,10 @@ public class SimpleInventory implements IInventory {
 	@Override
 	public int getSize() {
 		return this.items.length;
+	}
+
+	@Override
+	public void startOpen() {
 	}
 
 	@Override

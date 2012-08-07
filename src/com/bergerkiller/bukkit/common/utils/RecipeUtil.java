@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.server.CraftingRecipe;
-import net.minecraft.server.FurnaceRecipes;
 import net.minecraft.server.CraftingManager;
 import net.minecraft.server.IInventory;
+import net.minecraft.server.IRecipe;
 import net.minecraft.server.ItemStack;
+import net.minecraft.server.RecipesFurnace;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -72,11 +72,11 @@ public class RecipeUtil {
 		return getFurnaceResult(cooked.id);
 	}
 	public static ItemStack getFurnaceResult(int itemid) {
-		return FurnaceRecipes.getInstance().getResult(itemid);
+		return RecipesFurnace.getInstance().getResult(itemid);
 	}
 	@SuppressWarnings("unchecked")
 	public static Map<Integer, ItemStack> getFurnaceResults() {
-		return (Map<Integer, ItemStack>) FurnaceRecipes.getInstance().getRecipies();
+		return (Map<Integer, ItemStack>) RecipesFurnace.getInstance().getRecipes();
 	}
 	public static Set<Integer> getHeatableItems() {
 		return getFurnaceResults().keySet();
@@ -84,7 +84,7 @@ public class RecipeUtil {
 	
 	public static CraftRecipe[] getCraftingRequirements(int itemid, Integer data) {
 		List<CraftRecipe> poss = new ArrayList<CraftRecipe>();
-		for (CraftingRecipe rec : getCraftRecipes()) {
+		for (IRecipe rec : getCraftRecipes()) {
 			net.minecraft.server.ItemStack item = rec.b();
 			if (item.id == itemid && (data == null || data == item.getData())) {
 				CraftRecipe crec = CraftRecipe.create(rec);
@@ -118,7 +118,7 @@ public class RecipeUtil {
 	}
 		
 	@SuppressWarnings("unchecked")
-	public static List<CraftingRecipe> getCraftRecipes() {
-		return (List<CraftingRecipe>) CraftingManager.getInstance().getRecipies();
+	public static List<IRecipe> getCraftRecipes() {
+		return (List<IRecipe>) CraftingManager.getInstance().getRecipes();
 	}
 }

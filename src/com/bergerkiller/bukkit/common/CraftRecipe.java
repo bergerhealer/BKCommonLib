@@ -10,8 +10,8 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
-import net.minecraft.server.CraftingRecipe;
 import net.minecraft.server.IInventory;
+import net.minecraft.server.IRecipe;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.ShapedRecipes;
@@ -133,7 +133,7 @@ public class CraftRecipe {
 	    return false;
 	}
 
-	public static CraftRecipe create(CraftingRecipe recipe) {
+	public static CraftRecipe create(IRecipe recipe) {
 		if (recipe instanceof ShapedRecipes) {
 			return create(sf1.get(recipe), recipe.b());
 		} else if (recipe instanceof ShapelessRecipes) {
