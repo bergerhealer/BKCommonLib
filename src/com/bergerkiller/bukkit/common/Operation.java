@@ -122,7 +122,7 @@ public abstract class Operation extends ParameterWrapper {
 	}
 	public final void doChunks(ChunkProviderServer chunkProvider) {
 		try {
-			for (Chunk chunk : (List<Chunk>) chunkProvider.chunkList) {
+			for (Chunk chunk : chunkProvider.chunks.values()) {
 				this.handle(chunk);
 				if (chunk.bukkitChunk == null) continue;
 				this.handle((CraftChunk) chunk.bukkitChunk);

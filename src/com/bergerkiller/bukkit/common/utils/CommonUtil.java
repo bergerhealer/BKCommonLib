@@ -114,7 +114,7 @@ public class CommonUtil {
 	public static ServerConfigurationManager getServerConfig() {
 		return getCraftServer().getHandle();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<EntityPlayer> getOnlinePlayers() {
 		return (List<EntityPlayer>) getServerConfig().players;
