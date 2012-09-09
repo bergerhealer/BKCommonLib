@@ -37,7 +37,7 @@ public abstract class PluginBase extends JavaPlugin {
 	private ArrayList<Command> commands = new ArrayList<Command>();
 
 	static List<PluginBase> plugins = new ArrayList<PluginBase>();
-	
+
 	public PluginBase() {
 		super();
 	}
@@ -160,8 +160,44 @@ public abstract class PluginBase extends JavaPlugin {
 	public void setDisableMessage(String msg) {
 		this.disableMessage = msg;
 	}
-	
+
+	/**
+	 * Gets the minimum BKCommonLib version required for this Plugin to function
+	 * 
+	 * @return Minimum BKCommonLib version number
+	 */
+	public int getMinimumLibVersion() {
+		return 0;
+	}
+
+	/**
+	 * Handles a possible throwable thrown somewhere in the Plugin<br>
+	 * If the throwable is too severe, the plugin is automatically disabled<br>
+	 * Additional exception types can be handled if needed
+	 * 
+	 * @param reason to throw
+	 */
+	public void handle(Throwable reason) {
+		if (reason instanceof Exception) {
+			reason.printStackTrace();
+		} else if (reason instanceof NoClassDefFoundError) {
+			log(Level.WARNING, "Class is missing (plugin was hot-swapped?): " + reason.getMessage());
+		} else {
+			log(Level.SEVERE, "Encountered a critical error and had to be disabled.");
+			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
+			reason.printStackTrace();
+			Bukkit.getPluginManager().disablePlugin(this);
+		}
+	}
+
 	public final void onEnable() {
+		if (this.getMinimumLibVersion() > Common.VERSION) {
+			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
+			log(Level.SEVERE, "Verify that there is only one BKCommonLib.jar in the plugins folder before retrying");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+
 		this.setDisableMessage(this.getName() + " disabled!");
 		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
 		if (this.permissionconfig.exists()) {
@@ -175,9 +211,17 @@ public abstract class PluginBase extends JavaPlugin {
 		if (!this.permissionconfig.isEmpty()) {
 			this.savePermissions();
 		}
-				
-		this.enable();
-			
+
+		try {
+			this.enable();
+		} catch (Throwable t) {
+			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
+			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
+			t.printStackTrace();
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+
 		//update dependencies
 		plugins.add(this);
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -198,9 +242,16 @@ public abstract class PluginBase extends JavaPlugin {
 				Bukkit.getServer().getPluginManager().disablePlugin(plugin);
 			}
 		}
-		
-		this.disable();
-		
+
+		try {
+			this.disable();
+		} catch (Throwable t) {
+			log(Level.SEVERE, "An error occurred while disabling:");
+			t.printStackTrace();
+			plugins.remove(this);
+			return;
+		}
+
 		plugins.remove(this);
 
 		if (this.disableMessage != null) {

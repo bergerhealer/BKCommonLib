@@ -11,6 +11,7 @@ import net.minecraft.server.IInventory;
 import net.minecraft.server.IRecipe;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.RecipesFurnace;
+import net.minecraft.server.TileEntityFurnace;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -22,23 +23,20 @@ import com.bergerkiller.bukkit.common.ItemParser;
 public class RecipeUtil {
 	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
 	static {
-		fuelTimes.put(Material.STICK.getId(), 100);
-		fuelTimes.put(Material.SAPLING.getId(), 100);
-		fuelTimes.put(Material.LOG.getId(), 300);
-		fuelTimes.put(Material.WOOD.getId(), 300);
-		fuelTimes.put(Material.FENCE.getId(), 300);
-		fuelTimes.put(Material.WOOD_STAIRS.getId(), 300);
-		fuelTimes.put(Material.TRAP_DOOR.getId(), 300);
-		fuelTimes.put(Material.WORKBENCH.getId(), 300);
-		fuelTimes.put(Material.BOOKSHELF.getId(), 300);
-		fuelTimes.put(Material.CHEST.getId(), 300);
-		fuelTimes.put(Material.JUKEBOX.getId(), 300);
-		fuelTimes.put(Material.NOTE_BLOCK.getId(), 300);
-		fuelTimes.put(Material.HUGE_MUSHROOM_1.getId(), 300);
-		fuelTimes.put(Material.HUGE_MUSHROOM_2.getId(), 300);
-		fuelTimes.put(Material.COAL.getId(), 1600);
-		fuelTimes.put(Material.BLAZE_ROD.getId(), 2400);
-		fuelTimes.put(Material.LAVA_BUCKET.getId(), 20000);
+		ItemStack item;
+		for (Material material : Material.values()) {
+			item = new ItemStack(material.getId(), 1, 0);
+			if (item.getItem() == null) {
+				continue;
+			}
+			int fuel = TileEntityFurnace.fuelTime(item);
+			if (fuel > 0) {
+				fuelTimes.put(material.getId(), fuel);
+			}
+		}
+	}
+	public static Set<Integer> getFuelItems() {
+		return fuelTimes.keySet();
 	}
 	public static Map<Integer, Integer> getFuelTimes() {
 		return fuelTimes;

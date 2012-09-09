@@ -1,13 +1,35 @@
 package com.bergerkiller.bukkit.common;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 
 public class SafeField<T> {
-	
+
+	public SafeField(String methodPath) {
+		if (methodPath == null || methodPath.isEmpty() || !methodPath.contains(".")) {
+			Bukkit.getLogger().log(Level.SEVERE, "Method path contains no class: " + methodPath);
+			return;
+		}
+		try {
+			String className = methodPath.substring(0, methodPath.lastIndexOf('.'));
+			String methodName = methodPath.substring(className.length() + 1);
+			load(Class.forName(className), methodName);
+		} catch (Throwable t) {
+			System.out.println("Failed to load method '" + methodPath + "':");
+			t.printStackTrace();
+		}
+	}
 	public SafeField(Object value, String name) {
-		this(value.getClass(), name);
+		load(value.getClass(), name);
 	}
 	public SafeField(Class<?> source, String name) {
+		load(source, name);
+	}
+	private Field field;
+	
+	private void load(Class<?> source, String name) {
 		//try to find the field
 	    Class<?> tmp = source;
 	    while (tmp != null) {
@@ -24,7 +46,6 @@ public class SafeField<T> {
 	    }
 	    new Exception("Field '" + name + "' does not exist in class file '" + source.getSimpleName() + "'!").printStackTrace();
 	}
-	private Field field;
 	
 	public boolean isValid() {
 		return this.field != null;

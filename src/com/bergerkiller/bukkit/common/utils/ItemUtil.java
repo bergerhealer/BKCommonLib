@@ -309,12 +309,12 @@ public class ItemUtil {
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(ItemStack from, Inventory to, int maxAmount) {
-		if (maxAmount == 0) return 0;
+		if (maxAmount <= 0 || from == null || from.getTypeId() == 0 || from.getAmount() < 1) {
+			return 0;
+		}
+
 		int transferred = 0;
 		int tmptrans;
-		if (from == null) return transferred;
-		if (from.getTypeId() == 0) return transferred;
-		if (from.getAmount() < 1) return transferred;
 
 		//try to add to already existing items
 		for (ItemStack toitem : to.getContents()) {
@@ -325,11 +325,11 @@ public class ItemUtil {
 					maxAmount -= tmptrans;
 					transferred += tmptrans;
 					//everything done?
-					if (maxAmount == 0 || from.getAmount() == 0) break;
+					if (maxAmount <= 0 || from.getAmount() == 0) break;
 				}
 			}
 		}
-		
+
 		//try to add it to empty slots
 		if (maxAmount > 0 && from.getAmount() > 0) {
 			ItemStack toitem;
@@ -344,7 +344,7 @@ public class ItemUtil {
 					transferred += tmptrans;
 					setItem(to, i, toitem);
 					//everything done?
-					if (maxAmount == 0 || from.getAmount() == 0) break;
+					if (maxAmount <= 0 || from.getAmount() == 0) break;
 				}
 			}
 		}

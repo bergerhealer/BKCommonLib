@@ -41,5 +41,4 @@ public class CommonPlugin extends PluginBase {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }
