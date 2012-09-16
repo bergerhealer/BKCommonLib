@@ -14,25 +14,29 @@ import org.bukkit.plugin.Plugin;
 public abstract class DataWriter {
 
 	private final File file;
+
 	public DataWriter(Plugin plugin, String filename) {
 		this(plugin.getDataFolder(), filename);
 	}
+
 	public DataWriter(File folder, String filename) {
 		this(new File(folder, filename));
 	}
+
 	public DataWriter(String filepath) {
 		this(new File(filepath));
 	}
+
 	public DataWriter(final File file) {
 		this.file = file;
 	}
-	
+
 	public abstract void write(DataOutputStream stream) throws IOException;
-	
+
 	public DataOutputStream getStream(OutputStream stream) {
 		return new DataOutputStream(stream);
 	}
-	
+
 	public final void write() {
 		try {
 			DataOutputStream stream = this.getStream(new FileOutputStream(this.file));
@@ -55,5 +59,5 @@ public abstract class DataWriter {
 			t.printStackTrace();
 		}
 	}
-	
+
 }

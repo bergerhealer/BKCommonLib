@@ -36,13 +36,13 @@ public class CommonUtil {
 			}
 		}
 	}
-	
+
 	public static void sendListMessage(Object sender, String delimiter, Object[] items) {
 		String msgpart = null;
 		String item;
 		for (Object oitem : items) {
 			item = oitem.toString();
-			//display it
+			// display it
 			if (msgpart == null || msgpart.length() + item.length() < 70) {
 				if (msgpart == null) {
 					msgpart = item;
@@ -56,51 +56,59 @@ public class CommonUtil {
 		}
 		sendMessage(sender, msgpart);
 	}
-	
+
 	public static <T extends Event> T callEvent(T event) {
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		return event;
 	}
-	
+
 	public static MinecraftServer getMCServer() {
 		return getCraftServer().getServer();
 	}
-	
+
 	public static CraftServer getCraftServer() {
 		return (CraftServer) Bukkit.getServer();
 	}
-	
+
 	public static boolean contains(int value, int... values) {
 		for (int v : values) {
-			if (v == value) return true;
+			if (v == value)
+				return true;
 		}
 		return false;
 	}
+
 	public static boolean contains(byte value, byte... values) {
 		for (int v : values) {
-			if (v == value) return true;
+			if (v == value)
+				return true;
 		}
 		return false;
 	}
+
 	public static <T> boolean contains(T value, T... values) {
 		if (value == null) {
 			for (T v : values) {
-				if (v == null) return true;
+				if (v == null)
+					return true;
 			}
 		} else {
 			for (T v : values) {
-				if (v == value || value.equals(v)) return true;
+				if (v == value || value.equals(v))
+					return true;
 			}
 		}
 		return false;
 	}
-	
-    /**
-     * Shuffle an array of type T
-     *
-     * @param <T> The type contained in the array
-     * @param array The array to be shuffled
-     */
+
+	/**
+	 * Shuffle an array of type T
+	 * 
+	 * @param <T>
+	 *            The type contained in the array
+	 * @param array
+	 *            The array to be shuffled
+	 */
 	public static <T> void shuffle(T[] array) {
 		int random;
 		for (int i = 1; i < array.length; i++) {
@@ -110,7 +118,7 @@ public class CommonUtil {
 			array[random] = temp;
 		}
 	}
-	
+
 	public static ServerConfigurationManager getServerConfig() {
 		return getCraftServer().getHandle();
 	}
@@ -119,10 +127,11 @@ public class CommonUtil {
 	public static List<EntityPlayer> getOnlinePlayers() {
 		return (List<EntityPlayer>) getServerConfig().players;
 	}
-	
+
 	public static void heartbeat() {
 		broadcast("HEARTBEAT: " + System.currentTimeMillis());
 	}
+
 	public static void broadcast(Object message) {
 		if (message != null) {
 			for (EntityPlayer ep : getOnlinePlayers()) {
@@ -130,11 +139,11 @@ public class CommonUtil {
 			}
 		}
 	}
-	
+
 	public static Plugin[] getPlugins() {
 		return Bukkit.getServer().getPluginManager().getPlugins();
 	}
-	
+
 	public static Plugin getPlugin(String name) {
 		return Bukkit.getServer().getPluginManager().getPlugin(name);
 	}
@@ -142,7 +151,8 @@ public class CommonUtil {
 	/**
 	 * Tries to get the class at the path specified
 	 * 
-	 * @param path to the class
+	 * @param path
+	 *            to the class
 	 * @return the class, or null if not found
 	 */
 	public static Class<?> getClass(String path) {

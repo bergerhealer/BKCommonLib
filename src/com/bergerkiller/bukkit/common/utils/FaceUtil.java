@@ -6,12 +6,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 public class FaceUtil {
-	public static final BlockFace[] axis = new BlockFace[] {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-	public static final BlockFace[] attachedFaces = new BlockFace[] {BlockFace.NORTH, BlockFace.EAST, 
-		BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP};
-	public static final BlockFace[] attachedFacesDown = new BlockFace[] {BlockFace.NORTH, BlockFace.EAST, 
-		BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
-	
+	public static final BlockFace[] axis = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+	public static final BlockFace[] attachedFaces = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+	public static final BlockFace[] attachedFacesDown = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+
 	public static BlockFace combine(BlockFace from, BlockFace to) {
 		if (from == BlockFace.NORTH) {
 			if (to == BlockFace.WEST) {
@@ -19,19 +17,19 @@ public class FaceUtil {
 			} else if (to == BlockFace.EAST) {
 				return BlockFace.NORTH_EAST;
 			}
-		} else 	if (from == BlockFace.EAST) {
+		} else if (from == BlockFace.EAST) {
 			if (to == BlockFace.NORTH) {
 				return BlockFace.NORTH_EAST;
 			} else if (to == BlockFace.SOUTH) {
 				return BlockFace.SOUTH_EAST;
 			}
-		} else 	if (from == BlockFace.SOUTH) {
+		} else if (from == BlockFace.SOUTH) {
 			if (to == BlockFace.WEST) {
 				return BlockFace.SOUTH_WEST;
 			} else if (to == BlockFace.EAST) {
 				return BlockFace.SOUTH_EAST;
 			}
-		} else 	if (from == BlockFace.WEST) {
+		} else if (from == BlockFace.WEST) {
 			if (to == BlockFace.NORTH) {
 				return BlockFace.NORTH_WEST;
 			} else if (to == BlockFace.SOUTH) {
@@ -40,135 +38,213 @@ public class FaceUtil {
 		}
 		return from;
 	}
+
 	public static BlockFace offset(BlockFace main, BlockFace offset) {
 		if (offset == BlockFace.EAST) {
 			switch (main) {
-			case NORTH : return BlockFace.EAST;
-			case EAST : return BlockFace.SOUTH;
-			case SOUTH : return BlockFace.WEST;
-			case WEST : return BlockFace.NORTH;
+				case NORTH:
+					return BlockFace.EAST;
+				case EAST:
+					return BlockFace.SOUTH;
+				case SOUTH:
+					return BlockFace.WEST;
+				case WEST:
+					return BlockFace.NORTH;
 			}
 		} else if (offset == BlockFace.WEST) {
 			switch (main) {
-			case NORTH : return BlockFace.WEST;
-			case EAST : return BlockFace.NORTH;
-			case SOUTH : return BlockFace.EAST;
-			case WEST : return BlockFace.SOUTH;
+				case NORTH:
+					return BlockFace.WEST;
+				case EAST:
+					return BlockFace.NORTH;
+				case SOUTH:
+					return BlockFace.EAST;
+				case WEST:
+					return BlockFace.SOUTH;
 			}
 		} else if (offset == BlockFace.SOUTH) {
 			return main.getOppositeFace();
 		}
 		return main;
 	}
-	
+
 	public static BlockFace[] getFaces(BlockFace main) {
 		switch (main) {
-		case NORTH :
-		case SOUTH : return new BlockFace[] {BlockFace.NORTH, BlockFace.SOUTH};
-		case EAST :
-		case WEST : return new BlockFace[] {BlockFace.EAST, BlockFace.WEST};
-		case SOUTH_EAST : return new BlockFace[] {BlockFace.SOUTH, BlockFace.EAST};
-		case SOUTH_WEST : return new BlockFace[] {BlockFace.SOUTH, BlockFace.WEST};	
-		case NORTH_EAST : return new BlockFace[] {BlockFace.NORTH, BlockFace.EAST};
-		case NORTH_WEST : return new BlockFace[] {BlockFace.NORTH, BlockFace.WEST};
-		case UP :
-		case DOWN : return new BlockFace[] {BlockFace.DOWN, BlockFace.UP};
-		default : return new BlockFace[] {BlockFace.SELF, BlockFace.SELF};
+			case NORTH:
+			case SOUTH:
+				return new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH };
+			case EAST:
+			case WEST:
+				return new BlockFace[] { BlockFace.EAST, BlockFace.WEST };
+			case SOUTH_EAST:
+				return new BlockFace[] { BlockFace.SOUTH, BlockFace.EAST };
+			case SOUTH_WEST:
+				return new BlockFace[] { BlockFace.SOUTH, BlockFace.WEST };
+			case NORTH_EAST:
+				return new BlockFace[] { BlockFace.NORTH, BlockFace.EAST };
+			case NORTH_WEST:
+				return new BlockFace[] { BlockFace.NORTH, BlockFace.WEST };
+			case UP:
+			case DOWN:
+				return new BlockFace[] { BlockFace.DOWN, BlockFace.UP };
+			default:
+				return new BlockFace[] { BlockFace.SELF, BlockFace.SELF };
 		}
 	}
+
 	public static BlockFace rotate(BlockFace from, int notchCount) {
 		while (notchCount > 0) {
 			switch (from) {
-			case NORTH : from = BlockFace.NORTH_EAST; break;
-			case NORTH_EAST : from = BlockFace.EAST; break;
-			case EAST : from = BlockFace.SOUTH_EAST; break;
-			case SOUTH_EAST : from = BlockFace.SOUTH; break;
-			case SOUTH : from = BlockFace.SOUTH_WEST; break;
-			case SOUTH_WEST : from = BlockFace.WEST; break;
-			case WEST : from = BlockFace.NORTH_WEST; break;
-			case NORTH_WEST : from = BlockFace.NORTH; break;
-			default : return from;
+				case NORTH:
+					from = BlockFace.NORTH_EAST;
+					break;
+				case NORTH_EAST:
+					from = BlockFace.EAST;
+					break;
+				case EAST:
+					from = BlockFace.SOUTH_EAST;
+					break;
+				case SOUTH_EAST:
+					from = BlockFace.SOUTH;
+					break;
+				case SOUTH:
+					from = BlockFace.SOUTH_WEST;
+					break;
+				case SOUTH_WEST:
+					from = BlockFace.WEST;
+					break;
+				case WEST:
+					from = BlockFace.NORTH_WEST;
+					break;
+				case NORTH_WEST:
+					from = BlockFace.NORTH;
+					break;
+				default:
+					return from;
 			}
-			if (notchCount-- == 0) return from;
+			if (notchCount-- == 0)
+				return from;
 		}
 		while (notchCount < 0) {
 			switch (from) {
-			case NORTH : from = BlockFace.NORTH_WEST; break;
-			case NORTH_WEST : from = BlockFace.WEST; break;
-			case WEST : from = BlockFace.SOUTH_WEST; break;
-			case SOUTH_WEST : from = BlockFace.SOUTH; break;
-			case SOUTH : from = BlockFace.SOUTH_EAST; break;
-			case SOUTH_EAST : from = BlockFace.EAST; break;
-			case EAST : from = BlockFace.NORTH_EAST; break;
-			case NORTH_EAST : from = BlockFace.NORTH; break;
-			default : return from;
+				case NORTH:
+					from = BlockFace.NORTH_WEST;
+					break;
+				case NORTH_WEST:
+					from = BlockFace.WEST;
+					break;
+				case WEST:
+					from = BlockFace.SOUTH_WEST;
+					break;
+				case SOUTH_WEST:
+					from = BlockFace.SOUTH;
+					break;
+				case SOUTH:
+					from = BlockFace.SOUTH_EAST;
+					break;
+				case SOUTH_EAST:
+					from = BlockFace.EAST;
+					break;
+				case EAST:
+					from = BlockFace.NORTH_EAST;
+					break;
+				case NORTH_EAST:
+					from = BlockFace.NORTH;
+					break;
+				default:
+					return from;
 			}
-			if (notchCount++ == 0) return from;
+			if (notchCount++ == 0)
+				return from;
 		}
 		return from;
 	}
-	
+
 	public static BlockFace getRailsCartDirection(final BlockFace raildirection) {
 		switch (raildirection) {
-		case NORTH_EAST :
-		case SOUTH_WEST : return BlockFace.NORTH_WEST;
-		case NORTH_WEST :
-		case SOUTH_EAST : return BlockFace.SOUTH_WEST;
-		default : return raildirection;
+			case NORTH_EAST:
+			case SOUTH_WEST:
+				return BlockFace.NORTH_WEST;
+			case NORTH_WEST:
+			case SOUTH_EAST:
+				return BlockFace.SOUTH_WEST;
+			default:
+				return raildirection;
 		}
 	}
-	
+
 	public static BlockFace toRailsDirection(BlockFace direction) {
 		switch (direction) {
-		case NORTH : return BlockFace.SOUTH;
-		case EAST : return BlockFace.WEST;
-		default : return direction;
+			case NORTH:
+				return BlockFace.SOUTH;
+			case EAST:
+				return BlockFace.WEST;
+			default:
+				return direction;
 		}
 	}
-	
+
 	public static boolean isSubCardinal(final BlockFace face) {
 		switch (face) {
-		case NORTH_EAST : return true;
-		case SOUTH_EAST : return true;
-		case SOUTH_WEST : return true;
-		case NORTH_WEST : return true;
-		default : return false;
+			case NORTH_EAST:
+			case SOUTH_EAST:
+			case SOUTH_WEST:
+			case NORTH_WEST:
+				return true;
+			default:
+				return false;
 		}
 	}
+
 	public static boolean hasSubDifference(final BlockFace face1, final BlockFace face2) {
-		if (face1 == face2) return true;
+		if (face1 == face2)
+			return true;
 		switch (face1) {
-		case NORTH : return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.NORTH_WEST;
-		case NORTH_EAST : return face2 == BlockFace.NORTH || face2 == BlockFace.EAST;
-		case EAST : return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.SOUTH_EAST;
-		case SOUTH_EAST : return face2 == BlockFace.EAST || face2 == BlockFace.SOUTH;
-		case SOUTH : return face2 == BlockFace.SOUTH_EAST || face2 == BlockFace.SOUTH_WEST;
-		case SOUTH_WEST : return face2 == BlockFace.SOUTH || face2 == BlockFace.WEST;
-		case WEST : return face2 == BlockFace.SOUTH_WEST || face2 == BlockFace.NORTH_WEST;
-		case NORTH_WEST : return face2 == BlockFace.WEST || face2 == BlockFace.NORTH;
-		default : return false;
+			case NORTH:
+				return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.NORTH_WEST;
+			case NORTH_EAST:
+				return face2 == BlockFace.NORTH || face2 == BlockFace.EAST;
+			case EAST:
+				return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.SOUTH_EAST;
+			case SOUTH_EAST:
+				return face2 == BlockFace.EAST || face2 == BlockFace.SOUTH;
+			case SOUTH:
+				return face2 == BlockFace.SOUTH_EAST || face2 == BlockFace.SOUTH_WEST;
+			case SOUTH_WEST:
+				return face2 == BlockFace.SOUTH || face2 == BlockFace.WEST;
+			case WEST:
+				return face2 == BlockFace.SOUTH_WEST || face2 == BlockFace.NORTH_WEST;
+			case NORTH_WEST:
+				return face2 == BlockFace.WEST || face2 == BlockFace.NORTH;
+			default:
+				return false;
 		}
 	}
-	
+
 	public static Vector faceToVector(BlockFace face, double length) {
 		return faceToVector(face).multiply(length);
 	}
+
 	public static Vector faceToVector(BlockFace face) {
 		return new Vector(face.getModX(), face.getModY(), face.getModZ());
 	}
-	
+
 	public static BlockFace getDirection(Location from, Location to, boolean useSubCardinalDirections) {
 		return getDirection(to.getX() - from.getX(), to.getZ() - from.getZ(), useSubCardinalDirections);
 	}
+
 	public static BlockFace getDirection(Block from, Block to, boolean useSubCardinalDirections) {
 		return getDirection(to.getX() - from.getX(), to.getZ() - from.getZ(), useSubCardinalDirections);
 	}
+
 	public static BlockFace getDirection(Vector movement) {
 		return getDirection(movement, true);
 	}
+
 	public static BlockFace getDirection(Vector movement, boolean useSubCardinalDirections) {
 		return getDirection(movement.getX(), movement.getZ(), useSubCardinalDirections);
 	}
+
 	public static BlockFace getDirection(final double dx, final double dz, boolean useSubCardinalDirections) {
 		if (useSubCardinalDirections) {
 			if (dz < 0) {
@@ -216,67 +292,99 @@ public class FaceUtil {
 			}
 		}
 	}
-	
+
 	public static int getFaceYawDifference(BlockFace face1, BlockFace face2) {
 		int angle = faceToYaw(face1) - faceToYaw(face2);
-        while (angle <= -180) angle += 360;
-        while (angle > 180) angle -= 360;
-        return Math.abs(angle);
+		while (angle <= -180)
+			angle += 360;
+		while (angle > 180)
+			angle -= 360;
+		return Math.abs(angle);
 	}
-	
+
 	public static double cos(final BlockFace face) {
 		switch (face) {
-		case NORTH_WEST :
-		case NORTH_EAST : return MathUtil.halfRootOfTwo;
-		case SOUTH_WEST :
-		case SOUTH_EAST : return -MathUtil.halfRootOfTwo;
-		case SOUTH : return -1;
-		case NORTH : return 1;
-		default : return 0;
+			case NORTH_WEST:
+			case NORTH_EAST:
+				return MathUtil.halfRootOfTwo;
+			case SOUTH_WEST:
+			case SOUTH_EAST:
+				return -MathUtil.halfRootOfTwo;
+			case SOUTH:
+				return -1;
+			case NORTH:
+				return 1;
+			default:
+				return 0;
 		}
 	}
+
 	public static double sin(final BlockFace face) {
 		switch (face) {
-		case SOUTH_EAST :
-		case NORTH_EAST : return MathUtil.halfRootOfTwo;
-		case NORTH_WEST :
-		case SOUTH_WEST : return -MathUtil.halfRootOfTwo;
-		case EAST : return 1;
-		case WEST : return -1;
-		default : return 0;
+			case SOUTH_EAST:
+			case NORTH_EAST:
+				return MathUtil.halfRootOfTwo;
+			case NORTH_WEST:
+			case SOUTH_WEST:
+				return -MathUtil.halfRootOfTwo;
+			case EAST:
+				return 1;
+			case WEST:
+				return -1;
+			default:
+				return 0;
 		}
 	}
-	
+
 	public static int faceToYaw(final BlockFace face) {
 		switch (face) {
-		case NORTH : return 0;
-		case EAST : return 90;
-		case SOUTH : return 180;	
-		case WEST : return -90;
-		case SOUTH_WEST : return -135;
-		case NORTH_WEST : return -45;
-		case NORTH_EAST : return 45;
-		case SOUTH_EAST : return 135;
-		default : return 0;
+			case NORTH:
+				return 0;
+			case EAST:
+				return 90;
+			case SOUTH:
+				return 180;
+			case WEST:
+				return -90;
+			case SOUTH_WEST:
+				return -135;
+			case NORTH_WEST:
+				return -45;
+			case NORTH_EAST:
+				return 45;
+			case SOUTH_EAST:
+				return 135;
+			default:
+				return 0;
 		}
 	}
-	public static BlockFace yawToFace (float yaw) {
+
+	public static BlockFace yawToFace(float yaw) {
 		return yawToFace(yaw, true);
 	}
+
 	public static BlockFace yawToFace(float yaw, boolean useSubCardinalDirections) {
 		yaw = MathUtil.normalAngle(yaw);
 		if (useSubCardinalDirections) {
 			switch ((int) yaw) {
-			case 0 : return BlockFace.NORTH;
-			case 45 : return BlockFace.NORTH_EAST;
-			case 90 : return BlockFace.EAST;
-			case 135 : return BlockFace.SOUTH_EAST;
-			case 180 : return BlockFace.SOUTH;
-			case -135 : return BlockFace.SOUTH_WEST;
-			case -90 : return BlockFace.WEST;
-			case -45 : return BlockFace.NORTH_WEST;
+				case 0:
+					return BlockFace.NORTH;
+				case 45:
+					return BlockFace.NORTH_EAST;
+				case 90:
+					return BlockFace.EAST;
+				case 135:
+					return BlockFace.SOUTH_EAST;
+				case 180:
+					return BlockFace.SOUTH;
+				case -135:
+					return BlockFace.SOUTH_WEST;
+				case -90:
+					return BlockFace.WEST;
+				case -45:
+					return BlockFace.NORTH_WEST;
 			}
-			//Let's apply angle differences
+			// Let's apply angle differences
 			if (yaw >= -22.5 && yaw < 22.5) {
 				return BlockFace.NORTH;
 			} else if (yaw >= 22.5 && yaw < 67.5) {
@@ -296,12 +404,16 @@ public class FaceUtil {
 			}
 		} else {
 			switch ((int) yaw) {
-			case 0 : return BlockFace.NORTH;
-			case 90 : return BlockFace.EAST;
-			case 180 : return BlockFace.SOUTH;
-			case -90 : return BlockFace.WEST;
+				case 0:
+					return BlockFace.NORTH;
+				case 90:
+					return BlockFace.EAST;
+				case 180:
+					return BlockFace.SOUTH;
+				case -90:
+					return BlockFace.WEST;
 			}
-			//Let's apply angle differences
+			// Let's apply angle differences
 			if (yaw >= -45 && yaw < 45) {
 				return BlockFace.NORTH;
 			} else if (yaw >= 45 && yaw < 135) {
@@ -313,5 +425,5 @@ public class FaceUtil {
 			}
 		}
 	}
-		
+
 }

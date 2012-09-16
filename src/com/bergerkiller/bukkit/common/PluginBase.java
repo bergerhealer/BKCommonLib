@@ -31,7 +31,7 @@ import com.bergerkiller.bukkit.common.utils.EnumUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 @SuppressWarnings("unused")
-public abstract class PluginBase extends JavaPlugin { 
+public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
 	private ArrayList<Command> commands = new ArrayList<Command>();
@@ -41,11 +41,12 @@ public abstract class PluginBase extends JavaPlugin {
 	public PluginBase() {
 		super();
 	}
+
 	@Deprecated
 	public PluginBase(int minbuild, int maxbuild) {
 		super();
 	}
-	
+
 	public void log(Level level, String message) {
 		Bukkit.getLogger().log(level, "[" + this.getName() + "] " + message);
 	}
@@ -53,19 +54,25 @@ public abstract class PluginBase extends JavaPlugin {
 	public final String getVersion() {
 		return this.getDescription().getVersion();
 	}
+
 	public final void register(String... commands) {
 		this.register(this, commands);
 	}
+
 	public final void register(CommandExecutor executor, String... commands) {
 		for (String command : commands) {
 			PluginCommand cmd = this.getCommand(command);
-			if (cmd != null) cmd.setExecutor(executor);
+			if (cmd != null)
+				cmd.setExecutor(executor);
 		}
 	}
+
 	public final void register(Listener listener) {
-		if (listener == this) return;
+		if (listener == this)
+			return;
 		Bukkit.getPluginManager().registerEvents(listener, this);
 	}
+
 	public final void register(Class<? extends Listener> listener) {
 		try {
 			this.register(listener.newInstance());
@@ -73,11 +80,12 @@ public abstract class PluginBase extends JavaPlugin {
 			e.printStackTrace();
 		}
 	}
+
 	public final <T extends Command> T register(T command) {
 		this.commands.add(command);
 		return command;
 	}
-	
+
 	public static Permission getPermission(String permissionnode) {
 		Permission perm = Bukkit.getServer().getPluginManager().getPermission(permissionnode);
 		if (perm == null) {
@@ -90,15 +98,17 @@ public abstract class PluginBase extends JavaPlugin {
 	public final ConfigurationNode getPermissionNode() {
 		return this.permissionconfig;
 	}
+
 	public final ConfigurationNode getPermissionNode(String path) {
 		return this.permissionconfig.getNode(path);
 	}
-	
+
 	public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
 		for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
 			this.loadPermission(perm);
 		}
 	}
+
 	public final void loadPermission(IPermissionDefault permissionDefault) {
 		this.loadPermission(permissionDefault.getName(), permissionDefault.getDefault(), permissionDefault.getDescription());
 	}
@@ -106,15 +116,18 @@ public abstract class PluginBase extends JavaPlugin {
 	public final Permission loadPermission(String permissionnode) {
 		return this.loadPermission(getPermission(permissionnode));
 	}
+
 	public final Permission loadPermission(Permission permission) {
 		return this.loadPermission(permission.getName(), permission.getDefault(), permission.getDescription());
 	}
+
 	public final Permission loadPermission(String permissionnode, PermissionDefault def, String description) {
 		return this.loadPermission(getPermissionNode(permissionnode), def, description);
 	}
+
 	public final Permission loadPermission(ConfigurationNode permissionnode, PermissionDefault def, String description) {
 		description = permissionnode.get("description", description);
-		//permission default can be true/false too!
+		// permission default can be true/false too!
 		Object setvalue = permissionnode.get("default");
 		if (setvalue != null) {
 			if (setvalue instanceof String) {
@@ -142,14 +155,18 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 		return setPermission(permissionnode.getPath(), def, description);
 	}
+
 	public static Permission setPermission(String permissionnode, PermissionDefault def, String description) {
 		Permission perm = getPermission(permissionnode);
 		setPermission(perm, def, description);
 		return perm;
 	}
+
 	public static void setPermission(Permission permission, PermissionDefault def, String description) {
-		if (def != null) permission.setDefault(def);
-		if (description != null) permission.setDescription(description);
+		if (def != null)
+			permission.setDefault(def);
+		if (description != null)
+			permission.setDescription(description);
 	}
 
 	public abstract void permissions();
@@ -157,6 +174,7 @@ public abstract class PluginBase extends JavaPlugin {
 	public final String getDisableMessage() {
 		return this.disableMessage;
 	}
+
 	public void setDisableMessage(String msg) {
 		this.disableMessage = msg;
 	}
@@ -175,7 +193,8 @@ public abstract class PluginBase extends JavaPlugin {
 	 * If the throwable is too severe, the plugin is automatically disabled<br>
 	 * Additional exception types can be handled if needed
 	 * 
-	 * @param reason to throw
+	 * @param reason
+	 *            to throw
 	 */
 	public void handle(Throwable reason) {
 		if (reason instanceof Exception) {
@@ -203,7 +222,7 @@ public abstract class PluginBase extends JavaPlugin {
 		if (this.permissionconfig.exists()) {
 			this.loadPermissions();
 		}
-		//header
+		// header
 		this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
 		this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
 		this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
@@ -222,21 +241,23 @@ public abstract class PluginBase extends JavaPlugin {
 			return;
 		}
 
-		//update dependencies
+		// update dependencies
 		plugins.add(this);
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-			if (!plugin.isEnabled()) continue;
+			if (!plugin.isEnabled())
+				continue;
 			this.updateDependency(plugin, true);
 		}
-		
+
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
 	}
-	
+
 	public final void onDisable() {
-		//are there any plugins that depend on me?
+		// are there any plugins that depend on me?
 		List<String> depend;
 		for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
-			if (!plugin.isEnabled()) continue;
+			if (!plugin.isEnabled())
+				continue;
 			depend = (List<String>) plugin.getDescription().getDepend();
 			if (depend != null && depend.contains(this.getName())) {
 				Bukkit.getServer().getPluginManager().disablePlugin(plugin);
@@ -258,6 +279,7 @@ public abstract class PluginBase extends JavaPlugin {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
 	}
+
 	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
 			args = StringUtil.convertArgs(args);
@@ -292,12 +314,15 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	public abstract void enable();
+
 	public abstract void disable();
+
 	public abstract boolean command(CommandSender sender, String command, String[] args);
 
 	public final void loadPermissions() {
 		this.permissionconfig.load();
 	}
+
 	public final void savePermissions() {
 		this.permissionconfig.save();
 	}
@@ -305,6 +330,8 @@ public abstract class PluginBase extends JavaPlugin {
 	public final void updateDependency(Plugin plugin, boolean enabled) {
 		this.updateDependency(plugin, plugin.getDescription().getName(), enabled);
 	}
-	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {};
-		
+
+	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
+	};
+
 }

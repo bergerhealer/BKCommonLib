@@ -6,10 +6,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class CommonPlugin extends PluginBase {
-		
+
 	@Override
-	public void permissions() {}
-	
+	public void permissions() {
+	}
+
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (pluginName.equals("Showcase")) {
 			Common.isShowcaseEnabled = enabled;
@@ -23,15 +24,18 @@ public class CommonPlugin extends PluginBase {
 			}
 		} else if (pluginName.equals("BleedingMobs")) {
 			Common.bleedingMobsInstance = enabled ? plugin : null;
-			if (enabled ){
+			if (enabled) {
 				log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
 			}
 		}
 	}
-		
-	public void setDisableMessage(String message) {};
-	
-	public void disable() {}
+
+	public void setDisableMessage(String message) {
+	};
+
+	public void disable() {
+	}
+
 	public void enable() {
 		this.register(new PluginListener());
 	}

@@ -3,14 +3,15 @@ package com.bergerkiller.bukkit.common;
 import java.util.Iterator;
 
 public class CircularInteger implements Iterable<Integer> {
-	
+
 	private int value;
 	private final int size;
+
 	public CircularInteger(final int size) {
 		this.value = 0;
 		this.size = size;
 	}
-	
+
 	public int next() {
 		if (this.value == this.size) {
 			return (this.value = 0);
@@ -18,6 +19,7 @@ public class CircularInteger implements Iterable<Integer> {
 			return this.value++;
 		}
 	}
+
 	public int previous() {
 		if (this.value == -1) {
 			return (this.value = this.size - 1);
@@ -45,7 +47,7 @@ public class CircularInteger implements Iterable<Integer> {
 			public void remove() {
 				me.previous();
 			}
-			
+
 		};
 	}
 

@@ -26,7 +26,7 @@ public class SimpleInventory implements IInventory {
 	public SimpleInventory(IInventory inventory) {
 		this(inventory.getContents());
 	}
-	
+
 	public SimpleInventory(org.bukkit.inventory.ItemStack... items) {
 		this.items = new ItemStack[items.length];
 		for (int i = 0; i < items.length; i++) {
@@ -49,7 +49,7 @@ public class SimpleInventory implements IInventory {
 			i++;
 		}
 	}
-	
+
 	public SimpleInventory(ItemStack... items) {
 		this.items = items;
 	}
@@ -115,9 +115,9 @@ public class SimpleInventory implements IInventory {
 	@Override
 	public void setItem(int index, ItemStack stack) {
 		this.items[index] = stack;
-        if (stack != null && stack.count > this.getMaxStackSize()) {
-        	stack.count = this.getMaxStackSize();
-        }
+		if (stack != null && stack.count > this.getMaxStackSize()) {
+			stack.count = this.getMaxStackSize();
+		}
 	}
 
 	@Override
@@ -131,36 +131,36 @@ public class SimpleInventory implements IInventory {
 	}
 
 	@Override
-    public ItemStack splitStack(int index, int size) {
-        if (this.items[index] != null) {
-            ItemStack itemstack;
-            if (this.items[index].count <= size) {
-                itemstack = this.items[index];
-                this.items[index] = null;
-                return itemstack;
-            } else {
-                itemstack = this.items[index].a(size);
-                if (this.items[index].count == 0) {
-                    this.items[index] = null;
-                }
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
-    }
+	public ItemStack splitStack(int index, int size) {
+		if (this.items[index] != null) {
+			ItemStack itemstack;
+			if (this.items[index].count <= size) {
+				itemstack = this.items[index];
+				this.items[index] = null;
+				return itemstack;
+			} else {
+				itemstack = this.items[index].a(size);
+				if (this.items[index].count == 0) {
+					this.items[index] = null;
+				}
+				return itemstack;
+			}
+		} else {
+			return null;
+		}
+	}
 
 	@Override
-    public ItemStack splitWithoutUpdate(int index) {
-        if (this.items[index] != null) {
-            ItemStack itemstack = this.items[index];
-            this.items[index] = null;
-            return itemstack;
-        } else {
-            return null;
-        }
-    }
-	
+	public ItemStack splitWithoutUpdate(int index) {
+		if (this.items[index] != null) {
+			ItemStack itemstack = this.items[index];
+			this.items[index] = null;
+			return itemstack;
+		} else {
+			return null;
+		}
+	}
+
 	public Inventory getInventory() {
 		return new CraftInventory(this);
 	}

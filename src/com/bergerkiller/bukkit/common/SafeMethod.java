@@ -22,12 +22,15 @@ public class SafeMethod {
 			t.printStackTrace();
 		}
 	}
+
 	public SafeMethod(Object value, String name, Class<?>... parameterTypes) {
 		load(value == null ? null : value.getClass(), name, parameterTypes);
 	}
+
 	public SafeMethod(Class<?> source, String name, Class<?>... parameterTypes) {
 		load(source, name, parameterTypes);
 	}
+
 	private Method method;
 
 	private void load(Class<?> source, String name, Class<?>... parameterTypes) {
@@ -35,21 +38,21 @@ public class SafeMethod {
 			new Exception("Can not load method '" + name + "' because the class is null!").printStackTrace();
 			return;
 		}
-		//try to find the field
-	    Class<?> tmp = source;
-	    while (tmp != null) {
-	    	try {
-	    		this.method = tmp.getDeclaredMethod(name, parameterTypes);
-	    		this.method.setAccessible(true);
-	    		return;
-	    	} catch (NoSuchMethodException ex) {
-	    		tmp = tmp.getSuperclass();
-	    	} catch (SecurityException ex) {
-	    		new Exception("No permission to access method '" + name + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
-	    		return;
-	    	}
-	    }
-	    new Exception("Method '" + name + "' does not exist in class file '" + source.getSimpleName() + "'!").printStackTrace();
+		// try to find the field
+		Class<?> tmp = source;
+		while (tmp != null) {
+			try {
+				this.method = tmp.getDeclaredMethod(name, parameterTypes);
+				this.method.setAccessible(true);
+				return;
+			} catch (NoSuchMethodException ex) {
+				tmp = tmp.getSuperclass();
+			} catch (SecurityException ex) {
+				new Exception("No permission to access method '" + name + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
+				return;
+			}
+		}
+		new Exception("Method '" + name + "' does not exist in class file '" + source.getSimpleName() + "'!").printStackTrace();
 	}
 
 	public Object invoke(Object instance, Object... args) {

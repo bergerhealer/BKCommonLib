@@ -20,26 +20,29 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class Operation extends ParameterWrapper {
-	
+
 	public Operation() {
 		this.run();
 	}
+
 	public Operation(final Object... arguments) {
 		this(true, arguments);
 	}
+
 	public Operation(boolean run, final Object... arguments) {
 		super(arguments);
-		if (run) this.run();
+		if (run)
+			this.run();
 	}
-	
+
 	public abstract void run();
-	
+
 	private void multiAccess(final String location) {
 		System.out.println("The " + location + " got accessed by more than one thread or got modified while operating on it!");
 	}
-		
+
 	public final void doWorlds() {
 		try {
 			for (WorldServer world : WorldUtil.getWorlds()) {
@@ -55,20 +58,25 @@ public abstract class Operation extends ParameterWrapper {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
 				this.handle(player);
-				if (player.netServerHandler == null) continue;
-				if (player.netServerHandler.player != player) continue;
+				if (player.netServerHandler == null)
+					continue;
+				if (player.netServerHandler.player != player)
+					continue;
 				this.handle(player.netServerHandler.getPlayer());
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("server player list");
 		}
 	}
+
 	public final void doPlayers(World world) {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) world.players) {
 				this.handle(player);
-				if (player.netServerHandler == null) continue;
-				if (player.netServerHandler.player != player) continue;
+				if (player.netServerHandler == null)
+					continue;
+				if (player.netServerHandler.player != player)
+					continue;
 				this.handle(player.netServerHandler.getPlayer());
 			}
 		} catch (ConcurrentModificationException ex) {
@@ -85,6 +93,7 @@ public abstract class Operation extends ParameterWrapper {
 			multiAccess("server world list");
 		}
 	}
+
 	public final void doEntities(World world) {
 		try {
 			for (Entity e : (List<Entity>) world.entityList) {
@@ -95,6 +104,7 @@ public abstract class Operation extends ParameterWrapper {
 			multiAccess("world entity list of world '" + world.getWorld().getName() + "'");
 		}
 	}
+
 	public final void doEntities(Chunk chunk) {
 		try {
 			for (List list : chunk.entitySlices) {
@@ -117,20 +127,24 @@ public abstract class Operation extends ParameterWrapper {
 			multiAccess("server world list");
 		}
 	}
+
 	public final void doChunks(World world) {
 		this.doChunks(((WorldServer) world).chunkProviderServer);
 	}
+
 	public final void doChunks(ChunkProviderServer chunkProvider) {
 		try {
 			for (Chunk chunk : chunkProvider.chunks.values()) {
 				this.handle(chunk);
-				if (chunk.bukkitChunk == null) continue;
+				if (chunk.bukkitChunk == null)
+					continue;
 				this.handle((CraftChunk) chunk.bukkitChunk);
 			}
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world chunk list of world '" + chunkProvider.world.getWorld().getName() + "'");
 		}
 	}
+
 	public Task createTask(JavaPlugin plugin) {
 		final Operation op = this;
 		return new Task(plugin) {
@@ -139,14 +153,29 @@ public abstract class Operation extends ParameterWrapper {
 			}
 		};
 	}
-		
-	public void handle(WorldServer world) {};
-	public void handle(CraftWorld world) {};
-	public void handle(EntityPlayer player) {};
-	public void handle(CraftPlayer player) {};
-	public void handle(Entity entity) {};
-	public void handle(CraftEntity entity) {};
-	public void handle(Chunk chunk) {};
-	public void handle(CraftChunk chunk) {};
+
+	public void handle(WorldServer world) {
+	};
+
+	public void handle(CraftWorld world) {
+	};
+
+	public void handle(EntityPlayer player) {
+	};
+
+	public void handle(CraftPlayer player) {
+	};
+
+	public void handle(Entity entity) {
+	};
+
+	public void handle(CraftEntity entity) {
+	};
+
+	public void handle(Chunk chunk) {
+	};
+
+	public void handle(CraftChunk chunk) {
+	};
 
 }

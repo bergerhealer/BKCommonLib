@@ -10,11 +10,11 @@ import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 
 public abstract class Command {
-	
+
 	private ArrayList<Command> subCommands = new ArrayList<Command>();
 	public List<String> args;
 	public CommandSender sender;
-	
+
 	public final boolean isArg(int index, String... values) {
 		if (index < args.size()) {
 			String arg = args.get(index);
@@ -26,25 +26,27 @@ public abstract class Command {
 		}
 		return false;
 	}
-	
+
 	public final Double parseDouble(int index, Double def) {
 		try {
 			if (index < this.args.size()) {
 				return Double.parseDouble(this.args.get(index));
 			}
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+		}
 		return def;
 	}
-	
+
 	public final Integer parseInt(int index, Integer def) {
 		try {
 			if (index < this.args.size()) {
 				return Integer.parseInt(this.args.get(index));
 			}
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+		}
 		return def;
 	}
-		
+
 	public final boolean execute(CommandSender sender, List<String> args) throws NoPermissionException {
 		this.args = args;
 		this.sender = sender;
@@ -66,24 +68,24 @@ public abstract class Command {
 		}
 		return false;
 	}
-	
+
 	public boolean isConsoleAllowed() {
 		return true;
 	}
-	
+
 	public String getPermissionNode() {
 		IPermissionDefault def = this.getPermission();
 		return def == null ? null : def.getName();
 	}
-	
+
 	public IPermissionDefault getPermission() {
 		return null;
 	}
-	
+
 	public abstract boolean match();
-	
+
 	public abstract boolean handle() throws NoPermissionException;
-	
+
 	public final void register(Command command) {
 		this.subCommands.add(command);
 	}

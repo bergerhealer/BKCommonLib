@@ -12,18 +12,21 @@ public abstract class CompressedDataWriter extends DataWriter {
 	public CompressedDataWriter(File folder, String filename) {
 		super(folder, filename);
 	}
+
 	public CompressedDataWriter(File file) {
 		super(file);
 	}
+
 	public CompressedDataWriter(Plugin plugin, String filename) {
 		super(plugin, filename);
 	}
+
 	public CompressedDataWriter(String filepath) {
 		super(filepath);
 	}
-	
+
 	public DataOutputStream getStream(OutputStream stream) {
 		return super.getStream(new DeflaterOutputStream(stream));
 	}
-	
+
 }
