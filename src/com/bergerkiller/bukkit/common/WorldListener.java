@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.List;
+import com.bergerkiller.bukkit.common.reflection.WorldServerRef;
 
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
@@ -15,15 +15,13 @@ public class WorldListener implements IWorldAccess {
 		this.world = (WorldServer) world;
 	}
 
-	private static SafeField<List<IWorldAccess>> accesslist = new SafeField<List<IWorldAccess>>(World.class, "x");
-
 	public static boolean isValid() {
-		return accesslist.isValid();
+		return WorldServerRef.accessList.isValid();
 	}
 
 	public boolean enable() {
 		if (isValid()) {
-			accesslist.get(this.world).add(this);
+			WorldServerRef.accessList.get(this.world).add(this);
 			this.isEnabled = true;
 			return true;
 		} else {
@@ -33,7 +31,7 @@ public class WorldListener implements IWorldAccess {
 
 	public boolean disable() {
 		if (isValid()) {
-			accesslist.get(this.world).remove(this);
+			WorldServerRef.accessList.get(this.world).remove(this);
 			this.isEnabled = false;
 			return true;
 		} else {

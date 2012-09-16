@@ -3,8 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.List;
 
 import net.minecraft.server.Chunk;
+import net.minecraft.server.Entity;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet;
+import net.minecraft.server.Packet29DestroyEntity;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
@@ -13,6 +15,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class PacketUtil {
+	public static Packet getEntityDestroyPacket(Entity... entities) {
+		int[] ids = new int[entities.length];
+		for (int i = 0; i < ids.length; i++) {
+			ids[i] = entities[i].id;
+		}
+		return new Packet29DestroyEntity(ids);
+	}
+
 	public static void sendPacket(Player player, Packet packet, boolean throughListeners) {
 		sendPacket(EntityUtil.getNative(player), packet, throughListeners);
 	}

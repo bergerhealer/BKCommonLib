@@ -10,12 +10,13 @@ import org.bukkit.craftbukkit.CraftWorld;
 
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkProviderServer;
+import net.minecraft.server.Entity;
 import net.minecraft.server.EntityTracker;
+import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
 public class WorldUtil {
-	
 	public static List<WorldServer> getWorlds() {
 		try {
 			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
@@ -40,14 +41,17 @@ public class WorldUtil {
 	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
 		return chunkprovider.chunks.get(x, z);
 	}
-	
+
 	public static EntityTracker getTracker(org.bukkit.World world) {
 		return getTracker(getNative(world));
 	}
 	public static EntityTracker getTracker(World world) {
 		return ((WorldServer) world).tracker;
 	}
-			
+	public static EntityTrackerEntry getTrackerEntry(Entity entity) {
+		return (EntityTrackerEntry) WorldUtil.getTracker(entity.world).trackedEntities.d(entity.id);
+	}
+
 	public static void loadChunks(Location location, final int radius) {
 		loadChunks(location.getWorld(), location.getX(), location.getZ(), radius);
 	}

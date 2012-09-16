@@ -7,22 +7,22 @@ import org.bukkit.Bukkit;
 
 public class SafeField<T> {
 
-	public SafeField(String methodPath) {
-		if (methodPath == null || methodPath.isEmpty() || !methodPath.contains(".")) {
-			Bukkit.getLogger().log(Level.SEVERE, "Method path contains no class: " + methodPath);
+	public SafeField(String fieldPath) {
+		if (fieldPath == null || fieldPath.isEmpty() || !fieldPath.contains(".")) {
+			Bukkit.getLogger().log(Level.SEVERE, "Field path contains no class: " + fieldPath);
 			return;
 		}
 		try {
-			String className = methodPath.substring(0, methodPath.lastIndexOf('.'));
-			String methodName = methodPath.substring(className.length() + 1);
+			String className = fieldPath.substring(0, fieldPath.lastIndexOf('.'));
+			String methodName = fieldPath.substring(className.length() + 1);
 			load(Class.forName(className), methodName);
 		} catch (Throwable t) {
-			System.out.println("Failed to load method '" + methodPath + "':");
+			System.out.println("Failed to load field '" + fieldPath + "':");
 			t.printStackTrace();
 		}
 	}
 	public SafeField(Object value, String name) {
-		load(value.getClass(), name);
+		load(value == null ? null : value.getClass(), name);
 	}
 	public SafeField(Class<?> source, String name) {
 		load(source, name);
@@ -30,6 +30,10 @@ public class SafeField<T> {
 	private Field field;
 	
 	private void load(Class<?> source, String name) {
+		if (source == null) {
+			new Exception("Can not load field '" + name + "' because the class is null!").printStackTrace();
+			return;
+		}
 		//try to find the field
 	    Class<?> tmp = source;
 	    while (tmp != null) {
@@ -50,7 +54,21 @@ public class SafeField<T> {
 	public boolean isValid() {
 		return this.field != null;
 	}
-	
+
+	/**
+	 * Transfers the value from one instance to the other
+	 * 
+	 * @param from instance
+	 * @param to instance
+	 * @return the old value of the to instance
+	 */
+	public T transfer(Object from, Object to) {
+		if (this.field == null) return null;
+		T old = get(to);
+		set(to, get(from));
+		return old;
+	}
+
 	@SuppressWarnings("unchecked")
 	public T get(Object object) {
 		if (this.field == null) return null;

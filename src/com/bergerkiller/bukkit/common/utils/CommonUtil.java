@@ -138,5 +138,19 @@ public class CommonUtil {
 	public static Plugin getPlugin(String name) {
 		return Bukkit.getServer().getPluginManager().getPlugin(name);
 	}
-	
+
+	/**
+	 * Tries to get the class at the path specified
+	 * 
+	 * @param path to the class
+	 * @return the class, or null if not found
+	 */
+	public static Class<?> getClass(String path) {
+		try {
+			return Class.forName(path);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

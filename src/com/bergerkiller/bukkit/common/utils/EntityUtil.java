@@ -69,7 +69,7 @@ public class EntityUtil {
 		net.minecraft.server.Entity e = getEntity(WorldUtil.getNative(world), uid);
 		return e == null ? null : e.getBukkitEntity();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static net.minecraft.server.Entity getEntity(net.minecraft.server.World world, UUID uid) {
 		for (net.minecraft.server.Entity e : (List<net.minecraft.server.Entity>) world.entityList) {
@@ -77,7 +77,7 @@ public class EntityUtil {
 		}
 		return null;
 	}
-					
+
 	/* 
 	 * States
 	 */
@@ -90,7 +90,7 @@ public class EntityUtil {
 		"enderdragon", "blaze", "magmacube", "silverfish"};
 	public static final String[] npcNames = new String[] {
 		"villager", "irongolem"};
-	
+
 	public static boolean isMob(Entity entity) {
 		return isMob(getNative(entity));
 	}
@@ -103,7 +103,7 @@ public class EntityUtil {
 	public static boolean isNPC(Entity entity) {
 		return isNPC(getNative(entity));
 	}
-	
+
 	public static boolean isMob(net.minecraft.server.Entity entity) {
 		return entity instanceof EntityCreature;
 	}
@@ -116,7 +116,7 @@ public class EntityUtil {
 	public static boolean isMonster(net.minecraft.server.Entity entity) {
 		return entity instanceof IMonster;
 	}
-		
+
 	public static boolean isMob(EntityType type) {
 		return isMob(getName(type));
 	}
@@ -225,5 +225,4 @@ public class EntityUtil {
 			return entity.getBukkitEntity().teleport(to);			
 		}
 	}
-	
 }

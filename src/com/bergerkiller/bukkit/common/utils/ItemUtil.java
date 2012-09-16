@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
+import net.minecraft.server.EntityItem;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
@@ -34,6 +35,7 @@ import com.narrowtux.showcase.Showcase;
 
 public class ItemUtil {
 
+	@SuppressWarnings("deprecation")
 	public static boolean isIgnored(Entity itementity) {
 		if (!(itementity instanceof Item)) return true; 
 		Item item = (Item) itementity;
@@ -109,7 +111,20 @@ public class ItemUtil {
 		}
 		inv.setItem(index, item);
 	}
-	
+
+	public static EntityItem respawnItem(EntityItem item) {
+		item.dead = true;
+		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.itemStack);
+		newItem.fallDistance = item.fallDistance;
+		newItem.fireTicks = item.fireTicks;
+		newItem.pickupDelay = item.pickupDelay;
+		newItem.motX = item.motX;
+		newItem.motY = item.motY;
+		newItem.motZ = item.motZ;
+		newItem.world.addEntity(newItem);
+		return newItem;
+	}
+
 	public static ItemStack findItem(Inventory inventory, int typeid, Integer data) {
 		 net.minecraft.server.ItemStack item = findItem(getNative(inventory), typeid, data);
 		 return item == null ? null : new CraftItemStack(item);
@@ -317,13 +332,15 @@ public class ItemUtil {
 		int tmptrans;
 
 		//try to add to already existing items
-		for (ItemStack toitem : to.getContents()) {
+		for (int i = 0; i < to.getSize(); i++) {
+			ItemStack toitem = to.getItem(i);
 			if (toitem == null) continue;
 			if (toitem.getTypeId() == from.getTypeId()) {
 				if (toitem.getDurability() == from.getDurability()) {
 					tmptrans = transfer(from, toitem, maxAmount);
 					maxAmount -= tmptrans;
 					transferred += tmptrans;
+					setItem(to, i, toitem);
 					//everything done?
 					if (maxAmount <= 0 || from.getAmount() == 0) break;
 				}
