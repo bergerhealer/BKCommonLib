@@ -228,12 +228,12 @@ public class EntityUtil {
 
 	public static boolean teleport(final Plugin plugin, final net.minecraft.server.Entity entity, final Location to) {
 		WorldServer newworld = ((CraftWorld) to.getWorld()).getHandle();
-		WorldUtil.loadChunks(to, 2);
+		WorldUtil.loadChunks(to, 3);
 		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
-			if (entity.passenger != null) {
-				final net.minecraft.server.Entity passenger = entity.passenger;
-				passenger.vehicle = null;
+			final net.minecraft.server.Entity passenger = entity.passenger;
+			if (passenger != null) {
 				entity.passenger = null;
+				passenger.vehicle = null;
 				if (teleport(plugin, passenger, to)) {
 					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 						public void run() {
@@ -244,13 +244,11 @@ public class EntityUtil {
 			}
 
 			// teleport this entity
-			WorldUtil.getTracker(entity.world).untrackEntity(entity);
 			entity.world.removeEntity(entity);
 			entity.dead = false;
 			entity.world = newworld;
 			entity.setLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
 			entity.world.addEntity(entity);
-			WorldUtil.getTracker(entity.world).track(entity);
 			return true;
 		} else {
 			return entity.getBukkitEntity().teleport(to);
