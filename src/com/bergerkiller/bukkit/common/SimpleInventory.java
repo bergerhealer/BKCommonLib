@@ -1,23 +1,17 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import org.bukkit.craftbukkit.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
-import net.minecraft.server.EntityHuman;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.ItemStack;
 
-public class SimpleInventory implements IInventory {
+public class SimpleInventory extends IInventoryBase {
+	private ItemStack[] items;
 
 	public SimpleInventory(Inventory inventory) {
 		this(inventory.getContents());
@@ -54,23 +48,6 @@ public class SimpleInventory implements IInventory {
 		this.items = items;
 	}
 
-	private int maxstacksize = 64;
-	private ItemStack[] items;
-
-	@Override
-	public boolean a(EntityHuman arg0) {
-		return false;
-	}
-
-	@Override
-	public void f() {
-	}
-
-	@Override
-	public ItemStack[] getContents() {
-		return this.items;
-	}
-
 	@Override
 	public ItemStack getItem(int index) {
 		return this.items[index];
@@ -78,12 +55,7 @@ public class SimpleInventory implements IInventory {
 
 	@Override
 	public String getName() {
-		return "SimpleInventory";
-	}
-
-	@Override
-	public InventoryHolder getOwner() {
-		return null;
+		return "Simple Inventory";
 	}
 
 	@Override
@@ -92,76 +64,17 @@ public class SimpleInventory implements IInventory {
 	}
 
 	@Override
-	public void startOpen() {
+	public ItemStack[] getContents() {
+		return this.items;
 	}
 
 	@Override
-	public List<HumanEntity> getViewers() {
-		return new ArrayList<HumanEntity>(0);
+	public void setContents(ItemStack[] items) {
+		this.items = items;
 	}
 
 	@Override
-	public void onClose(CraftHumanEntity arg0) {
-	}
-
-	@Override
-	public void onOpen(CraftHumanEntity arg0) {
-	}
-
-	@Override
-	public void update() {
-	}
-
-	@Override
-	public void setItem(int index, ItemStack stack) {
-		this.items[index] = stack;
-		if (stack != null && stack.count > this.getMaxStackSize()) {
-			stack.count = this.getMaxStackSize();
-		}
-	}
-
-	@Override
-	public int getMaxStackSize() {
-		return this.maxstacksize;
-	}
-
-	@Override
-	public void setMaxStackSize(int size) {
-		this.maxstacksize = size;
-	}
-
-	@Override
-	public ItemStack splitStack(int index, int size) {
-		if (this.items[index] != null) {
-			ItemStack itemstack;
-			if (this.items[index].count <= size) {
-				itemstack = this.items[index];
-				this.items[index] = null;
-				return itemstack;
-			} else {
-				itemstack = this.items[index].a(size);
-				if (this.items[index].count == 0) {
-					this.items[index] = null;
-				}
-				return itemstack;
-			}
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public ItemStack splitWithoutUpdate(int index) {
-		if (this.items[index] != null) {
-			ItemStack itemstack = this.items[index];
-			this.items[index] = null;
-			return itemstack;
-		} else {
-			return null;
-		}
-	}
-
-	public Inventory getInventory() {
-		return new CraftInventory(this);
+	public void setItem(int index, ItemStack itemstack) {
+		this.items[index] = limitStack(itemstack);
 	}
 }

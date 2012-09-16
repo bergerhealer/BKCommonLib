@@ -72,6 +72,17 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Attempts to find the method by name
+	 * 
+	 * @param name of the method
+	 * @param arguments of the method
+	 * @return method
+	 */
+	public SafeMethod getMethod(String name, Class<?> parameterTypes) {
+		return new SafeMethod(this.getType(), name, parameterTypes);
+	}
+
+	/**
 	 * Attempts to create a new template for the class at the path specified
 	 * 
 	 * @param path to the class

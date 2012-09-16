@@ -57,7 +57,7 @@ public class WorldUtil {
 	}
 
 	public static EntityTrackerEntry getTrackerEntry(Entity entity) {
-		return (EntityTrackerEntry) WorldUtil.getTracker(entity.world).trackedEntities.d(entity.id);
+		return (EntityTrackerEntry) WorldUtil.getTracker(entity.world).trackedEntities.get(entity.id);
 	}
 
 	public static void loadChunks(Location location, final int radius) {

@@ -224,6 +224,15 @@ public class BlockUtil {
 		return b == null ? false : isRails(b.getTypeId());
 	}
 
+    public static boolean isPowerSource(Material type) {
+    	return isPowerSource(type.getId());
+    }
+
+    public static boolean isPowerSource(int typeId) {
+    	net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
+    	return block == null ? false : block.isPowerSource();
+    }
+
 	public static <T extends BlockState> T getState(Block block, Class<T> type) {
 		try {
 			return type.cast(block.getState());

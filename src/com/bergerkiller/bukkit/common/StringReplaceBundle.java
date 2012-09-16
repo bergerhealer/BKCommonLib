@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
+
 public class StringReplaceBundle {
 	private List<Entry<String, String>> entries = new ArrayList<Entry<String, String>>();
 
@@ -37,5 +39,28 @@ public class StringReplaceBundle {
 			}
 		}
 		return output.toString();
+	}
+
+	/**
+	 * Clears all entries stored
+	 * 
+	 * @return this bundle
+	 */
+	public StringReplaceBundle clear() {
+		this.entries.clear();
+		return this;
+	}
+
+	/**
+	 * Loads all the entries stored in the configuration node specified
+	 * 
+	 * @param node to load
+	 * @return this bundle
+	 */
+	public StringReplaceBundle load(ConfigurationNode node) {
+		for (String key : node.getKeys()) {
+			add(key, node.get(key, key));
+		}
+		return this;
 	}
 }

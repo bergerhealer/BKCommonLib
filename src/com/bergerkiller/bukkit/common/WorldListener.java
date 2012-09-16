@@ -1,42 +1,48 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.reflection.WorldServerRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
-import net.minecraft.server.IWorldAccess;
 import net.minecraft.server.World;
+import net.minecraft.server.WorldManager;
 import net.minecraft.server.WorldServer;
 
-public class WorldListener implements IWorldAccess {
-	public final WorldServer world;
+public class WorldListener extends WorldManager {
 	private boolean isEnabled = false;
 
 	public WorldListener(World world) {
-		this.world = (WorldServer) world;
+		super(CommonUtil.getMCServer(), (WorldServer) world);
 	}
 
 	public static boolean isValid() {
 		return WorldServerRef.accessList.isValid();
 	}
 
-	public boolean enable() {
+	/**
+	 * Enables the listener<br>
+	 * Will send entity add messages for all current entities
+	 */
+	public void enable() {
 		if (isValid()) {
 			WorldServerRef.accessList.get(this.world).add(this);
+			for (Object e : world.entityList) {
+				this.a((Entity) e);
+			}
 			this.isEnabled = true;
-			return true;
 		} else {
-			return false;
+			new RuntimeException("Failed to listen in World").printStackTrace();
 		}
 	}
 
-	public boolean disable() {
+	/**
+	 * Disables the listener
+	 */
+	public void disable() {
 		if (isValid()) {
 			WorldServerRef.accessList.get(this.world).remove(this);
 			this.isEnabled = false;
-			return true;
-		} else {
-			return false;
 		}
 	}
 
