@@ -51,7 +51,7 @@ public class SafeField<T> {
 				return;
 			}
 		}
-		new Exception("Field '" + name + "' does not exist in class file '" + source.getSimpleName() + "'!").printStackTrace();
+		Common.handleReflectionMissing("Field", name, source);
 	}
 
 	public boolean isValid() {

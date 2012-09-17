@@ -52,7 +52,15 @@ public class SafeMethod {
 				return;
 			}
 		}
-		new Exception("Method '" + name + "' does not exist in class file '" + source.getSimpleName() + "'!").printStackTrace();
+		name += "(";
+		for (int i = 0; i < parameterTypes.length; i++) {
+			if (i > 0) {
+				name += ", ";
+			}
+			name += parameterTypes[i].getSimpleName();
+		}
+		name += ")";
+		Common.handleReflectionMissing("Method", name, source);
 	}
 
 	public Object invoke(Object instance, Object... args) {
