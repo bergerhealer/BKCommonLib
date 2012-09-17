@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.HashMap;
+
 import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -13,14 +15,27 @@ import com.bergerkiller.bukkit.common.StringReplaceBundle;
 
 @SuppressWarnings("deprecation")
 public class EnumUtil {
+	private static final HashMap<String, Material> MAT_SPECIAL = new HashMap<String, Material>();
 	private static final StringReplaceBundle MAT_REPLACE = new StringReplaceBundle();
 	static {
+		// Material replacement algorithm
 		MAT_REPLACE.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
 		MAT_REPLACE.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
 		MAT_REPLACE.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
 		MAT_REPLACE.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
 		MAT_REPLACE.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
 		MAT_REPLACE.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN");
+		// Special name cases
+		MAT_SPECIAL.put("CROP", Material.CROPS);
+		MAT_SPECIAL.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
+		MAT_SPECIAL.put("BUTTON", Material.STONE_BUTTON);
+		MAT_SPECIAL.put("PISTON", Material.PISTON_BASE);
+		MAT_SPECIAL.put("STICKPISTON", Material.PISTON_STICKY_BASE);
+		MAT_SPECIAL.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
+		MAT_SPECIAL.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
+		MAT_SPECIAL.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
+		MAT_SPECIAL.put("GOLDAPPLE", Material.GOLDEN_APPLE);
+		MAT_SPECIAL.put("APPLEGOLD", Material.GOLDEN_APPLE);
 	}
 
 	public static <E extends Enum<E>> E parse(Class<E> enumeration, String name, E def) {
@@ -104,20 +119,9 @@ public class EnumUtil {
 		Material m = parse(Material.class, name, null);
 		if (m != null)
 			return m;
-		if (name.equals("CROP"))
-			return Material.CROPS;
-		if (name.equals("REDSTONETORCH"))
-			return Material.REDSTONE_TORCH_ON;
-		if (name.equals("BUTTON"))
-			return Material.STONE_BUTTON;
-		if (name.equals("PISTON"))
-			return Material.PISTON_BASE;
-		if (name.equals("STICKYPISTON"))
-			return Material.PISTON_STICKY_BASE;
-		if (name.equals("MOSSSTONE"))
-			return Material.MOSSY_COBBLESTONE;
-		if (name.equals("STONESTAIRS"))
-			return Material.COBBLESTONE_STAIRS;
+		m = MAT_SPECIAL.get(name);
+		if (m != null) 
+			return m;
 		if (name.endsWith("S")) {
 			return parseMaterialMain(name.substring(0, name.length() - 1), def);
 		} else {
