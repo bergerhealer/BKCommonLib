@@ -10,14 +10,6 @@ import org.bukkit.block.Block;
 
 public class StringUtil {
 
-	public static double tryParse(String text, double def) {
-		try {
-			return Double.parseDouble(text);
-		} catch (Exception ex) {
-			return def;
-		}
-	}
-
 	/**
 	 * Converts a Location to a destination name.
 	 * 
