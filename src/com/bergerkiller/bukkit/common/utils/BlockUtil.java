@@ -310,6 +310,26 @@ public class BlockUtil {
 		return block == null ? false : block.isPowerSource();
 	}
 
+	/**
+	 * Checks if a given material Type is solid and can cause player suffocation
+	 * 
+	 * @param type of the Material
+	 * @return True if it is Solid, False if not
+	 */
+	public static boolean isSolid(Material type) {
+		return isSolid(type.getId());
+	}
+
+	/**
+	 * Checks if a given material Type id is solid and can cause player suffocation
+	 * 
+	 * @param typeId of the Material
+	 * @return True if it is Solid, False if not
+	 */
+	public static boolean isSolid(int typeId) {
+		return net.minecraft.server.Block.i(typeId);
+	}
+
 	public static <T extends BlockState> T getState(Block block, Class<T> type) {
 		try {
 			return type.cast(block.getState());
