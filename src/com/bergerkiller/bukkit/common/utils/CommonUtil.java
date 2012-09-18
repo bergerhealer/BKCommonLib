@@ -104,10 +104,7 @@ public class CommonUtil {
 	/**
 	 * Shuffle an array of type T
 	 * 
-	 * @param <T>
-	 *            The type contained in the array
-	 * @param array
-	 *            The array to be shuffled
+	 * @param array to be shuffled
 	 */
 	public static <T> void shuffle(T[] array) {
 		int random;
@@ -151,8 +148,7 @@ public class CommonUtil {
 	/**
 	 * Tries to get the class at the path specified
 	 * 
-	 * @param path
-	 *            to the class
+	 * @param path to the class
 	 * @return the class, or null if not found
 	 */
 	public static Class<?> getClass(String path) {

@@ -2,11 +2,14 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
+
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkProviderServer;
@@ -25,6 +28,11 @@ public class WorldUtil {
 		} catch (NullPointerException ex) {
 		}
 		return new ArrayList<WorldServer>();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Entity> getEntities(World world) {
+		return world.entityList;
 	}
 
 	public static WorldServer getNative(org.bukkit.World world) {
@@ -48,16 +56,57 @@ public class WorldUtil {
 		return chunkprovider.chunks.get(x, z);
 	}
 
+	/**
+	 * Gets the Entity Tracker for the world specified
+	 * 
+	 * @param world to get the tracker for
+	 * @return world Entity Tracker
+	 */
 	public static EntityTracker getTracker(org.bukkit.World world) {
 		return getTracker(getNative(world));
 	}
 
+	/**
+	 * Gets the Entity Tracker for the world specified
+	 * 
+	 * @param world to get the tracker for
+	 * @return world Entity Tracker
+	 */
 	public static EntityTracker getTracker(World world) {
 		return ((WorldServer) world).tracker;
 	}
 
+	/**
+	 * Gets the tracker entry of the entity specified
+	 * 
+	 * @param entity to get it for
+	 * @return entity tracker entry, or null if none is set
+	 */
 	public static EntityTrackerEntry getTrackerEntry(Entity entity) {
 		return (EntityTrackerEntry) WorldUtil.getTracker(entity.world).trackedEntities.get(entity.id);
+	}
+
+	/**
+	 * Sets a new entity tracker entry for the entity specified
+	 * 
+	 * @param entity to set it for
+	 * @param tracker to set to (can be null to remove only)
+	 * @return the previous tracker entry for the entity, or null if there was none
+	 */
+	public static EntityTrackerEntry setTrackerEntry(Entity entity, EntityTrackerEntry tracker) {
+		EntityTracker t = getTracker(entity.world);
+		Set<EntityTrackerEntry> trackers = EntityTrackerRef.trackerSet.get(t);
+		synchronized (t) {
+			EntityTrackerEntry old = (EntityTrackerEntry) t.trackedEntities.d(entity.id);
+			if (old != null) {
+				trackers.remove(old);
+			}
+			if (tracker != null) {
+				trackers.add(tracker);
+				t.trackedEntities.a(entity.id, tracker);
+			}
+			return old;
+		}
 	}
 
 	public static void loadChunks(Location location, final int radius) {

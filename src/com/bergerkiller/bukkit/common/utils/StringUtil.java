@@ -13,8 +13,7 @@ public class StringUtil {
 	/**
 	 * Converts a Location to a destination name.
 	 * 
-	 * @param loc
-	 *            The Location to convert
+	 * @param loc The Location to convert
 	 * @return A string representing the destination name.
 	 */
 	public static String blockToString(Block block) {
@@ -24,8 +23,7 @@ public class StringUtil {
 	/**
 	 * Converts a destination name to a String.
 	 * 
-	 * @param str
-	 *            The String to convert
+	 * @param str The String to convert
 	 * @return A Location representing the String.
 	 */
 	public static Block stringToBlock(String str) {

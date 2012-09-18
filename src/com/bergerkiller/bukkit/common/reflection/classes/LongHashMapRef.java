@@ -1,11 +1,11 @@
-package com.bergerkiller.bukkit.common.reflection;
+package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import net.minecraft.server.LongHashMap;
 
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class LongHashMapRef {
 	private static final SafeField<Object[]> entriesField = new SafeField<Object[]>(LongHashMap.class, "entries");

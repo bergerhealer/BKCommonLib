@@ -1,7 +1,7 @@
-package com.bergerkiller.bukkit.common.reflection;
+package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.ClassTemplate;
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 import net.minecraft.server.ChunkProviderServer;
 import net.minecraft.server.IChunkLoader;

@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -6,7 +6,8 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
-public class SafeMethod {
+public class SafeMethod extends SafeBase {
+	private Method method;
 
 	public SafeMethod(String methodPath, Class<?>... parameterTypes) {
 		if (methodPath == null || methodPath.isEmpty() || !methodPath.contains(".")) {
@@ -30,8 +31,6 @@ public class SafeMethod {
 	public SafeMethod(Class<?> source, String name, Class<?>... parameterTypes) {
 		load(source, name, parameterTypes);
 	}
-
-	private Method method;
 
 	private void load(Class<?> source, String name, Class<?>... parameterTypes) {
 		if (source == null) {
@@ -60,9 +59,25 @@ public class SafeMethod {
 			name += parameterTypes[i].getSimpleName();
 		}
 		name += ")";
-		Common.handleReflectionMissing("Method", name, source);
+		handleReflectionMissing("Method", name, source);
 	}
 
+	/**
+	 * Checks if this Method is valid
+	 * 
+	 * @return True if valid, False if not
+	 */
+	public boolean isValid() {
+		return this.method != null;
+	}
+
+	/**
+	 * Executes the method
+	 * 
+	 * @param instance of the class the method is in, use null if it is a static method
+	 * @param args to use for the method
+	 * @return A possible returned value from the method, is always null if the method is a void
+	 */
 	public Object invoke(Object instance, Object... args) {
 		if (this.method != null) {
 			try {

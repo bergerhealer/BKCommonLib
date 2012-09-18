@@ -28,8 +28,8 @@ import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.ItemParser;
-import com.bergerkiller.bukkit.common.SimpleInventory;
+import com.bergerkiller.bukkit.common.items.ItemParser;
+import com.bergerkiller.bukkit.common.items.SimpleInventory;
 import com.miykeal.showCaseStandalone.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -323,15 +323,10 @@ public class ItemUtil {
 	/**
 	 * Transfers all ItemStacks from one Inventory to another
 	 * 
-	 * @param from
-	 *            : The Inventory to take ItemStacks from
-	 * @param to
-	 *            : The Inventory to transfer to
-	 * @param maxAmount
-	 *            : The maximum amount of items to transfer
-	 * @param parser
-	 *            : The item parser used to set what items to transfer. Can be
-	 *            null.
+	 * @param from The Inventory to take ItemStacks from
+	 * @param to The Inventory to transfer to
+	 * @param maxAmount The maximum amount of items to transfer
+	 * @param parser The item parser used to set what items to transfer. Can be null.
 	 * @return The amount of items that got transferred
 	 */
 	public static int transfer(Inventory from, Inventory to, ItemParser parser, int maxAmount) {
@@ -354,12 +349,9 @@ public class ItemUtil {
 	/**
 	 * Transfers the given ItemStack to multiple slots in the Inventory
 	 * 
-	 * @param from
-	 *            : The ItemStack to transfer
-	 * @param to
-	 *            : The Inventory to transfer to
-	 * @param maxAmount
-	 *            : The maximum amount of the item to transfer
+	 * @param from The ItemStack to transfer
+	 * @param to The Inventory to transfer to
+	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(ItemStack from, Inventory to, int maxAmount) {
@@ -413,12 +405,9 @@ public class ItemUtil {
 	/**
 	 * Merges two ItemStacks
 	 * 
-	 * @param from
-	 *            : The ItemStack to merge
-	 * @param to
-	 *            : The receiving ItemStack
-	 * @param maxAmount
-	 *            : The maximum amount of the item to transfer
+	 * @param from The ItemStack to merge
+	 * @param to The receiving ItemStack
+	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(ItemStack from, ItemStack to, int maxAmount) {
@@ -436,12 +425,9 @@ public class ItemUtil {
 	/**
 	 * Merges two native ItemStacks
 	 * 
-	 * @param from
-	 *            : The ItemStack to merge
-	 * @param to
-	 *            : The receiving ItemStack
-	 * @param maxAmount
-	 *            : The maximum amount of the item to transfer
+	 * @param from The ItemStack to merge
+	 * @param to The receiving ItemStack
+	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(net.minecraft.server.ItemStack from, net.minecraft.server.ItemStack to, int maxCount) {
@@ -525,15 +511,10 @@ public class ItemUtil {
 	/**
 	 * Tries to transfer a single item from the Inventory to the ItemStack
 	 * 
-	 * @param from
-	 *            : The Inventory to take an ItemStack from
-	 * @param to
-	 *            : The ItemStack to merge the item taken
-	 * @param maxAmount
-	 *            : The maximum amount of items to transfer
-	 * @param parser
-	 *            : The item parser used to set what item to transfer if the
-	 *            receiving item is empty. Can be null.
+	 * @param from The Inventory to take an ItemStack from
+	 * @param to The ItemStack to merge the item taken
+	 * @param maxAmount The maximum amount of items to transfer
+	 * @param parser The item parser used to set what item to transfer if the receiving item is empty. Can be null.
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(Inventory from, ItemStack to, ItemParser parser, int maxAmount) {

@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.items;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
@@ -18,7 +19,6 @@ import net.minecraft.server.ShapedRecipes;
 import net.minecraft.server.ShapelessRecipes;
 
 public class CraftRecipe {
-
 	private static SafeField<ItemStack[]> sf1 = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
 	private static SafeField<List<ItemStack>> sf2 = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "ingredients");
 
@@ -58,18 +58,40 @@ public class CraftRecipe {
 	private final ItemStack[] input;
 	private final ItemStack[] output;
 
+	/**
+	 * Gets the input item at the index specified
+	 * 
+	 * @param index of the item
+	 * @return input Item
+	 */
 	public ItemStack getInput(int index) {
 		return this.input[index];
 	}
 
+	/**
+	 * Gets all the input items
+	 * 
+	 * @return input Items
+	 */
 	public ItemStack[] getInput() {
 		return this.input;
 	}
 
+	/**
+	 * Gets all the output items
+	 * 
+	 * @return output Items
+	 */
 	public ItemStack[] getOutput() {
 		return this.output;
 	}
 
+	/**
+	 * Gets the total amount of items, this adds all the amounts of all the items together<br>
+	 * <b>This is not the length of the Input item array!</b>
+	 * 
+	 * @return Input item amount
+	 */
 	public int getInputSize() {
 		int count = 0;
 		for (ItemStack item : this.input) {
@@ -78,6 +100,12 @@ public class CraftRecipe {
 		return count;
 	}
 
+	/**
+	 * Gets the total amount of items, this adds all the amounts of all the items together<br>
+	 * <b>This is not the length of the Output item array!</b>
+	 * 
+	 * @return Output item amount
+	 */
 	public int getOutputSize() {
 		int count = 0;
 		for (ItemStack item : this.output) {
@@ -89,10 +117,8 @@ public class CraftRecipe {
 	/**
 	 * Performs this recipe multiple times in the inventory specified
 	 * 
-	 * @param inventory
-	 *            to craft in
-	 * @param itemlimit
-	 *            the max amount of resulting items
+	 * @param inventory to craft in
+	 * @param itemlimit the max amount of resulting items
 	 * @return the amount of resulting items that were crafted
 	 */
 	public int craftItems(IInventory inventory, int itemlimit) {
@@ -103,10 +129,8 @@ public class CraftRecipe {
 	/**
 	 * Performs this recipe multiple times in the inventory specified
 	 * 
-	 * @param inventory
-	 *            to craft in
-	 * @param limit
-	 *            the amount of times it can craft
+	 * @param inventory to craft in
+	 * @param limit the amount of times it can craft
 	 * @return the amount of times it crafted
 	 */
 	public int craft(IInventory inventory, int limit) {
@@ -119,8 +143,7 @@ public class CraftRecipe {
 	/**
 	 * Performs this recipe once in the inventory specified
 	 * 
-	 * @param inventory
-	 *            to craft in
+	 * @param inventory to craft in
 	 * @return whether the crafting was successful
 	 */
 	public boolean craft(IInventory inventory) {
@@ -173,5 +196,4 @@ public class CraftRecipe {
 			return new CraftRecipe(input, output);
 		}
 	}
-
 }

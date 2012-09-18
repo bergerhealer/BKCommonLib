@@ -1,14 +1,58 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.EnumMap;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 public class FaceUtil {
-	public static final BlockFace[] axis = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
-	public static final BlockFace[] attachedFaces = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
-	public static final BlockFace[] attachedFacesDown = new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+	public static final BlockFace[] axis = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+	public static final BlockFace[] attachedFaces = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+	public static final BlockFace[] attachedFacesDown = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+	public static final BlockFace[] radial = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
+	private static final EnumMap<BlockFace, Integer> notches = new EnumMap<BlockFace, Integer>(BlockFace.class);
+
+	static {
+		for (int i = 0; i < radial.length; i++) {
+			notches.put(radial[i], i);
+		}
+	}
+
+	/**
+	 * Gets the Notch integer representation of a BlockFace<br>
+	 * <b>These are the horizontal faces, which exclude up and down</b>
+	 * 
+	 * @param face to get
+	 * @return Notch of the face
+	 */
+	public static int faceToNotch(BlockFace face) {
+		Integer notch = notches.get(face);
+		return notch == null ? 0 : notch.intValue();
+	}
+
+	/**
+	 * Gets the Block Face at the notch index specified<br>
+	 * <b>These are the horizontal faces, which exclude up and down</b>
+	 * 
+	 * @param notch to get
+	 * @return BlockFace of the notch
+	 */
+	public static BlockFace notchToFace(int notch) {
+		return radial[notch & 0x7];
+	}
+
+	/**
+	 * Rotates a given Block Face horizontally
+	 * 
+	 * @param from face
+	 * @param notchCount to rotate at
+	 * @return rotated face
+	 */
+	public static BlockFace rotate(BlockFace from, int notchCount) {
+		return notchToFace(faceToNotch(from) + notchCount);
+	}
 
 	public static BlockFace combine(BlockFace from, BlockFace to) {
 		if (from == BlockFace.NORTH) {
@@ -90,74 +134,6 @@ public class FaceUtil {
 			default:
 				return new BlockFace[] { BlockFace.SELF, BlockFace.SELF };
 		}
-	}
-
-	public static BlockFace rotate(BlockFace from, int notchCount) {
-		while (notchCount > 0) {
-			switch (from) {
-				case NORTH:
-					from = BlockFace.NORTH_EAST;
-					break;
-				case NORTH_EAST:
-					from = BlockFace.EAST;
-					break;
-				case EAST:
-					from = BlockFace.SOUTH_EAST;
-					break;
-				case SOUTH_EAST:
-					from = BlockFace.SOUTH;
-					break;
-				case SOUTH:
-					from = BlockFace.SOUTH_WEST;
-					break;
-				case SOUTH_WEST:
-					from = BlockFace.WEST;
-					break;
-				case WEST:
-					from = BlockFace.NORTH_WEST;
-					break;
-				case NORTH_WEST:
-					from = BlockFace.NORTH;
-					break;
-				default:
-					return from;
-			}
-			if (notchCount-- == 0)
-				return from;
-		}
-		while (notchCount < 0) {
-			switch (from) {
-				case NORTH:
-					from = BlockFace.NORTH_WEST;
-					break;
-				case NORTH_WEST:
-					from = BlockFace.WEST;
-					break;
-				case WEST:
-					from = BlockFace.SOUTH_WEST;
-					break;
-				case SOUTH_WEST:
-					from = BlockFace.SOUTH;
-					break;
-				case SOUTH:
-					from = BlockFace.SOUTH_EAST;
-					break;
-				case SOUTH_EAST:
-					from = BlockFace.EAST;
-					break;
-				case EAST:
-					from = BlockFace.NORTH_EAST;
-					break;
-				case NORTH_EAST:
-					from = BlockFace.NORTH;
-					break;
-				default:
-					return from;
-			}
-			if (notchCount++ == 0)
-				return from;
-		}
-		return from;
 	}
 
 	public static BlockFace getRailsCartDirection(final BlockFace raildirection) {
@@ -364,7 +340,7 @@ public class FaceUtil {
 	}
 
 	public static BlockFace yawToFace(float yaw, boolean useSubCardinalDirections) {
-		yaw = MathUtil.normalAngle(yaw);
+		yaw = MathUtil.wrapAngle(yaw);
 		if (useSubCardinalDirections) {
 			switch ((int) yaw) {
 				case 0:

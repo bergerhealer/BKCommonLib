@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.items;
 
 import java.util.Collection;
 import java.util.List;

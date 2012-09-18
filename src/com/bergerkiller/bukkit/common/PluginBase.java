@@ -193,8 +193,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * If the throwable is too severe, the plugin is automatically disabled<br>
 	 * Additional exception types can be handled if needed
 	 * 
-	 * @param reason
-	 *            to throw
+	 * @param reason to throw
 	 */
 	public void handle(Throwable reason) {
 		if (reason instanceof Exception) {

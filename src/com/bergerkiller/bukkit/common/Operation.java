@@ -21,18 +21,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class Operation extends ParameterWrapper {
+public abstract class Operation {
 
 	public Operation() {
-		this.run();
+		this(true);
 	}
 
-	public Operation(final Object... arguments) {
-		this(true, arguments);
-	}
-
-	public Operation(boolean run, final Object... arguments) {
-		super(arguments);
+	public Operation(boolean run) {
 		if (run)
 			this.run();
 	}
@@ -94,6 +89,10 @@ public abstract class Operation extends ParameterWrapper {
 		}
 	}
 
+	public final void doEntities(org.bukkit.World world) {
+		doEntities(WorldUtil.getNative(world));
+	}
+
 	public final void doEntities(World world) {
 		try {
 			for (Entity e : (List<Entity>) world.entityList) {
@@ -103,6 +102,10 @@ public abstract class Operation extends ParameterWrapper {
 		} catch (ConcurrentModificationException ex) {
 			multiAccess("world entity list of world '" + world.getWorld().getName() + "'");
 		}
+	}
+
+	public final void doEntities(org.bukkit.Chunk chunk) {
+		doEntities(WorldUtil.getNative(chunk));
 	}
 
 	public final void doEntities(Chunk chunk) {

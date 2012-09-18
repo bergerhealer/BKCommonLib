@@ -1,11 +1,12 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
-public class SafeField<T> {
+public class SafeField<T> extends SafeBase {
+	private Field field;
 
 	public SafeField(String fieldPath) {
 		if (fieldPath == null || fieldPath.isEmpty() || !fieldPath.contains(".")) {
@@ -30,8 +31,6 @@ public class SafeField<T> {
 		load(source, name);
 	}
 
-	private Field field;
-
 	private void load(Class<?> source, String name) {
 		if (source == null) {
 			new Exception("Can not load field '" + name + "' because the class is null!").printStackTrace();
@@ -51,9 +50,14 @@ public class SafeField<T> {
 				return;
 			}
 		}
-		Common.handleReflectionMissing("Field", name, source);
+		handleReflectionMissing("Field", name, source);
 	}
 
+	/**
+	 * Checks if this Field is valid
+	 * 
+	 * @return True if valid, False if not
+	 */
 	public boolean isValid() {
 		return this.field != null;
 	}

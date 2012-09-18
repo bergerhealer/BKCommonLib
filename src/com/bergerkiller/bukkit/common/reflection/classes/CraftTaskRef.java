@@ -1,9 +1,9 @@
-package com.bergerkiller.bukkit.common.reflection;
+package com.bergerkiller.bukkit.common.reflection.classes;
 
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.ClassTemplate;
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class CraftTaskRef {
 	public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create("org.bukkit.craftbukkit.scheduler.CraftTask");

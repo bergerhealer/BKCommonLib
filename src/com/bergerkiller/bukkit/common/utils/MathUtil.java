@@ -5,6 +5,7 @@ import net.minecraft.server.MathHelper;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.TrigMath;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -42,10 +43,16 @@ public class MathUtil {
 	}
 
 	public static float getAngleDifference(float angle1, float angle2) {
-		return Math.abs(normalAngle(angle1 - angle2));
+		return Math.abs(wrapAngle(angle1 - angle2));
 	}
 
-	public static float normalAngle(float angle) {
+	/**
+	 * Wraps the angle to be between -180 and 180 degrees
+	 * 
+	 * @param angle to wrap
+	 * @return [-180 > angle >= 180]
+	 */
+	public static float wrapAngle(float angle) {
 		while (angle <= -180)
 			angle += 360;
 		while (angle > 180)
@@ -53,6 +60,16 @@ public class MathUtil {
 		return angle;
 	}
 
+	/**
+	 * Normalizes a 2D-vector to be the length of another 2D-vector<br>
+	 * Calculates the normalization factor to multiply the input vector with, to get the requested length
+	 * 
+	 * @param x axis of the vector
+	 * @param z axis of the vector
+	 * @param reqx axis of the length vector
+	 * @param reqz axis of the length vector
+	 * @return the normalization factor
+	 */
 	public static double normalize(double x, double z, double reqx, double reqz) {
 		return Math.sqrt(lengthSquared(reqx, reqz) / lengthSquared(x, z));
 	}
@@ -78,39 +95,81 @@ public class MathUtil {
 		return getLookAtYaw(motion.getX(), motion.getZ());
 	}
 
+	/**
+	 * Gets the horizontal look-at angle in degrees to look into the 2D-direction specified
+	 * 
+	 * @param dx axis of the direction
+	 * @param dz axis of the direction
+	 * @return the angle in degrees
+	 */
 	public static float getLookAtYaw(double dx, double dz) {
-		float yaw = 0;
-		// Set yaw
-		if (dx != 0) {
-			// Set yaw start value based on dx
-			if (dx < 0) {
-				yaw = 270;
-			} else {
-				yaw = 90;
-			}
-			yaw -= atan(dz / dx);
-		} else if (dz < 0) {
-			yaw = 180;
-		}
-		return -yaw - 90;
+		return atan2(dz, dx) - 180f;
 	}
 
-	public static float getLookAtPitch(double motX, double motY, double motZ) {
-		return getLookAtPitch(motY, length(motX, motZ));
+	/**
+	 * Gets the pitch angle in degrees to look into the direction specified
+	 * 
+	 * @param dX axis of the direction
+	 * @param dY axis of the direction
+	 * @param dZ axis of the direction
+	 * @return look-at angle in degrees
+	 */
+	public static float getLookAtPitch(double dX, double dY, double dZ) {
+		return getLookAtPitch(dY, length(dX, dZ));
 	}
 
-	public static float getLookAtPitch(double motY, double motXZ) {
-		return -atan(motY / motXZ);
+	/**
+	 * Gets the pitch angle in degrees to look into the direction specified
+	 * 
+	 * @param dY axis of the direction
+	 * @param dXZ axis of the direction (length of x and z)
+	 * @return look-at angle in degrees
+	 */
+	public static float getLookAtPitch(double dY, double dXZ) {
+		return -atan(dY / dXZ);
 	}
 
+	/**
+	 * Gets the inverse tangent of the value in degrees
+	 * 
+	 * @param value
+	 * @return inverse tangent angle in degrees
+	 */
 	public static float atan(double value) {
-		return RADTODEG * (float) Math.atan(value);
+		return RADTODEG * (float) TrigMath.atan(value);
 	}
 
+	/**
+	 * Gets the inverse tangent angle in degrees of the rectangle vector
+	 * 
+	 * @param y axis
+	 * @param x axis
+	 * @return inverse tangent 2 angle in degrees
+	 */
+	public static float atan2(double y, double x) {
+		return RADTODEG * (float) Math.atan2(y, x);
+	}
+
+	/**
+	 * Moves a Location into the yaw and pitch of the Location in the offset specified
+	 * 
+	 * @param loc to move
+	 * @param offset vector
+	 * @return Translated Location
+	 */
 	public static Location move(Location loc, Vector offset) {
 		return move(loc, offset.getX(), offset.getY(), offset.getZ());
 	}
 
+	/**
+	 * Moves a Location into the yaw and pitch of the Location in the offset specified
+	 * 
+	 * @param loc to move
+	 * @param dx offset
+	 * @param dy offset
+	 * @param dz offset
+	 * @return Translated Location
+	 */
 	public static Location move(Location loc, double dx, double dy, double dz) {
 		Vector off = rotate(loc.getYaw(), loc.getPitch(), dx, dy, dz);
 		double x = loc.getX() + off.getX();
@@ -119,10 +178,28 @@ public class MathUtil {
 		return new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
 	}
 
-	public static Vector rotate(float yaw, float pitch, Vector value) {
-		return rotate(yaw, pitch, value.getX(), value.getY(), value.getZ());
+	/**
+	 * Rotates a 3D-vector using yaw and pitch
+	 * 
+	 * @param yaw angle in degrees
+	 * @param pitch angle in degrees
+	 * @param vector to rotate
+	 * @return Vector rotated by the angle (new instance)
+	 */
+	public static Vector rotate(float yaw, float pitch, Vector vector) {
+		return rotate(yaw, pitch, vector.getX(), vector.getY(), vector.getZ());
 	}
 
+	/**
+	 * Rotates a 3D-vector using yaw and pitch
+	 * 
+	 * @param yaw angle in degrees
+	 * @param pitch angle in degrees
+	 * @param x axis of the vector
+	 * @param y axis of the vector
+	 * @param z axis of the vector
+	 * @return Vector rotated by the angle
+	 */
 	public static Vector rotate(float yaw, float pitch, double x, double y, double z) {
 		// Conversions found by (a lot of) testing
 		float angle;
@@ -149,25 +226,56 @@ public class MathUtil {
 		return new Vector(newx, newy, newz);
 	}
 
-	public static double round(double Rval, int Rpl) {
-		double p = Math.pow(10, Rpl);
-		return Math.round(Rval * p) / p;
+	/**
+	 * Rounds the specified value to the amount of decimals specified
+	 * 
+	 * @param value to round
+	 * @param decimals count
+	 * @return value round to the decimal count specified
+	 */
+	public static double round(double value, int decimals) {
+		double p = Math.pow(10, decimals);
+		return Math.round(value * p) / p;
 	}
 
-	public static double fixNaN(double value, double def) {
-		if (Double.isNaN(value))
-			return def;
-		return value;
-	}
-
+	/**
+	 * Returns 0 if the value is not-a-number
+	 * 
+	 * @param value to check
+	 * @return The value, or 0 if it is NaN
+	 */
 	public static double fixNaN(double value) {
-		return fixNaN(value, 0);
+		return fixNaN(value, 0.0);
 	}
 
+	/**
+	 * Returns the default if the value is not-a-number
+	 * 
+	 * @param value to check
+	 * @param def value
+	 * @return The value, or the default if it is NaN
+	 */
+	public static double fixNaN(double value, double def) {
+		return Double.isNaN(value) ? def : value;
+	}
+
+	/**
+	 * Converts a location value into a chunk coordinate
+	 * 
+	 * @param loc to convert
+	 * @return chunk coordinate
+	 */
 	public static int locToChunk(double loc) {
 		return MathHelper.floor(loc / 16.0);
 	}
 
+	/**
+	 * Merges two ints into a long
+	 * 
+	 * @param msw integer
+	 * @param lsw integer
+	 * @return merged long value
+	 */
 	public static long toLong(int msw, int lsw) {
 		return ((long) msw << 32) + lsw - Integer.MIN_VALUE;
 	}
@@ -180,10 +288,7 @@ public class MathUtil {
 		return oldvalue + (peruseold * (newvalue - oldvalue));
 	}
 
-	/*
-	 * Stages the value between the two points using a stage from 0 to 1
-	 */
-	public static double stage(double d1, double d2, double stage) {
+	public static double lerp(double d1, double d2, double stage) {
 		if (Double.isNaN(stage))
 			return d2;
 		if (stage < 0)
@@ -193,74 +298,121 @@ public class MathUtil {
 		return d1 * (1 - stage) + d2 * stage;
 	}
 
-	public static Vector stage(Vector vec1, Vector vec2, double stage) {
+	public static Vector lerp(Vector vec1, Vector vec2, double stage) {
 		Vector newvec = new Vector();
-		newvec.setX(stage(vec1.getX(), vec2.getX(), stage));
-		newvec.setY(stage(vec1.getY(), vec2.getY(), stage));
-		newvec.setZ(stage(vec1.getZ(), vec2.getZ(), stage));
+		newvec.setX(lerp(vec1.getX(), vec2.getX(), stage));
+		newvec.setY(lerp(vec1.getY(), vec2.getY(), stage));
+		newvec.setZ(lerp(vec1.getZ(), vec2.getZ(), stage));
 		return newvec;
 	}
 
-	public static Location stage(Location loc1, Location loc2, double stage) {
+	public static Location lerp(Location loc1, Location loc2, double stage) {
 		Location newloc = new Location(loc1.getWorld(), 0, 0, 0);
-		newloc.setX(stage(loc1.getX(), loc2.getX(), stage));
-		newloc.setY(stage(loc1.getY(), loc2.getY(), stage));
-		newloc.setZ(stage(loc1.getZ(), loc2.getZ(), stage));
-		newloc.setYaw((float) stage(loc1.getYaw(), loc2.getYaw(), stage));
-		newloc.setPitch((float) stage(loc1.getPitch(), loc2.getPitch(), stage));
+		newloc.setX(lerp(loc1.getX(), loc2.getX(), stage));
+		newloc.setY(lerp(loc1.getY(), loc2.getY(), stage));
+		newloc.setZ(lerp(loc1.getZ(), loc2.getZ(), stage));
+		newloc.setYaw((float) lerp(loc1.getYaw(), loc2.getYaw(), stage));
+		newloc.setPitch((float) lerp(loc1.getPitch(), loc2.getPitch(), stage));
 		return newloc;
 	}
 
+	/**
+	 * Checks whether one value is negative and the other positive, or opposite
+	 * 
+	 * @param value1 to check
+	 * @param value2 to check
+	 * @return True if value1 is inverted from value2
+	 */
 	public static boolean isInverted(double value1, double value2) {
 		return (value1 > 0 && value2 < 0) || (value1 < 0 && value2 > 0);
 	}
 
+	/**
+	 * Gets the direction of yaw and pitch angles
+	 * 
+	 * @param yaw angle in degrees
+	 * @param pitch angle in degrees
+	 * @return Direction Vector
+	 */
 	public static Vector getDirection(float yaw, float pitch) {
-		return new Location(null, 0, 0, 0, yaw, pitch).getDirection();
+        Vector vector = new Vector();
+        double rotX = DEGTORAD * yaw;
+        double rotY = DEGTORAD * pitch;
+        vector.setY(-Math.sin(rotY));
+        double h = Math.cos(rotY);
+        vector.setX(-h * Math.sin(rotX));
+        vector.setZ(h * Math.cos(rotX));
+        return vector;
 	}
 
-	public static double limit(double value, double limit) {
-		return limit(value, -limit, limit);
+	/**
+	 * Clamps the value between -limit and limit
+	 * 
+	 * @param value to clamp
+	 * @param limit
+	 * @return value, -limit or limit
+	 */
+	public static double clamp(double value, double limit) {
+		return clamp(value, -limit, limit);
 	}
 
-	public static double limit(double value, double min, double max) {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
+	/**
+	 * Clamps the value between the min and max values
+	 * @param value to clamp
+	 * @param min
+	 * @param max
+	 * @return value, min or max
+	 */
+	public static double clamp(double value, double min, double max) {
+		return value < min ? min : (value > max ? max : value);
 	}
 
-	public static float limit(float value, float limit) {
-		return limit(value, -limit, limit);
+	/**
+	 * Clamps the value between -limit and limit
+	 * 
+	 * @param value to clamp
+	 * @param limit
+	 * @return value, -limit or limit
+	 */
+	public static float clamp(float value, float limit) {
+		return clamp(value, -limit, limit);
 	}
 
-	public static float limit(float value, float min, float max) {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
+	/**
+	 * Clamps the value between the min and max values
+	 * @param value to clamp
+	 * @param min
+	 * @param max
+	 * @return value, min or max
+	 */
+	public static float clamp(float value, float min, float max) {
+		return value < min ? min : (value > max ? max : value);
 	}
 
-	public static int limit(int value, int limit) {
-		return limit(value, -limit, limit);
+	/**
+	 * Clamps the value between -limit and limit
+	 * 
+	 * @param value to clamp
+	 * @param limit
+	 * @return value, -limit or limit
+	 */
+	public static int clamp(int value, int limit) {
+		return clamp(value, -limit, limit);
 	}
 
-	public static int limit(int value, int min, int max) {
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
+	/**
+	 * Clamps the value between the min and max values
+	 * @param value to clamp
+	 * @param min
+	 * @param max
+	 * @return value, min or max
+	 */
+	public static int clamp(int value, int min, int max) {
+		return value < min ? min : (value > max ? max : value);
 	}
 
 	public static void setVectorLength(Vector vector, double length) {
-		if (length >= 0) {
-			setVectorLengthSquared(vector, length * length);
-		} else {
-			setVectorLengthSquared(vector, -length * length);
-		}
+		setVectorLengthSquared(vector, Math.signum(length) * length * length);
 	}
 
 	public static void setVectorLengthSquared(Vector vector, double lengthsquared) {
@@ -290,5 +442,4 @@ public class MathUtil {
 		setVectorLengthSquared(velocity, dbefore);
 		return dbefore > velocity.subtract(offset).lengthSquared();
 	}
-
 }

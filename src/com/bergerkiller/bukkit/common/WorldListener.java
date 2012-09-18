@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.reflection.WorldServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.Entity;

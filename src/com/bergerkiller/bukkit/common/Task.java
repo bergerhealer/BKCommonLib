@@ -3,10 +3,9 @@ package com.bergerkiller.bukkit.common;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class Task extends ParameterWrapper implements Runnable {
+public abstract class Task implements Runnable {
 
-	public Task(final JavaPlugin plugin, Object... arguments) {
-		super(arguments);
+	public Task(final JavaPlugin plugin) {
 		this.plugin = plugin;
 	}
 

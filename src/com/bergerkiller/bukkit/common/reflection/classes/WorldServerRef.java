@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.reflection;
+package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class WorldServerRef {
 	public static SafeField<PlayerManager> playerManager = new SafeField<PlayerManager>(WorldServer.class, "manager");

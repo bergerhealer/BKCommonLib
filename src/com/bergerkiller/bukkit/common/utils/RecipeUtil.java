@@ -17,8 +17,8 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
-import com.bergerkiller.bukkit.common.CraftRecipe;
-import com.bergerkiller.bukkit.common.ItemParser;
+import com.bergerkiller.bukkit.common.items.CraftRecipe;
+import com.bergerkiller.bukkit.common.items.ItemParser;
 
 public class RecipeUtil {
 	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();

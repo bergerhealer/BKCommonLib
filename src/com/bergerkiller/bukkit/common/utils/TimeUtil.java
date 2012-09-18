@@ -37,10 +37,10 @@ public class TimeUtil {
 				long minutes = 1000 * Long.parseLong(bits[1]) / 60;
 				return hours + minutes;
 			} else {
-				return (long) ((Double.parseDouble(timeName) - 8) * 1000) ;
+				return (long) ((Double.parseDouble(timeName) - 8) * 1000);
 			}
 		} catch (Exception ex) {
-	        // Or some shortcuts
+			// Or some shortcuts
 			Integer time = times.get(timeName.toLowerCase());
 			if (time != null) {
 				return time.longValue();
@@ -52,33 +52,31 @@ public class TimeUtil {
 	/**
 	 * CommandBook getTime function, credit go to them for this!
 	 * 
-	 * @param time - The time to parse
+	 * @param time The time to parse
 	 * @return The name of this time
 	 */
-    public static String getTimeString(long time) {
-        int hours = (int) ((time / 1000 + 8) % 24);
-        int minutes = (int) (60 * (time % 1000) / 1000);
-        return String.format("%02d:%02d (%d:%02d %s)",
-                hours, minutes, (hours % 12) == 0 ? 12 : hours % 12, minutes,
-                hours < 12 ? "am" : "pm");
-    }
+	public static String getTimeString(long time) {
+		int hours = (int) ((time / 1000 + 8) % 24);
+		int minutes = (int) (60 * (time % 1000) / 1000);
+		return String.format("%02d:%02d (%d:%02d %s)", hours, minutes, (hours % 12) == 0 ? 12 : hours % 12, minutes, hours < 12 ? "am" : "pm");
+	}
 
-    /**
-     * Gets the current time in the data format specified
-     * 
-     * @param dateformat to use
-     * @return current time in the format
-     */
+	/**
+	 * Gets the current time in the data format specified
+	 * 
+	 * @param dateformat to use
+	 * @return current time in the format
+	 */
 	public static String now(String dateformat) {
 		return now(new SimpleDateFormat(dateformat));
 	}
 
-    /**
-     * Gets the current time in the data format specified
-     * 
-     * @param format to use
-     * @return current time in the format
-     */
+	/**
+	 * Gets the current time in the data format specified
+	 * 
+	 * @param format to use
+	 * @return current time in the format
+	 */
 	public static String now(SimpleDateFormat format) {
 		return format.format(Calendar.getInstance().getTime()).trim();
 	}

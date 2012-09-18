@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.items;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

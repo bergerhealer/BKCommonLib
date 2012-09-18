@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
-public abstract class AsyncTask extends ParameterWrapper implements Runnable {
+public abstract class AsyncTask implements Runnable {
 
 	public AsyncTask() {
 		this(null);
@@ -10,8 +10,7 @@ public abstract class AsyncTask extends ParameterWrapper implements Runnable {
 		this(name, 0);
 	}
 
-	public AsyncTask(final String name, final int priority, Object... arguments) {
-		super(arguments);
+	public AsyncTask(final String name, final int priority) {
 		final AsyncTask task = this;
 		this.thread = new Thread() {
 			public void run() {

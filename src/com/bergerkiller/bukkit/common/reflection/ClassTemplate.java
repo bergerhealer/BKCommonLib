@@ -1,11 +1,11 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -41,10 +41,21 @@ public class ClassTemplate<T> {
 		this.fillFields(clazz.getSuperclass());
 	}
 
+	/**
+	 * Gets the Class type represented by this Template
+	 * 
+	 * @return Class type
+	 */
 	public Class<T> getType() {
 		return this.type;
 	}
 
+	/**
+	 * Transfers all the fields from one class instance to the other
+	 * 
+	 * @param from instance
+	 * @param to instance
+	 */
 	public void transfer(T from, T to) {
 		for (Field field : this.fields) {
 			try {
@@ -57,6 +68,11 @@ public class ClassTemplate<T> {
 		}
 	}
 
+	/**
+	 * Checks if this Template is valid
+	 * 
+	 * @return True if valid, False if not
+	 */
 	public boolean isValid() {
 		return this.type != null;
 	}
@@ -78,7 +94,7 @@ public class ClassTemplate<T> {
 	 * @param arguments of the method
 	 * @return method
 	 */
-	public SafeMethod getMethod(String name, Class<?> parameterTypes) {
+	public SafeMethod getMethod(String name, Class<?>... parameterTypes) {
 		return new SafeMethod(this.getType(), name, parameterTypes);
 	}
 

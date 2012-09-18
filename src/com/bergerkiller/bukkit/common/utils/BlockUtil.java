@@ -28,7 +28,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
 
-import com.bergerkiller.bukkit.common.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class BlockUtil {
 
@@ -40,7 +40,14 @@ public class BlockUtil {
 		return block.getType().getNewData(block.getData());
 	}
 
-	public static <T extends MaterialData> T getData(Block block, Class<T> type) {
+	/**
+	 * Gets the Material data for the block specified and attempts to cast it
+	 * 
+	 * @param block to get the Material data for
+	 * @param type to cast to
+	 * @return The cast material data, or null if there was no data or if casting failed
+	 */
+	public static <T> T getData(Block block, Class<T> type) {
 		try {
 			return type.cast(getData(block));
 		} catch (Exception ex) {
@@ -48,7 +55,16 @@ public class BlockUtil {
 		}
 	}
 
-	public static int getBlockSteps(Location b1, Location b2, boolean checkY) {
+	/**
+	 * Calculates the so-called 'Manhatten Distance' between two locations<br>
+	 * This is the distance between two points without going diagonally
+	 * 
+	 * @param b1 location
+	 * @param b2 location
+	 * @param checkY state, True to include the y distance, False to exclude it
+	 * @return The manhattan distance
+	 */
+	public static int getManhattanDistance(Location b1, Location b2, boolean checkY) {
 		int d = Math.abs(b1.getBlockX() - b2.getBlockX());
 		d += Math.abs(b1.getBlockZ() - b2.getBlockZ());
 		if (checkY)
@@ -56,7 +72,16 @@ public class BlockUtil {
 		return d;
 	}
 
-	public static int getBlockSteps(Block b1, Block b2, boolean checkY) {
+	/**
+	 * Calculates the so-called 'Manhatten Distance' between two blocks<br>
+	 * This is the distance between two points without going diagonally
+	 * 
+	 * @param b1 block
+	 * @param b2 block
+	 * @param checkY state, True to include the y distance, False to exclude it
+	 * @return The Manhattan distance
+	 */
+	public static int getManhattanDistance(Block b1, Block b2, boolean checkY) {
 		int d = Math.abs(b1.getX() - b2.getX());
 		d += Math.abs(b1.getZ() - b2.getZ());
 		if (checkY)
@@ -64,6 +89,13 @@ public class BlockUtil {
 		return d;
 	}
 
+	/**
+	 * Checks if two Blocks are equal
+	 * 
+	 * @param block1 to evaluate
+	 * @param block2 to evaluate
+	 * @return True if the blocks are the same, False if not
+	 */
 	public static boolean equals(Block block1, Block block2) {
 		if (block1 == null || block2 == null)
 			return false;
@@ -72,6 +104,13 @@ public class BlockUtil {
 		return block1.getX() == block2.getX() && block1.getZ() == block2.getZ() && block1.getY() == block2.getY() && block1.getWorld() == block2.getWorld();
 	}
 
+	/**
+	 * Gets all the Blocks relative to a main block using multiple Block Faces
+	 * 
+	 * @param main block
+	 * @param faces to get the blocks relative to the main of
+	 * @return An array of relative blocks to the main based on the input faces
+	 */
 	public static Block[] getRelative(Block main, BlockFace... faces) {
 		if (main == null)
 			return new Block[0];
@@ -82,31 +121,66 @@ public class BlockUtil {
 		return rval;
 	}
 
+	/**
+	 * Gets the Chunk Coordinates of a block
+	 * 
+	 * @param block to use
+	 * @return Chunk coordinates
+	 */
 	public static ChunkCoordinates getCoordinates(final Block block) {
 		return new ChunkCoordinates(block.getX(), block.getY(), block.getZ());
 	}
 
+	/**
+	 * Gets the Block at the chunk coordinates specified
+	 * 
+	 * @param world of the block
+	 * @param at coordinates
+	 * @return Block a the coordinates in the world
+	 */
 	public static Block getBlock(World world, ChunkCoordinates at) {
 		return world.getBlockAt(at.x, at.y, at.z);
 	}
 
+	/**
+	 * Gets the face an attachable block is attached to<br>
+	 * Returns DOWN if the block is not attachable
+	 * 
+	 * @param attachable block
+	 * @return Attached face
+	 */
 	public static BlockFace getAttachedFace(Block attachable) {
-		MaterialData data = getData(attachable);
-		if (data != null && data instanceof Attachable) {
-			return ((Attachable) data).getAttachedFace();
-		}
-		return BlockFace.DOWN;
+		Attachable data = getData(attachable, Attachable.class);
+		return data == null ? BlockFace.DOWN : data.getAttachedFace();
 	}
 
-	public static BlockFace getFacing(Block b) {
-		MaterialData data = getData(b);
-		if (data != null && data instanceof Directional) {
-			return ((Directional) data).getFacing();
-		} else {
-			return BlockFace.NORTH;
-		}
+	/**
+	 * Gets the Block an attachable block is attached to
+	 * 
+	 * @param attachable block
+	 * @return Block the attachable is attached to
+	 */
+	public static Block getAttachedBlock(Block attachable) {
+		return attachable.getRelative(getAttachedFace(attachable));
 	}
 
+	/**
+	 * Gets the facing direction of a Directional block
+	 * 
+	 * @param directional block
+	 * @return facing direction
+	 */
+	public static BlockFace getFacing(Block directional) {
+		Directional data = getData(directional, Directional.class);
+		return data == null ? BlockFace.NORTH : data.getFacing();
+	}
+
+	/**
+	 * Sets the facing direction of a Directional block
+	 * 
+	 * @param block to set
+	 * @param facing direction to set to
+	 */
 	public static void setFacing(Block block, BlockFace facing) {
 		MaterialData data = getData(block);
 		if (data != null && data instanceof Directional) {
@@ -115,39 +189,42 @@ public class BlockUtil {
 		}
 	}
 
-	public static Block getAttachedBlock(Block b) {
-		return b.getRelative(getAttachedFace(b));
-	}
-
+	/**
+	 * Sets the toggled state for all levers attached to a certain block
+	 * 
+	 * @param block center
+	 * @param down state to set to
+	 */
 	public static void setLeversAroundBlock(Block block, boolean down) {
 		Block b;
 		for (BlockFace dir : FaceUtil.attachedFaces) {
 			if (isType(b = block.getRelative(dir), Material.LEVER)) {
 				// attached?
 				if (getAttachedFace(b) == dir.getOppositeFace()) {
-					setLever(b, down, false);
+					setLever(b, down);
 				}
 			}
 		}
 	}
 
+	/**
+	 * Sets the toggled state of a single lever<br>
+	 * <b>No Lever type check is performed</b>
+	 * 
+	 * @param lever block
+	 * @param down state to set to
+	 */
 	public static void setLever(Block lever, boolean down) {
-		setLever(lever, down, true);
-	}
-
-	public static void setLever(Block lever, boolean down, boolean checktype) {
-		if (!checktype || lever.getTypeId() == Material.LEVER.getId()) {
-			byte data = lever.getData();
-			int newData;
-			if (down) {
-				newData = data | 0x8;
-			} else {
-				newData = data & 0x7;
-			}
-			if (newData != data) {
-				lever.setData((byte) newData, true);
-				applyPhysics(getAttachedBlock(lever), Material.LEVER);
-			}
+		byte data = lever.getData();
+		int newData;
+		if (down) {
+			newData = data | 0x8;
+		} else {
+			newData = data & 0x7;
+		}
+		if (newData != data) {
+			lever.setData((byte) newData, true);
+			applyPhysics(getAttachedBlock(lever), Material.LEVER);
 		}
 	}
 
@@ -224,14 +301,14 @@ public class BlockUtil {
 		return b == null ? false : isRails(b.getTypeId());
 	}
 
-    public static boolean isPowerSource(Material type) {
-    	return isPowerSource(type.getId());
-    }
+	public static boolean isPowerSource(Material type) {
+		return isPowerSource(type.getId());
+	}
 
-    public static boolean isPowerSource(int typeId) {
-    	net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
-    	return block == null ? false : block.isPowerSource();
-    }
+	public static boolean isPowerSource(int typeId) {
+		net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
+		return block == null ? false : block.isPowerSource();
+	}
 
 	public static <T extends BlockState> T getState(Block block, Class<T> type) {
 		try {
