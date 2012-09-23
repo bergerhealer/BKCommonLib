@@ -132,6 +132,21 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Tries to cast the object to the type specified, returning null upon failure
+	 * 
+	 * @param object to cast
+	 * @param type to cast to
+	 * @return The cast object, or null
+	 */
+	public static <T> T tryCast(Object object, Class<T> type) {
+		try {
+			return type.cast(object);
+		} catch (ClassCastException ex) {
+		}
+		return null;
+	}
+
+	/**
 	 * Schedules a runnable to execute the next Tick<br>
 	 * The BKCommonLib internal plugin will handle this task<br>
 	 * This method is thread safe

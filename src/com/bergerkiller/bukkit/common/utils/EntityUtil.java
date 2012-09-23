@@ -52,29 +52,15 @@ public class EntityUtil {
 	}
 
 	public static <T extends net.minecraft.server.Entity> T getNative(Entity e, Class<T> type) {
-		net.minecraft.server.Entity ee = getNative(e);
-		if (ee != null) {
-			try {
-				return type.cast(ee);
-			} catch (ClassCastException ex) {
-			}
-		}
-		return null;
+		return CommonUtil.tryCast(getNative(e), type);
 	}
 
 	public static net.minecraft.server.Entity getNative(Entity e) {
-		return ((CraftEntity) e).getHandle();
+		return e == null ? null : ((CraftEntity) e).getHandle();
 	}
 
 	public static <T extends Entity> T getEntity(World world, UUID uid, Class<T> type) {
-		Entity e = getEntity(world, uid);
-		if (e != null) {
-			try {
-				return type.cast(e);
-			} catch (ClassCastException ex) {
-			}
-		}
-		return null;
+		return CommonUtil.tryCast(getEntity(world, uid), type);
 	}
 
 	public static Entity getEntity(World world, UUID uid) {
