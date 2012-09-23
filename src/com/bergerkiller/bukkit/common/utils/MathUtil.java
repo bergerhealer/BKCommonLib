@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.TrigMath;
+import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -277,7 +278,7 @@ public class MathUtil {
 	 * @return merged long value
 	 */
 	public static long toLong(int msw, int lsw) {
-		return ((long) msw << 32) + lsw - Integer.MIN_VALUE;
+		return LongHash.toLong(msw, lsw);
 	}
 
 	public static double useOld(double oldvalue, double newvalue) {

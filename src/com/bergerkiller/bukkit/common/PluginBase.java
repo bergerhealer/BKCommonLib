@@ -25,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.utils.EnumUtil;
@@ -35,8 +36,6 @@ public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
 	private ArrayList<Command> commands = new ArrayList<Command>();
-
-	static List<PluginBase> plugins = new ArrayList<PluginBase>();
 
 	public PluginBase() {
 		super();
@@ -241,7 +240,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 
 		// update dependencies
-		plugins.add(this);
+		CommonPlugin.plugins.add(this);
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 			if (!plugin.isEnabled())
 				continue;
@@ -268,11 +267,11 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while disabling:");
 			t.printStackTrace();
-			plugins.remove(this);
+			CommonPlugin.plugins.remove(this);
 			return;
 		}
 
-		plugins.remove(this);
+		CommonPlugin.plugins.remove(this);
 
 		if (this.disableMessage != null) {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);

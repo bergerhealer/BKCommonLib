@@ -3,18 +3,20 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.server.Chunk;
 import net.minecraft.server.EntityCreature;
 import net.minecraft.server.EntityFallingBlock;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.IAnimal;
 import net.minecraft.server.IMonster;
+import net.minecraft.server.IntHashMap;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.NPC;
 import net.minecraft.server.WorldServer;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,6 +30,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 @SuppressWarnings("deprecation")
 public class EntityUtil {
@@ -85,6 +89,99 @@ public class EntityUtil {
 				return e;
 		}
 		return null;
+	}
+
+	/**
+	 * Replaces a given Entity with another Entity<br>
+	 * The entity is not respawned to the clients!
+	 * 
+	 * @param toReplace Entity, which will be removed
+	 * @param with Entity, which will be added in its place
+	 */
+	public static void setEntity(net.minecraft.server.Entity toreplace, net.minecraft.server.Entity with) {
+		setEntity(toreplace, with, WorldUtil.getTrackerEntry(toreplace));
+	}
+
+	/**
+	 * Replaces a given Entity with another Entity<br>
+	 * The entity is not respawned to the clients!
+	 * 
+	 * @param toreplace Entity, which will be removed
+	 * @param with Entity, which will be added in its place
+	 * @param tracker to use for the new entity
+	 */
+	@SuppressWarnings("unchecked")
+	public static void setEntity(final net.minecraft.server.Entity toreplace, final net.minecraft.server.Entity with, EntityTrackerEntry tracker) {
+		// transfer important information
+		with.locX = toreplace.locX;
+		with.locY = toreplace.locY;
+		with.locZ = toreplace.locZ;
+		with.ah = toreplace.ah;
+		with.ai = toreplace.ai;
+		with.aj = toreplace.aj;
+		with.world = toreplace.world;
+		with.id = toreplace.id;
+		toreplace.dead = true;
+		with.dead = false;
+		// Bukkit entity
+		EntityRef.bukkitEntity.transfer(toreplace, with);
+		((CraftEntity) with.getBukkitEntity()).setHandle(with);
+		// Passenger
+		if (toreplace.passenger != null) {
+			toreplace.passenger.setPassengerOf(with);
+		}
+
+		// make sure the chunk is loaded prior to swapping
+		// this may cause the chunk unload to be delayed one tick
+		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(toreplace.ah, toreplace.aj);
+
+		// replace the entity in the world
+		List<net.minecraft.server.Entity> worldEntities = WorldUtil.getEntities(toreplace.world);
+		for (int i = 0; i < worldEntities.size(); i++) {
+			if (worldEntities.get(i).id == toreplace.id) {
+				toreplace.world.entityList.set(i, with);
+				break;
+			}
+		}
+
+		// replace the entity in the 'entities by id' map
+		final IntHashMap entitiesById = WorldServerRef.entitiesById.get(toreplace.world);
+		if (entitiesById.d(toreplace.id) == null) {
+			CommonUtil.nextTick(new Runnable() {
+				public void run() {
+					entitiesById.a(toreplace.id, with);
+				}
+			});
+		} else {
+			entitiesById.a(toreplace.id, with);
+		}
+
+		// replace the entity in the chunk
+		int chunkY = toreplace.ai;
+		if (!replaceInChunk(chunk, chunkY, toreplace, with)) {
+			for (int y = 0; y < chunk.entitySlices.length; y++) {
+				if (y != chunkY && replaceInChunk(chunk, y, toreplace, with)) {
+					break;
+				}
+			}
+		}
+
+		// put the new entity tracker
+		tracker.tracker = with;
+		WorldUtil.setTrackerEntry(toreplace, tracker);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	private static boolean replaceInChunk(Chunk chunk, int chunkY, net.minecraft.server.Entity toreplace, net.minecraft.server.Entity with) {
+		List<net.minecraft.server.Entity> list = chunk.entitySlices[chunkY];
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).id == toreplace.id) {
+				list.set(i, with);
+				chunk.m = true; //set invalid
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*
@@ -222,11 +319,21 @@ public class EntityUtil {
 	/*
 	 * Teleport
 	 */
+	@Deprecated
 	public static boolean teleport(final Plugin plugin, Entity entity, final Location to) {
-		return teleport(plugin, getNative(entity), to);
+		return teleport(getNative(entity), to);
 	}
 
+	@Deprecated
 	public static boolean teleport(final Plugin plugin, final net.minecraft.server.Entity entity, final Location to) {
+		return teleport(entity, to);
+	}
+
+	public static boolean teleport(Entity entity, final Location to) {
+		return teleport(getNative(entity), to);
+	}
+
+	public static boolean teleport(final net.minecraft.server.Entity entity, final Location to) {
 		WorldServer newworld = ((CraftWorld) to.getWorld()).getHandle();
 		WorldUtil.loadChunks(to, 3);
 		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
@@ -234,8 +341,8 @@ public class EntityUtil {
 			if (passenger != null) {
 				entity.passenger = null;
 				passenger.vehicle = null;
-				if (teleport(plugin, passenger, to)) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+				if (teleport(passenger, to)) {
+					CommonUtil.nextTick(new Runnable() {
 						public void run() {
 							passenger.setPassengerOf(entity);
 						}

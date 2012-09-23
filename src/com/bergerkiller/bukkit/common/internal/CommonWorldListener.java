@@ -1,5 +1,7 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.events.EntityAddEvent;
+import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -9,10 +11,10 @@ import net.minecraft.server.World;
 import net.minecraft.server.WorldManager;
 import net.minecraft.server.WorldServer;
 
-public class WorldListener extends WorldManager {
+class CommonWorldListener extends WorldManager {
 	private boolean isEnabled = false;
 
-	public WorldListener(World world) {
+	public CommonWorldListener(World world) {
 		super(CommonUtil.getMCServer(), (WorldServer) world);
 	}
 
@@ -27,9 +29,6 @@ public class WorldListener extends WorldManager {
 	public void enable() {
 		if (isValid()) {
 			WorldServerRef.accessList.get(this.world).add(this);
-			for (Object e : world.entityList) {
-				this.a((Entity) e);
-			}
 			this.isEnabled = true;
 		} else {
 			new RuntimeException("Failed to listen in World").printStackTrace();
@@ -51,22 +50,24 @@ public class WorldListener extends WorldManager {
 	}
 
 	@Override
-	public final void a(Entity arg0) {
-		if (arg0 == null)
-			return;
-		this.onEntityAdd(arg0);
+	public final void a(Entity added) {
+		if (added != null) {
+			// Add entity
+			CommonUtil.callEvent(new EntityAddEvent(added.getBukkitEntity()));
+		}
 	}
 
 	@Override
-	public final void b(Entity arg0) {
-		if (arg0 == null)
-			return;
-		this.onEntityRemove(arg0);
+	public final void b(Entity removed) {
+		if (removed != null) {
+			// Remove entity
+			CommonUtil.callEvent(new EntityRemoveEvent(removed.getBukkitEntity()));
+		}
 	}
 
 	@Override
 	public final void a(int arg0, int arg1, int arg2) {
-		this.onNotify(arg0, arg1, arg2);
+		// Block notify (physics)
 	}
 
 	@Override
@@ -95,14 +96,5 @@ public class WorldListener extends WorldManager {
 
 	@Override
 	public void a(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
-	}
-
-	public void onEntityAdd(Entity entity) {
-	}
-
-	public void onEntityRemove(Entity entity) {
-	}
-
-	public void onNotify(int x, int y, int z) {
 	}
 }

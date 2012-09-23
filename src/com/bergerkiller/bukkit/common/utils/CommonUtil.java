@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 public class CommonUtil {
 	public static final int view = Bukkit.getServer().getViewDistance();
 	public static final int viewWidth = view + view + 1;
@@ -127,6 +129,19 @@ public class CommonUtil {
 
 	public static void heartbeat() {
 		broadcast("HEARTBEAT: " + System.currentTimeMillis());
+	}
+
+	/**
+	 * Schedules a runnable to execute the next Tick<br>
+	 * The BKCommonLib internal plugin will handle this task<br>
+	 * This method is thread safe
+	 * 
+	 * @param runnable to execute
+	 */
+	public static void nextTick(Runnable runnable) {
+		synchronized (CommonPlugin.nextTickTasks) {
+			CommonPlugin.nextTickTasks.add(runnable);
+		}
 	}
 
 	public static void broadcast(Object message) {

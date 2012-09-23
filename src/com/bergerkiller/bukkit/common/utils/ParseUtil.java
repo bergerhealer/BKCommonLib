@@ -91,4 +91,34 @@ public class ParseUtil {
 			return def;
 		}
 	}
+
+	/**
+	 * Parses a time value from a String. Supported formats:<br>
+	 * - Seconds only (can be a double value)<br>
+	 * - Minutes:Seconds (int values)<br>
+	 * - Hours:Minutes:Seconds (int values)
+	 * 
+	 * @param timestring to parse
+	 * @return time in milliseconds
+	 */
+	public static long parseTime(String timestring) {
+		long rval = 0;
+		if (timestring != null && !timestring.isEmpty()) {
+			String[] parts = timestring.split(":");
+			if (parts.length == 1) {
+				//Seconds display only
+				rval = (long) (ParseUtil.parseDouble(parts[0], 0.0) * 1000);
+			} else if (parts.length == 2) {
+				//Min:Sec
+				rval = ParseUtil.parseLong(parts[0], 0) * 60000;
+				rval += ParseUtil.parseLong(parts[1], 0) * 1000;
+			} else if (parts.length == 3) {
+				//Hour:Min:Sec
+				rval = ParseUtil.parseLong(parts[0], 0) * 3600000;
+				rval += ParseUtil.parseLong(parts[1], 0) * 60000;
+				rval += ParseUtil.parseLong(parts[2], 0) * 1000;
+			}
+		}
+		return rval;
+	}
 }
