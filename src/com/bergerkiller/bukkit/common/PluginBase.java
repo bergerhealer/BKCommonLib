@@ -36,6 +36,7 @@ public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
 	private ArrayList<Command> commands = new ArrayList<Command>();
+	private boolean enabled = false;
 
 	public PluginBase() {
 		super();
@@ -231,6 +232,7 @@ public abstract class PluginBase extends JavaPlugin {
 
 		try {
 			this.enable();
+			this.enabled = true;
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
 			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
@@ -263,7 +265,10 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 
 		try {
-			this.disable();
+			if (this.enabled) {
+				this.disable();
+				this.enabled = false;
+			}
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while disabling:");
 			t.printStackTrace();

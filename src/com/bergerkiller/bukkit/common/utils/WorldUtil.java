@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.util.LongHash;
 
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
@@ -53,7 +54,7 @@ public class WorldUtil {
 	}
 
 	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
-		return chunkprovider.chunks.get(x, z);
+		return chunkprovider.chunks.get(LongHash.toLong(x, z));
 	}
 
 	/**
