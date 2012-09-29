@@ -6,6 +6,7 @@ public class ParseUtil {
 	 * - Commas are changed to dots<br>
 	 * - Text after a space is excluded<br>
 	 * - Non-digit information is erased<br>
+	 * - Prefixed text is ignored<br>
 	 * - A single dot maximum is enforced
 	 * 
 	 * @param text to filter
@@ -14,12 +15,16 @@ public class ParseUtil {
 	public static String filterNumeric(String text) {
 		StringBuilder rval = new StringBuilder(text.length());
 		boolean hasComma = false;
+		boolean hasDigit = false;
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 			if (Character.isDigit(c)) {
 				rval.append(c);
+				hasDigit = true;
 			} else if (c == ' ') {
-				break;
+				if (hasDigit) {
+					break;
+				}
 			} else if ((c == ',' || c == '.') && !hasComma) {
 				rval.append('.');
 				hasComma = true;

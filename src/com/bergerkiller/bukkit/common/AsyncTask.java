@@ -1,6 +1,10 @@
 package com.bergerkiller.bukkit.common;
 
 public abstract class AsyncTask implements Runnable {
+	private boolean running = false;
+	private boolean stoprequested = false;
+	private boolean looped = false;
+	private final Thread thread;
 
 	public AsyncTask() {
 		this(null);
@@ -37,11 +41,11 @@ public abstract class AsyncTask implements Runnable {
 		}
 	}
 
-	private boolean running = false;
-	private boolean stoprequested = false;
-	private boolean looped = false;
-	private final Thread thread;
-
+	/**
+	 * A sleep method that handles an interruption automatically
+	 * 
+	 * @param msdelay to sleep
+	 */
 	public static void sleep(long msdelay) {
 		try {
 			Thread.sleep(msdelay);
@@ -49,18 +53,39 @@ public abstract class AsyncTask implements Runnable {
 		}
 	}
 
+	/**
+	 * Checks if this Async task is running
+	 * 
+	 * @return True if running, False if not
+	 */
 	public boolean isRunning() {
 		return this.running;
 	}
 
+	/**
+	 * Checks if this Async task is requested to stop
+	 * 
+	 * @return True if it should stop, False if not
+	 */
 	public boolean isStopRequested() {
 		return this.stoprequested;
 	}
 
+	/**
+	 * Starts this Async task (once, not looped)
+	 * 
+	 * @return This Async task
+	 */
 	public AsyncTask start() {
 		return this.start(false);
 	}
 
+	/**
+	 * Starts this Async task
+	 * 
+	 * @param looped state, True to infinitely loop the run method of this Thread
+	 * @return This Async task
+	 */
 	public AsyncTask start(boolean looped) {
 		this.stoprequested = false;
 		this.looped = looped;
@@ -72,6 +97,12 @@ public abstract class AsyncTask implements Runnable {
 		return this;
 	}
 
+	/**
+	 * Stops an Async task
+	 * 
+	 * @param task to stop, if null it is ignored
+	 * @return True if stopped, False if not
+	 */
 	public static boolean stop(AsyncTask task) {
 		if (task == null)
 			return false;
@@ -79,11 +110,21 @@ public abstract class AsyncTask implements Runnable {
 		return true;
 	}
 
+	/**
+	 * Stops this Async task
+	 * 
+	 * @return This Async task
+	 */
 	public AsyncTask stop() {
 		this.stoprequested = true;
 		return this;
 	}
 
+	/**
+	 * Waits until this Async task finished executing
+	 * 
+	 * @return This Async task
+	 */
 	public final AsyncTask waitFinished() {
 		while (this.running) {
 			sleep(20);

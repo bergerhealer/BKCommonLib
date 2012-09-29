@@ -7,7 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 import com.bergerkiller.bukkit.common.PluginBase;
@@ -30,7 +30,7 @@ class CommonListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	private void onWorldLoad(WorldLoadEvent event) {
+	private void onWorldInit(WorldInitEvent event) {
 		if (CommonPlugin.worldListeners.containsKey(event.getWorld())) {
 			return;
 		}
