@@ -11,8 +11,10 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * An abstract version of a Data writing class used to write to a destination File
+ */
 public abstract class DataWriter {
-
 	private final File file;
 
 	public DataWriter(Plugin plugin, String filename) {
@@ -31,12 +33,28 @@ public abstract class DataWriter {
 		this.file = file;
 	}
 
+	/**
+	 * Is called to write the payload to a prepared data stream
+	 * 
+	 * @param stream to write to
+	 * @throws IOException
+	 */
 	public abstract void write(DataOutputStream stream) throws IOException;
 
+	/**
+	 * Gets the Preferred Data stream from an Output stream<br>
+	 * Can add additional stream logic
+	 * 
+	 * @param stream to get the data stream for
+	 * @return Data stream
+	 */
 	public DataOutputStream getStream(OutputStream stream) {
 		return new DataOutputStream(stream);
 	}
 
+	/**
+	 * Performs the actual writing to the file
+	 */
 	public final void write() {
 		try {
 			DataOutputStream stream = this.getStream(new FileOutputStream(this.file));
@@ -59,5 +77,4 @@ public abstract class DataWriter {
 			t.printStackTrace();
 		}
 	}
-
 }

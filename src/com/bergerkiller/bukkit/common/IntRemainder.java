@@ -4,8 +4,12 @@ import java.util.Arrays;
 
 import net.minecraft.server.MathHelper;
 
+/**
+ * The Int Remainder uses a set amount of different Integer values to represent a single Double value<br>
+ * Integer values can be asked from this Int Remainder, the average of all the returned values is the contained Double value<br>
+ * This allows to, for example, work with Double rates when only Integer rates were possible
+ */
 public class IntRemainder {
-
 	private double contained = 0;
 	private final CircularInteger counter;
 	private final int[] values;
@@ -19,6 +23,11 @@ public class IntRemainder {
 		this.set(initialvalue);
 	}
 
+	/**
+	 * Sets the value represented by this Int remainder
+	 * 
+	 * @param value to set to
+	 */
 	public void set(double value) {
 		this.contained = value;
 		// set floor
@@ -35,12 +44,21 @@ public class IntRemainder {
 		return this.values[this.counter.next()];
 	}
 
+	/**
+	 * Gets the Double value represented by this Int remainder
+	 * 
+	 * @return contained value
+	 */
 	public double get() {
 		return this.contained;
 	}
 
+	/**
+	 * Gets all the Integer values used to make the contained Double value
+	 * 
+	 * @return Integer values
+	 */
 	public int[] getValues() {
 		return this.values;
 	}
-
 }

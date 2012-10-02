@@ -28,13 +28,16 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
 
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 
+/**
+ * Multiple Block utilities you can use to manipulate blocks and get block information
+ */
 public class BlockUtil {
 
-	/*
-	 * Prevents the need to read the lighting when using getState() Can be a
-	 * little bit faster :)
+	/**
+	 * Directly obtains the Material Data from the block<br>
+	 * This alternative does not create a Block State and is preferred if you only need material data
 	 */
 	public static MaterialData getData(Block block) {
 		return block.getType().getNewData(block.getData());
@@ -228,18 +231,43 @@ public class BlockUtil {
 		}
 	}
 
+	/**
+	 * Performs Physics at the block specified
+	 * 
+	 * @param block to apply physics to
+	 * @param callertype Material, the source of these physics (use Air if there is no caller)
+	 */
 	public static void applyPhysics(Block block, Material callertype) {
 		applyPhysics(block, callertype.getId());
 	}
 
+	/**
+	 * Performs Physics at the block specified
+	 * 
+	 * @param block to apply physics to
+	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
+	 */
 	public static void applyPhysics(Block block, int callertypeid) {
 		WorldUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
 	}
 
+	/**
+	 * Sets the alignment of Rails
+	 * 
+	 * @param rails to set the alignment for
+	 * @param from direction
+	 * @param to direction
+	 */
 	public static void setRails(Block rails, BlockFace from, BlockFace to) {
 		setRails(rails, FaceUtil.combine(from, to).getOppositeFace());
 	}
 
+	/**
+	 * Sets the alignment of Rails
+	 * 
+	 * @param rails to set the alignment for
+	 * @param alignment
+	 */
 	public static void setRails(Block rails, BlockFace direction) {
 		Material type = rails.getType();
 		if (type == Material.RAILS) {
@@ -305,6 +333,13 @@ public class BlockUtil {
 		return isPowerSource(type.getId());
 	}
 
+	/**
+	 * Checks if a given Material type Id is a power source<br>
+	 * Redstone wire attaches to power sources
+	 * 
+	 * @param typeId to check it for
+	 * @return True if it is a power source, False if not
+	 */
 	public static boolean isPowerSource(int typeId) {
 		net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
 		return block == null ? false : block.isPowerSource();
@@ -330,12 +365,15 @@ public class BlockUtil {
 		return net.minecraft.server.Block.i(typeId);
 	}
 
+	/**
+	 * Gets the State of a block, cast to a certain type
+	 * 
+	 * @param block to get the state for
+	 * @param type to cast to
+	 * @return The block state cast to the type, or null if not possible
+	 */
 	public static <T extends BlockState> T getState(Block block, Class<T> type) {
-		try {
-			return type.cast(block.getState());
-		} catch (Exception ex) {
-			return null;
-		}
+		return CommonUtil.tryCast(block.getState(), type);
 	}
 
 	public static Rails getRails(Block railsblock) {
@@ -446,10 +484,8 @@ public class BlockUtil {
 		return tilebuff;
 	}
 
-	private static final SafeField<net.minecraft.server.World> tileWorldField = new SafeField<net.minecraft.server.World>(TileEntity.class, "world");
-
 	public static net.minecraft.server.World getWorld(TileEntity tile) {
-		return tileWorldField.get(tile);
+		return TileEntityRef.world.get(tile);
 	}
 
 	public static Packet getUpdatePacket(TileEntity tile) {
@@ -482,6 +518,11 @@ public class BlockUtil {
 		tilebuff.add(tile);
 	}
 
+	/**
+	 * Naturally breaks a given block
+	 * 
+	 * @param block to break
+	 */
 	public static void breakBlock(Block block) {
 		int x = block.getX();
 		int y = block.getY();

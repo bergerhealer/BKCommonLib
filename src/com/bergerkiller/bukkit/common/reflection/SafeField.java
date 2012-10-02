@@ -5,6 +5,12 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+/**
+ * Wraps around the java.lang.reflect.Field class to provide an error-free alternative<br>
+ * Exceptions are logged, isValid can be used to check if the Field is actually working
+ * 
+ * @param <T> type of the Field
+ */
 public class SafeField<T> extends SafeBase {
 	private Field field;
 

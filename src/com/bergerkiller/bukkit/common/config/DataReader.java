@@ -11,8 +11,10 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * An abstract version of a Data reading class used to read from a source File
+ */
 public abstract class DataReader {
-
 	private final File file;
 
 	public DataReader(Plugin plugin, String filename) {
@@ -31,20 +33,46 @@ public abstract class DataReader {
 		this.file = file;
 	}
 
+	/**
+	 * Is called to read the payload from a prepared data stream
+	 * 
+	 * @param stream to read from
+	 * @throws IOException
+	 */
 	public abstract void read(DataInputStream stream) throws IOException;
 
+	/**
+	 * Gets the Preferred Data stream from an Input stream<br>
+	 * Can add additional stream logic
+	 * 
+	 * @param stream to get the data stream for
+	 * @return Data stream
+	 */
 	public DataInputStream getStream(InputStream stream) {
 		return new DataInputStream(stream);
 	}
 
+	/**
+	 * Gets the File from which is read
+	 * 
+	 * @return source File
+	 */
 	public File getFile() {
 		return this.file;
 	}
 
+	/**
+	 * Checks if the file to read from exists
+	 * 
+	 * @return True if it exists, False if it doesn't
+	 */
 	public boolean exists() {
 		return this.file.exists();
 	}
 
+	/**
+	 * Performs the actual reading from the file
+	 */
 	public final void read() {
 		try {
 			DataInputStream stream = getStream(new FileInputStream(this.file));
@@ -66,5 +94,4 @@ public abstract class DataReader {
 			t.printStackTrace();
 		}
 	}
-
 }

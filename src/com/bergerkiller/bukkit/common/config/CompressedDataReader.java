@@ -7,6 +7,9 @@ import java.util.zip.InflaterInputStream;
 
 import org.bukkit.plugin.Plugin;
 
+/**
+ * A compression based Data reader
+ */
 public abstract class CompressedDataReader extends DataReader {
 
 	public CompressedDataReader(File folder, String filename) {
@@ -25,8 +28,8 @@ public abstract class CompressedDataReader extends DataReader {
 		super(filepath);
 	}
 
+	@Override
 	public DataInputStream getStream(InputStream stream) {
 		return super.getStream(new InflaterInputStream(stream));
 	}
-
 }

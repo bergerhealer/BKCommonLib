@@ -147,5 +147,4 @@ public class WorldUtil {
 			return false;
 		return world.isChunkLoaded(chunkX, chunkZ);
 	}
-
 }

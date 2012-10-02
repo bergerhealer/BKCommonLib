@@ -246,6 +246,12 @@ public class MessageBuilder {
 		return this.builder.length() == 0;
 	}
 
+	/**
+	 * Gets the full width of one or more Strings appended
+	 * 
+	 * @param text to get the total width of (can be one or more parts)
+	 * @return The width of all the text combined
+	 */
 	public static int getWidth(String... text) {
 		int width = 0;
 		for (String part : text) {
@@ -271,6 +277,12 @@ public class MessageBuilder {
 		return width;
 	}
 
+	/**
+	 * Gets the Width of a certain character in Minecraft Font
+	 * 
+	 * @param character to get the width of
+	 * @return Character width in pixels
+	 */
 	public static int getWidth(char character) {
 		return MinecraftFont.Font.getChar(character).getWidth();
 	}
@@ -279,6 +291,7 @@ public class MessageBuilder {
 		return this.builder.toString();
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder total = new StringBuilder();
 		for (StringBuilder line : this.lines) {
@@ -299,6 +312,11 @@ public class MessageBuilder {
 		return lines;
 	}
 
+	/**
+	 * Clears all the Messages stored by this Message Builder
+	 * 
+	 * @return This Message Builder
+	 */
 	public MessageBuilder clear() {
 		this.lines.clear();
 		this.lines.add(this.builder = new StringBuilder());
@@ -306,6 +324,13 @@ public class MessageBuilder {
 		return this;
 	}
 
+	/**
+	 * Sends all of the messages to a receiver and clears them<br>
+	 * After calling flush this Message Builder is cleared
+	 * 
+	 * @param sender to send to
+	 * @return This Message Builder
+	 */
 	public MessageBuilder flush(CommandSender sender) {
 		if (this.lines.size() > 1) {
 			this.lines.remove(this.lines.size() - 1);
@@ -316,6 +341,12 @@ public class MessageBuilder {
 		return this;
 	}
 
+	/**
+	 * Sends all of the messages to a receiver without clearing them
+	 * 
+	 * @param sender to send to
+	 * @return This Message Builder
+	 */
 	public MessageBuilder send(CommandSender sender) {
 		for (StringBuilder line : this.lines) {
 			sender.sendMessage(line.toString());
@@ -323,11 +354,16 @@ public class MessageBuilder {
 		return this;
 	}
 
+	/**
+	 * Logs all of the messages to the server
+	 * 
+	 * @param level for the messages
+	 * @return This Message Builder
+	 */
 	public MessageBuilder log(Level level) {
 		for (StringBuilder line : this.lines) {
 			Bukkit.getLogger().log(level, line.toString());
 		}
 		return this;
 	}
-
 }

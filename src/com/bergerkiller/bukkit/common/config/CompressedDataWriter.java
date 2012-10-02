@@ -7,6 +7,9 @@ import java.util.zip.DeflaterOutputStream;
 
 import org.bukkit.plugin.Plugin;
 
+/**
+ * A compression based Data writer
+ */
 public abstract class CompressedDataWriter extends DataWriter {
 
 	public CompressedDataWriter(File folder, String filename) {
@@ -25,8 +28,8 @@ public abstract class CompressedDataWriter extends DataWriter {
 		super(filepath);
 	}
 
+	@Override
 	public DataOutputStream getStream(OutputStream stream) {
 		return super.getStream(new DeflaterOutputStream(stream));
 	}
-
 }

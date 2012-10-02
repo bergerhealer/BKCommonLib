@@ -6,6 +6,10 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+/**
+ * Wraps around the java.lang.reflect.Method class to provide an error-free alternative<br>
+ * Exceptions are logged, isValid can be used to check if the Field is actually working
+ */
 public class SafeMethod extends SafeBase {
 	private Method method;
 

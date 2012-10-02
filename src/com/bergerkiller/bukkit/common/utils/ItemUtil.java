@@ -38,7 +38,7 @@ public class ItemUtil {
 	@SuppressWarnings("deprecation")
 	public static boolean isIgnored(Entity itementity) {
 		if (!(itementity instanceof Item))
-			return true;
+			return false;
 		Item item = (Item) itementity;
 		if (Common.isShowcaseEnabled) {
 			try {

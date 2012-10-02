@@ -10,6 +10,9 @@ import org.bukkit.craftbukkit.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+/**
+ * Multiple Math utilities to compare and calculate using Vectors and raw values
+ */
 public class MathUtil {
 	public static final float DEGTORAD = 0.017453293F;
 	public static final float RADTODEG = 57.29577951F;
