@@ -1,23 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.logging.Level;
-
-import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
-import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Leaves;
@@ -27,56 +21,14 @@ import org.bukkit.material.TexturedMaterial;
 import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.items.ItemParser;
 import com.bergerkiller.bukkit.common.items.SimpleInventory;
-import com.miykeal.showCaseStandalone.ShowCaseStandalone;
-import com.narrowtux.showcase.Showcase;
 
 public class ItemUtil {
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static boolean isIgnored(Entity itementity) {
-		if (!(itementity instanceof Item))
-			return false;
-		Item item = (Item) itementity;
-		if (Common.isShowcaseEnabled) {
-			try {
-				if (Showcase.instance.getItemByDrop(item) != null)
-					return true;
-			} catch (Throwable t) {
-				Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
-				t.printStackTrace();
-				Common.isShowcaseEnabled = false;
-			}
-		}
-		if (Common.isSCSEnabled) {
-			try {
-				if (ShowCaseStandalone.get().isShowCaseItem(item))
-					return true;
-			} catch (Throwable t) {
-				Bukkit.getLogger().log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
-				t.printStackTrace();
-				Common.isSCSEnabled = false;
-			}
-		}
-		if (Common.bleedingMobsInstance != null) {
-			try {
-				BleedingMobs bm = (BleedingMobs) Common.bleedingMobsInstance;
-				if (bm.isSpawning())
-					return true;
-				if (bm.isWorldEnabled(item.getWorld())) {
-					if (bm.isParticleItem(((CraftItem) item).getUniqueId())) {
-						return true;
-					}
-				}
-			} catch (Throwable t) {
-				Bukkit.getLogger().log(Level.SEVERE, "Bleeding Mobs item verification failed (update needed?), contact the authors!");
-				t.printStackTrace();
-				Common.bleedingMobsInstance = null;
-			}
-		}
-		return false;
+		return EntityUtil.isIgnored(itementity);
 	}
 
 	public static net.minecraft.server.ItemStack getNative(ItemStack stack) {

@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -10,6 +11,7 @@ import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.util.LongHash;
 
+import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
 import net.minecraft.server.Chunk;
@@ -21,6 +23,20 @@ import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
 public class WorldUtil {
+	/**
+	 * Obtains the internal mapping which maps worlds to world names name
+	 * 
+	 * @return A map of world names as keys and Bukkit worlds as values
+	 */
+	public static Map<String, org.bukkit.World> getWorldsMap() {
+		return CraftServerRef.worlds.get(CommonUtil.getCraftServer());
+	}
+
+	/**
+	 * Obtains the internal list of native Minecraft server worlds
+	 * 
+	 * @return A list of WorldServer instances
+	 */
 	public static List<WorldServer> getWorlds() {
 		try {
 			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;

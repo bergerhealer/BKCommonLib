@@ -9,7 +9,7 @@ public class Common {
 	public static boolean isShowcaseEnabled = false;
 	public static boolean isSCSEnabled = false;
 	public static Plugin bleedingMobsInstance = null;
-	public static final int VERSION = 2;
+	public static final int VERSION = 3;
 
 	protected static void handleReflectionMissing(String type, String name, Class<?> source) {
 		String msg = type + " '" + name + "' does not exist in class file " + source.getSimpleName();
