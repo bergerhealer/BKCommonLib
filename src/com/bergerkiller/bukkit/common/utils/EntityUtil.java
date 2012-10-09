@@ -37,7 +37,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
-import com.miykeal.showCaseStandalone.ShowCaseStandalone;
+import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
 @SuppressWarnings("deprecation")
