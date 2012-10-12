@@ -23,6 +23,7 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
@@ -226,6 +227,15 @@ public class BlockUtil {
 			newData = data & 0x7;
 		}
 		if (newData != data) {
+			// CraftBukkit start - Redstone event for lever
+			int old = !down ? 1 : 0;
+			int current = down ? 1 : 0;
+			BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(lever, old, current);
+			CommonUtil.callEvent(eventRedstone);
+			if ((eventRedstone.getNewCurrent() > 0) != down) {
+				return;
+			}
+			// CraftBukkit end
 			lever.setData((byte) newData, true);
 			applyPhysics(getAttachedBlock(lever), Material.LEVER);
 		}
