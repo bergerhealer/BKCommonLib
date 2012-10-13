@@ -46,8 +46,40 @@ public class MathUtil {
 		return lengthSquared(x1 - x2, y1 - y2, z1 - z2);
 	}
 
+	/**
+	 * Gets the angle difference between two angles
+	 * 
+	 * @param angle1
+	 * @param angle2
+	 * @return angle difference
+	 */
+	public static int getAngleDifference(int angle1, int angle2) {
+		return Math.abs(wrapAngle(angle1 - angle2));
+	}
+
+	/**
+	 * Gets the angle difference between two angles
+	 * 
+	 * @param angle1
+	 * @param angle2
+	 * @return angle difference
+	 */
 	public static float getAngleDifference(float angle1, float angle2) {
 		return Math.abs(wrapAngle(angle1 - angle2));
+	}
+
+	/**
+	 * Wraps the angle to be between -180 and 180 degrees
+	 * 
+	 * @param angle to wrap
+	 * @return [-180 > angle >= 180]
+	 */
+	public static int wrapAngle(int angle) {
+		while (angle <= -180)
+			angle += 360;
+		while (angle > 180)
+			angle -= 360;
+		return angle;
 	}
 
 	/**

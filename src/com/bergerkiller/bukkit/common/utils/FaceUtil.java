@@ -54,6 +54,15 @@ public class FaceUtil {
 		return notchToFace(faceToNotch(from) + notchCount);
 	}
 
+	/**
+	 * Combines two non-subcardinal faces into one face<br>
+	 * - NORTH and WEST returns NORTH_WEST<br>
+	 * - NORTH and SOUTH returns NORTH (not possible to combine)
+	 * 
+	 * @param from face to combined
+	 * @param to face to combined
+	 * @return the combined face
+	 */
 	public static BlockFace combine(BlockFace from, BlockFace to) {
 		if (from == BlockFace.NORTH) {
 			if (to == BlockFace.WEST) {
@@ -83,59 +92,62 @@ public class FaceUtil {
 		return from;
 	}
 
-	public static BlockFace offset(BlockFace main, BlockFace offset) {
-		if (offset == BlockFace.EAST) {
-			switch (main) {
-				case NORTH:
-					return BlockFace.EAST;
-				case EAST:
-					return BlockFace.SOUTH;
-				case SOUTH:
-					return BlockFace.WEST;
-				case WEST:
-					return BlockFace.NORTH;
-			}
-		} else if (offset == BlockFace.WEST) {
-			switch (main) {
-				case NORTH:
-					return BlockFace.WEST;
-				case EAST:
-					return BlockFace.NORTH;
-				case SOUTH:
-					return BlockFace.EAST;
-				case WEST:
-					return BlockFace.SOUTH;
-			}
-		} else if (offset == BlockFace.SOUTH) {
-			return main.getOppositeFace();
-		}
-		return main;
+	/**
+	 * Subtracts two faces
+	 * 
+	 * @param face1
+	 * @param face2 to subtract from face1
+	 * @return Block Face result ofthe subtraction
+	 */
+	public static BlockFace subtract(BlockFace face1, BlockFace face2) {
+		return notchToFace(faceToNotch(face1) - faceToNotch(face2));
 	}
 
+	/**
+	 * Adds two faces together
+	 * 
+	 * @param face1
+	 * @param face2 to add to face1
+	 * @return Block Face result of the addition
+	 */
+	public static BlockFace add(BlockFace face1, BlockFace face2) {
+		return notchToFace(faceToNotch(face1) + faceToNotch(face2));
+	}
+
+	@Deprecated
+	public static BlockFace offset(BlockFace main, BlockFace offset) {
+		return add(main, offset);
+	}
+
+	/**
+	 * Gets all the individual faces represented by a Block Face<br>
+	 * - NORTH_WEST returns NORTH and WEST<br>
+	 * - NORTH returns NORTH and SOUTH<br>
+	 * 
+	 * @param main face to get the faces for
+	 * @return an array of length 2 containing all the faces
+	 */
 	public static BlockFace[] getFaces(BlockFace main) {
 		switch (main) {
-			case NORTH:
-			case SOUTH:
-				return new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH };
-			case EAST:
-			case WEST:
-				return new BlockFace[] { BlockFace.EAST, BlockFace.WEST };
 			case SOUTH_EAST:
-				return new BlockFace[] { BlockFace.SOUTH, BlockFace.EAST };
+				return new BlockFace[] {BlockFace.SOUTH, BlockFace.EAST};
 			case SOUTH_WEST:
-				return new BlockFace[] { BlockFace.SOUTH, BlockFace.WEST };
+				return new BlockFace[] {BlockFace.SOUTH, BlockFace.WEST};
 			case NORTH_EAST:
-				return new BlockFace[] { BlockFace.NORTH, BlockFace.EAST };
+				return new BlockFace[] {BlockFace.NORTH, BlockFace.EAST};
 			case NORTH_WEST:
-				return new BlockFace[] { BlockFace.NORTH, BlockFace.WEST };
-			case UP:
-			case DOWN:
-				return new BlockFace[] { BlockFace.DOWN, BlockFace.UP };
+				return new BlockFace[] {BlockFace.NORTH, BlockFace.WEST};
 			default:
-				return new BlockFace[] { BlockFace.SELF, BlockFace.SELF };
+				return new BlockFace[] {main, main.getOppositeFace()};
 		}
 	}
 
+	/**
+	 * Gets the direction a minecart faces when on a given track
+	 * 
+	 * @param raildirection of the rails
+	 * @return minecart direction
+	 */
 	public static BlockFace getRailsCartDirection(final BlockFace raildirection) {
 		switch (raildirection) {
 			case NORTH_EAST:
@@ -149,6 +161,13 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets the rail direction from a Direction<br>
+	 * NORTH becomes SOUTH and EAST becomes WEST
+	 * 
+	 * @param direction to convert
+	 * @return rail direction
+	 */
 	public static BlockFace toRailsDirection(BlockFace direction) {
 		switch (direction) {
 			case NORTH:
@@ -160,6 +179,12 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets whether a given Block Face is sub-cardinal (such as NORTH_WEST)
+	 * 
+	 * @param face to check
+	 * @return True if sub-cardinal, False if not
+	 */
 	public static boolean isSubCardinal(final BlockFace face) {
 		switch (face) {
 			case NORTH_EAST:
@@ -172,112 +197,111 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets whether two faces have a sub-cardinal difference or less
+	 * 
+	 * @param face1 to check
+	 * @param face2 to check
+	 * @return True if the difference <= 45 degrees
+	 */
 	public static boolean hasSubDifference(final BlockFace face1, final BlockFace face2) {
-		if (face1 == face2)
-			return true;
-		switch (face1) {
-			case NORTH:
-				return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.NORTH_WEST;
-			case NORTH_EAST:
-				return face2 == BlockFace.NORTH || face2 == BlockFace.EAST;
-			case EAST:
-				return face2 == BlockFace.NORTH_EAST || face2 == BlockFace.SOUTH_EAST;
-			case SOUTH_EAST:
-				return face2 == BlockFace.EAST || face2 == BlockFace.SOUTH;
-			case SOUTH:
-				return face2 == BlockFace.SOUTH_EAST || face2 == BlockFace.SOUTH_WEST;
-			case SOUTH_WEST:
-				return face2 == BlockFace.SOUTH || face2 == BlockFace.WEST;
-			case WEST:
-				return face2 == BlockFace.SOUTH_WEST || face2 == BlockFace.NORTH_WEST;
-			case NORTH_WEST:
-				return face2 == BlockFace.WEST || face2 == BlockFace.NORTH;
-			default:
-				return false;
-		}
+		return getFaceYawDifference(face1, face2) <= 45;
 	}
 
+	/**
+	 * Gets the Vector direction from a Block Face
+	 * 
+	 * @param face to use
+	 * @param length of the vector
+	 * @return Vector of the direction and length
+	 */
 	public static Vector faceToVector(BlockFace face, double length) {
 		return faceToVector(face).multiply(length);
 	}
 
+	/**
+	 * Gets the Vector direction from a Block Face
+	 * 
+	 * @param face to use
+	 * @return Vector of the direction and length 1
+	 */
 	public static Vector faceToVector(BlockFace face) {
 		return new Vector(face.getModX(), face.getModY(), face.getModZ());
 	}
 
+	/**
+	 * Gets the Block Face direction to go from one point to another
+	 * 
+	 * @param from point
+	 * @param to point
+	 * @param useSubCardinalDirections setting
+	 * @return the Block Face of the direction
+	 */
 	public static BlockFace getDirection(Location from, Location to, boolean useSubCardinalDirections) {
 		return getDirection(to.getX() - from.getX(), to.getZ() - from.getZ(), useSubCardinalDirections);
 	}
 
+	/**
+	 * Gets the Block Face direction to go from one block to another
+	 * 
+	 * @param from block
+	 * @param to block
+	 * @param useSubCardinalDirections setting
+	 * @return the Block Face of the direction
+	 */
 	public static BlockFace getDirection(Block from, Block to, boolean useSubCardinalDirections) {
 		return getDirection(to.getX() - from.getX(), to.getZ() - from.getZ(), useSubCardinalDirections);
 	}
 
+	/**
+	 * Gets the Block Face direction to go into the movement vector direction
+	 * 
+	 * @param movement vector
+	 * @return the Block Face of the direction
+	 */
 	public static BlockFace getDirection(Vector movement) {
 		return getDirection(movement, true);
 	}
 
+	/**
+	 * Gets the Block Face direction to go into the movement vector direction
+	 * 
+	 * @param movement vector
+	 * @param useSubCardinalDirections setting
+	 * @return the Block Face of the direction
+	 */
 	public static BlockFace getDirection(Vector movement, boolean useSubCardinalDirections) {
 		return getDirection(movement.getX(), movement.getZ(), useSubCardinalDirections);
 	}
 
+	/**
+	 * Gets the Block Face direction to go into the movement vector direction
+	 * 
+	 * @param dx vector axis
+	 * @param dz vector axis
+	 * @param useSubCardinalDirections setting
+	 * @return the Block Face of the direction
+	 */
 	public static BlockFace getDirection(final double dx, final double dz, boolean useSubCardinalDirections) {
-		if (useSubCardinalDirections) {
-			if (dz < 0) {
-				if (dx < 0) {
-					if (dx * 2 < dz) {
-						return 2 * dz < dx ? BlockFace.NORTH_EAST : BlockFace.NORTH;
-					} else {
-						return BlockFace.EAST;
-					}
-				} else {
-					if (dz * -2 > dx) {
-						return -2 * dx < dz ? BlockFace.SOUTH_EAST : BlockFace.EAST;
-					} else {
-						return BlockFace.SOUTH;
-					}
-				}
-			} else {
-				if (dx < 0) {
-					if (-2 * dz < dx) {
-						return -2 * dx > dz ? BlockFace.NORTH_WEST : BlockFace.WEST;
-					} else {
-						return BlockFace.NORTH;
-					}
-				} else {
-					if (2 * dx > dz) {
-						return 2 * dz > dx ? BlockFace.SOUTH_WEST : BlockFace.SOUTH;
-					} else {
-						return BlockFace.WEST;
-					}
-				}
-			}
-		} else {
-			if (dz < 0) {
-				if (dx < 0) {
-					return dx < dz ? BlockFace.NORTH : BlockFace.EAST;
-				} else {
-					return dx < -dz ? BlockFace.EAST : BlockFace.SOUTH;
-				}
-			} else {
-				if (dx < 0) {
-					return dx < -dz ? BlockFace.NORTH : BlockFace.WEST;
-				} else {
-					return dx < dz ? BlockFace.WEST : BlockFace.SOUTH;
-				}
-			}
-		}
+		return yawToFace(MathUtil.getLookAtYaw(dx, dz), useSubCardinalDirections);
 	}
 
+	/**
+	 * Gets the yaw angle in degrees difference between two Block Faces
+	 * @param face1
+	 * @param face2
+	 * @return angle in degrees
+	 */
 	public static int getFaceYawDifference(BlockFace face1, BlockFace face2) {
-		int angle = faceToYaw(face1) - faceToYaw(face2);
-		while (angle <= -180)
-			angle += 360;
-		while (angle > 180)
-			angle -= 360;
-		return Math.abs(angle);
+		return MathUtil.getAngleDifference(faceToYaw(face1), faceToYaw(face2));
 	}
 
+	/**
+	 * Gets the co-sinus value from a Block Face treated as an Angle
+	 * 
+	 * @param face to get the co-sinus value from
+	 * @return co-sinus value
+	 */
 	public static double cos(final BlockFace face) {
 		switch (face) {
 			case NORTH_WEST:
@@ -295,6 +319,12 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets the sinus value from a Block Face treated as an Angle
+	 * 
+	 * @param face to get the sinus value from
+	 * @return sinus value
+	 */
 	public static double sin(final BlockFace face) {
 		switch (face) {
 			case SOUTH_EAST:
@@ -312,6 +342,12 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets the angle from a horizontal Block Face
+	 * 
+	 * @param face to get the angle for
+	 * @return face angle
+	 */
 	public static int faceToYaw(final BlockFace face) {
 		switch (face) {
 			case NORTH:
