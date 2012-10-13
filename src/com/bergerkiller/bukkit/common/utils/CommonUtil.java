@@ -23,6 +23,14 @@ public class CommonUtil {
 	public static final int blockView = 32 + (view << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
 
+	/**
+	 * Sends a message to a sender<br>
+	 * - Empty messages are ignored<br>
+	 * - Color is stripped from messages to consoles
+	 * 
+	 * @param sender to send to
+	 * @param message to send
+	 */
 	public static void sendMessage(Object sender, Object message) {
 		if (message != null) {
 			String msg = message.toString();
@@ -39,6 +47,13 @@ public class CommonUtil {
 		}
 	}
 
+	/**
+	 * Sends a message containing a list of items
+	 * 
+	 * @param sender to send to
+	 * @param delimiter to use between items
+	 * @param items to send
+	 */
 	public static void sendListMessage(Object sender, String delimiter, Object[] items) {
 		String msgpart = null;
 		String item;
@@ -59,17 +74,42 @@ public class CommonUtil {
 		sendMessage(sender, msgpart);
 	}
 
+	/**
+	 * Calls an Event
+	 * 
+	 * @param event to call
+	 * @return the input Event
+	 */
 	public static <T extends Event> T callEvent(T event) {
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		return event;
 	}
 
+	/**
+	 * Gets the native Minecraft Server which contains the main logic
+	 * 
+	 * @return Minecraft Server
+	 */
 	public static MinecraftServer getMCServer() {
 		return getCraftServer().getServer();
 	}
 
+	/**
+	 * Gets the Craft server
+	 * 
+	 * @return Craft server
+	 */
 	public static CraftServer getCraftServer() {
 		return (CraftServer) Bukkit.getServer();
+	}
+
+	/**
+	 * Gets the server configuration manager which deals with server settings
+	 * 
+	 * @return Server Configuration Manager
+	 */
+	public static ServerConfigurationManager getServerConfig() {
+		return getCraftServer().getHandle();
 	}
 
 	public static boolean contains(int value, int... values) {
@@ -118,18 +158,25 @@ public class CommonUtil {
 		}
 	}
 
-	public static ServerConfigurationManager getServerConfig() {
-		return getCraftServer().getHandle();
-	}
-
+	/**
+	 * Gets a list of online players on the server
+	 * 
+	 * @return online players
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<EntityPlayer> getOnlinePlayers() {
 		return (List<EntityPlayer>) getServerConfig().players;
 	}
 
+	/**
+	 * A debug function - broadcasts HEARTBEAT with the current time<br>
+	 * Can be used to check if a ticked object is still alive
+	 */
+
 	public static void heartbeat() {
 		broadcast("HEARTBEAT: " + System.currentTimeMillis());
 	}
+
 
 	/**
 	 * Tries to cast the object to the type specified, returning null upon failure
@@ -146,6 +193,7 @@ public class CommonUtil {
 		return null;
 	}
 
+
 	/**
 	 * Schedules a runnable to execute the next Tick<br>
 	 * The BKCommonLib internal plugin will handle this task<br>
@@ -159,6 +207,12 @@ public class CommonUtil {
 		}
 	}
 
+	/**
+	 * Broadcasts a message to all players on a world
+	 * 
+	 * @param message to send
+	 */
+
 	public static void broadcast(Object message) {
 		if (message != null) {
 			for (EntityPlayer ep : getOnlinePlayers()) {
@@ -167,13 +221,27 @@ public class CommonUtil {
 		}
 	}
 
+	/**
+	 * Gets all the Plugins running on the Server
+	 * 
+	 * @return Plugins
+	 */
+
 	public static Plugin[] getPlugins() {
 		return Bukkit.getServer().getPluginManager().getPlugins();
 	}
 
+	/**
+	 * Gets a certain Plugin by name
+	 * 
+	 * @param name of the Plugin
+	 * @return Plugin
+	 */
+
 	public static Plugin getPlugin(String name) {
 		return Bukkit.getServer().getPluginManager().getPlugin(name);
 	}
+
 
 	/**
 	 * Tries to get the class at the path specified

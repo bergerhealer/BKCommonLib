@@ -83,6 +83,12 @@ public class SafeField<T> extends SafeBase {
 		return old;
 	}
 
+	/**
+	 * Gets this Field from a certain Object
+	 * 
+	 * @param object to get the Field from
+	 * @return the Field value, or null if not possible
+	 */
 	@SuppressWarnings("unchecked")
 	public T get(Object object) {
 		if (this.field == null)
@@ -96,6 +102,13 @@ public class SafeField<T> extends SafeBase {
 		}
 	}
 
+	/**
+	 * Sets this Field on a certain Object
+	 * 
+	 * @param object to set the Field on
+	 * @param value to set to
+	 * @return True if successful, False if not
+	 */
 	public boolean set(Object object, T value) {
 		if (this.field == null)
 			return false;
@@ -109,8 +122,26 @@ public class SafeField<T> extends SafeBase {
 		}
 	}
 
+	/**
+	 * Tries to set a Field for a certain Object
+	 * 
+	 * @param source to set a Field for
+	 * @param fieldname to set
+	 * @param value to set to
+	 * @return True if successful, False if not
+	 */
 	public static <T> boolean set(Object source, String fieldname, T value) {
 		return new SafeField<T>(source, fieldname).set(source, value);
 	}
 
+	/**
+	 * Tries to get a Field from a certain Object
+	 * 
+	 * @param source to get the Field from
+	 * @param fieldname to get
+	 * @return The Field value, or null if not possible
+	 */
+	public static <T> T get(Object source, String fieldname) {
+		return new SafeField<T>(source, fieldname).get(source);
+	}
 }

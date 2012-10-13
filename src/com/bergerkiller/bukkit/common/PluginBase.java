@@ -42,15 +42,21 @@ public abstract class PluginBase extends JavaPlugin {
 		super();
 	}
 
-	@Deprecated
-	public PluginBase(int minbuild, int maxbuild) {
-		super();
-	}
-
+	/**
+	 * Logs a message to the server console
+	 * 
+	 * @param level of the message
+	 * @param message to log
+	 */
 	public void log(Level level, String message) {
 		Bukkit.getLogger().log(level, "[" + this.getName() + "] " + message);
 	}
 
+	/**
+	 * Gets the version of this Plugin
+	 * 
+	 * @return Plugin version
+	 */
 	public final String getVersion() {
 		return this.getDescription().getVersion();
 	}
@@ -198,6 +204,8 @@ public abstract class PluginBase extends JavaPlugin {
 	public void handle(Throwable reason) {
 		if (reason instanceof Exception) {
 			reason.printStackTrace();
+		} else if (reason instanceof OutOfMemoryError) {
+			log(Level.SEVERE, "The server is running out of memory! Do something!");
 		} else if (reason instanceof NoClassDefFoundError) {
 			log(Level.WARNING, "Class is missing (plugin was hot-swapped?): " + reason.getMessage());
 		} else {

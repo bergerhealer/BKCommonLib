@@ -335,71 +335,29 @@ public class FaceUtil {
 		}
 	}
 
+	/**
+	 * Gets the horizontal Block Face from a given yaw angle<br>
+	 * This includes the NORTH_WEST faces
+	 * 
+	 * @param yaw angle
+	 * @return The Block Face of the angle
+	 */
 	public static BlockFace yawToFace(float yaw) {
 		return yawToFace(yaw, true);
 	}
 
+	/**
+	 * Gets the horizontal Block Face from a given yaw angle
+	 * 
+	 * @param yaw angle
+	 * @param useSubCardinalDirections setting, True to allow NORTH_WEST to be returned
+	 * @return The Block Face of the angle
+	 */
 	public static BlockFace yawToFace(float yaw, boolean useSubCardinalDirections) {
-		yaw = MathUtil.wrapAngle(yaw);
 		if (useSubCardinalDirections) {
-			switch ((int) yaw) {
-				case 0:
-					return BlockFace.NORTH;
-				case 45:
-					return BlockFace.NORTH_EAST;
-				case 90:
-					return BlockFace.EAST;
-				case 135:
-					return BlockFace.SOUTH_EAST;
-				case 180:
-					return BlockFace.SOUTH;
-				case -135:
-					return BlockFace.SOUTH_WEST;
-				case -90:
-					return BlockFace.WEST;
-				case -45:
-					return BlockFace.NORTH_WEST;
-			}
-			// Let's apply angle differences
-			if (yaw >= -22.5 && yaw < 22.5) {
-				return BlockFace.NORTH;
-			} else if (yaw >= 22.5 && yaw < 67.5) {
-				return BlockFace.NORTH_EAST;
-			} else if (yaw >= 67.5 && yaw < 112.5) {
-				return BlockFace.EAST;
-			} else if (yaw >= 112.5 && yaw < 157.5) {
-				return BlockFace.SOUTH_EAST;
-			} else if (yaw >= -67.5 && yaw < -22.5) {
-				return BlockFace.NORTH_WEST;
-			} else if (yaw >= -112.5 && yaw < -67.5) {
-				return BlockFace.WEST;
-			} else if (yaw >= -157.5 && yaw < -112.5) {
-				return BlockFace.SOUTH_WEST;
-			} else {
-				return BlockFace.SOUTH;
-			}
+			return radial[Math.round(yaw / 45f) & 0x7];
 		} else {
-			switch ((int) yaw) {
-				case 0:
-					return BlockFace.NORTH;
-				case 90:
-					return BlockFace.EAST;
-				case 180:
-					return BlockFace.SOUTH;
-				case -90:
-					return BlockFace.WEST;
-			}
-			// Let's apply angle differences
-			if (yaw >= -45 && yaw < 45) {
-				return BlockFace.NORTH;
-			} else if (yaw >= 45 && yaw < 135) {
-				return BlockFace.EAST;
-			} else if (yaw >= -135 && yaw < -45) {
-				return BlockFace.WEST;
-			} else {
-				return BlockFace.SOUTH;
-			}
+			return axis[Math.round(yaw / 90f) & 0x3];
 		}
 	}
-
 }

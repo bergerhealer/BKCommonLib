@@ -4,17 +4,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class Task implements Runnable {
+	private final JavaPlugin plugin;
+	private int id = -1;
 
 	public Task(final JavaPlugin plugin) {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Gets the Plugin this Task belongs to
+	 * 
+	 * @return Plugin
+	 */
 	public final JavaPlugin getPlugin() {
 		return this.plugin;
 	}
-
-	private final JavaPlugin plugin;
-	private int id = -1;
 
 	/**
 	 * Checks if this Task is currently being executed

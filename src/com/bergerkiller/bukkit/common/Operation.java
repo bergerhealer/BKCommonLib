@@ -180,5 +180,4 @@ public abstract class Operation {
 
 	public void handle(CraftChunk chunk) {
 	};
-
 }
