@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 public class StringUtil {
+	public static final char CHAT_STYLE_CHAR = '§';
 
 	/**
 	 * Converts a Location to a destination name.
@@ -274,5 +275,47 @@ public class StringUtil {
 			index += to.length(); // Move to the end of the replacement
 			index = builder.indexOf(from, index);
 		}
+	}
+
+	/**
+	 * Converts color codes such as &5 to the Color code representation
+	 * 
+	 * @param line to work on
+	 * @return converted line
+	 */
+	public static String ampToColor(String line) {
+		return swapColorCodes(line, '&', CHAT_STYLE_CHAR);
+	}
+
+	/**
+	 * Converts color codes to the ampersand representation, such as &5
+	 * 
+	 * @param line to work on
+	 * @return converted line
+	 */
+	public static String colorToAmp(String line) {
+		return swapColorCodes(line, CHAT_STYLE_CHAR, '&');
+	}
+
+	/**
+	 * Swaps the color coded character
+	 * 
+	 * @param line to operate on
+	 * @param fromCode to replace
+	 * @param toCode to replace fromCode with
+	 * @return converted String
+	 */
+	public static String swapColorCodes(String line, char fromCode, char toCode) {
+		StringBuilder builder = new StringBuilder(line);
+		for (int i = 0; i < builder.length() - 1; i++) {
+			if (builder.charAt(i) == fromCode) {
+				// Next char is a valid color code?
+				if (CommonUtil.containsChar(builder.charAt(i + 1), '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')) {
+					builder.setCharAt(i, toCode);
+					i++;
+				}
+			}
+		}
+		return builder.toString();
 	}
 }

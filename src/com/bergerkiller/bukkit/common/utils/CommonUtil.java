@@ -112,6 +112,14 @@ public class CommonUtil {
 		return getCraftServer().getHandle();
 	}
 
+	public static boolean containsChar(char value, char... values) {
+		for (int v : values) {
+			if (v == value)
+				return true;
+		}
+		return false;
+	}
+
 	public static boolean contains(int value, int... values) {
 		for (int v : values) {
 			if (v == value)
