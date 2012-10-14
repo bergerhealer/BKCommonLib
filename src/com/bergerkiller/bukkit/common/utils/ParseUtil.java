@@ -407,4 +407,51 @@ public class ParseUtil {
 			}
 		}
 	}
+
+	/**
+	 * Tries to convert a given Object to the type specified
+	 * 
+	 * @param object to convert
+	 * @param type to convert to
+	 * @return The convered object, or null if not possible
+	 */
+	public static <T> T convert(Object object, Class<T> type) {
+		return convert(object, type, null);
+	}
+
+	/**
+	 * Tries to convert a given Object to the type specified<br>
+	 * <b>The default value can not be null!</b>
+	 * 
+	 * @param object to convert
+	 * @param def to return on failure
+	 * @return The convered object, or the default if not possible
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T convert(Object object, T def) {
+		return convert(object, (Class<T>) def.getClass(), def);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T convert(Object object, Class<T> type, T def) {
+		if (object == null) {
+			return def;
+		}
+		Object rval = def;
+		try {
+			if (type == object.getClass()) {
+				rval = (T) object;
+			} else if (type.isEnum()) {
+				rval = ParseUtil.parseEnum(type, object.toString(), def);
+			} else if (type == Integer.class) {
+				rval = Integer.parseInt(object.toString());
+			} else if (type == Double.class) {
+				rval = Double.parseDouble(object.toString());
+				;
+			}
+		} catch (Exception ex) {
+			rval = def;
+		}
+		return (T) rval;
+	}
 }

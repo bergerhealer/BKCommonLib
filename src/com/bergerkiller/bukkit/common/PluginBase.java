@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import net.minecraft.server.MathHelper;
@@ -30,6 +33,7 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
+import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
@@ -38,7 +42,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 @SuppressWarnings("unused")
 public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
-	private FileConfiguration permissionconfig;
+	private FileConfiguration permissionconfig, localizationconfig;
 	private boolean enabled = false;
 
 	/**
@@ -58,6 +62,41 @@ public abstract class PluginBase extends JavaPlugin {
 	 */
 	public final String getVersion() {
 		return this.getDescription().getVersion();
+	}
+
+	/**
+	 * Gets a Permission, creates one if it doesn't exist
+	 * 
+	 * @param path of the Permission to obtain
+	 * @return Permission
+	 */
+	public static Permission getPermission(String path) {
+		Permission perm = Bukkit.getServer().getPluginManager().getPermission(path);
+		if (perm == null) {
+			perm = new Permission(path, PermissionDefault.FALSE);
+			Bukkit.getServer().getPluginManager().addPermission(perm);
+		}
+		return perm;
+	}
+
+	/**
+	 * Gets a permission configuration node
+	 * 
+	 * @param path of the node to get
+	 * @return Permission configuration node
+	 */
+	public final ConfigurationNode getPermissionNode(String path) {
+		return this.permissionconfig.getNode(path);
+	}
+
+	/**
+	 * Gets a localization configuration node
+	 * 
+	 * @param path of the node to get
+	 * @return Localization configuration node
+	 */
+	public final ConfigurationNode getLocalizationNode(String path) {
+		return this.localizationconfig.getNode(path);
 	}
 
 	public final void register(String... commands) {
@@ -86,90 +125,85 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
-	public static Permission getPermission(String permissionnode) {
-		Permission perm = Bukkit.getServer().getPluginManager().getPermission(permissionnode);
-		if (perm == null) {
-			perm = new Permission(permissionnode, PermissionDefault.FALSE);
-			Bukkit.getServer().getPluginManager().addPermission(perm);
-		}
-		return perm;
-	}
-
-	public final ConfigurationNode getPermissionNode() {
-		return this.permissionconfig;
-	}
-
-	public final ConfigurationNode getPermissionNode(String path) {
-		return this.permissionconfig.getNode(path);
-	}
-
+	/**
+	 * Loads all the permissions from a Permissions enumeration
+	 * 
+	 * @param permissionDefaults class
+	 */
 	public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
 		for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
 			this.loadPermission(perm);
 		}
 	}
 
-	public final void loadPermission(IPermissionDefault permissionDefault) {
-		this.loadPermission(permissionDefault.getName(), permissionDefault.getDefault(), permissionDefault.getDescription());
+	/**
+	 * Loads a single permission using a permission default
+	 * 
+	 * @param permissionDefault to use
+	 * @return Permission that was loaded
+	 */
+	public final Permission loadPermission(IPermissionDefault permissionDefault) {
+		return this.loadPermission(permissionDefault.getName(), permissionDefault.getDefault(), permissionDefault.getDescription());
 	}
 
-	public final Permission loadPermission(String permissionnode) {
-		return this.loadPermission(getPermission(permissionnode));
+	/**
+	 * Loads a single permission using a permission path
+	 * 
+	 * @param path of the Permission
+	 * @return Permission that was loaded
+	 */
+	public final Permission loadPermission(String path) {
+		return this.loadPermission(getPermission(path));
 	}
 
+	/**
+	 * Loads a single permission using a Permission
+	 * 
+	 * @param permission to load
+	 * @return Permission that was loaded
+	 */
 	public final Permission loadPermission(Permission permission) {
 		return this.loadPermission(permission.getName(), permission.getDefault(), permission.getDescription());
 	}
 
-	public final Permission loadPermission(String permissionnode, PermissionDefault def, String description) {
-		return this.loadPermission(getPermissionNode(permissionnode), def, description);
+	/**
+	 * Loads a single permission using the path, default and description
+	 * 
+	 * @param path of the Permission
+	 * @param def value of the Permission
+	 * @param description value of the Permission
+	 * @return Permission that was loaded
+	 */
+	public final Permission loadPermission(String path, PermissionDefault def, String description) {
+		return this.loadPermission(getPermissionNode(path), def, description);
 	}
 
-	public final Permission loadPermission(ConfigurationNode permissionnode, PermissionDefault def, String description) {
-		description = permissionnode.get("description", description);
-		// permission default can be true/false too!
-		Object setvalue = permissionnode.get("default");
-		if (setvalue != null) {
-			if (setvalue instanceof String) {
-				def = ParseUtil.parseEnum((String) setvalue, def);
-				permissionnode.set("default", def.toString());
-			} else if (setvalue instanceof Boolean) {
-				boolean val = (Boolean) setvalue;
-				if (val) {
-					def = PermissionDefault.TRUE;
-				} else {
-					def = PermissionDefault.FALSE;
-				}
-			} else {
-				setvalue = null;
-			}
-		}
-		if (setvalue == null) {
-			if (def == PermissionDefault.TRUE) {
-				permissionnode.set("default", true);
-			} else if (def == PermissionDefault.FALSE) {
-				permissionnode.set("default", false);
-			} else {
-				permissionnode.set("default", def.toString());
-			}
-		}
-		return setPermission(permissionnode.getPath(), def, description);
+	/**
+	 * Loads a single permission using the configuration node, default and description
+	 * 
+	 * @param node to use for the permission path, default and description
+	 * @param def value to use if the node is unusable
+	 * @param description to use if the node is unusable
+	 * @return Permission that was loaded
+	 */
+	public final Permission loadPermission(ConfigurationNode node, PermissionDefault def, String description) {
+		Permission permission = getPermission(node.getPath());
+		permission.setDefault(node.get("default", def));
+		permission.setDescription(node.get("description", description));
+		return permission;
 	}
 
-	public static Permission setPermission(String permissionnode, PermissionDefault def, String description) {
-		Permission perm = getPermission(permissionnode);
-		setPermission(perm, def, description);
-		return perm;
+	/**
+	 * Fired when the Permission nodes have to be created
+	 */
+	public void permissions() {
 	}
 
-	public static void setPermission(Permission permission, PermissionDefault def, String description) {
-		if (def != null)
-			permission.setDefault(def);
-		if (description != null)
-			permission.setDescription(description);
+	/**
+	 * Fired when the Localization nodes have to be created
+	 */
+	public void localization() {
 	}
-
-	public abstract void permissions();
 
 	public final String getDisableMessage() {
 		return this.disableMessage;
@@ -210,6 +244,51 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * Called when this Plugin loads up<br>
+	 * <b>Do not forget to call super.onLoad() when overriding!</b>
+	 */
+	@Override
+	public void onLoad() {
+		// Load permission configuration
+		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
+		if (this.permissionconfig.exists()) {
+			this.loadPermissions();
+		}
+		// header
+		this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
+		this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
+		this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
+
+		// Load localization configuration
+		this.localizationconfig = new FileConfiguration(this, "Localization.yml");
+		if (this.localizationconfig.exists()) {
+			this.loadLocalization();
+		}
+		// header
+		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
+		// Load all the commands for this Plugin
+		Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
+		if (commands != null && PluginDescriptionFileRef.commands.isValid()) {
+			// Prepare commands localization node
+			ConfigurationNode commandsNode = getLocalizationNode("commands");
+			commandsNode.setHeader("Command descriptions and usages");
+			// Create a new modifiable commands map to replace with
+			commands = new HashMap<String, Map<String, Object>>(commands);
+			for (Entry<String, Map<String, Object>> commandEntry : commands.entrySet()) {
+				ConfigurationNode node = commandsNode.getNode(commandEntry.getKey());
+				// Transfer description and usage
+				Map<String, Object> data = new HashMap<String, Object>(commandEntry.getValue());
+				node.shareWith(data, "description", "No description specified");
+				node.shareWith(data, "usage", "/" + commandEntry.getKey());
+				commandEntry.setValue(Collections.unmodifiableMap(data));
+			}
+			// Set the new commands map using reflection
+			PluginDescriptionFileRef.commands.set(this.getDescription(), Collections.unmodifiableMap(commands));
+		}
+	}
+
+	@Override
 	public final void onEnable() {
 		if (this.getMinimumLibVersion() > Common.VERSION) {
 			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
@@ -219,17 +298,17 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 
 		this.setDisableMessage(this.getName() + " disabled!");
-		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
-		if (this.permissionconfig.exists()) {
-			this.loadPermissions();
-		}
-		// header
-		this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
-		this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
-		this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
+
+		// ==== Permissions ====
 		this.permissions();
 		if (!this.permissionconfig.isEmpty()) {
 			this.savePermissions();
+		}
+
+		// ==== Localization ====
+		this.localization();
+		if (!this.localizationconfig.isEmpty()) {
+			this.saveLocalization();
 		}
 
 		try {
@@ -254,6 +333,7 @@ public abstract class PluginBase extends JavaPlugin {
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
 	}
 
+	@Override
 	public final void onDisable() {
 		// are there any plugins that depend on me?
 		List<String> depend;
@@ -285,6 +365,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
+	@Override
 	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
 			args = StringUtil.convertArgs(args);
@@ -320,6 +401,14 @@ public abstract class PluginBase extends JavaPlugin {
 
 	public abstract boolean command(CommandSender sender, String command, String[] args);
 
+	public final void loadLocalization() {
+		this.localizationconfig.load();
+	}
+
+	public final void saveLocalization() {
+		this.localizationconfig.save();
+	}
+	
 	public final void loadPermissions() {
 		this.permissionconfig.load();
 	}
