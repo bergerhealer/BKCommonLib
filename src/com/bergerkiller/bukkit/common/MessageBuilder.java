@@ -332,13 +332,7 @@ public class MessageBuilder {
 	 * @return This Message Builder
 	 */
 	public MessageBuilder flush(CommandSender sender) {
-		if (this.lines.size() > 1) {
-			this.lines.remove(this.lines.size() - 1);
-			this.send(sender);
-			this.lines.clear();
-			this.lines.add(this.builder);
-		}
-		return this;
+		return this.send(sender).clear();
 	}
 
 	/**

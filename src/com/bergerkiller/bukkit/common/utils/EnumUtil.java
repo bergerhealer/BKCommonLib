@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.HashMap;
-
 import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -11,121 +9,60 @@ import org.bukkit.World.Environment;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.permissions.PermissionDefault;
 
-import com.bergerkiller.bukkit.common.StringReplaceBundle;
-
-@SuppressWarnings("deprecation")
+@Deprecated
 public class EnumUtil {
-	private static final HashMap<String, Material> MAT_SPECIAL = new HashMap<String, Material>();
-	private static final StringReplaceBundle MAT_REPLACE = new StringReplaceBundle();
-	static {
-		// Material replacement algorithm
-		MAT_REPLACE.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-		MAT_REPLACE.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
-		MAT_REPLACE.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
-		MAT_REPLACE.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
-		MAT_REPLACE.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
-		MAT_REPLACE.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN");
-		// Special name cases
-		MAT_SPECIAL.put("CROP", Material.CROPS);
-		MAT_SPECIAL.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
-		MAT_SPECIAL.put("BUTTON", Material.STONE_BUTTON);
-		MAT_SPECIAL.put("PISTON", Material.PISTON_BASE);
-		MAT_SPECIAL.put("STICKPISTON", Material.PISTON_STICKY_BASE);
-		MAT_SPECIAL.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
-		MAT_SPECIAL.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
-		MAT_SPECIAL.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
-		MAT_SPECIAL.put("GOLDAPPLE", Material.GOLDEN_APPLE);
-		MAT_SPECIAL.put("APPLEGOLD", Material.GOLDEN_APPLE);
-	}
-
+	@Deprecated
 	public static <E extends Enum<E>> E parse(Class<E> enumeration, String name, E def) {
-		return parse(enumeration.getEnumConstants(), name, def);
+		return ParseUtil.parseEnum(enumeration, name, def);
 	}
 
+	@Deprecated
 	public static <E extends Enum<E>> E parse(E[] values, String name, E def) {
-		if (name == null || name.length() == 0)
-			return def;
-		name = name.toUpperCase().replace("_", "").replace(" ", "");
-		String[] enumNames = new String[values.length];
-		int i;
-		for (i = 0; i < enumNames.length; i++) {
-			enumNames[i] = values[i].toString().toUpperCase().replace("_", "");
-			if (enumNames[i].equals(name))
-				return values[i];
-		}
-		for (i = 0; i < enumNames.length; i++) {
-			if (enumNames[i].contains(name))
-				return values[i];
-		}
-		for (i = 0; i < enumNames.length; i++) {
-			if (name.contains(enumNames[i]))
-				return values[i];
-		}
-		return def;
+		return ParseUtil.parseArray(values, name, def);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <E extends Enum<E>> E parse(String name, E def) {
-		return parse((Class<E>) def.getClass(), name, def);
+		return ParseUtil.parseEnum(name, def);
 	}
 
+	@Deprecated
 	public static PermissionDefault parsePermissionDefault(String name, PermissionDefault def) {
 		return parse(PermissionDefault.class, name, def);
 	}
 
+	@Deprecated
 	public static GameMode parseGameMode(String name, GameMode def) {
 		return parse(GameMode.class, name, def);
 	}
 
+	@Deprecated
 	public static Environment parseEnvironment(String name, Environment def) {
 		return parse(Environment.class, name, def);
 	}
 
+	@Deprecated
 	public static Difficulty parseDifficulty(String name, Difficulty def) {
 		return parse(Difficulty.class, name, def);
 	}
 
+	@Deprecated
 	public static TreeSpecies parseTreeSpecies(String name, TreeSpecies def) {
-		name = name.toLowerCase();
-		if (name.contains("oak")) {
-			return TreeSpecies.GENERIC;
-		} else if (name.contains("pine") || name.contains("spruce")) {
-			return TreeSpecies.REDWOOD;
-		} else {
-			return parse(TreeSpecies.class, name, def);
-		}
+		return ParseUtil.parseTreeSpecies(name, def);
 	}
 
+	@Deprecated
 	public static DyeColor parseDyeColor(String name, DyeColor def) {
 		return parse(DyeColor.class, name, def);
 	}
 
+	@Deprecated
 	public static CreatureType parseCreatureType(String name, CreatureType def) {
 		return parse(CreatureType.class, name, def);
 	}
 
+	@Deprecated
 	public static Material parseMaterial(String name, Material def) {
-		// from ID
-		try {
-			Material m = Material.getMaterial(Integer.parseInt(name));
-			return m == null ? def : m;
-		} catch (Exception ex) {
-		}
-		name = MAT_REPLACE.replace(name.trim().toUpperCase());
-		return parseMaterialMain(name, def);
-	}
-
-	private static Material parseMaterialMain(String name, Material def) {
-		Material m = parse(Material.class, name, null);
-		if (m != null)
-			return m;
-		m = MAT_SPECIAL.get(name);
-		if (m != null) 
-			return m;
-		if (name.endsWith("S")) {
-			return parseMaterialMain(name.substring(0, name.length() - 1), def);
-		} else {
-			return def;
-		}
+		return ParseUtil.parseMaterial(name, def);
 	}
 }

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,25 @@ import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
  * Multiple Block utilities you can use to manipulate blocks and get block information
  */
 public class BlockUtil {
+	private static final Set<Integer> interactableBlocks = new HashSet<Integer>();
+
+	static {
+		interactableBlocks.add(Material.LEVER.getId());
+		interactableBlocks.add(Material.WOODEN_DOOR.getId());
+		interactableBlocks.add(Material.IRON_DOOR.getId());
+		interactableBlocks.add(Material.TRAP_DOOR.getId());
+		interactableBlocks.add(Material.CHEST.getId());
+		interactableBlocks.add(Material.FURNACE.getId());
+		interactableBlocks.add(Material.BURNING_FURNACE.getId());
+		interactableBlocks.add(Material.DISPENSER.getId());
+		interactableBlocks.add(Material.WORKBENCH.getId());
+		interactableBlocks.add(Material.DIODE_BLOCK_ON.getId());
+		interactableBlocks.add(Material.DIODE_BLOCK_OFF.getId());
+		interactableBlocks.add(Material.BED.getId());
+		interactableBlocks.add(Material.CAKE.getId());
+		interactableBlocks.add(Material.NOTE_BLOCK.getId());
+		interactableBlocks.add(Material.JUKEBOX.getId());
+	}
 
 	/**
 	 * Directly obtains the Material Data from the block<br>
@@ -297,18 +317,15 @@ public class BlockUtil {
 	}
 
 	public static boolean isType(int material, int... types) {
-		return CommonUtil.contains(material, types);
+		return LogicUtil.containsInt(material, types);
 	}
 
 	public static boolean isType(Material material, Material... types) {
-		return CommonUtil.contains(material, types);
+		return LogicUtil.contains(material, types);
 	}
 
 	public static boolean isType(int material, Material... types) {
-		int[] inttypes = new int[types.length];
-		for (int i = 0; i < types.length; i++)
-			inttypes[i] = types[i].getId();
-		return CommonUtil.contains(material, inttypes);
+		return isType(Material.getMaterial(material), types);
 	}
 
 	public static boolean isType(Block block, Material... types) {
@@ -316,7 +333,7 @@ public class BlockUtil {
 	}
 
 	public static boolean isType(Block block, int... types) {
-		return CommonUtil.contains(block.getTypeId(), types);
+		return isType(block.getTypeId(), types);
 	}
 
 	public static boolean isSign(Material material) {
@@ -353,6 +370,48 @@ public class BlockUtil {
 	public static boolean isPowerSource(int typeId) {
 		net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
 		return block == null ? false : block.isPowerSource();
+	}
+
+	/**
+	 * Checks if a given Type is a Bucket<br>
+	 * Note: The milk bucket is excluded
+	 * 
+	 * @param type of the Material
+	 * @return True if it is a type of Bucket, False if not
+	 */
+	public static boolean isBucket(Material type) {
+		return isType(type, Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET);
+	}
+
+	/**
+	 * Checks if a given Type id is a Bucket<br>
+	 * Note: The milk bucket is excluded
+	 * 
+	 * @param typeId of the Material
+	 * @return True if it is a type of Bucket, False if not
+	 */
+	public static boolean isBucket(int typeId) {
+		return isType(typeId, Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET);
+	}
+
+	/**
+	 * Checks if a given material Type can be interacted with
+	 * 
+	 * @param type of the Material
+	 * @return True if it is Interactable, False if not
+	 */
+	public static boolean isInteractable(Material type) {
+		return isInteractable(type.getId());
+	}
+
+	/**
+	 * Checks if a given material Type id can be interacted with
+	 * 
+	 * @param typeId of the Material
+	 * @return True if it is Interactable, False if not
+	 */
+	public static boolean isInteractable(int typeId) {
+		return interactableBlocks.contains(typeId);
 	}
 
 	/**

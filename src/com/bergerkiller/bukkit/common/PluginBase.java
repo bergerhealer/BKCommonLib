@@ -28,7 +28,7 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
-import com.bergerkiller.bukkit.common.utils.EnumUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 @SuppressWarnings("unused")
@@ -137,7 +137,7 @@ public abstract class PluginBase extends JavaPlugin {
 		Object setvalue = permissionnode.get("default");
 		if (setvalue != null) {
 			if (setvalue instanceof String) {
-				def = EnumUtil.parse((String) setvalue, def);
+				def = ParseUtil.parseEnum((String) setvalue, def);
 				permissionnode.set("default", def.toString());
 			} else if (setvalue instanceof Boolean) {
 				boolean val = (Boolean) setvalue;

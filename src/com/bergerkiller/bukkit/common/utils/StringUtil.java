@@ -176,76 +176,24 @@ public class StringUtil {
 		return tmpargs.toArray(new String[0]);
 	}
 
+	@Deprecated
 	public static boolean getBool(String name) {
-		name = name.toLowerCase().trim();
-		if (name.equals("yes"))
-			return true;
-		if (name.equals("allow"))
-			return true;
-		if (name.equals("true"))
-			return true;
-		if (name.equals("ye"))
-			return true;
-		if (name.equals("y"))
-			return true;
-		if (name.equals("t"))
-			return true;
-		if (name.equals("on"))
-			return true;
-		if (name.equals("enabled"))
-			return true;
-		if (name.equals("enable"))
-			return true;
-		return false;
+		return ParseUtil.parseBool(name);
 	}
 
+	@Deprecated
 	public static boolean isBool(String name) {
-		name = name.toLowerCase().trim();
-		if (name.equals("yes"))
-			return true;
-		if (name.equals("allow"))
-			return true;
-		if (name.equals("true"))
-			return true;
-		if (name.equals("ye"))
-			return true;
-		if (name.equals("y"))
-			return true;
-		if (name.equals("t"))
-			return true;
-		if (name.equals("on"))
-			return true;
-		if (name.equals("enabled"))
-			return true;
-		if (name.equals("enable"))
-			return true;
-		if (name.equals("no"))
-			return true;
-		if (name.equals("none"))
-			return true;
-		if (name.equals("deny"))
-			return true;
-		if (name.equals("false"))
-			return true;
-		if (name.equals("n"))
-			return true;
-		if (name.equals("f"))
-			return true;
-		if (name.equals("off"))
-			return true;
-		if (name.equals("disabled"))
-			return true;
-		if (name.equals("disable"))
-			return true;
-		return false;
+		return ParseUtil.isBool(name);
 	}
 
-	public static boolean isIn(String item, String... items) {
-		for (String i : items) {
-			if (item.equalsIgnoreCase(i))
-				return true;
-		}
-		return false;
+	/**
+	 * Checks if a given Character is a valid chat formatting code
+	 * 
+	 * @param character to check
+	 * @return True if it is a formatting code, False if not
+	 */
+	public static boolean isChatCode(char character) {
+		return LogicUtil.containsChar(character, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r');
 	}
 
 	public static int getSuccessiveCharCount(String value, char character) {
@@ -310,7 +258,7 @@ public class StringUtil {
 		for (int i = 0; i < builder.length() - 1; i++) {
 			if (builder.charAt(i) == fromCode) {
 				// Next char is a valid color code?
-				if (CommonUtil.containsChar(builder.charAt(i + 1), '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')) {
+				if (isChatCode(builder.charAt(i + 1))) {
 					builder.setCharAt(i, toCode);
 					i++;
 				}

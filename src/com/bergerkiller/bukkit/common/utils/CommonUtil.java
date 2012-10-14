@@ -23,6 +23,26 @@ public class CommonUtil {
 	public static final int blockView = 32 + (view << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
 
+	@Deprecated
+	public static boolean containsChar(char value, char... values) {
+		return LogicUtil.containsChar(value, values);
+	}
+
+	@Deprecated
+	public static boolean contains(int value, int... values) {
+		return LogicUtil.containsInt(value, values);
+	}
+
+	@Deprecated
+	public static boolean contains(byte value, byte... values) {
+		return LogicUtil.containsByte(value, values);
+	}
+
+	@Deprecated
+	public static <T> boolean contains(T value, T... values) {
+		return LogicUtil.contains(value, values);
+	}
+
 	/**
 	 * Sends a message to a sender<br>
 	 * - Empty messages are ignored<br>
@@ -110,45 +130,6 @@ public class CommonUtil {
 	 */
 	public static ServerConfigurationManager getServerConfig() {
 		return getCraftServer().getHandle();
-	}
-
-	public static boolean containsChar(char value, char... values) {
-		for (int v : values) {
-			if (v == value)
-				return true;
-		}
-		return false;
-	}
-
-	public static boolean contains(int value, int... values) {
-		for (int v : values) {
-			if (v == value)
-				return true;
-		}
-		return false;
-	}
-
-	public static boolean contains(byte value, byte... values) {
-		for (int v : values) {
-			if (v == value)
-				return true;
-		}
-		return false;
-	}
-
-	public static <T> boolean contains(T value, T... values) {
-		if (value == null) {
-			for (T v : values) {
-				if (v == null)
-					return true;
-			}
-		} else {
-			for (T v : values) {
-				if (v == value || value.equals(v))
-					return true;
-			}
-		}
-		return false;
 	}
 
 	/**

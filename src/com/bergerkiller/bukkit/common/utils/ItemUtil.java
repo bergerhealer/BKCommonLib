@@ -5,21 +5,12 @@ import net.minecraft.server.IInventory;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 
-import org.bukkit.DyeColor;
-import org.bukkit.GrassSpecies;
 import org.bukkit.Material;
-import org.bukkit.TreeSpecies;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Leaves;
-import org.bukkit.material.LongGrass;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.TexturedMaterial;
-import org.bukkit.material.Tree;
-import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.items.ItemParser;
 import com.bergerkiller.bukkit.common.items.SimpleInventory;
@@ -545,63 +536,8 @@ public class ItemUtil {
 		return max == -1 ? 64 : max;
 	}
 
+	@Deprecated
 	public static Byte getData(Material type, String name) {
-		try {
-			return Byte.parseByte(name);
-		} catch (NumberFormatException ex) {
-			if (type == Material.WOOD) {
-				TreeSpecies ts = EnumUtil.parseTreeSpecies(name, null);
-				if (ts != null) {
-					switch (ts) {
-						case GENERIC:
-							return 0;
-						case REDWOOD:
-							return 1;
-						case BIRCH:
-							return 2;
-						case JUNGLE:
-							return 3;
-					}
-				}
-				return null;
-			} else {
-				MaterialData dat = type.getNewData((byte) 0);
-				if (dat instanceof TexturedMaterial) {
-					TexturedMaterial tdat = (TexturedMaterial) dat;
-					Material mat = EnumUtil.parseMaterial(name, null);
-					if (mat == null)
-						return null;
-					tdat.setMaterial(mat);
-				} else if (dat instanceof Wool) {
-					Wool wdat = (Wool) dat;
-					DyeColor color = EnumUtil.parseDyeColor(name, null);
-					if (color == null)
-						return null;
-					wdat.setColor(color);
-				} else if (dat instanceof Tree) {
-					Tree tdat = (Tree) dat;
-					TreeSpecies species = EnumUtil.parseTreeSpecies(name, null);
-					if (species == null)
-						return null;
-					tdat.setSpecies(species);
-				} else if (dat instanceof Leaves) {
-					Leaves tdat = (Leaves) dat;
-					TreeSpecies species = EnumUtil.parseTreeSpecies(name, null);
-					if (species == null)
-						return null;
-					tdat.setSpecies(species);
-				} else if (dat instanceof LongGrass) {
-					LongGrass ldat = (LongGrass) dat;
-					GrassSpecies species = EnumUtil.parse(GrassSpecies.class, name, null);
-					if (species == null)
-						return null;
-					ldat.setSpecies(species);
-				} else {
-					return null;
-				}
-				return dat.getData();
-			}
-		}
+		return ParseUtil.parseMaterialData(name, type, null);
 	}
-
 }

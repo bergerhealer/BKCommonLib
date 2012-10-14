@@ -3,8 +3,7 @@ package com.bergerkiller.bukkit.common.items;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.EnumUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class ItemParser {
@@ -74,13 +73,13 @@ public class ItemParser {
 			parser.type = null;
 			return parser;
 		}
-		parser.type = EnumUtil.parseMaterial(name, null);
+		parser.type = ParseUtil.parseMaterial(name, null);
 		if (parser.type == null) {
 			parser.type = Material.AIR;
 		}
 		// match data name if needed
 		if (parser.hasdata) {
-			Byte dat = ItemUtil.getData(parser.type, dataname);
+			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
 			if (dat == null) {
 				parser.hasdata = false;
 			} else {

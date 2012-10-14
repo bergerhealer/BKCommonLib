@@ -11,6 +11,8 @@ import java.util.Set;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ConfigurationNode {
 	private final MemorySection source;
@@ -242,8 +244,12 @@ public class ConfigurationNode {
 	}
 
 	public void set(String path, Object value) {
-		if (value != null)
+		if (value != null) {
 			this.setRead(path);
+		}
+		if (value != null && value.getClass().isEnum()) {
+			value = value.toString();
+		}
 		this.source.set(path, value);
 	}
 
@@ -305,6 +311,8 @@ public class ConfigurationNode {
 		try {
 			if (type == object.getClass()) {
 				rval = (T) object;
+			} else if (type.isEnum()) {
+				rval = ParseUtil.parseEnum(type, object.toString(), def);
 			} else if (type == Integer.class) {
 				rval = Integer.parseInt(object.toString());
 			} else if (type == Double.class) {
@@ -316,5 +324,4 @@ public class ConfigurationNode {
 		}
 		return (T) rval;
 	}
-
 }

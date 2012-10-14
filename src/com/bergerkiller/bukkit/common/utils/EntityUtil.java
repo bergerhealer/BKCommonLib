@@ -6,31 +6,32 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.Chunk;
-import net.minecraft.server.EntityCreature;
 import net.minecraft.server.EntityFallingBlock;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.EntityTrackerEntry;
-import net.minecraft.server.IAnimal;
-import net.minecraft.server.IMonster;
 import net.minecraft.server.IntHashMap;
 import net.minecraft.server.MathHelper;
-import net.minecraft.server.NPC;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.Squid;
 import org.bukkit.plugin.Plugin;
 
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -185,36 +186,36 @@ public class EntityUtil {
 			"blaze", "magmacube", "silverfish" };
 	public static final String[] npcNames = new String[] { "villager", "irongolem" };
 
-	public static boolean isMob(Entity entity) {
-		return isMob(getNative(entity));
-	}
-
-	public static boolean isAnimal(Entity entity) {
-		return isAnimal(getNative(entity));
-	}
-
-	public static boolean isMonster(Entity entity) {
-		return isMonster(getNative(entity));
-	}
-
-	public static boolean isNPC(Entity entity) {
-		return isNPC(getNative(entity));
-	}
-
 	public static boolean isMob(net.minecraft.server.Entity entity) {
-		return entity instanceof EntityCreature;
+		return isMob(entity.getBukkitEntity());
 	}
 
-	public static boolean isNPC(net.minecraft.server.Entity entity) {
-		return entity instanceof NPC;
+	public static boolean isMob(Entity entity) {
+		return entity instanceof Creature || entity instanceof Slime;
 	}
 
 	public static boolean isAnimal(net.minecraft.server.Entity entity) {
-		return entity instanceof IAnimal;
+		return isAnimal(entity.getBukkitEntity());
+	}
+
+	public static boolean isAnimal(Entity entity) {
+		return entity instanceof Animals || entity instanceof Squid;
 	}
 
 	public static boolean isMonster(net.minecraft.server.Entity entity) {
-		return entity instanceof IMonster;
+		return isMonster(entity.getBukkitEntity());
+	}
+
+	public static boolean isMonster(Entity entity) {
+		return entity instanceof Monster || entity instanceof Slime;
+	}
+
+	public static boolean isNPC(net.minecraft.server.Entity entity) {
+		return isNPC(entity.getBukkitEntity());
+	}
+
+	public static boolean isNPC(Entity entity) {
+		return entity instanceof NPC;
 	}
 
 	public static boolean isMob(EntityType type) {
@@ -238,15 +239,15 @@ public class EntityUtil {
 	}
 
 	public static boolean isAnimal(String name) {
-		return StringUtil.isIn(name, animalNames);
+		return LogicUtil.contains(name.toLowerCase(), animalNames);
 	}
 
 	public static boolean isMonster(String name) {
-		return StringUtil.isIn(name, monsterNames);
+		return LogicUtil.contains(name.toLowerCase(), monsterNames);
 	}
 
 	public static boolean isNPC(String name) {
-		return StringUtil.isIn(name, npcNames);
+		return LogicUtil.contains(name.toLowerCase(), npcNames);
 	}
 
 	public static String getName(Entity entity) {
@@ -377,7 +378,7 @@ public class EntityUtil {
 	}
 
 	public static boolean teleport(final net.minecraft.server.Entity entity, final Location to) {
-		WorldServer newworld = ((CraftWorld) to.getWorld()).getHandle();
+		WorldServer newworld = WorldUtil.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
 		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
 			final net.minecraft.server.Entity passenger = entity.passenger;
