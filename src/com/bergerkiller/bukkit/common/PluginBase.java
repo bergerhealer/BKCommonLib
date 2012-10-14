@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.server.MathHelper;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
@@ -28,6 +30,8 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -35,12 +39,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig;
-	private ArrayList<Command> commands = new ArrayList<Command>();
 	private boolean enabled = false;
-
-	public PluginBase() {
-		super();
-	}
 
 	/**
 	 * Logs a message to the server console
@@ -85,11 +84,6 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public final <T extends Command> T register(T command) {
-		this.commands.add(command);
-		return command;
 	}
 
 	public static Permission getPermission(String permissionnode) {
@@ -294,34 +288,30 @@ public abstract class PluginBase extends JavaPlugin {
 	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
 			args = StringUtil.convertArgs(args);
-			if (!this.commands.isEmpty()) {
-				ArrayList<String> arglist = new ArrayList<String>(args.length + 1);
-				arglist.add(command);
-				for (String arg : args) {
-					arglist.add(arg);
-				}
-				for (Command ccc : this.commands) {
-					if (ccc.execute(sender, arglist)) {
-						return true;
-					}
-				}
+			// Handle regularly
+			if (command(sender, command, args)) {
+				return true;
 			}
-			return command(sender, command, args);
+			// Default commands for all plugins
+			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(), "version", "ver")) {
+				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.instance.getVersion());
+			}
+			// Handle regularly
+			sender.sendMessage(ChatColor.RED + "Unknown command, for help use /help " + command);
 		} catch (NoPermissionException ex) {
 			if (sender instanceof Player) {
 				sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
 			} else {
 				sender.sendMessage("This command is only for players!");
 			}
-			return true;
 		} catch (Throwable t) {
 			StringBuilder msg = new StringBuilder("Unhandled exception executing command '");
 			msg.append(command).append("' in plugin ").append(this.getName()).append(" v").append(this.getVersion());
 			Bukkit.getLogger().log(Level.SEVERE, msg.toString());
 			t.printStackTrace();
 			sender.sendMessage(ChatColor.RED + "An internal error occured while executing this command");
-			return true;
 		}
+		return true;
 	}
 
 	public abstract void enable();
@@ -344,5 +334,4 @@ public abstract class PluginBase extends JavaPlugin {
 
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 	};
-
 }

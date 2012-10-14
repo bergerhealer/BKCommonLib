@@ -6,7 +6,7 @@ import java.util.LinkedList;
  * Contains a value which can be used to temporarily change states<br>
  * For example, setting it to a value, and after you are done, setting it back to the old value
  */
-public class ActiveState <T> {
+public class ActiveState<T> {
 	private T state;
 	private LinkedList<T> oldStates = new LinkedList<T>();
 

@@ -11,7 +11,6 @@ import org.bukkit.map.MapFont.CharacterSprite;
 import org.bukkit.map.MinecraftFont;
 
 public class MessageBuilder {
-
 	private final List<StringBuilder> lines = new ArrayList<StringBuilder>();
 	private StringBuilder builder;
 	private int currentWidth;
@@ -205,16 +204,16 @@ public class MessageBuilder {
 	}
 
 	public MessageBuilder append(String... text) {
-		if (text == null || text.length == 0)
-			return this;
-		int width = getWidth(text);
-		if (this.needsWordWrap(width)) {
-			this.newLine();
-		}
-		this.currentWidth += width;
-		this.prepareNewAppend();
-		for (String part : text) {
-			this.builder.append(part);
+		if (text != null && text.length > 0) {
+			int width = getWidth(text);
+			if (this.needsWordWrap(width)) {
+				this.newLine();
+			}
+			this.currentWidth += width;
+			this.prepareNewAppend();
+			for (String part : text) {
+				this.builder.append(part);
+			}
 		}
 		return this;
 	}
@@ -231,6 +230,11 @@ public class MessageBuilder {
 		}
 	}
 
+	/**
+	 * Starts a new line
+	 * 
+	 * @return this Message Builder
+	 */
 	public MessageBuilder newLine() {
 		this.builder = new StringBuilder();
 		this.lines.add(this.builder);
@@ -238,12 +242,26 @@ public class MessageBuilder {
 		return this;
 	}
 
+	/**
+	 * Gets the total length of this Message
+	 * 
+	 * @return total length
+	 */
 	public int length() {
-		return this.builder.length();
+		int length = this.lines.size() - 1;
+		for (StringBuilder line : this.lines) {
+			length += line.length();
+		}
+		return length;
 	}
 
+	/**
+	 * Gets whether messages are contained
+	 * 
+	 * @return True if empty, False if not
+	 */
 	public boolean isEmpty() {
-		return this.builder.length() == 0;
+		return this.lines.size() == 1 && this.builder.length() == 0;
 	}
 
 	/**
@@ -287,23 +305,31 @@ public class MessageBuilder {
 		return MinecraftFont.Font.getChar(character).getWidth();
 	}
 
+	/**
+	 * Gets the last line of this Message Builder
+	 * 
+	 * @return last line
+	 */
 	public String lastLine() {
 		return this.builder.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder total = new StringBuilder();
-		for (StringBuilder line : this.lines) {
-			if (total.length() > 0) {
+		StringBuilder total = new StringBuilder(this.length());
+		for (int i = 0; i < this.lines.size(); i++) {
+			if (i != 0) {
 				total.append('\n');
 			}
-			total.append(line);
+			total.append(this.lines.get(i));
 		}
 		return total.toString();
 	}
 
 	public String[] lines() {
+		if (this.isEmpty()) {
+			return new String[0];
+		}
 		String[] lines = new String[this.lines.size()];
 		int i = 0;
 		for (StringBuilder line : this.lines) {
