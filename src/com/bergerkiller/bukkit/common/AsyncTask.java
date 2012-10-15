@@ -1,19 +1,38 @@
 package com.bergerkiller.bukkit.common;
 
+/**
+ * A wrapper class around a Thread that can:<br>
+ * - Create an infinite loop that can be stopped externally<br>
+ * - Provide an error-free sleep function<br>
+ */
 public abstract class AsyncTask implements Runnable {
 	private boolean running = false;
 	private boolean stoprequested = false;
 	private boolean looped = false;
 	private final Thread thread;
 
+	/**
+	 * Initializes a new nameless Async task
+	 */
 	public AsyncTask() {
 		this(null);
 	}
 
+	/**
+	 * Initializes a new named Async task
+	 * 
+	 * @param name of the Async task
+	 */
 	public AsyncTask(final String name) {
 		this(name, 0);
 	}
 
+	/**
+	 * Initializes a new named and prioritized Async task
+	 * 
+	 * @param name of the Async task
+	 * @param priority for the Async task
+	 */
 	public AsyncTask(final String name, final int priority) {
 		final AsyncTask task = this;
 		this.thread = new Thread() {

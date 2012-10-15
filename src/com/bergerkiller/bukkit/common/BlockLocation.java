@@ -8,7 +8,18 @@ import org.bukkit.block.Block;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
+/**
+ * Contains a world name and block coordinates
+ */
 public class BlockLocation {
+	public final int x, y, z;
+	public final String world;
+
+	/**
+	 * Initializes a new Block Location using the data in the configuration node
+	 * 
+	 * @param node to use
+	 */
 	public BlockLocation(ConfigurationNode node) {
 		this.world = node.get("world", "world");
 		this.x = node.get("x", 0);
@@ -16,26 +27,41 @@ public class BlockLocation {
 		this.z = node.get("z", 0);
 	}
 
+	/**
+	 * Initializes a new Block Location using a Block
+	 * 
+	 * @param block to use
+	 */
 	public BlockLocation(Block block) {
 		this(block.getWorld(), block.getX(), block.getY(), block.getZ());
 	}
 
+	/**
+	 * Initializes a new Block Location using a world and x/y/z coordinate
+	 * 
+	 * @param world to use the name of
+	 * @param x - coordinate
+	 * @param y - coordinate
+	 * @param z - coordinate
+	 */
 	public BlockLocation(World world, final int x, final int y, final int z) {
-		this.world = world == null ? null : world.getName();
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this(world == null ? null : world.getName(), x, y, z);
 	}
 
+	/**
+	 * Initializes a new Block Location using a world and x/y/z coordinate
+	 * 
+	 * @param world name to use
+	 * @param x - coordinate
+	 * @param y - coordinate
+	 * @param z - coordinate
+	 */
 	public BlockLocation(final String world, final int x, final int y, final int z) {
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-
-	public final int x, y, z;
-	public final String world;
 
 	public static BlockLocation parseLocation(String value) {
 		if (value.length() < 10) {
@@ -90,6 +116,12 @@ public class BlockLocation {
 		}
 	}
 
+	/**
+	 * Checks if this Block Location is within the boundaries of a chunk
+	 * 
+	 * @param chunk to check
+	 * @return True if within, False if not
+	 */
 	public boolean isIn(Chunk chunk) {
 		if (chunk != null && this.isIn(chunk.getWorld())) {
 			return (this.x >> 4) == chunk.getX() && (this.z >> 4) == chunk.getZ();
@@ -97,6 +129,13 @@ public class BlockLocation {
 		return false;
 	}
 
+	/**
+	 * Checks if this Block Location is within the boundaries of a cuboid
+	 * 
+	 * @param point1 of the Cuboid
+	 * @param point2 of the Cuboid
+	 * @return True if within, False if not
+	 */
 	public boolean isIn(BlockLocation point1, BlockLocation point2) {
 		if (point1 != null && point2 != null) {
 			if (point1.world.equals(point2.world) && point1.world.equals(this.world)) {
@@ -119,10 +158,12 @@ public class BlockLocation {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		return this.world + "_" + this.x + "_" + this.y + "_" + this.z;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (object == this)
 			return true;
@@ -134,6 +175,7 @@ public class BlockLocation {
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		int hash = 3;
 		hash = 53 * hash + this.world.hashCode();

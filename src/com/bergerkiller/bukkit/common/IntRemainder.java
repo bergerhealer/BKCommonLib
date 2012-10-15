@@ -40,6 +40,11 @@ public class IntRemainder {
 		}
 	}
 
+	/**
+	 * Gets the next Integer value of this remainder
+	 * 
+	 * @return Next Integer value
+	 */
 	public int next() {
 		return this.values[this.counter.next()];
 	}
