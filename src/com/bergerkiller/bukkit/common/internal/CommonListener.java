@@ -18,14 +18,14 @@ class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
 		for (PluginBase pb : CommonPlugin.plugins) {
-			pb.updateDependency(event.getPlugin(), true);
+			pb.updateDependency(event.getPlugin(), event.getPlugin().getName(), true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginDisable(PluginDisableEvent event) {
 		for (PluginBase pb : CommonPlugin.plugins) {
-			pb.updateDependency(event.getPlugin(), false);
+			pb.updateDependency(event.getPlugin(), event.getPlugin().getName(), false);
 		}
 	}
 

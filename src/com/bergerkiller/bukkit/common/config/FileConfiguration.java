@@ -43,26 +43,39 @@ public class FileConfiguration extends ConfigurationNode {
 	}
 
 	private void writeHeader(int indent, String header, BufferedWriter writer) throws IOException {
-		if (header == null)
-			return;
-		for (String line : header.split("\n", -1)) {
-			StreamUtil.writeIndent(writer, indent * this.getIndent());
-			if (line.trim().length() > 0) {
-				writer.write("# ");
-				writer.write(line);
+		if (header != null) {
+			for (String line : header.split("\n", -1)) {
+				StreamUtil.writeIndent(writer, indent * this.getIndent());
+				if (line.trim().length() > 0) {
+					writer.write("# ");
+					writer.write(line);
+				}
+				writer.newLine();
 			}
-			writer.newLine();
 		}
 	}
 
+	/**
+	 * Sets the indentation of sub-nodes
+	 * 
+	 * @param indent size
+	 */
 	public void setIndent(int indent) {
 		this.getSource().options().indent(indent);
 	}
 
+	/**
+	 * Gets the indentation of sub-nodes
+	 * 
+	 * @return indent size
+	 */
 	public int getIndent() {
 		return this.getSource().options().indent();
 	}
 
+	/**
+	 * Loads this File Configuration from file
+	 */
 	public void load() {
 		try {
 			FileInputStream stream = new FileInputStream(this.file);
@@ -74,40 +87,27 @@ public class FileConfiguration extends ConfigurationNode {
 			try {
 				String line;
 				List<String> nodes = new ArrayList<String>();
-				StringBuilder header = null;
+				StringBuilder header = new StringBuilder();
 				boolean readfirstheader = false;
 				while ((line = input.readLine()) != null) {
 					if (!readfirstheader) {
 						String h = line.trim();
 						if (h.length() == 0) {
-							if (header == null) {
-								header = new StringBuilder();
-							} else {
-								header.append('\n');
-							}
+							header.append("\n ");
 							continue;
 						} else if (h.startsWith("#")) {
-							h = h.substring(1).trim();
-							if (header == null) {
-								header = new StringBuilder(h);
-							} else {
-								header.append('\n').append(h);
-							}
+							header.append("\n ").append(h.substring(1).trim());
 							continue;
 						} else {
-							if (header != null) {
+							if (header.length() != 0) {
 								this.setHeader(header.toString());
-								header = null;
+								header.setLength(0);
 							}
 							readfirstheader = true;
 						}
 					}
 					if (line.trim().length() == 0) {
-						if (header == null) {
-							header = new StringBuilder();
-						} else {
-							header.append("\n ");
-						}
+						header.append("\n ");
 						continue;
 					}
 					// get indent
@@ -115,13 +115,9 @@ public class FileConfiguration extends ConfigurationNode {
 					if (indent % 2 == 0 && line.length() > indent && line.charAt(indent) != '-') {
 						if (line.charAt(indent) == '#') {
 							String h = line.substring(indent + 1).trim();
-							if (header != null) {
-								header.append('\n').append(h);
-							} else {
-								header = new StringBuilder(h);
-							}
+							header.append('\n').append(h);
 							continue;
-						} else if (header != null) {
+						} else if (header.length() != 0) {
 							int startindex = indent;
 							indent >>= 1;
 							int endindex = line.indexOf(':', startindex);
@@ -138,7 +134,7 @@ public class FileConfiguration extends ConfigurationNode {
 									}
 								}
 								this.setHeader(StringUtil.combine(".", nodes), header.toString());
-								header = null;
+								header.setLength(0);
 							}
 						}
 					}
@@ -155,6 +151,9 @@ public class FileConfiguration extends ConfigurationNode {
 		}
 	}
 
+	/**
+	 * Saves this File Configuration to file
+	 */
 	public void save() {
 		try {
 			boolean regen = !this.exists();

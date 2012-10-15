@@ -68,9 +68,7 @@ public class StringUtil {
 		int i = -1;
 		int index;
 		for (String value : values) {
-			if ((index = text.indexOf(value, startindex)) == -1)
-				continue;
-			if (i == -1 || index < i) {
+			if ((index = text.indexOf(value, startindex)) != -1 && (i == -1 || index < i)) {
 				i = index;
 			}
 		}
@@ -78,8 +76,9 @@ public class StringUtil {
 	}
 
 	public static String[] remove(String[] input, int index) {
-		if (index < 0 || index >= input.length)
+		if (index < 0 || index >= input.length) {
 			return input;
+		}
 		String[] rval = new String[input.length - 1];
 		System.arraycopy(input, 0, rval, 0, index);
 		System.arraycopy(input, index + 1, rval, index, input.length - index - 1);

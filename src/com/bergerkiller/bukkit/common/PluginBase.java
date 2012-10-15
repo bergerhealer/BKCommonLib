@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,6 +66,26 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
+	 * Gets the file of the path relative to this plugin's data folder
+	 * 
+	 * @param path of the file
+	 * @return relative data File
+	 */
+	public File getDataFile(String... path) {
+		if (path == null || path.length == 0) {
+			return this.getDataFolder();
+		}
+		StringBuilder name = new StringBuilder(path.length * 15);
+		for (int i = 0; i < path.length; i++) {
+			if (i != 0) {
+				name.append(File.separatorChar);
+			}
+			name.append(path[i]);
+		}
+		return new File(this.getDataFolder(), name.toString());
+	}
+
+	/**
 	 * Gets a Permission, creates one if it doesn't exist
 	 * 
 	 * @param path of the Permission to obtain
@@ -99,24 +120,46 @@ public abstract class PluginBase extends JavaPlugin {
 		return this.localizationconfig.getNode(path);
 	}
 
+	/**
+	 * Registers this main class for one or more commands
+	 * 
+	 * @param commands to register this Plugin class for
+	 */
 	public final void register(String... commands) {
 		this.register(this, commands);
 	}
 
+	/**
+	 * Registers a command executor for one or more commands
+	 * 
+	 * @param executor to register
+	 * @param commands to register it for
+	 */
 	public final void register(CommandExecutor executor, String... commands) {
 		for (String command : commands) {
 			PluginCommand cmd = this.getCommand(command);
-			if (cmd != null)
+			if (cmd != null) {
 				cmd.setExecutor(executor);
+			}
 		}
 	}
 
+	/**
+	 * Registers a listener instance
+	 * 
+	 * @param listener to register
+	 */
 	public final void register(Listener listener) {
-		if (listener == this)
-			return;
-		Bukkit.getPluginManager().registerEvents(listener, this);
+		if (listener != this) {
+			Bukkit.getPluginManager().registerEvents(listener, this);
+		}
 	}
 
+	/**
+	 * Registers a listener class
+	 * 
+	 * @param listener class to register
+	 */
 	public final void register(Class<? extends Listener> listener) {
 		try {
 			this.register(listener.newInstance());
@@ -205,10 +248,20 @@ public abstract class PluginBase extends JavaPlugin {
 	public void localization() {
 	}
 
+	/**
+	 * Gets the disable message shown when this Plugin disables
+	 * 
+	 * @return disable message
+	 */
 	public final String getDisableMessage() {
 		return this.disableMessage;
 	}
 
+	/**
+	 * Sets the disable message shown when this Plugin disables
+	 * 
+	 * @param msg to set to, null to disable the message
+	 */
 	public void setDisableMessage(String msg) {
 		this.disableMessage = msg;
 	}
@@ -267,22 +320,26 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 		// header
 		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
+
 		// Load all the commands for this Plugin
 		Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
 		if (commands != null && PluginDescriptionFileRef.commands.isValid()) {
 			// Prepare commands localization node
 			ConfigurationNode commandsNode = getLocalizationNode("commands");
 			commandsNode.setHeader("Command descriptions and usages");
+
 			// Create a new modifiable commands map to replace with
 			commands = new HashMap<String, Map<String, Object>>(commands);
 			for (Entry<String, Map<String, Object>> commandEntry : commands.entrySet()) {
 				ConfigurationNode node = commandsNode.getNode(commandEntry.getKey());
+
 				// Transfer description and usage
 				Map<String, Object> data = new HashMap<String, Object>(commandEntry.getValue());
 				node.shareWith(data, "description", "No description specified");
 				node.shareWith(data, "usage", "/" + commandEntry.getKey());
 				commandEntry.setValue(Collections.unmodifiableMap(data));
 			}
+
 			// Set the new commands map using reflection
 			PluginDescriptionFileRef.commands.set(this.getDescription(), Collections.unmodifiableMap(commands));
 		}
@@ -311,6 +368,7 @@ public abstract class PluginBase extends JavaPlugin {
 			this.saveLocalization();
 		}
 
+		// ==== Enabling ====
 		try {
 			this.enable();
 			this.enabled = true;
@@ -325,9 +383,9 @@ public abstract class PluginBase extends JavaPlugin {
 		// update dependencies
 		CommonPlugin.plugins.add(this);
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-			if (!plugin.isEnabled())
-				continue;
-			this.updateDependency(plugin, true);
+			if (plugin.isEnabled()) {
+				this.updateDependency(plugin, plugin.getName(), true);
+			}
 		}
 
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
@@ -395,10 +453,24 @@ public abstract class PluginBase extends JavaPlugin {
 		return true;
 	}
 
+	/**
+	 * Called when this plugin is being enabled
+	 */
 	public abstract void enable();
 
+	/**
+	 * Called when this plugin is being disabled
+	 */
 	public abstract void disable();
 
+	/**
+	 * Handles a command
+	 * 
+	 * @param sender of the command
+	 * @param command name
+	 * @param args of the command
+	 * @return True if handled, False if not
+	 */
 	public abstract boolean command(CommandSender sender, String command, String[] args);
 
 	public final void loadLocalization() {
@@ -417,10 +489,13 @@ public abstract class PluginBase extends JavaPlugin {
 		this.permissionconfig.save();
 	}
 
-	public final void updateDependency(Plugin plugin, boolean enabled) {
-		this.updateDependency(plugin, plugin.getDescription().getName(), enabled);
-	}
-
+	/**
+	 * Called when a plugin is enabled or disabled
+	 * 
+	 * @param plugin that got enabled or disabled
+	 * @param pluginName of the plugin
+	 * @param enabled state, True if enabled, False if disabled
+	 */
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 	};
 }

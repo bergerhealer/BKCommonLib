@@ -123,7 +123,6 @@ public class MathUtil {
 	}
 
 	public static float getLookAtYaw(Location loc, Location lookat) {
-		// Values of change in distance (make it relative)
 		return getLookAtYaw(lookat.getX() - loc.getX(), lookat.getZ() - loc.getZ());
 	}
 
