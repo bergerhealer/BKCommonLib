@@ -7,8 +7,8 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.map.MapFont.CharacterSprite;
-import org.bukkit.map.MinecraftFont;
+
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class MessageBuilder {
 	private final List<StringBuilder> lines = new ArrayList<StringBuilder>();
@@ -19,7 +19,6 @@ public class MessageBuilder {
 	private int indent = 0;
 
 	public static final int CHAT_WINDOW_WIDTH = 240;
-	public static int SPACE_WIDTH = getWidth(' ');
 
 	public MessageBuilder() {
 		this(new StringBuilder());
@@ -47,7 +46,7 @@ public class MessageBuilder {
 			return this.clearSeparator();
 		} else {
 			this.separator = separator;
-			this.sepwidth = getWidth(separator);
+			this.sepwidth = StringUtil.getWidth(separator);
 			return this;
 		}
 	}
@@ -80,11 +79,11 @@ public class MessageBuilder {
 	}
 
 	public boolean needsWordWrap(String... textToAppend) {
-		return this.needsWordWrap(getWidth(textToAppend));
+		return this.needsWordWrap(StringUtil.getWidth(textToAppend));
 	}
 
 	public boolean needsWordWrap(int widthToAppend) {
-		return (this.currentWidth + widthToAppend + this.sepwidth + (this.indent * SPACE_WIDTH)) > CHAT_WINDOW_WIDTH;
+		return (this.currentWidth + widthToAppend + this.sepwidth + (this.indent * StringUtil.SPACE_WIDTH)) > CHAT_WINDOW_WIDTH;
 	}
 
 	public MessageBuilder black(Object... text) {
@@ -155,6 +154,13 @@ public class MessageBuilder {
 		return this.append(ChatColor.MAGIC, text);
 	}
 
+	/**
+	 * Appends new text after a color
+	 * 
+	 * @param color for the text
+	 * @param text to append
+	 * @return This Message Builder
+	 */
 	public MessageBuilder append(ChatColor color, Object... text) {
 		String[] newtext = new String[text.length];
 		for (int i = 0; i < text.length; i++) {
@@ -163,6 +169,12 @@ public class MessageBuilder {
 		return this.append(color, newtext);
 	}
 
+	/**
+	 * Appends new text
+	 * 
+	 * @param text to append
+	 * @return This Message Builder
+	 */
 	public MessageBuilder append(Object... text) {
 		String[] newtext = new String[text.length];
 		for (int i = 0; i < text.length; i++) {
@@ -171,29 +183,41 @@ public class MessageBuilder {
 		return this.append(newtext);
 	}
 
+	/**
+	 * Appends new text after a color
+	 * 
+	 * @param color for the text
+	 * @param text to append
+	 * @return This Message Builder
+	 */
 	public MessageBuilder append(ChatColor color, String... text) {
-		if (text == null || text.length == 0)
-			return this;
-		int width = getWidth(text);
-		if (this.needsWordWrap(width)) {
-			this.newLine();
-		}
-		this.currentWidth += width;
-		this.prepareNewAppend();
-		this.builder.append(color.toString());
-		for (String part : text) {
-			this.builder.append(part);
+		if (text != null && text.length > 0) {
+			int width = StringUtil.getWidth(text);
+			if (this.needsWordWrap(width)) {
+				this.newLine();
+			}
+			this.currentWidth += width;
+			this.prepareNewAppend();
+			this.builder.append(color.toString());
+			for (String part : text) {
+				this.builder.append(part);
+			}
 		}
 		return this;
 	}
 
+	/**
+	 * Appends a new character
+	 * 
+	 * @param character to append
+	 * @return This Message Builder
+	 */
 	public MessageBuilder append(char character) {
 		if (character == '\n') {
-			this.newLine();
-			return this;
+			return this.newLine();
 		}
 		// word wrap needed?
-		int width = getWidth(character);
+		int width = StringUtil.getWidth(character);
 		if (this.needsWordWrap(width)) {
 			this.newLine();
 		}
@@ -203,9 +227,15 @@ public class MessageBuilder {
 		return this;
 	}
 
+	/**
+	 * Appends new text
+	 * 
+	 * @param text to append
+	 * @return This Message Builder
+	 */
 	public MessageBuilder append(String... text) {
 		if (text != null && text.length > 0) {
-			int width = getWidth(text);
+			int width = StringUtil.getWidth(text);
 			if (this.needsWordWrap(width)) {
 				this.newLine();
 			}
@@ -220,7 +250,7 @@ public class MessageBuilder {
 
 	private void prepareNewAppend() {
 		if (this.builder.length() == 0) {
-			this.currentWidth += SPACE_WIDTH * this.indent;
+			this.currentWidth += StringUtil.SPACE_WIDTH * this.indent;
 			for (int i = 0; i < this.indent; i++) {
 				this.builder.append(' ');
 			}
@@ -265,47 +295,6 @@ public class MessageBuilder {
 	}
 
 	/**
-	 * Gets the full width of one or more Strings appended
-	 * 
-	 * @param text to get the total width of (can be one or more parts)
-	 * @return The width of all the text combined
-	 */
-	public static int getWidth(String... text) {
-		int width = 0;
-		for (String part : text) {
-			char character;
-			CharacterSprite charsprite;
-			for (int i = 0; i < part.length(); i++) {
-				character = part.charAt(i);
-				if (character == '\n')
-					continue;
-				if (character == '\u00A7') {
-					i++;
-					continue;
-				} else if (character == ' ') {
-					width += SPACE_WIDTH;
-				} else {
-					charsprite = MinecraftFont.Font.getChar(character);
-					if (charsprite != null) {
-						width += charsprite.getWidth();
-					}
-				}
-			}
-		}
-		return width;
-	}
-
-	/**
-	 * Gets the Width of a certain character in Minecraft Font
-	 * 
-	 * @param character to get the width of
-	 * @return Character width in pixels
-	 */
-	public static int getWidth(char character) {
-		return MinecraftFont.Font.getChar(character).getWidth();
-	}
-
-	/**
 	 * Gets the last line of this Message Builder
 	 * 
 	 * @return last line
@@ -326,6 +315,11 @@ public class MessageBuilder {
 		return total.toString();
 	}
 
+	/**
+	 * Obtains all the lines of this Message
+	 * 
+	 * @return array of lines
+	 */
 	public String[] lines() {
 		if (this.isEmpty()) {
 			return new String[0];

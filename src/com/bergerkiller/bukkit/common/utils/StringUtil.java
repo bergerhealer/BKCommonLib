@@ -7,9 +7,12 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.map.MinecraftFont;
+import org.bukkit.map.MapFont.CharacterSprite;
 
 public class StringUtil {
 	public static final char CHAT_STYLE_CHAR = '§';
+	public static int SPACE_WIDTH = getWidth(' ');
 
 	/**
 	 * Converts a Location to a destination name.
@@ -58,6 +61,47 @@ public class StringUtil {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Gets the full width of one or more Strings appended
+	 * 
+	 * @param text to get the total width of (can be one or more parts)
+	 * @return The width of all the text combined
+	 */
+	public static int getWidth(String... text) {
+		int width = 0;
+		for (String part : text) {
+			char character;
+			CharacterSprite charsprite;
+			for (int i = 0; i < part.length(); i++) {
+				character = part.charAt(i);
+				if (character == '\n')
+					continue;
+				if (character == StringUtil.CHAT_STYLE_CHAR) {
+					i++;
+					continue;
+				} else if (character == ' ') {
+					width += SPACE_WIDTH;
+				} else {
+					charsprite = MinecraftFont.Font.getChar(character);
+					if (charsprite != null) {
+						width += charsprite.getWidth();
+					}
+				}
+			}
+		}
+		return width;
+	}
+
+	/**
+	 * Gets the Width of a certain character in Minecraft Font
+	 * 
+	 * @param character to get the width of
+	 * @return Character width in pixels
+	 */
+	public static int getWidth(char character) {
+		return MinecraftFont.Font.getChar(character).getWidth();
 	}
 
 	public static int firstIndexOf(String text, String... values) {

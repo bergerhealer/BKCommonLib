@@ -14,6 +14,12 @@ public class IntRemainder {
 	private final CircularInteger counter;
 	private final int[] values;
 
+	/**
+	 * Initializes a new Int remainder  with an initial value and the amount of decimals specified
+	 * 
+	 * @param initialvalue to use
+	 * @param decimals count for the accuracy of the remainder
+	 */
 	public IntRemainder(double initialvalue, int decimals) {
 		if (decimals < 1) {
 			throw new IllegalArgumentException("Decimal count needs to be higher than 0");

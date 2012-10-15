@@ -11,6 +11,11 @@ public class CircularInteger implements Iterable<Integer> {
 	private int value;
 	private final int size;
 
+	/**
+	 * Initializes a new Circular Integer of the given size
+	 * 
+	 * @param size to loop in
+	 */
 	public CircularInteger(final int size) {
 		this.value = 0;
 		this.size = size;

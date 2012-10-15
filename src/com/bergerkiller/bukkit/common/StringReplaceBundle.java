@@ -7,6 +7,9 @@ import java.util.Map.Entry;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 
+/**
+ * Can perform a large amount of String replacements at once
+ */
 public class StringReplaceBundle {
 	private List<Entry<String, String>> entries = new ArrayList<Entry<String, String>>();
 

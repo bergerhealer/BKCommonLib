@@ -21,23 +21,37 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class Operation {
+public abstract class Operation implements Runnable {
 
+	/**
+	 * Initializes a new Operation, it is run during initialization
+	 */
 	public Operation() {
 		this(true);
 	}
 
+	/**
+	 * Initializes a new Operation
+	 * 
+	 * @param run setting, True to run during initialization
+	 */
 	public Operation(boolean run) {
-		if (run)
+		if (run) {
 			this.run();
+		}
 	}
-
-	public abstract void run();
 
 	private void multiAccess(final String location) {
-		System.out.println("The " + location + " got accessed by more than one thread or got modified while operating on it!");
+		Bukkit.getLogger().severe("The " + location + " got accessed by more than one thread or got modified while operating on it!");
 	}
 
+	/**
+	 * Handles all the worlds on the server<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftWorld)<br>
+	 * - handle(WorldServer)
+	 */
 	public final void doWorlds() {
 		try {
 			for (WorldServer world : WorldUtil.getWorlds()) {
@@ -49,6 +63,13 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the players on the server<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftPlayer)<br>
+	 * - handle(EntityPlayer)
+	 */
 	public final void doPlayers() {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
@@ -64,6 +85,15 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the players on a world<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftPlayer)<br>
+	 * - handle(EntityPlayer)
+	 * 
+	 * @param world to handle the players of
+	 */
 	public final void doPlayers(World world) {
 		try {
 			for (EntityPlayer player : (List<EntityPlayer>) world.players) {
@@ -79,6 +109,13 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the entities on the server<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftEntity)<br>
+	 * - handle(Entity)
+	 */
 	public final void doEntities() {
 		try {
 			for (WorldServer world : WorldUtil.getWorlds()) {
@@ -89,10 +126,28 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the entities on a world<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftEntity)<br>
+	 * - handle(Entity)
+	 * 
+	 * @param world to handle the entities of
+	 */
 	public final void doEntities(org.bukkit.World world) {
 		doEntities(WorldUtil.getNative(world));
 	}
 
+	/**
+	 * Handles all the entities on a world<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftEntity)<br>
+	 * - handle(Entity)
+	 * 
+	 * @param world to handle the entities of
+	 */
 	public final void doEntities(World world) {
 		try {
 			for (Entity e : (List<Entity>) world.entityList) {
@@ -104,10 +159,28 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the entities in a chunk<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftEntity)<br>
+	 * - handle(Entity)
+	 * 
+	 * @param chunk to handle the entities of
+	 */
 	public final void doEntities(org.bukkit.Chunk chunk) {
 		doEntities(WorldUtil.getNative(chunk));
 	}
 
+	/**
+	 * Handles all the entities in a chunk<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftEntity)<br>
+	 * - handle(Entity)
+	 * 
+	 * @param chunk to handle the entities of
+	 */
 	public final void doEntities(Chunk chunk) {
 		try {
 			for (List list : chunk.entitySlices) {
@@ -121,6 +194,13 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the chunks on the server<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftChunk)<br>
+	 * - handle(Chunk)
+	 */
 	public final void doChunks() {
 		try {
 			for (WorldServer world : WorldUtil.getWorlds()) {
@@ -131,10 +211,28 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Handles all the chunks on a world<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftChunk)<br>
+	 * - handle(Chunk)
+	 * 
+	 * @param world to handle the chunks of
+	 */
 	public final void doChunks(World world) {
 		this.doChunks(((WorldServer) world).chunkProviderServer);
 	}
 
+	/**
+	 * Handles all the chunks on a world<br><br>
+	 * 
+	 * Calls:<br>
+	 * - handle(CraftChunk)<br>
+	 * - handle(Chunk)
+	 * 
+	 * @param chunkProvider to handle the chunks of
+	 */
 	public final void doChunks(ChunkProviderServer chunkProvider) {
 		try {
 			for (Chunk chunk : chunkProvider.chunks.values()) {
@@ -148,6 +246,13 @@ public abstract class Operation {
 		}
 	}
 
+	/**
+	 * Creates a new task that runs this Operation<br>
+	 * <b>The task still has to be started</b>
+	 * 
+	 * @param plugin to set as owner
+	 * @return a new Task
+	 */
 	public Task createTask(JavaPlugin plugin) {
 		final Operation op = this;
 		return new Task(plugin) {
