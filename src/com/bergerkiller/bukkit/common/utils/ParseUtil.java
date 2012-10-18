@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.DyeColor;
@@ -432,7 +433,7 @@ public class ParseUtil {
 		return convert(object, (Class<T>) def.getClass(), def);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> T convert(Object object, Class<T> type, T def) {
 		if (object == null) {
 			return def;
@@ -441,6 +442,22 @@ public class ParseUtil {
 		try {
 			if (type == object.getClass()) {
 				rval = (T) object;
+			} else if (type.equals(String.class)) {
+				if (object instanceof List) {
+					List list = (List) object;
+					StringBuilder builder = new StringBuilder(list.size() * 100);
+					boolean first = false;
+					for (Object element : (List) object) {
+						if (!first) {
+							builder.append('\n');
+						}
+						builder.append(convert(element, String.class, ""));
+						first = true;
+					}
+					rval = builder.toString();
+				} else {
+					rval = object.toString();
+				}
 			} else if (type.isEnum()) {
 				rval = ParseUtil.parseEnum(type, object.toString(), def);
 			} else if (type == Integer.class) {

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -311,6 +312,8 @@ public class ConfigurationNode {
 				} else {
 					value = text;
 				}
+			} else if (value instanceof String && ((String) value).contains("\n")) {
+				value = Arrays.asList(((String) value).split("\n", -1));
 			}
 		}
 		this.source.set(path, value);
