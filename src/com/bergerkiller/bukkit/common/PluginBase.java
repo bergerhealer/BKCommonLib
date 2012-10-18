@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
@@ -231,6 +232,58 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
+	 * Loads all the localization defaults from a Localization enumeration
+	 * 
+	 * @param localizationDefaults class
+	 */
+	public void loadLocales(Class<? extends ILocalizationDefault> localizationDefaults) {
+		for (ILocalizationDefault def : localizationDefaults.getEnumConstants()) {
+			this.loadLocale(def);
+		}
+	}
+
+	/**
+	 * Loads a localization using a localization default
+	 * 
+	 * @param localizationDefault to load from
+	 */
+	public void loadLocale(ILocalizationDefault localizationDefault) {
+		this.loadLocale(localizationDefault.getName(), localizationDefault.getDefault());
+	}
+
+	/**
+	 * Loads a single Localization value<br>
+	 * Adds this node to the localization configuration if it wsn't added
+	 * 
+	 * @param path to the value
+	 * @param defaultValue for the value
+	 */
+	public void loadLocale(String path, String defaultValue) {
+		if (!this.localizationconfig.contains(path)) {
+			this.localizationconfig.set(path, defaultValue);
+		}
+	}
+
+	/**
+	 * Gets a localization value
+	 * 
+	 * @param path to the localization value
+	 * @param arguments to use for the value
+	 * @return Localization value
+	 */
+	public String getLocale(String path, String... arguments) {
+		if (arguments.length > 0) {
+			StringBuilder locale = new StringBuilder(this.localizationconfig.get(path, String.class, ""));
+			for (int i = 0; i < arguments.length; i++) {
+				StringUtil.replaceAll(locale, "%" + i + "%", arguments[i]);
+			}
+			return locale.toString();
+		} else {
+			return this.localizationconfig.get(path, String.class, "");
+		}
+	}
+
+	/**
 	 * Fired when the Permission nodes have to be created
 	 */
 	public void permissions() {
@@ -314,6 +367,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 		// header
 		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
+		this.localizationconfig.addHeader("For colors, use the " + StringUtil.CHAT_STYLE_CHAR + " character followed up by 0 - F");
 
 		// Load all the commands for this Plugin
 		Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
