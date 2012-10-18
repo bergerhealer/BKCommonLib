@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
@@ -119,6 +120,13 @@ public class StringUtil {
 		return i;
 	}
 
+	/**
+	 * Removes a single elements from an array
+	 * 
+	 * @param input array
+	 * @param index in the array to remove
+	 * @return modified array
+	 */
 	public static String[] remove(String[] input, int index) {
 		if (index < 0 || index >= input.length) {
 			return input;
@@ -129,65 +137,94 @@ public class StringUtil {
 		return rval;
 	}
 
+	/**
+	 * Combines all the items in a set using the 'and' and ',' separators
+	 * 
+	 * @param items to combine
+	 * @return Combined items text
+	 */
 	@SuppressWarnings("rawtypes")
 	public static String combineNames(Set items) {
 		return combineNames((Collection) items);
 	}
 
+	/**
+	 * Combines all the items in a collection using the 'and' and ',' separators
+	 * 
+	 * @param items to combine
+	 * @return Combined items text
+	 */
 	@SuppressWarnings("rawtypes")
 	public static String combineNames(Collection items) {
-		if (items.size() == 0)
+		// If null or empty collection, return empty String
+		if (items == null || items.isEmpty()) {
 			return "";
-		String[] sitems = new String[items.size()];
+		}
+		// If only one item, return just this one item
+		if (items.size() == 1) {
+			Object item = items.iterator().next();
+			return item == null ? "" : item.toString();
+		}
+		// Build the items into one return value
+		StringBuilder rval = new StringBuilder();
 		int i = 0;
 		for (Object item : items) {
-			sitems[i] = item.toString();
+			if (i == items.size() - 1) {
+				// Last item: Combine using 'and'
+				rval.append(" and ");
+			} else if (i > 0) {
+				// Middle item: Combine using a comma
+				rval.append(", ");
+			}
+			if (item != null) {
+				rval.append(item);
+			}
 			i++;
 		}
-		return combineNames(sitems);
+		return rval.toString();
 	}
 
-	public static String combine(String separator, String... lines) {
-		StringBuilder builder = new StringBuilder();
-		for (String line : lines) {
-			if (line != null && line.length() > 0) {
-				if (builder.length() != 0)
-					builder.append(separator);
-				builder.append(line);
-			}
-		}
-		return builder.toString();
-	}
-
-	public static String combine(String separator, Collection<String> lines) {
-		StringBuilder builder = new StringBuilder();
-		for (String line : lines) {
-			if (line != null && line.length() > 0) {
-				if (builder.length() != 0)
-					builder.append(separator);
-				builder.append(line);
-			}
-		}
-		return builder.toString();
-	}
-
+	/**
+	 * Combines all the items in an array using the 'and' and ',' separators
+	 * 
+	 * @param items to combine
+	 * @return Combined items text
+	 */
 	public static String combineNames(String... items) {
-		if (items.length == 0)
-			return "";
-		if (items.length == 1)
-			return items[0];
-		int count = 1;
-		String name = "";
-		for (String item : items) {
-			name += item;
-			if (count == items.length - 1) {
-				name += " and ";
-			} else if (count != items.length) {
-				name += ", ";
+		return combineNames(Arrays.asList(items));
+	}
+
+	/**
+	 * Combines all the separate parts together with a separator in between
+	 * 
+	 * @param separator to put in between the parts
+	 * @param parts to combine
+	 * @return combined parts separated using the separator
+	 */
+	public static String combine(String separator, String... parts) {
+		return combine(separator, Arrays.asList(parts));
+	}
+
+	/**
+	 * Combines all the separate parts together with a separator in between
+	 * 
+	 * @param separator to put in between the parts
+	 * @param parts to combine
+	 * @return combined parts separated using the separator
+	 */
+	public static String combine(String separator, Collection<String> parts) {
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		for (String line : parts) {
+			if (!first) {
+				builder.append(separator);
 			}
-			count++;
+			if (line != null) {
+				builder.append(line);
+			}
+			first = false;
 		}
-		return name;
+		return builder.toString();
 	}
 
 	/**

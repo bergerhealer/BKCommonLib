@@ -392,13 +392,14 @@ public abstract class PluginBase extends JavaPlugin {
 		// header
 		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
 		this.localizationconfig.addHeader("For colors, use the " + StringUtil.CHAT_STYLE_CHAR + " character followed up by 0 - F");
+		this.localizationconfig.addHeader("Need help with this file? Please visit:");
+		this.localizationconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/localization/");
 
 		// Load all the commands for this Plugin
 		Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
 		if (commands != null && PluginDescriptionFileRef.commands.isValid()) {
 			// Prepare commands localization node
 			ConfigurationNode commandsNode = getLocalizationNode("commands");
-			commandsNode.setHeader("Command descriptions and usages");
 
 			// Create a new modifiable commands map to replace with
 			commands = new HashMap<String, Map<String, Object>>(commands);
