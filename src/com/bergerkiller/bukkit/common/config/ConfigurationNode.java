@@ -42,58 +42,122 @@ public class ConfigurationNode {
 		this.headers = headers;
 	}
 
+	/**
+	 * Checks if this node has a parent, or if it a root node
+	 * 
+	 * @return True if it has a parent, False if not
+	 */
 	public boolean hasParent() {
 		return this.source.getParent() != null;
 	}
 
+	/**
+	 * Checks if this node has sub-nodes or values
+	 * 
+	 * @return True if this node is empty, False if not
+	 */
 	public boolean isEmpty() {
 		return this.getKeys().isEmpty();
 	}
 
+	/**
+	 * Gets the parent configuration node of this Node
+	 * 
+	 * @return parent node
+	 */
 	public ConfigurationNode getParent() {
 		MemorySection sec = (MemorySection) this.source.getParent();
-		if (sec == null)
+		if (sec == null) {
 			return null;
+		}
 		return new ConfigurationNode(this.readkeys, this.headers, sec);
 	}
 
+	/**
+	 * Gets the full path of a value or node relative to this Configuration Node
+	 * 
+	 * @param append path, the path to the value or node relative to this Node
+	 * @return The full path
+	 */
 	public String getPath(String append) {
 		String p = this.getPath();
-		if (append == null || append.length() == 0)
+		if (append == null || append.isEmpty()) {
 			return p;
-		if (p == null || p.length() == 0)
+		}
+		if (p == null || p.isEmpty()) {
 			return append;
+		}
 		return p + "." + append;
 	}
 
+	/**
+	 * Gets the full path of this Configuration Node
+	 * 
+	 * @return node path
+	 */
 	public String getPath() {
 		return this.source.getCurrentPath();
 	}
 
+	/**
+	 * Gets the name of this Configuration Node
+	 * 
+	 * @return node name
+	 */
 	public String getName() {
 		return this.source.getName();
 	}
 
+	/**
+	 * Gets the header of this Node
+	 * 
+	 * @return The header
+	 */
 	public String getHeader() {
 		return this.headers.get(this.getPath());
 	}
 
+	/**
+	 * Gets the header of a value or node
+	 * 
+	 * @param path to the value or node
+	 * @return Header at the path specified
+	 */
 	public String getHeader(String path) {
 		return this.headers.get(this.getPath(path));
 	}
 
+	/**
+	 * Removes the header for this Node
+	 */
 	public void removeHeader() {
 		this.setHeader(null);
 	}
 
+	/**
+	 * Removes the header for a certain value or node
+	 * 
+	 * @param path to the value or node
+	 */
 	public void removeHeader(String path) {
 		this.setHeader(path, null);
 	}
 
+	/**
+	 * Sets the header displayed above this configuration node
+	 * 
+	 * @param header to set to
+	 */
 	public void setHeader(String header) {
 		this.setHeader(null, header);
 	}
 
+	/**
+	 * Sets the header displayed above a given configuration node or value
+	 * 
+	 * @param path to the node or value the header is for
+	 * @param header to set to
+	 */
 	public void setHeader(String path, String header) {
 		if (header == null) {
 			this.headers.remove(this.getPath(path));
@@ -102,10 +166,21 @@ public class ConfigurationNode {
 		}
 	}
 
+	/**
+	 * Adds a new line to the header displayed above this configuration node
+	 * 
+	 * @param header line to add
+	 */
 	public void addHeader(String header) {
 		this.addHeader(null, header);
 	}
 
+	/**
+	 * Adds a new line to the header displayed above a given configuration node or value
+	 * 
+	 * @param path to the node or value the header is for
+	 * @param header line to add
+	 */
 	public void addHeader(String path, String header) {
 		String oldheader = this.getHeader(path);
 		if (oldheader == null) {
@@ -115,10 +190,15 @@ public class ConfigurationNode {
 		}
 	}
 
+	/**
+	 * Gets all the headers displayed for this Node and the sub-nodes
+	 * 
+	 * @return A mapping of keys vs. headers
+	 */
 	public Map<String, String> getHeaders() {
 		String root = this.getPath();
 		Map<String, String> rval = new HashMap<String, String>(this.headers.size());
-		if (root == null || root.length() == 0) {
+		if (root == null || root.isEmpty()) {
 			rval.putAll(this.headers);
 		} else {
 			for (Map.Entry<String, String> entry : this.headers.entrySet()) {
@@ -130,6 +210,9 @@ public class ConfigurationNode {
 		return rval;
 	}
 
+	/**
+	 * Clears all the headers displayed for this node and the values and sub-nodes in this node
+	 */
 	public void clearHeaders() {
 		String root = this.getPath();
 		if (root == null || root.length() == 0) {
@@ -145,10 +228,20 @@ public class ConfigurationNode {
 
 	}
 
+	/**
+	 * Gets the Memory Section represented by this Configuration Node
+	 * 
+	 * @return Memory Section of this Node
+	 */
 	public MemorySection getSection() {
 		return this.source;
 	}
 
+	/**
+	 * Gets the YamlConfiguration root source for this Configuration
+	 * 
+	 * @return Yaml Configuration root
+	 */
 	public YamlConfiguration getSource() {
 		return (YamlConfiguration) this.source.getRoot();
 	}

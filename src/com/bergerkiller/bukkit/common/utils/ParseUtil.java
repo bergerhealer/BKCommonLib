@@ -433,6 +433,14 @@ public class ParseUtil {
 		return convert(object, (Class<T>) def.getClass(), def);
 	}
 
+	/**
+	 * Tries to convert a given Object to the type specified
+	 * 
+	 * @param object to convert
+	 * @param type to convert to
+	 * @param def to return on failure
+	 * @return The convered object, or the default if not possible
+	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> T convert(Object object, Class<T> type, T def) {
 		if (object == null) {

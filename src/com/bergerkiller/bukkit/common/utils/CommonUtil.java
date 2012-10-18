@@ -215,7 +215,6 @@ public class CommonUtil {
 	 * 
 	 * @return Plugins
 	 */
-
 	public static Plugin[] getPlugins() {
 		return Bukkit.getServer().getPluginManager().getPlugins();
 	}

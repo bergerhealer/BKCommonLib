@@ -70,14 +70,7 @@ public abstract class PluginBase extends JavaPlugin {
 		if (path == null || path.length == 0) {
 			return this.getDataFolder();
 		}
-		StringBuilder name = new StringBuilder(path.length * 15);
-		for (int i = 0; i < path.length; i++) {
-			if (i != 0) {
-				name.append(File.separatorChar);
-			}
-			name.append(path[i]);
-		}
-		return new File(this.getDataFolder(), name.toString());
+		return new File(this.getDataFolder(), StringUtil.combine(File.separator, path));
 	}
 
 	/**

@@ -63,6 +63,12 @@ public class BlockLocation {
 		this.z = z;
 	}
 
+	/**
+	 * Tries to parse a Block Location from a String value
+	 * 
+	 * @param value to parse
+	 * @return Block Location, or null if it could not be parsed
+	 */
 	public static BlockLocation parseLocation(String value) {
 		if (value.length() < 10) {
 			return null;
@@ -86,26 +92,54 @@ public class BlockLocation {
 		}
 	}
 
+	/**
+	 * Gets the chunk this Block Location is in<br>
+	 * <b>Will load the chunk if it isn't loaded</b>
+	 * 
+	 * @return the Chunk, or null if the world this location is in is not loaded
+	 */
 	public Chunk getChunk() {
 		World world = this.getWorld();
-		if (world == null)
+		if (world == null) {
 			return null;
+		}
 		return world.getChunkAt(this.x >> 4, this.z >> 4);
 	}
 
+	/**
+	 * Gets the Block this Location is in
+	 * 
+	 * @return the Block, or null if the world this location is in is not loaded
+	 */
 	public Block getBlock() {
 		World world = this.getWorld();
 		return world == null ? null : world.getBlockAt(this.x, this.y, this.z);
 	}
 
+	/**
+	 * Gets the World this Location is in
+	 * 
+	 * @return the World, or null if it is not loaded
+	 */
 	public World getWorld() {
 		return Bukkit.getServer().getWorld(this.world);
 	}
 
+	/**
+	 * Checks if this location is loaded
+	 * 
+	 * @return True if it is loaded, False if not
+	 */
 	public boolean isLoaded() {
 		return WorldUtil.isLoaded(this.getWorld(), this.x, this.y, this.z);
 	}
 
+	/**
+	 * Checks if this Location is in the World specified
+	 * 
+	 * @param world to check
+	 * @return True if it is in the world, False if not
+	 */
 	public boolean isIn(World world) {
 		if (this.world == null && world == null) {
 			return true;
