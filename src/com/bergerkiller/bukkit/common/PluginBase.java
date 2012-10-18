@@ -255,10 +255,11 @@ public abstract class PluginBase extends JavaPlugin {
 	 * Loads a single Localization value<br>
 	 * Adds this node to the localization configuration if it wsn't added
 	 * 
-	 * @param path to the value
+	 * @param path to the value (case insensitive, can not be null)
 	 * @param defaultValue for the value
 	 */
 	public void loadLocale(String path, String defaultValue) {
+		path = path.toLowerCase();
 		if (!this.localizationconfig.contains(path)) {
 			this.localizationconfig.set(path, defaultValue);
 		}
@@ -267,11 +268,34 @@ public abstract class PluginBase extends JavaPlugin {
 	/**
 	 * Gets a localization value
 	 * 
-	 * @param path to the localization value
+	 * @param path to the localization value (case insensitive, can not be null)
 	 * @param arguments to use for the value
 	 * @return Localization value
 	 */
 	public String getLocale(String path, String... arguments) {
+		path = path.toLowerCase();
+		// First check if the path leads to a node
+		if (this.localizationconfig.isNode(path)) {
+			// Redirect to the proper sub-node
+			// Check recursively if the arguments are contained
+			String newPath = path + ".default";
+			if (arguments.length > 0) {
+				StringBuilder tmpPathBuilder = new StringBuilder(path);
+				String tmpPath = path;
+				for (int i = 0; i < arguments.length; i++) {
+					tmpPath = tmpPathBuilder.append('.').append(arguments[i].toLowerCase()).toString();
+					// New argument appended path exists, update the path
+					if (this.localizationconfig.contains(tmpPath)) {
+						newPath = tmpPath;
+					} else {
+						break;
+					}
+				}
+			}
+			// Update path to lead to the new path
+			path = newPath;
+		}
+		// Regular loading going on
 		if (arguments.length > 0) {
 			StringBuilder locale = new StringBuilder(this.localizationconfig.get(path, String.class, ""));
 			for (int i = 0; i < arguments.length; i++) {
