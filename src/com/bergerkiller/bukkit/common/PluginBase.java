@@ -259,6 +259,59 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
+	 * Tries to find the command configuration for a command
+	 * 
+	 * @param command to find the configuration node for
+	 * @return The configuration node, or null if not found
+	 */
+	private ConfigurationNode getCommandNode(String command) {
+		command = command.toLowerCase();
+		String fullPath = "commands." + command;
+		if (this.localizationconfig.isNode(fullPath)) {
+			return this.localizationconfig.getNode(fullPath);
+		} else {
+			fullPath = "commands." + command.replace('.', ' ');
+			if (this.localizationconfig.isNode(fullPath)) {
+				return this.localizationconfig.getNode(fullPath);
+			} else {
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * Gets the localized usage for a command
+	 * 
+	 * @param command name (case insensitive)
+	 * @return command usage
+	 */
+	public String getCommandUsage(String command) {
+		ConfigurationNode node = getCommandNode(command);
+		final String defValue = "/" + command;
+		if (node == null) {
+			return defValue;
+		} else {
+			return node.get("usage", defValue);
+		}
+	}
+
+	/**
+	 * Gets the localized description for a command
+	 * 
+	 * @param command name (case insensitive)
+	 * @return command description
+	 */
+	public String getCommandDescription(String command) {
+		ConfigurationNode node = getCommandNode(command);
+		final String defValue = "No description specified";
+		if (node == null) {
+			return defValue;
+		} else {
+			return node.get("description", defValue);
+		}
+	}
+
+	/**
 	 * Gets a localization value
 	 * 
 	 * @param path to the localization value (case insensitive, can not be null)
@@ -290,7 +343,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 		// Regular loading going on
 		if (arguments.length > 0) {
-			StringBuilder locale = new StringBuilder(this.localizationconfig.get(path, String.class, ""));
+			StringBuilder locale = new StringBuilder(this.localizationconfig.get(path, ""));
 			for (int i = 0; i < arguments.length; i++) {
 				StringUtil.replaceAll(locale, "%" + i + "%", arguments[i]);
 			}
