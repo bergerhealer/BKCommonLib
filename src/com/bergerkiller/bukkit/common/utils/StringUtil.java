@@ -257,6 +257,11 @@ public class StringUtil {
 	}
 
 	@Deprecated
+	public static boolean isIn(String value, String... values) {
+		return LogicUtil.contains(value, values);
+	}
+
+	@Deprecated
 	public static boolean getBool(String name) {
 		return ParseUtil.parseBool(name);
 	}
