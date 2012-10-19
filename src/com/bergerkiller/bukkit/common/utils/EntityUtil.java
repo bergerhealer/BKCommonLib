@@ -373,10 +373,36 @@ public class EntityUtil {
 		return teleport(entity, to);
 	}
 
+	/**
+	 * Teleports an entity in the next tick
+	 * 
+	 * @param entity to teleport
+	 * @param to location to teleport to
+	 */
+	public static void teleportNextTick(final Entity entity, final Location to) {
+		CommonUtil.nextTick(new Runnable() {
+			public void run() {
+				teleport(entity, to);
+			}
+		});
+	}
+
+	/**
+	 * Teleports an entity
+	 * 
+	 * @param entity to teleport
+	 * @param to location to teleport to
+	 */
 	public static boolean teleport(Entity entity, final Location to) {
 		return teleport(getNative(entity), to);
 	}
 
+	/**
+	 * Teleports an entity
+	 * 
+	 * @param entity to teleport
+	 * @param to location to teleport to
+	 */
 	public static boolean teleport(final net.minecraft.server.Entity entity, final Location to) {
 		WorldServer newworld = WorldUtil.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
