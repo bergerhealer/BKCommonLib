@@ -133,7 +133,7 @@ public class FileConfiguration extends ConfigurationNode {
 										nodes.remove(indent + 1);
 									}
 								}
-								this.setHeader(StringUtil.combine(".", nodes), header.toString());
+								this.setHeader(StringUtil.combine(".", nodes), header.substring(1));
 								header.setLength(0);
 							}
 						}
