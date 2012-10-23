@@ -12,6 +12,7 @@ import java.util.Set;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -81,10 +82,10 @@ public class ConfigurationNode {
 	 */
 	public String getPath(String append) {
 		String p = this.getPath();
-		if (append == null || append.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(append)) {
 			return p;
 		}
-		if (p == null || p.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(p)) {
 			return append;
 		}
 		return p + "." + append;
@@ -198,7 +199,7 @@ public class ConfigurationNode {
 	public Map<String, String> getHeaders() {
 		String root = this.getPath();
 		Map<String, String> rval = new HashMap<String, String>(this.headers.size());
-		if (root == null || root.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(root)) {
 			rval.putAll(this.headers);
 		} else {
 			for (Map.Entry<String, String> entry : this.headers.entrySet()) {

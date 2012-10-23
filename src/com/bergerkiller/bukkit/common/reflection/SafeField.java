@@ -5,6 +5,9 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
+
 /**
  * Wraps around the java.lang.reflect.Field class to provide an error-free alternative<br>
  * Exceptions are logged, isValid can be used to check if the Field is actually working
@@ -15,12 +18,12 @@ public class SafeField<T> extends SafeBase {
 	private Field field;
 
 	public SafeField(String fieldPath) {
-		if (fieldPath == null || fieldPath.isEmpty() || !fieldPath.contains(".")) {
+		if (LogicUtil.nullOrEmpty(fieldPath) || !fieldPath.contains(".")) {
 			Bukkit.getLogger().log(Level.SEVERE, "Field path contains no class: " + fieldPath);
 			return;
 		}
 		try {
-			String className = fieldPath.substring(0, fieldPath.lastIndexOf('.'));
+			String className = StringUtil.getBefore(fieldPath, ".");
 			String methodName = fieldPath.substring(className.length() + 1);
 			load(Class.forName(className), methodName);
 		} catch (Throwable t) {

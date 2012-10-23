@@ -103,7 +103,7 @@ public class ParseUtil {
 	 * @return True if it is a number, False if it isn't
 	 */
 	public static boolean isNumeric(String text) {
-		if (text == null || text.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(text)) {
 			return false;
 		}
 		for (int i = 0; i < text.length(); i++) {
@@ -225,7 +225,7 @@ public class ParseUtil {
 	 */
 	public static long parseTime(String timestring) {
 		long rval = 0;
-		if (timestring != null && !timestring.isEmpty()) {
+		if (!LogicUtil.nullOrEmpty(timestring)) {
 			String[] parts = timestring.split(":");
 			if (parts.length == 1) {
 				//Seconds display only
@@ -253,7 +253,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static <T> T parseArray(T[] values, String text, T def) {
-		if (text == null || text.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(text)) {
 			return def;
 		}
 		text = text.toUpperCase().replace("_", "").replace(" ", "");

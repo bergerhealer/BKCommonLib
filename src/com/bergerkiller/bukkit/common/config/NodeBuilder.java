@@ -1,0 +1,52 @@
+package com.bergerkiller.bukkit.common.config;
+
+import java.util.LinkedList;
+
+import com.bergerkiller.bukkit.common.utils.StringUtil;
+
+/**
+ * Can handle node formatting lines to keep track of the currently active node
+ */
+public class NodeBuilder {
+	private LinkedList<String> nodes = new LinkedList<String>();
+	private final int indent;
+
+	/**
+	 * Constructs a new Node Builder
+	 * 
+	 * @param indent is the space count between a node and it's sub-node
+	 */
+	public NodeBuilder(int indent) {
+		this.indent = indent;
+	}
+
+	/**
+	 * Handles the reading input of a new line
+	 * 
+	 * @param line to handle
+	 * @param index of the node according to the indentation of the line
+	 * @return True if a node was handled, False if not
+	 */
+	public boolean handle(String line, int preceedingSpaces) {
+		int nodeIndex = preceedingSpaces / this.indent;
+		String nodeName = StringUtil.getBefore(line, ":");
+		if (!nodeName.isEmpty()) {
+			// Calculate current path
+			while (this.nodes.size() >= nodeIndex + 1) {
+				this.nodes.pollLast();
+			}
+			nodes.offerLast(nodeName);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Gets the path to the currently active node
+	 * 
+	 * @return current path
+	 */
+	public String getPath() {
+		return StringUtil.combine(".", this.nodes);
+	}
+}

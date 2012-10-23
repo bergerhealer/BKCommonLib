@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,6 +16,26 @@ public class LogicUtil {
 	 */
 	public static boolean bothNullOrEqual(Object value1, Object value2) {
 		return value1 == null ? value2 == null : value1.equals(value2);
+	}
+
+	/**
+	 * Checks if a Collection is null or empty
+	 * 
+	 * @param collection to check
+	 * @return True if the collection is null or empty
+	 */
+	public static boolean nullOrEmpty(Collection<?> collection) {
+		return collection == null || collection.isEmpty();
+	}
+
+	/**
+	 * Checks if a String is null or empty
+	 * 
+	 * @param text to check
+	 * @return True if the text is null or empty
+	 */
+	public static boolean nullOrEmpty(String text) {
+		return text == null || text.isEmpty();
 	}
 
 	/**

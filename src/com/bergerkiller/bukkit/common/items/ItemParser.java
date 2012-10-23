@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.items;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -69,7 +70,7 @@ public class ItemParser {
 			}
 		}
 		// match material from name
-		if (name == null || name.isEmpty()) {
+		if (LogicUtil.nullOrEmpty(name)) {
 			parser.type = null;
 			return parser;
 		}

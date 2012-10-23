@@ -34,30 +34,27 @@ public class StringUtil {
 	public static Block stringToBlock(String str) {
 		try {
 			String s[] = str.split("_");
-			String w = "";
-			int x = 0, y = 0, z = 0;
-			for (int i = 0; i < s.length; i++) {
-				switch (s.length - i) {
-					case 1:
-						z = Integer.parseInt(s[i]);
-						break;
-					case 2:
-						y = Integer.parseInt(s[i]);
-						break;
-					case 3:
-						x = Integer.parseInt(s[i]);
-						break;
-					default:
-						if (!w.isEmpty()) {
-							w += "_";
-						}
-						w += s[i];
-						break;
-				}
-			}
-			World world = Bukkit.getServer().getWorld(w);
-			if (world == null)
+			// Saved data needs at least 4 elements
+			if (s.length < 4) {
 				return null;
+			}
+			// Parse xyz from last three parts
+			int x = Integer.parseInt(s[s.length - 3]);
+			int y = Integer.parseInt(s[s.length - 2]);
+			int z = Integer.parseInt(s[s.length - 1]);
+			// Parse the world name from first parts
+			StringBuilder worldName = new StringBuilder(12);
+			for (int i = 0; i < s.length - 3; i++) {
+				if (i != 0) {
+					worldName.append('_');
+				}
+				worldName.append(s[i]);
+			}
+			// World exists? If not, can't get a block there
+			World world = Bukkit.getServer().getWorld(worldName.toString());
+			if (world == null) {
+				return null;
+			}
 			return world.getBlockAt(x, y, z);
 		} catch (Exception e) {
 			return null;
@@ -118,6 +115,30 @@ public class StringUtil {
 			}
 		}
 		return i;
+	}
+
+	/**
+	 * Gets the text before a given separator in a text
+	 * 
+	 * @param text to use
+	 * @param delimiter to find
+	 * @return the text before the delimiter, or an empty String if not found
+	 */
+	public static String getBefore(String text, String delimiter) {
+		int index = text.lastIndexOf(delimiter);
+		return index >= 0 ? text.substring(0, index) : "";
+	}
+
+	/**
+	 * Gets the text after a given separator in a text
+	 * 
+	 * @param text to use
+	 * @param delimiter to find
+	 * @return the text after the delimiter, or an empty String if not found
+	 */
+	public static String getAfter(String text, String delimiter) {
+		int index = text.indexOf(delimiter);
+		return index >= 0 ? text.substring(index + 1) : "";
 	}
 
 	/**

@@ -6,6 +6,9 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
+
 /**
  * Wraps around the java.lang.reflect.Method class to provide an error-free alternative<br>
  * Exceptions are logged, isValid can be used to check if the Field is actually working
@@ -14,12 +17,12 @@ public class SafeMethod extends SafeBase {
 	private Method method;
 
 	public SafeMethod(String methodPath, Class<?>... parameterTypes) {
-		if (methodPath == null || methodPath.isEmpty() || !methodPath.contains(".")) {
+		if (LogicUtil.nullOrEmpty(methodPath) || !methodPath.contains(".")) {
 			Bukkit.getLogger().log(Level.SEVERE, "Method path contains no class: " + methodPath);
 			return;
 		}
 		try {
-			String className = methodPath.substring(0, methodPath.lastIndexOf('.'));
+			String className = StringUtil.getBefore(methodPath, ".");
 			String methodName = methodPath.substring(className.length() + 1);
 			load(Class.forName(className), methodName, parameterTypes);
 		} catch (Throwable t) {

@@ -6,10 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -42,19 +39,6 @@ public class FileConfiguration extends ConfigurationNode {
 		return this.file.exists();
 	}
 
-	private void writeHeader(int indent, String header, BufferedWriter writer) throws IOException {
-		if (header != null) {
-			for (String line : header.split("\n", -1)) {
-				StreamUtil.writeIndent(writer, indent * this.getIndent());
-				if (line.trim().length() > 0) {
-					writer.write("# ");
-					writer.write(line);
-				}
-				writer.newLine();
-			}
-		}
-	}
-
 	/**
 	 * Sets the indentation of sub-nodes
 	 * 
@@ -85,58 +69,23 @@ public class FileConfiguration extends ConfigurationNode {
 			BufferedReader input = new BufferedReader(reader);
 
 			try {
-				String line;
-				List<String> nodes = new ArrayList<String>();
-				StringBuilder header = new StringBuilder();
-				boolean readfirstheader = false;
+				String line, trimmedLine;
+				HeaderBuilder header = new HeaderBuilder();
+				NodeBuilder node = new NodeBuilder(this.getIndent());
+				int indent;
 				while ((line = input.readLine()) != null) {
-					if (!readfirstheader) {
-						String h = line.trim();
-						if (h.length() == 0) {
-							header.append("\n ");
-							continue;
-						} else if (h.startsWith("#")) {
-							header.append("\n ").append(h.substring(1).trim());
-							continue;
-						} else {
-							if (header.length() != 0) {
-								this.setHeader(header.toString());
-								header.setLength(0);
-							}
-							readfirstheader = true;
-						}
-					}
-					if (line.trim().length() == 0) {
-						header.append("\n ");
+					indent = StringUtil.getSuccessiveCharCount(line, ' ');
+					trimmedLine = line.substring(indent);
+					// Handle a header line
+					if (header.handle(trimmedLine)) {
 						continue;
 					}
-					// get indent
-					int indent = StringUtil.getSuccessiveCharCount(line, ' ');
-					if (indent % 2 == 0 && line.length() > indent && line.charAt(indent) != '-') {
-						if (line.charAt(indent) == '#') {
-							String h = line.substring(indent + 1).trim();
-							header.append('\n').append(h);
-							continue;
-						} else if (header.length() != 0) {
-							int startindex = indent;
-							indent >>= 1;
-							int endindex = line.indexOf(':', startindex);
-							if (endindex >= 0) {
-								String varname = line.substring(startindex, endindex);
-								// get current path
-								if (indent >= nodes.size()) {
-									indent = nodes.size();
-									nodes.add(varname);
-								} else {
-									nodes.set(indent, varname);
-									for (int i = indent + 1; i < nodes.size(); i++) {
-										nodes.remove(indent + 1);
-									}
-								}
-								this.setHeader(StringUtil.combine(".", nodes), header.substring(1));
-								header.setLength(0);
-							}
-						}
+					// Handle a node line
+					node.handle(trimmedLine, indent);
+					// Apply the header to a node if available
+					if (header.hasHeader()) {
+						this.setHeader(node.getPath(), header.getHeader());
+						header.clear();
 					}
 					builder.append(line).append('\n');
 				}
@@ -160,33 +109,27 @@ public class FileConfiguration extends ConfigurationNode {
 			this.file.getAbsoluteFile().getParentFile().mkdirs();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(this.file));
 			try {
-				// write first header
-				writeHeader(0, this.getHeader(), writer);
-
-				List<String> nodes = new ArrayList<String>();
-				for (String element : this.getSource().saveToString().split("\n", -1)) {
-					// get indent
-					int indent = StringUtil.getSuccessiveCharCount(element, ' ');
-					if (indent % this.getIndent() == 0 && element.length() > indent + 1 && element.charAt(indent) != '-') {
-						int startindex = indent;
-						indent /= this.getIndent();
-						int endindex = element.indexOf(':', startindex);
-						if (endindex >= 0) {
-							String varname = element.substring(startindex, endindex);
-							// get current path
-							if (indent >= nodes.size()) {
-								indent = nodes.size();
-							} else {
-								while (nodes.size() > indent) {
-									nodes.remove(nodes.size() - 1);
+				String trimmedLine;
+				int indent;
+				NodeBuilder node = new NodeBuilder(this.getIndent());
+				for (String line : this.getSource().saveToString().split("\n", -1)) {
+					indent = StringUtil.getSuccessiveCharCount(line, ' ');
+					trimmedLine = line.substring(indent);
+					// Handle a node
+					if (node.handle(trimmedLine, indent)) {
+						String header = this.getHeader(node.getPath());
+						if (header != null) {
+							for (String headerLine : header.split("\n", -1)) {
+								StreamUtil.writeIndent(writer, indent);
+								if (headerLine.trim().length() > 0) {
+									writer.write("# ");
+									writer.write(headerLine);
 								}
+								writer.newLine();
 							}
-							nodes.add(varname);
-							String header = this.getHeader(StringUtil.combine(".", nodes));
-							writeHeader(indent, header, writer);
 						}
 					}
-					writer.write(element);
+					writer.write(line);
 					writer.newLine();
 				}
 			} finally {
