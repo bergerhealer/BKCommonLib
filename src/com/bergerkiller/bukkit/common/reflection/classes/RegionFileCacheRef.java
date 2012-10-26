@@ -16,4 +16,19 @@ public class RegionFileCacheRef {
 	static {
 		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, Reference<RegionFile>>();
 	}
+
+	/**
+	 * Gets a region file from file without creating a new instance
+	 * 
+	 * @param file to get the RegionFile of
+	 * @return the Region File, or null if not loaded
+	 */
+	public static RegionFile getFile(File file) {
+		Reference<RegionFile> ref = FILES.get(file);
+		if (ref != null) {
+			return ref.get();
+		} else {
+			return null;
+		}
+	}
 }

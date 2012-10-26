@@ -6,18 +6,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class FileConfiguration extends ConfigurationNode {
-
 	private final File file;
+	public static final String MAIN_HEADER_PREFIX = "#> ";
 
 	public FileConfiguration(JavaPlugin plugin) {
 		this(plugin, "config.yml");
@@ -37,6 +39,16 @@ public class FileConfiguration extends ConfigurationNode {
 
 	public boolean exists() {
 		return this.file.exists();
+	}
+
+	@Override
+	public String getPath() {
+		return "";
+	}
+
+	@Override
+	public String getPath(String append) {
+		return LogicUtil.nullOrEmpty(append) ? "" : append;
 	}
 
 	/**
@@ -72,10 +84,16 @@ public class FileConfiguration extends ConfigurationNode {
 				String line, trimmedLine;
 				HeaderBuilder header = new HeaderBuilder();
 				NodeBuilder node = new NodeBuilder(this.getIndent());
+				StringBuilder mainHeader = new StringBuilder();
 				int indent;
 				while ((line = input.readLine()) != null) {
 					indent = StringUtil.getSuccessiveCharCount(line, ' ');
 					trimmedLine = line.substring(indent);
+					// Handle a main header line
+					if (trimmedLine.startsWith(MAIN_HEADER_PREFIX)) {
+						mainHeader.append('\n').append(trimmedLine.substring(MAIN_HEADER_PREFIX.length()));
+						continue;
+					}
 					// Handle a header line
 					if (header.handle(trimmedLine)) {
 						continue;
@@ -89,6 +107,10 @@ public class FileConfiguration extends ConfigurationNode {
 					}
 					builder.append(line).append('\n');
 				}
+				// Set main header
+				if (mainHeader.length() > 0) {
+					this.setHeader(mainHeader.toString());
+				}
 			} finally {
 				input.close();
 			}
@@ -97,6 +119,22 @@ public class FileConfiguration extends ConfigurationNode {
 		} catch (Exception ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
 			ex.printStackTrace();
+		}
+	}
+
+	private void writeHeader(boolean main, BufferedWriter writer, String header, int indent) throws IOException {
+		if (header != null) {
+			for (String headerLine : header.split("\n", -1)) {
+				StreamUtil.writeIndent(writer, indent);
+				if (main) {
+					writer.write(MAIN_HEADER_PREFIX);
+					writer.write(headerLine);
+				} else if (headerLine.trim().length() > 0) {
+					writer.write("# ");
+					writer.write(headerLine);
+				}
+				writer.newLine();
+			}
 		}
 	}
 
@@ -109,6 +147,10 @@ public class FileConfiguration extends ConfigurationNode {
 			this.file.getAbsoluteFile().getParentFile().mkdirs();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(this.file));
 			try {
+				// Write the top header
+				writeHeader(true, writer, this.getHeader(), 0);
+
+				// Write other headers and the nodes
 				String trimmedLine;
 				int indent;
 				NodeBuilder node = new NodeBuilder(this.getIndent());
@@ -117,17 +159,7 @@ public class FileConfiguration extends ConfigurationNode {
 					trimmedLine = line.substring(indent);
 					// Handle a node
 					if (node.handle(trimmedLine, indent)) {
-						String header = this.getHeader(node.getPath());
-						if (header != null) {
-							for (String headerLine : header.split("\n", -1)) {
-								StreamUtil.writeIndent(writer, indent);
-								if (headerLine.trim().length() > 0) {
-									writer.write("# ");
-									writer.write(headerLine);
-								}
-								writer.newLine();
-							}
-						}
+						writeHeader(false, writer, this.getHeader(node.getPath()), indent);
 					}
 					writer.write(line);
 					writer.newLine();

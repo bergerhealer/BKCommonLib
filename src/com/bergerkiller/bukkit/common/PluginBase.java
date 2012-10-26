@@ -422,6 +422,7 @@ public abstract class PluginBase extends JavaPlugin {
 	public void onLoad() {
 		// Load permission configuration
 		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
+		// load
 		if (this.permissionconfig.exists()) {
 			this.loadPermissions();
 		}
@@ -432,6 +433,7 @@ public abstract class PluginBase extends JavaPlugin {
 
 		// Load localization configuration
 		this.localizationconfig = new FileConfiguration(this, "Localization.yml");
+		// load
 		if (this.localizationconfig.exists()) {
 			this.loadLocalization();
 		}

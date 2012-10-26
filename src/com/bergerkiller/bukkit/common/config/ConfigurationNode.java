@@ -150,7 +150,7 @@ public class ConfigurationNode {
 	 * @param header to set to
 	 */
 	public void setHeader(String header) {
-		this.setHeader(null, header);
+		this.setHeader("", header);
 	}
 
 	/**
@@ -173,7 +173,7 @@ public class ConfigurationNode {
 	 * @param header line to add
 	 */
 	public void addHeader(String header) {
-		this.addHeader(null, header);
+		this.addHeader("", header);
 	}
 
 	/**

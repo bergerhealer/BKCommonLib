@@ -28,6 +28,9 @@ public class NodeBuilder {
 	 * @return True if a node was handled, False if not
 	 */
 	public boolean handle(String line, int preceedingSpaces) {
+		if (line.startsWith("#")) {
+			return false;
+		}
 		int nodeIndex = preceedingSpaces / this.indent;
 		String nodeName = StringUtil.getBefore(line, ":");
 		if (!nodeName.isEmpty()) {

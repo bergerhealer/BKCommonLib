@@ -9,7 +9,7 @@ public class Common {
 	public static boolean isShowcaseEnabled = false;
 	public static boolean isSCSEnabled = false;
 	public static Plugin bleedingMobsInstance = null;
-	public static final int VERSION = 6;
+	public static final int VERSION = 7;
 
 	/**
 	 * Handles a reflection field or method missing<br>
