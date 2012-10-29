@@ -19,4 +19,8 @@ public class EntityRef {
 		public Integer get(Entity instance) { return instance.ak; }
 		public void set(Entity instance, Integer value) { instance.ak = value; }
 	};
+	public static final SafeDirectField<Boolean, Entity> positionChanged = new SafeDirectField<Boolean, Entity>() {
+		public Boolean get(Entity instance) { return instance.am; }
+		public void set(Entity instance, Boolean value) { instance.am = value; }
+	};
 }

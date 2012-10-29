@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,25 +35,6 @@ import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
  * Multiple Block utilities you can use to manipulate blocks and get block information
  */
 public class BlockUtil {
-	private static final Set<Integer> interactableBlocks = new HashSet<Integer>();
-
-	static {
-		interactableBlocks.add(Material.LEVER.getId());
-		interactableBlocks.add(Material.WOODEN_DOOR.getId());
-		interactableBlocks.add(Material.IRON_DOOR.getId());
-		interactableBlocks.add(Material.TRAP_DOOR.getId());
-		interactableBlocks.add(Material.CHEST.getId());
-		interactableBlocks.add(Material.FURNACE.getId());
-		interactableBlocks.add(Material.BURNING_FURNACE.getId());
-		interactableBlocks.add(Material.DISPENSER.getId());
-		interactableBlocks.add(Material.WORKBENCH.getId());
-		interactableBlocks.add(Material.DIODE_BLOCK_ON.getId());
-		interactableBlocks.add(Material.DIODE_BLOCK_OFF.getId());
-		interactableBlocks.add(Material.BED.getId());
-		interactableBlocks.add(Material.CAKE.getId());
-		interactableBlocks.add(Material.NOTE_BLOCK.getId());
-		interactableBlocks.add(Material.JUKEBOX.getId());
-	}
 
 	/**
 	 * Directly obtains the Material Data from the block<br>
@@ -232,6 +212,18 @@ public class BlockUtil {
 	}
 
 	/**
+	 * Checks if a given lever block is in the down state<br>
+	 * The block type is not checked.
+	 * 
+	 * @param lever block
+	 * @return True if the lever is down, False if not
+	 */
+	public static boolean isLeverDown(Block lever) {
+		byte dat = lever.getData();
+		return dat == (dat | 0x8);
+	}
+
+	/**
 	 * Sets the toggled state of a single lever<br>
 	 * <b>No Lever type check is performed</b>
 	 * 
@@ -317,121 +309,88 @@ public class BlockUtil {
 	}
 
 	public static boolean isType(int material, int... types) {
-		return LogicUtil.containsInt(material, types);
+		return MaterialUtil.isType(material, types);
 	}
 
 	public static boolean isType(Material material, Material... types) {
-		return LogicUtil.contains(material, types);
+		return MaterialUtil.isType(material, types);
 	}
 
 	public static boolean isType(int material, Material... types) {
-		return isType(Material.getMaterial(material), types);
+		return MaterialUtil.isType(material, types);
 	}
 
 	public static boolean isType(Block block, Material... types) {
-		return isType(block.getTypeId(), types);
+		return MaterialUtil.isType(block, types);
 	}
 
 	public static boolean isType(Block block, int... types) {
-		return isType(block.getTypeId(), types);
+		return MaterialUtil.isType(block, types);
 	}
 
+	@Deprecated
 	public static boolean isSign(Material material) {
-		return isType(material, Material.WALL_SIGN, Material.SIGN_POST);
+		return MaterialUtil.ISSIGN.get(material);
 	}
 
+	@Deprecated
 	public static boolean isSign(Block b) {
-		return b == null ? false : isSign(b.getType());
+		return MaterialUtil.ISSIGN.get(b);
 	}
 
+	@Deprecated
 	public static boolean isRails(Material type) {
-		return isType(type, Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL);
+		return MaterialUtil.ISRAILS.get(type);
 	}
 
+	@Deprecated
 	public static boolean isRails(int type) {
-		return isType(type, Material.RAILS.getId(), Material.POWERED_RAIL.getId(), Material.DETECTOR_RAIL.getId());
+		return MaterialUtil.ISRAILS.get(type);
 	}
 
+	@Deprecated
 	public static boolean isRails(Block b) {
-		return b == null ? false : isRails(b.getTypeId());
+		return MaterialUtil.ISRAILS.get(b);
 	}
 
+	@Deprecated
 	public static boolean isPowerSource(Material type) {
-		return isPowerSource(type.getId());
+		return MaterialUtil.ISPOWERSOURCE.get(type);
 	}
 
-	/**
-	 * Checks if a given Material type Id is a power source<br>
-	 * Redstone wire attaches to power sources
-	 * 
-	 * @param typeId to check it for
-	 * @return True if it is a power source, False if not
-	 */
+	@Deprecated
 	public static boolean isPowerSource(int typeId) {
-		net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
-		return block == null ? false : block.isPowerSource();
+		return MaterialUtil.ISPOWERSOURCE.get(typeId);
 	}
 
-	/**
-	 * Checks if a given Type is a Bucket<br>
-	 * Note: The milk bucket is excluded
-	 * 
-	 * @param type of the Material
-	 * @return True if it is a type of Bucket, False if not
-	 */
+	@Deprecated
 	public static boolean isBucket(Material type) {
-		return isType(type, Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET);
+		return MaterialUtil.ISBUCKET.get(type);
 	}
 
-	/**
-	 * Checks if a given Type id is a Bucket<br>
-	 * Note: The milk bucket is excluded
-	 * 
-	 * @param typeId of the Material
-	 * @return True if it is a type of Bucket, False if not
-	 */
+	@Deprecated
 	public static boolean isBucket(int typeId) {
-		return isType(typeId, Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET);
+		return MaterialUtil.ISBUCKET.get(typeId);
 	}
 
-	/**
-	 * Checks if a given material Type can be interacted with
-	 * 
-	 * @param type of the Material
-	 * @return True if it is Interactable, False if not
-	 */
+	@Deprecated
 	public static boolean isInteractable(Material type) {
-		return isInteractable(type.getId());
+		return MaterialUtil.ISINTERACTABLE.get(type);
 	}
 
-	/**
-	 * Checks if a given material Type id can be interacted with
-	 * 
-	 * @param typeId of the Material
-	 * @return True if it is Interactable, False if not
-	 */
+	@Deprecated
 	public static boolean isInteractable(int typeId) {
-		return interactableBlocks.contains(typeId);
+		return MaterialUtil.ISINTERACTABLE.get(typeId);
 	}
 
-	/**
-	 * Checks if a given material Type is solid and can cause player suffocation
-	 * 
-	 * @param type of the Material
-	 * @return True if it is Solid, False if not
-	 */
+	@Deprecated
 	public static boolean isSolid(Material type) {
-		return isSolid(type.getId());
+		return MaterialUtil.SUFFOCATES.get(type);
 	}
 
-	/**
-	 * Checks if a given material Type id is solid and can cause player suffocation
-	 * 
-	 * @param typeId of the Material
-	 * @return True if it is Solid, False if not
-	 */
+	@Deprecated
 	public static boolean isSolid(int typeId) {
-		return net.minecraft.server.Block.i(typeId);
+		return MaterialUtil.SUFFOCATES.get(typeId);
 	}
 
 	/**
