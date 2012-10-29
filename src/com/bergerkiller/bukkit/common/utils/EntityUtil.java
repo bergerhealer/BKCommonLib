@@ -110,9 +110,9 @@ public class EntityUtil {
 		with.locX = toreplace.locX;
 		with.locY = toreplace.locY;
 		with.locZ = toreplace.locZ;
-		with.ah = toreplace.ah;
-		with.ai = toreplace.ai;
-		with.aj = toreplace.aj;
+		EntityRef.chunkX.transfer(toreplace, with);
+		EntityRef.chunkY.transfer(toreplace, with);
+		EntityRef.chunkZ.transfer(toreplace, with);
 		with.world = toreplace.world;
 		with.id = toreplace.id;
 		toreplace.dead = true;
@@ -127,7 +127,7 @@ public class EntityUtil {
 
 		// make sure the chunk is loaded prior to swapping
 		// this may cause the chunk unload to be delayed one tick
-		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(toreplace.ah, toreplace.aj);
+		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(EntityRef.chunkX.get(with), EntityRef.chunkZ.get(with));
 
 		// replace the entity in the world
 		List<net.minecraft.server.Entity> worldEntities = WorldUtil.getEntities(toreplace.world);
@@ -151,7 +151,7 @@ public class EntityUtil {
 		}
 
 		// replace the entity in the chunk
-		int chunkY = toreplace.ai;
+		int chunkY = EntityRef.chunkY.get(with);
 		if (!replaceInChunk(chunk, chunkY, toreplace, with)) {
 			for (int y = 0; y < chunk.entitySlices.length; y++) {
 				if (y != chunkY && replaceInChunk(chunk, y, toreplace, with)) {
