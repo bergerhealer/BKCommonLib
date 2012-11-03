@@ -78,7 +78,7 @@ public class MaterialUtil {
 	/**
 	 * The material is a type of redstone torch
 	 */
-	public static final MaterialTypeProperty ISREDSTONETORCH = new MaterialTypeProperty(Material.REDSTONE_TORCH_OFF, Material.REDSTONE_LAMP_ON);
+	public static final MaterialTypeProperty ISREDSTONETORCH = new MaterialTypeProperty(Material.REDSTONE_TORCH_OFF, Material.REDSTONE_TORCH_ON);
 
 	/**
 	 * The material is a type of diode (item type excluded)

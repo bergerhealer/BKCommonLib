@@ -47,20 +47,27 @@ public class ItemUtil {
 		net.minecraft.server.ItemStack[] items = from.getContents();
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
-				to.setItem(i, new net.minecraft.server.ItemStack(items[i].id, items[i].count, items[i].getData()));
+				to.setItem(i, items[i].cloneItemStack());
 			}
 		}
-		for (int i = 0; i < items.length; i++)
+		for (int i = 0; i < items.length; i++) {
 			from.setItem(i, null);
+		}
 	}
 
 	public static void setItem(Inventory inv, int index, ItemStack item) {
-		if (item != null && (item.getAmount() == 0 || item.getTypeId() == 0)) {
+		if (LogicUtil.nullOrEmpty(item)) {
 			item = null;
 		}
 		inv.setItem(index, item);
 	}
 
+	/**
+	 * Kills the old item and spawns a new item in it's place
+	 * 
+	 * @param item to respawn
+	 * @return Respawned item
+	 */
 	public static EntityItem respawnItem(EntityItem item) {
 		item.dead = true;
 		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.itemStack);
@@ -74,11 +81,27 @@ public class ItemUtil {
 		return newItem;
 	}
 
+	/**
+	 * Gets the total item count of a given type and data
+	 * 
+	 * @param inventory to look in
+	 * @param typeid of the items to look for, null for any item
+	 * @param data of the items to look for, null for any data
+	 * @return Amount of items in the inventory
+	 */
 	public static ItemStack findItem(Inventory inventory, int typeid, Integer data) {
 		net.minecraft.server.ItemStack item = findItem(getNative(inventory), typeid, data);
 		return item == null ? null : new CraftItemStack(item);
 	}
 
+	/**
+	 * Gets the total item count of a given type and data
+	 * 
+	 * @param inventory to look in
+	 * @param typeid of the items to look for, null for any item
+	 * @param data of the items to look for, null for any data
+	 * @return Amount of items in the inventory
+	 */
 	public static net.minecraft.server.ItemStack findItem(IInventory inventory, int typeid, Integer data) {
 		net.minecraft.server.ItemStack rval = null;
 		for (net.minecraft.server.ItemStack item : inventory.getContents()) {
@@ -99,13 +122,21 @@ public class ItemUtil {
 		return rval;
 	}
 
+	/**
+	 * Gets the total item count of a given type and data
+	 * 
+	 * @param inventory to look in
+	 * @param typeid of the items to look for, null for any item
+	 * @param data of the items to look for, null for any data
+	 * @return Amount of items in the inventory
+	 */
 	public static int getItemCount(Inventory inventory, Integer typeid, Integer data) {
 		if (typeid == null) {
 			int count = 0;
 			for (ItemStack item : inventory.getContents()) {
-				if (item == null)
-					continue;
-				count += item.getAmount();
+				if (!LogicUtil.nullOrEmpty(item)) {
+					count += item.getAmount();
+				}
 			}
 			return count;
 		} else {
@@ -114,13 +145,21 @@ public class ItemUtil {
 		}
 	}
 
+	/**
+	 * Gets the total item count of a given type and data
+	 * 
+	 * @param inventory to look in
+	 * @param typeid of the items to look for, null for any item
+	 * @param data of the items to look for, null for any data
+	 * @return Amount of items in the inventory
+	 */
 	public static int getItemCount(IInventory inventory, Integer typeid, Integer data) {
 		if (typeid == null) {
 			int count = 0;
 			for (net.minecraft.server.ItemStack item : inventory.getContents()) {
-				if (item == null)
-					continue;
-				count += item.count;
+				if (!LogicUtil.nullOrEmpty(item)) {
+					count += item.count;
+				}
 			}
 			return count;
 		} else {
@@ -162,6 +201,12 @@ public class ItemUtil {
 		}
 	}
 
+	/**
+	 * Creates a new itemstack array containing items not referencing the input item stacks
+	 * 
+	 * @param input array to process
+	 * @return Cloned item stack array
+	 */
 	public static ItemStack[] cloneItems(ItemStack[] input) {
 		ItemStack[] cloned = new ItemStack[input.length];
 		for (int i = 0; i < cloned.length; i++) {
@@ -170,6 +215,12 @@ public class ItemUtil {
 		return cloned;
 	}
 
+	/**
+	 * Creates a new itemstack array containing items not referencing the input item stacks
+	 * 
+	 * @param input array to process
+	 * @return Cloned item stack array
+	 */
 	public static net.minecraft.server.ItemStack[] cloneItems(net.minecraft.server.ItemStack[] input) {
 		net.minecraft.server.ItemStack[] cloned = new net.minecraft.server.ItemStack[input.length];
 		for (int i = 0; i < cloned.length; i++) {
@@ -219,8 +270,9 @@ public class ItemUtil {
 	 * @return The amount that could be transferred
 	 */
 	public static int testTransfer(net.minecraft.server.ItemStack from, IInventory to) {
-		if (from == null || from.count == 0 || from.id == 0)
+		if (LogicUtil.nullOrEmpty(from)) {
 			return 0;
+		}
 		int olditemcount = from.count;
 		int trans = 0;
 		int tmptrans;
@@ -228,8 +280,9 @@ public class ItemUtil {
 			tmptrans = testTransfer(from, item);
 			from.count -= tmptrans;
 			trans += tmptrans;
-			if (from.count == 0)
+			if (LogicUtil.nullOrEmpty(from)) {
 				break;
+			}
 		}
 		from.count = olditemcount;
 		return trans;
@@ -273,18 +326,16 @@ public class ItemUtil {
 	 * @return The amount of items that got transferred
 	 */
 	public static int transfer(Inventory from, Inventory to, ItemParser parser, int maxAmount) {
-		if (maxAmount == 0)
-			return 0;
-		ItemStack item;
 		int transferred = 0;
-		for (int i = 0; i < from.getSize(); i++) {
-			item = from.getItem(i);
-			if (item == null)
-				continue;
-			if (parser != null && !parser.match(item))
-				continue;
-			transferred += transfer(item, to, maxAmount - transferred);
-			setItem(from, i, item);
+		if (maxAmount > 0) {
+			for (int i = 0; i < from.getSize(); i++) {
+				ItemStack item = from.getItem(i);
+				if (item == null || (parser != null && !parser.match(item))) {
+					continue;
+				}
+				transferred += transfer(item, to, maxAmount - transferred);
+				setItem(from, i, item);
+			}
 		}
 		return transferred;
 	}
@@ -420,6 +471,13 @@ public class ItemUtil {
 		}
 	}
 
+	/**
+	 * Checks if a given list of enchantments contains all of the enchantments specified
+	 * 
+	 * @param enchantments to look int
+	 * @param enchantmentsToCheck to evaluate against
+	 * @return True if all enchantments are contained, False if not
+	 */
 	public static boolean hasEnchantments(NBTTagList enchantments, NBTTagList enchantmentsToCheck) {
 		try {
 			for (int i = 0; i < enchantmentsToCheck.size(); i++) {
@@ -433,10 +491,25 @@ public class ItemUtil {
 		}
 	}
 
+	/**
+	 * Checks whether a NBT list has a given enchantment
+	 * 
+	 * @param enchantments to look in
+	 * @param enchantment data to look for
+	 * @return True if such an enchantment is contained, False if not
+	 */
 	public static boolean hasEnchantment(NBTTagList enchantments, NBTTagCompound enchantment) {
 		return hasEnchantment(enchantments, enchantment.getShort("id"), enchantment.getShort("lvl"));
 	}
 
+	/**
+	 * Checks whether a NBT list has a given enchantment
+	 * 
+	 * @param enchantments to look in
+	 * @param id of the enchantment
+	 * @param level of the enchantment
+	 * @return True if such an enchantment is contained, False if not
+	 */
 	public static boolean hasEnchantment(NBTTagList enchantments, short id, short level) {
 		NBTTagCompound comp;
 		for (int i = 0; i < enchantments.size(); i++) {
@@ -466,8 +539,9 @@ public class ItemUtil {
 		boolean all = false;
 		for (int i = 0; i < from.getSize(); i++) {
 			ItemStack item = from.getItem(i);
-			if (item == null || item.getTypeId() == 0 || item.getAmount() < 1)
+			if (item == null || item.getTypeId() == 0 || item.getAmount() < 1) {
 				continue;
+			}
 			if (to.getTypeId() == 0) {
 				// take over entire item - or use parser
 				if (parser != null && parser.hasType()) {
@@ -509,29 +583,16 @@ public class ItemUtil {
 		return trans;
 	}
 
-	public static net.minecraft.server.ItemStack transferItem(IInventory inventory, ItemParser parser, int limit) {
-		net.minecraft.server.ItemStack rval = null;
-		for (int i = 0; i < inventory.getSize(); i++) {
-			net.minecraft.server.ItemStack item = inventory.getItem(i);
-			if (item == null)
-				continue;
-			if (parser.match(item)) {
-				if (item.count <= limit) {
-					limit -= item.count;
-					if (rval == null) {
-						rval = item;
-					} else {
-						rval.count += item.count;
-					}
-				}
-			}
-		}
-		return rval;
-	}
-
+	/**
+	 * Gets the max stacking size for a given item
+	 * 
+	 * @param stack to get the max stacked size
+	 * @return max stacking size
+	 */
 	public static int getMaxSize(ItemStack stack) {
-		if (stack == null)
+		if (stack == null) {
 			return 0;
+		}
 		int max = stack.getMaxStackSize();
 		return max == -1 ? 64 : max;
 	}

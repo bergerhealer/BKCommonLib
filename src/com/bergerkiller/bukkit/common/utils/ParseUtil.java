@@ -320,7 +320,7 @@ public class ParseUtil {
 		} else if (text.contains("pine") || text.contains("spruce")) {
 			return TreeSpecies.REDWOOD;
 		} else {
-			return parseEnum(TreeSpecies.class, text, def);
+			return parseTreeSpecies(text, def);
 		}
 	}
 
@@ -357,16 +357,7 @@ public class ParseUtil {
 			if (material == Material.WOOD) {
 				TreeSpecies ts = parseTreeSpecies(text, null);
 				if (ts != null) {
-					switch (ts) {
-						case GENERIC:
-							return 0;
-						case REDWOOD:
-							return 1;
-						case BIRCH:
-							return 2;
-						case JUNGLE:
-							return 3;
-					}
+					return ts.getData();
 				}
 				return def;
 			} else {

@@ -98,7 +98,7 @@ public class RecipeUtil {
 		List<CraftRecipe> poss = new ArrayList<CraftRecipe>();
 		for (IRecipe rec : getCraftRecipes()) {
 			net.minecraft.server.ItemStack item = rec.b();
-			if (item.id == itemid && (data == null || data == item.getData())) {
+			if (item != null && item.id == itemid && (data == null || data == item.getData())) {
 				CraftRecipe crec = CraftRecipe.create(rec);
 				if (crec != null)
 					poss.add(crec);
@@ -115,7 +115,7 @@ public class RecipeUtil {
 			} else {
 				limit = Integer.MAX_VALUE;
 			}
-			Integer data = parser.hasData() ? null : (int) parser.getData();
+			Integer data = parser.hasData() ? (int) parser.getData() : null;
 			craftItems(parser.getTypeId(), data, source, limit);
 		}
 	}

@@ -6,7 +6,6 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.minecraft.server.Chunk;
-import net.minecraft.server.EntityFallingBlock;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
@@ -17,24 +16,15 @@ import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftItem;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Squid;
 import org.bukkit.plugin.Plugin;
 
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
@@ -42,7 +32,7 @@ import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
 @SuppressWarnings("deprecation")
-public class EntityUtil {
+public class EntityUtil extends EntityGroupingUtil {
 
 	/*
 	 * Entity getters
@@ -178,110 +168,6 @@ public class EntityUtil {
 		return false;
 	}
 
-	/*
-	 * States
-	 */
-	public static final String[] animalNames = new String[] { "cow", "pig", "sheep", "chicken", "wolf", "squid", "snowman", "mushroomcow", "ocelot", "snowman" };
-	public static final String[] monsterNames = new String[] { "creeper", "skeleton", "zombie", "slime", "skeleton", "pigzombie", "spider", "giant", "ghast", "enderman", "cavespider", "enderdragon",
-			"blaze", "magmacube", "silverfish" };
-	public static final String[] npcNames = new String[] { "villager", "irongolem" };
-
-	public static boolean isMob(net.minecraft.server.Entity entity) {
-		return isMob(entity.getBukkitEntity());
-	}
-
-	public static boolean isMob(Entity entity) {
-		return entity instanceof Creature || entity instanceof Slime;
-	}
-
-	public static boolean isAnimal(net.minecraft.server.Entity entity) {
-		return isAnimal(entity.getBukkitEntity());
-	}
-
-	public static boolean isAnimal(Entity entity) {
-		return entity instanceof Animals || entity instanceof Squid;
-	}
-
-	public static boolean isMonster(net.minecraft.server.Entity entity) {
-		return isMonster(entity.getBukkitEntity());
-	}
-
-	public static boolean isMonster(Entity entity) {
-		return entity instanceof Monster || entity instanceof Slime;
-	}
-
-	public static boolean isNPC(net.minecraft.server.Entity entity) {
-		return isNPC(entity.getBukkitEntity());
-	}
-
-	public static boolean isNPC(Entity entity) {
-		return entity instanceof NPC;
-	}
-
-	public static boolean isMob(EntityType type) {
-		return isMob(getName(type));
-	}
-
-	public static boolean isMob(CreatureType type) {
-		return isMob(getName(type));
-	}
-
-	public static boolean isAnimal(CreatureType type) {
-		return isAnimal(getName(type));
-	}
-
-	public static boolean isMonster(CreatureType type) {
-		return isMonster(getName(type));
-	}
-
-	public static boolean isMob(String name) {
-		return isAnimal(name) || isMonster(name) || isNPC(name);
-	}
-
-	public static boolean isAnimal(String name) {
-		return LogicUtil.contains(name.toLowerCase(), animalNames);
-	}
-
-	public static boolean isMonster(String name) {
-		return LogicUtil.contains(name.toLowerCase(), monsterNames);
-	}
-
-	public static boolean isNPC(String name) {
-		return LogicUtil.contains(name.toLowerCase(), npcNames);
-	}
-
-	public static String getName(Entity entity) {
-		return getName(getNative(entity));
-	}
-
-	public static String getName(EntityType type) {
-		return type.toString().toLowerCase().replace("_", "");
-	}
-
-	public static String getName(CreatureType type) {
-		return type.toString().toLowerCase().replace("_", "");
-	}
-
-	public static String getName(net.minecraft.server.Entity entity) {
-		if (entity == null)
-			return "";
-		if (entity instanceof EntityItem) {
-			Material mat = Material.getMaterial(((EntityItem) entity).itemStack.id);
-			return mat == null ? "item" : "item" + mat.toString().toLowerCase();
-		} else if (entity instanceof EntityFallingBlock) {
-			Material mat = Material.getMaterial(((EntityFallingBlock) entity).id);
-			return mat == null ? "falling" : "falling" + mat.toString().toLowerCase();
-		} else if (entity instanceof EntityMinecart) {
-			return "minecart";
-		} else {
-			String name = entity.getClass().getSimpleName().toLowerCase();
-			if (name.startsWith("entity"))
-				name = name.substring(6);
-			if (name.contains("tnt"))
-				return "tnt";
-			return name;
-		}
-	}
 
 	/**
 	 * Checks if a given Entity should be ignored when working with it<br>

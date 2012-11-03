@@ -147,4 +147,15 @@ public class SafeField<T> extends SafeBase {
 	public static <T> T get(Object source, String fieldname) {
 		return new SafeField<T>(source, fieldname).get(source);
 	}
+
+	/**
+	 * Tries to get a static Field from a class
+	 * 
+	 * @param clazz to get the field value for
+	 * @param fieldname of the field value
+	 * @return The Field value, or null if not possible
+	 */
+	public static <T> T get(Class<?> clazz, String fieldname) {
+		return new SafeField<T>(clazz, fieldname).get(null);
+	}
 }

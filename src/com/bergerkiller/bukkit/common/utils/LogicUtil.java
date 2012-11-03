@@ -39,6 +39,26 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Checks if an Item Stack is null or empty
+	 * 
+	 * @param item to check
+	 * @return True if the item is null or empty
+	 */
+	public static boolean nullOrEmpty(net.minecraft.server.ItemStack item) {
+		return item == null || item.id == 0 || item.count < 1;
+	}
+
+	/**
+	 * Checks if an Item Stack is null or empty
+	 * 
+	 * @param item to check
+	 * @return True if the item is null or empty
+	 */
+	public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
+		return item == null || item.getTypeId() == 0 || item.getAmount() < 1;
+	}
+
+	/**
 	 * Tries to get a specific element from a list. 
 	 * The default value is returned when:<br>
 	 * - The list is null<br>
