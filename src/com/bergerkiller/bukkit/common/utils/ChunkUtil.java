@@ -10,7 +10,6 @@ import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.craftbukkit.util.LongHash;
-import org.bukkit.craftbukkit.util.LongObjectHashMap;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
@@ -19,8 +18,10 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
+	private static boolean canUseFlatSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.FlatSet") != null;
 	private static boolean canUseFlatLookup = CommonUtil.getClass("org.bukkit.craftbukkit.util.FlatLookup") != null;
 	private static boolean canUseLongObjectHashMap = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongObjectHashMap") != null;
+	private static boolean canUseLongHashSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongHashSet") != null;
 
 	/**
 	 * Gets a chunk from a world without loading or generating it
@@ -69,8 +70,8 @@ public class ChunkUtil {
 				}
 				try {
 					if (canUseLongObjectHashMap) {
-						if (chunks instanceof LongObjectHashMap) {
-							return ((LongObjectHashMap) chunks).values();
+						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+							return ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values();
 						}
 					}
 				} catch (Throwable t) {
@@ -128,8 +129,8 @@ public class ChunkUtil {
 				}
 				try {
 					if (canUseLongObjectHashMap) {
-						if (chunks instanceof LongObjectHashMap) {
-							return (Chunk) ((LongObjectHashMap) chunks).get(key);
+						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+							return (Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key);
 						}
 					}
 				} catch (Throwable t) {
@@ -177,6 +178,7 @@ public class ChunkUtil {
 					if (canUseFlatLookup) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.FlatLookup) {
 							((org.bukkit.craftbukkit.util.FlatLookup) chunks).put(key, chunk);
+							return;
 						}
 					}
 				} catch (Throwable t) {
@@ -186,8 +188,9 @@ public class ChunkUtil {
 				}
 				try {
 					if (canUseLongObjectHashMap) {
-						if (chunks instanceof LongObjectHashMap) {
-							((LongObjectHashMap) chunks).put(key, chunk);
+						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+							((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, chunk);
+							return;
 						}
 					}
 				} catch (Throwable t) {
@@ -197,6 +200,67 @@ public class ChunkUtil {
 				}
 			}
 		}
-		throw new RuntimeException("Failed to set chunk using a known method...");
+		throw new RuntimeException("Failed to set chunk using a known method");
+	}
+
+	/**
+	 * Sets whether a given chunk coordinate has to be unloaded
+	 * 
+	 * @param world to set the unload request for
+	 * @param x coordinate of the chunk
+	 * @param z coordinate of the chunk
+	 * @param unload state to set to
+	 */
+	public static void setChunkUnloading(World world, final int x, final int z, boolean unload) {
+		setChunkUnloading(((WorldServer) world).chunkProviderServer, x, z, unload);
+	}
+
+	/**
+	 * Sets whether a given chunk coordinate has to be unloaded
+	 * 
+	 * @param chunkprovider to set the unload request for
+	 * @param x coordinate of the chunk
+	 * @param z coordinate of the chunk
+	 * @param unload state to set to
+	 */
+	public static void setChunkUnloading(ChunkProviderServer chunkprovider, final int x, final int z, boolean unload) {
+		if (canUseFlatSet || canUseLongHashSet) {
+			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(chunkprovider);
+			if (unloadQueue != null) {
+				try {
+					if (canUseFlatSet) {
+						if (unloadQueue instanceof org.bukkit.craftbukkit.util.FlatSet) {
+							if (unload) {
+								((org.bukkit.craftbukkit.util.FlatSet) unloadQueue).add(x, z);
+							} else {
+								((org.bukkit.craftbukkit.util.FlatSet) unloadQueue).remove(x, z);
+							}
+							return;
+						}
+					}
+				} catch (Throwable t) {
+					canUseFlatSet = false;
+					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using Spigot's flat lookup, support disabled");
+					CommonUtil.filterStackTrace(t).printStackTrace();
+				}
+				try {
+					if (canUseLongHashSet) {
+						if (unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
+							if (unload) {
+								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
+							} else {
+								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).add(x, z);
+							}
+							return;
+						}
+					}
+				} catch (Throwable t) {
+					canUseLongHashSet = false;
+					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
+					CommonUtil.filterStackTrace(t).printStackTrace();
+				}
+			}
+		}
+		throw new RuntimeException("Failed to set unload queue using a known method");
 	}
 }

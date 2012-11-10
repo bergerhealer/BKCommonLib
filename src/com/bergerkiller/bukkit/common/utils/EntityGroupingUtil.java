@@ -189,7 +189,8 @@ public class EntityGroupingUtil {
 	 */
 	public static String getName(Class<? extends Entity> entityClass) {
 		for (EntityType type : EntityType.values()) {
-			if (type.getEntityClass().isInstance(entityClass)) {
+			Class<?> typeEntityClass = type.getEntityClass();
+			if (typeEntityClass != null && typeEntityClass.isInstance(entityClass)) {
 				return getName(type);
 			}
 		}
