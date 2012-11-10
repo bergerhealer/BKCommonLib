@@ -11,21 +11,24 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
+		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.plugins) {
-			pb.updateDependency(event.getPlugin(), event.getPlugin().getName(), true);
+			pb.updateDependency(event.getPlugin(), name, true);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginDisable(PluginDisableEvent event) {
+		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.plugins) {
-			pb.updateDependency(event.getPlugin(), event.getPlugin().getName(), false);
+			pb.updateDependency(event.getPlugin(), name, false);
 		}
 	}
 

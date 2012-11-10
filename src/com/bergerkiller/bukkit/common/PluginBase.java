@@ -437,6 +437,7 @@ public abstract class PluginBase extends JavaPlugin {
 		if (this.localizationconfig.exists()) {
 			this.loadLocalization();
 		}
+
 		// header
 		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
 		this.localizationconfig.addHeader("For colors, use the " + StringUtil.CHAT_STYLE_CHAR + " character followed up by 0 - F");
@@ -466,8 +467,26 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
+	private static void setPermissions(ConfigurationNode node) {
+		for (ConfigurationNode subNode : node.getNodes()) {
+			setPermissions(subNode);
+		}
+		PermissionDefault def = node.get("default", PermissionDefault.class);
+		String desc = node.get("description", String.class);
+		if (def != null || desc != null) {
+			Permission permission = getPermission(node.getPath());
+			if (def != null) {
+				permission.setDefault(def);
+			}
+			if (desc != null) {
+				permission.setDescription(desc);
+			}
+		}
+	}
+
 	@Override
 	public final void onEnable() {
+		long startTime = System.currentTimeMillis();
 		if (this.getMinimumLibVersion() > Common.VERSION) {
 			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
 			log(Level.SEVERE, "Verify that there is only one BKCommonLib.jar in the plugins folder before retrying");
@@ -479,6 +498,8 @@ public abstract class PluginBase extends JavaPlugin {
 
 		// ==== Permissions ====
 		this.permissions();
+		// Load all nodes from the permissions config
+		setPermissions(this.permissionconfig);
 		if (!this.permissionconfig.isEmpty()) {
 			this.savePermissions();
 		}
@@ -509,7 +530,7 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 		}
 
-		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled!");
+		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + (0.001 * (System.currentTimeMillis() - startTime)) + "s)");
 	}
 
 	@Override

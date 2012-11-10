@@ -235,7 +235,7 @@ public abstract class Operation implements Runnable {
 	 */
 	public final void doChunks(ChunkProviderServer chunkProvider) {
 		try {
-			for (Chunk chunk : chunkProvider.chunks.values()) {
+			for (Chunk chunk : WorldUtil.getChunks(chunkProvider)) {
 				this.handle(chunk);
 				if (chunk.bukkitChunk == null)
 					continue;

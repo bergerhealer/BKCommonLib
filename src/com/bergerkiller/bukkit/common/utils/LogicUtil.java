@@ -59,6 +59,17 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Returns the default value if the input value is null
+	 * 
+	 * @param value to fix
+	 * @param def to return if the value is null
+	 * @return the value or the default
+	 */
+	public static <T> T fixNull(T value, T def) {
+		return value == null ? def : value;
+	}
+
+	/**
 	 * Tries to get a specific element from a list. 
 	 * The default value is returned when:<br>
 	 * - The list is null<br>

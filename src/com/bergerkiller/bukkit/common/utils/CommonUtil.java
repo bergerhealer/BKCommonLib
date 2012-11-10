@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.server.EntityPlayer;
@@ -166,6 +167,66 @@ public class CommonUtil {
 		broadcast("HEARTBEAT: " + System.currentTimeMillis());
 	}
 
+	/**
+	 * Removes all stack trace elements after a given method
+	 * 
+	 * @param elements to filter
+	 * @param className to filter from
+	 * @param methodName to filter from
+	 * @return Filtered stack trace
+	 */
+	public static StackTraceElement[] filterStackTrace(StackTraceElement[] elements, String className, String methodName) {
+		ArrayList<StackTraceElement> rval = new ArrayList<StackTraceElement>(elements.length - 1);
+		for (StackTraceElement elem : elements) {
+			if (elem.getClassName().equals(className) && elem.getMethodName().equals(methodName)) {
+				break;
+			} else {
+				rval.add(elem);
+			}
+		}
+		return rval.toArray(new StackTraceElement[0]);
+	}
+
+	/**
+	 * Removes all stack trace elements after a given method from an error
+	 * 
+	 * @param error to filter
+	 * @param className to filter from
+	 * @param methodName to filter from
+	 * @return The input error (uncloned, same instance)
+	 */
+	public static <T extends Throwable> T filterStackTrace(T error, String className, String methodName) {
+		error.setStackTrace(filterStackTrace(error.getStackTrace(), className, methodName));
+		return error;
+	}
+
+	/**
+	 * Removes all stack trace elements after the method that called this function
+	 * 
+	 * @param elements to filter
+	 * @return Filtered stack trace
+	 */
+	public static StackTraceElement[] filterStackTrace(StackTraceElement[] elements) {
+		// Obtain the calling method and class name
+		StackTraceElement[] currStack = Thread.currentThread().getStackTrace();
+		for (int i = 1; i < currStack.length; i++) {
+			if (!currStack[i].getClassName().equals(CommonUtil.class.getName()) || !currStack[i].getMethodName().equals("filterStackTrace")) {
+				return filterStackTrace(elements, currStack[i + 1].getClassName(), currStack[i + 1].getMethodName());
+			}
+		}
+		return elements;
+	}
+
+	/**
+	 * Removes all stack trace elements after the method that called this function from an error
+	 * 
+	 * @param error to filter
+	 * @return The input error (uncloned, same instance)
+	 */
+	public static <T extends Throwable> T filterStackTrace(T error) {
+		error.setStackTrace(filterStackTrace(error.getStackTrace()));
+		return error;
+	}
 
 	/**
 	 * Tries to cast the object to the type specified, returning null upon failure
@@ -182,7 +243,6 @@ public class CommonUtil {
 		return null;
 	}
 
-
 	/**
 	 * Schedules a runnable to execute the next Tick<br>
 	 * The BKCommonLib internal plugin will handle this task<br>
@@ -191,6 +251,9 @@ public class CommonUtil {
 	 * @param runnable to execute
 	 */
 	public static void nextTick(Runnable runnable) {
+		if (runnable == null) {
+			return;
+		}
 		synchronized (CommonPlugin.nextTickTasks) {
 			CommonPlugin.nextTickTasks.add(runnable);
 		}
@@ -201,7 +264,6 @@ public class CommonUtil {
 	 * 
 	 * @param message to send
 	 */
-
 	public static void broadcast(Object message) {
 		if (message != null) {
 			for (EntityPlayer ep : getOnlinePlayers()) {
@@ -225,11 +287,9 @@ public class CommonUtil {
 	 * @param name of the Plugin
 	 * @return Plugin
 	 */
-
 	public static Plugin getPlugin(String name) {
 		return Bukkit.getServer().getPluginManager().getPlugin(name);
 	}
-
 
 	/**
 	 * Tries to get the class at the path specified

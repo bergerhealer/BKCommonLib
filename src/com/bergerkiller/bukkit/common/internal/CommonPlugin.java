@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 public class CommonPlugin extends PluginBase {
@@ -29,6 +30,7 @@ public class CommonPlugin extends PluginBase {
 	public void permissions() {
 	}
 
+	@Override
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (pluginName.equals("Showcase")) {
 			Common.isShowcaseEnabled = enabled;
@@ -48,6 +50,7 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
+	@Override
 	public void setDisableMessage(String message) {
 	};
 
@@ -70,6 +73,7 @@ public class CommonPlugin extends PluginBase {
 			listener.enable();
 			worldListeners.put(world.getWorld(), listener);
 		}
+
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				synchronized (nextTickTasks) {
@@ -80,7 +84,12 @@ public class CommonPlugin extends PluginBase {
 					nextTickTasks.clear();
 				}
 				for (Runnable task : nextTickSync) {
-					task.run();
+					try {
+						task.run();
+					} catch (Throwable t) {
+						instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
+						CommonUtil.filterStackTrace(t).printStackTrace();
+					}
 				}
 				nextTickSync.clear();
 			}

@@ -168,7 +168,6 @@ public class EntityUtil extends EntityGroupingUtil {
 		return false;
 	}
 
-
 	/**
 	 * Checks if a given Entity should be ignored when working with it<br>
 	 * This could be because another plugin is operating on it, or for Virtual items

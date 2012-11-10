@@ -9,22 +9,20 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.util.LongHash;
 
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
 import net.minecraft.server.Chunk;
-import net.minecraft.server.ChunkProviderServer;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityTracker;
 import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
-public class WorldUtil {
+public class WorldUtil extends ChunkUtil {
 	/**
-	 * Obtains the internal mapping which maps worlds to world names name
+	 * Obtains the internal mapping which maps worlds to world names
 	 * 
 	 * @return A map of world names as keys and Bukkit worlds as values
 	 */
@@ -58,19 +56,6 @@ public class WorldUtil {
 
 	public static Chunk getNative(org.bukkit.Chunk chunk) {
 		return ((CraftChunk) chunk).getHandle();
-	}
-
-	public static org.bukkit.Chunk getChunk(org.bukkit.World world, final int x, final int z) {
-		Chunk chunk = getChunk(getNative(world), x, z);
-		return chunk == null ? null : chunk.bukkitChunk;
-	}
-
-	public static Chunk getChunk(World world, final int x, final int z) {
-		return getChunk(((WorldServer) world).chunkProviderServer, x, z);
-	}
-
-	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
-		return chunkprovider.chunks.get(LongHash.toLong(x, z));
 	}
 
 	/**
@@ -143,7 +128,7 @@ public class WorldUtil {
 	}
 
 	public static boolean isLoaded(Location location) {
-		return isLoaded(location.getWorld(), location.getX(), location.getY(), location.getZ());
+		return isLoaded(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
 
 	public static boolean isLoaded(Block block) {
@@ -159,8 +144,9 @@ public class WorldUtil {
 	}
 
 	public static boolean isLoaded(final org.bukkit.World world, final int chunkX, final int chunkZ) {
-		if (world == null)
+		if (world == null) {
 			return false;
+		}
 		return world.isChunkLoaded(chunkX, chunkZ);
 	}
 }
