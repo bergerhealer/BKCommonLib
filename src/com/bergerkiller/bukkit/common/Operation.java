@@ -12,12 +12,12 @@ import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +72,7 @@ public abstract class Operation implements Runnable {
 	 */
 	public final void doPlayers() {
 		try {
-			for (EntityPlayer player : (List<EntityPlayer>) ((CraftServer) Bukkit.getServer()).getHandle().players) {
+			for (EntityPlayer player : CommonUtil.getOnlinePlayers()) {
 				this.handle(player);
 				if (player.netServerHandler == null)
 					continue;

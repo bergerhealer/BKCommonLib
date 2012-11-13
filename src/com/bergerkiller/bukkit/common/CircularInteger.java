@@ -9,15 +9,33 @@ import java.util.Iterator;
  */
 public class CircularInteger implements Iterable<Integer> {
 	private int value;
-	private final int size;
+	private int size;
 
 	/**
 	 * Initializes a new Circular Integer of the given size
 	 * 
 	 * @param size to loop in
 	 */
-	public CircularInteger(final int size) {
+	public CircularInteger(int size) {
 		this.value = 0;
+		this.size = size;
+	}
+
+	/**
+	 * Gets the current size
+	 * 
+	 * @return current size
+	 */
+	public int getSize() {
+		return this.size;
+	}
+
+	/**
+	 * Sets the new size
+	 * 
+	 * @param size to set to
+	 */
+	public void setSize(int size) {
 		this.size = size;
 	}
 
@@ -27,11 +45,11 @@ public class CircularInteger implements Iterable<Integer> {
 	 * @return Next value
 	 */
 	public int next() {
-		if (this.value == this.size) {
-			return (this.value = 0);
-		} else {
-			return this.value++;
+		this.value++;
+		if (this.value >= this.size) {
+			this.value = 0;
 		}
+		return this.value;
 	}
 
 	/**
@@ -40,11 +58,20 @@ public class CircularInteger implements Iterable<Integer> {
 	 * @return Previous value
 	 */
 	public int previous() {
-		if (this.value == -1) {
-			return (this.value = this.size - 1);
-		} else {
-			return this.value--;
+		this.value--;
+		if (this.value <= -1) {
+			this.value = this.size - 1;
 		}
+		return this.value;
+	}
+
+	/**
+	 * Gets the next integer value, and returns true if it is the first value (0)
+	 * 
+	 * @return True if the next value is 0, False if not
+	 */
+	public boolean nextBool() {
+		return this.next() == 0;
 	}
 
 	/**
@@ -53,7 +80,6 @@ public class CircularInteger implements Iterable<Integer> {
 	 */
 	@Override
 	public Iterator<Integer> iterator() {
-		final CircularInteger me = this;
 		return new Iterator<Integer>() {
 			@Override
 			public boolean hasNext() {
@@ -62,12 +88,12 @@ public class CircularInteger implements Iterable<Integer> {
 
 			@Override
 			public Integer next() {
-				return me.next();
+				return CircularInteger.this.next();
 			}
 
 			@Override
 			public void remove() {
-				me.previous();
+				CircularInteger.this.previous();
 			}
 		};
 	}

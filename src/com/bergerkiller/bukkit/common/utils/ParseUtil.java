@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.DyeColor;
@@ -70,12 +70,16 @@ public class ParseUtil {
 	 * - Text after a space is excluded<br>
 	 * - Non-digit information is erased<br>
 	 * - Prefixed text is ignored<br>
-	 * - A single dot maximum is enforced
+	 * - A single dot maximum is enforced<br>
+	 * - Null input returns an empty String instead
 	 * 
 	 * @param text to filter
 	 * @return filtered text
 	 */
 	public static String filterNumeric(String text) {
+		if (text == null) {
+			return "";
+		}
 		StringBuilder rval = new StringBuilder(text.length());
 		boolean hasComma = false;
 		boolean hasDigit = false;
@@ -134,6 +138,32 @@ public class ParseUtil {
 	 */
 	public static boolean parseBool(String text) {
 		return yesValues.contains(text.toLowerCase().trim());
+	}
+
+	/**
+	 * Tries to parse the text specified to a float
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static float parseFloat(String text, float def) {
+		return parseFloat(text, Float.valueOf(def)).floatValue();
+	}
+
+	/**
+	 * Tries to parse the text specified to a float
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static Float parseFloat(String text, Float def) {
+		try {
+			return Float.parseFloat(filterNumeric(text));
+		} catch (Exception ex) {
+			return def;
+		}
 	}
 
 	/**
@@ -320,7 +350,7 @@ public class ParseUtil {
 		} else if (text.contains("pine") || text.contains("spruce")) {
 			return TreeSpecies.REDWOOD;
 		} else {
-			return parseTreeSpecies(text, def);
+			return parseEnum(TreeSpecies.class, text, def);
 		}
 	}
 
@@ -332,6 +362,9 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Material parseMaterial(String text, Material def) {
+		if (LogicUtil.nullOrEmpty(text)) {
+			return def;
+		}
 		// from ID
 		try {
 			Material m = Material.getMaterial(Integer.parseInt(text));
@@ -442,11 +475,11 @@ public class ParseUtil {
 			if (type == object.getClass()) {
 				rval = (T) object;
 			} else if (type.equals(String.class)) {
-				if (object instanceof List) {
-					List list = (List) object;
-					StringBuilder builder = new StringBuilder(list.size() * 100);
+				if (object instanceof Collection) {
+					Collection collection = (Collection) object;
+					StringBuilder builder = new StringBuilder(collection.size() * 100);
 					boolean first = false;
-					for (Object element : (List) object) {
+					for (Object element : collection) {
 						if (!first) {
 							builder.append('\n');
 						}
@@ -457,13 +490,16 @@ public class ParseUtil {
 				} else {
 					rval = object.toString();
 				}
+			} else if (type.equals(Material.class)) {
+				rval = parseMaterial(object.toString(), (Material) def);
 			} else if (type.isEnum()) {
 				rval = ParseUtil.parseEnum(type, object.toString(), def);
 			} else if (type == Integer.class) {
-				rval = Integer.parseInt(object.toString());
+				rval = parseInt(object.toString(), (Integer) def);
 			} else if (type == Double.class) {
-				rval = Double.parseDouble(object.toString());
-				;
+				rval = parseDouble(object.toString(), (Double) def);
+			} else if (type == Float.class) {
+				rval = parseFloat(object.toString(), (Float) def);
 			}
 		} catch (Exception ex) {
 			rval = def;

@@ -301,7 +301,6 @@ public class CommonUtil {
 		try {
 			return Class.forName(path);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 			return null;
 		}
 	}

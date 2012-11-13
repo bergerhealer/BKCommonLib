@@ -23,8 +23,7 @@ public class ItemParser {
 		this.type = type;
 	}
 
-	private ItemParser(boolean hasdata) {
-		this.hasdata = hasdata;
+	private ItemParser() {
 	}
 
 	private byte data = 0;
@@ -58,33 +57,20 @@ public class ItemParser {
 	}
 
 	public static ItemParser parse(String name, String dataname, String amount) {
-		ItemParser parser = new ItemParser(dataname != null);
-		if (amount == null) {
-			parser.hasamount = false;
-		} else {
-			try {
-				parser.amount = Integer.parseInt(amount);
-				parser.hasamount = true;
-			} catch (NumberFormatException ex) {
-				parser.hasamount = false;
-			}
+		ItemParser parser = new ItemParser();
+		// parse amount
+		Integer amountVal = ParseUtil.parseInt(amount, null);
+		if (parser.hasamount = amountVal != null) {
+			parser.amount = amountVal.intValue();
 		}
-		// match material from name
-		if (LogicUtil.nullOrEmpty(name)) {
-			parser.type = null;
-			return parser;
-		}
+		// parse material from name
 		parser.type = ParseUtil.parseMaterial(name, null);
-		if (parser.type == null) {
-			parser.type = Material.AIR;
-		}
-		// match data name if needed
-		if (parser.hasdata) {
+		// parse material data from name if needed
+		if (parser.type != null && !LogicUtil.nullOrEmpty(dataname)) {
 			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
-			if (dat == null) {
-				parser.hasdata = false;
-			} else {
-				parser.data = dat;
+			parser.hasdata = dat != null;
+			if (parser.hasdata = dat != null) {
+				parser.data = dat.byteValue();
 			}
 		}
 		return parser;
@@ -154,6 +140,22 @@ public class ItemParser {
 		}
 	}
 
+	/**
+	 * Multiplies the amount of this item parser with the amount specified<br>
+	 * If this parser has no amount, an amount of 1 is assumed, 
+	 * resulting in a new item parser with the specified amount
+	 * 
+	 * @param amount to multiply with
+	 * @return new Item Parser with the multiplied amount
+	 */
+	public ItemParser multiplyAmount(int amount) {
+		if (this.hasAmount()) {
+			amount *= this.getAmount();
+		}
+		return new ItemParser(amount, hasType() ? type : null, hasData() ? data : null);
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder rval = new StringBuilder();
 		if (this.hasamount) {

@@ -188,13 +188,16 @@ public class EntityGroupingUtil {
 	 * @return Entity name
 	 */
 	public static String getName(Class<? extends Entity> entityClass) {
+		if (entityClass == null) {
+			return "";
+		}
 		for (EntityType type : EntityType.values()) {
 			Class<?> typeEntityClass = type.getEntityClass();
 			if (typeEntityClass != null && typeEntityClass.isInstance(entityClass)) {
 				return getName(type);
 			}
 		}
-		return "";
+		return entityClass.getSimpleName();
 	}
 
 	/**
