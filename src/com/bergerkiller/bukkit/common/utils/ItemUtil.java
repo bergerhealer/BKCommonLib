@@ -425,15 +425,17 @@ public class ItemUtil {
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(net.minecraft.server.ItemStack from, net.minecraft.server.ItemStack to, int maxCount) {
-		maxCount = Math.min(maxCount, from.getMaxStackSize());
-		if (maxCount == 0) {
+		maxCount = Math.min(maxCount, from.count);
+		if (!LogicUtil.nullOrEmpty(to)) {
+			maxCount = Math.min(maxCount, to.getMaxStackSize() - to.count);
+		}
+		if (maxCount <= 0) {
 			// nothing to stack
 			return 0;
 		} else if (to.id == 0 || to.count == 0) {
 			// fully copy data over
 			to.id = from.id;
 			to.setData(from.getData());
-			final int transferred = Math.min(maxCount, from.count);
 			// enchantments
 			if (from.hasEnchantments()) {
 				if (to.tag == null) {
@@ -441,12 +443,9 @@ public class ItemUtil {
 				}
 				to.tag.set("ench", from.getEnchantments().clone());
 			}
-			to.count = transferred;
-			from.count -= transferred;
-			return transferred;
-		} else if (maxCount == 1) {
-			// can't stack any further
-			return 0;
+			to.count = maxCount;
+			from.count -= maxCount;
+			return maxCount;
 		} else if (to.id != from.id || to.getData() != from.getData()) {
 			// different items - can't stack
 			return 0;
@@ -462,12 +461,10 @@ public class ItemUtil {
 			} else if (efrom != null || eto != null) {
 				return 0;
 			}
-
 			// stack the items
-			final int transferred = Math.min(maxCount - to.count, from.count);
-			to.count += transferred;
-			from.count -= transferred;
-			return transferred;
+			to.count += maxCount;
+			from.count -= maxCount;
+			return maxCount;
 		}
 	}
 
