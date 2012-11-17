@@ -32,12 +32,12 @@ public class MergedInventory implements IInventory {
 	}
 
 	@Override
-	public boolean a(EntityHuman human) {
+	public boolean a_(EntityHuman human) {
 		// called when a human clicks on this inventory
 		// if true is returned, something happened
 		boolean flag = false;
 		for (IInventory i : this.inv)
-			if (i.a(human))
+			if (i.a_(human))
 				flag = true;
 		return flag;
 	}

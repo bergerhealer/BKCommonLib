@@ -62,7 +62,7 @@ public abstract class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public boolean a(EntityHuman arg0) {
+	public boolean a_(EntityHuman arg0) {
 		return false;
 	}
 

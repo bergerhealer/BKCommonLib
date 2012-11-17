@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.io.File;
-import java.lang.ref.Reference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,10 +10,10 @@ import net.minecraft.server.RegionFileCache;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class RegionFileCacheRef {
-	public static final SafeField<Map<File, Reference<RegionFile>>> filesField = new SafeField<Map<File, Reference<RegionFile>>>(RegionFileCache.class, "a");
-	public static final Map<File, Reference<RegionFile>> FILES;
+	public static final SafeField<Map<File, RegionFile>> filesField = new SafeField<Map<File, RegionFile>>(RegionFileCache.class, "a");
+	public static final Map<File, RegionFile> FILES;
 	static {
-		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, Reference<RegionFile>>();
+		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, RegionFile>();
 	}
 
 	/**
@@ -24,11 +23,6 @@ public class RegionFileCacheRef {
 	 * @return the Region File, or null if not loaded
 	 */
 	public static RegionFile getFile(File file) {
-		Reference<RegionFile> ref = FILES.get(file);
-		if (ref != null) {
-			return ref.get();
-		} else {
-			return null;
-		}
+		return FILES.get(file);
 	}
 }

@@ -517,7 +517,7 @@ public class BlockUtil {
 	}
 
 	public static Packet getUpdatePacket(TileEntity tile) {
-		return tile.l();
+		return tile.getUpdatePacket();
 	}
 
 	private static void offerTile(TileEntity tile) {

@@ -51,6 +51,36 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Checks whether a given object is an instance of the class represented by this Template
+	 * 
+	 * @param object to check
+	 * @return True if the object is an instance, False if not
+	 */
+	public boolean isInstance(Object object) {
+		return this.type.isInstance(object);
+	}
+
+	/**
+	 * Checks whether the object class equals the class represented by this Template
+	 * 
+	 * @param object to check
+	 * @return True if the object is a direct instance, False if not
+	 */
+	public boolean isType(Object object) {
+		return object != null && isType(object.getClass());
+	}
+
+	/**
+	 * Checks whether a given class instance equals the class represented by this Template
+	 * 
+	 * @param clazz to check
+	 * @return True if the clazz is not null and equals the class of this template
+	 */
+	public boolean isType(Class<?> clazz) {
+		return clazz != null && this.type.equals(clazz);
+	}
+
+	/**
 	 * Transfers all the fields from one class instance to the other
 	 * 
 	 * @param from instance
