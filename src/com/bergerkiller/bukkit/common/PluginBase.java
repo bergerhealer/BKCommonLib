@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -157,13 +159,30 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
-	 * Loads all the permissions from a Permissions enumeration
+	 * Loads all the permissions from a Permissions enumeration<br>
+	 * If the class is not an enumeration, the static constants in the class are used instead
 	 * 
 	 * @param permissionDefaults class
 	 */
 	public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
-		for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
-			this.loadPermission(perm);
+		if (permissionDefaults.isEnum()) {
+			// Get using enum constants
+			for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
+				this.loadPermission(perm);
+			}
+		} else {
+			// Get using reflection
+			try {
+				for (Field field : permissionDefaults.getDeclaredFields()) {
+					if (Modifier.isStatic(field.getModifiers())) {
+						if (IPermissionDefault.class.isAssignableFrom(field.getType())) {
+							this.loadPermission((IPermissionDefault) field.get(null));
+						}
+					}
+				}
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
 		}
 	}
 

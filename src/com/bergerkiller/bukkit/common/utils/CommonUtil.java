@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.internal.CommonPermissions;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -159,12 +160,14 @@ public class CommonUtil {
 	}
 
 	/**
-	 * A debug function - broadcasts HEARTBEAT with the current time<br>
-	 * Can be used to check if a ticked object is still alive
+	 * Checks whether a given command sender has a given permission
+	 * 
+	 * @param sender to check
+	 * @param permissionNode to check
+	 * @return True if the sender has permission for the node, False if not
 	 */
-
-	public static void heartbeat() {
-		broadcast("HEARTBEAT: " + System.currentTimeMillis());
+	public static boolean hasPermission(CommandSender sender, String permissionNode) {
+		return CommonPermissions.has(sender, permissionNode);
 	}
 
 	/**

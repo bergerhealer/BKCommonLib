@@ -70,4 +70,12 @@ public class DebugUtil {
 		StringUtil.replaceAll(buffer, "#type", block.getType().toString());
 		return buffer.toString();
 	}
+
+	/**
+	 * Broadcasts HEARTBEAT with the current time<br>
+	 * Can be used to check if a ticked object is still alive
+	 */
+	public static void heartbeat() {
+		CommonUtil.broadcast("HEARTBEAT: " + System.currentTimeMillis());
+	}
 }
