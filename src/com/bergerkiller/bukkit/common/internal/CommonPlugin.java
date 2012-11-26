@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.server.Entity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
@@ -25,6 +27,7 @@ public class CommonPlugin extends PluginBase {
 	public static final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private static final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private int nextTickHandlerId = -1;
+	private int entityMoveHandlerId = -1;
 
 	@Override
 	public void permissions() {
@@ -63,6 +66,9 @@ public class CommonPlugin extends PluginBase {
 		if (nextTickHandlerId != -1) {
 			Bukkit.getScheduler().cancelTask(nextTickHandlerId);
 		}
+		if (entityMoveHandlerId != -1) {
+			Bukkit.getScheduler().cancelTask(entityMoveHandlerId);
+		}
 	}
 
 	public void enable() {
@@ -92,6 +98,22 @@ public class CommonPlugin extends PluginBase {
 					}
 				}
 				nextTickSync.clear();
+			}
+		}, 1, 1);
+
+		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			public void run() {
+				if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
+					EntityMoveEvent event = new EntityMoveEvent();
+					for (WorldServer world : WorldUtil.getWorlds()) {
+						for (Entity entity : WorldUtil.getEntities(world)) {
+							if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ) {
+								event.setEntity(entity);
+								CommonUtil.callEvent(event);
+							}
+						}
+					}
+				}
 			}
 		}, 1, 1);
 	}
