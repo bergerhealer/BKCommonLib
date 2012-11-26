@@ -68,7 +68,6 @@ public class ItemParser {
 		// parse material data from name if needed
 		if (parser.type != null && !LogicUtil.nullOrEmpty(dataname)) {
 			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
-			parser.hasdata = dat != null;
 			if (parser.hasdata = dat != null) {
 				parser.data = dat.byteValue();
 			}

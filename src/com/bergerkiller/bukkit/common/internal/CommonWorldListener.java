@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.ArrayList;
+
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
@@ -7,12 +9,14 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
+import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldManager;
 import net.minecraft.server.WorldServer;
 
 class CommonWorldListener extends WorldManager {
 	private boolean isEnabled = false;
+	private ArrayList<EntityPlayer> addedPlayers = new ArrayList<EntityPlayer>();
 
 	public CommonWorldListener(World world) {
 		super(CommonUtil.getMCServer(), (WorldServer) world);
@@ -26,9 +30,11 @@ class CommonWorldListener extends WorldManager {
 	 * Enables the listener<br>
 	 * Will send entity add messages for all current entities
 	 */
+	@SuppressWarnings("unchecked")
 	public void enable() {
 		if (isValid()) {
 			WorldServerRef.accessList.get(this.world).add(this);
+			this.addedPlayers.addAll(this.world.players);
 			this.isEnabled = true;
 		} else {
 			new RuntimeException("Failed to listen in World").printStackTrace();
@@ -41,6 +47,7 @@ class CommonWorldListener extends WorldManager {
 	public void disable() {
 		if (isValid()) {
 			WorldServerRef.accessList.get(this.world).remove(this);
+			this.addedPlayers.clear();
 			this.isEnabled = false;
 		}
 	}
@@ -53,6 +60,13 @@ class CommonWorldListener extends WorldManager {
 	public final void a(Entity added) {
 		if (added != null) {
 			// Add entity
+			if (added instanceof EntityPlayer) {
+				if (this.addedPlayers.contains(added)) {
+					return;
+				} else {
+					this.addedPlayers.add((EntityPlayer) added);
+				}
+			}
 			CommonUtil.callEvent(new EntityAddEvent(added.getBukkitEntity()));
 		}
 	}
@@ -61,6 +75,11 @@ class CommonWorldListener extends WorldManager {
 	public final void b(Entity removed) {
 		if (removed != null) {
 			// Remove entity
+			if (removed instanceof EntityPlayer) {
+				if (!this.addedPlayers.remove(removed)) {
+					return;
+				}
+			}
 			CommonUtil.callEvent(new EntityRemoveEvent(removed.getBukkitEntity()));
 		}
 	}
