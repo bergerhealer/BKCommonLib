@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 public class CommonPlugin extends PluginBase {
@@ -79,43 +80,57 @@ public class CommonPlugin extends PluginBase {
 			listener.enable();
 			worldListeners.put(world.getWorld(), listener);
 		}
-
-		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			public void run() {
-				synchronized (nextTickTasks) {
-					if (nextTickTasks.isEmpty()) {
-						return;
-					}
-					nextTickSync.addAll(nextTickTasks);
-					nextTickTasks.clear();
-				}
-				for (Runnable task : nextTickSync) {
-					try {
-						task.run();
-					} catch (Throwable t) {
-						instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
-						CommonUtil.filterStackTrace(t).printStackTrace();
-					}
-				}
-				nextTickSync.clear();
+		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
+		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
+		// Parse version to int
+		String ver = this.getVersion();
+		int dot1 = ver.indexOf('.');
+		if (dot1 != -1) {
+			int dot2 = ver.indexOf('.', dot1 + 1);
+			if (dot2 != -1) {
+				ver = ver.substring(0, dot2);
 			}
-		}, 1, 1);
+		}
+		Common.VERSION = (int) (100.0 * ParseUtil.parseDouble(this.getVersion(), 0.0));
+	}
 
-		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			public void run() {
-				if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
-					EntityMoveEvent event = new EntityMoveEvent();
-					for (WorldServer world : WorldUtil.getWorlds()) {
-						for (Entity entity : WorldUtil.getEntities(world)) {
-							if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ) {
-								event.setEntity(entity);
-								CommonUtil.callEvent(event);
-							}
+	private static class NextTickHandler implements Runnable {
+		public void run() {
+			synchronized (nextTickTasks) {
+				if (nextTickTasks.isEmpty()) {
+					return;
+				}
+				nextTickSync.addAll(nextTickTasks);
+				nextTickTasks.clear();
+			}
+			for (Runnable task : nextTickSync) {
+				try {
+					task.run();
+				} catch (Throwable t) {
+					instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
+					CommonUtil.filterStackTrace(t).printStackTrace();
+				}
+			}
+			nextTickSync.clear();
+		}
+	}
+
+	private static class MoveEventHandler implements Runnable {
+		public void run() {
+			if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
+				EntityMoveEvent event = new EntityMoveEvent();
+				for (WorldServer world : WorldUtil.getWorlds()) {
+					for (Entity entity : WorldUtil.getEntities(world)) {
+						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
+								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
+
+							event.setEntity(entity);
+							CommonUtil.callEvent(event);
 						}
 					}
 				}
 			}
-		}, 1, 1);
+		}
 	}
 
 	@Override

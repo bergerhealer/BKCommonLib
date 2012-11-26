@@ -569,15 +569,14 @@ public abstract class PluginBase extends JavaPlugin {
 	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
 			args = StringUtil.convertArgs(args);
-			// Handle regularly
-			if (command(sender, command, args)) {
-				return true;
-			}
 			// Default commands for all plugins
 			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(), "version", "ver")) {
 				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.instance.getVersion());
 			}
 			// Handle regularly
+			if (command(sender, command, args)) {
+				return true;
+			}
 			sender.sendMessage(ChatColor.RED + "Unknown command, for help use /help " + command);
 		} catch (NoPermissionException ex) {
 			if (sender instanceof Player) {
