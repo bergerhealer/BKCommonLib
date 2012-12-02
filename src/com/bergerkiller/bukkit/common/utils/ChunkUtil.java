@@ -18,8 +18,6 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
-	private static boolean canUseFlatSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.FlatSet") != null;
-	private static boolean canUseFlatLookup = CommonUtil.getClass("org.bukkit.craftbukkit.util.FlatLookup") != null;
 	private static boolean canUseLongObjectHashMap = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongObjectHashMap") != null;
 	private static boolean canUseLongHashSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongHashSet") != null;
 
@@ -54,20 +52,9 @@ public class ChunkUtil {
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static Collection<Chunk> getChunks(ChunkProviderServer chunkprovider) {
-		if (canUseFlatLookup || canUseLongObjectHashMap) {
+		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
 			if (chunks != null) {
-				try {
-					if (canUseFlatLookup) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.FlatLookup) {
-							return ((org.bukkit.craftbukkit.util.FlatLookup) chunks).values();
-						}
-					}
-				} catch (Throwable t) {
-					canUseFlatLookup = false;
-					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using Spigot's flat lookup, support disabled");
-					CommonUtil.filterStackTrace(t).printStackTrace();
-				}
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
@@ -112,21 +99,10 @@ public class ChunkUtil {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
-		if (canUseFlatLookup || canUseLongObjectHashMap) {
+		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
-				try {
-					if (canUseFlatLookup) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.FlatLookup) {
-							return (Chunk) ((org.bukkit.craftbukkit.util.FlatLookup) chunks).get(key);
-						}
-					}
-				} catch (Throwable t) {
-					canUseFlatLookup = false;
-					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using Spigot's flat lookup, support disabled");
-					CommonUtil.filterStackTrace(t).printStackTrace();
-				}
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
@@ -170,22 +146,10 @@ public class ChunkUtil {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void setChunk(ChunkProviderServer chunkprovider, final int x, final int z, final Chunk chunk) {
-		if (canUseFlatLookup || canUseLongObjectHashMap) {
+		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
-				try {
-					if (canUseFlatLookup) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.FlatLookup) {
-							((org.bukkit.craftbukkit.util.FlatLookup) chunks).put(key, chunk);
-							return;
-						}
-					}
-				} catch (Throwable t) {
-					canUseFlatLookup = false;
-					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using Spigot's flat lookup, support disabled");
-					CommonUtil.filterStackTrace(t).printStackTrace();
-				}
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
@@ -224,25 +188,9 @@ public class ChunkUtil {
 	 * @param unload state to set to
 	 */
 	public static void setChunkUnloading(ChunkProviderServer chunkprovider, final int x, final int z, boolean unload) {
-		if (canUseFlatSet || canUseLongHashSet) {
+		if (canUseLongHashSet) {
 			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(chunkprovider);
 			if (unloadQueue != null) {
-				try {
-					if (canUseFlatSet) {
-						if (unloadQueue instanceof org.bukkit.craftbukkit.util.FlatSet) {
-							if (unload) {
-								((org.bukkit.craftbukkit.util.FlatSet) unloadQueue).add(x, z);
-							} else {
-								((org.bukkit.craftbukkit.util.FlatSet) unloadQueue).remove(x, z);
-							}
-							return;
-						}
-					}
-				} catch (Throwable t) {
-					canUseFlatSet = false;
-					CommonPlugin.instance.log(Level.WARNING, "Failed to access chunks using Spigot's flat lookup, support disabled");
-					CommonUtil.filterStackTrace(t).printStackTrace();
-				}
 				try {
 					if (canUseLongHashSet) {
 						if (unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
