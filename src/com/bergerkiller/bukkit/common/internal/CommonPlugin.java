@@ -129,6 +129,11 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	@Override
+	public int getMinimumLibVersion() {
+		return 0;
+	}
+
+	@Override
 	public void setDisableMessage(String message) {
 	};
 

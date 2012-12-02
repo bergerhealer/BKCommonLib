@@ -418,7 +418,8 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
-	 * Gets the minimum BKCommonLib version required for this Plugin to function
+	 * Gets the minimum BKCommonLib version required for this Plugin to function<br>
+	 * Override this and return Common.VERSION as result (compiler will automatically inline this)
 	 * 
 	 * @return Minimum BKCommonLib version number
 	 */
@@ -464,6 +465,8 @@ public abstract class PluginBase extends JavaPlugin {
 		this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
 		this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
 		this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
+		this.permissionconfig.addHeader("Need help with this file? Please visit:");
+		this.permissionconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/permission-defaults/");
 
 		// Load localization configuration
 		this.localizationconfig = new FileConfiguration(this, "Localization.yml");

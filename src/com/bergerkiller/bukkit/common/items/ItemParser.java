@@ -10,26 +10,25 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 public class ItemParser {
 
 	public ItemParser(Material type) {
-		this(null, type);
+		this(type, null);
 	}
 
-	public ItemParser(Integer amount, Material type) {
-		this(amount, type, null);
+	public ItemParser(Material type, Integer amount) {
+		this(type, amount, null);
 	}
 
-	public ItemParser(Integer amount, Material type, Byte data) {
-		this.amount = (this.hasamount = amount != null) ? amount : 0;
-		this.data = (this.hasdata = data != null) ? data : 0;
+	public ItemParser(Material type, Integer amount, Byte data) {
+		this.amount = amount;
+		this.data = data;
 		this.type = type;
 	}
 
 	private ItemParser() {
 	}
 
-	private byte data = 0;
+	private Byte data = 0;
 	private Material type = null;
-	private int amount = 1;
-	private boolean hasdata, hasamount;
+	private Integer amount = 1;
 
 	/**
 	 * Supported formats: typedata: [type]:[data] [typeid]:[data] [typeid]
@@ -59,18 +58,12 @@ public class ItemParser {
 	public static ItemParser parse(String name, String dataname, String amount) {
 		ItemParser parser = new ItemParser();
 		// parse amount
-		Integer amountVal = ParseUtil.parseInt(amount, null);
-		if (parser.hasamount = amountVal != null) {
-			parser.amount = amountVal.intValue();
-		}
+		parser.amount = ParseUtil.parseInt(amount, null);
 		// parse material from name
 		parser.type = ParseUtil.parseMaterial(name, null);
 		// parse material data from name if needed
 		if (parser.type != null && !LogicUtil.nullOrEmpty(dataname)) {
-			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
-			if (parser.hasdata = dat != null) {
-				parser.data = dat.byteValue();
-			}
+			parser.data = ParseUtil.parseMaterialData(dataname, parser.type, null);
 		}
 		return parser;
 	}
@@ -96,11 +89,11 @@ public class ItemParser {
 	}
 
 	public boolean hasAmount() {
-		return this.hasamount;
+		return this.amount != null;
 	}
 
 	public boolean hasData() {
-		return this.hasdata;
+		return this.data != null;
 	}
 
 	public boolean hasType() {
@@ -108,11 +101,11 @@ public class ItemParser {
 	}
 
 	public byte getData() {
-		return this.data;
+		return this.data == null ? 0 : this.data.byteValue();
 	}
 
 	public int getAmount() {
-		return this.amount;
+		return this.amount == null ? -1 : this.amount.intValue();
 	}
 
 	public Material getType() {
@@ -140,6 +133,26 @@ public class ItemParser {
 	}
 
 	/**
+	 * Creates a new ItemParser with the type and amount of this parser, but with a new data
+	 * 
+	 * @param data for the new parser
+	 * @return new ItemParser with the new data
+	 */
+	public ItemParser setData(Byte data) {
+		return new ItemParser(this.type, this.amount, data);
+	}
+
+	/**
+	 * Creates a new ItemParser with the type and data of this parser, but with a new amount
+	 * 
+	 * @param amount for the new parser
+	 * @return new ItemParser with the new amount
+	 */
+	public ItemParser setAmount(Integer amount) {
+		return new ItemParser(this.type, amount, this.data);
+	}
+
+	/**
 	 * Multiplies the amount of this item parser with the amount specified<br>
 	 * If this parser has no amount, an amount of 1 is assumed, 
 	 * resulting in a new item parser with the specified amount
@@ -151,20 +164,20 @@ public class ItemParser {
 		if (this.hasAmount()) {
 			amount *= this.getAmount();
 		}
-		return new ItemParser(amount, hasType() ? type : null, hasData() ? data : null);
+		return this.setAmount(amount);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder rval = new StringBuilder();
-		if (this.hasamount) {
+		if (this.hasAmount()) {
 			rval.append(this.amount).append(" of ");
 		}
-		if (this.type == null) {
+		if (this.hasType()) {
 			rval.append("any type");
 		} else {
 			rval.append(this.type.toString().toLowerCase());
-			if (this.hasdata) {
+			if (this.hasData()) {
 				rval.append(':').append(this.data);
 			}
 		}
