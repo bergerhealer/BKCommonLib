@@ -87,8 +87,14 @@ public class FileConfiguration extends ConfigurationNode {
 				StringBuilder mainHeader = new StringBuilder();
 				int indent;
 				while ((line = input.readLine()) != null) {
+					line = StringUtil.ampToColor(line);
 					indent = StringUtil.getSuccessiveCharCount(line, ' ');
 					trimmedLine = line.substring(indent);
+					// Prevent new name convention errors
+					if (trimmedLine.equals("*:")) {
+						trimmedLine = "'*':";
+						line = StringUtil.getFilledString(" ", indent) + trimmedLine;
+					}
 					// Handle a main header line
 					if (trimmedLine.startsWith(MAIN_HEADER_PREFIX)) {
 						mainHeader.append('\n').append(trimmedLine.substring(MAIN_HEADER_PREFIX.length()));
@@ -155,8 +161,16 @@ public class FileConfiguration extends ConfigurationNode {
 				int indent;
 				NodeBuilder node = new NodeBuilder(this.getIndent());
 				for (String line : this.getSource().saveToString().split("\n", -1)) {
+					line = StringUtil.colorToAmp(line);
 					indent = StringUtil.getSuccessiveCharCount(line, ' ');
 					trimmedLine = line.substring(indent);
+					// ===== Logic start =====
+					// Get rid of the unneeded '-characters around certain common names
+					if (trimmedLine.equals("'*':")) {
+						trimmedLine = "*:";
+						line = StringUtil.getFilledString(" ", indent) + trimmedLine;
+					}
+
 					// Handle a node
 					if (node.handle(trimmedLine, indent)) {
 						writeHeader(false, writer, this.getHeader(node.getPath()), indent);

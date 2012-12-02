@@ -6,20 +6,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.server.Entity;
+import me.snowleo.bleedingmobs.BleedingMobs;
+import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.kellerkindt.scs.ShowCaseStandalone;
+import com.narrowtux.showcase.Showcase;
 
 public class CommonPlugin extends PluginBase {
 	public static CommonPlugin instance;
@@ -29,6 +35,63 @@ public class CommonPlugin extends PluginBase {
 	private static final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private int nextTickHandlerId = -1;
 	private int entityMoveHandlerId = -1;
+	private boolean vaultEnabled = false;
+	private Permission vaultPermission = null;
+	private boolean isShowcaseEnabled = false;
+	private boolean isSCSEnabled = false;
+	private Plugin bleedingMobsInstance = null;
+
+	@SuppressWarnings("deprecation")
+	public boolean isEntityIgnored(Entity entity) {
+		if (entity instanceof Item) {
+			Item item = (Item) entity;
+			if (this.isShowcaseEnabled) {
+				try {
+					if (Showcase.instance.getItemByDrop(item) != null)
+						return true;
+				} catch (Throwable t) {
+					Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
+					t.printStackTrace();
+					this.isShowcaseEnabled = false;
+				}
+			}
+			if (this.isSCSEnabled) {
+				try {
+					if (ShowCaseStandalone.get().isShowCaseItem(item))
+						return true;
+				} catch (Throwable t) {
+					Bukkit.getLogger().log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
+					t.printStackTrace();
+					this.isSCSEnabled = false;
+				}
+			}
+			if (this.bleedingMobsInstance != null) {
+				try {
+					BleedingMobs bm = (BleedingMobs) this.bleedingMobsInstance;
+					if (bm.isSpawning())
+						return true;
+					if (bm.isWorldEnabled(item.getWorld())) {
+						if (bm.isParticleItem(((CraftItem) item).getUniqueId())) {
+							return true;
+						}
+					}
+				} catch (Throwable t) {
+					Bukkit.getLogger().log(Level.SEVERE, "Bleeding Mobs item verification failed (update needed?), contact the authors!");
+					t.printStackTrace();
+					this.bleedingMobsInstance = null;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean hasPermission(CommandSender sender, String permissionNode) {
+		if (this.vaultEnabled) {
+			return this.vaultPermission.has(sender, permissionNode);
+		} else {
+			return sender.hasPermission(permissionNode);
+		}
+	}
 
 	@Override
 	public void permissions() {
@@ -37,19 +100,30 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (pluginName.equals("Showcase")) {
-			Common.isShowcaseEnabled = enabled;
+			this.isShowcaseEnabled = enabled;
 			if (enabled) {
 				log(Level.INFO, "Showcase detected: Showcased items will be ignored");
 			}
 		} else if (pluginName.equals("ShowCaseStandalone")) {
-			Common.isSCSEnabled = enabled;
+			this.isSCSEnabled = enabled;
 			if (enabled) {
 				log(Level.INFO, "Showcase Standalone detected: Showcased items will be ignored");
 			}
 		} else if (pluginName.equals("BleedingMobs")) {
-			Common.bleedingMobsInstance = enabled ? plugin : null;
+			this.bleedingMobsInstance = enabled ? plugin : null;
 			if (enabled) {
 				log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
+			}
+		} else if (pluginName.equals("Vault")) {
+			if (enabled) {
+		        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(Permission.class);
+		        if (permissionProvider != null) {
+		            this.vaultPermission = permissionProvider.getProvider();
+		            this.vaultEnabled = this.vaultPermission != null;
+		        }
+			} else {
+				this.vaultPermission = null;
+				this.vaultEnabled = false;
 			}
 		}
 	}
@@ -58,6 +132,7 @@ public class CommonPlugin extends PluginBase {
 	public void setDisableMessage(String message) {
 	};
 
+	@Override
 	public void disable() {
 		instance = null;
 		for (CommonWorldListener listener : worldListeners.values()) {
@@ -72,8 +147,10 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
+	@Override
 	public void enable() {
 		instance = this;
+		// Register events and tasks, initialize
 		this.register(new CommonListener());
 		for (WorldServer world : WorldUtil.getWorlds()) {
 			CommonWorldListener listener = new CommonWorldListener(world);
@@ -82,7 +159,8 @@ public class CommonPlugin extends PluginBase {
 		}
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
-		// Parse version to int
+
+		// Parse BKCommonLib version to int
 		String ver = this.getVersion();
 		int dot1 = ver.indexOf('.');
 		if (dot1 != -1) {
@@ -91,7 +169,10 @@ public class CommonPlugin extends PluginBase {
 				ver = ver.substring(0, dot2);
 			}
 		}
-		Common.VERSION = (int) (100.0 * ParseUtil.parseDouble(this.getVersion(), 0.0));
+		int version = this.getVersionNumber();
+		if (version != Common.VERSION) {
+			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
+		}
 	}
 
 	private static class NextTickHandler implements Runnable {
@@ -120,7 +201,7 @@ public class CommonPlugin extends PluginBase {
 			if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
 				EntityMoveEvent event = new EntityMoveEvent();
 				for (WorldServer world : WorldUtil.getWorlds()) {
-					for (Entity entity : WorldUtil.getEntities(world)) {
+					for (net.minecraft.server.Entity entity : WorldUtil.getEntities(world)) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
 
@@ -135,7 +216,6 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public boolean command(CommandSender sender, String command, String[] args) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

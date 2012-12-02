@@ -1,12 +1,15 @@
 package com.bergerkiller.bukkit.common.permissions;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
-public class PermissionEnum implements IPermissionDefault {
+/**
+ * Basic implementation of IPermissionDefault that supplies additional function routines
+ */
+public abstract class PermissionEnum implements IPermissionDefault {
 	private final String node;
 	private final String name;
 	private final PermissionDefault def;
@@ -20,11 +23,16 @@ public class PermissionEnum implements IPermissionDefault {
 		this.node = node;
 		this.def = def;
 		this.desc = description;
-		StringBuilder builder = new StringBuilder(this.node);
-		for (int i = 0; i < argCount; i++) {
-			builder.append(".*");
-		}
-		this.name = builder.toString();
+		this.name = this.node + StringUtil.getFilledString(".*", argCount);
+	}
+
+	/**
+	 * Gets the root name of this Permission, the node name excluding appended * parts for arguments
+	 * 
+	 * @return permission root name
+	 */
+	public String getRootName() {
+		return this.node;
 	}
 
 	@Override
@@ -47,27 +55,90 @@ public class PermissionEnum implements IPermissionDefault {
 		return this.desc;
 	}
 
-	public boolean hasGlobal(Player player, String... args) {
-		return has(player, name) || has(player, "*");
+	/**
+	 * Checks whether a CommandSender has this permission<br>
+	 * If the sender does not have this permission, the message specified is sent
+	 * 
+	 * @param sender to check the permission for
+	 * @param message to send if the sender has no permission
+	 * @return True if the sender has permission, False if not
+	 */
+	public boolean handleMsg(CommandSender sender, String message) {
+		return handleMsg(sender, message, StringUtil.EMPTY_ARRAY);
 	}
 
-	public boolean hasGlobal(CommandSender sender, String name1, String name2) {
-		return has(sender, name1, name2) || has(sender, name1, "*") || has(sender, "*", name2) || has(sender, "*", "*");
-	}
-
-	public boolean has(CommandSender sender) {
-		return has(sender, new String[0]);
-	}
-
-	public boolean has(CommandSender sender, String... args) {
-		String node = this.node;
-		if (args.length > 0) {
-			StringBuilder builder = new StringBuilder(node);
-			for (String arg : args) {
-				builder.append('.').append(arg);
-			}
-			node = builder.toString();
+	/**
+	 * Checks whether a CommandSender has this permission<br>
+	 * If the sender does not have this permission, the message specified is sent
+	 * 
+	 * @param sender to check the permission for
+	 * @param message to send if the sender has no permission
+	 * @param args to use for this permission node (appended to the node name)
+	 * @return True if the sender has permission, False if not
+	 */
+	public boolean handleMsg(CommandSender sender, String message, String... args) {
+		if (this.has(sender, args)) {
+			return true;
 		}
-		return CommonUtil.hasPermission(sender, node);
+		sender.sendMessage(message);
+		return false;
+	}
+
+	/**
+	 * Checks whether a CommandSender has this permission<br>
+	 * If the sender does not have this permission, a NoPermissionException is thrown
+	 * 
+	 * @param sender to check the permission for
+	 */
+	public void handle(CommandSender sender) {
+		handle(sender, StringUtil.EMPTY_ARRAY);
+	}
+
+	/**
+	 * Checks whether a CommandSender has this permission<br>
+	 * If the sender does not have this permission, a NoPermissionException is thrown
+	 * 
+	 * @param sender to check the permission for
+	 * @param args to use for this permission node (appended to the node name)
+	 */
+	public void handle(CommandSender sender, String... args) throws NoPermissionException {
+		if (!has(sender, args)) {
+			throw new NoPermissionException();
+		}
+	}
+
+	/**
+	 * Checks whether a CommandSender has this permission
+	 * 
+	 * @param sender to check the permission for
+	 * @return True if the sender has permission for this node, False if not
+	 */
+	public boolean has(CommandSender sender) {
+		return has(sender, StringUtil.EMPTY_ARRAY);
+	}
+
+	/**
+	 * Checks whether a CommandSender has this permission
+	 * 
+	 * @param sender to check the permission for
+	 * @param args to use for this permission node (appended to the node name)
+	 * @return True if the sender has permission for this node, False if not
+	 */
+	public boolean has(CommandSender sender, String... args) {
+		if (args.length == 0) {
+			// No-argument version
+			return CommonUtil.hasPermission(sender, this.node);
+		} else {
+			// Do recursive argument version
+			return check(sender, this.getRootName(), args, 0);
+		}
+	}
+
+	private static boolean check(CommandSender sender, String root, String[] args, int argIndex) {
+		if (argIndex >= args.length) {
+			return CommonUtil.hasPermission(sender, root);
+		} else {
+			return check(sender, root + "." + args[argIndex], args, argIndex + 1) || check(sender, root + ".*", args, argIndex + 1);
+		}
 	}
 }

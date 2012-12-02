@@ -13,7 +13,8 @@ import org.bukkit.map.MapFont.CharacterSprite;
 
 public class StringUtil {
 	public static final char CHAT_STYLE_CHAR = '§';
-	public static int SPACE_WIDTH = getWidth(' ');
+	public static final int SPACE_WIDTH = getWidth(' ');
+	public static final String[] EMPTY_ARRAY = new String[0];
 
 	/**
 	 * Converts a Location to a destination name.
@@ -115,6 +116,21 @@ public class StringUtil {
 			}
 		}
 		return i;
+	}
+
+	/**
+	 * Gets a String containing a given text appended n times
+	 * 
+	 * @param text to fill inside the String
+	 * @param n times to put in the String
+	 * @return new String with a length of [n * text.length()]
+	 */
+	public static String getFilledString(String text, int n) {
+		StringBuffer outputBuffer = new StringBuffer(text.length() * n);
+		for (int i = 0; i < n; i++){
+		   outputBuffer.append(text);
+		}
+		return outputBuffer.toString();
 	}
 
 	/**

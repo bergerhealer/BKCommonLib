@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.internal.CommonPermissions;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -160,14 +161,15 @@ public class CommonUtil {
 	}
 
 	/**
-	 * Checks whether a given command sender has a given permission
+	 * Checks whether a given command sender has a given permission<br>
+	 * Vault is used for permissions if available, otherwise super permissions are used
 	 * 
 	 * @param sender to check
 	 * @param permissionNode to check
 	 * @return True if the sender has permission for the node, False if not
 	 */
 	public static boolean hasPermission(CommandSender sender, String permissionNode) {
-		return CommonPermissions.has(sender, permissionNode);
+		return CommonPlugin.instance.hasPermission(sender, permissionNode);
 	}
 
 	/**
@@ -305,6 +307,39 @@ public class CommonUtil {
 			return Class.forName(path);
 		} catch (ClassNotFoundException e) {
 			return null;
+		}
+	}
+
+	/**
+	 * Gets constants of the class type statically defined in the class itself<br>
+	 * If the class is an enum, the enumeration constants are returned
+	 * 
+	 * @param theClass to get the class constants of
+	 * @return class constants defined in class 'theClass'
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] getClassConstants(Class<T> theClass) {
+		if (theClass.isEnum()) {
+			// Get using enum constants
+			return theClass.getEnumConstants();
+		} else {
+			// Get using reflection
+			try {
+				Field[] declaredFields = theClass.getDeclaredFields();
+				ArrayList<T> constants = new ArrayList<T>(declaredFields.length);
+				for (Field field : declaredFields) {
+					if (Modifier.isStatic(field.getModifiers()) && theClass.isAssignableFrom(field.getType())) {
+						T constant = (T) field.get(null);
+						if (constant != null) {
+							constants.add(constant);
+						}
+					}
+				}
+				return LogicUtil.toArray(constants, theClass);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				return LogicUtil.createArray(theClass, 0);
+			}
 		}
 	}
 }

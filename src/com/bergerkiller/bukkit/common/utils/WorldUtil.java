@@ -135,18 +135,26 @@ public class WorldUtil extends ChunkUtil {
 		return isLoaded(block.getWorld(), block.getX(), block.getY(), block.getZ());
 	}
 
-	public static boolean isLoaded(final org.bukkit.World world, double x, double y, double z) {
+	public static boolean isLoaded(org.bukkit.World world, double x, double y, double z) {
 		return isLoaded(world, MathUtil.locToChunk(x), MathUtil.locToChunk(z));
 	}
 
-	public static boolean isLoaded(final org.bukkit.World world, int x, int y, int z) {
+	public static boolean isLoaded(org.bukkit.World world, int x, int y, int z) {
 		return isLoaded(world, x >> 4, z >> 4);
 	}
 
-	public static boolean isLoaded(final org.bukkit.World world, final int chunkX, final int chunkZ) {
+	public static boolean isLoaded(org.bukkit.World world, int chunkX, int chunkZ) {
 		if (world == null) {
 			return false;
 		}
 		return world.isChunkLoaded(chunkX, chunkZ);
+	}
+
+	public static boolean areChunksLoaded(org.bukkit.World world, int chunkCenterX, int chunkCenterZ, int chunkDistance) {
+		return areBlocksLoaded(world, chunkCenterX << 4, chunkCenterZ << 4, chunkDistance << 4);
+	}
+
+	public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
+		return getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
 	}
 }

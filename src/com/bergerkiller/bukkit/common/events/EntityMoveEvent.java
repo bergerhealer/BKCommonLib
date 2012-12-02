@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.events;
 
+import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
 
@@ -16,13 +17,22 @@ public class EntityMoveEvent extends EntityEvent {
 
 	/**
 	 * Sets the Entity represented by this move event<br>
-	 * <b>Only called by the event creator!</b>
+	 * <b>Only called internally by the event creator!</b>
 	 * 
 	 * @param entity to set to
 	 */
 	public void setEntity(net.minecraft.server.Entity entity) {
 		this.nativeEntity = entity;
 		this.entity = entity.getBukkitEntity();
+	}
+
+	/**
+	 * Gets the world in which the entity moved
+	 * 
+	 * @return Last and current Entity World
+	 */
+	public World getWorld() {
+		return this.entity.getWorld();
 	}
 
 	/**

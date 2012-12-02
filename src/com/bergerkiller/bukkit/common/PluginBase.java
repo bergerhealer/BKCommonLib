@@ -1,8 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,9 @@ import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
@@ -60,6 +60,36 @@ public abstract class PluginBase extends JavaPlugin {
 	 */
 	public final String getVersion() {
 		return this.getDescription().getVersion();
+	}
+
+	/**
+	 * Gets the version of this Plugin parsed into a major-minor number.
+	 * This expects the version of the plugin to be formatted like <b>MAJOR.MINOR.REVISION.BUILD</b>
+	 * with separate parts not exceeding 100.<br>
+	 * <b>REVISION and BUILD will not be contained in this version number!</b><br><br>
+	 * 
+	 * Examples:<br>
+	 * - v1.0 = 100<br>
+	 * - v8.6 = 860<br>
+	 * - v8.06 = 806<br>
+	 * - v1.0.0 = 100<br>
+	 * - v1.81.65 = 181
+	 * 
+	 * @return version parsed to an Integer
+	 */
+	public int getVersionNumber() {
+		String ver = this.getVersion();
+		// Get first dot index
+		int dotIndex = ver.indexOf('.');
+		if (dotIndex != -1) {
+			// Get second dot index from first dot index
+			dotIndex = ver.indexOf('.', dotIndex + 1);
+			if (dotIndex != -1) {
+				// Trim this trailing part
+				ver = ver.substring(0, dotIndex);
+			}
+		}
+		return (int) (100.0 * ParseUtil.parseDouble(ver, 1.0));
 	}
 
 	/**
@@ -159,30 +189,14 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
-	 * Loads all the permissions from a Permissions enumeration<br>
+	 * Loads all the permissions from a Permissions container class<br>
 	 * If the class is not an enumeration, the static constants in the class are used instead
 	 * 
 	 * @param permissionDefaults class
 	 */
 	public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
-		if (permissionDefaults.isEnum()) {
-			// Get using enum constants
-			for (IPermissionDefault perm : permissionDefaults.getEnumConstants()) {
-				this.loadPermission(perm);
-			}
-		} else {
-			// Get using reflection
-			try {
-				for (Field field : permissionDefaults.getDeclaredFields()) {
-					if (Modifier.isStatic(field.getModifiers())) {
-						if (IPermissionDefault.class.isAssignableFrom(field.getType())) {
-							this.loadPermission((IPermissionDefault) field.get(null));
-						}
-					}
-				}
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
+		for (IPermissionDefault def : CommonUtil.getClassConstants(permissionDefaults)) {
+			this.loadPermission(def);
 		}
 	}
 
@@ -244,12 +258,13 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
-	 * Loads all the localization defaults from a Localization enumeration
+	 * Loads all the localization defaults from a Localization container class<br>
+	 * If the class is not an enumeration, the static constants in the class are used instead
 	 * 
 	 * @param localizationDefaults class
 	 */
 	public void loadLocales(Class<? extends ILocalizationDefault> localizationDefaults) {
-		for (ILocalizationDefault def : localizationDefaults.getEnumConstants()) {
+		for (ILocalizationDefault def : CommonUtil.getClassConstants(localizationDefaults)) {
 			this.loadLocale(def);
 		}
 	}
@@ -459,7 +474,7 @@ public abstract class PluginBase extends JavaPlugin {
 
 		// header
 		this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
-		this.localizationconfig.addHeader("For colors, use the " + StringUtil.CHAT_STYLE_CHAR + " character followed up by 0 - F");
+		this.localizationconfig.addHeader("For colors, use the & character followed up by 0 - F");
 		this.localizationconfig.addHeader("Need help with this file? Please visit:");
 		this.localizationconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/localization/");
 

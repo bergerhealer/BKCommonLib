@@ -3,13 +3,22 @@ package com.bergerkiller.bukkit.common;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 public class Common {
-	public static boolean isShowcaseEnabled = false;
-	public static boolean isSCSEnabled = false;
-	public static Plugin bleedingMobsInstance = null;
-	public static int VERSION = 0;
+	/**
+	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
+	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>
+	 */
+	public static final int VERSION = 139;
+
+	/**
+	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version
+	 * 
+	 * @return BKCommonLib version number
+	 */
+	public static int getVersion() {
+		return VERSION;
+	}
 
 	/**
 	 * Handles a reflection field or method missing<br>

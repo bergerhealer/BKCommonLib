@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,6 +106,29 @@ public class LogicUtil {
 		} else {
 			return array[index];
 		}
+	}
+
+	/**
+	 * Constructs a new 1-dimensional Array of a given type and length
+	 * 
+	 * @param type of the new Array
+	 * @param length of the new Array
+	 * @return new Array
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] createArray(Class<T> type, int length) {
+		return (T[]) Array.newInstance(type, length);
+	}
+
+	/**
+	 * Converts a collection to an Array
+	 * 
+	 * @param collection to convert
+	 * @param type of the collection and the array to return
+	 * @return new Array containing the elements in the collection
+	 */
+	public static <T> T[] toArray(Collection<T> collection, Class<T> type) {
+		return collection.toArray(createArray(type, collection.size()));
 	}
 
 	/**

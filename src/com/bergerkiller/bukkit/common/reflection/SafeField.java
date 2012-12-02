@@ -138,6 +138,18 @@ public class SafeField<T> extends SafeBase {
 	}
 
 	/**
+	 * Tries to set a static Field in a certain Class
+	 * 
+	 * @param clazz to set the static field in
+	 * @param fieldname of the static field
+	 * @param value to set to
+	 * @return True if successful, False if not
+	 */
+	public static <T> boolean setStatic(Class<?> clazz, String fieldname, T value) {
+		return new SafeField<T>(clazz, fieldname).set(null, value);
+	}
+
+	/**
 	 * Tries to get a Field from a certain Object
 	 * 
 	 * @param source to get the Field from
