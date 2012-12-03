@@ -99,10 +99,10 @@ public class ChunkUtil {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
-		if (canUseLongObjectHashMap) {
-			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
-			if (chunks != null) {
-				final long key = LongHash.toLong(x, z);
+		final long key = LongHash.toLong(x, z);
+		Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
+		if (chunks != null) {
+			if (canUseLongObjectHashMap) {
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
@@ -195,9 +195,9 @@ public class ChunkUtil {
 					if (canUseLongHashSet) {
 						if (unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
 							if (unload) {
-								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
-							} else {
 								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).add(x, z);
+							} else {
+								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
 							}
 							return;
 						}

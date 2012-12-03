@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.IInventory;
+import net.minecraft.server.Item;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 
@@ -579,11 +580,29 @@ public class ItemUtil {
 	 * @param stack to get the max stacked size
 	 * @return max stacking size
 	 */
-	public static int getMaxSize(ItemStack stack) {
+	public static int getMaxSize(net.minecraft.server.ItemStack stack) {
 		if (stack == null) {
 			return 0;
 		}
-		int max = stack.getMaxStackSize();
-		return max == -1 ? 64 : max;
+		Item item = stack.getItem();
+		if (item == null) {
+			return 0;
+		} else {
+			return item.getMaxStackSize();
+		}
+	}
+
+	/**
+	 * Gets the max stacking size for a given item
+	 * 
+	 * @param stack to get the max stacked size
+	 * @return max stacking size
+	 */
+	public static int getMaxSize(ItemStack stack) {
+		if (stack == null) {
+			return 0;
+		} else {
+			return getMaxSize(getNative(stack));
+		}
 	}
 }
