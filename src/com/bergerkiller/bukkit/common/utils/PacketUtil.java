@@ -14,6 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.internal.SilentPacket;
+
 public class PacketUtil {
 	public static Packet getEntityDestroyPacket(Entity... entities) {
 		int[] ids = new int[entities.length];
@@ -23,8 +25,16 @@ public class PacketUtil {
 		return new Packet29DestroyEntity(ids);
 	}
 
+	public static void sendPacket(Player player, Packet packet) {
+		sendPacket(player, packet, true);
+	}
+
 	public static void sendPacket(Player player, Packet packet, boolean throughListeners) {
 		sendPacket(EntityUtil.getNative(player), packet, throughListeners);
+	}
+
+	public static void sendPacket(EntityPlayer player, Packet packet) {
+		sendPacket(player, packet, true);
 	}
 
 	public static void sendPacket(EntityPlayer player, Packet packet, boolean throughListeners) {
@@ -32,11 +42,10 @@ public class PacketUtil {
 			return;
 		if (player.netServerHandler == null || player.netServerHandler.disconnected)
 			return;
-		if (throughListeners) {
-			player.netServerHandler.sendPacket(packet);
-		} else if (player.netServerHandler.networkManager != null) {
-			player.netServerHandler.networkManager.queue(packet);
+		if (!throughListeners) {
+			packet = new SilentPacket(packet);
 		}
+		player.netServerHandler.sendPacket(packet);
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Packet packet, boolean throughListeners) {
