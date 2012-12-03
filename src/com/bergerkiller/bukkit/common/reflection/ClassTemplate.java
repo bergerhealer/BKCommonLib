@@ -99,9 +99,9 @@ public class ClassTemplate<T> {
 	}
 
 	/**
-	 * Checks if this Template is valid
+	 * Checks whether this Class Template is properly initialized and can be used
 	 * 
-	 * @return True if valid, False if not
+	 * @return True if this template is valid for use, False if not
 	 */
 	public boolean isValid() {
 		return this.type != null;
@@ -124,8 +124,8 @@ public class ClassTemplate<T> {
 	 * @param arguments of the method
 	 * @return method
 	 */
-	public SafeMethod getMethod(String name, Class<?>... parameterTypes) {
-		return new SafeMethod(this.getType(), name, parameterTypes);
+	public <K> SafeMethod<K> getMethod(String name, Class<?>... parameterTypes) {
+		return new SafeMethod<K>(this.getType(), name, parameterTypes);
 	}
 
 	/**

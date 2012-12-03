@@ -5,10 +5,8 @@ import net.minecraft.server.IInventory;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,11 +14,6 @@ import com.bergerkiller.bukkit.common.items.ItemParser;
 import com.bergerkiller.bukkit.common.items.SimpleInventory;
 
 public class ItemUtil {
-
-	@Deprecated
-	public static boolean isIgnored(Entity itementity) {
-		return EntityUtil.isIgnored(itementity);
-	}
 
 	public static net.minecraft.server.ItemStack getNative(ItemStack stack) {
 		if (!(stack instanceof CraftItemStack)) {
@@ -592,10 +585,5 @@ public class ItemUtil {
 		}
 		int max = stack.getMaxStackSize();
 		return max == -1 ? 64 : max;
-	}
-
-	@Deprecated
-	public static Byte getData(Material type, String name) {
-		return ParseUtil.parseMaterialData(name, type, null);
 	}
 }

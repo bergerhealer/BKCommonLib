@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.HashMap;
 
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 
@@ -9,7 +10,7 @@ import net.minecraft.server.EntityTypes;
 
 @SuppressWarnings("rawtypes")
 public class EntityTypesRef {
-	private static final SafeMethod register = new SafeMethod(EntityTypes.class, "a", Class.class, String.class, int.class);
+	private static final MethodAccessor<Void> register = new SafeMethod<Void>(EntityTypes.class, "a", Class.class, String.class, int.class);
 	public static final HashMap<String, Class> namesToClass = SafeField.get(EntityTypes.class, "b");
 	public static final HashMap<Class, String> classToNames = SafeField.get(EntityTypes.class, "c");
 	public static final HashMap<Integer, Class> idToClass = SafeField.get(EntityTypes.class, "d");

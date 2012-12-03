@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -13,7 +14,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * Wraps around the java.lang.reflect.Method class to provide an error-free alternative<br>
  * Exceptions are logged, isValid can be used to check if the Field is actually working
  */
-public class SafeMethod extends SafeBase {
+public class SafeMethod<T> implements MethodAccessor<T> {
 	private Method method;
 
 	public SafeMethod(String methodPath, Class<?>... parameterTypes) {
@@ -66,29 +67,20 @@ public class SafeMethod extends SafeBase {
 			name += parameterTypes[i].getSimpleName();
 		}
 		name += ")";
-		handleReflectionMissing("Method", name, source);
+		CommonPlugin.instance.handleReflectionMissing("Method", name, source);
 	}
 
-	/**
-	 * Checks if this Method is valid
-	 * 
-	 * @return True if valid, False if not
-	 */
+	@Override
 	public boolean isValid() {
 		return this.method != null;
 	}
 
-	/**
-	 * Executes the method
-	 * 
-	 * @param instance of the class the method is in, use null if it is a static method
-	 * @param args to use for the method
-	 * @return A possible returned value from the method, is always null if the method is a void
-	 */
-	public Object invoke(Object instance, Object... args) {
+	@Override
+	@SuppressWarnings("unchecked")
+	public T invoke(Object instance, Object... args) {
 		if (this.method != null) {
 			try {
-				return this.method.invoke(instance, args);
+				return (T) this.method.invoke(instance, args);
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {

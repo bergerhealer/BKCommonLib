@@ -5,11 +5,12 @@ import java.util.Collection;
 
 import net.minecraft.server.LongHashMap;
 
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class LongHashMapRef {
-	private static final SafeField<Object[]> entriesField = new SafeField<Object[]>(LongHashMap.class, "entries");
-	private static final SafeField<Integer> countField = new SafeField<Integer>(LongHashMap.class, "count");
+	private static final FieldAccessor<Object[]> entriesField = new SafeField<Object[]>(LongHashMap.class, "entries");
+	private static final FieldAccessor<Integer> countField = new SafeField<Integer>(LongHashMap.class, "count");
 
 	public static Collection<Object> getValues(LongHashMap instance) {
 		Object[] entries = getEntries(instance);

@@ -446,6 +446,28 @@ public class MathUtil {
 		return value < min ? min : (value > max ? max : value);
 	}
 
+	/**
+	 * Turns a value negative or keeps it positive based on a boolean input
+	 * 
+	 * @param value to work with
+	 * @param negative - True to invert, False to keep the old value
+	 * @return the value or inverted (-value)
+	 */
+	public static int invert(int value, boolean negative) {
+		return negative ? -value : value;
+	}
+
+	/**
+	 * Turns a value negative or keeps it positive based on a boolean input
+	 * 
+	 * @param value to work with
+	 * @param negative - True to invert, False to keep the old value
+	 * @return the value or inverted (-value)
+	 */
+	public static double invert(double value, boolean negative) {
+		return negative ? -value : value;
+	}
+
 	public static void setVectorLength(Vector vector, double length) {
 		setVectorLengthSquared(vector, Math.signum(length) * length * length);
 	}

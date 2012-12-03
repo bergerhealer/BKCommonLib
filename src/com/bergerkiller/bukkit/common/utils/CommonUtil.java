@@ -26,26 +26,6 @@ public class CommonUtil {
 	public static final int blockView = 32 + (view << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
 
-	@Deprecated
-	public static boolean containsChar(char value, char... values) {
-		return LogicUtil.containsChar(value, values);
-	}
-
-	@Deprecated
-	public static boolean contains(int value, int... values) {
-		return LogicUtil.containsInt(value, values);
-	}
-
-	@Deprecated
-	public static boolean contains(byte value, byte... values) {
-		return LogicUtil.containsByte(value, values);
-	}
-
-	@Deprecated
-	public static <T> boolean contains(T value, T... values) {
-		return LogicUtil.contains(value, values);
-	}
-
 	/**
 	 * Sends a message to a sender<br>
 	 * - Empty messages are ignored<br>

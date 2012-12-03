@@ -5,19 +5,15 @@ import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.Packet;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 
 public class EntityTrackerEntryRef {
 	public static final ClassTemplate<EntityTrackerEntry> TEMPLATE = ClassTemplate.create(EntityTrackerEntry.class);
-	private static final SafeMethod getSpawnPacketMethod = TEMPLATE.getMethod("b");
-	public static final SafeField<Entity> vehicle = TEMPLATE.getField("v");
-	public static final SafeField<Boolean> synched = TEMPLATE.getField("s");
-	public static final SafeField<Double> prevX = TEMPLATE.getField("p");
-	public static final SafeField<Double> prevY = TEMPLATE.getField("q");
-	public static final SafeField<Double> prevZ = TEMPLATE.getField("r");
-
-	public static Packet getSpawnPacket(EntityTrackerEntry instance) {
-		return (Packet) getSpawnPacketMethod.invoke(instance);
-	}
+	public static final MethodAccessor<Packet> getSpawnPacket = TEMPLATE.getMethod("b");
+	public static final FieldAccessor<Entity> vehicle = TEMPLATE.getField("v");
+	public static final FieldAccessor<Boolean> synched = TEMPLATE.getField("s");
+	public static final FieldAccessor<Double> prevX = TEMPLATE.getField("p");
+	public static final FieldAccessor<Double> prevY = TEMPLATE.getField("q");
+	public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("r");
 }

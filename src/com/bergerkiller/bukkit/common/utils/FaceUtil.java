@@ -114,11 +114,6 @@ public class FaceUtil {
 		return notchToFace(faceToNotch(face1) + faceToNotch(face2));
 	}
 
-	@Deprecated
-	public static BlockFace offset(BlockFace main, BlockFace offset) {
-		return add(main, offset);
-	}
-
 	/**
 	 * Gets all the individual faces represented by a Block Face<br>
 	 * - NORTH_WEST returns NORTH and WEST<br>
@@ -195,6 +190,16 @@ public class FaceUtil {
 			default:
 				return false;
 		}
+	}
+
+	/**
+	 * Checks whether a face is up or down
+	 * 
+	 * @param face to check
+	 * @return True if it is UP or DOWN
+	 */
+	public static boolean isVertical(BlockFace face) {
+		return face == BlockFace.UP || face == BlockFace.DOWN;
 	}
 
 	/**

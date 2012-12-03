@@ -5,6 +5,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -14,7 +15,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * 
  * @param <T> type of the Field
  */
-public class SafeField<T> extends SafeBase {
+public class SafeField<T> implements FieldAccessor<T> {
 	private Field field;
 
 	public SafeField(String fieldPath) {
@@ -59,39 +60,25 @@ public class SafeField<T> extends SafeBase {
 				return;
 			}
 		}
-		handleReflectionMissing("Field", name, source);
+		CommonPlugin.instance.handleReflectionMissing("Field", name, source);
 	}
 
-	/**
-	 * Checks if this Field is valid
-	 * 
-	 * @return True if valid, False if not
-	 */
+	@Override
 	public boolean isValid() {
 		return this.field != null;
 	}
 
-	/**
-	 * Transfers the value from one instance to the other
-	 * 
-	 * @param from instance
-	 * @param to instance
-	 * @return the old value of the to instance
-	 */
+	@Override
 	public T transfer(Object from, Object to) {
-		if (this.field == null)
+		if (this.field == null) {
 			return null;
+		}
 		T old = get(to);
 		set(to, get(from));
 		return old;
 	}
 
-	/**
-	 * Gets this Field from a certain Object
-	 * 
-	 * @param object to get the Field from
-	 * @return the Field value, or null if not possible
-	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public T get(Object object) {
 		if (this.field == null)
@@ -105,24 +92,18 @@ public class SafeField<T> extends SafeBase {
 		}
 	}
 
-	/**
-	 * Sets this Field on a certain Object
-	 * 
-	 * @param object to set the Field on
-	 * @param value to set to
-	 * @return True if successful, False if not
-	 */
+	@Override
 	public boolean set(Object object, T value) {
-		if (this.field == null)
-			return false;
-		try {
-			this.field.set(object, value);
-			return true;
-		} catch (Throwable t) {
-			t.printStackTrace();
-			this.field = null;
-			return false;
+		if (this.field != null) {
+			try {
+				this.field.set(object, value);
+				return true;
+			} catch (Throwable t) {
+				t.printStackTrace();
+				this.field = null;
+			}
 		}
+		return false;
 	}
 
 	/**
@@ -133,8 +114,8 @@ public class SafeField<T> extends SafeBase {
 	 * @param value to set to
 	 * @return True if successful, False if not
 	 */
-	public static <T> boolean set(Object source, String fieldname, T value) {
-		return new SafeField<T>(source, fieldname).set(source, value);
+	public static <T> void set(Object source, String fieldname, T value) {
+		new SafeField<T>(source, fieldname).set(source, value);
 	}
 
 	/**
@@ -145,8 +126,8 @@ public class SafeField<T> extends SafeBase {
 	 * @param value to set to
 	 * @return True if successful, False if not
 	 */
-	public static <T> boolean setStatic(Class<?> clazz, String fieldname, T value) {
-		return new SafeField<T>(clazz, fieldname).set(null, value);
+	public static <T> void setStatic(Class<?> clazz, String fieldname, T value) {
+		new SafeField<T>(clazz, fieldname).set(null, value);
 	}
 
 	/**

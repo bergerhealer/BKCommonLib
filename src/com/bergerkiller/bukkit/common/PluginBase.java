@@ -54,6 +54,18 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
+	 * Logs the action of a certain player
+	 * 
+	 * @param by whome the action was performed (only logged if it is a player)
+	 * @param action the player performed
+	 */
+	public void logAction(CommandSender by, String action) {
+		if (by instanceof Player) {
+			log(Level.INFO, ((Player) by).getName() + " " + action);
+		}
+	}
+
+	/**
 	 * Gets the version of this Plugin
 	 * 
 	 * @return Plugin version
@@ -423,9 +435,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * 
 	 * @return Minimum BKCommonLib version number
 	 */
-	public int getMinimumLibVersion() {
-		return 0;
-	}
+	public abstract int getMinimumLibVersion();
 
 	/**
 	 * Handles a possible throwable thrown somewhere in the Plugin<br>

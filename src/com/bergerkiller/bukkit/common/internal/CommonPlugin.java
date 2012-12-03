@@ -41,6 +41,25 @@ public class CommonPlugin extends PluginBase {
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 
+	/**
+	 * Handles the message and/or stack trace logging when something related to reflection is missing
+	 * 
+	 * @param type of thing that is missing
+	 * @param name of the thing that is missing
+	 * @param source class in which it is missing
+	 */
+	public void handleReflectionMissing(String type, String name, Class<?> source) {
+		String msg = type + " '" + name + "' does not exist in class file " + source.getSimpleName();
+		Exception ex = new Exception(msg);
+		for (StackTraceElement elem : ex.getStackTrace()) {
+			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection.classes")) {
+				log(Level.SEVERE, msg + " (Update BKCommonLib?)");
+				return;
+			}
+		}
+		ex.printStackTrace();
+	}
+
 	@SuppressWarnings("deprecation")
 	public boolean isEntityIgnored(Entity entity) {
 		if (entity instanceof Item) {

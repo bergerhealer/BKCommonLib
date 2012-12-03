@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class ConfigurationNode {
+public class ConfigurationNode implements Cloneable {
 	private final MemorySection source;
 	private final Map<String, String> headers;
 	private final Set<String> readkeys;
@@ -319,6 +319,23 @@ public class ConfigurationNode {
 	 */
 	public Set<String> getKeys() {
 		return this.source.getKeys(false);
+	}
+
+	/**
+	 * Clones this ConfigurationNode in a way that it no longer references the backing file configuration
+	 */
+	@Override
+	public ConfigurationNode clone() {
+		ConfigurationNode cloned = new ConfigurationNode();
+		cloned.setHeader(this.getHeader());
+		for (String key : this.getKeys()) {
+			if (this.isNode(key)) {
+				cloned.set(key, this.getNode(key).clone());
+			} else {
+				cloned.set(key, this.get(key));
+			}
+		}
+		return cloned;
 	}
 
 	public boolean isRead() {

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.map.MinecraftFont;
@@ -293,21 +294,6 @@ public class StringUtil {
 		return tmpargs.toArray(new String[0]);
 	}
 
-	@Deprecated
-	public static boolean isIn(String value, String... values) {
-		return LogicUtil.contains(value, values);
-	}
-
-	@Deprecated
-	public static boolean getBool(String name) {
-		return ParseUtil.parseBool(name);
-	}
-
-	@Deprecated
-	public static boolean isBool(String name) {
-		return ParseUtil.isBool(name);
-	}
-
 	/**
 	 * Checks if a given Character is a valid chat formatting code
 	 * 
@@ -345,6 +331,23 @@ public class StringUtil {
 			index += to.length(); // Move to the end of the replacement
 			index = builder.indexOf(from, index);
 		}
+	}
+
+	/**
+	 * Obtains a chat color constant from a given color code<br>
+	 * If the code is not part of a constant, the default value is returned
+	 * 
+	 * @param code of the chat color
+	 * @param def to return if not found
+	 * @return Chat Color of the code
+	 */
+	public static ChatColor getColor(char code, ChatColor def) {
+		for (ChatColor color : ChatColor.values()) {
+			if (code == color.toString().charAt(1)) {
+				return color;
+			}
+		}
+		return def;
 	}
 
 	/**

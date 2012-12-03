@@ -19,7 +19,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -197,19 +196,6 @@ public class EntityUtil extends EntityGroupingUtil {
 		if (Math.abs(MathHelper.floor(entity.locZ) - bz) > blockview)
 			return false;
 		return true;
-	}
-
-	/*
-	 * Teleport
-	 */
-	@Deprecated
-	public static boolean teleport(final Plugin plugin, Entity entity, final Location to) {
-		return teleport(getNative(entity), to);
-	}
-
-	@Deprecated
-	public static boolean teleport(final Plugin plugin, final net.minecraft.server.Entity entity, final Location to) {
-		return teleport(entity, to);
 	}
 
 	/**
