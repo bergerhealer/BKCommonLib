@@ -71,6 +71,7 @@ public class ItemUtil {
 		newItem.motX = item.motX;
 		newItem.motY = item.motY;
 		newItem.motZ = item.motZ;
+		newItem.age = item.age;
 		newItem.world.addEntity(newItem);
 		return newItem;
 	}
