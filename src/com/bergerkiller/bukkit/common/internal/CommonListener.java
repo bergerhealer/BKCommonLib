@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 @SuppressWarnings("unused")
@@ -40,7 +41,7 @@ class CommonListener implements Listener {
 		if (CommonPlugin.worldListeners.containsKey(event.getWorld())) {
 			return;
 		}
-		WorldServer world = WorldUtil.getNative(event.getWorld());
+		WorldServer world = NativeUtil.getNative(event.getWorld());
 		CommonWorldListener listener = new CommonWorldListener(world);
 		listener.enable();
 		CommonPlugin.worldListeners.put(event.getWorld(), listener);

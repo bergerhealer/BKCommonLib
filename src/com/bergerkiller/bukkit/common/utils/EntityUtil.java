@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.server.Chunk;
-import net.minecraft.server.EntityItem;
-import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.IntHashMap;
@@ -16,9 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -26,35 +21,12 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 public class EntityUtil extends EntityGroupingUtil {
 
-	/*
-	 * Entity getters
-	 */
-	public static EntityItem getNative(Item item) {
-		return getNative(item, EntityItem.class);
-	}
-
-	public static EntityMinecart getNative(Minecart m) {
-		return getNative(m, EntityMinecart.class);
-	}
-
-	public static EntityPlayer getNative(Player p) {
-		return getNative(p, EntityPlayer.class);
-	}
-
-	public static <T extends net.minecraft.server.Entity> T getNative(Entity e, Class<T> type) {
-		return CommonUtil.tryCast(getNative(e), type);
-	}
-
-	public static net.minecraft.server.Entity getNative(Entity e) {
-		return e == null ? null : ((CraftEntity) e).getHandle();
-	}
-
 	public static <T extends Entity> T getEntity(World world, UUID uid, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(world, uid), type);
 	}
 
 	public static Entity getEntity(World world, UUID uid) {
-		net.minecraft.server.Entity e = getEntity(WorldUtil.getNative(world), uid);
+		net.minecraft.server.Entity e = getEntity(NativeUtil.getNative(world), uid);
 		return e == null ? null : e.getBukkitEntity();
 	}
 
@@ -175,7 +147,7 @@ public class EntityUtil extends EntityGroupingUtil {
 	 * Is near something?
 	 */
 	public static boolean isNearChunk(Entity entity, final int cx, final int cz, final int chunkview) {
-		return isNearChunk(getNative(entity), cx, cz, chunkview);
+		return isNearChunk(NativeUtil.getNative(entity), cx, cz, chunkview);
 	}
 
 	public static boolean isNearChunk(net.minecraft.server.Entity entity, final int cx, final int cz, final int chunkview) {
@@ -187,7 +159,7 @@ public class EntityUtil extends EntityGroupingUtil {
 	}
 
 	public static boolean isNearBlock(Entity entity, final int bx, final int bz, final int blockview) {
-		return isNearBlock(getNative(entity), bx, bz, blockview);
+		return isNearBlock(NativeUtil.getNative(entity), bx, bz, blockview);
 	}
 
 	public static boolean isNearBlock(net.minecraft.server.Entity entity, final int bx, final int bz, final int blockview) {
@@ -219,7 +191,7 @@ public class EntityUtil extends EntityGroupingUtil {
 	 * @param to location to teleport to
 	 */
 	public static boolean teleport(Entity entity, final Location to) {
-		return teleport(getNative(entity), to);
+		return teleport(NativeUtil.getNative(entity), to);
 	}
 
 	/**
@@ -229,7 +201,7 @@ public class EntityUtil extends EntityGroupingUtil {
 	 * @param to location to teleport to
 	 */
 	public static boolean teleport(final net.minecraft.server.Entity entity, final Location to) {
-		WorldServer newworld = WorldUtil.getNative(to.getWorld());
+		WorldServer newworld = NativeUtil.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
 		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
 			final net.minecraft.server.Entity passenger = entity.passenger;

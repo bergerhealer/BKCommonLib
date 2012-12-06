@@ -64,10 +64,6 @@ public class EntityGroupingUtil {
 		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), monsterNames);
 	}
 
-	public static boolean isMob(net.minecraft.server.Entity entity) {
-		return isMob(entity.getBukkitEntity());
-	}
-
 	public static boolean isMob(Entity entity) {
 		return isMob(entity.getClass());
 	}
@@ -84,10 +80,6 @@ public class EntityGroupingUtil {
 		return isAnimal(entityClass) || isMonster(entityClass);
 	}
 
-	public static boolean isNPC(net.minecraft.server.Entity entity) {
-		return isNPC(entity.getBukkitEntity());
-	}
-
 	public static boolean isNPC(Entity entity) {
 		return isNPC(entity.getClass());
 	}
@@ -98,10 +90,6 @@ public class EntityGroupingUtil {
 
 	public static boolean isNPC(Class<? extends Entity> entityClass) {
 		return entityClass != null && NPC.class.isAssignableFrom(entityClass);
-	}
-
-	public static boolean isAnimal(net.minecraft.server.Entity entity) {
-		return isAnimal(entity.getBukkitEntity());
 	}
 
 	public static boolean isAnimal(Entity entity) {
@@ -120,10 +108,6 @@ public class EntityGroupingUtil {
 		return entityClass != null && (Animals.class.isAssignableFrom(entityClass) || Squid.class.isAssignableFrom(entityClass));
 	}
 
-	public static boolean isMonster(net.minecraft.server.Entity entity) {
-		return isMonster(entity.getBukkitEntity());
-	}
-
 	public static boolean isMonster(Entity entity) {
 		return isMonster(entity.getClass());
 	}
@@ -138,18 +122,6 @@ public class EntityGroupingUtil {
 
 	public static boolean isMonster(Class<? extends Entity> entityClass) {
 		return entityClass != null && (Monster.class.isAssignableFrom(entityClass) || Slime.class.isAssignableFrom(entityClass));
-	}
-
-	/**
-	 * Gets the lower-cased name of a given Entity<br>
-	 * - Items will get the name 'item' with the item type appended to it<br>
-	 * - Falling blocks will get the name 'falling' with the block type appended to it
-	 * 
-	 * @param entity to get the name of
-	 * @return Entity name
-	 */
-	public static String getName(net.minecraft.server.Entity entity) {
-		return getName(entity.getBukkitEntity());
 	}
 
 	/**

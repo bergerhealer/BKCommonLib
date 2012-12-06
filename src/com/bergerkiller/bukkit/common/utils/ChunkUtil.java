@@ -4,14 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import net.minecraft.server.Chunk;
-import net.minecraft.server.ChunkProviderServer;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldServer;
-
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.util.LongHash;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 
 /**
@@ -22,43 +20,20 @@ public class ChunkUtil {
 	private static boolean canUseLongHashSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongHashSet") != null;
 
 	/**
-	 * Gets a chunk from a world without loading or generating it
-	 * 
-	 * @param world to obtain the chunk from
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
-	 * @return The chunk, or null if it is not loaded
-	 */
-	public static org.bukkit.Chunk getChunk(org.bukkit.World world, final int x, final int z) {
-		Chunk chunk = getChunk(WorldUtil.getNative(world), x, z);
-		return chunk == null ? null : chunk.bukkitChunk;
-	}
-
-	/**
-	 * Gets all the chunks loaded on a given world
-	 * 
-	 * @param world to get the loaded chunks from
-	 * @return Loaded chunks
-	 */
-	public static Collection<Chunk> getChunks(World world) {
-		return getChunks(((WorldServer) world).chunkProviderServer);
-	}
-
-	/**
 	 * Gets all the chunks loaded on a given world
 	 * 
 	 * @param chunkprovider to get the loaded chunks from
 	 * @return Loaded chunks
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static Collection<Chunk> getChunks(ChunkProviderServer chunkprovider) {
+	public static Collection<Chunk> getChunks(World world) {
 		if (canUseLongObjectHashMap) {
-			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
+			Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							return ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values();
+							return new NativeChunkWrapper(((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values());
 						}
 					}
 				} catch (Throwable t) {
@@ -69,12 +44,7 @@ public class ChunkUtil {
 			}
 		}
 		// Bukkit alternative
-		org.bukkit.Chunk[] bChunks = chunkprovider.world.getWorld().getLoadedChunks();
-		Chunk[] rval = new Chunk[bChunks.length];
-		for (int i = 0; i < rval.length; i++) {
-			rval[i] = WorldUtil.getNative(bChunks[i]);
-		}
-		return Arrays.asList(rval);
+		return Arrays.asList(world.getLoadedChunks());
 	}
 
 	/**
@@ -85,28 +55,16 @@ public class ChunkUtil {
 	 * @param z coordinate of the chunk
 	 * @return The chunk, or null if it is not loaded
 	 */
-	public static Chunk getChunk(World world, final int x, final int z) {
-		return getChunk(((WorldServer) world).chunkProviderServer, x, z);
-	}
-
-	/**
-	 * Gets a chunk from a world without loading or generating it
-	 * 
-	 * @param chunkprovider to obtain the chunk from
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
-	 * @return The chunk, or null if it is not loaded
-	 */
 	@SuppressWarnings("rawtypes")
-	public static Chunk getChunk(ChunkProviderServer chunkprovider, final int x, final int z) {
+	public static Chunk getChunk(World world, final int x, final int z) {
 		final long key = LongHash.toLong(x, z);
-		Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
+		Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 		if (chunks != null) {
 			if (canUseLongObjectHashMap) {
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							return (Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key);
+							return ((net.minecraft.server.Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key)).bukkitChunk;
 						}
 					}
 				} catch (Throwable t) {
@@ -117,8 +75,8 @@ public class ChunkUtil {
 			}
 		}
 		// Bukkit alternative
-		if (chunkprovider.isChunkLoaded(x, z)) {
-			return chunkprovider.getChunkAt(x, z);
+		if (world.isChunkLoaded(x, z)) {
+			return world.getChunkAt(x, z);
 		} else {
 			return null;
 		}
@@ -132,28 +90,16 @@ public class ChunkUtil {
 	 * @param z coordinate of the chunk
 	 * @param chunk to set to
 	 */
-	public static void setChunk(World world, final int x, final int z, final Chunk chunk) {
-		setChunk(((WorldServer) world).chunkProviderServer, x, z, chunk);
-	}
-
-	/**
-	 * Sets a given chunk coordinate to contain the chunk specified
-	 * 
-	 * @param chunkprovider to set the chunk in
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
-	 * @param chunk to set to
-	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void setChunk(ChunkProviderServer chunkprovider, final int x, final int z, final Chunk chunk) {
+	public static void setChunk(World world, final int x, final int z, final Chunk chunk) {
 		if (canUseLongObjectHashMap) {
-			Object chunks = ChunkProviderServerRef.chunks.get(chunkprovider);
+			Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
 					if (canUseLongObjectHashMap) {
 						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, chunk);
+							((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, NativeUtil.getNative(chunk));
 							return;
 						}
 					}
@@ -176,20 +122,8 @@ public class ChunkUtil {
 	 * @param unload state to set to
 	 */
 	public static void setChunkUnloading(World world, final int x, final int z, boolean unload) {
-		setChunkUnloading(((WorldServer) world).chunkProviderServer, x, z, unload);
-	}
-
-	/**
-	 * Sets whether a given chunk coordinate has to be unloaded
-	 * 
-	 * @param chunkprovider to set the unload request for
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
-	 * @param unload state to set to
-	 */
-	public static void setChunkUnloading(ChunkProviderServer chunkprovider, final int x, final int z, boolean unload) {
 		if (canUseLongHashSet) {
-			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(chunkprovider);
+			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (unloadQueue != null) {
 				try {
 					if (canUseLongHashSet) {

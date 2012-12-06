@@ -7,13 +7,10 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftWorld;
 
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
-import net.minecraft.server.Chunk;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityTracker;
 import net.minecraft.server.EntityTrackerEntry;
@@ -50,14 +47,6 @@ public class WorldUtil extends ChunkUtil {
 		return world.entityList;
 	}
 
-	public static WorldServer getNative(org.bukkit.World world) {
-		return ((CraftWorld) world).getHandle();
-	}
-
-	public static Chunk getNative(org.bukkit.Chunk chunk) {
-		return ((CraftChunk) chunk).getHandle();
-	}
-
 	/**
 	 * Gets the Entity Tracker for the world specified
 	 * 
@@ -65,7 +54,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return world Entity Tracker
 	 */
 	public static EntityTracker getTracker(org.bukkit.World world) {
-		return getTracker(getNative(world));
+		return getTracker(NativeUtil.getNative(world));
 	}
 
 	/**
@@ -155,6 +144,6 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
-		return getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
+		return NativeUtil.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
 	}
 }

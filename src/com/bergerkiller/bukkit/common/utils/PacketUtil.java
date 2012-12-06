@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.internal.SilentPacket;
+import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
 
 public class PacketUtil {
 	public static Packet getEntityDestroyPacket(Entity... entities) {
@@ -30,7 +30,7 @@ public class PacketUtil {
 	}
 
 	public static void sendPacket(Player player, Packet packet, boolean throughListeners) {
-		sendPacket(EntityUtil.getNative(player), packet, throughListeners);
+		sendPacket(NativeUtil.getNative(player), packet, throughListeners);
 	}
 
 	public static void sendPacket(EntityPlayer player, Packet packet) {
@@ -43,13 +43,13 @@ public class PacketUtil {
 		if (player.netServerHandler == null || player.netServerHandler.disconnected)
 			return;
 		if (!throughListeners) {
-			packet = new SilentPacket(packet);
+			packet = new NativeSilentPacket(packet);
 		}
 		player.netServerHandler.sendPacket(packet);
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Packet packet, boolean throughListeners) {
-		broadcastChunkPacket(WorldUtil.getNative(chunk), packet, throughListeners);
+		broadcastChunkPacket(NativeUtil.getNative(chunk), packet, throughListeners);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,7 +68,7 @@ public class PacketUtil {
 	}
 
 	public static void broadcastBlockPacket(org.bukkit.World world, final int x, final int z, Packet packet, boolean throughListeners) {
-		broadcastBlockPacket(WorldUtil.getNative(world), x, z, packet, throughListeners);
+		broadcastBlockPacket(NativeUtil.getNative(world), x, z, packet, throughListeners);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class PacketUtil {
 	}
 
 	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Packet packet) {
-		broadcastPacketNearby(WorldUtil.getNative(world), x, y, z, radius, packet);
+		broadcastPacketNearby(NativeUtil.getNative(world), x, y, z, radius, packet);
 	}
 
 	public static void broadcastPacketNearby(World world, double x, double y, double z, double radius, Packet packet) {

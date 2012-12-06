@@ -270,7 +270,7 @@ public class BlockUtil {
 	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
 	 */
 	public static void applyPhysics(Block block, int callertypeid) {
-		WorldUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
+		NativeUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
 	}
 
 	/**
@@ -353,7 +353,7 @@ public class BlockUtil {
 
 	public static <T extends TileEntity> T getTile(Block block, Class<T> type) {
 		try {
-			return type.cast(WorldUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
+			return type.cast(NativeUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
 		} catch (Exception ex) {
 			return null;
 		}
@@ -361,7 +361,7 @@ public class BlockUtil {
 
 	public static <T extends TileEntity> T getTile(BlockState block, Class<T> type) {
 		try {
-			return type.cast(WorldUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
+			return type.cast(NativeUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
 		} catch (Exception ex) {
 			return null;
 		}
@@ -412,7 +412,7 @@ public class BlockUtil {
 	}
 
 	public static Set<TileEntity> getTileEntities(World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
-		return getTileEntities(WorldUtil.getNative(world), x, y, z, radiusX, radiusY, radiusZ);
+		return getTileEntities(NativeUtil.getNative(world), x, y, z, radiusX, radiusY, radiusZ);
 	}
 
 	private static LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
@@ -447,8 +447,8 @@ public class BlockUtil {
 		return tilebuff;
 	}
 
-	public static net.minecraft.server.World getWorld(TileEntity tile) {
-		return TileEntityRef.world.get(tile);
+	public static World getWorld(TileEntity tile) {
+		return TileEntityRef.world.get(tile).getWorld();
 	}
 
 	public static Packet getUpdatePacket(TileEntity tile) {
@@ -458,7 +458,7 @@ public class BlockUtil {
 	private static void offerTile(TileEntity tile) {
 		if (tile instanceof TileEntityChest) {
 			// find a possible double chest as well
-			net.minecraft.server.World world = getWorld(tile);
+			net.minecraft.server.World world = NativeUtil.getNative(getWorld(tile));
 			int tmpx, tmpz;
 			for (BlockFace sface : FaceUtil.axis) {
 				tmpx = tile.x + sface.getModX();
