@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -298,7 +299,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @param defaultValue for the value
 	 */
 	public void loadLocale(String path, String defaultValue) {
-		path = path.toLowerCase();
+		path = path.toLowerCase(Locale.ENGLISH);
 		if (!this.localizationconfig.contains(path)) {
 			this.localizationconfig.set(path, defaultValue);
 		}
@@ -311,7 +312,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @return The configuration node, or null if not found
 	 */
 	private ConfigurationNode getCommandNode(String command) {
-		command = command.toLowerCase();
+		command = command.toLowerCase(Locale.ENGLISH);
 		String fullPath = "commands." + command;
 		if (this.localizationconfig.isNode(fullPath)) {
 			return this.localizationconfig.getNode(fullPath);
@@ -365,7 +366,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @return Localization value
 	 */
 	public String getLocale(String path, String... arguments) {
-		path = path.toLowerCase();
+		path = path.toLowerCase(Locale.ENGLISH);
 		// First check if the path leads to a node
 		if (this.localizationconfig.isNode(path)) {
 			// Redirect to the proper sub-node
@@ -375,7 +376,7 @@ public abstract class PluginBase extends JavaPlugin {
 				StringBuilder tmpPathBuilder = new StringBuilder(path);
 				String tmpPath = path;
 				for (int i = 0; i < arguments.length; i++) {
-					tmpPath = tmpPathBuilder.append('.').append(arguments[i].toLowerCase()).toString();
+					tmpPath = tmpPathBuilder.append('.').append(arguments[i].toLowerCase(Locale.ENGLISH)).toString();
 					// New argument appended path exists, update the path
 					if (this.localizationconfig.contains(tmpPath)) {
 						newPath = tmpPath;
@@ -617,7 +618,7 @@ public abstract class PluginBase extends JavaPlugin {
 		try {
 			args = StringUtil.convertArgs(args);
 			// Default commands for all plugins
-			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(), "version", "ver")) {
+			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
 				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.instance.getVersion());
 			}
 			// Handle regularly

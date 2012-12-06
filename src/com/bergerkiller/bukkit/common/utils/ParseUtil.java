@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.bukkit.DyeColor;
@@ -126,7 +127,7 @@ public class ParseUtil {
 	 * @return True if it is a boolean, False if it isn't
 	 */
 	public static boolean isBool(String text) {
-		text = text.toLowerCase().trim();
+		text = text.toLowerCase(Locale.ENGLISH).trim();
 		return yesValues.contains(text) || noValues.contains(text);
 	}
 
@@ -137,7 +138,7 @@ public class ParseUtil {
 	 * @return Parsed value, false when not a known yes value
 	 */
 	public static boolean parseBool(String text) {
-		return yesValues.contains(text.toLowerCase().trim());
+		return yesValues.contains(text.toLowerCase(Locale.ENGLISH).trim());
 	}
 
 	/**
@@ -286,11 +287,11 @@ public class ParseUtil {
 		if (LogicUtil.nullOrEmpty(text)) {
 			return def;
 		}
-		text = text.toUpperCase().replace("_", "").replace(" ", "");
+		text = text.toUpperCase(Locale.ENGLISH).replace("_", "").replace(" ", "");
 		String[] names = new String[values.length];
 		int i;
 		for (i = 0; i < names.length; i++) {
-			names[i] = values[i].toString().toUpperCase().replace("_", "");
+			names[i] = values[i].toString().toUpperCase(Locale.ENGLISH).replace("_", "");
 			if (names[i].equals(text)) {
 				return values[i];
 			}
@@ -344,7 +345,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static TreeSpecies parseTreeSpecies(String text, TreeSpecies def) {
-		text = text.toLowerCase();
+		text = text.toLowerCase(Locale.ENGLISH);
 		if (text.contains("oak")) {
 			return TreeSpecies.GENERIC;
 		} else if (text.contains("pine") || text.contains("spruce")) {
@@ -371,7 +372,7 @@ public class ParseUtil {
 			return m == null ? def : m;
 		} catch (Exception ex) {
 		}
-		text = MAT_REPLACE.replace(text.trim().toUpperCase());
+		text = MAT_REPLACE.replace(text.trim().toUpperCase(Locale.ENGLISH));
 		return parseMaterialMain(text, def);
 	}
 
@@ -478,13 +479,13 @@ public class ParseUtil {
 				if (object instanceof Collection) {
 					Collection collection = (Collection) object;
 					StringBuilder builder = new StringBuilder(collection.size() * 100);
-					boolean first = false;
+					boolean first = true;
 					for (Object element : collection) {
 						if (!first) {
 							builder.append('\n');
 						}
 						builder.append(convert(element, String.class, ""));
-						first = true;
+						first = false;
 					}
 					rval = builder.toString();
 				} else {
@@ -500,6 +501,8 @@ public class ParseUtil {
 				rval = parseDouble(object.toString(), (Double) def);
 			} else if (type == Float.class) {
 				rval = parseFloat(object.toString(), (Float) def);
+			} else if (type == Long.class) {
+				rval = parseLong(object.toString(), (Long) def);
 			}
 		} catch (Exception ex) {
 			rval = def;

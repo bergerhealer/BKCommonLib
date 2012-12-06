@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -150,6 +151,18 @@ public class FileConfiguration extends ConfigurationNode {
 	public void save() {
 		try {
 			boolean regen = !this.exists();
+
+			// Get rid of newline characters in text - Bukkit bug prevents proper saving
+			for (String key : this.getSource().getKeys(true)) {
+				Object value = this.getSource().get(key);
+				if (value instanceof String) {
+					String text = (String) value;
+					if (text.contains("\n")) {
+						this.getSource().set(key, Arrays.asList(text.split("\n", -1)));
+					}
+				}
+			}
+
 			this.file.getAbsoluteFile().getParentFile().mkdirs();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(this.file));
 			try {

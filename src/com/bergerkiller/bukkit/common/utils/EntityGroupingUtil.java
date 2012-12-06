@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Animals;
@@ -52,15 +53,15 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isNPC(String name) {
-		return LogicUtil.contains(name.toLowerCase(), npcNames);
+		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), npcNames);
 	}
 
 	public static boolean isAnimal(String name) {
-		return LogicUtil.contains(name.toLowerCase(), animalNames);
+		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), animalNames);
 	}
 
 	public static boolean isMonster(String name) {
-		return LogicUtil.contains(name.toLowerCase(), monsterNames);
+		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), monsterNames);
 	}
 
 	public static boolean isMob(net.minecraft.server.Entity entity) {
@@ -167,14 +168,14 @@ public class EntityGroupingUtil {
 			if (mat == null || mat == Material.AIR) {
 				return "item";
 			} else {
-				return "item" + mat.toString().toLowerCase();
+				return "item" + mat.toString().toLowerCase(Locale.ENGLISH);
 			}
 		} else if (entity instanceof FallingBlock) {
 			Material mat = ((FallingBlock) entity).getMaterial();
 			if (mat == null || mat == Material.AIR) {
 				return "fallingblock";
 			} else {
-				return "falling" + mat.toString().toLowerCase();
+				return "falling" + mat.toString().toLowerCase(Locale.ENGLISH);
 			}
 		} else {
 			return getName(entity.getClass());
@@ -211,7 +212,7 @@ public class EntityGroupingUtil {
 		if (type == EntityType.OCELOT) {
 			return "ocelot";
 		}
-		return type.getName().toLowerCase();
+		return type.getName().toLowerCase(Locale.ENGLISH);
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class TimeUtil {
@@ -41,7 +42,7 @@ public class TimeUtil {
 			}
 		} catch (Exception ex) {
 			// Or some shortcuts
-			Integer time = times.get(timeName.toLowerCase());
+			Integer time = times.get(timeName.toLowerCase(Locale.ENGLISH));
 			if (time != null) {
 				return time.longValue();
 			}
