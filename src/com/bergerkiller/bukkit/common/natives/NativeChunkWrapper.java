@@ -130,7 +130,7 @@ public class NativeChunkWrapper implements Collection<Chunk> {
 		}
 		Iterator<Chunk> iter = this.iterator();
 		for (int i = 0; iter.hasNext(); i++) {
-			array[i] = (T) iter.next();
+			rval[i] = (T) iter.next();
 		}
 		return rval;
 	}

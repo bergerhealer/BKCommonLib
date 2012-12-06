@@ -1,14 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.List;
-
-import net.minecraft.server.Chunk;
-import net.minecraft.server.Entity;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet;
 import net.minecraft.server.Packet29DestroyEntity;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -17,10 +11,10 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
 
 public class PacketUtil {
-	public static Packet getEntityDestroyPacket(Entity... entities) {
+	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
 		int[] ids = new int[entities.length];
 		for (int i = 0; i < ids.length; i++) {
-			ids[i] = entities[i].id;
+			ids[i] = entities[i].getEntityId();
 		}
 		return new Packet29DestroyEntity(ids);
 	}
@@ -30,35 +24,25 @@ public class PacketUtil {
 	}
 
 	public static void sendPacket(Player player, Packet packet, boolean throughListeners) {
-		sendPacket(NativeUtil.getNative(player), packet, throughListeners);
-	}
-
-	public static void sendPacket(EntityPlayer player, Packet packet) {
-		sendPacket(player, packet, true);
-	}
-
-	public static void sendPacket(EntityPlayer player, Packet packet, boolean throughListeners) {
+		EntityPlayer ep = NativeUtil.getNative(player);
 		if (packet == null || player == null)
 			return;
-		if (player.netServerHandler == null || player.netServerHandler.disconnected)
+		if (ep.netServerHandler == null || ep.netServerHandler.disconnected)
 			return;
 		if (!throughListeners) {
 			packet = new NativeSilentPacket(packet);
 		}
-		player.netServerHandler.sendPacket(packet);
+		ep.netServerHandler.sendPacket(packet);
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Packet packet, boolean throughListeners) {
-		broadcastChunkPacket(NativeUtil.getNative(chunk), packet, throughListeners);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static void broadcastChunkPacket(Chunk chunk, Packet packet, boolean throughListeners) {
-		if (chunk == null || packet == null)
+		if (chunk == null || packet == null) {
 			return;
-		for (EntityPlayer ep : (List<EntityPlayer>) chunk.world.players) {
-			if (EntityUtil.isNearChunk(ep, chunk.x, chunk.z, CommonUtil.view)) {
-				sendPacket(ep, packet, throughListeners);
+		}
+		
+		for (Player player : WorldUtil.getPlayers(chunk.getWorld())) {
+			if (EntityUtil.isNearChunk(player, chunk.getX(), chunk.getZ(), CommonUtil.view)) {
+				sendPacket(player, packet, throughListeners);
 			}
 		}
 	}
@@ -68,23 +52,19 @@ public class PacketUtil {
 	}
 
 	public static void broadcastBlockPacket(org.bukkit.World world, final int x, final int z, Packet packet, boolean throughListeners) {
-		broadcastBlockPacket(NativeUtil.getNative(world), x, z, packet, throughListeners);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static void broadcastBlockPacket(World world, final int x, final int z, Packet packet, boolean throughListeners) {
-		if (world == null || packet == null)
+		if (world == null || packet == null) {
 			return;
-		for (EntityPlayer ep : (List<EntityPlayer>) world.players) {
-			if (EntityUtil.isNearBlock(ep, x, z, CommonUtil.blockView)) {
-				sendPacket(ep, packet, throughListeners);
+		}
+		for (Player player : WorldUtil.getPlayers(world)) {
+			if (EntityUtil.isNearBlock(player, x, z, CommonUtil.blockView)) {
+				sendPacket(player, packet, throughListeners);
 			}
 		}
 	}
 
 	public static void broadcastPacket(Packet packet, boolean throughListeners) {
-		for (EntityPlayer ep : CommonUtil.getOnlinePlayers()) {
-			sendPacket(ep, packet, throughListeners);
+		for (Player player : CommonUtil.getOnlinePlayers()) {
+			sendPacket(player, packet, throughListeners);
 		}
 	}
 
@@ -93,10 +73,6 @@ public class PacketUtil {
 	}
 
 	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Packet packet) {
-		broadcastPacketNearby(NativeUtil.getNative(world), x, y, z, radius, packet);
-	}
-
-	public static void broadcastPacketNearby(World world, double x, double y, double z, double radius, Packet packet) {
-		CommonUtil.getServerConfig().sendPacketNearby(x, y, z, radius, ((WorldServer) world).dimension, packet);
+		CommonUtil.getServerConfig().sendPacketNearby(x, y, z, radius, NativeUtil.getNative(world).dimension, packet);
 	}
 }

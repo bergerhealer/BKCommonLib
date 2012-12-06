@@ -44,6 +44,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
  * Contains utility functions to get to the net.minecraft.server core in the CraftBukkit library<br>
  * Try to avoid using this class as much as possible!
  */
+@SuppressWarnings("rawtypes")
 public class NativeUtil {
 
 	/**
@@ -148,7 +149,15 @@ public class NativeUtil {
 		return new NativeChunkWrapper(chunks);
 	}
 
-	public static Collection<org.bukkit.entity.Entity> getEntities(Collection<Entity> entities) {
-		return new NativeEntityWrapper(entities);
+	public static Collection<Player> getPlayers(Collection players) {
+		return getEntities(players, Player.class);
+	}
+
+	public static Collection<org.bukkit.entity.Entity> getEntities(Collection entities) {
+		return getEntities(entities, org.bukkit.entity.Entity.class);
+	}
+
+	public static <T extends org.bukkit.entity.Entity> Collection<T> getEntities(Collection entities, Class<T> type) {
+		return new NativeEntityWrapper<T>(entities, type);
 	}
 }

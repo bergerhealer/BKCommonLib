@@ -5,8 +5,9 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
+import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
@@ -34,7 +35,28 @@ public class WorldUtil extends ChunkUtil {
 	 * @return collection of entities on the world
 	 */
 	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-		return new NativeEntityWrapper(NativeUtil.getEntities(world));
+		return NativeUtil.getEntities(NativeUtil.getNative(world).entityList);
+	}
+
+	/**
+	 * Gets a live collection of all the entities in a chunk<br>
+	 * Changes to this collection are reflected back in the chunk
+	 * 
+	 * @param chunk for which to get the entities
+	 * @return Live collection of entities in the chunk
+	 */
+	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
+		return new NativeChunkEntitiesWrapper(chunk);
+	}
+
+	/**
+	 * Gets a live collection (allows modification in the world) of players on a given world
+	 * 
+	 * @param world the players are on
+	 * @return collection of players on the world
+	 */
+	public static Collection<Player> getPlayers(org.bukkit.World world) {
+		return NativeUtil.getPlayers(NativeUtil.getNative(world).players);
 	}
 
 	/**

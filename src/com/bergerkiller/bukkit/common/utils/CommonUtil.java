@@ -3,9 +3,8 @@ package com.bergerkiller.bukkit.common.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerConfigurationManager;
 
@@ -135,9 +134,8 @@ public class CommonUtil {
 	 * 
 	 * @return online players
 	 */
-	@SuppressWarnings("unchecked")
-	public static List<EntityPlayer> getOnlinePlayers() {
-		return (List<EntityPlayer>) getServerConfig().players;
+	public static Collection<Player> getOnlinePlayers() {
+		return NativeUtil.getPlayers(getServerConfig().players);
 	}
 
 	/**
@@ -251,8 +249,8 @@ public class CommonUtil {
 	 */
 	public static void broadcast(Object message) {
 		if (message != null) {
-			for (EntityPlayer ep : getOnlinePlayers()) {
-				ep.getBukkitEntity().sendMessage(message.toString());
+			for (Player player : getOnlinePlayers()) {
+				player.sendMessage(message.toString());
 			}
 		}
 	}

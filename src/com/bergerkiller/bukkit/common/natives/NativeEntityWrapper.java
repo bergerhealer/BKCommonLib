@@ -3,26 +3,30 @@ package com.bergerkiller.bukkit.common.natives;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.bukkit.entity.Entity;
+import net.minecraft.server.Entity;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
-public class NativeEntityWrapper implements Collection<Entity> {
-	private final Collection<net.minecraft.server.Entity> entities;
+@SuppressWarnings("rawtypes")
+public class NativeEntityWrapper<T extends org.bukkit.entity.Entity> implements Collection<T> {
+	private final Collection entities;
+	private final Class<T> type;
 
-	public NativeEntityWrapper(Collection<net.minecraft.server.Entity> entities) {
+	public NativeEntityWrapper(Collection entities, Class<T> type) {
 		this.entities = entities;
+		this.type = type;
 	}
 
 	@Override
-	public boolean add(Entity value) {
+	@SuppressWarnings("unchecked")
+	public boolean add(org.bukkit.entity.Entity value) {
 		return this.entities.add(NativeUtil.getNative(value));
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends Entity> values) {
-		for (Entity chunk : values) {
+	public boolean addAll(Collection<? extends T> values) {
+		for (org.bukkit.entity.Entity chunk : values) {
 			add(chunk);
 		}
 		return true;
@@ -35,10 +39,10 @@ public class NativeEntityWrapper implements Collection<Entity> {
 
 	@Override
 	public boolean contains(Object value) {
-		if (!(value instanceof Entity)) {
+		if (!(value instanceof org.bukkit.entity.Entity)) {
 			return false;
 		}
-		return this.entities.contains(NativeUtil.getNative((Entity) value));
+		return this.entities.contains(NativeUtil.getNative((org.bukkit.entity.Entity) value));
 	}
 
 	@Override
@@ -57,9 +61,10 @@ public class NativeEntityWrapper implements Collection<Entity> {
 	}
 
 	@Override
-	public Iterator<Entity> iterator() {
-		final Iterator<net.minecraft.server.Entity> iter = this.entities.iterator();
-		return new Iterator<Entity>() {
+	@SuppressWarnings("unchecked")
+	public Iterator<T> iterator() {
+		final Iterator<Entity> iter = this.entities.iterator();
+		return new Iterator<T>() {
 
 			@Override
 			public boolean hasNext() {
@@ -67,9 +72,8 @@ public class NativeEntityWrapper implements Collection<Entity> {
 			}
 
 			@Override
-			public Entity next() {
-				net.minecraft.server.Entity e = iter.next();
-				return e == null ? null : e.getBukkitEntity();
+			public T next() {
+				return NativeUtil.getEntity(iter.next(), NativeEntityWrapper.this.type);
 			}
 
 			@Override
@@ -81,10 +85,10 @@ public class NativeEntityWrapper implements Collection<Entity> {
 
 	@Override
 	public boolean remove(Object value) {
-		if (!(value instanceof Entity)) {
+		if (!(value instanceof org.bukkit.entity.Entity)) {
 			return false;
 		}
-		return this.entities.remove(NativeUtil.getNative((Entity) value));
+		return this.entities.remove(NativeUtil.getNative((org.bukkit.entity.Entity) value));
 	}
 
 	@Override
@@ -112,7 +116,7 @@ public class NativeEntityWrapper implements Collection<Entity> {
 	@Override
 	public Object[] toArray() {
 		Object[] array = new Object[this.size()];
-		Iterator<Entity> iter = this.iterator();
+		Iterator<T> iter = this.iterator();
 		for (int i = 0; i < array.length; i++) {
 			array[i] = iter.next();
 		}
@@ -121,17 +125,14 @@ public class NativeEntityWrapper implements Collection<Entity> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T[] toArray(T[] array) {
-		T[] rval;
-		if (array.length >= this.size()) {
-			rval = array;
-		} else {
-			rval = (T[]) LogicUtil.createArray(array.getClass().getComponentType(), this.size());
+	public <K> K[] toArray(K[] array) {
+		if (this.size() > array.length) {
+			array = (K[]) LogicUtil.createArray(array.getClass().getComponentType(), this.size());
 		}
-		Iterator<Entity> iter = this.iterator();
+		Iterator<T> iter = this.iterator();
 		for (int i = 0; iter.hasNext(); i++) {
-			array[i] = (T) iter.next();
+			array[i] = (K) iter.next();
 		}
-		return rval;
+		return array;
 	}
 }
