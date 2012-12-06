@@ -1,6 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import net.minecraft.server.ChunkCoordIntPair;
+import net.minecraft.server.EntityHuman;
+
+import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
 
@@ -50,5 +56,47 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 
 	public static void setLastZ(Entity entity, double value) {
 		NativeUtil.getNative(entity).lastZ = value;
+	}
+
+	public static void queueChunkSend(Player player, Chunk chunk) {
+		queueChunkSend(player, chunk.getX(), chunk.getZ());
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
+		NativeUtil.getNative(player).chunkCoordIntPairQueue.add(new ChunkCoordIntPair(chunkX, chunkZ));
+	}
+
+	public static void cancelChunkSend(Player player, Chunk chunk) {
+		cancelChunkSend(player, chunk.getX(), chunk.getZ());
+	}
+
+	public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
+		NativeUtil.getNative(player).chunkCoordIntPairQueue.remove(new ChunkCoordIntPair(chunkX, chunkZ));
+	}
+
+	/**
+	 * Sets the invulerability state of an Entity
+	 * 
+	 * @param entity to set it for
+	 * @param state to set to
+	 */
+	public static void setInvulnerable(Entity entity, boolean state) {
+		if (entity instanceof HumanEntity) {
+			NativeUtil.getNative(entity, EntityHuman.class).abilities.isInvulnerable = state;
+		}
+	}
+
+	/**
+	 * Gets the invulerability state of an Entity
+	 * 
+	 * @param entity to get it for
+	 * @return invulnerability state
+	 */
+	public static boolean isInvulnerable(org.bukkit.entity.Entity entity) {
+		if (entity instanceof HumanEntity) {
+			return NativeUtil.getNative(entity, EntityHuman.class).abilities.isInvulnerable;
+		}
+		return false;
 	}
 }

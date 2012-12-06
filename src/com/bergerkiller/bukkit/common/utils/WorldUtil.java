@@ -20,6 +20,17 @@ import net.minecraft.server.WorldServer;
 public class WorldUtil extends ChunkUtil {
 
 	/**
+	 * Removes a single entity from the world
+	 * 
+	 * @param entity to remove
+	 */
+	public static void removeEntity(org.bukkit.entity.Entity entity) {
+		Entity e = NativeUtil.getNative(entity);
+		e.world.removeEntity(e);
+		getTracker(entity.getWorld()).untrackEntity(e);
+	}
+
+	/**
 	 * Removes a world from all global locations where worlds are mapped
 	 * 
 	 * @param world to remove

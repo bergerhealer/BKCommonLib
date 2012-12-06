@@ -2,10 +2,10 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.HashSet;
 
-import net.minecraft.server.ChunkCoordinates;
-
 import org.bukkit.World;
 import org.bukkit.block.Block;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 public class BlockSet extends HashSet<BlockLocation> {
 	private static final long serialVersionUID = 1L;
@@ -18,11 +18,11 @@ public class BlockSet extends HashSet<BlockLocation> {
 		return this.contains(world.getName(), x, y, z);
 	}
 
-	public boolean contains(World world, ChunkCoordinates coord) {
+	public boolean contains(World world, IntVector3 coord) {
 		return this.contains(world.getName(), coord.x, coord.y, coord.z);
 	}
 
-	public boolean contains(final String world, ChunkCoordinates coord) {
+	public boolean contains(final String world, IntVector3 coord) {
 		return this.contains(world, coord.x, coord.y, coord.z);
 	}
 
@@ -38,11 +38,11 @@ public class BlockSet extends HashSet<BlockLocation> {
 		return this.remove(world.getName(), x, y, z);
 	}
 
-	public boolean remove(World world, ChunkCoordinates coord) {
+	public boolean remove(World world, IntVector3 coord) {
 		return this.remove(world.getName(), coord.x, coord.y, coord.z);
 	}
 
-	public boolean remove(final String world, ChunkCoordinates coord) {
+	public boolean remove(final String world, IntVector3 coord) {
 		return this.remove(world, coord.x, coord.y, coord.z);
 	}
 
@@ -58,11 +58,11 @@ public class BlockSet extends HashSet<BlockLocation> {
 		return this.add(world.getName(), x, y, z);
 	}
 
-	public boolean add(World world, ChunkCoordinates coord) {
+	public boolean add(World world, IntVector3 coord) {
 		return this.add(world.getName(), coord.x, coord.y, coord.z);
 	}
 
-	public boolean add(final String world, ChunkCoordinates coord) {
+	public boolean add(final String world, IntVector3 coord) {
 		return this.add(world, coord.x, coord.y, coord.z);
 	}
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.server.Chunk;
+import net.minecraft.server.Entity;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.IntHashMap;
@@ -13,7 +14,6 @@ import net.minecraft.server.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -21,22 +21,34 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 public class EntityUtil extends EntityPropertyUtil {
 
-	public static <T extends Entity> T getEntity(World world, UUID uid, Class<T> type) {
+	public static <T extends org.bukkit.entity.Entity> T getEntity(World world, UUID uid, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(world, uid), type);
 	}
 
-	public static Entity getEntity(World world, UUID uid) {
+	public static org.bukkit.entity.Entity getEntity(World world, UUID uid) {
 		net.minecraft.server.Entity e = getEntity(NativeUtil.getNative(world), uid);
 		return e == null ? null : e.getBukkitEntity();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static net.minecraft.server.Entity getEntity(net.minecraft.server.World world, UUID uid) {
-		for (net.minecraft.server.Entity e : (List<net.minecraft.server.Entity>) world.entityList) {
+	public static Entity getEntity(net.minecraft.server.World world, UUID uid) {
+		for (Entity e : (List<Entity>) world.entityList) {
 			if (e.uniqueId.equals(uid))
 				return e;
 		}
 		return null;
+	}
+
+	/**
+	 * Adds a single entity to the server
+	 * 
+	 * @param entity to add
+	 */
+	public static void addEntity(org.bukkit.entity.Entity entity) {
+		Entity nmsentity = NativeUtil.getNative(entity);
+		nmsentity.world.getChunkAt(MathUtil.locToChunk(nmsentity.locX), MathUtil.locToChunk(nmsentity.locZ));
+		nmsentity.dead = false;
+		nmsentity.world.addEntity(nmsentity);
 	}
 
 	/**
@@ -46,7 +58,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param toReplace Entity, which will be removed
 	 * @param with Entity, which will be added in its place
 	 */
-	public static void setEntity(net.minecraft.server.Entity toreplace, net.minecraft.server.Entity with) {
+	public static void setEntity(Entity toreplace, net.minecraft.server.Entity with) {
 		setEntity(toreplace, with, WorldUtil.getTrackerEntry(toreplace));
 	}
 
@@ -139,14 +151,14 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to check
 	 * @return True if the entity should be ignored, False if not
 	 */
-	public static boolean isIgnored(Entity entity) {
+	public static boolean isIgnored(org.bukkit.entity.Entity entity) {
 		return CommonPlugin.getInstance().isEntityIgnored(entity);
 	}
 
 	/*
 	 * Is near something?
 	 */
-	public static boolean isNearChunk(Entity entity, final int cx, final int cz, final int chunkview) {
+	public static boolean isNearChunk(org.bukkit.entity.Entity entity, final int cx, final int cz, final int chunkview) {
 		return isNearChunk(NativeUtil.getNative(entity), cx, cz, chunkview);
 	}
 
@@ -158,7 +170,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		return true;
 	}
 
-	public static boolean isNearBlock(Entity entity, final int bx, final int bz, final int blockview) {
+	public static boolean isNearBlock(org.bukkit.entity.Entity entity, final int bx, final int bz, final int blockview) {
 		return isNearBlock(NativeUtil.getNative(entity), bx, bz, blockview);
 	}
 
@@ -176,7 +188,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to teleport
 	 * @param to location to teleport to
 	 */
-	public static void teleportNextTick(final Entity entity, final Location to) {
+	public static void teleportNextTick(final org.bukkit.entity.Entity entity, final Location to) {
 		CommonUtil.nextTick(new Runnable() {
 			public void run() {
 				teleport(entity, to);
@@ -190,7 +202,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to teleport
 	 * @param to location to teleport to
 	 */
-	public static boolean teleport(Entity entity, final Location to) {
+	public static boolean teleport(org.bukkit.entity.Entity entity, final Location to) {
 		return teleport(NativeUtil.getNative(entity), to);
 	}
 

@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import net.minecraft.server.Block;
+
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
@@ -50,7 +51,7 @@ public class MaterialUtil {
 	 * @param types to look in
 	 * @return True if the material is contained
 	 */
-	public static boolean isType(Block block, Material... types) {
+	public static boolean isType(org.bukkit.block.Block block, Material... types) {
 		return isType(block.getTypeId(), types);
 	}
 
@@ -61,7 +62,7 @@ public class MaterialUtil {
 	 * @param types to look in
 	 * @return True if the material is contained
 	 */
-	public static boolean isType(Block block, int... types) {
+	public static boolean isType(org.bukkit.block.Block block, int... types) {
 		return isType(block.getTypeId(), types);
 	}
 
@@ -140,6 +141,16 @@ public class MaterialUtil {
 		public Boolean get(int typeId) {
 			net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
 			return block == null ? false : block.isPowerSource();
+		}
+	};
+
+	/**
+	 * Gets the amount of light a block material emits
+	 */
+	public static final MaterialProperty<Integer> EMISSION = new MaterialProperty<Integer>() {
+		@Override
+		public Integer get(int typeId) {
+			return Block.lightEmission[typeId];
 		}
 	};
 

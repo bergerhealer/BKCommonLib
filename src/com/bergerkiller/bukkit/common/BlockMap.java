@@ -2,19 +2,19 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.HashMap;
 
-import net.minecraft.server.ChunkCoordinates;
-
 import org.bukkit.World;
 import org.bukkit.block.Block;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 public class BlockMap<T> extends HashMap<BlockLocation, T> {
 	private static final long serialVersionUID = 1L;
 
-	public boolean containsKey(World world, ChunkCoordinates coord) {
+	public boolean containsKey(World world, IntVector3 coord) {
 		return this.containsKey(world.getName(), coord);
 	}
 
-	public boolean containsKey(final String world, ChunkCoordinates coord) {
+	public boolean containsKey(final String world, IntVector3 coord) {
 		return this.containsKey(world, coord.x, coord.y, coord.z);
 	}
 
@@ -26,11 +26,11 @@ public class BlockMap<T> extends HashMap<BlockLocation, T> {
 		return super.containsKey(new BlockLocation(block));
 	}
 
-	public T get(World world, ChunkCoordinates coord) {
+	public T get(World world, IntVector3 coord) {
 		return this.get(world.getName(), coord);
 	}
 
-	public T get(final String world, ChunkCoordinates coord) {
+	public T get(final String world, IntVector3 coord) {
 		return this.get(world, coord.x, coord.y, coord.z);
 	}
 
@@ -46,11 +46,11 @@ public class BlockMap<T> extends HashMap<BlockLocation, T> {
 		return super.get(new BlockLocation(block));
 	}
 
-	public T put(World world, ChunkCoordinates coord, T value) {
+	public T put(World world, IntVector3 coord, T value) {
 		return this.put(world.getName(), coord, value);
 	}
 
-	public T put(final String world, ChunkCoordinates coord, T value) {
+	public T put(final String world, IntVector3 coord, T value) {
 		return this.put(world, coord.x, coord.y, coord.z, value);
 	}
 
@@ -66,11 +66,11 @@ public class BlockMap<T> extends HashMap<BlockLocation, T> {
 		return super.put(new BlockLocation(world, x, y, z), value);
 	}
 
-	public T remove(World world, ChunkCoordinates coord) {
+	public T remove(World world, IntVector3 coord) {
 		return this.remove(world.getName(), coord);
 	}
 
-	public T remove(final String world, ChunkCoordinates coord) {
+	public T remove(final String world, IntVector3 coord) {
 		return this.remove(world, coord.x, coord.y, coord.z);
 	}
 
