@@ -168,7 +168,7 @@ public class EntityUtil extends EntityGroupingUtil {
 	 * @return True if the entity should be ignored, False if not
 	 */
 	public static boolean isIgnored(Entity entity) {
-		return CommonPlugin.instance.isEntityIgnored(entity);
+		return CommonPlugin.getInstance().isEntityIgnored(entity);
 	}
 
 	/*

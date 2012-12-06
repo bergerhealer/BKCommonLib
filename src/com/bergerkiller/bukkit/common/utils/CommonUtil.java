@@ -149,7 +149,7 @@ public class CommonUtil {
 	 * @return True if the sender has permission for the node, False if not
 	 */
 	public static boolean hasPermission(CommandSender sender, String permissionNode) {
-		return CommonPlugin.instance.hasPermission(sender, permissionNode);
+		return CommonPlugin.getInstance().hasPermission(sender, permissionNode);
 	}
 
 	/**

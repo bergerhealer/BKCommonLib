@@ -67,7 +67,7 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 			name += parameterTypes[i].getSimpleName();
 		}
 		name += ")";
-		CommonPlugin.instance.handleReflectionMissing("Method", name, source);
+		CommonPlugin.getInstance().handleReflectionMissing("Method", name, source);
 	}
 
 	@Override

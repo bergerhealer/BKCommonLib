@@ -28,7 +28,7 @@ import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
 public class CommonPlugin extends PluginBase {
-	public static CommonPlugin instance;
+	private static CommonPlugin instance;
 	public static final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	protected static final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	public static final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
@@ -40,6 +40,10 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
+
+	public static CommonPlugin getInstance() {
+		return instance;
+	}
 
 	/**
 	 * Handles the message and/or stack trace logging when something related to reflection is missing

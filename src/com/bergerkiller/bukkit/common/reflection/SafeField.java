@@ -60,7 +60,7 @@ public class SafeField<T> implements FieldAccessor<T> {
 				return;
 			}
 		}
-		CommonPlugin.instance.handleReflectionMissing("Field", name, source);
+		CommonPlugin.getInstance().handleReflectionMissing("Field", name, source);
 	}
 
 	@Override

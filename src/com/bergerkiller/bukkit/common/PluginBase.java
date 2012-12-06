@@ -619,7 +619,7 @@ public abstract class PluginBase extends JavaPlugin {
 			args = StringUtil.convertArgs(args);
 			// Default commands for all plugins
 			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
-				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.instance.getVersion());
+				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.getInstance().getVersion());
 			}
 			// Handle regularly
 			if (command(sender, command, args)) {
