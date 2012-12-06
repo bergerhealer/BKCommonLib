@@ -1,13 +1,13 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
@@ -20,7 +20,25 @@ import net.minecraft.server.WorldServer;
 public class WorldUtil extends ChunkUtil {
 
 	/**
-	 * Obtains the internally stored collection of worlds
+	 * Removes a world from all global locations where worlds are mapped
+	 * 
+	 * @param world to remove
+	 */
+	public static void removeWorld(org.bukkit.World world) {
+		// Remove the world from the Bukkit worlds mapping
+		Iterator<org.bukkit.World> iter = CraftServerRef.worlds.values().iterator();
+		while (iter.hasNext()) {
+			if (iter.next() == world) {
+				iter.remove();
+			}
+		}
+		// Remove the world from the MinecraftServer worlds mapping
+		NativeUtil.getWorlds().remove(NativeUtil.getNative(world));
+	}
+
+	/**
+	 * Obtains the internally stored collection of worlds<br>
+	 * Gets the values from the CraftServer.worlds map
 	 * 
 	 * @return A collection of World instances
 	 */
@@ -36,17 +54,6 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
 		return NativeUtil.getEntities(NativeUtil.getNative(world).entityList);
-	}
-
-	/**
-	 * Gets a live collection of all the entities in a chunk<br>
-	 * Changes to this collection are reflected back in the chunk
-	 * 
-	 * @param chunk for which to get the entities
-	 * @return Live collection of entities in the chunk
-	 */
-	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
-		return new NativeChunkEntitiesWrapper(chunk);
 	}
 
 	/**

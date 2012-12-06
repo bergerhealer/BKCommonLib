@@ -41,8 +41,9 @@ public class ItemUtil {
 	 * @param item to respawn
 	 * @return Respawned item
 	 */
-	public static EntityItem respawnItem(EntityItem item) {
-		item.dead = true;
+	public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item bitem) {
+		bitem.remove();
+		EntityItem item = NativeUtil.getNative(bitem);
 		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.itemStack);
 		newItem.fallDistance = item.fallDistance;
 		newItem.fireTicks = item.fireTicks;
@@ -52,7 +53,7 @@ public class ItemUtil {
 		newItem.motZ = item.motZ;
 		newItem.age = item.age;
 		newItem.world.addEntity(newItem);
-		return newItem;
+		return NativeUtil.getItem(newItem);
 	}
 
 	/**

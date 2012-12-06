@@ -68,10 +68,6 @@ public class ItemParser {
 		return parser;
 	}
 
-	public boolean match(net.minecraft.server.ItemStack stack) {
-		return this.match(stack.id, stack.getData());
-	}
-
 	public boolean match(ItemStack stack) {
 		return this.match(stack.getTypeId(), stack.getData().getData());
 	}

@@ -48,15 +48,17 @@ import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 public class NativeUtil {
 
 	/**
-	 * Obtains the internal list of native Minecraft server worlds
+	 * Obtains the internal list of native Minecraft server worlds<br>
+	 * Gets the MinecraftServer.worlds value
 	 * 
 	 * @return A list of WorldServer instances
 	 */
 	public static List<WorldServer> getWorlds() {
 		try {
 			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
-			if (worlds != null)
+			if (worlds != null) {
 				return worlds;
+			}
 		} catch (NullPointerException ex) {
 		}
 		return new ArrayList<WorldServer>();
@@ -129,6 +131,14 @@ public class NativeUtil {
 		return chest instanceof CraftChest ? BlockStateRef.CHEST.get(chest) : null;
 	}
 
+	public static Player getPlayer(EntityPlayer entity) {
+		return getEntity(entity, Player.class);
+	}
+
+	public static Item getItem(EntityItem entity) {
+		return getEntity(entity, Item.class);
+	}
+
 	public static <T extends org.bukkit.entity.Entity> T getEntity(Entity entity, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(entity), type);
 	}
@@ -147,6 +157,11 @@ public class NativeUtil {
 
 	public static Collection<org.bukkit.Chunk> getChunks(Collection<Chunk> chunks) {
 		return new NativeChunkWrapper(chunks);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<EntityPlayer> getOnlinePlayers() {
+		return CommonUtil.getServerConfig().players;
 	}
 
 	public static Collection<Player> getPlayers(Collection players) {

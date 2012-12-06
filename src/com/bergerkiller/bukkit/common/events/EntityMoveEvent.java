@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.events;
 
+import net.minecraft.server.Entity;
+
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
@@ -9,7 +11,7 @@ import org.bukkit.event.entity.EntityEvent;
  */
 public class EntityMoveEvent extends EntityEvent {
 	private static final HandlerList handlers = new HandlerList();
-	private net.minecraft.server.Entity nativeEntity;
+	private Entity nativeEntity;
 
 	public EntityMoveEvent() {
 		super(null);
@@ -21,7 +23,7 @@ public class EntityMoveEvent extends EntityEvent {
 	 * 
 	 * @param entity to set to
 	 */
-	public void setEntity(net.minecraft.server.Entity entity) {
+	public void setEntity(Entity entity) {
 		this.nativeEntity = entity;
 		this.entity = entity.getBukkitEntity();
 	}
