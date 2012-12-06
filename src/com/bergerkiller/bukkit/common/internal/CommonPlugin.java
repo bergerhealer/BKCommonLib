@@ -8,13 +8,13 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
+import net.minecraft.server.Entity;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.entity.CraftItem;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -23,7 +23,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -65,7 +65,7 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	@SuppressWarnings("deprecation")
-	public boolean isEntityIgnored(Entity entity) {
+	public boolean isEntityIgnored(org.bukkit.entity.Entity entity) {
 		if (entity instanceof Item) {
 			Item item = (Item) entity;
 			if (this.isShowcaseEnabled) {
@@ -180,7 +180,7 @@ public class CommonPlugin extends PluginBase {
 		instance = this;
 		// Register events and tasks, initialize
 		this.register(new CommonListener());
-		for (WorldServer world : WorldUtil.getWorlds()) {
+		for (WorldServer world : NativeUtil.getWorlds()) {
 			CommonWorldListener listener = new CommonWorldListener(world);
 			listener.enable();
 			worldListeners.put(world.getWorld(), listener);
@@ -225,11 +225,12 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private static class MoveEventHandler implements Runnable {
+		@SuppressWarnings("unchecked")
 		public void run() {
 			if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
 				EntityMoveEvent event = new EntityMoveEvent();
-				for (WorldServer world : WorldUtil.getWorlds()) {
-					for (net.minecraft.server.Entity entity : WorldUtil.getEntities(world)) {
+				for (WorldServer world : NativeUtil.getWorlds()) {
+					for (Entity entity : (List<Entity>) world.entityList) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
 

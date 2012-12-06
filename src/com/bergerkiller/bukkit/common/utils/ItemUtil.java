@@ -12,30 +12,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.items.ItemParser;
-import com.bergerkiller.bukkit.common.items.SimpleInventory;
+import com.bergerkiller.bukkit.common.natives.IInventoryBaseImpl;
 
 public class ItemUtil {
-
-	public static net.minecraft.server.ItemStack getNative(ItemStack stack) {
-		if (!(stack instanceof CraftItemStack)) {
-			stack = new CraftItemStack(stack);
-		}
-		net.minecraft.server.ItemStack rval = ((CraftItemStack) stack).getHandle();
-		if (rval == null) {
-			stack.setTypeId(1); // force the creation of a new native itemstack
-			rval = ((CraftItemStack) stack).getHandle();
-			if (rval == null) {
-				throw new RuntimeException("Native item is null when setting a valid type!");
-			}
-			rval.id = 0;
-			rval.count = 0;
-		}
-		return rval;
-	}
-
-	public static IInventory getNative(Inventory inv) {
-		return ((CraftInventory) inv).getInventory();
-	}
 
 	public static void transfer(IInventory from, IInventory to) {
 		net.minecraft.server.ItemStack[] items = from.getContents();
@@ -85,7 +64,7 @@ public class ItemUtil {
 	 * @return Amount of items in the inventory
 	 */
 	public static ItemStack findItem(Inventory inventory, int typeid, Integer data) {
-		net.minecraft.server.ItemStack item = findItem(getNative(inventory), typeid, data);
+		net.minecraft.server.ItemStack item = findItem(NativeUtil.getNative(inventory), typeid, data);
 		return item == null ? null : new CraftItemStack(item);
 	}
 
@@ -168,7 +147,7 @@ public class ItemUtil {
 	}
 
 	public static void removeItem(Inventory inventory, int itemid, Integer data, int count) {
-		removeItem(getNative(inventory), itemid, data, count);
+		removeItem(NativeUtil.getNative(inventory), itemid, data, count);
 	}
 
 	public static void removeItem(IInventory inventory, net.minecraft.server.ItemStack item) {
@@ -239,7 +218,7 @@ public class ItemUtil {
 	 * @return Whether it was possible
 	 */
 	public static boolean testTransfer(net.minecraft.server.ItemStack[] from, net.minecraft.server.ItemStack[] to) {
-		Inventory invto = new SimpleInventory(cloneItems(to)).getInventory();
+		Inventory invto = new IInventoryBaseImpl(cloneItems(to)).getInventory();
 		for (net.minecraft.server.ItemStack nitem : cloneItems(from)) {
 			ItemStack item = new CraftItemStack(nitem);
 			transfer(item, invto, Integer.MAX_VALUE);
@@ -400,8 +379,8 @@ public class ItemUtil {
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(ItemStack from, ItemStack to, int maxAmount) {
-		net.minecraft.server.ItemStack nmsFrom = getNative(from);
-		net.minecraft.server.ItemStack nmsTo = getNative(to);
+		net.minecraft.server.ItemStack nmsFrom = NativeUtil.getNative(from);
+		net.minecraft.server.ItemStack nmsTo = NativeUtil.getNative(to);
 		int trans = transfer(nmsFrom, nmsTo, maxAmount);
 		// make sure the native items are null if they are empty
 		if (nmsFrom.count == 0)
@@ -547,7 +526,7 @@ public class ItemUtil {
 					to.setTypeId(item.getTypeId());
 					to.setDurability(item.getDurability());
 				}
-				getNative(to).count = 0;
+				NativeUtil.getNative(to).count = 0;
 				all = true;
 			}
 			if (item.getTypeId() == to.getTypeId()) {
@@ -603,7 +582,7 @@ public class ItemUtil {
 		if (stack == null) {
 			return 0;
 		} else {
-			return getMaxSize(getNative(stack));
+			return getMaxSize(NativeUtil.getNative(stack));
 		}
 	}
 }

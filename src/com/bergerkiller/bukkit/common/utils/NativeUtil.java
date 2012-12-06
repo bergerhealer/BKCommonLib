@@ -1,12 +1,16 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.minecraft.server.Chunk;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityItem;
 import net.minecraft.server.EntityMinecart;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.IInventory;
+import net.minecraft.server.ItemStack;
 import net.minecraft.server.TileEntityChest;
 import net.minecraft.server.TileEntityDispenser;
 import net.minecraft.server.TileEntityFurnace;
@@ -25,9 +29,12 @@ import org.bukkit.craftbukkit.block.CraftDispenser;
 import org.bukkit.craftbukkit.block.CraftFurnace;
 import org.bukkit.craftbukkit.block.CraftSign;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
@@ -38,6 +45,44 @@ import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
  * Try to avoid using this class as much as possible!
  */
 public class NativeUtil {
+
+	/**
+	 * Obtains the internal list of native Minecraft server worlds
+	 * 
+	 * @return A list of WorldServer instances
+	 */
+	public static List<WorldServer> getWorlds() {
+		try {
+			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
+			if (worlds != null)
+				return worlds;
+		} catch (NullPointerException ex) {
+		}
+		return new ArrayList<WorldServer>();
+	}
+
+	/**
+	 * Obtains the internal list of native Entity instances in a world
+	 * 
+	 * @param world to get from
+	 * @return list of native entity instances
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Entity> getEntities(org.bukkit.World world) {
+		return getNative(world).entityList;
+	}
+
+	public static ItemStack getNative(org.bukkit.inventory.ItemStack stack) {
+		ItemStack rval = CraftItemStack.createNMSItemStack(stack);
+		if (rval == null) {
+			rval = new ItemStack(0, 0, 0);
+		}
+		return rval;
+	}
+
+	public static IInventory getNative(Inventory inv) {
+		return inv instanceof CraftInventory ? ((CraftInventory) inv).getInventory() : null;
+	}
 
 	public static EntityItem getNative(Item item) {
 		return getNative(item, EntityItem.class);

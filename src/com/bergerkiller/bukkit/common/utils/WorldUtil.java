@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
@@ -18,33 +17,24 @@ import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
+
 	/**
-	 * Obtains the internal mapping which maps worlds to world names
+	 * Obtains the internally stored collection of worlds
 	 * 
-	 * @return A map of world names as keys and Bukkit worlds as values
+	 * @return A collection of World instances
 	 */
-	public static Map<String, org.bukkit.World> getWorldsMap() {
-		return CraftServerRef.worlds.get(CommonUtil.getCraftServer());
+	public static Collection<org.bukkit.World> getWorlds() {
+		return CraftServerRef.worlds.values();
 	}
 
 	/**
-	 * Obtains the internal list of native Minecraft server worlds
+	 * Gets a live collection (allows modification in the world) of entities on a given world
 	 * 
-	 * @return A list of WorldServer instances
+	 * @param world the entities are on
+	 * @return collection of entities on the world
 	 */
-	public static List<WorldServer> getWorlds() {
-		try {
-			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
-			if (worlds != null)
-				return worlds;
-		} catch (NullPointerException ex) {
-		}
-		return new ArrayList<WorldServer>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public static List<Entity> getEntities(World world) {
-		return world.entityList;
+	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
+		return new NativeEntityWrapper(NativeUtil.getEntities(world));
 	}
 
 	/**

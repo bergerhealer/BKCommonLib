@@ -50,15 +50,11 @@ public class RecipeUtil {
 	}
 
 	public static int getFuelTime(org.bukkit.inventory.ItemStack item) {
-		if (item == null)
+		if (item == null) {
 			return 0;
-		return getFuelTime(item.getTypeId()) * item.getAmount();
-	}
-
-	public static int getFuelTime(ItemStack item) {
-		if (item == null)
-			return 0;
-		return getFuelTime(item.id) * item.count;
+		} else {
+			return getFuelTime(item.getTypeId()) * item.getAmount();
+		}
 	}
 
 	public static int getFuelTime(Material material) {
@@ -73,25 +69,17 @@ public class RecipeUtil {
 		return isFuelItem(material.getId());
 	}
 
+	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
+		return new CraftItemStack(RecipesFurnace.getInstance().getResult(itemid));
+	}
+
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-		return new CraftItemStack(getFurnaceResult(cooked.getTypeId()));
-	}
-
-	public static ItemStack getFurnaceResult(ItemStack cooked) {
-		return getFurnaceResult(cooked.id);
-	}
-
-	public static ItemStack getFurnaceResult(int itemid) {
-		return RecipesFurnace.getInstance().getResult(itemid);
+		return getFurnaceResult(cooked.getTypeId());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Map<Integer, ItemStack> getFurnaceResults() {
-		return (Map<Integer, ItemStack>) RecipesFurnace.getInstance().getRecipes();
-	}
-
 	public static Set<Integer> getHeatableItems() {
-		return getFurnaceResults().keySet();
+		return RecipesFurnace.getInstance().recipes.keySet();
 	}
 
 	public static CraftRecipe[] getCraftingRequirements(int itemid, Integer data) {
@@ -121,17 +109,14 @@ public class RecipeUtil {
 	}
 
 	public static void craftItems(int itemid, Integer data, Inventory source, int limit) {
-		craftItems(itemid, data, ItemUtil.getNative(source), limit);
-	}
-
-	public static void craftItems(int itemid, Integer data, IInventory source, int limit) {
+		IInventory nsource = NativeUtil.getNative(source);
 		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
-			limit -= rec.craftItems(source, limit);
+			limit -= rec.craftItems(nsource, limit);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<IRecipe> getCraftRecipes() {
+	private static List<IRecipe> getCraftRecipes() {
 		return (List<IRecipe>) CraftingManager.getInstance().getRecipes();
 	}
 }

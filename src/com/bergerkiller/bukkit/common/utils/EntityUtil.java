@@ -19,7 +19,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
-public class EntityUtil extends EntityGroupingUtil {
+public class EntityUtil extends EntityPropertyUtil {
 
 	public static <T extends Entity> T getEntity(World world, UUID uid, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(world, uid), type);
@@ -84,7 +84,7 @@ public class EntityUtil extends EntityGroupingUtil {
 		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(EntityRef.chunkX.get(with), EntityRef.chunkZ.get(with));
 
 		// replace the entity in the world
-		List<net.minecraft.server.Entity> worldEntities = WorldUtil.getEntities(toreplace.world);
+		List<net.minecraft.server.Entity> worldEntities = toreplace.world.entityList;
 		for (int i = 0; i < worldEntities.size(); i++) {
 			if (worldEntities.get(i).id == toreplace.id) {
 				toreplace.world.entityList.set(i, with);
