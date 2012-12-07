@@ -107,6 +107,22 @@ public class ClassTemplate<T> {
 		return this.type != null;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder(500);
+		builder.append("Class path: ").append(this.getType().getName()).append('\n');
+		builder.append("Fields (").append(this.fields.size()).append("):").append('\n');
+		for (Field field : this.fields) {
+			builder.append("    ");
+			if (Modifier.isStatic(field.getModifiers())) {
+				builder.append("Static ");
+			}
+			builder.append("Field Name = ").append(field.getName()).append(" Of type ").append(field.getType().getSimpleName());
+			builder.append('\n');
+		}
+		return builder.toString();
+	}
+	
 	/**
 	 * Attempts to find the field by name
 	 * 

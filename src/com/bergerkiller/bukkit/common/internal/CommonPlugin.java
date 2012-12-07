@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +20,13 @@ import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.bukkit.plugin.java.PluginClassLoader;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
@@ -173,6 +178,18 @@ public class CommonPlugin extends PluginBase {
 		if (entityMoveHandlerId != -1) {
 			Bukkit.getScheduler().cancelTask(entityMoveHandlerId);
 		}
+	}
+
+	@Override
+	public void onLoad() {
+		JavaPluginLoader loader = SafeField.get(getClass().getClassLoader(), "loader");
+		Map<String, PluginClassLoader> loaders = SafeField.get(loader, "loaders");
+		try {
+			loaders.put("nms", new CommonPluginClassLoader(loader, new URL[] {this.getFile().toURI().toURL()}));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		super.onLoad();
 	}
 
 	@Override
