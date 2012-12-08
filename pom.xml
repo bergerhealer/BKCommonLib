@@ -15,10 +15,12 @@
   </properties>
 
   <repositories>
+    <!-- Repo for access to Vault -->
     <repository>
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/project/Vault/LastSuccessful/repository/</url>
     </repository>
+    <!-- Repo for access to the non-package-versioned CraftBukkit -->
     <repository>
       <id>craftbukkit-nonversioned</id>
       <name>craftbukkit-nonversioned</name>
@@ -26,13 +28,13 @@
     </repository>
   </repositories>
 
-  <!-- Needed to include ASM -->
+  <!-- Repo for access to ASM and ASM Commons -->
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/plugins/tags/maven-shade-plugin-1.4</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/plugins/tags/maven-shade-plugin-1.4</developerConnection>
     <url>http://svn.apache.org/viewvc/maven/plugins/tags/maven-shade-plugin-1.4</url>
   </scm>
-  
+
   <dependencies>
     <dependency>
       <groupId>asm</groupId>
@@ -43,6 +45,12 @@
     <dependency>
       <groupId>asm</groupId>
       <artifactId>asm-commons</artifactId>
+      <version>3.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-tree</artifactId>
       <version>3.2</version>
       <scope>compile</scope>
     </dependency>
@@ -60,24 +68,24 @@
     </dependency>
     <dependency>
       <groupId>com.kellerkindt</groupId>
-      <artifactId>ShowcaseStandalone</artifactId>
+      <artifactId>ShowCaseStandalone</artifactId>
       <version>1.43</version>
       <scope>system</scope>
-      <systemPath>c:/Eclipse dependencies/ShowcaseStandalone.jar</systemPath>
+      <systemPath>${project.basedir}/lib/ShowCaseStandalone.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.narrowtux</groupId>
-      <artifactId>Showcase</artifactId>
+      <artifactId>ShowCase</artifactId>
       <version>0.7.9</version>
       <scope>system</scope>
-      <systemPath>c:/Eclipse dependencies/Showcase.jar</systemPath>
+      <systemPath>${project.basedir}/lib/ShowCase.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>me.snowleo</groupId>
       <artifactId>BleedingMobs</artifactId>
       <version>3.7</version>
       <scope>system</scope>
-      <systemPath>c:/Eclipse dependencies/BleedingMobs.jar</systemPath>
+      <systemPath>${project.basedir}/lib/BleedingMobs.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
