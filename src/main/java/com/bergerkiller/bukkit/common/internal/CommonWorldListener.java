@@ -6,20 +6,19 @@ import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.World;
 import net.minecraft.server.WorldManager;
-import net.minecraft.server.WorldServer;
 
 class CommonWorldListener extends WorldManager {
 	private boolean isEnabled = false;
 	private ArrayList<EntityPlayer> addedPlayers = new ArrayList<EntityPlayer>();
 
-	public CommonWorldListener(World world) {
-		super(CommonUtil.getMCServer(), (WorldServer) world);
+	public CommonWorldListener(org.bukkit.World world) {
+		super(CommonUtil.getMCServer(), NativeUtil.getNative(world));
 	}
 
 	public static boolean isValid() {

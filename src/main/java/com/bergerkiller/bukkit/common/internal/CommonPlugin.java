@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +16,13 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPluginLoader;
-import org.bukkit.plugin.java.PluginClassLoader;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
@@ -35,7 +31,7 @@ import com.narrowtux.showcase.Showcase;
 public class CommonPlugin extends PluginBase {
 	private static CommonPlugin instance;
 	public static final List<PluginBase> plugins = new ArrayList<PluginBase>();
-	protected static final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
+	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	public static final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private static final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private int nextTickHandlerId = -1;
@@ -45,9 +41,14 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
+	private String mc_version = "";
 
 	public static CommonPlugin getInstance() {
 		return instance;
+	}
+
+	public String getMCVersion() {
+		return this.mc_version;
 	}
 
 	/**
@@ -180,28 +181,57 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
+	private void loadMCVersion() {
+		if (CommonUtil.getClass(Common.NMS + "World") == null) {
+			StringBuilder builder = new StringBuilder();
+			for (int a = 0; a < 10; a++) {
+				for (int b = 0; b < 10; b++) {
+					for (int c = 0; c < 10; c++) {
+						// Format:
+						// net.minecraft.server.v1_4_5.*
+						builder.setLength(0);
+						builder.append(Common.NMS).append("v");
+						builder.append(a).append('_').append(b).append('_').append(c);
+						builder.append(".World");
+						if (CommonUtil.getClass(builder.toString()) != null) {
+							mc_version = "v" + a + "_" + b + "_" + c;
+							log(Level.INFO, "Detected Minecraft support for " + mc_version);
+							return;
+						}
+					}
+				}
+			}
+			throw new RuntimeException("Could not detect the current Minecraft version!");
+		}
+	}
+
+//	public static void replaceClassLoader() {
+//		ClassLoader loader = CommonPlugin.class.getClassLoader().getParent();
+//		sun.misc.URLClassPath old = SafeField.get(loader, "ucp");
+//		sun.misc.URLClassPath ucpFixed = new sun.misc.URLClassPath(new java.net.URL[0]) {
+//			public sun.misc.Resource getResource(String path, boolean check) {
+//				System.out.println(path);
+//				return super.getResource(path, check);
+//			}
+//		};
+//		ClassTemplate.create(old).transfer(old, ucpFixed);
+//		SafeField.set(loader, "ucp", ucpFixed);
+//	}
+
 	@Override
 	public void onLoad() {
-		JavaPluginLoader loader = SafeField.get(getClass().getClassLoader(), "loader");
-		Map<String, PluginClassLoader> loaders = SafeField.get(loader, "loaders");
-		try {
-			loaders.put("nms", new CommonPluginClassLoader(loader, new URL[] {this.getFile().toURI().toURL()}));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
 		super.onLoad();
+		loadMCVersion();
 	}
 
 	@Override
 	public void enable() {
 		instance = this;
+
+		CommonUtil.undoVersionPackages(getClass());
+
 		// Register events and tasks, initialize
-		this.register(new CommonListener());
-		for (WorldServer world : NativeUtil.getWorlds()) {
-			CommonWorldListener listener = new CommonWorldListener(world);
-			listener.enable();
-			worldListeners.put(world.getWorld(), listener);
-		}
+		//register(CommonListener.class);
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
 

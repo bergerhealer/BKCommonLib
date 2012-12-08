@@ -4,7 +4,22 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 public class Common {
+	public static final String NMS = "net.minecraft.server.";
+	public static final String CB = "org.bukkit.craftbukkit.";
+
+	/**
+	 * Gets the Minecraft version<br>
+	 * If none is enforced, an empty String is returned
+	 * 
+	 * @return Minecraft version
+	 */
+	public static String getMCVersion() {
+		return CommonPlugin.getInstance().getMCVersion();
+	}
+
 	/**
 	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
 	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>

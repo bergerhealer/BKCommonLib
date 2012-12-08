@@ -115,9 +115,9 @@ public class ClassTemplate<T> {
 		for (Field field : this.fields) {
 			builder.append("    ");
 			if (Modifier.isStatic(field.getModifiers())) {
-				builder.append("Static ");
+				builder.append("static ");
 			}
-			builder.append("Field Name = ").append(field.getName()).append(" Of type ").append(field.getType().getSimpleName());
+			builder.append(field.getType().getName()).append(" ").append(field.getName());
 			builder.append('\n');
 		}
 		return builder.toString();
@@ -152,6 +152,18 @@ public class ClassTemplate<T> {
 	 */
 	public static ClassTemplate<?> create(String path) {
 		return create(CommonUtil.getClass(path));
+	}
+
+	/**
+	 * Attempts to create a new template for the class of the class instance specified<br>
+	 * If something fails, an empty instance is returned
+	 * 
+	 * @param value of the class to create the template for
+	 * @return a new template
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> ClassTemplate<T> create(T value) {
+		return create((Class<T>) value.getClass());
 	}
 
 	/**

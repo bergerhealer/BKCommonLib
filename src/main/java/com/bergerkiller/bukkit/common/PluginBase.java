@@ -183,6 +183,9 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @param listener to register
 	 */
 	public final void register(Listener listener) {
+		if (listener == null) {
+			throw new RuntimeException("Can not load a listener: The listener instance is null");
+		}
 		if (listener != this) {
 			Bukkit.getPluginManager().registerEvents(listener, this);
 		}
@@ -194,6 +197,9 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @param listener class to register
 	 */
 	public final void register(Class<? extends Listener> listener) {
+		if (listener == null) {
+			throw new RuntimeException("Can not load a listener: The listener class is null");
+		}
 		try {
 			this.register(listener.newInstance());
 		} catch (Exception e) {
