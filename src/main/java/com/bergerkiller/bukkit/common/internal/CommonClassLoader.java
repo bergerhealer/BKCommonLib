@@ -22,11 +22,6 @@ public class CommonClassLoader extends URLClassLoader {
         this.loader = SafeField.get(base, "loader");
     }
 
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return findClass(name, true);
-    }
-
 	@Override
 	protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		if (name.startsWith(Common.NMS)) {

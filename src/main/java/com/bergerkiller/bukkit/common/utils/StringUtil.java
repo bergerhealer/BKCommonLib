@@ -13,7 +13,7 @@ import org.bukkit.map.MinecraftFont;
 import org.bukkit.map.MapFont.CharacterSprite;
 
 public class StringUtil {
-	public static final char CHAT_STYLE_CHAR = '§';
+	public static final char CHAT_STYLE_CHAR = '\u00A7';
 	public static final int SPACE_WIDTH = getWidth(' ');
 	public static final String[] EMPTY_ARRAY = new String[0];
 

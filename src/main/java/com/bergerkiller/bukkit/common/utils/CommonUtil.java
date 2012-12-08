@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerConfigurationManager;
@@ -41,7 +40,7 @@ public class CommonUtil {
 			return; // Not needed
 		}
 		ClassLoader loader = pluginClass.getClassLoader();
-		SafeField.set(loader, "parent", new CommonClassLoader(loader.getParent()));
+		SafeField.set(loader, "parent", new CommonClassLoader((PluginClassLoader) loader));
 	}
 
 	/**
