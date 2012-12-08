@@ -19,6 +19,11 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/project/Vault/LastSuccessful/repository/</url>
     </repository>
+    <repository>
+      <id>craftbukkit-nonversioned</id>
+      <name>craftbukkit-nonversioned</name>
+      <url>http://repo.xemsdoom.com/content/repositories/craftbukkit-nonversioned</url>
+    </repository>
   </repositories>
 
   <!-- Needed to include ASM -->
@@ -32,6 +37,12 @@
     <dependency>
       <groupId>asm</groupId>
       <artifactId>asm</artifactId>
+      <version>3.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-commons</artifactId>
       <version>3.2</version>
       <scope>compile</scope>
     </dependency>

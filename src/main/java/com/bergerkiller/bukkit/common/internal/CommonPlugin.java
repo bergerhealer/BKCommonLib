@@ -16,7 +16,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
@@ -41,14 +40,18 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
-	private String mc_version = "";
+	private static String mc_version = "";
+
+	static {
+		Common.undoPackageVersioning(CommonPlugin.class);
+	}
 
 	public static CommonPlugin getInstance() {
 		return instance;
 	}
 
-	public String getMCVersion() {
-		return this.mc_version;
+	public static String getMCVersion() {
+		return mc_version;
 	}
 
 	/**
@@ -181,54 +184,9 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
-	private void loadMCVersion() {
-		if (CommonUtil.getClass(Common.NMS + "World") == null) {
-			StringBuilder builder = new StringBuilder();
-			for (int a = 0; a < 10; a++) {
-				for (int b = 0; b < 10; b++) {
-					for (int c = 0; c < 10; c++) {
-						// Format:
-						// net.minecraft.server.v1_4_5.*
-						builder.setLength(0);
-						builder.append(Common.NMS).append("v");
-						builder.append(a).append('_').append(b).append('_').append(c);
-						builder.append(".World");
-						if (CommonUtil.getClass(builder.toString()) != null) {
-							mc_version = "v" + a + "_" + b + "_" + c;
-							log(Level.INFO, "Detected Minecraft support for " + mc_version);
-							return;
-						}
-					}
-				}
-			}
-			throw new RuntimeException("Could not detect the current Minecraft version!");
-		}
-	}
-
-//	public static void replaceClassLoader() {
-//		ClassLoader loader = CommonPlugin.class.getClassLoader().getParent();
-//		sun.misc.URLClassPath old = SafeField.get(loader, "ucp");
-//		sun.misc.URLClassPath ucpFixed = new sun.misc.URLClassPath(new java.net.URL[0]) {
-//			public sun.misc.Resource getResource(String path, boolean check) {
-//				System.out.println(path);
-//				return super.getResource(path, check);
-//			}
-//		};
-//		ClassTemplate.create(old).transfer(old, ucpFixed);
-//		SafeField.set(loader, "ucp", ucpFixed);
-//	}
-
-	@Override
-	public void onLoad() {
-		super.onLoad();
-		loadMCVersion();
-	}
-
 	@Override
 	public void enable() {
 		instance = this;
-
-		CommonUtil.undoVersionPackages(getClass());
 
 		// Register events and tasks, initialize
 		//register(CommonListener.class);

@@ -15,12 +15,8 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.PluginClassLoader;
 
-import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.internal.CommonClassLoader;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class CommonUtil {
 	public static final int view = Bukkit.getServer().getViewDistance();
@@ -28,20 +24,6 @@ public class CommonUtil {
 	public static final int chunkArea = viewWidth * viewWidth;
 	public static final int blockView = 32 + (view << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
-
-	/**
-	 * Gets around the version packages introduced by Bukkit
-	 * 
-	 * @param pluginClass - your main plugin class to work with
-	 */
-	public static void undoVersionPackages(Class<?> pluginClass) {
-		System.out.println("REPLACING");
-		if (Common.getMCVersion().isEmpty()) {
-			return; // Not needed
-		}
-		ClassLoader loader = pluginClass.getClassLoader();
-		SafeField.set(loader, "parent", new CommonClassLoader((PluginClassLoader) loader));
-	}
 
 	/**
 	 * Sends a message to a sender<br>
