@@ -40,7 +40,6 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
-	private static String mc_version = "";
 
 	static {
 		Common.undoPackageVersioning(CommonPlugin.class);
@@ -48,10 +47,6 @@ public class CommonPlugin extends PluginBase {
 
 	public static CommonPlugin getInstance() {
 		return instance;
-	}
-
-	public static String getMCVersion() {
-		return mc_version;
 	}
 
 	/**
