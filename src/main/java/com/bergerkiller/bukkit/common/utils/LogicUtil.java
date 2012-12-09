@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Logic operations, such as contains checks
+ * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
 	/**
