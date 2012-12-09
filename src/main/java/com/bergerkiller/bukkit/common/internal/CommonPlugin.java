@@ -28,11 +28,19 @@ import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
 public class CommonPlugin extends PluginBase {
+	/*
+	 * BKCommonLib Minecraft versioning
+	 */
+	public static final String DEPENDENT_MC_VERSION = "v1_4_5";
+	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
+	/*
+	 * Remaining internal variables
+	 */
 	private static CommonPlugin instance;
-	public static final List<PluginBase> plugins = new ArrayList<PluginBase>();
+	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
-	public static final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
-	private static final List<Runnable> nextTickSync = new ArrayList<Runnable>();
+	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
+	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private int nextTickHandlerId = -1;
 	private int entityMoveHandlerId = -1;
 	private boolean vaultEnabled = false;
@@ -42,7 +50,9 @@ public class CommonPlugin extends PluginBase {
 	private Plugin bleedingMobsInstance = null;
 
 	static {
-		Common.undoPackageVersioning(CommonPlugin.class);
+		if (IS_COMPATIBLE) {
+			Common.undoPackageVersioning(CommonPlugin.class);
+		}
 	}
 
 	public static CommonPlugin getInstance() {
@@ -66,6 +76,15 @@ public class CommonPlugin extends PluginBase {
 			}
 		}
 		ex.printStackTrace();
+	}
+
+	public void nextTick(Runnable runnable) {
+		if (runnable == null) {
+			return;
+		}
+		synchronized (this.nextTickTasks) {
+			this.nextTickTasks.add(runnable);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -183,8 +202,19 @@ public class CommonPlugin extends PluginBase {
 	public void enable() {
 		instance = this;
 
+		// Validate version
+		if (IS_COMPATIBLE) {
+			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
+		} else {
+			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
+			log(Level.SEVERE, "Please look for an available BKCommonLib update:");
+			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+
 		// Register events and tasks, initialize
-		//register(CommonListener.class);
+		register(new CommonListener());
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
 
@@ -205,14 +235,16 @@ public class CommonPlugin extends PluginBase {
 
 	private static class NextTickHandler implements Runnable {
 		public void run() {
-			synchronized (nextTickTasks) {
-				if (nextTickTasks.isEmpty()) {
+			List<Runnable> nextTick = getInstance().nextTickTasks;
+			List<Runnable> nextSync = getInstance().nextTickSync;
+			synchronized (nextTick) {
+				if (nextTick.isEmpty()) {
 					return;
 				}
-				nextTickSync.addAll(nextTickTasks);
-				nextTickTasks.clear();
+				nextSync.addAll(nextTick);
+				nextTick.clear();
 			}
-			for (Runnable task : nextTickSync) {
+			for (Runnable task : nextSync) {
 				try {
 					task.run();
 				} catch (Throwable t) {
@@ -220,7 +252,7 @@ public class CommonPlugin extends PluginBase {
 					CommonUtil.filterStackTrace(t).printStackTrace();
 				}
 			}
-			nextTickSync.clear();
+			nextSync.clear();
 		}
 	}
 

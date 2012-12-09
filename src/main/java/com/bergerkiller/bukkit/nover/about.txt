@@ -1,0 +1,6 @@
+Call NoVerClassLoader.undoPackageVersioning(<PluginName>.class) in a static block to get around package versioning
+The two classes in this package and the shaded ASM library are the only things required to accomplish this
+
+Plugins sharing the class loader with you will automatically use the included Class Loader
+
+Use with caution: nms incompatibilities can still occur

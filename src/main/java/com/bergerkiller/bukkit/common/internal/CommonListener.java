@@ -16,7 +16,7 @@ class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
-		for (PluginBase pb : CommonPlugin.plugins) {
+		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, true);
 		}
 	}
@@ -24,7 +24,7 @@ class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginDisable(PluginDisableEvent event) {
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
-		for (PluginBase pb : CommonPlugin.plugins) {
+		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, false);
 		}
 	}

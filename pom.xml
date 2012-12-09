@@ -48,12 +48,6 @@
       <version>3.2</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm-tree</artifactId>
-      <version>3.2</version>
-      <scope>compile</scope>
-    </dependency>
   	<dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>

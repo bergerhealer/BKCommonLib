@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.nover;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -7,13 +7,14 @@ import java.util.Map;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.plugin.java.PluginClassLoader;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 
 /**
- * Redirects package paths to the correct version to fix Class Not Found exceptions
+ * Redirects package paths to the correct version to fix Class Not Found exceptions<br><br>
+ * 
+ * <b>Feel free to use NoVerClassLoader and NoVerRemapper in your own plugins</b>
  */
 public class NoVerClassLoader extends PluginClassLoader {
 	private final JavaPluginLoader loader;
@@ -25,14 +26,34 @@ public class NoVerClassLoader extends PluginClassLoader {
 	private static final SafeMethod<Void> resolveClassMethod = new SafeMethod<Void>(PluginClassLoader.class, "resolveClass", Class.class);
 	private static final SafeMethod<Class<?>> defineClassMethod = new SafeMethod<Class<?>>(ClassLoader.class, "defineClass", String.class, byte[].class, int.class, int.class);
 	private static final SafeMethod<InputStream> getResourceAsStreamMethod = new SafeMethod<InputStream>(PluginClassLoader.class, "getResourceAsStream", String.class);
+	/**
+	 * Defines the minecraft version this class loader will redirect package-versioned classes to
+	 */
+	public static String MC_VERSION = "v1_4_5"; // Can be changed externally, is merely here to separate these classes
 
 	static {
 		// Pre-load the remapper - otherwise we get class loading circularities
 		NoVerRemapper.class.getName();
-		Common.class.getName();
 	}
 
-	public NoVerClassLoader(PluginClassLoader base) {
+	/**
+	 * Applies the NoVerClassLoader to the plugin class loader chain to get around package version
+	 * 
+	 * @param pluginClass - main plugin class of your plugin
+	 */
+	public static void undoPackageVersioning(Class<?> pluginClass) {
+		ClassLoader loader = pluginClass.getClassLoader();
+		if (loader instanceof NoVerClassLoader) {
+			return;
+		}
+		if (loader instanceof PluginClassLoader) {
+			SafeField.set(loader, "parent", new NoVerClassLoader((PluginClassLoader) loader));
+		} else {
+			throw new RuntimeException("The plugin class specified was not loaded by the Bukkit plugin loader (is it a plugin?)");
+		}
+	}
+
+	private NoVerClassLoader(PluginClassLoader base) {
 		super(loaderField.get(base), base.getURLs(), base.getParent());
 		this.topChild = base;
 		this.loader = loaderField.get(base);

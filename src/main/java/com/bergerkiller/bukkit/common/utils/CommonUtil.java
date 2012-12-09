@@ -234,12 +234,7 @@ public class CommonUtil {
 	 * @param runnable to execute
 	 */
 	public static void nextTick(Runnable runnable) {
-		if (runnable == null) {
-			return;
-		}
-		synchronized (CommonPlugin.nextTickTasks) {
-			CommonPlugin.nextTickTasks.add(runnable);
-		}
+		CommonPlugin.getInstance().nextTick(runnable);
 	}
 
 	/**

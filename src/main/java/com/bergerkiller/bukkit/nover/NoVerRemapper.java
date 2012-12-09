@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.nover;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,10 +11,13 @@ import org.objectweb.asm.commons.RemappingClassAdapter;
 import com.bergerkiller.bukkit.common.Common;
 
 /**
- * Re-maps class references from non-versioned packages to the correct versioned package
+ * Re-maps class references from non-versioned packages to the correct versioned package<br><br>
+ * 
+ * <b>Feel free to use NoVerClassLoader and NoVerRemapper in your own plugins</b>
  */
 class NoVerRemapper extends Remapper {
 	public static final String ASM_ROOT = "com.bergerkiller.bukkit.common.libs.org.objectweb.asm.";
+	private static final String[] PACKAGE_ROOTS = {"net/minecraft/server/", "org/bukkit/craftbukkit/"};
 
 	@Override
 	public String mapDesc(String desc) {
@@ -28,13 +31,10 @@ class NoVerRemapper extends Remapper {
 
 	private static String filter(String text) {
 		int idx;
-		idx = text.indexOf(Common.NMS_PATH);
-		if (idx != -1) {
-			return convert(text, Common.NMS_PATH, idx);
-		}
-		idx = text.indexOf(Common.CB_PATH);
-		if (idx != -1) {
-			return convert(text, Common.CB_PATH, idx);
+		for (String packageRoot : PACKAGE_ROOTS) {
+			if ((idx = text.indexOf(packageRoot)) != -1) {
+				return convert(text, packageRoot, idx);
+			}
 		}
 		return text;
 	}
@@ -69,9 +69,9 @@ class NoVerRemapper extends Remapper {
 
 	public static byte[] remap(InputStream stream) throws IOException {
 		ClassReader classReader = new ClassReader(stream);
-        ClassWriter classWriter = new ClassWriter(classReader, 0);
-        Remapper remapper = new NoVerRemapper();
-        classReader.accept(new RemappingClassAdapter(classWriter, remapper), ClassReader.EXPAND_FRAMES);
-        return classWriter.toByteArray();
+		ClassWriter classWriter = new ClassWriter(classReader, 0);
+		Remapper remapper = new NoVerRemapper();
+		classReader.accept(new RemappingClassAdapter(classWriter, remapper), ClassReader.EXPAND_FRAMES);
+		return classWriter.toByteArray();
 	}
 }

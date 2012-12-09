@@ -3,16 +3,10 @@ package com.bergerkiller.bukkit.common;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.PluginClassLoader;
 
-import com.bergerkiller.bukkit.common.internal.NoVerClassLoader;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.nover.NoVerClassLoader;
 
 public class Common {
-	public static final String NMS = "net.minecraft.server.";
-	public static final String NMS_PATH = NMS.replace('.', '/');
-	public static final String CB = "org.bukkit.craftbukkit.";
-	public static final String CB_PATH = CB.replace('.', '/');
 	public static final String MC_VERSION;
 	static {
 		String version = "";
@@ -36,17 +30,31 @@ public class Common {
 		MC_VERSION = version;
 	}
 
+	static {
+		NoVerClassLoader.MC_VERSION = MC_VERSION;
+	}
+
 	private static boolean checkVersion(String version) {
 		try {
 			if (version.isEmpty()) {
-				Class.forName(Common.NMS + "World");
+				Class.forName("net.minecraft.server.World");
 			} else {
-				Class.forName(Common.NMS + version + ".World");
+				Class.forName("net.minecraft.server." + version + ".World");
 			}
 			return true;
 		} catch (ClassNotFoundException ex) {
 			return false;
 		}
+	}
+
+	/**
+	 * Checks whether the version specified is compatible with the Minecraft version used on this server
+	 * 
+	 * @param version to check, in the v1_4_5 format where 1, 4 and 5 are the version numbers
+	 * @return True if the version is compatible, False if not
+	 */
+	public static boolean isMCVersionCompatible(String version) {
+		return MC_VERSION.isEmpty() || version.equals(MC_VERSION);
 	}
 
 	/**
@@ -70,15 +78,7 @@ public class Common {
 	 * @param pluginClass - the main plugin class instance of your plugin
 	 */
 	public static void undoPackageVersioning(Class<?> pluginClass) {
-		ClassLoader loader = pluginClass.getClassLoader();
-		if (loader instanceof NoVerClassLoader) {
-			return;
-		}
-		if (loader instanceof PluginClassLoader) {
-			SafeField.set(loader, "parent", new NoVerClassLoader((PluginClassLoader) loader));
-		} else {
-			throw new RuntimeException("The plugin class specified was not loaded by the Bukkit plugin loader (is it a plugin?)");
-		}
+		NoVerClassLoader.undoPackageVersioning(pluginClass);
 	}
 
 	/**

@@ -577,7 +577,7 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 
 		// update dependencies
-		CommonPlugin.plugins.add(this);
+		CommonPlugin.getInstance().plugins.add(this);
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 			if (plugin.isEnabled()) {
 				this.updateDependency(plugin, plugin.getName(), true);
@@ -600,6 +600,7 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 		}
 
+		boolean doDisableMessage = this.disableMessage != null;
 		try {
 			if (this.enabled) {
 				this.disable();
@@ -608,13 +609,14 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while disabling:");
 			t.printStackTrace();
-			CommonPlugin.plugins.remove(this);
-			return;
+			doDisableMessage = false;
 		}
 
-		CommonPlugin.plugins.remove(this);
+		if (CommonPlugin.getInstance() != null) {
+			CommonPlugin.getInstance().plugins.remove(this);
+		}
 
-		if (this.disableMessage != null) {
+		if (doDisableMessage) {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
 	}
