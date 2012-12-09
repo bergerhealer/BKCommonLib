@@ -467,12 +467,35 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
-	/**
-	 * Called when this Plugin loads up<br>
-	 * <b>Do not forget to call super.onLoad() when overriding!</b>
-	 */
+	private static void setPermissions(ConfigurationNode node) {
+		for (ConfigurationNode subNode : node.getNodes()) {
+			setPermissions(subNode);
+		}
+		PermissionDefault def = node.get("default", PermissionDefault.class);
+		String desc = node.get("description", String.class);
+		if (def != null || desc != null) {
+			Permission permission = getPermission(node.getPath().toLowerCase());
+			if (def != null) {
+				permission.setDefault(def);
+			}
+			if (desc != null) {
+				permission.setDescription(desc);
+			}
+		}
+	}
+
 	@Override
-	public void onLoad() {
+	public final void onEnable() {
+		long startTime = System.currentTimeMillis();
+		if (this.getMinimumLibVersion() > Common.VERSION) {
+			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
+			log(Level.SEVERE, "Verify that there is only one BKCommonLib.jar in the plugins folder before retrying");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+
+		this.setDisableMessage(this.getName() + " disabled!");
+
 		// Load permission configuration
 		this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
 		// load
@@ -520,36 +543,6 @@ public abstract class PluginBase extends JavaPlugin {
 			// Set the new commands map using reflection
 			PluginDescriptionFileRef.commands.set(this.getDescription(), Collections.unmodifiableMap(commands));
 		}
-	}
-
-	private static void setPermissions(ConfigurationNode node) {
-		for (ConfigurationNode subNode : node.getNodes()) {
-			setPermissions(subNode);
-		}
-		PermissionDefault def = node.get("default", PermissionDefault.class);
-		String desc = node.get("description", String.class);
-		if (def != null || desc != null) {
-			Permission permission = getPermission(node.getPath());
-			if (def != null) {
-				permission.setDefault(def);
-			}
-			if (desc != null) {
-				permission.setDescription(desc);
-			}
-		}
-	}
-
-	@Override
-	public final void onEnable() {
-		long startTime = System.currentTimeMillis();
-		if (this.getMinimumLibVersion() > Common.VERSION) {
-			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
-			log(Level.SEVERE, "Verify that there is only one BKCommonLib.jar in the plugins folder before retrying");
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
-		}
-
-		this.setDisableMessage(this.getName() + " disabled!");
 
 		// ==== Permissions ====
 		this.permissions();

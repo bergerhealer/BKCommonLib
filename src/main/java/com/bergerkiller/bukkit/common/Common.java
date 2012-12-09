@@ -7,6 +7,10 @@ import org.bukkit.Bukkit;
 import com.bergerkiller.bukkit.nover.NoVerClassLoader;
 
 public class Common {
+	/**
+	 * Defines the Minecraft version that runs on the server<br>
+	 * If none is specified, this value is an empty String
+	 */
 	public static final String MC_VERSION;
 	static {
 		String version = "";
@@ -29,6 +33,15 @@ public class Common {
 		}
 		MC_VERSION = version;
 	}
+	private static final String MC_VERSION_PACKAGEPART = MC_VERSION.isEmpty() ? "" : ("." + MC_VERSION);
+	/**
+	 * Defines the net.minecraft.server root path
+	 */
+	public static final String NMS_ROOT = "net.minecraft.server" + MC_VERSION_PACKAGEPART;
+	/**
+	 * Defines the org.bukkit.craftbukkit root path
+	 */
+	public static final String CB_ROOT = "org.bukkit.craftbukkit" + MC_VERSION_PACKAGEPART;
 
 	static {
 		NoVerClassLoader.MC_VERSION = MC_VERSION;

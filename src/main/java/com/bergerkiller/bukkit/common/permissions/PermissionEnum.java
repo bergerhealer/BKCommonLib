@@ -20,7 +20,7 @@ public abstract class PermissionEnum implements IPermissionDefault {
 	}
 
 	protected PermissionEnum(String node, PermissionDefault def, String description, int argCount) {
-		this.node = node;
+		this.node = node.toLowerCase();
 		this.def = def;
 		this.desc = description;
 		this.name = this.node + StringUtil.getFilledString(".*", argCount);
@@ -136,7 +136,7 @@ public abstract class PermissionEnum implements IPermissionDefault {
 
 	private static boolean check(CommandSender sender, String root, String[] args, int argIndex) {
 		if (argIndex >= args.length) {
-			return CommonUtil.hasPermission(sender, root);
+			return CommonUtil.hasPermission(sender, root.toLowerCase());
 		} else {
 			return check(sender, root + "." + args[argIndex], args, argIndex + 1) || check(sender, root + ".*", args, argIndex + 1);
 		}
