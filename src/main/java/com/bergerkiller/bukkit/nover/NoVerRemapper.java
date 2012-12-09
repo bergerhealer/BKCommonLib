@@ -8,15 +8,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingClassAdapter;
 
-import com.bergerkiller.bukkit.common.Common;
-
 /**
  * Re-maps class references from non-versioned packages to the correct versioned package<br><br>
  * 
  * <b>Feel free to use NoVerClassLoader and NoVerRemapper in your own plugins</b>
  */
 class NoVerRemapper extends Remapper {
-	public static final String ASM_ROOT = "com.bergerkiller.bukkit.common.libs.org.objectweb.asm.";
 	private static final String[] PACKAGE_ROOTS = {"net/minecraft/server/", "org/bukkit/craftbukkit/"};
 
 	@Override
@@ -60,10 +57,10 @@ class NoVerRemapper extends Remapper {
 				}
 			}
 		}
-		if (Common.MC_VERSION.isEmpty()) {
+		if (NoVerClassLoader.MC_VERSION.isEmpty()) {
 			return header + packagePath + name;
 		} else {
-			return header + packagePath + Common.MC_VERSION + '/' + name;
+			return header + packagePath + NoVerClassLoader.MC_VERSION + '/' + name;
 		}
 	}
 

@@ -1,6 +1,12 @@
+The NoVerClassLoader will automatically update the class files in a plugin to link to the correct internal CraftBukkit packages
+This allows plugins to stay compatible when Minecraft versions change
+
 Call NoVerClassLoader.undoPackageVersioning(<PluginName>.class) in a static block to get around package versioning
 The two classes in this package and the shaded ASM library are the only things required to accomplish this
 
 Plugins sharing the class loader with you will automatically use the included Class Loader
 
 Use with caution: nms incompatibilities can still occur
+
+It is wise to provide safety catches if you decide to go this route.
+Better yet: Only use functions of a library to interact with native code

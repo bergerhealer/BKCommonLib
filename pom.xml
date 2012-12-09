@@ -18,7 +18,7 @@
     <!-- Repo for access to Vault -->
     <repository>
       <id>vault-repo</id>
-      <url>http://ci.herocraftonline.com/plugin/repository/project/Vault/LastSuccessful/repository/</url>
+      <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
     <!-- Repo for access to the non-package-versioned CraftBukkit -->
     <repository>

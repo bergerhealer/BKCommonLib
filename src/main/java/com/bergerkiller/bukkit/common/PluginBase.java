@@ -43,6 +43,7 @@ public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig, localizationconfig;
 	private boolean enabled = false;
+	private boolean wasDisableRequested = false;
 
 	/**
 	 * Logs a message to the server console
@@ -566,7 +567,11 @@ public abstract class PluginBase extends JavaPlugin {
 
 		// ==== Enabling ====
 		try {
+			this.wasDisableRequested = false;
 			this.enable();
+			if (this.wasDisableRequested) {
+				return; // Plugin was disabled again while enabling
+			}
 			this.enabled = true;
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
@@ -592,30 +597,31 @@ public abstract class PluginBase extends JavaPlugin {
 		// are there any plugins that depend on me?
 		List<String> depend;
 		for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
-			if (!plugin.isEnabled())
-				continue;
-			depend = (List<String>) plugin.getDescription().getDepend();
-			if (depend != null && depend.contains(this.getName())) {
-				Bukkit.getServer().getPluginManager().disablePlugin(plugin);
+			if (plugin.isEnabled()) {
+				depend = (List<String>) plugin.getDescription().getDepend();
+				if (depend != null && depend.contains(this.getName())) {
+					Bukkit.getServer().getPluginManager().disablePlugin(plugin);
+				}
 			}
 		}
-
+		this.wasDisableRequested = true;
 		boolean doDisableMessage = this.disableMessage != null;
-		try {
-			if (this.enabled) {
+		if (this.enabled) {
+			// Try to disable the plugin
+			try {
 				this.disable();
-				this.enabled = false;
+			} catch (Throwable t) {
+				log(Level.SEVERE, "An error occurred while disabling:");
+				t.printStackTrace();
+				doDisableMessage = false;
 			}
-		} catch (Throwable t) {
-			log(Level.SEVERE, "An error occurred while disabling:");
-			t.printStackTrace();
-			doDisableMessage = false;
+			// Remove references to the plugin - it is disabled now
+			this.enabled = false;
+			if (CommonPlugin.getInstance() != null) {
+				CommonPlugin.getInstance().plugins.remove(this);
+			}
 		}
-
-		if (CommonPlugin.getInstance() != null) {
-			CommonPlugin.getInstance().plugins.remove(this);
-		}
-
+		// If specified to do so, a disable message is shown
 		if (doDisableMessage) {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);
 		}
