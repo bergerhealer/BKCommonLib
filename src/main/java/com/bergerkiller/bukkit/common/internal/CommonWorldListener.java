@@ -74,10 +74,8 @@ class CommonWorldListener extends WorldManager {
 	public final void b(Entity removed) {
 		if (removed != null) {
 			// Remove entity
-			if (removed instanceof EntityPlayer) {
-				if (!this.addedPlayers.remove(removed)) {
-					return;
-				}
+			if (removed instanceof EntityPlayer && !this.addedPlayers.remove(removed)) {
+				return;
 			}
 			CommonUtil.callEvent(new EntityRemoveEvent(removed.getBukkitEntity()));
 		}

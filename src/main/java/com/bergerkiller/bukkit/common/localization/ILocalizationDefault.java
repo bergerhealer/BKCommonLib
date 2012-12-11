@@ -6,12 +6,12 @@ public interface ILocalizationDefault {
 	 * 
 	 * @return Localization name
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Gets the default value set for this Localization node
 	 * 
 	 * @return Localization default
 	 */
-	public String getDefault();
+	String getDefault();
 }

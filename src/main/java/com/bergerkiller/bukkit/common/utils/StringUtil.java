@@ -328,7 +328,8 @@ public class StringUtil {
 		int index = builder.indexOf(from);
 		while (index != -1) {
 			builder.replace(index, index + from.length(), to);
-			index += to.length(); // Move to the end of the replacement
+			// Move to the end of the replacement
+			index += to.length();
 			index = builder.indexOf(from, index);
 		}
 	}
@@ -381,12 +382,10 @@ public class StringUtil {
 	public static String swapColorCodes(String line, char fromCode, char toCode) {
 		StringBuilder builder = new StringBuilder(line);
 		for (int i = 0; i < builder.length() - 1; i++) {
-			if (builder.charAt(i) == fromCode) {
-				// Next char is a valid color code?
-				if (isChatCode(builder.charAt(i + 1))) {
-					builder.setCharAt(i, toCode);
-					i++;
-				}
+			// Next char is a valid color code?
+			if (builder.charAt(i) == fromCode && isChatCode(builder.charAt(i + 1))) {
+				builder.setCharAt(i, toCode);
+				i++;
 			}
 		}
 		return builder.toString();

@@ -46,7 +46,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 */
 	public static void addEntity(org.bukkit.entity.Entity entity) {
 		Entity nmsentity = NativeUtil.getNative(entity);
-		nmsentity.world.getChunkAt(MathUtil.locToChunk(nmsentity.locX), MathUtil.locToChunk(nmsentity.locZ));
+		nmsentity.world.getChunkAt(MathUtil.toChunk(nmsentity.locX), MathUtil.toChunk(nmsentity.locZ));
 		nmsentity.dead = false;
 		nmsentity.world.addEntity(nmsentity);
 	}
@@ -137,7 +137,8 @@ public class EntityUtil extends EntityPropertyUtil {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).id == toreplace.id) {
 				list.set(i, with);
-				chunk.m = true; //set invalid
+				//set invalid
+				chunk.m = true;
 				return true;
 			}
 		}
@@ -163,9 +164,9 @@ public class EntityUtil extends EntityPropertyUtil {
 	}
 
 	public static boolean isNearChunk(net.minecraft.server.Entity entity, final int cx, final int cz, final int chunkview) {
-		if (Math.abs(MathUtil.locToChunk(entity.locX) - cx) > chunkview)
+		if (Math.abs(MathUtil.toChunk(entity.locX) - cx) > chunkview)
 			return false;
-		if (Math.abs(MathUtil.locToChunk(entity.locZ) - cz) > chunkview)
+		if (Math.abs(MathUtil.toChunk(entity.locZ) - cz) > chunkview)
 			return false;
 		return true;
 	}

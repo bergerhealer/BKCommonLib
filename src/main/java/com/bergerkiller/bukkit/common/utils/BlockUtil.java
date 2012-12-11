@@ -34,7 +34,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block information
  */
-public class BlockUtil {
+public class BlockUtil extends MaterialUtil {
 
 	/**
 	 * Directly obtains the Material Data from the block<br>
@@ -201,12 +201,10 @@ public class BlockUtil {
 	 */
 	public static void setLeversAroundBlock(Block block, boolean down) {
 		Block b;
-		for (BlockFace dir : FaceUtil.attachedFaces) {
-			if (isType(b = block.getRelative(dir), Material.LEVER)) {
-				// attached?
-				if (getAttachedFace(b) == dir.getOppositeFace()) {
-					setLever(b, down);
-				}
+		for (BlockFace dir : FaceUtil.ATTACHEDFACES) {
+			// Attached lever at this direction?
+			if (isType(b = block.getRelative(dir), Material.LEVER) && getAttachedFace(b) == dir.getOppositeFace()) {
+				setLever(b, down);
 			}
 		}
 	}
@@ -293,39 +291,22 @@ public class BlockUtil {
 	public static void setRails(Block rails, BlockFace direction) {
 		Material type = rails.getType();
 		if (type == Material.RAILS) {
+			BlockFace railsDirection;
 			if (direction == BlockFace.NORTH) {
-				direction = BlockFace.SOUTH;
+				railsDirection = BlockFace.SOUTH;
 			} else if (direction == BlockFace.EAST) {
-				direction = BlockFace.WEST;
+				railsDirection = BlockFace.WEST;
+			} else {
+				railsDirection = direction;
 			}
 			byte olddata = rails.getData();
 			Rails r = (Rails) type.getNewData(olddata);
-			r.setDirection(direction, r.isOnSlope());
+			r.setDirection(railsDirection, r.isOnSlope());
 			byte newdata = r.getData();
 			if (olddata != newdata) {
 				rails.setData(newdata);
 			}
 		}
-	}
-
-	public static boolean isType(int material, int... types) {
-		return MaterialUtil.isType(material, types);
-	}
-
-	public static boolean isType(Material material, Material... types) {
-		return MaterialUtil.isType(material, types);
-	}
-
-	public static boolean isType(int material, Material... types) {
-		return MaterialUtil.isType(material, types);
-	}
-
-	public static boolean isType(Block block, Material... types) {
-		return MaterialUtil.isType(block, types);
-	}
-
-	public static boolean isType(Block block, int... types) {
-		return MaterialUtil.isType(block, types);
 	}
 
 	/**
@@ -423,21 +404,21 @@ public class BlockUtil {
 		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
 			// simplified coding instead
 			TileEntity tile = world.getTileEntity(x, y, z);
-			if (tile != null)
+			if (tile != null) {
 				offerTile(tile);
+			}
 		} else {
 			// loop through tile entity list
-			x -= radiusX;
-			y -= radiusY;
-			z -= radiusZ;
-			radiusX = x + radiusX * 2;
-			radiusY = y + radiusY * 2;
-			radiusZ = z + radiusZ * 2;
+			int xMin = x - radiusX;
+			int yMin = y - radiusY;
+			int zMin = z - radiusZ;
+			int xMax = x + radiusX;
+			int yMax = y + radiusY;
+			int zMax = z + radiusZ;
 			for (TileEntity tile : (List<TileEntity>) world.tileEntityList) {
-				if (tile.x < x || tile.y < y || tile.z < z)
+				if (tile.x < xMin || tile.y < yMin || tile.z < zMin || tile.x > xMax || tile.y > yMax || tile.z > zMax) {
 					continue;
-				if (tile.x > radiusX || tile.y > radiusY || tile.z > radiusZ)
-					continue;
+				}
 				tile = world.getTileEntity(tile.x, tile.y, tile.z);
 				if (tile != null) {
 					offerTile(tile);
@@ -460,7 +441,7 @@ public class BlockUtil {
 			// find a possible double chest as well
 			net.minecraft.server.World world = NativeUtil.getNative(getWorld(tile));
 			int tmpx, tmpz;
-			for (BlockFace sface : FaceUtil.axis) {
+			for (BlockFace sface : FaceUtil.AXIS) {
 				tmpx = tile.x + sface.getModX();
 				tmpz = tile.z + sface.getModZ();
 				if (world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {

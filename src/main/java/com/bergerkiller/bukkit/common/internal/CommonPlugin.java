@@ -79,11 +79,10 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	public void nextTick(Runnable runnable) {
-		if (runnable == null) {
-			return;
-		}
-		synchronized (this.nextTickTasks) {
-			this.nextTickTasks.add(runnable);
+		if (runnable != null) {
+			synchronized (this.nextTickTasks) {
+				this.nextTickTasks.add(runnable);
+			}
 		}
 	}
 
@@ -93,8 +92,9 @@ public class CommonPlugin extends PluginBase {
 			Item item = (Item) entity;
 			if (this.isShowcaseEnabled) {
 				try {
-					if (Showcase.instance.getItemByDrop(item) != null)
+					if (Showcase.instance.getItemByDrop(item) != null) {
 						return true;
+					}
 				} catch (Throwable t) {
 					Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
 					t.printStackTrace();
@@ -103,8 +103,9 @@ public class CommonPlugin extends PluginBase {
 			}
 			if (this.isSCSEnabled) {
 				try {
-					if (ShowCaseStandalone.get().isShowCaseItem(item))
+					if (ShowCaseStandalone.get().isShowCaseItem(item)) {
 						return true;
+					}
 				} catch (Throwable t) {
 					Bukkit.getLogger().log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
 					t.printStackTrace();
@@ -114,12 +115,8 @@ public class CommonPlugin extends PluginBase {
 			if (this.bleedingMobsInstance != null) {
 				try {
 					BleedingMobs bm = (BleedingMobs) this.bleedingMobsInstance;
-					if (bm.isSpawning())
+					if (bm.isSpawning() || (bm.isWorldEnabled(item.getWorld()) && bm.isParticleItem(((CraftItem) item).getUniqueId()))) {
 						return true;
-					if (bm.isWorldEnabled(item.getWorld())) {
-						if (bm.isParticleItem(((CraftItem) item).getUniqueId())) {
-							return true;
-						}
 					}
 				} catch (Throwable t) {
 					Bukkit.getLogger().log(Level.SEVERE, "Bleeding Mobs item verification failed (update needed?), contact the authors!");
@@ -182,6 +179,11 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void setDisableMessage(String message) {
 	};
+
+	@Override
+	public void onLoad() {
+		CommonClasses.init(); // Load the classes contained in this library
+	}
 
 	@Override
 	public void disable() {

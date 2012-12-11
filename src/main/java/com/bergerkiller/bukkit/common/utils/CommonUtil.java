@@ -19,10 +19,10 @@ import org.bukkit.plugin.Plugin;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
-	public static final int view = Bukkit.getServer().getViewDistance();
-	public static final int viewWidth = view + view + 1;
-	public static final int chunkArea = viewWidth * viewWidth;
-	public static final int blockView = 32 + (view << 4);
+	public static final int VIEW = Bukkit.getServer().getViewDistance();
+	public static final int VIEWWIDTH = VIEW + VIEW + 1;
+	public static final int CHUNKAREA = VIEWWIDTH * VIEWWIDTH;
+	public static final int BLOCKVIEW = 32 + (VIEW << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
 
 	/**
@@ -36,14 +36,12 @@ public class CommonUtil {
 	public static void sendMessage(Object sender, Object message) {
 		if (message != null) {
 			String msg = message.toString();
-			if (msg.length() > 0) {
-				if (sender instanceof CommandSender) {
-					if (!(sender instanceof Player)) {
-						message = ChatColor.stripColor(msg);
-					}
-					for (String line : msg.split("\n", -1)) {
-						((CommandSender) sender).sendMessage(line);
-					}
+			if (msg.length() > 0 && sender instanceof CommandSender) {
+				if (!(sender instanceof Player)) {
+					message = ChatColor.stripColor(msg);
+				}
+				for (String line : msg.split("\n", -1)) {
+					((CommandSender) sender).sendMessage(line);
 				}
 			}
 		}

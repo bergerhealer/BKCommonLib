@@ -171,23 +171,21 @@ public class BlockLocation {
 	 * @return True if within, False if not
 	 */
 	public boolean isIn(BlockLocation point1, BlockLocation point2) {
-		if (point1 != null && point2 != null) {
-			if (point1.world.equals(point2.world) && point1.world.equals(this.world)) {
+		if (point1 != null && point2 != null && point1.world.equals(point2.world) && point1.world.equals(this.world)) {
 				int value;
 				value = Math.min(point1.x, point2.x);
-				if (this.x < value || this.x > (value + Math.abs(point1.x - point2.x)))
+				if (this.x < value || this.x > (value + Math.abs(point1.x - point2.x))) {
 					return false;
-
+				}
 				value = Math.min(point1.y, point2.y);
-				if (this.y < value || this.y > (value + Math.abs(point1.y - point2.y)))
+				if (this.y < value || this.y > (value + Math.abs(point1.y - point2.y))) {
 					return false;
-
+				}
 				value = Math.min(point1.z, point2.z);
-				if (this.z < value || this.z > (value + Math.abs(point1.z - point2.z)))
+				if (this.z < value || this.z > (value + Math.abs(point1.z - point2.z))) {
 					return false;
-
+				}
 				return true;
-			}
 		}
 		return false;
 	}
@@ -199,9 +197,9 @@ public class BlockLocation {
 
 	@Override
 	public boolean equals(Object object) {
-		if (object == this)
+		if (object == this) {
 			return true;
-		if (object instanceof BlockLocation) {
+		} else if (object instanceof BlockLocation) {
 			BlockLocation bloc = (BlockLocation) object;
 			return bloc.x == this.x && bloc.y == this.y && bloc.z == this.z && bloc.world.equals(this.world);
 		} else {

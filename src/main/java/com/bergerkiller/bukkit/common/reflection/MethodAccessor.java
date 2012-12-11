@@ -10,7 +10,7 @@ public interface MethodAccessor<T> {
 	 * 
 	 * @return True if this accessor is valid, False if not
 	 */
-	public boolean isValid();
+	boolean isValid();
 
 	/**
 	 * Executes the method
@@ -19,5 +19,5 @@ public interface MethodAccessor<T> {
 	 * @param args to use for the method
 	 * @return A possible returned value from the method, is always null if the method is a void
 	 */
-	public T invoke(Object instance, Object... args);
+	T invoke(Object instance, Object... args);
 }

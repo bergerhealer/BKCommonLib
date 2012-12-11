@@ -41,7 +41,7 @@ public class PacketUtil {
 		}
 		
 		for (Player player : WorldUtil.getPlayers(chunk.getWorld())) {
-			if (EntityUtil.isNearChunk(player, chunk.getX(), chunk.getZ(), CommonUtil.view)) {
+			if (EntityUtil.isNearChunk(player, chunk.getX(), chunk.getZ(), CommonUtil.VIEW)) {
 				sendPacket(player, packet, throughListeners);
 			}
 		}
@@ -56,7 +56,7 @@ public class PacketUtil {
 			return;
 		}
 		for (Player player : WorldUtil.getPlayers(world)) {
-			if (EntityUtil.isNearBlock(player, x, z, CommonUtil.blockView)) {
+			if (EntityUtil.isNearBlock(player, x, z, CommonUtil.BLOCKVIEW)) {
 				sendPacket(player, packet, throughListeners);
 			}
 		}

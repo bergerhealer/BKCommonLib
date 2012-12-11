@@ -135,7 +135,7 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	public static void loadChunks(org.bukkit.World world, double xmid, double zmid, final int radius) {
-		loadChunks(world, MathUtil.locToChunk(xmid), MathUtil.locToChunk(zmid), radius);
+		loadChunks(world, MathUtil.toChunk(xmid), MathUtil.toChunk(zmid), radius);
 	}
 
 	public static void loadChunks(org.bukkit.World world, final int xmid, final int zmid, final int radius) {
@@ -155,7 +155,7 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	public static boolean isLoaded(org.bukkit.World world, double x, double y, double z) {
-		return isLoaded(world, MathUtil.locToChunk(x), MathUtil.locToChunk(z));
+		return isLoaded(world, MathUtil.toChunk(x), MathUtil.toChunk(z));
 	}
 
 	public static boolean isLoaded(org.bukkit.World world, int x, int y, int z) {

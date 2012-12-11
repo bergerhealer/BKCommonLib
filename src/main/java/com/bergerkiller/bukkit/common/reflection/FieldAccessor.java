@@ -10,7 +10,7 @@ public interface FieldAccessor<T> {
 	 * 
 	 * @return True if this accessor is valid, False if not
 	 */
-	public boolean isValid();
+	boolean isValid();
 
 	/**
 	 * Gets the value of a field from an instance
@@ -18,7 +18,7 @@ public interface FieldAccessor<T> {
 	 * @param instance to get from
 	 * @return value of the field in the instance
 	 */
-	public T get(Object instance);
+	T get(Object instance);
 
 	/**
 	 * Sets the value of a field of an instance
@@ -27,7 +27,7 @@ public interface FieldAccessor<T> {
 	 * @param value to set to
 	 * @return True if setting was successful, False if not
 	 */
-	public boolean set(Object instance, T value);
+	boolean set(Object instance, T value);
 
 	/**
 	 * Transfers the value of this field from one instance to another
@@ -36,5 +36,5 @@ public interface FieldAccessor<T> {
 	 * @param to instance to copy to
 	 * @return the old value in the to instance
 	 */
-	public T transfer(Object from, Object to);
+	T transfer(Object from, Object to);
 }

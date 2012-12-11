@@ -15,6 +15,8 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
 import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
+import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
 
 /**
  * Contains utilities to get and set chunks of a world
@@ -22,6 +24,44 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 public class ChunkUtil {
 	private static boolean canUseLongObjectHashMap = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongObjectHashMap") != null;
 	private static boolean canUseLongHashSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongHashSet") != null;
+
+	/**
+	 * Gets the height of a given column in a chunk
+	 * 
+	 * @param chunk the column is in
+	 * @param x-coordinate of the block column
+	 * @param z-coordinate of the block column
+	 * @return column height
+	 */
+	public static int getHeight(org.bukkit.Chunk chunk, int x, int z) {
+		return ChunkRef.getHeight(NativeUtil.getNative(chunk), x, z);
+	}
+
+	/**
+	 * Gets the block light level
+	 * 
+	 * @param chunk the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return Block light level
+	 */
+	public static int getBlockLight(org.bukkit.Chunk chunk, int x, int y, int z) {
+		return ChunkRef.getBlockLight(NativeUtil.getNative(chunk), x, y, z);
+	}
+
+	/**
+	 * Gets the sky light level
+	 * 
+	 * @param chunk the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return Sky light level
+	 */
+	public static int getSkyLight(org.bukkit.Chunk chunk, int x, int y, int z) {
+		return ChunkRef.getSkyLight(NativeUtil.getNative(chunk), x, y, z);
+	}
 
 	/**
 	 * Gets the block data
@@ -33,7 +73,7 @@ public class ChunkUtil {
 	 * @return block data
 	 */
 	public static int getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return NativeUtil.getNative(chunk).getData(x & 15, y & 255, z & 15);
+		return ChunkRef.getData(NativeUtil.getNative(chunk), x, y, z);
 	}
 
 	/**
@@ -46,7 +86,7 @@ public class ChunkUtil {
 	 * @return block type Id
 	 */
 	public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return NativeUtil.getNative(chunk).getTypeId(x & 15, y & 255, z & 15);
+		return ChunkRef.getTypeId(NativeUtil.getNative(chunk), x, y, z);
 	}
 
 	/**
@@ -60,17 +100,17 @@ public class ChunkUtil {
 	 * @param data to set to
 	 */
 	public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
-		x &= 15;
-		y &= 255;
-		z &= 15;
-		ChunkSection[] sections = NativeUtil.getNative(chunk).i();
+		if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
+			return;
+		}
+		ChunkSection[] sections = ChunkRef.getSections(NativeUtil.getNative(chunk));
 		final int secIndex = y >> 4;
 		ChunkSection section = sections[secIndex];
 		if (section == null) {
-			sections[secIndex] = section = new ChunkSection(y >> 4 << 4);
+			section = sections[secIndex] = new ChunkSection(y >> 4 << 4);
 		}
-		section.a(x, y & 15, z, typeId);
-		section.b(x, y & 15, z, data);
+		ChunkSectionRef.setTypeId(section, x, y, z, typeId);
+		ChunkSectionRef.setData(section, x, y, z, data);
 	}
 
 	/**
@@ -88,7 +128,7 @@ public class ChunkUtil {
 		boolean result = y >= 0 && y <= chunk.getWorld().getMaxHeight();
 		WorldServer world = NativeUtil.getNative(chunk.getWorld());
 		if (result) {
-			result = NativeUtil.getNative(chunk).a(x & 15, y & 255, z & 15, typeId, data);
+			result = ChunkRef.setBlock(NativeUtil.getNative(chunk), x, y, z, typeId, data);
             world.methodProfiler.a("checkLight");
             world.z(x, y, z);
             world.methodProfiler.b();
@@ -122,10 +162,8 @@ public class ChunkUtil {
 			Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				try {
-					if (canUseLongObjectHashMap) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							return new NativeChunkWrapper(((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values());
-						}
+					if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+						return new NativeChunkWrapper(((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values());
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
@@ -151,13 +189,9 @@ public class ChunkUtil {
 		final long key = LongHash.toLong(x, z);
 		Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 		if (chunks != null) {
-			if (canUseLongObjectHashMap) {
+			if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
 				try {
-					if (canUseLongObjectHashMap) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							return NativeUtil.getChunk(((Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key)));
-						}
-					}
+					return NativeUtil.getChunk(((Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key)));
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
 					CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
@@ -188,11 +222,9 @@ public class ChunkUtil {
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
-					if (canUseLongObjectHashMap) {
-						if (chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-							((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, NativeUtil.getNative(chunk));
-							return;
-						}
+					if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+						((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, NativeUtil.getNative(chunk));
+						return;
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
@@ -226,15 +258,13 @@ public class ChunkUtil {
 			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (unloadQueue != null) {
 				try {
-					if (canUseLongHashSet) {
-						if (unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
-							if (unload) {
-								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).add(x, z);
-							} else {
-								((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
-							}
-							return;
+					if (canUseLongHashSet && unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
+						if (unload) {
+							((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).add(x, z);
+						} else {
+							((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
 						}
+						return;
 					}
 				} catch (Throwable t) {
 					canUseLongHashSet = false;

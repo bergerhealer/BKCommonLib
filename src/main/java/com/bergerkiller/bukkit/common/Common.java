@@ -75,7 +75,11 @@ public class Common {
 	 * An additional class loader will be inserted to load these classes<br><br>
 	 * 
 	 * It is recommended to include a static block in your main plugin class where you call this method<br>
-	 * Make sure that no native classes are exposed through your main plugin class, as those will not be caught in time<br><br>
+	 * Make sure that no native classes are exposed through your main plugin class, as those will not be caught in time<br>
+	 * Also, if you replace native classes, make sure you load all non-native classes your class uses<br>
+	 * You have to prevent that the server class loader tries to load your plugin classes, because then no renaming occurs<br><br>
+	 * 
+	 * The native-accessing utility classes of BKCommonLib are pre-loaded to prevent this happening<br><br>
 	 * 
 	 * Alternatively, you could include the following line in your plugin.yml:<br>
 	 * <i>class-loader-of: BKCommonLib</i><br>
@@ -84,7 +88,7 @@ public class Common {
 	 * <pre>
 	 * {@code
 	 * static {
-	 *     Common.undoPackageVersioning();
+	 *     Common.undoPackageVersioning(MyPlugin.class);
 	 * }
 	 * </pre>
 	 * 
@@ -107,6 +111,28 @@ public class Common {
 	 */
 	public static int getVersion() {
 		return VERSION;
+	}
+
+	/**
+	 * Loads one or more classes<br>
+	 * Use this method to pre-load certain classes before enabling your plugin
+	 * 
+	 * @param classNames to load
+	 */
+	public static void loadClasses(String... classNames) {
+		for (String className : classNames) {
+			try {
+				loadInner(Class.forName(className));
+			} catch (ClassNotFoundException ex) {
+				throw new RuntimeException("Could not load class '" + className + "' - Update needed?");
+			}
+		}
+	}
+
+	private static void loadInner(Class<?> clazz) {
+		for (Class<?> subclass : clazz.getDeclaredClasses()) {
+			loadInner(subclass);
+		}
 	}
 
 	/**

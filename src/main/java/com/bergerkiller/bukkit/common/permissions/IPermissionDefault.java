@@ -9,19 +9,19 @@ public interface IPermissionDefault {
 	 * 
 	 * @return Permission name
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Gets the default value set for this Permission
 	 * 
 	 * @return Permission default
 	 */
-	public PermissionDefault getDefault();
+	PermissionDefault getDefault();
 
 	/**
 	 * Gets the Permission description
 	 * 
 	 * @return Permission description
 	 */
-	public String getDescription();
+	String getDescription();
 }

@@ -563,7 +563,8 @@ public abstract class PluginBase extends JavaPlugin {
 			this.wasDisableRequested = false;
 			this.enable();
 			if (this.wasDisableRequested) {
-				return; // Plugin was disabled again while enabling
+				// Plugin was disabled again while enabling
+				return;
 			}
 			this.enabled = true;
 		} catch (Throwable t) {
@@ -623,13 +624,13 @@ public abstract class PluginBase extends JavaPlugin {
 	@Override
 	public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
 		try {
-			args = StringUtil.convertArgs(args);
+			String[] fixedArgs = StringUtil.convertArgs(args);
 			// Default commands for all plugins
-			if (args.length >= 1 && LogicUtil.contains(args[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
+			if (fixedArgs.length >= 1 && LogicUtil.contains(fixedArgs[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
 				sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.getInstance().getVersion());
 			}
 			// Handle regularly
-			if (command(sender, command, args)) {
+			if (command(sender, command, fixedArgs)) {
 				return true;
 			}
 			sender.sendMessage(ChatColor.RED + "Unknown command, for help use /help " + command);

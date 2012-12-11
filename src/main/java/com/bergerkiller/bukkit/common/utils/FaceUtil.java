@@ -8,15 +8,15 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 public class FaceUtil {
-	public static final BlockFace[] axis = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
-	public static final BlockFace[] attachedFaces = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
-	public static final BlockFace[] attachedFacesDown = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
-	public static final BlockFace[] radial = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
+	public static final BlockFace[] AXIS = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+	public static final BlockFace[] ATTACHEDFACES = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
+	public static final BlockFace[] ATTACHEDFACESDOWN = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+	public static final BlockFace[] RADIAL = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
 	private static final EnumMap<BlockFace, Integer> notches = new EnumMap<BlockFace, Integer>(BlockFace.class);
 
 	static {
-		for (int i = 0; i < radial.length; i++) {
-			notches.put(radial[i], i);
+		for (int i = 0; i < RADIAL.length; i++) {
+			notches.put(RADIAL[i], i);
 		}
 	}
 
@@ -40,7 +40,7 @@ public class FaceUtil {
 	 * @return BlockFace of the notch
 	 */
 	public static BlockFace notchToFace(int notch) {
-		return radial[notch & 0x7];
+		return RADIAL[notch & 0x7];
 	}
 
 	/**
@@ -311,10 +311,10 @@ public class FaceUtil {
 		switch (face) {
 			case NORTH_WEST:
 			case NORTH_EAST:
-				return MathUtil.halfRootOfTwo;
+				return MathUtil.HALFROOTOFTWO;
 			case SOUTH_WEST:
 			case SOUTH_EAST:
-				return -MathUtil.halfRootOfTwo;
+				return -MathUtil.HALFROOTOFTWO;
 			case SOUTH:
 				return -1;
 			case NORTH:
@@ -334,10 +334,10 @@ public class FaceUtil {
 		switch (face) {
 			case SOUTH_EAST:
 			case NORTH_EAST:
-				return MathUtil.halfRootOfTwo;
+				return MathUtil.HALFROOTOFTWO;
 			case NORTH_WEST:
 			case SOUTH_WEST:
-				return -MathUtil.halfRootOfTwo;
+				return -MathUtil.HALFROOTOFTWO;
 			case EAST:
 				return 1;
 			case WEST:
@@ -396,9 +396,9 @@ public class FaceUtil {
 	 */
 	public static BlockFace yawToFace(float yaw, boolean useSubCardinalDirections) {
 		if (useSubCardinalDirections) {
-			return radial[Math.round(yaw / 45f) & 0x7];
+			return RADIAL[Math.round(yaw / 45f) & 0x7];
 		} else {
-			return axis[Math.round(yaw / 90f) & 0x3];
+			return AXIS[Math.round(yaw / 90f) & 0x3];
 		}
 	}
 }

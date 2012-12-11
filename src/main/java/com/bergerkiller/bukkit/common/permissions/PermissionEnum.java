@@ -100,8 +100,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
 	 * 
 	 * @param sender to check the permission for
 	 * @param args to use for this permission node (appended to the node name)
+	 * @throws NoPermissionException
 	 */
-	public void handle(CommandSender sender, String... args) throws NoPermissionException {
+	public void handle(CommandSender sender, String... args) {
 		if (!has(sender, args)) {
 			throw new NoPermissionException();
 		}

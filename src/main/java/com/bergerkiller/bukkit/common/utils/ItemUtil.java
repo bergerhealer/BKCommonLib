@@ -29,8 +29,9 @@ public class ItemUtil {
 	}
 
 	public static void setItem(Inventory inv, int index, ItemStack item) {
-		if (LogicUtil.nullOrEmpty(item)) {
-			item = null;
+		ItemStack itemToSet = item;
+		if (LogicUtil.nullOrEmpty(itemToSet)) {
+			itemToSet = null;
 		}
 		inv.setItem(index, item);
 	}
@@ -79,12 +80,14 @@ public class ItemUtil {
 	 */
 	public static net.minecraft.server.ItemStack findItem(IInventory inventory, int typeid, Integer data) {
 		net.minecraft.server.ItemStack rval = null;
+		Integer itemData = data;
 		for (net.minecraft.server.ItemStack item : inventory.getContents()) {
-			if (item == null || item.id != typeid)
+			if (item == null || item.id != typeid) {
 				continue;
-			if (data == null) {
-				data = item.getData();
-			} else if (data != item.getData()) {
+			}
+			if (itemData == null) {
+				itemData = item.getData();
+			} else if (itemData != item.getData()) {
 				continue;
 			}
 			// addition
@@ -156,20 +159,19 @@ public class ItemUtil {
 	}
 
 	public static void removeItem(IInventory inventory, int itemid, Integer data, int count) {
+		Integer itemData = data;
+		int countToRemove = count;
 		for (int i = 0; i < inventory.getSize(); i++) {
 			net.minecraft.server.ItemStack item = inventory.getItem(i);
-			if (item == null)
+			if (item == null || item.id != itemid || (itemData != null && item.getData() != itemData)) {
 				continue;
-			if (item.id != itemid)
-				continue;
-			if (data != null && item.getData() != data)
-				continue;
-			if (item.count < count) {
-				count -= item.count;
+			}
+			if (item.count < countToRemove) {
+				countToRemove -= item.count;
 				inventory.setItem(i, null);
 			} else {
-				item.count -= count;
-				count = 0;
+				item.count -= countToRemove;
+				countToRemove = 0;
 				inventory.setItem(i, item.count == 0 ? null : item);
 				break;
 			}
@@ -330,27 +332,27 @@ public class ItemUtil {
 
 		int transferred = 0;
 		int tmptrans;
+		int amountToTransfer = maxAmount;
 
 		// try to add to already existing items
 		for (int i = 0; i < to.getSize(); i++) {
 			ItemStack toitem = to.getItem(i);
 			if (toitem == null)
 				continue;
-			if (toitem.getTypeId() == from.getTypeId()) {
-				if (toitem.getDurability() == from.getDurability()) {
-					tmptrans = transfer(from, toitem, maxAmount);
-					maxAmount -= tmptrans;
-					transferred += tmptrans;
-					setItem(to, i, toitem);
-					// everything done?
-					if (maxAmount <= 0 || from.getAmount() == 0)
-						break;
+			if (toitem.getTypeId() == from.getTypeId() && toitem.getDurability() == from.getDurability()) {
+				tmptrans = transfer(from, toitem, amountToTransfer);
+				amountToTransfer -= tmptrans;
+				transferred += tmptrans;
+				setItem(to, i, toitem);
+				// everything done?
+				if (amountToTransfer <= 0 || from.getAmount() == 0){
+					break;
 				}
 			}
 		}
 
 		// try to add it to empty slots
-		if (maxAmount > 0 && from.getAmount() > 0) {
+		if (amountToTransfer > 0 && from.getAmount() > 0) {
 			ItemStack toitem;
 			for (int i = 0; i < to.getSize(); i++) {
 				toitem = to.getItem(i);
@@ -358,13 +360,14 @@ public class ItemUtil {
 					toitem = new CraftItemStack(0);
 				}
 				if (toitem.getTypeId() == 0) {
-					tmptrans = transfer(from, toitem, maxAmount);
-					maxAmount -= tmptrans;
+					tmptrans = transfer(from, toitem, amountToTransfer);
+					amountToTransfer -= tmptrans;
 					transferred += tmptrans;
 					setItem(to, i, toitem);
 					// everything done?
-					if (maxAmount <= 0 || from.getAmount() == 0)
+					if (amountToTransfer <= 0 || from.getAmount() == 0) {
 						break;
+					}
 				}
 			}
 		}
@@ -384,10 +387,12 @@ public class ItemUtil {
 		net.minecraft.server.ItemStack nmsTo = NativeUtil.getNative(to);
 		int trans = transfer(nmsFrom, nmsTo, maxAmount);
 		// make sure the native items are null if they are empty
-		if (nmsFrom.count == 0)
+		if (nmsFrom.count == 0) {
 			from.setTypeId(0);
-		if (nmsTo.count == 0)
+		}
+		if (nmsTo.count == 0) {
 			to.setTypeId(0);
+		}
 		return trans;
 	}
 
@@ -400,11 +405,11 @@ public class ItemUtil {
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(net.minecraft.server.ItemStack from, net.minecraft.server.ItemStack to, int maxCount) {
-		maxCount = Math.min(maxCount, from.count);
+		int amountToTransfer = Math.min(maxCount, from.count);
 		if (!LogicUtil.nullOrEmpty(to)) {
-			maxCount = Math.min(maxCount, to.getMaxStackSize() - to.count);
+			amountToTransfer = Math.min(amountToTransfer, to.getMaxStackSize() - to.count);
 		}
-		if (maxCount <= 0) {
+		if (amountToTransfer <= 0) {
 			// nothing to stack
 			return 0;
 		} else if (to.id == 0 || to.count == 0) {
@@ -418,9 +423,9 @@ public class ItemUtil {
 				}
 				to.tag.set("ench", from.getEnchantments().clone());
 			}
-			to.count = maxCount;
-			from.count -= maxCount;
-			return maxCount;
+			to.count = amountToTransfer;
+			from.count -= amountToTransfer;
+			return amountToTransfer;
 		} else if (to.id != from.id || to.getData() != from.getData()) {
 			// different items - can't stack
 			return 0;
@@ -437,9 +442,9 @@ public class ItemUtil {
 				return 0;
 			}
 			// stack the items
-			to.count += maxCount;
-			from.count -= maxCount;
-			return maxCount;
+			to.count += amountToTransfer;
+			from.count -= amountToTransfer;
+			return amountToTransfer;
 		}
 	}
 
@@ -546,8 +551,9 @@ public class ItemUtil {
 					} else {
 						trans += transfer(item, to, maxAmount - trans);
 						setItem(from, i, item);
-						if (maxAmount == trans)
+						if (maxAmount == trans) {
 							break;
+						}
 					}
 				}
 			}

@@ -1,8 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
+import net.minecraft.server.World;
+
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
+
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 
 /**
  * Represents a property for a given material<br>
@@ -38,6 +43,32 @@ public abstract class MaterialProperty<T> {
 	 */
 	public T get(Block block) {
 		return block == null ? get(0) : get(block.getTypeId());
+	}
+
+	/**
+	 * Gets this property for the block specified
+	 * 
+	 * @param world the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return The property of the material
+	 */
+	public T get(Chunk chunk, int x, int y, int z) {
+		return get(ChunkUtil.getBlockTypeId(chunk, x, y, z));
+	}
+
+	/**
+	 * Gets this property for the block specified
+	 * 
+	 * @param world the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return The property of the material
+	 */
+	public T get(World world, int x, int y, int z) {
+		return get(world.getTypeId(x, y, z));
 	}
 
 	/**

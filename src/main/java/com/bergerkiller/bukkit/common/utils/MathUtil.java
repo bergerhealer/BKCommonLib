@@ -14,9 +14,11 @@ import org.bukkit.util.Vector;
  * Multiple Math utilities to compare and calculate using Vectors and raw values
  */
 public class MathUtil {
+	private static final int CHUNK_BITS = 4;
+	private static final int CHUNK_VALUES = 16;
 	public static final float DEGTORAD = 0.017453293F;
 	public static final float RADTODEG = 57.29577951F;
-	public static final double halfRootOfTwo = 0.707106781;
+	public static final double HALFROOTOFTWO = 0.707106781;
 
 	public static double lengthSquared(double... values) {
 		double rval = 0;
@@ -75,11 +77,14 @@ public class MathUtil {
 	 * @return [-180 > angle >= 180]
 	 */
 	public static int wrapAngle(int angle) {
-		while (angle <= -180)
-			angle += 360;
-		while (angle > 180)
-			angle -= 360;
-		return angle;
+		int wrappedAngle = angle;
+		while (wrappedAngle <= -180) {
+			wrappedAngle += 360;
+		}
+		while (wrappedAngle > 180) {
+			wrappedAngle -= 360;
+		}
+		return wrappedAngle;
 	}
 
 	/**
@@ -89,11 +94,14 @@ public class MathUtil {
 	 * @return [-180 > angle >= 180]
 	 */
 	public static float wrapAngle(float angle) {
-		while (angle <= -180)
-			angle += 360;
-		while (angle > 180)
-			angle -= 360;
-		return angle;
+		float wrappedAngle = angle;
+		while (wrappedAngle <= -180f) {
+			wrappedAngle += 360f;
+		}
+		while (wrappedAngle > 180f) {
+			wrappedAngle -= 360f;
+		}
+		return wrappedAngle;
 	}
 
 	/**
@@ -311,8 +319,18 @@ public class MathUtil {
 	 * @param loc to convert
 	 * @return chunk coordinate
 	 */
-	public static int locToChunk(double loc) {
-		return MathHelper.floor(loc / 16.0);
+	public static int toChunk(double loc) {
+		return MathHelper.floor(loc / (double) CHUNK_VALUES);
+	}
+
+	/**
+	 * Converts a location value into a chunk coordinate
+	 * 
+	 * @param loc to convert
+	 * @return chunk coordinate
+	 */
+	public static int toChunk(int loc) {
+		return loc >> CHUNK_BITS;
 	}
 
 	/**
@@ -326,22 +344,20 @@ public class MathUtil {
 		return LongHash.toLong(msw, lsw);
 	}
 
-	public static double useOld(double oldvalue, double newvalue) {
-		return useOld(oldvalue, newvalue, 0.2);
-	}
-
 	public static double useOld(double oldvalue, double newvalue, double peruseold) {
 		return oldvalue + (peruseold * (newvalue - oldvalue));
 	}
 
 	public static double lerp(double d1, double d2, double stage) {
-		if (Double.isNaN(stage))
+		if (Double.isNaN(stage)) {
 			return d2;
-		if (stage < 0)
-			stage = 0;
-		if (stage > 1)
-			stage = 1;
-		return d1 * (1 - stage) + d2 * stage;
+		} else if (stage < 0) {
+			return d1;
+		} else if (stage > 1) {
+			return d2;
+		} else {
+			return d1 * (1 - stage) + d2 * stage;
+		}
 	}
 
 	public static Vector lerp(Vector vec1, Vector vec2, double stage) {
@@ -504,10 +520,11 @@ public class MathUtil {
 
 	public static boolean isHeadingTo(Vector offset, Vector velocity) {
 		double dbefore = offset.lengthSquared();
-		if (dbefore < 0.0001)
+		if (dbefore < 0.0001) {
 			return true;
-		velocity = velocity.clone();
-		setVectorLengthSquared(velocity, dbefore);
-		return dbefore > velocity.subtract(offset).lengthSquared();
+		}
+		Vector clonedVelocity = velocity.clone();
+		setVectorLengthSquared(clonedVelocity, dbefore);
+		return dbefore > clonedVelocity.subtract(offset).lengthSquared();
 	}
 }
