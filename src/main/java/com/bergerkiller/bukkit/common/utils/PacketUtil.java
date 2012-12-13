@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet;
-import net.minecraft.server.Packet29DestroyEntity;
+import net.minecraft.server.v1_4_5.EntityPlayer;
+import net.minecraft.server.v1_4_5.Packet;
+import net.minecraft.server.v1_4_5.Packet29DestroyEntity;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;

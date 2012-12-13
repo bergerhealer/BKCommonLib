@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.Arrays;
 
-import net.minecraft.server.MathHelper;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
  * The Int Remainder uses a set amount of different Integer values to represent a single Double value<br>
@@ -37,7 +37,7 @@ public class IntRemainder {
 	public void set(double value) {
 		this.contained = value;
 		// set floor
-		int floor = MathHelper.floor(value);
+		int floor = MathUtil.floor(value);
 		Arrays.fill(this.values, floor);
 		// get remainder (1.2 -> .2)
 		floor = (int) ((value - floor) * this.values.length);

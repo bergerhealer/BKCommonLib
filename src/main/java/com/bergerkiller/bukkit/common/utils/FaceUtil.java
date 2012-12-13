@@ -8,15 +8,18 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 public class FaceUtil {
-	public static final BlockFace[] AXIS = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+	public static final BlockFace[] AXIS = new BlockFace[4];
 	public static final BlockFace[] ATTACHEDFACES = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP };
 	public static final BlockFace[] ATTACHEDFACESDOWN = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
-	public static final BlockFace[] RADIAL = { BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
+	public static final BlockFace[] RADIAL = { BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST };
 	private static final EnumMap<BlockFace, Integer> notches = new EnumMap<BlockFace, Integer>(BlockFace.class);
 
 	static {
 		for (int i = 0; i < RADIAL.length; i++) {
 			notches.put(RADIAL[i], i);
+		}
+		for (int i = 0; i < AXIS.length; i++) {
+			AXIS[i] = RADIAL[i << 1];
 		}
 	}
 
@@ -167,8 +170,8 @@ public class FaceUtil {
 		switch (direction) {
 			case NORTH:
 				return BlockFace.SOUTH;
-			case EAST:
-				return BlockFace.WEST;
+			case WEST:
+				return BlockFace.EAST;
 			default:
 				return direction;
 		}
@@ -309,15 +312,15 @@ public class FaceUtil {
 	 */
 	public static double cos(final BlockFace face) {
 		switch (face) {
-			case NORTH_WEST:
-			case NORTH_EAST:
-				return MathUtil.HALFROOTOFTWO;
 			case SOUTH_WEST:
+			case NORTH_WEST:
+				return MathUtil.HALFROOTOFTWO;
 			case SOUTH_EAST:
+			case NORTH_EAST:
 				return -MathUtil.HALFROOTOFTWO;
-			case SOUTH:
+			case EAST:
 				return -1;
-			case NORTH:
+			case WEST:
 				return 1;
 			default:
 				return 0;
@@ -332,15 +335,15 @@ public class FaceUtil {
 	 */
 	public static double sin(final BlockFace face) {
 		switch (face) {
-			case SOUTH_EAST:
 			case NORTH_EAST:
-				return MathUtil.HALFROOTOFTWO;
 			case NORTH_WEST:
+				return MathUtil.HALFROOTOFTWO;
 			case SOUTH_WEST:
+			case SOUTH_EAST:
 				return -MathUtil.HALFROOTOFTWO;
-			case EAST:
+			case NORTH:
 				return 1;
-			case WEST:
+			case SOUTH:
 				return -1;
 			default:
 				return 0;
@@ -354,26 +357,7 @@ public class FaceUtil {
 	 * @return face angle
 	 */
 	public static int faceToYaw(final BlockFace face) {
-		switch (face) {
-			case NORTH:
-				return 0;
-			case EAST:
-				return 90;
-			case SOUTH:
-				return 180;
-			case WEST:
-				return -90;
-			case SOUTH_WEST:
-				return -135;
-			case NORTH_WEST:
-				return -45;
-			case NORTH_EAST:
-				return 45;
-			case SOUTH_EAST:
-				return 135;
-			default:
-				return 0;
-		}
+		return MathUtil.wrapAngle(45 * faceToNotch(face));
 	}
 
 	/**

@@ -4,13 +4,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import net.minecraft.server.Chunk;
-import net.minecraft.server.ChunkSection;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.Chunk;
+import net.minecraft.server.v1_4_5.ChunkSection;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.util.LongHash;
+import org.bukkit.craftbukkit.v1_4_5.util.LongHash;
+import org.bukkit.craftbukkit.v1_4_5.util.LongHashSet;
+import org.bukkit.craftbukkit.v1_4_5.util.LongObjectHashMap;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
 import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
@@ -22,8 +25,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
-	private static boolean canUseLongObjectHashMap = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongObjectHashMap") != null;
-	private static boolean canUseLongHashSet = CommonUtil.getClass("org.bukkit.craftbukkit.util.LongHashSet") != null;
+	private static boolean canUseLongObjectHashMap = CommonUtil.getClass(Common.CB_ROOT + ".util.LongObjectHashMap") != null;
+	private static boolean canUseLongHashSet = CommonUtil.getClass(Common.CB_ROOT + ".util.LongHashSet") != null;
 
 	/**
 	 * Gets the height of a given column in a chunk
@@ -162,8 +165,8 @@ public class ChunkUtil {
 			Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				try {
-					if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-						return new NativeChunkWrapper(((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).values());
+					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
+						return new NativeChunkWrapper(((LongObjectHashMap) chunks).values());
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
@@ -189,9 +192,9 @@ public class ChunkUtil {
 		final long key = LongHash.toLong(x, z);
 		Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 		if (chunks != null) {
-			if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
+			if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
 				try {
-					return NativeUtil.getChunk(((Chunk) ((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).get(key)));
+					return NativeUtil.getChunk(((Chunk) ((LongObjectHashMap) chunks).get(key)));
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
 					CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
@@ -222,8 +225,8 @@ public class ChunkUtil {
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
-					if (canUseLongObjectHashMap && chunks instanceof org.bukkit.craftbukkit.util.LongObjectHashMap) {
-						((org.bukkit.craftbukkit.util.LongObjectHashMap) chunks).put(key, NativeUtil.getNative(chunk));
+					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
+						((LongObjectHashMap) chunks).put(key, NativeUtil.getNative(chunk));
 						return;
 					}
 				} catch (Throwable t) {
@@ -258,11 +261,11 @@ public class ChunkUtil {
 			Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (unloadQueue != null) {
 				try {
-					if (canUseLongHashSet && unloadQueue instanceof org.bukkit.craftbukkit.util.LongHashSet) {
+					if (canUseLongHashSet && unloadQueue instanceof LongHashSet) {
 						if (unload) {
-							((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).add(x, z);
+							((LongHashSet) unloadQueue).add(x, z);
 						} else {
-							((org.bukkit.craftbukkit.util.LongHashSet) unloadQueue).remove(x, z);
+							((LongHashSet) unloadQueue).remove(x, z);
 						}
 						return;
 					}

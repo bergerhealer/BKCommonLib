@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.EntityMinecart;
+import net.minecraft.server.v1_4_5.EntityMinecart;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;

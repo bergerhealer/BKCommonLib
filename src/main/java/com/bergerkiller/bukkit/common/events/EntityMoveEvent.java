@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.events;
 
-import net.minecraft.server.Entity;
+import net.minecraft.server.v1_4_5.Entity;
 
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;

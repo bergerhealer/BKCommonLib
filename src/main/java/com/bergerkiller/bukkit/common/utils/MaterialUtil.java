@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.Block;
+import net.minecraft.server.v1_4_5.Block;
 
 import org.bukkit.Material;
 
@@ -119,7 +119,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialProperty<Boolean>() {
 		@Override
 		public Boolean get(int typeId) {
-			return net.minecraft.server.Block.i(typeId);
+			return Block.i(typeId);
 		}
 	};
 
@@ -129,7 +129,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> ISSOLID = new MaterialProperty<Boolean>() {
 		@Override
 		public Boolean get(int typeId) {
-			return net.minecraft.server.Block.q[typeId];
+			return Block.q[typeId];
 		}
 	};
 
@@ -139,7 +139,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialProperty<Boolean>() {
 		@Override
 		public Boolean get(int typeId) {
-			net.minecraft.server.Block block = net.minecraft.server.Block.byId[typeId];
+			Block block = Block.byId[typeId];
 			return block == null ? false : block.isPowerSource();
 		}
 	};
@@ -160,7 +160,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Integer> OPACITY = new MaterialProperty<Integer>() {
 		@Override
 		public Integer get(int typeId) {
-			return net.minecraft.server.Block.lightBlock[typeId];
+			return Block.lightBlock[typeId];
 		}
 	};
 }

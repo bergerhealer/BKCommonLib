@@ -10,17 +10,17 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-import net.minecraft.server.EnumGamemode;
-import net.minecraft.server.IChunkLoader;
-import net.minecraft.server.IChunkProvider;
-import net.minecraft.server.IDataManager;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.PlayerFileData;
-import net.minecraft.server.WorldData;
-import net.minecraft.server.WorldProvider;
-import net.minecraft.server.WorldServer;
-import net.minecraft.server.WorldSettings;
-import net.minecraft.server.WorldType;
+import net.minecraft.server.v1_4_5.EnumGamemode;
+import net.minecraft.server.v1_4_5.IChunkLoader;
+import net.minecraft.server.v1_4_5.IChunkProvider;
+import net.minecraft.server.v1_4_5.IDataManager;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.PlayerFileData;
+import net.minecraft.server.v1_4_5.WorldData;
+import net.minecraft.server.v1_4_5.WorldProvider;
+import net.minecraft.server.v1_4_5.WorldServer;
+import net.minecraft.server.v1_4_5.WorldSettings;
+import net.minecraft.server.v1_4_5.WorldType;
 
 /**
  * A dummy world that can be used to operate on or using worlds without referencing it on the server<br>

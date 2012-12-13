@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.ChunkCoordIntPair;
-import net.minecraft.server.EntityHuman;
+import net.minecraft.server.v1_4_5.ChunkCoordIntPair;
+import net.minecraft.server.v1_4_5.EntityHuman;
 
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;

@@ -8,13 +8,13 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.Entity;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_4_5.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -48,12 +48,6 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
-
-	static {
-		if (IS_COMPATIBLE) {
-			Common.undoPackageVersioning(CommonPlugin.class);
-		}
-	}
 
 	public static CommonPlugin getInstance() {
 		return instance;

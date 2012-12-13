@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Animals;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Squid;
 /**
  * Contains entity naming and grouping functions to categorize entities
  */
-@SuppressWarnings("deprecation")
 public class EntityGroupingUtil {
 	public static final String[] animalNames;
 	public static final String[] monsterNames;
@@ -68,10 +66,6 @@ public class EntityGroupingUtil {
 		return isMob(entity.getClass());
 	}
 
-	public static boolean isMob(CreatureType type) {
-		return isMob(type.toEntityType());
-	}
-
 	public static boolean isMob(EntityType entityType) {
 		return isMob(entityType.getEntityClass());
 	}
@@ -96,10 +90,6 @@ public class EntityGroupingUtil {
 		return isAnimal(entity.getClass());
 	}
 
-	public static boolean isAnimal(CreatureType type) {
-		return isAnimal(type.toEntityType());
-	}
-
 	public static boolean isAnimal(EntityType entityType) {
 		return isAnimal(entityType.getEntityClass());
 	}
@@ -110,10 +100,6 @@ public class EntityGroupingUtil {
 
 	public static boolean isMonster(Entity entity) {
 		return isMonster(entity.getClass());
-	}
-
-	public static boolean isMonster(CreatureType type) {
-		return isMonster(type.toEntityType());
 	}
 
 	public static boolean isMonster(EntityType entityType) {
@@ -185,15 +171,5 @@ public class EntityGroupingUtil {
 			return "ocelot";
 		}
 		return type.getName().toLowerCase(Locale.ENGLISH);
-	}
-
-	/**
-	 * Gets the lower-cased name of a given Creature Type
-	 * 
-	 * @param type to get the name of
-	 * @return Creature Type name
-	 */
-	public static String getName(CreatureType type) {
-		return getName(type.toEntityType());
 	}
 }

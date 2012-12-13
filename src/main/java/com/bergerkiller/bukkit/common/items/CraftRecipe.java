@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
-import net.minecraft.server.IInventory;
-import net.minecraft.server.IRecipe;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.MathHelper;
-import net.minecraft.server.ShapedRecipes;
-import net.minecraft.server.ShapelessRecipes;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.IRecipe;
+import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_5.MathHelper;
+import net.minecraft.server.v1_4_5.ShapedRecipes;
+import net.minecraft.server.v1_4_5.ShapelessRecipes;
 
 public class CraftRecipe {
 	private static SafeField<ItemStack[]> sf1 = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
@@ -164,7 +164,7 @@ public class CraftRecipe {
 			}
 			CraftInventory ci = new CraftInventory(inventory);
 			for (ItemStack item : this.output) {
-				ItemUtil.transfer(new CraftItemStack(item.cloneItemStack()), ci, Integer.MAX_VALUE);
+				ItemUtil.transfer(CraftItemStack.asCraftMirror(item.cloneItemStack()), ci, Integer.MAX_VALUE);
 			}
 			return true;
 		}

@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import net.minecraft.server.ChunkCoordIntPair;
-import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.v1_4_5.ChunkCoordIntPair;
+import net.minecraft.server.v1_4_5.EntityPlayer;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;

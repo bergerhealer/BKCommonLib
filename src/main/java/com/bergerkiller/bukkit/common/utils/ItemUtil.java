@@ -1,15 +1,15 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.EntityItem;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.Item;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
+import net.minecraft.server.v1_4_5.EntityItem;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.Item;
+import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.NBTTagList;
 
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.items.ItemParser;
 import com.bergerkiller.bukkit.common.natives.IInventoryBaseImpl;
@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.natives.IInventoryBaseImpl;
 public class ItemUtil {
 
 	public static void transfer(IInventory from, IInventory to) {
-		net.minecraft.server.ItemStack[] items = from.getContents();
+		ItemStack[] items = from.getContents();
 		for (int i = 0; i < items.length; i++) {
 			if (items[i] != null) {
 				to.setItem(i, items[i].cloneItemStack());
@@ -28,8 +28,8 @@ public class ItemUtil {
 		}
 	}
 
-	public static void setItem(Inventory inv, int index, ItemStack item) {
-		ItemStack itemToSet = item;
+	public static void setItem(Inventory inv, int index, org.bukkit.inventory.ItemStack item) {
+		org.bukkit.inventory.ItemStack itemToSet = item;
 		if (LogicUtil.nullOrEmpty(itemToSet)) {
 			itemToSet = null;
 		}
@@ -65,9 +65,9 @@ public class ItemUtil {
 	 * @param data of the items to look for, null for any data
 	 * @return Amount of items in the inventory
 	 */
-	public static ItemStack findItem(Inventory inventory, int typeid, Integer data) {
-		net.minecraft.server.ItemStack item = findItem(NativeUtil.getNative(inventory), typeid, data);
-		return item == null ? null : new CraftItemStack(item);
+	public static org.bukkit.inventory.ItemStack findItem(Inventory inventory, int typeid, Integer data) {
+		ItemStack item = findItem(NativeUtil.getNative(inventory), typeid, data);
+		return item == null ? null : NativeUtil.getItemStack(item);
 	}
 
 	/**
@@ -78,10 +78,10 @@ public class ItemUtil {
 	 * @param data of the items to look for, null for any data
 	 * @return Amount of items in the inventory
 	 */
-	public static net.minecraft.server.ItemStack findItem(IInventory inventory, int typeid, Integer data) {
-		net.minecraft.server.ItemStack rval = null;
+	public static ItemStack findItem(IInventory inventory, int typeid, Integer data) {
+		ItemStack rval = null;
 		Integer itemData = data;
-		for (net.minecraft.server.ItemStack item : inventory.getContents()) {
+		for (ItemStack item : inventory.getContents()) {
 			if (item == null || item.id != typeid) {
 				continue;
 			}
@@ -111,14 +111,14 @@ public class ItemUtil {
 	public static int getItemCount(Inventory inventory, Integer typeid, Integer data) {
 		if (typeid == null) {
 			int count = 0;
-			for (ItemStack item : inventory.getContents()) {
+			for (org.bukkit.inventory.ItemStack item : inventory.getContents()) {
 				if (!LogicUtil.nullOrEmpty(item)) {
 					count += item.getAmount();
 				}
 			}
 			return count;
 		} else {
-			ItemStack rval = findItem(inventory, typeid, data);
+			org.bukkit.inventory.ItemStack rval = findItem(inventory, typeid, data);
 			return rval == null ? 0 : rval.getAmount();
 		}
 	}
@@ -134,19 +134,19 @@ public class ItemUtil {
 	public static int getItemCount(IInventory inventory, Integer typeid, Integer data) {
 		if (typeid == null) {
 			int count = 0;
-			for (net.minecraft.server.ItemStack item : inventory.getContents()) {
+			for (ItemStack item : inventory.getContents()) {
 				if (!LogicUtil.nullOrEmpty(item)) {
 					count += item.count;
 				}
 			}
 			return count;
 		} else {
-			net.minecraft.server.ItemStack rval = findItem(inventory, typeid, data);
+			ItemStack rval = findItem(inventory, typeid, data);
 			return rval == null ? 0 : rval.count;
 		}
 	}
 
-	public static void removeItem(Inventory inventory, ItemStack item) {
+	public static void removeItem(Inventory inventory, org.bukkit.inventory.ItemStack item) {
 		removeItem(inventory, item.getTypeId(), (int) item.getDurability(), item.getAmount());
 	}
 
@@ -154,7 +154,7 @@ public class ItemUtil {
 		removeItem(NativeUtil.getNative(inventory), itemid, data, count);
 	}
 
-	public static void removeItem(IInventory inventory, net.minecraft.server.ItemStack item) {
+	public static void removeItem(IInventory inventory, ItemStack item) {
 		removeItem(inventory, item.id, item.getData() == -1 ? null : item.getData(), item.count);
 	}
 
@@ -162,7 +162,7 @@ public class ItemUtil {
 		Integer itemData = data;
 		int countToRemove = count;
 		for (int i = 0; i < inventory.getSize(); i++) {
-			net.minecraft.server.ItemStack item = inventory.getItem(i);
+			ItemStack item = inventory.getItem(i);
 			if (item == null || item.id != itemid || (itemData != null && item.getData() != itemData)) {
 				continue;
 			}
@@ -184,8 +184,8 @@ public class ItemUtil {
 	 * @param input array to process
 	 * @return Cloned item stack array
 	 */
-	public static ItemStack[] cloneItems(ItemStack[] input) {
-		ItemStack[] cloned = new ItemStack[input.length];
+	public static org.bukkit.inventory.ItemStack[] cloneItems(org.bukkit.inventory.ItemStack[] input) {
+		org.bukkit.inventory.ItemStack[] cloned = new org.bukkit.inventory.ItemStack[input.length];
 		for (int i = 0; i < cloned.length; i++) {
 			cloned[i] = input[i] == null ? null : input[i].clone();
 		}
@@ -198,8 +198,8 @@ public class ItemUtil {
 	 * @param input array to process
 	 * @return Cloned item stack array
 	 */
-	public static net.minecraft.server.ItemStack[] cloneItems(net.minecraft.server.ItemStack[] input) {
-		net.minecraft.server.ItemStack[] cloned = new net.minecraft.server.ItemStack[input.length];
+	public static ItemStack[] cloneItems(ItemStack[] input) {
+		ItemStack[] cloned = new ItemStack[input.length];
 		for (int i = 0; i < cloned.length; i++) {
 			cloned[i] = input[i] == null ? null : input[i].cloneItemStack();
 		}
@@ -211,7 +211,7 @@ public class ItemUtil {
 	 * 
 	 * @return Whether it was possible
 	 */
-	public static boolean testTransfer(net.minecraft.server.ItemStack[] from, IInventory to) {
+	public static boolean testTransfer(ItemStack[] from, IInventory to) {
 		return testTransfer(from, to.getContents());
 	}
 
@@ -220,10 +220,10 @@ public class ItemUtil {
 	 * 
 	 * @return Whether it was possible
 	 */
-	public static boolean testTransfer(net.minecraft.server.ItemStack[] from, net.minecraft.server.ItemStack[] to) {
+	public static boolean testTransfer(ItemStack[] from, ItemStack[] to) {
 		Inventory invto = new IInventoryBaseImpl(cloneItems(to)).getInventory();
-		for (net.minecraft.server.ItemStack nitem : cloneItems(from)) {
-			ItemStack item = new CraftItemStack(nitem);
+		for (ItemStack nitem : cloneItems(from)) {
+			org.bukkit.inventory.ItemStack item = NativeUtil.getItemStack(nitem);
 			transfer(item, invto, Integer.MAX_VALUE);
 			if (item.getAmount() > 0) {
 				return false;
@@ -237,8 +237,8 @@ public class ItemUtil {
 	 * 
 	 * @return The amount that could be transferred
 	 */
-	public static int testTransfer(ItemStack from, Inventory to) {
-		return testTransfer(((CraftItemStack) from).getHandle(), ((CraftInventory) to).getInventory());
+	public static int testTransfer(org.bukkit.inventory.ItemStack from, Inventory to) {
+		return testTransfer(NativeUtil.getNative(from), ((CraftInventory) to).getInventory());
 	}
 
 	/**
@@ -246,14 +246,14 @@ public class ItemUtil {
 	 * 
 	 * @return The amount that could be transferred
 	 */
-	public static int testTransfer(net.minecraft.server.ItemStack from, IInventory to) {
+	public static int testTransfer(ItemStack from, IInventory to) {
 		if (LogicUtil.nullOrEmpty(from)) {
 			return 0;
 		}
 		int olditemcount = from.count;
 		int trans = 0;
 		int tmptrans;
-		for (net.minecraft.server.ItemStack item : to.getContents()) {
+		for (ItemStack item : to.getContents()) {
 			tmptrans = testTransfer(from, item);
 			from.count -= tmptrans;
 			trans += tmptrans;
@@ -270,8 +270,8 @@ public class ItemUtil {
 	 * 
 	 * @return The amount that could be transferred
 	 */
-	public static int testTransfer(ItemStack from, ItemStack to) {
-		return testTransfer(((CraftItemStack) from).getHandle(), ((CraftItemStack) to).getHandle());
+	public static int testTransfer(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
+		return testTransfer(NativeUtil.getNative(from), NativeUtil.getNative(to));
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class ItemUtil {
 	 * 
 	 * @return The amount that could be transferred
 	 */
-	public static int testTransfer(net.minecraft.server.ItemStack from, net.minecraft.server.ItemStack to) {
+	public static int testTransfer(ItemStack from, ItemStack to) {
 		final int trans;
 		if (from == null) {
 			trans = 0;
@@ -306,7 +306,7 @@ public class ItemUtil {
 		int transferred = 0;
 		if (maxAmount > 0) {
 			for (int i = 0; i < from.getSize(); i++) {
-				ItemStack item = from.getItem(i);
+				org.bukkit.inventory.ItemStack item = from.getItem(i);
 				if (item == null || (parser != null && !parser.match(item))) {
 					continue;
 				}
@@ -325,7 +325,7 @@ public class ItemUtil {
 	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
-	public static int transfer(ItemStack from, Inventory to, int maxAmount) {
+	public static int transfer(org.bukkit.inventory.ItemStack from, Inventory to, int maxAmount) {
 		if (maxAmount <= 0 || from == null || from.getTypeId() == 0 || from.getAmount() < 1) {
 			return 0;
 		}
@@ -336,7 +336,7 @@ public class ItemUtil {
 
 		// try to add to already existing items
 		for (int i = 0; i < to.getSize(); i++) {
-			ItemStack toitem = to.getItem(i);
+			org.bukkit.inventory.ItemStack toitem = to.getItem(i);
 			if (toitem == null)
 				continue;
 			if (toitem.getTypeId() == from.getTypeId() && toitem.getDurability() == from.getDurability()) {
@@ -353,11 +353,11 @@ public class ItemUtil {
 
 		// try to add it to empty slots
 		if (amountToTransfer > 0 && from.getAmount() > 0) {
-			ItemStack toitem;
+			org.bukkit.inventory.ItemStack toitem;
 			for (int i = 0; i < to.getSize(); i++) {
 				toitem = to.getItem(i);
 				if (toitem == null) {
-					toitem = new CraftItemStack(0);
+					toitem = CraftItemStack.asCraftCopy(new org.bukkit.inventory.ItemStack(0));
 				}
 				if (toitem.getTypeId() == 0) {
 					tmptrans = transfer(from, toitem, amountToTransfer);
@@ -382,9 +382,9 @@ public class ItemUtil {
 	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
-	public static int transfer(ItemStack from, ItemStack to, int maxAmount) {
-		net.minecraft.server.ItemStack nmsFrom = NativeUtil.getNative(from);
-		net.minecraft.server.ItemStack nmsTo = NativeUtil.getNative(to);
+	public static int transfer(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to, int maxAmount) {
+		ItemStack nmsFrom = NativeUtil.getNative(from);
+		ItemStack nmsTo = NativeUtil.getNative(to);
 		int trans = transfer(nmsFrom, nmsTo, maxAmount);
 		// make sure the native items are null if they are empty
 		if (nmsFrom.count == 0) {
@@ -404,7 +404,7 @@ public class ItemUtil {
 	 * @param maxAmount The maximum amount of the item to transfer
 	 * @return The amount of the item that got transferred
 	 */
-	public static int transfer(net.minecraft.server.ItemStack from, net.minecraft.server.ItemStack to, int maxCount) {
+	public static int transfer(ItemStack from, ItemStack to, int maxCount) {
 		int amountToTransfer = Math.min(maxCount, from.count);
 		if (!LogicUtil.nullOrEmpty(to)) {
 			amountToTransfer = Math.min(amountToTransfer, to.getMaxStackSize() - to.count);
@@ -510,12 +510,12 @@ public class ItemUtil {
 	 * @param parser The item parser used to set what item to transfer if the receiving item is empty. Can be null.
 	 * @return The amount of the item that got transferred
 	 */
-	public static int transfer(Inventory from, ItemStack to, ItemParser parser, int maxAmount) {
+	public static int transfer(Inventory from, org.bukkit.inventory.ItemStack to, ItemParser parser, int maxAmount) {
 		int trans = 0;
 		boolean hasdata = true;
 		boolean all = false;
 		for (int i = 0; i < from.getSize(); i++) {
-			ItemStack item = from.getItem(i);
+			org.bukkit.inventory.ItemStack item = from.getItem(i);
 			if (item == null || item.getTypeId() == 0 || item.getAmount() < 1) {
 				continue;
 			}
@@ -567,7 +567,7 @@ public class ItemUtil {
 	 * @param stack to get the max stacked size
 	 * @return max stacking size
 	 */
-	public static int getMaxSize(net.minecraft.server.ItemStack stack) {
+	public static int getMaxSize(ItemStack stack) {
 		if (stack == null) {
 			return 0;
 		}
@@ -585,7 +585,7 @@ public class ItemUtil {
 	 * @param stack to get the max stacked size
 	 * @return max stacking size
 	 */
-	public static int getMaxSize(ItemStack stack) {
+	public static int getMaxSize(org.bukkit.inventory.ItemStack stack) {
 		if (stack == null) {
 			return 0;
 		} else {

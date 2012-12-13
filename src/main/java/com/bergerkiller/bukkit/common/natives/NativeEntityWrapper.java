@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.natives;
 import java.util.Collection;
 import java.util.Iterator;
 
-import net.minecraft.server.Entity;
+import net.minecraft.server.v1_4_5.Entity;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;

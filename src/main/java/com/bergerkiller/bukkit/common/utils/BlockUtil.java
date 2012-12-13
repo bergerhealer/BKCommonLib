@@ -4,25 +4,24 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.server.ChunkCoordinates;
-import net.minecraft.server.Packet;
-import net.minecraft.server.TileEntity;
-import net.minecraft.server.TileEntityChest;
-import net.minecraft.server.TileEntityDispenser;
-import net.minecraft.server.TileEntityFurnace;
-import net.minecraft.server.TileEntitySign;
+import net.minecraft.server.v1_4_5.Block;
+import net.minecraft.server.v1_4_5.ChunkCoordinates;
+import net.minecraft.server.v1_4_5.Packet;
+import net.minecraft.server.v1_4_5.TileEntity;
+import net.minecraft.server.v1_4_5.TileEntityChest;
+import net.minecraft.server.v1_4_5.TileEntityDispenser;
+import net.minecraft.server.v1_4_5.TileEntityFurnace;
+import net.minecraft.server.v1_4_5.TileEntitySign;
+import net.minecraft.server.v1_4_5.World;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
@@ -40,7 +39,7 @@ public class BlockUtil extends MaterialUtil {
 	 * Directly obtains the Material Data from the block<br>
 	 * This alternative does not create a Block State and is preferred if you only need material data
 	 */
-	public static MaterialData getData(Block block) {
+	public static MaterialData getData(org.bukkit.block.Block block) {
 		return block.getType().getNewData(block.getData());
 	}
 
@@ -51,7 +50,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param type to cast to
 	 * @return The cast material data, or null if there was no data or if casting failed
 	 */
-	public static <T> T getData(Block block, Class<T> type) {
+	public static <T> T getData(org.bukkit.block.Block block, Class<T> type) {
 		try {
 			return type.cast(getData(block));
 		} catch (Exception ex) {
@@ -85,7 +84,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param checkY state, True to include the y distance, False to exclude it
 	 * @return The Manhattan distance
 	 */
-	public static int getManhattanDistance(Block b1, Block b2, boolean checkY) {
+	public static int getManhattanDistance(org.bukkit.block.Block b1, org.bukkit.block.Block b2, boolean checkY) {
 		int d = Math.abs(b1.getX() - b2.getX());
 		d += Math.abs(b1.getZ() - b2.getZ());
 		if (checkY)
@@ -100,7 +99,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param block2 to evaluate
 	 * @return True if the blocks are the same, False if not
 	 */
-	public static boolean equals(Block block1, Block block2) {
+	public static boolean equals(org.bukkit.block.Block block1, org.bukkit.block.Block block2) {
 		if (block1 == null || block2 == null)
 			return false;
 		if (block1 == block2)
@@ -115,10 +114,11 @@ public class BlockUtil extends MaterialUtil {
 	 * @param faces to get the blocks relative to the main of
 	 * @return An array of relative blocks to the main based on the input faces
 	 */
-	public static Block[] getRelative(Block main, BlockFace... faces) {
-		if (main == null)
-			return new Block[0];
-		Block[] rval = new Block[faces.length];
+	public static org.bukkit.block.Block[] getRelative(org.bukkit.block.Block main, BlockFace... faces) {
+		if (main == null) {
+			return new org.bukkit.block.Block[0];
+		}
+		org.bukkit.block.Block[] rval = new org.bukkit.block.Block[faces.length];
 		for (int i = 0; i < rval.length; i++) {
 			rval[i] = main.getRelative(faces[i]);
 		}
@@ -131,7 +131,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param block to use
 	 * @return Chunk coordinates
 	 */
-	public static ChunkCoordinates getCoordinates(final Block block) {
+	public static ChunkCoordinates getCoordinates(final org.bukkit.block.Block block) {
 		return new ChunkCoordinates(block.getX(), block.getY(), block.getZ());
 	}
 
@@ -142,7 +142,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param at coordinates
 	 * @return Block a the coordinates in the world
 	 */
-	public static Block getBlock(World world, ChunkCoordinates at) {
+	public static org.bukkit.block.Block getBlock(org.bukkit.World world, ChunkCoordinates at) {
 		return world.getBlockAt(at.x, at.y, at.z);
 	}
 
@@ -153,7 +153,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param attachable block
 	 * @return Attached face
 	 */
-	public static BlockFace getAttachedFace(Block attachable) {
+	public static BlockFace getAttachedFace(org.bukkit.block.Block attachable) {
 		Attachable data = getData(attachable, Attachable.class);
 		return data == null ? BlockFace.DOWN : data.getAttachedFace();
 	}
@@ -164,7 +164,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param attachable block
 	 * @return Block the attachable is attached to
 	 */
-	public static Block getAttachedBlock(Block attachable) {
+	public static org.bukkit.block.Block getAttachedBlock(org.bukkit.block.Block attachable) {
 		return attachable.getRelative(getAttachedFace(attachable));
 	}
 
@@ -174,7 +174,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param directional block
 	 * @return facing direction
 	 */
-	public static BlockFace getFacing(Block directional) {
+	public static BlockFace getFacing(org.bukkit.block.Block directional) {
 		Directional data = getData(directional, Directional.class);
 		return data == null ? BlockFace.NORTH : data.getFacing();
 	}
@@ -185,7 +185,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param block to set
 	 * @param facing direction to set to
 	 */
-	public static void setFacing(Block block, BlockFace facing) {
+	public static void setFacing(org.bukkit.block.Block block, BlockFace facing) {
 		MaterialData data = getData(block);
 		if (data != null && data instanceof Directional) {
 			((Directional) data).setFacingDirection(facing);
@@ -199,8 +199,8 @@ public class BlockUtil extends MaterialUtil {
 	 * @param block center
 	 * @param down state to set to
 	 */
-	public static void setLeversAroundBlock(Block block, boolean down) {
-		Block b;
+	public static void setLeversAroundBlock(org.bukkit.block.Block block, boolean down) {
+		org.bukkit.block.Block b;
 		for (BlockFace dir : FaceUtil.ATTACHEDFACES) {
 			// Attached lever at this direction?
 			if (isType(b = block.getRelative(dir), Material.LEVER) && getAttachedFace(b) == dir.getOppositeFace()) {
@@ -216,7 +216,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param lever block
 	 * @return True if the lever is down, False if not
 	 */
-	public static boolean isLeverDown(Block lever) {
+	public static boolean isLeverDown(org.bukkit.block.Block lever) {
 		byte dat = lever.getData();
 		return dat == (dat | 0x8);
 	}
@@ -228,7 +228,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param lever block
 	 * @param down state to set to
 	 */
-	public static void setLever(Block lever, boolean down) {
+	public static void setLever(org.bukkit.block.Block lever, boolean down) {
 		byte data = lever.getData();
 		int newData;
 		if (down) {
@@ -252,12 +252,25 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
+	 * Causes a block to drop items as if it was broken
+	 * 
+	 * @param block to spawn the drops for
+	 * @param yield of the drop
+	 */
+	public static void dropNaturally(org.bukkit.block.Block block, float yield) {
+		Block b = Block.byId[block.getTypeId()];
+		if (b != null) {
+			b.dropNaturally(NativeUtil.getNative(block.getWorld()), block.getX(), block.getY(), block.getZ(), block.getData(), yield, 0);
+		}
+	}
+
+	/**
 	 * Performs Physics at the block specified
 	 * 
 	 * @param block to apply physics to
 	 * @param callertype Material, the source of these physics (use Air if there is no caller)
 	 */
-	public static void applyPhysics(Block block, Material callertype) {
+	public static void applyPhysics(org.bukkit.block.Block block, Material callertype) {
 		applyPhysics(block, callertype.getId());
 	}
 
@@ -267,7 +280,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param block to apply physics to
 	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
 	 */
-	public static void applyPhysics(Block block, int callertypeid) {
+	public static void applyPhysics(org.bukkit.block.Block block, int callertypeid) {
 		NativeUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
 	}
 
@@ -278,7 +291,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param from direction
 	 * @param to direction
 	 */
-	public static void setRails(Block rails, BlockFace from, BlockFace to) {
+	public static void setRails(org.bukkit.block.Block rails, BlockFace from, BlockFace to) {
 		setRails(rails, FaceUtil.combine(from, to).getOppositeFace());
 	}
 
@@ -288,7 +301,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param rails to set the alignment for
 	 * @param alignment
 	 */
-	public static void setRails(Block rails, BlockFace direction) {
+	public static void setRails(org.bukkit.block.Block rails, BlockFace direction) {
 		Material type = rails.getType();
 		if (type == Material.RAILS) {
 			BlockFace railsDirection;
@@ -316,23 +329,23 @@ public class BlockUtil extends MaterialUtil {
 	 * @param type to cast to
 	 * @return The block state cast to the type, or null if not possible
 	 */
-	public static <T extends BlockState> T getState(Block block, Class<T> type) {
+	public static <T extends BlockState> T getState(org.bukkit.block.Block block, Class<T> type) {
 		return CommonUtil.tryCast(block.getState(), type);
 	}
 
-	public static Rails getRails(Block railsblock) {
+	public static Rails getRails(org.bukkit.block.Block railsblock) {
 		return getData(railsblock, Rails.class);
 	}
 
-	public static Sign getSign(Block signblock) {
+	public static Sign getSign(org.bukkit.block.Block signblock) {
 		return getState(signblock, Sign.class);
 	}
 
-	public static Chest getChest(Block chestblock) {
+	public static Chest getChest(org.bukkit.block.Block chestblock) {
 		return getState(chestblock, Chest.class);
 	}
 
-	public static <T extends TileEntity> T getTile(Block block, Class<T> type) {
+	public static <T extends TileEntity> T getTile(org.bukkit.block.Block block, Class<T> type) {
 		try {
 			return type.cast(NativeUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
 		} catch (Exception ex) {
@@ -364,42 +377,42 @@ public class BlockUtil extends MaterialUtil {
 		return getTile(dispenser, TileEntityDispenser.class);
 	}
 
-	public static TileEntitySign getTileSign(Block block) {
+	public static TileEntitySign getTileSign(org.bukkit.block.Block block) {
 		return getTile(block, TileEntitySign.class);
 	}
 
-	public static TileEntityChest getTileChest(Block block) {
+	public static TileEntityChest getTileChest(org.bukkit.block.Block block) {
 		return getTile(block, TileEntityChest.class);
 	}
 
-	public static TileEntityFurnace getTileFurnace(Block block) {
+	public static TileEntityFurnace getTileFurnace(org.bukkit.block.Block block) {
 		return getTile(block, TileEntityFurnace.class);
 	}
 
-	public static TileEntityDispenser getTileDispenser(Block block) {
+	public static TileEntityDispenser getTileDispenser(org.bukkit.block.Block block) {
 		return getTile(block, TileEntityDispenser.class);
 	}
 
-	public static Set<TileEntity> getTileEntities(Block middle) {
+	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle) {
 		return getTileEntities(middle, 0, 0, 0);
 	}
 
-	public static Set<TileEntity> getTileEntities(Block middle, int radius) {
+	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle, int radius) {
 		return getTileEntities(middle, radius, radius, radius);
 	}
 
-	public static Set<TileEntity> getTileEntities(Block middle, int radiusX, int radiusY, int radiusZ) {
+	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle, int radiusX, int radiusY, int radiusZ) {
 		return getTileEntities(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
 	}
 
-	public static Set<TileEntity> getTileEntities(World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
+	public static Set<TileEntity> getTileEntities(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
 		return getTileEntities(NativeUtil.getNative(world), x, y, z, radiusX, radiusY, radiusZ);
 	}
 
 	private static LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
 
 	@SuppressWarnings("unchecked")
-	public static Set<TileEntity> getTileEntities(net.minecraft.server.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
+	public static Set<TileEntity> getTileEntities(World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
 		tilebuff.clear();
 		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
 			// simplified coding instead
@@ -428,7 +441,7 @@ public class BlockUtil extends MaterialUtil {
 		return tilebuff;
 	}
 
-	public static World getWorld(TileEntity tile) {
+	public static org.bukkit.World getWorld(TileEntity tile) {
 		return TileEntityRef.world.get(tile).getWorld();
 	}
 
@@ -439,7 +452,7 @@ public class BlockUtil extends MaterialUtil {
 	private static void offerTile(TileEntity tile) {
 		if (tile instanceof TileEntityChest) {
 			// find a possible double chest as well
-			net.minecraft.server.World world = NativeUtil.getNative(getWorld(tile));
+			World world = NativeUtil.getNative(getWorld(tile));
 			int tmpx, tmpz;
 			for (BlockFace sface : FaceUtil.AXIS) {
 				tmpx = tile.x + sface.getModX();
@@ -467,19 +480,8 @@ public class BlockUtil extends MaterialUtil {
 	 * 
 	 * @param block to break
 	 */
-	public static void breakBlock(Block block) {
-		int x = block.getX();
-		int y = block.getY();
-		int z = block.getZ();
-		net.minecraft.server.World world = ((CraftWorld) block.getWorld()).getHandle();
-		net.minecraft.server.Block bb = net.minecraft.server.Block.byId[block.getTypeId()];
-		if (bb != null) {
-			try {
-				bb.dropNaturally(world, x, y, z, block.getData(), 20, 0);
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
-		}
-		world.setTypeId(x, y, z, 0);
+	public static void breakBlock(org.bukkit.block.Block block) {
+		dropNaturally(block, 20.0f);
+		block.setTypeId(0);
 	}
 }

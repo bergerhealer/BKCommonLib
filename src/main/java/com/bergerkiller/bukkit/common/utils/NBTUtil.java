@@ -5,16 +5,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import net.minecraft.server.Entity;
-import net.minecraft.server.FoodMetaData;
-import net.minecraft.server.InventoryEnderChest;
-import net.minecraft.server.MobEffect;
-import net.minecraft.server.NBTCompressedStreamTools;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagDouble;
-import net.minecraft.server.NBTTagFloat;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.PlayerInventory;
+import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_5.FoodMetaData;
+import net.minecraft.server.v1_4_5.InventoryEnderChest;
+import net.minecraft.server.v1_4_5.MobEffect;
+import net.minecraft.server.v1_4_5.NBTCompressedStreamTools;
+import net.minecraft.server.v1_4_5.NBTTagCompound;
+import net.minecraft.server.v1_4_5.NBTTagDouble;
+import net.minecraft.server.v1_4_5.NBTTagFloat;
+import net.minecraft.server.v1_4_5.NBTTagList;
+import net.minecraft.server.v1_4_5.PlayerInventory;
 
 /**
  * Contains utility functions for dealing with NBT data

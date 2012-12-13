@@ -6,15 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.server.CraftingManager;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.IRecipe;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.RecipesFurnace;
-import net.minecraft.server.TileEntityFurnace;
+import net.minecraft.server.v1_4_5.CraftingManager;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.IRecipe;
+import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_5.RecipesFurnace;
+import net.minecraft.server.v1_4_5.TileEntityFurnace;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.items.CraftRecipe;
@@ -70,7 +69,7 @@ public class RecipeUtil {
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
-		return new CraftItemStack(RecipesFurnace.getInstance().getResult(itemid));
+		return NativeUtil.getItemStack(RecipesFurnace.getInstance().getResult(itemid));
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
@@ -85,7 +84,7 @@ public class RecipeUtil {
 	public static CraftRecipe[] getCraftingRequirements(int itemid, Integer data) {
 		List<CraftRecipe> poss = new ArrayList<CraftRecipe>();
 		for (IRecipe rec : getCraftRecipes()) {
-			net.minecraft.server.ItemStack item = rec.b();
+			ItemStack item = rec.b();
 			if (item != null && item.id == itemid && (data == null || data == item.getData())) {
 				CraftRecipe crec = CraftRecipe.create(rec);
 				if (crec != null)

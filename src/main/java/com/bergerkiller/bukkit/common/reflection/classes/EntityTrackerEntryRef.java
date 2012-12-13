@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.Entity;
-import net.minecraft.server.EntityTrackerEntry;
-import net.minecraft.server.Packet;
+import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_5.EntityTrackerEntry;
+import net.minecraft.server.v1_4_5.Packet;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;

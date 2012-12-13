@@ -3,17 +3,17 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.List;
 import java.util.UUID;
 
-import net.minecraft.server.Chunk;
-import net.minecraft.server.Entity;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.EntityTrackerEntry;
-import net.minecraft.server.IntHashMap;
-import net.minecraft.server.MathHelper;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.Chunk;
+import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_5.EntityPlayer;
+import net.minecraft.server.v1_4_5.EntityTrackerEntry;
+import net.minecraft.server.v1_4_5.IntHashMap;
+import net.minecraft.server.v1_4_5.MathHelper;
+import net.minecraft.server.v1_4_5.World;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -21,17 +21,17 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 public class EntityUtil extends EntityPropertyUtil {
 
-	public static <T extends org.bukkit.entity.Entity> T getEntity(World world, UUID uid, Class<T> type) {
+	public static <T extends org.bukkit.entity.Entity> T getEntity(org.bukkit.World world, UUID uid, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(world, uid), type);
 	}
 
-	public static org.bukkit.entity.Entity getEntity(World world, UUID uid) {
-		net.minecraft.server.Entity e = getEntity(NativeUtil.getNative(world), uid);
+	public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
+		Entity e = getEntity(NativeUtil.getNative(world), uid);
 		return e == null ? null : e.getBukkitEntity();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Entity getEntity(net.minecraft.server.World world, UUID uid) {
+	public static Entity getEntity(World world, UUID uid) {
 		for (Entity e : (List<Entity>) world.entityList) {
 			if (e.uniqueId.equals(uid))
 				return e;
@@ -58,7 +58,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param toReplace Entity, which will be removed
 	 * @param with Entity, which will be added in its place
 	 */
-	public static void setEntity(Entity toreplace, net.minecraft.server.Entity with) {
+	public static void setEntity(Entity toreplace, Entity with) {
 		setEntity(toreplace, with, WorldUtil.getTrackerEntry(toreplace));
 	}
 
@@ -71,7 +71,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param tracker to use for the new entity
 	 */
 	@SuppressWarnings("unchecked")
-	public static void setEntity(final net.minecraft.server.Entity toreplace, final net.minecraft.server.Entity with, EntityTrackerEntry tracker) {
+	public static void setEntity(final Entity toreplace, final Entity with, EntityTrackerEntry tracker) {
 		// transfer important information
 		with.locX = toreplace.locX;
 		with.locY = toreplace.locY;
@@ -96,7 +96,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(EntityRef.chunkX.get(with), EntityRef.chunkZ.get(with));
 
 		// replace the entity in the world
-		List<net.minecraft.server.Entity> worldEntities = toreplace.world.entityList;
+		List<Entity> worldEntities = toreplace.world.entityList;
 		for (int i = 0; i < worldEntities.size(); i++) {
 			if (worldEntities.get(i).id == toreplace.id) {
 				toreplace.world.entityList.set(i, with);
@@ -132,8 +132,8 @@ public class EntityUtil extends EntityPropertyUtil {
 	}
 
 	@SuppressWarnings({"unchecked"})
-	private static boolean replaceInChunk(Chunk chunk, int chunkY, net.minecraft.server.Entity toreplace, net.minecraft.server.Entity with) {
-		List<net.minecraft.server.Entity> list = chunk.entitySlices[chunkY];
+	private static boolean replaceInChunk(Chunk chunk, int chunkY, Entity toreplace, Entity with) {
+		List<Entity> list = chunk.entitySlices[chunkY];
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).id == toreplace.id) {
 				list.set(i, with);
@@ -163,7 +163,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		return isNearChunk(NativeUtil.getNative(entity), cx, cz, chunkview);
 	}
 
-	public static boolean isNearChunk(net.minecraft.server.Entity entity, final int cx, final int cz, final int chunkview) {
+	public static boolean isNearChunk(Entity entity, final int cx, final int cz, final int chunkview) {
 		if (Math.abs(MathUtil.toChunk(entity.locX) - cx) > chunkview)
 			return false;
 		if (Math.abs(MathUtil.toChunk(entity.locZ) - cz) > chunkview)
@@ -175,7 +175,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		return isNearBlock(NativeUtil.getNative(entity), bx, bz, blockview);
 	}
 
-	public static boolean isNearBlock(net.minecraft.server.Entity entity, final int bx, final int bz, final int blockview) {
+	public static boolean isNearBlock(Entity entity, final int bx, final int bz, final int blockview) {
 		if (Math.abs(MathHelper.floor(entity.locX) - bx) > blockview)
 			return false;
 		if (Math.abs(MathHelper.floor(entity.locZ) - bz) > blockview)
@@ -213,11 +213,11 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to teleport
 	 * @param to location to teleport to
 	 */
-	public static boolean teleport(final net.minecraft.server.Entity entity, final Location to) {
+	public static boolean teleport(final Entity entity, final Location to) {
 		WorldServer newworld = NativeUtil.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
 		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
-			final net.minecraft.server.Entity passenger = entity.passenger;
+			final Entity passenger = entity.passenger;
 			if (passenger != null) {
 				entity.passenger = null;
 				passenger.vehicle = null;

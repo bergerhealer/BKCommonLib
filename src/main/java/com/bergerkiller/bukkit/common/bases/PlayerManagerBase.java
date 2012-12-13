@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.EntityPlayer;
+import net.minecraft.server.v1_4_5.PlayerManager;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 public class PlayerManagerBase extends PlayerManager {
 

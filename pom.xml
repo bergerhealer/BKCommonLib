@@ -20,39 +20,18 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
-    <!-- Repo for access to the non-package-versioned CraftBukkit -->
+    <!-- Repo for access to CraftBukkit -->
     <repository>
-      <id>craftbukkit-nonversioned</id>
-      <name>craftbukkit-nonversioned</name>
-      <url>http://repo.xemsdoom.com/content/repositories/craftbukkit-nonversioned</url>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
   </repositories>
 
-  <!-- Repo for access to ASM and ASM Commons -->
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/plugins/tags/maven-shade-plugin-1.4</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/plugins/tags/maven-shade-plugin-1.4</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/plugins/tags/maven-shade-plugin-1.4</url>
-  </scm>
-
   <dependencies>
     <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>3.2</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>asm</groupId>
-      <artifactId>asm-commons</artifactId>
-      <version>3.2</version>
-      <scope>compile</scope>
-    </dependency>
-  	<dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
       <version>1.4.5-R0.3-SNAPSHOT</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
@@ -107,28 +86,6 @@
 	<defaultGoal>clean install</defaultGoal>
 	<!-- Plugins -->
 	<plugins>
-      <!-- ASM Commons -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <relocations>
-                <relocation>
-                  <pattern>org.objectweb.asm</pattern>
-                  <shadedPattern>com.bergerkiller.bukkit.common.libs.org.objectweb.asm</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
 	  <!-- Compiler plugin -->
 	  <plugin>
 	    <groupId>org.apache.maven.plugins</groupId>

@@ -3,12 +3,12 @@ package com.bergerkiller.bukkit.common.natives;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.server.EntityHuman;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.ItemStack;
+import net.minecraft.server.v1_4_5.EntityHuman;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.ItemStack;
 
-import org.bukkit.craftbukkit.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_5.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

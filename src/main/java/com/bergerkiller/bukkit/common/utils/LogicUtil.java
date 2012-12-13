@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 
+import net.minecraft.server.v1_4_5.ItemStack;
+
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
@@ -45,7 +47,7 @@ public class LogicUtil {
 	 * @param item to check
 	 * @return True if the item is null or empty
 	 */
-	public static boolean nullOrEmpty(net.minecraft.server.ItemStack item) {
+	public static boolean nullOrEmpty(ItemStack item) {
 		return item == null || item.id == 0 || item.count < 1;
 	}
 

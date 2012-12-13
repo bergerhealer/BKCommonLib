@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import net.minecraft.server.World;
-
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -67,8 +65,8 @@ public abstract class MaterialProperty<T> {
 	 * @param z-coordinate of the block
 	 * @return The property of the material
 	 */
-	public T get(World world, int x, int y, int z) {
-		return get(world.getTypeId(x, y, z));
+	public T get(org.bukkit.World world, int x, int y, int z) {
+		return get(world.getBlockTypeIdAt(x, y, z));
 	}
 
 	/**

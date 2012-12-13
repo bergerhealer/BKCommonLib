@@ -4,8 +4,6 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
-import com.bergerkiller.bukkit.nover.NoVerClassLoader;
-
 public class Common {
 	/**
 	 * Defines the Minecraft version that runs on the server<br>
@@ -43,10 +41,6 @@ public class Common {
 	 */
 	public static final String CB_ROOT = "org.bukkit.craftbukkit" + MC_VERSION_PACKAGEPART;
 
-	static {
-		NoVerClassLoader.MC_VERSION = MC_VERSION;
-	}
-
 	private static boolean checkVersion(String version) {
 		try {
 			if (version.isEmpty()) {
@@ -68,34 +62,6 @@ public class Common {
 	 */
 	public static boolean isMCVersionCompatible(String version) {
 		return MC_VERSION.isEmpty() || version.equals(MC_VERSION);
-	}
-
-	/**
-	 * Automatically applies package versioning to the classes included in your plugin<br>
-	 * An additional class loader will be inserted to load these classes<br><br>
-	 * 
-	 * It is recommended to include a static block in your main plugin class where you call this method<br>
-	 * Make sure that no native classes are exposed through your main plugin class, as those will not be caught in time<br>
-	 * Also, if you replace native classes, make sure you load all non-native classes your class uses<br>
-	 * You have to prevent that the server class loader tries to load your plugin classes, because then no renaming occurs<br><br>
-	 * 
-	 * The native-accessing utility classes of BKCommonLib are pre-loaded to prevent this happening<br><br>
-	 * 
-	 * Alternatively, you could include the following line in your plugin.yml:<br>
-	 * <i>class-loader-of: BKCommonLib</i><br>
-	 * 
-	 * <b>Example:</b>
-	 * <pre>
-	 * {@code
-	 * static {
-	 *     Common.undoPackageVersioning(MyPlugin.class);
-	 * }
-	 * </pre>
-	 * 
-	 * @param pluginClass - the main plugin class instance of your plugin
-	 */
-	public static void undoPackageVersioning(Class<?> pluginClass) {
-		NoVerClassLoader.undoPackageVersioning(pluginClass);
 	}
 
 	/**

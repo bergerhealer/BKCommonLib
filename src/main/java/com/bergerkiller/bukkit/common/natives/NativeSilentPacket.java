@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
-import net.minecraft.server.NetHandler;
-import net.minecraft.server.Packet;
+import net.minecraft.server.v1_4_5.NetHandler;
+import net.minecraft.server.v1_4_5.Packet;
 
 /**
  * Wraps around another packet to create an undetectable packet type to send to clients undetected

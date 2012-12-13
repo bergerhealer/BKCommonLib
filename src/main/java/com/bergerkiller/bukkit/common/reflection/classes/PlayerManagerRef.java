@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Queue;
 
-import net.minecraft.server.LongHashMap;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.server.v1_4_5.LongHashMap;
+import net.minecraft.server.v1_4_5.PlayerManager;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;

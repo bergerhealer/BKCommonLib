@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.MathHelper;
+import net.minecraft.server.v1_4_5.MathHelper;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.TrigMath;
-import org.bukkit.craftbukkit.util.LongHash;
+import org.bukkit.craftbukkit.v1_4_5.TrigMath;
+import org.bukkit.craftbukkit.v1_4_5.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -116,10 +116,6 @@ public class MathUtil {
 	 */
 	public static double normalize(double x, double z, double reqx, double reqz) {
 		return Math.sqrt(lengthSquared(reqx, reqz) / lengthSquared(x, z));
-	}
-
-	public static float getLookAtYaw(net.minecraft.server.Entity loc, net.minecraft.server.Entity lookat) {
-		return getLookAtYaw(loc.getBukkitEntity(), lookat.getBukkitEntity());
 	}
 
 	public static float getLookAtYaw(Entity loc, Entity lookat) {
@@ -493,6 +489,18 @@ public class MathUtil {
 	 */
 	public static double invert(double value, boolean negative) {
 		return negative ? -value : value;
+	}
+
+	public static long longHashToLong(int msw, int lsw) {
+		return LongHash.toLong(msw, lsw);
+	}
+
+	public static int longHashMsw(long key) {
+		return LongHash.msw(key);
+	}
+
+	public static int longHashLsw(long key) {
+		return LongHash.lsw(key);
 	}
 
 	public static void setVectorLength(Vector vector, double length) {

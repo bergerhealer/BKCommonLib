@@ -2,11 +2,11 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import net.minecraft.server.IWorldAccess;
-import net.minecraft.server.IntHashMap;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.IWorldAccess;
+import net.minecraft.server.v1_4_5.IntHashMap;
+import net.minecraft.server.v1_4_5.PlayerManager;
+import net.minecraft.server.v1_4_5.World;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

@@ -4,33 +4,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.server.Chunk;
-import net.minecraft.server.Entity;
-import net.minecraft.server.EntityItem;
-import net.minecraft.server.EntityMinecart;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.TileEntityChest;
-import net.minecraft.server.TileEntityDispenser;
-import net.minecraft.server.TileEntityFurnace;
-import net.minecraft.server.TileEntitySign;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_5.Chunk;
+import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_5.EntityItem;
+import net.minecraft.server.v1_4_5.EntityMinecart;
+import net.minecraft.server.v1_4_5.EntityPlayer;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_5.TileEntityChest;
+import net.minecraft.server.v1_4_5.TileEntityDispenser;
+import net.minecraft.server.v1_4_5.TileEntityFurnace;
+import net.minecraft.server.v1_4_5.TileEntitySign;
+import net.minecraft.server.v1_4_5.World;
+import net.minecraft.server.v1_4_5.WorldServer;
 
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftChest;
-import org.bukkit.craftbukkit.block.CraftDispenser;
-import org.bukkit.craftbukkit.block.CraftFurnace;
-import org.bukkit.craftbukkit.block.CraftSign;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_5.CraftChunk;
+import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_5.block.CraftChest;
+import org.bukkit.craftbukkit.v1_4_5.block.CraftDispenser;
+import org.bukkit.craftbukkit.v1_4_5.block.CraftFurnace;
+import org.bukkit.craftbukkit.v1_4_5.block.CraftSign;
+import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -39,6 +39,7 @@ import org.bukkit.inventory.Inventory;
 import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
+import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 
 /**
  * Contains utility functions to get to the net.minecraft.server core in the CraftBukkit library<br>
@@ -76,11 +77,10 @@ public class NativeUtil {
 	}
 
 	public static ItemStack getNative(org.bukkit.inventory.ItemStack stack) {
-		ItemStack rval = CraftItemStack.createNMSItemStack(stack);
-		if (rval == null) {
-			rval = new ItemStack(0, 0, 0);
+		if (stack instanceof CraftItemStack) {
+			return CraftItemStackRef.handle.get(stack);
 		}
-		return rval;
+		return CraftItemStack.asNMSCopy(stack);
 	}
 
 	public static IInventory getNative(Inventory inv) {
@@ -174,5 +174,9 @@ public class NativeUtil {
 
 	public static <T extends org.bukkit.entity.Entity> Collection<T> getEntities(Collection entities, Class<T> type) {
 		return new NativeEntityWrapper<T>(entities, type);
+	}
+
+	public static org.bukkit.inventory.ItemStack getItemStack(ItemStack itemstack) {
+		return CraftItemStack.asCraftMirror(itemstack);
 	}
 }

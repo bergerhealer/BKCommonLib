@@ -2,13 +2,12 @@ package com.bergerkiller.bukkit.common.natives;
 
 import java.util.Collection;
 
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
-import net.minecraft.server.IInventory;
-import net.minecraft.server.ItemStack;
+import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.ItemStack;
 
 public class IInventoryBaseImpl extends IInventoryBase {
 	private ItemStack[] items;
@@ -35,8 +34,8 @@ public class IInventoryBaseImpl extends IInventoryBase {
 		for (Object item : items) {
 			if (item instanceof ItemStack) {
 				this.items[i] = (ItemStack) item;
-			} else if (item instanceof CraftItemStack) {
-				this.items[i] = ((CraftItemStack) item).getHandle();
+			} else if (item instanceof org.bukkit.inventory.ItemStack) {
+				this.items[i] = NativeUtil.getNative((org.bukkit.inventory.ItemStack) item);
 			} else {
 				this.items[i] = null;
 			}
