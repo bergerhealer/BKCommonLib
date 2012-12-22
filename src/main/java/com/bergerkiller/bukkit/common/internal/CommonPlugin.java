@@ -1,9 +1,13 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
@@ -20,13 +24,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.EntityMap;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
+import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
+@SuppressWarnings("rawtypes")
 public class CommonPlugin extends PluginBase {
 	/*
 	 * BKCommonLib Minecraft versioning
@@ -39,10 +46,13 @@ public class CommonPlugin extends PluginBase {
 	private static CommonPlugin instance;
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
+	protected final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
+	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private int nextTickHandlerId = -1;
 	private int entityMoveHandlerId = -1;
+	private int entityRemoveHandlerId = -1;
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
@@ -72,12 +82,25 @@ public class CommonPlugin extends PluginBase {
 		ex.printStackTrace();
 	}
 
+	@SuppressWarnings("unchecked")
+	public void registerMap(EntityMap map) {
+		this.maps.add(new SoftReference(map));
+	}
+
 	public void nextTick(Runnable runnable) {
 		if (runnable != null) {
 			synchronized (this.nextTickTasks) {
 				this.nextTickTasks.add(runnable);
 			}
 		}
+	}
+
+	public void notifyAdded(org.bukkit.entity.Entity e) {
+		this.entitiesToRemove.remove(e);
+	}
+
+	public void notifyRemoved(org.bukkit.entity.Entity e) {
+		this.entitiesToRemove.add(e);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -192,6 +215,9 @@ public class CommonPlugin extends PluginBase {
 		if (entityMoveHandlerId != -1) {
 			Bukkit.getScheduler().cancelTask(entityMoveHandlerId);
 		}
+		if (entityRemoveHandlerId != -1) {
+			Bukkit.getScheduler().cancelTask(entityRemoveHandlerId);
+		}
 	}
 
 	@Override
@@ -213,6 +239,7 @@ public class CommonPlugin extends PluginBase {
 		register(new CommonListener());
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
+		entityRemoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new EntityRemovalHandler(), 1, 1);
 
 		// Parse BKCommonLib version to int
 		String ver = this.getVersion();
@@ -226,6 +253,33 @@ public class CommonPlugin extends PluginBase {
 		int version = this.getVersionNumber();
 		if (version != Common.VERSION) {
 			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
+		}
+	}
+
+	private static class EntityRemovalHandler implements Runnable {
+		@SuppressWarnings("unchecked")
+		public void run() {
+			Set<org.bukkit.entity.Entity> entities = getInstance().entitiesToRemove;
+			if (!entities.isEmpty()) {
+				// Remove from maps
+				Iterator<SoftReference<EntityMap>> iter = CommonPlugin.getInstance().maps.iterator();
+				while (iter.hasNext()) {
+					EntityMap map = iter.next().get();
+					if (map == null) {
+						iter.remove();
+					} else if (!map.isEmpty()) {
+						map.keySet().removeAll(entities);
+					}
+				}
+				// Fire events
+				if (CommonUtil.hasHandlers(EntityRemoveFromServerEvent.getHandlerList())) {
+					for (org.bukkit.entity.Entity e : entities) {
+						CommonUtil.callEvent(new EntityRemoveFromServerEvent(e));
+					}
+				}
+				// Clear for next run
+				entities.clear();
+			}
 		}
 	}
 
@@ -255,7 +309,7 @@ public class CommonPlugin extends PluginBase {
 	private static class MoveEventHandler implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			if (EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {
+			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
 				for (WorldServer world : NativeUtil.getWorlds()) {
 					for (Entity entity : (List<Entity>) world.entityList) {

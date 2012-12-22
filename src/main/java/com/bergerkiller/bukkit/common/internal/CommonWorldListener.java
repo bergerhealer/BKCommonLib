@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
@@ -15,7 +15,7 @@ import net.minecraft.server.v1_4_5.WorldManager;
 
 class CommonWorldListener extends WorldManager {
 	private boolean isEnabled = false;
-	private ArrayList<EntityPlayer> addedPlayers = new ArrayList<EntityPlayer>();
+	private HashSet<EntityPlayer> addedPlayers = new HashSet<EntityPlayer>();
 
 	public CommonWorldListener(org.bukkit.World world) {
 		super(CommonUtil.getMCServer(), NativeUtil.getNative(world));
@@ -59,13 +59,12 @@ class CommonWorldListener extends WorldManager {
 	public final void a(Entity added) {
 		if (added != null) {
 			// Add entity
-			if (added instanceof EntityPlayer) {
-				if (this.addedPlayers.contains(added)) {
-					return;
-				} else {
-					this.addedPlayers.add((EntityPlayer) added);
-				}
+			if (added instanceof EntityPlayer && !this.addedPlayers.add((EntityPlayer) added)) {
+				return;
 			}
+			// Notify it is added
+			CommonPlugin.getInstance().notifyAdded(NativeUtil.getEntity(added));
+			// Event
 			CommonUtil.callEvent(new EntityAddEvent(added.getBukkitEntity()));
 		}
 	}
@@ -77,6 +76,9 @@ class CommonWorldListener extends WorldManager {
 			if (removed instanceof EntityPlayer && !this.addedPlayers.remove(removed)) {
 				return;
 			}
+			// Notify it is removed
+			CommonPlugin.getInstance().notifyRemoved(NativeUtil.getEntity(removed));
+			// Event
 			CommonUtil.callEvent(new EntityRemoveEvent(removed.getBukkitEntity()));
 		}
 	}

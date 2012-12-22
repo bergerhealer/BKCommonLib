@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_4_5.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -83,6 +84,17 @@ public class CommonUtil {
 	public static <T extends Event> T callEvent(T event) {
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		return event;
+	}
+
+	/**
+	 * Checks whether the event handler list of an event has registered listeners<br>
+	 * If creating an event causes a performance drain, useless event creation can be avoided this way
+	 * 
+	 * @param handlerList of the Event
+	 * @return True if handlers are contained, False if not
+	 */
+	public static boolean hasHandlers(HandlerList handlerList) {
+		return handlerList.getRegisteredListeners().length > 0;
 	}
 
 	/**
