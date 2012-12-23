@@ -4,19 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.server.v1_4_5.Chunk;
-import net.minecraft.server.v1_4_5.Entity;
-import net.minecraft.server.v1_4_5.EntityItem;
-import net.minecraft.server.v1_4_5.EntityMinecart;
-import net.minecraft.server.v1_4_5.EntityPlayer;
-import net.minecraft.server.v1_4_5.IInventory;
-import net.minecraft.server.v1_4_5.ItemStack;
-import net.minecraft.server.v1_4_5.TileEntityChest;
-import net.minecraft.server.v1_4_5.TileEntityDispenser;
-import net.minecraft.server.v1_4_5.TileEntityFurnace;
-import net.minecraft.server.v1_4_5.TileEntitySign;
-import net.minecraft.server.v1_4_5.World;
-import net.minecraft.server.v1_4_5.WorldServer;
+import net.minecraft.server.v1_4_5.*;
 
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
@@ -24,13 +12,9 @@ import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_4_5.CraftChunk;
 import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
-import org.bukkit.craftbukkit.v1_4_5.block.CraftChest;
-import org.bukkit.craftbukkit.v1_4_5.block.CraftDispenser;
-import org.bukkit.craftbukkit.v1_4_5.block.CraftFurnace;
-import org.bukkit.craftbukkit.v1_4_5.block.CraftSign;
+import org.bukkit.craftbukkit.v1_4_5.block.*;
 import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_5.inventory.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -131,6 +115,35 @@ public class NativeUtil {
 		return chest instanceof CraftChest ? BlockStateRef.CHEST.get(chest) : null;
 	}
 
+	public static Inventory getInventory(IInventory inventory) {
+		if (inventory == null) {
+			return null;
+		}
+		if (inventory instanceof InventoryCrafting) {
+			return new CraftInventoryCrafting((InventoryCrafting) inventory, null);
+		} else if (inventory instanceof PlayerInventory) {
+			return new CraftInventoryPlayer((PlayerInventory) inventory);
+		} else if (inventory instanceof TileEntityFurnace) {
+			return new CraftInventoryFurnace((TileEntityFurnace) inventory);
+		} else if (inventory instanceof ContainerEnchantTableInventory) {
+			return new CraftInventoryEnchanting((ContainerEnchantTableInventory) inventory);
+		} else if (inventory instanceof TileEntityBrewingStand) {
+			return new CraftInventoryBrewer((TileEntityBrewingStand) inventory);
+		} else if (inventory instanceof InventoryMerchant) {
+			return new CraftInventoryMerchant((InventoryMerchant) inventory);
+		} else if (inventory instanceof TileEntityBeacon) {
+			return new CraftInventoryBeacon((TileEntityBeacon) inventory);
+		} else if (inventory instanceof ContainerAnvilInventory) {
+			return new CraftInventoryAnvil((ContainerAnvilInventory) inventory);
+		} else {
+			return new CraftInventory(inventory);
+		}
+	}
+
+	public static <T extends Inventory> T getInventory(IInventory inventory, Class<T> type) {
+		return CommonUtil.tryCast(getInventory(inventory), type);
+	}
+
 	public static Player getPlayer(EntityPlayer entity) {
 		return getEntity(entity, Player.class);
 	}
@@ -178,5 +191,13 @@ public class NativeUtil {
 
 	public static org.bukkit.inventory.ItemStack getItemStack(ItemStack itemstack) {
 		return CraftItemStack.asCraftMirror(itemstack);
+	}
+
+	public static org.bukkit.inventory.ItemStack[] getItemStacks(ItemStack[] itemstacks) {
+		org.bukkit.inventory.ItemStack[] stacks = new org.bukkit.inventory.ItemStack[itemstacks.length];
+		for (int i = 0; i < stacks.length; i++) {
+			stacks[i] = getItemStack(itemstacks[i]);
+		}
+		return stacks;
 	}
 }

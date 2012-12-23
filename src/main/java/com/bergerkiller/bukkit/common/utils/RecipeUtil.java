@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.server.v1_4_5.CraftingManager;
-import net.minecraft.server.v1_4_5.IInventory;
 import net.minecraft.server.v1_4_5.IRecipe;
 import net.minecraft.server.v1_4_5.ItemStack;
 import net.minecraft.server.v1_4_5.RecipesFurnace;
@@ -16,8 +15,8 @@ import net.minecraft.server.v1_4_5.TileEntityFurnace;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
-import com.bergerkiller.bukkit.common.items.CraftRecipe;
-import com.bergerkiller.bukkit.common.items.ItemParser;
+import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
+import com.bergerkiller.bukkit.common.inventory.ItemParser;
 
 public class RecipeUtil {
 	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
@@ -108,9 +107,8 @@ public class RecipeUtil {
 	}
 
 	public static void craftItems(int itemid, Integer data, Inventory source, int limit) {
-		IInventory nsource = NativeUtil.getNative(source);
 		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
-			limit -= rec.craftItems(nsource, limit);
+			limit -= rec.craftItems(source, limit);
 		}
 	}
 

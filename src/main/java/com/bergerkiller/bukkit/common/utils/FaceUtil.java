@@ -36,6 +36,36 @@ public class FaceUtil {
 	}
 
 	/**
+	 * Checks whether a given face is an offset along the X-axis
+	 * 
+	 * @param face to check
+	 * @return True if it is along the X-axis, False if not
+	 */
+	public static boolean isAlongX(BlockFace face) {
+		return face.getModX() != 0 && face.getModZ() == 0;
+	}
+
+	/**
+	 * Checks whether a given face is an offset along the Y-axis
+	 * 
+	 * @param face to check
+	 * @return True if it is along the Y-axis, False if not
+	 */
+	public static boolean isAlongY(BlockFace face) {
+		return isVertical(face);
+	}
+
+	/**
+	 * Checks whether a given face is an offset along the Z-axis
+	 * 
+	 * @param face to check
+	 * @return True if it is along the Z-axis, False if not
+	 */
+	public static boolean isAlongZ(BlockFace face) {
+		return face.getModZ() != 0 && face.getModX() == 0;
+	}
+
+	/**
 	 * Gets the Block Face at the notch index specified<br>
 	 * <b>These are the horizontal faces, which exclude up and down</b>
 	 * 

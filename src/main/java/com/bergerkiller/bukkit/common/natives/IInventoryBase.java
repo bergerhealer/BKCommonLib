@@ -14,10 +14,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 /**
- * An Inventory that excludes the getting and setting of items<br>
- * All other logic has been implemented
+ * An base Inventory that excludes the getting and setting of items<br>
+ * Avoid using this class as much as possible, use the Bukkit versions instead!
  */
-public abstract class IInventoryBase implements IInventory {
+public class IInventoryBase implements IInventory {
 	private int maxstacksize = 64;
 
 	public void setContents(ItemStack[] items) {
@@ -80,13 +80,6 @@ public abstract class IInventoryBase implements IInventory {
 		this.maxstacksize = size;
 	}
 
-	public ItemStack limitStack(ItemStack itemstack) {
-		if (itemstack != null && itemstack.count > this.getMaxStackSize()) {
-			itemstack.count = this.getMaxStackSize();
-		}
-		return itemstack;
-	}
-
 	@Override
 	public ItemStack splitStack(int index, int size) {
 		ItemStack item = this.getItem(index);
@@ -121,5 +114,24 @@ public abstract class IInventoryBase implements IInventory {
 
 	public Inventory getInventory() {
 		return new CraftInventory(this);
+	}
+
+	@Override
+	public ItemStack getItem(int arg0) {
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		return null;
+	}
+
+	@Override
+	public int getSize() {
+		return 0;
+	}
+
+	@Override
+	public void setItem(int arg0, ItemStack arg1) {
 	}
 }

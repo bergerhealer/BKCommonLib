@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.server.v1_4_5.ItemStack;
 
@@ -19,6 +20,16 @@ public class LogicUtil {
 	 */
 	public static boolean bothNullOrEqual(Object value1, Object value2) {
 		return value1 == null ? value2 == null : value1.equals(value2);
+	}
+
+	/**
+	 * Checks if a Map is null or empty
+	 * 
+	 * @param map to check
+	 * @return True if the collection is null or empty
+	 */
+	public static boolean nullOrEmpty(Map<?, ?> map) {
+		return map == null || map.isEmpty();
 	}
 
 	/**
@@ -59,6 +70,16 @@ public class LogicUtil {
 	 */
 	public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
 		return item == null || item.getTypeId() == 0 || item.getAmount() < 1;
+	}
+
+	/**
+	 * Checks if an array is null or empty
+	 * 
+	 * @param array to check
+	 * @return True if the item is null or empty
+	 */
+	public static boolean nullOrEmpty(Object[] array) {
+		return array == null || array.length == 0;
 	}
 
 	/**
@@ -131,6 +152,28 @@ public class LogicUtil {
 	 */
 	public static <T> T[] toArray(Collection<T> collection, Class<T> type) {
 		return collection.toArray(createArray(type, collection.size()));
+	}
+
+	/**
+	 * Checks whether one map contains all the contents of another map
+	 * 
+	 * @param map to check for contents
+	 * @param contents to check the map for
+	 * @return True if all contents are contained in the map, False if not
+	 */
+	public static boolean containsAll(Map<?, ?> map, Map<?, ?> contents) {
+		for (Map.Entry<?, ?> entry : contents.entrySet()) {
+			Object value = map.get(entry.getKey());
+			// Null value stored in the map?
+			if (value == null) {
+				if (entry.getValue() != null || !map.containsKey(entry.getKey())) {
+					return false;
+				}
+			} else if (!value.equals(entry.getValue())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

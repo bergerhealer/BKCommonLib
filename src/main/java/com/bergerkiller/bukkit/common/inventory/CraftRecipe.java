@@ -1,17 +1,16 @@
-package com.bergerkiller.bukkit.common.items;
+package com.bergerkiller.bukkit.common.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
-import net.minecraft.server.v1_4_5.IInventory;
 import net.minecraft.server.v1_4_5.IRecipe;
 import net.minecraft.server.v1_4_5.ItemStack;
 import net.minecraft.server.v1_4_5.MathHelper;
@@ -19,8 +18,8 @@ import net.minecraft.server.v1_4_5.ShapedRecipes;
 import net.minecraft.server.v1_4_5.ShapelessRecipes;
 
 public class CraftRecipe {
-	private static SafeField<ItemStack[]> sf1 = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
-	private static SafeField<List<ItemStack>> sf2 = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "ingredients");
+	private static final SafeField<ItemStack[]> srItems = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
+	private static final SafeField<List<ItemStack>> slIngredients = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "ingredients");
 
 	private CraftRecipe(ItemStack[] input, ItemStack output) {
 		List<ItemStack> newinput = new ArrayList<ItemStack>(input.length);
@@ -42,21 +41,21 @@ public class CraftRecipe {
 				newinput.add(item);
 			}
 		}
-		this.input = newinput.toArray(new ItemStack[0]);
+		this.input = NativeUtil.getItemStacks(newinput.toArray(new ItemStack[0]));
 		List<ItemStack> newoutput = new ArrayList<ItemStack>(1);
 		newoutput.add(output.cloneItemStack());
-		for (ItemStack stack : this.input) {
+		for (ItemStack stack : newinput) {
 			if (BlockUtil.isType(stack.id, Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.MILK_BUCKET)) {
 				ItemStack s = stack.cloneItemStack();
 				s.id = Material.BUCKET.getId();
 				newoutput.add(s);
 			}
 		}
-		this.output = newoutput.toArray(new ItemStack[0]);
+		this.output = NativeUtil.getItemStacks(newoutput.toArray(new ItemStack[0]));
 	}
 
-	private final ItemStack[] input;
-	private final ItemStack[] output;
+	private final org.bukkit.inventory.ItemStack[] input;
+	private final org.bukkit.inventory.ItemStack[] output;
 
 	/**
 	 * Gets the input item at the index specified
@@ -64,7 +63,7 @@ public class CraftRecipe {
 	 * @param index of the item
 	 * @return input Item
 	 */
-	public ItemStack getInput(int index) {
+	public org.bukkit.inventory.ItemStack getInput(int index) {
 		return this.input[index];
 	}
 
@@ -73,7 +72,7 @@ public class CraftRecipe {
 	 * 
 	 * @return input Items
 	 */
-	public ItemStack[] getInput() {
+	public org.bukkit.inventory.ItemStack[] getInput() {
 		return this.input;
 	}
 
@@ -82,7 +81,7 @@ public class CraftRecipe {
 	 * 
 	 * @return output Items
 	 */
-	public ItemStack[] getOutput() {
+	public org.bukkit.inventory.ItemStack[] getOutput() {
 		return this.output;
 	}
 
@@ -94,8 +93,8 @@ public class CraftRecipe {
 	 */
 	public int getInputSize() {
 		int count = 0;
-		for (ItemStack item : this.input) {
-			count += item.count;
+		for (org.bukkit.inventory.ItemStack item : this.input) {
+			count += item.getAmount();
 		}
 		return count;
 	}
@@ -108,8 +107,8 @@ public class CraftRecipe {
 	 */
 	public int getOutputSize() {
 		int count = 0;
-		for (ItemStack item : this.output) {
-			count += item.count;
+		for (org.bukkit.inventory.ItemStack item : this.output) {
+			count += item.getAmount();
 		}
 		return count;
 	}
@@ -121,9 +120,9 @@ public class CraftRecipe {
 	 * @param itemlimit the max amount of resulting items
 	 * @return the amount of resulting items that were crafted
 	 */
-	public int craftItems(IInventory inventory, int itemlimit) {
-		int lim = MathHelper.floor((double) itemlimit / (double) this.output[0].count);
-		return this.craft(inventory, lim) * this.output[0].count;
+	public int craftItems(Inventory inventory, int itemlimit) {
+		int lim = MathHelper.floor((double) itemlimit / (double) this.output[0].getAmount());
+		return this.craft(inventory, lim) * this.output[0].getAmount();
 	}
 
 	/**
@@ -133,10 +132,9 @@ public class CraftRecipe {
 	 * @param limit the amount of times it can craft
 	 * @return the amount of times it crafted
 	 */
-	public int craft(IInventory inventory, int limit) {
-		int amount = 0;
-		while (amount < limit && craft(inventory))
-			amount++;
+	public int craft(Inventory inventory, int limit) {
+		int amount;
+		for (amount = 0; amount < limit && craft(inventory); amount++);
 		return amount;
 	}
 
@@ -144,38 +142,34 @@ public class CraftRecipe {
 	 * Performs this recipe once in the inventory specified
 	 * 
 	 * @param inventory to craft in
-	 * @return whether the crafting was successful
+	 * @return True if crafting occurred, False if not
 	 */
-	public boolean craft(IInventory inventory) {
+	public boolean craft(Inventory inventory) {
 		// contains the required items?
-		for (ItemStack item : this.input) {
-			Integer data = item.getData();
-			if (data == -1)
-				data = null;
-			if (ItemUtil.getItemCount(inventory, item.id, data) < item.count) {
+		for (org.bukkit.inventory.ItemStack item : this.input) {
+			if (ItemUtil.getItemCount(inventory, item.getTypeId(), item.getDurability()) < item.getAmount()) {
 				return false;
 			}
 		}
 		// contains enough room to put in the results?
-		if (ItemUtil.testTransfer(this.output, inventory)) {
-			// actually transfer everything...
-			for (ItemStack item : this.input) {
-				ItemUtil.removeItem(inventory, item);
-			}
-			CraftInventory ci = new CraftInventory(inventory);
-			for (ItemStack item : this.output) {
-				ItemUtil.transfer(CraftItemStack.asCraftMirror(item.cloneItemStack()), ci, Integer.MAX_VALUE);
-			}
-			return true;
+		if (!ItemUtil.canTransferAll(this.output, inventory)) {
+			return false;
 		}
-		return false;
+		// actually transfer everything...
+		for (org.bukkit.inventory.ItemStack item : this.input) {
+			ItemUtil.removeItems(inventory, item);
+		}
+		for (org.bukkit.inventory.ItemStack item : this.output) {
+			ItemUtil.transfer(ItemUtil.cloneItem(item), inventory, Integer.MAX_VALUE);
+		}
+		return true;
 	}
 
 	public static CraftRecipe create(IRecipe recipe) {
 		if (recipe instanceof ShapedRecipes) {
-			return create(sf1.get(recipe), recipe.b());
+			return create(srItems.get(recipe), recipe.b());
 		} else if (recipe instanceof ShapelessRecipes) {
-			return create(sf2.get(recipe), recipe.b());
+			return create(slIngredients.get(recipe), recipe.b());
 		} else {
 			return null;
 		}

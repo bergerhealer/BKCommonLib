@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.items;
+package com.bergerkiller.bukkit.common.inventory;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -77,10 +77,12 @@ public class ItemParser {
 	}
 
 	public boolean match(int typeid, int data) {
-		if (this.hasType() && typeid != this.getTypeId())
+		if (this.hasType() && typeid != this.getTypeId()) {
 			return false;
-		if (this.hasData() && data != this.getData())
+		}
+		if (this.hasData() && data != this.getData()) {
 			return false;
+		}
 		return true;
 	}
 
