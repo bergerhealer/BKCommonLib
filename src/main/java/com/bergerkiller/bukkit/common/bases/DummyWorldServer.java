@@ -52,7 +52,7 @@ public class DummyWorldServer extends WorldServer {
 		this(new CommonDummyDataManager(), new WorldSettings(0, EnumGamemode.NONE, true, false, WorldType.NORMAL));
 	}
 
-	public DummyWorldServer(CommonDummyDataManager datamanager, WorldSettings settings) {
+	private DummyWorldServer(CommonDummyDataManager datamanager, WorldSettings settings) {
 		super(CommonUtil.getMCServer(), datamanager, getDummyName(), 0, settings, CommonUtil.getMCServer().methodProfiler, Environment.NORMAL, null);
 		datamanager.initialized = true;
 		// dereference this dummy world again...
