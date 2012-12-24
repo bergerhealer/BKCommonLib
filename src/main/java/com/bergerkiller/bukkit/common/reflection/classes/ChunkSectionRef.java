@@ -20,18 +20,18 @@ public class ChunkSectionRef {
 	}
 
 	public static int getSkyLight(ChunkSection section, int x, int y, int z) {
-		return section.c(x, y, z);
+		return section.c(x & 0xf, y & 0xf, z & 0xf);
 	}
 
 	public static void setSkyLight(ChunkSection section, int x, int y, int z, int level) {
-		section.c(x, y, z, level);
+		section.c(x & 0xf, y & 0xf, z & 0xf, level);
 	}
 
 	public static int getBlockLight(ChunkSection section, int x, int y, int z) {
-		return section.d(x, y, z);
+		return section.d(x & 0xf, y & 0xf, z & 0xf);
 	}
 
 	public static void setBlockLight(ChunkSection section, int x, int y, int z, int level) {
-		section.d(x, y, z, level);
+		section.d(x & 0xf, y & 0xf, z & 0xf, level);
 	}
 }
