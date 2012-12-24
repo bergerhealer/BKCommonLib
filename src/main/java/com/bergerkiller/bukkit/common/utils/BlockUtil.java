@@ -1,8 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.server.v1_4_5.Block;
 import net.minecraft.server.v1_4_5.ChunkCoordinates;
@@ -144,6 +145,16 @@ public class BlockUtil extends MaterialUtil {
 	 */
 	public static org.bukkit.block.Block getBlock(org.bukkit.World world, ChunkCoordinates at) {
 		return world.getBlockAt(at.x, at.y, at.z);
+	}
+
+	/**
+	 * Gets the Block of a certain tile entity
+	 * 
+	 * @param tileEntityto get the block of
+	 * @return Tile Entity Block
+	 */
+	public static org.bukkit.block.Block getBlock(TileEntity tileEntity) {
+		return tileEntity.world.getWorld().getBlockAt(tileEntity.x, tileEntity.y, tileEntity.z);
 	}
 
 	/**
@@ -393,30 +404,24 @@ public class BlockUtil extends MaterialUtil {
 		return getTile(block, TileEntityDispenser.class);
 	}
 
-	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle) {
-		return getTileEntities(middle, 0, 0, 0);
+	public static Collection<BlockState> getBlockStates(org.bukkit.block.Block middle) {
+		return getBlockStates(middle, 0, 0, 0);
 	}
 
-	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle, int radius) {
-		return getTileEntities(middle, radius, radius, radius);
+	public static Collection<BlockState> getBlockStates(org.bukkit.block.Block middle, int radius) {
+		return getBlockStates(middle, radius, radius, radius);
 	}
 
-	public static Set<TileEntity> getTileEntities(org.bukkit.block.Block middle, int radiusX, int radiusY, int radiusZ) {
-		return getTileEntities(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
+	public static Collection<BlockState> getBlockStates(org.bukkit.block.Block middle, int radiusX, int radiusY, int radiusZ) {
+		return getBlockStates(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
 	}
-
-	public static Set<TileEntity> getTileEntities(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
-		return getTileEntities(NativeUtil.getNative(world), x, y, z, radiusX, radiusY, radiusZ);
-	}
-
-	private static LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
 
 	@SuppressWarnings("unchecked")
-	public static Set<TileEntity> getTileEntities(World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
-		tilebuff.clear();
+	public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
+		World nWorld = NativeUtil.getNative(world);
 		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
 			// simplified coding instead
-			TileEntity tile = world.getTileEntity(x, y, z);
+			TileEntity tile = nWorld.getTileEntity(x, y, z);
 			if (tile != null) {
 				offerTile(tile);
 			}
@@ -428,17 +433,25 @@ public class BlockUtil extends MaterialUtil {
 			int xMax = x + radiusX;
 			int yMax = y + radiusY;
 			int zMax = z + radiusZ;
-			for (TileEntity tile : (List<TileEntity>) world.tileEntityList) {
+			for (TileEntity tile : (List<TileEntity>) nWorld.tileEntityList) {
 				if (tile.x < xMin || tile.y < yMin || tile.z < zMin || tile.x > xMax || tile.y > yMax || tile.z > zMax) {
 					continue;
 				}
-				tile = world.getTileEntity(tile.x, tile.y, tile.z);
+				tile = nWorld.getTileEntity(tile.x, tile.y, tile.z);
 				if (tile != null) {
 					offerTile(tile);
 				}
 			}
 		}
-		return tilebuff;
+		// Convert back to Bukkit types
+		ArrayList<BlockState> blocks = new ArrayList<BlockState>(tilebuff.size());
+		for (TileEntity tile : tilebuff) {
+			BlockState state = getBlock(tile).getState();
+			if (state != null) {
+				blocks.add(state);
+			}
+		}
+		return blocks;
 	}
 
 	public static org.bukkit.World getWorld(TileEntity tile) {
@@ -449,6 +462,7 @@ public class BlockUtil extends MaterialUtil {
 		return tile.getUpdatePacket();
 	}
 
+	private static final LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
 	private static void offerTile(TileEntity tile) {
 		if (tile instanceof TileEntityChest) {
 			// find a possible double chest as well
@@ -460,7 +474,7 @@ public class BlockUtil extends MaterialUtil {
 				if (world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {
 					TileEntity next = world.getTileEntity(tmpx, tile.y, tmpz);
 					if (next != null && next instanceof TileEntityChest) {
-						if (sface == BlockFace.NORTH || sface == BlockFace.EAST) {
+						if (sface == BlockFace.WEST || sface == BlockFace.SOUTH) {
 							tilebuff.add(next);
 							tilebuff.add(tile);
 						} else {

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import java.util.Collection;
+
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -12,6 +14,19 @@ public class InventoryBaseImpl extends InventoryBase {
 
 	public InventoryBaseImpl(int size) {
 		this(new ItemStack[size], false);
+	}
+
+	public InventoryBaseImpl(Collection<ItemStack> contents) {
+		this(contents, true);
+	}
+
+	public InventoryBaseImpl(Collection<ItemStack> contents, boolean clone) {
+		this(contents.toArray(new ItemStack[0]), false);
+		if (clone) {
+			for (int i = 0; i < this.items.length; i++) {
+				this.items[i] = ItemUtil.cloneItem(this.items[i]);
+			}
+		}
 	}
 
 	public InventoryBaseImpl(ItemStack[] contents) {

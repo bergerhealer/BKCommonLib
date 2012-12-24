@@ -90,27 +90,26 @@ public class ItemUtil {
 	 * 
 	 * @param from The Inventory to take ItemStacks from
 	 * @param to The Inventory to transfer to
-	 * @param maxAmount The maximum amount of items to transfer
+	 * @param maxAmount The maximum amount of items to transfer, -1 for infinite
 	 * @param parser The item parser used to set what items to transfer. Can be null.
 	 * @return The amount of items that got transferred
 	 */
 	public static int transfer(Inventory from, Inventory to, ItemParser parser, int maxAmount) {
-		int amountToTransfer = maxAmount;
-		if (maxAmount > 0) {
-			int tmptrans;
-			for (int i = 0; i < from.getSize() && amountToTransfer > 0; i++) {
-				org.bukkit.inventory.ItemStack item = from.getItem(i);
-				if (LogicUtil.nullOrEmpty(item) || (parser != null && !parser.match(item))) {
-					continue;
-				}
-				tmptrans = transfer(item, to, amountToTransfer);
-				if (tmptrans > 0) {
-					amountToTransfer -= tmptrans;
-					from.setItem(i, item);
-				}
+		int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
+		int amountToTransfer = startAmount;
+		int tmptrans;
+		for (int i = 0; i < from.getSize() && amountToTransfer > 0; i++) {
+			org.bukkit.inventory.ItemStack item = from.getItem(i);
+			if (LogicUtil.nullOrEmpty(item) || (parser != null && !parser.match(item))) {
+				continue;
+			}
+			tmptrans = transfer(item, to, amountToTransfer);
+			if (tmptrans > 0) {
+				amountToTransfer -= tmptrans;
+				from.setItem(i, item);
 			}
 		}
-		return maxAmount - amountToTransfer;
+		return startAmount - amountToTransfer;
 	}
 
 	/**
@@ -118,15 +117,16 @@ public class ItemUtil {
 	 * 
 	 * @param from The ItemStack to transfer
 	 * @param to The Inventory to transfer to
-	 * @param maxAmount The maximum amount of the item to transfer
+	 * @param maxAmount The maximum amount of the item to transfer, -1 for infinite
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(org.bukkit.inventory.ItemStack from, Inventory to, int maxAmount) {
-		if (maxAmount <= 0 || LogicUtil.nullOrEmpty(from)) {
+		int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
+		if (startAmount == 0 || LogicUtil.nullOrEmpty(from)) {
 			return 0;
 		}
 		int tmptrans;
-		int amountToTransfer = maxAmount;
+		int amountToTransfer = startAmount;
 
 		// try to stack to already existing items
 		org.bukkit.inventory.ItemStack toitem;
@@ -164,7 +164,7 @@ public class ItemUtil {
 				}
 			}
 		}
-		return maxAmount - amountToTransfer;
+		return startAmount - amountToTransfer;
 	}
 
 	/**
@@ -173,12 +173,13 @@ public class ItemUtil {
 	 * @param from The Inventory to take an ItemStack from
 	 * @param to The ItemStack to merge the item taken
 	 * @param parser The item parser used to set what item to transfer if the receiving item is empty. Can be null.
-	 * @param maxAmount The maximum amount of the item to transfer
+	 * @param maxAmount The maximum amount of the item to transfer, -1 for infinite
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(Inventory from, org.bukkit.inventory.ItemStack to, ItemParser parser, int maxAmount) {
-		int trans = 0;
-		for (int i = 0; i < from.getSize() && trans < maxAmount; i++) {
+		int startAmount = maxAmount < 0 ? Integer.MAX_VALUE : maxAmount;
+		int amountToTransfer = startAmount;
+		for (int i = 0; i < from.getSize() && amountToTransfer > 0; i++) {
 			org.bukkit.inventory.ItemStack item = from.getItem(i);
 			if (LogicUtil.nullOrEmpty(item)) {
 				continue;
@@ -191,14 +192,10 @@ public class ItemUtil {
 				// Set item info to this item
 				transferInfo(item, to);			
 			}
-			trans += transfer(item, to, maxAmount - trans);
+			amountToTransfer -= transfer(item, to, amountToTransfer);
 			from.setItem(i, item);
-			
-			if (maxAmount == trans) {
-				break;
-			}
 		}
-		return trans;
+		return startAmount - amountToTransfer;
 	}
 
 	/**
@@ -209,14 +206,14 @@ public class ItemUtil {
 	 * 
 	 * @param from The ItemStack to merge
 	 * @param to The receiving ItemStack
-	 * @param maxAmount The maximum amount of the item to transfer
+	 * @param maxAmount The maximum amount of the item to transfer, -1 for infinite
 	 * @return The amount of the item that got transferred
 	 */
 	public static int transfer(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to, int maxAmount) {
 		if (LogicUtil.nullOrEmpty(from) || to == null) {
 			return 0;
 		}
-		int amountToTransfer = Math.min(maxAmount, from.getAmount());
+		int amountToTransfer = Math.min(maxAmount < 0 ? Integer.MAX_VALUE : maxAmount, from.getAmount());
 
 		// Transfering to an empty item, don't bother doing any stacking logic
 		if (LogicUtil.nullOrEmpty(to)) {
@@ -349,6 +346,20 @@ public class ItemUtil {
 		newItem.age = item.age;
 		newItem.world.addEntity(newItem);
 		return NativeUtil.getItem(newItem);
+	}
+
+	/**
+	 * Gets the contents of an inventory, cloning all the items
+	 * 
+	 * @param inventory to get the cloned contents of
+	 * @return Cloned inventory contents array
+	 */
+	public static org.bukkit.inventory.ItemStack[] getClonedContents(Inventory inventory) {
+		org.bukkit.inventory.ItemStack[] rval = new org.bukkit.inventory.ItemStack[inventory.getSize()];
+		for (int i = 0; i < rval.length; i++) {
+			rval[i] = cloneItem(inventory.getItem(i));
+		}
+		return rval;
 	}
 
 	/**

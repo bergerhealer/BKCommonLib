@@ -7,28 +7,52 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
+/**
+ * Can be used to match items against, and to provide amounts
+ */
 public class ItemParser {
 
+	/**
+	 * Constructs a new Item Parser for any data and infinite amount
+	 * 
+	 * @param type to match, null for any type
+	 */
 	public ItemParser(Material type) {
-		this(type, null);
+		this(type, -1);
 	}
 
-	public ItemParser(Material type, Integer amount) {
-		this(type, amount, null);
+	/**
+	 * Constructs a new Item Parser for any data
+	 * 
+	 * @param type to match, null for any type
+	 * @param amount to use, -1 for infinite
+	 */
+	public ItemParser(Material type, int amount) {
+		this(type, amount, -1);
 	}
 
-	public ItemParser(Material type, Integer amount, Byte data) {
+	/**
+	 * Constructs a new Item Parser
+	 * 
+	 * @param type to match, null for any type
+	 * @param amount to use, -1 for infinite
+	 * @param data to match, -1 for any data
+	 */
+	public ItemParser(Material type, int amount, int data) {
 		this.amount = amount;
 		this.data = data;
 		this.type = type;
 	}
 
 	private ItemParser() {
+		this.data = -1;
+		this.type = null;
+		this.amount = 1;
 	}
 
-	private Byte data = 0;
-	private Material type = null;
-	private Integer amount = 1;
+	private int data;
+	private Material type;
+	private int amount;
 
 	/**
 	 * Supported formats: typedata: [type]:[data] [typeid]:[data] [typeid]
@@ -58,12 +82,13 @@ public class ItemParser {
 	public static ItemParser parse(String name, String dataname, String amount) {
 		ItemParser parser = new ItemParser();
 		// parse amount
-		parser.amount = ParseUtil.parseInt(amount, null);
+		parser.amount = ParseUtil.parseInt(amount, -1);
 		// parse material from name
 		parser.type = ParseUtil.parseMaterial(name, null);
 		// parse material data from name if needed
-		if (parser.type != null && !LogicUtil.nullOrEmpty(dataname)) {
-			parser.data = ParseUtil.parseMaterialData(dataname, parser.type, null);
+		if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname)) {
+			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
+			parser.data = dat == null ? -1 : dat.intValue();
 		}
 		return parser;
 	}
@@ -86,32 +111,67 @@ public class ItemParser {
 		return true;
 	}
 
+	/**
+	 * Checks whether an amount is being used
+	 * 
+	 * @return True if there is an amount, False if not
+	 */
 	public boolean hasAmount() {
-		return this.amount != null;
+		return this.amount >= 0;
 	}
 
+	/**
+	 * Checks whether data is being used
+	 * 
+	 * @return True if there is data, False if not
+	 */
 	public boolean hasData() {
-		return this.data != null;
+		return this.data >= 0;
 	}
 
+	/**
+	 * Checks whether a type is being used
+	 * 
+	 * @return True if there is a type, False if not
+	 */
 	public boolean hasType() {
 		return this.type != null;
 	}
 
-	public byte getData() {
-		return this.data == null ? 0 : this.data.byteValue();
+	/**
+	 * Gets the data to match against, -1 for any data
+	 * 
+	 * @return Matched data
+	 */
+	public int getData() {
+		return this.data;
 	}
 
+	/**
+	 * Gets the amount, -1 for infinite amount
+	 * 
+	 * @return Amount
+	 */
 	public int getAmount() {
-		return this.amount == null ? -1 : this.amount.intValue();
+		return this.amount;
 	}
 
+	/**
+	 * Gets the type to match against, null for any item
+	 * 
+	 * @return Matched type
+	 */
 	public Material getType() {
 		return this.type;
 	}
 
+	/**
+	 * Gets the type Id to match against, -1 for any item
+	 * 
+	 * @return Matched type Id
+	 */
 	public int getTypeId() {
-		return this.type.getId();
+		return this.type == null ? -1 : this.type.getId();
 	}
 
 	public ItemStack getItemStack() {
@@ -119,7 +179,7 @@ public class ItemParser {
 	}
 
 	public ItemStack getItemStack(int amount) {
-		return new ItemStack(this.type, this.amount, this.data);
+		return new ItemStack(this.type, this.amount, (byte) this.data);
 	}
 
 	public int getMaxStackSize() {
@@ -143,10 +203,10 @@ public class ItemParser {
 	/**
 	 * Creates a new ItemParser with the type and data of this parser, but with a new amount
 	 * 
-	 * @param amount for the new parser
+	 * @param amount for the new parser, -1 for infinite
 	 * @return new ItemParser with the new amount
 	 */
-	public ItemParser setAmount(Integer amount) {
+	public ItemParser setAmount(int amount) {
 		return new ItemParser(this.type, amount, this.data);
 	}
 
@@ -172,12 +232,12 @@ public class ItemParser {
 			rval.append(this.amount).append(" of ");
 		}
 		if (this.hasType()) {
-			rval.append("any type");
-		} else {
 			rval.append(this.type.toString().toLowerCase());
 			if (this.hasData()) {
 				rval.append(':').append(this.data);
 			}
+		} else {
+			rval.append("any type");
 		}
 		return rval.toString();
 	}

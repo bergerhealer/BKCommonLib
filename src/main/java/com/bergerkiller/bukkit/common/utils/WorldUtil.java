@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -18,6 +19,16 @@ import net.minecraft.server.v1_4_5.World;
 import net.minecraft.server.v1_4_5.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
+
+	/**
+	 * Gets the shared Random of a world
+	 * 
+	 * @param world to get the Random of
+	 * @return Random generator of a world
+	 */
+	public static Random getRandom(org.bukkit.World world) {
+		return NativeUtil.getNative(world).random;
+	}
 
 	/**
 	 * Removes a single entity from the world

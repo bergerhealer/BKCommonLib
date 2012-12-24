@@ -67,6 +67,22 @@ public class RecipeUtil {
 		return isFuelItem(material.getId());
 	}
 
+	public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
+		return isFuelItem(item.getTypeId());
+	}
+
+	public static boolean isHeatableItem(int itemid) {
+		return RecipesFurnace.getInstance().recipes.containsKey(itemid);
+	}
+
+	public static boolean isHeatableItem(Material material) {
+		return isFuelItem(material.getId());
+	}
+
+	public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
+		return isHeatableItem(item.getTypeId());
+	}
+
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
 		return NativeUtil.getItemStack(RecipesFurnace.getInstance().getResult(itemid));
 	}
