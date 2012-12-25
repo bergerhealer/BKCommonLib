@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
-import net.minecraft.server.v1_4_5.ItemStack;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
+import net.minecraft.server.v1_4_6.ItemStack;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

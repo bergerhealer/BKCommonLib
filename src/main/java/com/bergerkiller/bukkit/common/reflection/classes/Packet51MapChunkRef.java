@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_4_5.Packet51MapChunk;
-
+import net.minecraft.server.v1_4_6.Packet51MapChunk;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;

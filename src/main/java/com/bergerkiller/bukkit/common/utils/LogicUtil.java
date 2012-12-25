@@ -4,8 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_6.ItemStack;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations

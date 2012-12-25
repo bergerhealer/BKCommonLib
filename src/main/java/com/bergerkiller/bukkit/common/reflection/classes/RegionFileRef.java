@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.io.File;
 import java.io.RandomAccessFile;
 
-import net.minecraft.server.v1_4_5.RegionFile;
+import net.minecraft.server.v1_4_6.RegionFile;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

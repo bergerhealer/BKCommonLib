@@ -3,23 +3,20 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import net.minecraft.server.v1_4_5.*;
-
+import net.minecraft.server.v1_4_6.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_4_5.CraftChunk;
-import org.bukkit.craftbukkit.v1_4_5.CraftWorld;
-import org.bukkit.craftbukkit.v1_4_5.block.*;
-import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_4_5.inventory.*;
+import org.bukkit.craftbukkit.v1_4_6.CraftChunk;
+import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_6.block.*;
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_4_6.inventory.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
 import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;

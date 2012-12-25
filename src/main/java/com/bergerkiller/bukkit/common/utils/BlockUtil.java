@@ -1,20 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import net.minecraft.server.v1_4_5.Block;
-import net.minecraft.server.v1_4_5.ChunkCoordinates;
-import net.minecraft.server.v1_4_5.Packet;
-import net.minecraft.server.v1_4_5.TileEntity;
-import net.minecraft.server.v1_4_5.TileEntityChest;
-import net.minecraft.server.v1_4_5.TileEntityDispenser;
-import net.minecraft.server.v1_4_5.TileEntityFurnace;
-import net.minecraft.server.v1_4_5.TileEntitySign;
-import net.minecraft.server.v1_4_5.World;
-
+import net.minecraft.server.v1_4_6.Block;
+import net.minecraft.server.v1_4_6.ChunkCoordinates;
+import net.minecraft.server.v1_4_6.Packet;
+import net.minecraft.server.v1_4_6.TileEntity;
+import net.minecraft.server.v1_4_6.TileEntityChest;
+import net.minecraft.server.v1_4_6.TileEntityDispenser;
+import net.minecraft.server.v1_4_6.TileEntityFurnace;
+import net.minecraft.server.v1_4_6.TileEntitySign;
+import net.minecraft.server.v1_4_6.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -28,7 +25,6 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
-
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 
 /**

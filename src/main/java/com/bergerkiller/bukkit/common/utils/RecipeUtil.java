@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import net.minecraft.server.v1_4_5.CraftingManager;
-import net.minecraft.server.v1_4_5.IRecipe;
-import net.minecraft.server.v1_4_5.ItemStack;
-import net.minecraft.server.v1_4_5.RecipesFurnace;
-import net.minecraft.server.v1_4_5.TileEntityFurnace;
+import net.minecraft.server.v1_4_6.CraftingManager;
+import net.minecraft.server.v1_4_6.IRecipe;
+import net.minecraft.server.v1_4_6.ItemStack;
+import net.minecraft.server.v1_4_6.RecipesFurnace;
+import net.minecraft.server.v1_4_6.TileEntityFurnace;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

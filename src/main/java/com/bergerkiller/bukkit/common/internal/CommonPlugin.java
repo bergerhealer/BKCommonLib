@@ -12,13 +12,13 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_4_5.Entity;
-import net.minecraft.server.v1_4_5.WorldServer;
+import net.minecraft.server.v1_4_6.Entity;
+import net.minecraft.server.v1_4_6.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -39,7 +39,7 @@ public class CommonPlugin extends PluginBase {
 	/*
 	 * BKCommonLib Minecraft versioning
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_4_5";
+	public static final String DEPENDENT_MC_VERSION = "v1_4_6";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
 	/*
 	 * Remaining internal variables
@@ -103,7 +103,7 @@ public class CommonPlugin extends PluginBase {
 	public void notifyRemoved(org.bukkit.entity.Entity e) {
 		this.entitiesToRemove.add(e);
 	}
-
+	
 	public void notifyWorldAdded(org.bukkit.World world) {
 		if (worldListeners.containsKey(world)) {
 			return;
@@ -250,12 +250,10 @@ public class CommonPlugin extends PluginBase {
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
 		entityRemoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new EntityRemovalHandler(), 1, 1);
-
 		// Register world listeners
 		for (World world : WorldUtil.getWorlds()) {
 			notifyWorldAdded(world);
 		}
-
 		// Parse BKCommonLib version to int
 		String ver = this.getVersion();
 		int dot1 = ver.indexOf('.');

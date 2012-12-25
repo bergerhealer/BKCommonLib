@@ -2,20 +2,17 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
-
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
-
-import net.minecraft.server.v1_4_5.IRecipe;
-import net.minecraft.server.v1_4_5.ItemStack;
-import net.minecraft.server.v1_4_5.MathHelper;
-import net.minecraft.server.v1_4_5.ShapedRecipes;
-import net.minecraft.server.v1_4_5.ShapelessRecipes;
+import net.minecraft.server.v1_4_6.IRecipe;
+import net.minecraft.server.v1_4_6.ItemStack;
+import net.minecraft.server.v1_4_6.MathHelper;
+import net.minecraft.server.v1_4_6.ShapedRecipes;
+import net.minecraft.server.v1_4_6.ShapelessRecipes;
 
 public class CraftRecipe {
 	private static final SafeField<ItemStack[]> srItems = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");

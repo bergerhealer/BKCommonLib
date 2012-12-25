@@ -3,11 +3,10 @@ package com.bergerkiller.bukkit.common.natives;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
-import net.minecraft.server.v1_4_5.NetHandler;
-import net.minecraft.server.v1_4_5.Packet;
+import net.minecraft.server.v1_4_6.Connection;
+import net.minecraft.server.v1_4_6.Packet;
 
 /**
  * Wraps around another packet to create an undetectable packet type to send to clients undetected
@@ -40,7 +39,7 @@ public class NativeSilentPacket extends Packet {
 	}
 
 	@Override
-	public void handle(NetHandler arg0) {
+	public void handle(Connection arg0) {
 		// Nothing happens here to avoid problems
 	}
 }

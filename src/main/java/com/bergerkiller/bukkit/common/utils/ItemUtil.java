@@ -1,17 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Map;
-
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
-
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-
-import net.minecraft.server.v1_4_5.EntityItem;
-import net.minecraft.server.v1_4_5.Item;
-import net.minecraft.server.v1_4_5.ItemStack;
+import net.minecraft.server.v1_4_6.EntityItem;
+import net.minecraft.server.v1_4_6.Item;
+import net.minecraft.server.v1_4_6.ItemStack;
 
 /**
  * Contains item stack, item and inventory utilities
@@ -336,7 +333,7 @@ public class ItemUtil {
 	public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item bitem) {
 		bitem.remove();
 		EntityItem item = NativeUtil.getNative(bitem);
-		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.itemStack);
+		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.getItemStack());
 		newItem.fallDistance = item.fallDistance;
 		newItem.fireTicks = item.fireTicks;
 		newItem.pickupDelay = item.pickupDelay;

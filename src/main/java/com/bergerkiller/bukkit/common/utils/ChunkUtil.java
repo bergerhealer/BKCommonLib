@@ -3,16 +3,13 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
-
-import net.minecraft.server.v1_4_5.Chunk;
-import net.minecraft.server.v1_4_5.ChunkSection;
-import net.minecraft.server.v1_4_5.WorldServer;
-
+import net.minecraft.server.v1_4_6.Chunk;
+import net.minecraft.server.v1_4_6.ChunkSection;
+import net.minecraft.server.v1_4_6.WorldServer;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_4_5.util.LongHash;
-import org.bukkit.craftbukkit.v1_4_5.util.LongHashSet;
-import org.bukkit.craftbukkit.v1_4_5.util.LongObjectHashMap;
-
+import org.bukkit.craftbukkit.v1_4_6.util.LongHash;
+import org.bukkit.craftbukkit.v1_4_6.util.LongHashSet;
+import org.bukkit.craftbukkit.v1_4_6.util.LongObjectHashMap;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
@@ -110,7 +107,7 @@ public class ChunkUtil {
 		final int secIndex = y >> 4;
 		ChunkSection section = sections[secIndex];
 		if (section == null) {
-			section = sections[secIndex] = new ChunkSection(y >> 4 << 4);
+			section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !((net.minecraft.server.v1_4_6.World)chunk.getWorld()).worldProvider.f);
 		}
 		ChunkSectionRef.setTypeId(section, x, y, z, typeId);
 		ChunkSectionRef.setData(section, x, y, z, data);

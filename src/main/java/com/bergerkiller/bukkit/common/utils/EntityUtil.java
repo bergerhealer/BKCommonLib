@@ -2,19 +2,16 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.List;
 import java.util.UUID;
-
-import net.minecraft.server.v1_4_5.Chunk;
-import net.minecraft.server.v1_4_5.Entity;
-import net.minecraft.server.v1_4_5.EntityPlayer;
-import net.minecraft.server.v1_4_5.EntityTrackerEntry;
-import net.minecraft.server.v1_4_5.IntHashMap;
-import net.minecraft.server.v1_4_5.MathHelper;
-import net.minecraft.server.v1_4_5.World;
-import net.minecraft.server.v1_4_5.WorldServer;
-
+import net.minecraft.server.v1_4_6.Chunk;
+import net.minecraft.server.v1_4_6.Entity;
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.EntityTrackerEntry;
+import net.minecraft.server.v1_4_6.IntHashMap;
+import net.minecraft.server.v1_4_6.MathHelper;
+import net.minecraft.server.v1_4_6.World;
+import net.minecraft.server.v1_4_6.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
-
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;

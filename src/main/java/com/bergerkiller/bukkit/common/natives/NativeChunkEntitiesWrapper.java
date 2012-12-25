@@ -9,8 +9,8 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
-import net.minecraft.server.v1_4_5.Chunk;
-import net.minecraft.server.v1_4_5.Entity;
+import net.minecraft.server.v1_4_6.Chunk;
+import net.minecraft.server.v1_4_6.Entity;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class NativeChunkEntitiesWrapper implements Collection<org.bukkit.entity.Entity> {

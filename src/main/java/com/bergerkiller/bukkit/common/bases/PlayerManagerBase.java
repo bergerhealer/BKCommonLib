@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import net.minecraft.server.v1_4_5.EntityPlayer;
-import net.minecraft.server.v1_4_5.PlayerManager;
-import net.minecraft.server.v1_4_5.WorldServer;
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.PlayerChunkMap;
+import net.minecraft.server.v1_4_6.WorldServer;
 
-public class PlayerManagerBase extends PlayerManager {
+public class PlayerManagerBase extends PlayerChunkMap {
 
 	public PlayerManagerBase(WorldServer worldserver, int viewDistace) {
 		super(worldserver, viewDistace);

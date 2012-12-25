@@ -2,25 +2,22 @@ package com.bergerkiller.bukkit.common.bases;
 
 import java.io.File;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
-
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-
-import net.minecraft.server.v1_4_5.EnumGamemode;
-import net.minecraft.server.v1_4_5.IChunkLoader;
-import net.minecraft.server.v1_4_5.IChunkProvider;
-import net.minecraft.server.v1_4_5.IDataManager;
-import net.minecraft.server.v1_4_5.NBTTagCompound;
-import net.minecraft.server.v1_4_5.PlayerFileData;
-import net.minecraft.server.v1_4_5.WorldData;
-import net.minecraft.server.v1_4_5.WorldProvider;
-import net.minecraft.server.v1_4_5.WorldServer;
-import net.minecraft.server.v1_4_5.WorldSettings;
-import net.minecraft.server.v1_4_5.WorldType;
+import net.minecraft.server.v1_4_6.EnumGamemode;
+import net.minecraft.server.v1_4_6.IChunkLoader;
+import net.minecraft.server.v1_4_6.IChunkProvider;
+import net.minecraft.server.v1_4_6.IDataManager;
+import net.minecraft.server.v1_4_6.NBTTagCompound;
+import net.minecraft.server.v1_4_6.PlayerFileData;
+import net.minecraft.server.v1_4_6.WorldData;
+import net.minecraft.server.v1_4_6.WorldProvider;
+import net.minecraft.server.v1_4_6.WorldServer;
+import net.minecraft.server.v1_4_6.WorldSettings;
+import net.minecraft.server.v1_4_6.WorldType;
 
 /**
  * A dummy world that can be used to operate on or using worlds without referencing it on the server<br>

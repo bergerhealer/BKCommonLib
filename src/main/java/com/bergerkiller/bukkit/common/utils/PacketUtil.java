@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_5.EntityPlayer;
-import net.minecraft.server.v1_4_5.Packet;
-import net.minecraft.server.v1_4_5.Packet29DestroyEntity;
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.Packet;
+import net.minecraft.server.v1_4_6.Packet29DestroyEntity;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -27,12 +27,12 @@ public class PacketUtil {
 		EntityPlayer ep = NativeUtil.getNative(player);
 		if (packet == null || player == null)
 			return;
-		if (ep.netServerHandler == null || ep.netServerHandler.disconnected)
+		if (ep.playerConnection == null || ep.playerConnection.disconnected)
 			return;
 		if (!throughListeners) {
 			packet = new NativeSilentPacket(packet);
 		}
-		ep.netServerHandler.sendPacket(packet);
+		ep.playerConnection.sendPacket(packet);
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Packet packet, boolean throughListeners) {

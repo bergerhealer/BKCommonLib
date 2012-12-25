@@ -5,18 +5,16 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.v1_4_5.MinecraftServer;
-import net.minecraft.server.v1_4_5.ServerConfigurationManager;
-
+import net.minecraft.server.v1_4_6.DedicatedPlayerList;
+import net.minecraft.server.v1_4_6.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_5.CraftServer;
+import org.bukkit.craftbukkit.v1_4_6.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
-
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -120,7 +118,7 @@ public class CommonUtil {
 	 * 
 	 * @return Server Configuration Manager
 	 */
-	public static ServerConfigurationManager getServerConfig() {
+	public static DedicatedPlayerList getServerConfig() {
 		return getCraftServer().getHandle();
 	}
 

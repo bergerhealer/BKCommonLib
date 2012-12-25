@@ -3,9 +3,9 @@ package com.bergerkiller.bukkit.common.inventory;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_6.IInventory;
 
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;

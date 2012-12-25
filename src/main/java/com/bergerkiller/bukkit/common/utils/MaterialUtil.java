@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_5.Block;
-
+import net.minecraft.server.v1_4_6.Block;
 import org.bukkit.Material;
-
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 
