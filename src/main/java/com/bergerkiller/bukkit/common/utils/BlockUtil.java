@@ -451,6 +451,7 @@ public class BlockUtil extends MaterialUtil {
 				blocks.add(state);
 			}
 		}
+		tilebuff.clear();
 		return blocks;
 	}
 
