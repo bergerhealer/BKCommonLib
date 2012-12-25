@@ -41,12 +41,7 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onWorldInit(WorldInitEvent event) {
-		if (CommonPlugin.getInstance().worldListeners.containsKey(event.getWorld())) {
-			return;
-		}
-		CommonWorldListener listener = new CommonWorldListener(event.getWorld());
-		listener.enable();
-		CommonPlugin.getInstance().worldListeners.put(event.getWorld(), listener);
+		CommonPlugin.getInstance().notifyWorldAdded(event.getWorld());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)

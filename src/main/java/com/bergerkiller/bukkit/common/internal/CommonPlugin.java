@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -101,6 +102,15 @@ public class CommonPlugin extends PluginBase {
 
 	public void notifyRemoved(org.bukkit.entity.Entity e) {
 		this.entitiesToRemove.add(e);
+	}
+
+	public void notifyWorldAdded(org.bukkit.World world) {
+		if (worldListeners.containsKey(world)) {
+			return;
+		}
+		CommonWorldListener listener = new CommonWorldListener(world);
+		listener.enable();
+		worldListeners.put(world, listener);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -240,6 +250,11 @@ public class CommonPlugin extends PluginBase {
 		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
 		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
 		entityRemoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new EntityRemovalHandler(), 1, 1);
+
+		// Register world listeners
+		for (World world : WorldUtil.getWorlds()) {
+			notifyWorldAdded(world);
+		}
 
 		// Parse BKCommonLib version to int
 		String ver = this.getVersion();
