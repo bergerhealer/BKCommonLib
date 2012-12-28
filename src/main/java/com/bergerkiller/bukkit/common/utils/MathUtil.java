@@ -185,7 +185,7 @@ public class MathUtil {
 	 * @return inverse tangent 2 angle in degrees
 	 */
 	public static float atan2(double y, double x) {
-		return RADTODEG * (float) Math.atan2(y, x);
+		return RADTODEG * (float) TrigMath.atan2(y, x);
 	}
 
 	/**
