@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -29,7 +28,6 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
@@ -237,6 +235,13 @@ public class CommonPlugin extends PluginBase {
 		// Validate version
 		if (IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
+			//send annonymous stats to mcstats.org
+			try {
+				Metrics metrics =  new Metrics(this);
+				metrics.start();
+			} catch(Exception e) {
+				log(Level.INFO, "Failed sending stats to mcstats.org");
+			}
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib update:");
@@ -320,12 +325,12 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private static class MoveEventHandler implements Runnable {
-		@SuppressWarnings("unchecked")
 		public void run() {
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
-				for (WorldServer world : NativeUtil.getWorlds()) {
-					for (Entity entity : (List<Entity>) world.entityList) {
+				for (World world : Bukkit.getServer().getWorlds()) {
+					for (org.bukkit.entity.Entity a : world.getEntities()) {
+						Entity entity = (Entity)a;
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
 
