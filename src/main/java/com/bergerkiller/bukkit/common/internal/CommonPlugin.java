@@ -59,6 +59,7 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
+	public List<Entity> entities = new ArrayList<Entity>();
 
 	public static CommonPlugin getInstance() {
 		return instance;
@@ -329,12 +330,12 @@ public class CommonPlugin extends PluginBase {
 	private static class MoveEventHandler implements Runnable {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			List<Entity> entities = new ArrayList<Entity>();
+			CommonPlugin cp = CommonPlugin.getInstance();
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
 				for (WorldServer world : NativeUtil.getWorlds()) {
-					entities.addAll(world.entityList);
-					for (Entity entity : entities) {
+					cp.entities.addAll(world.entityList);
+					for (Entity entity : cp.entities) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
 
@@ -342,6 +343,7 @@ public class CommonPlugin extends PluginBase {
 							CommonUtil.callEvent(event);
 						}
 					}
+					cp.entities.clear();
 				}
 			}
 		}
