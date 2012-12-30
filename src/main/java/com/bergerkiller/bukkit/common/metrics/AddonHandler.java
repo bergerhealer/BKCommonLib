@@ -8,19 +8,42 @@ import org.bukkit.plugin.Plugin;
 public class AddonHandler {
 	private Plugin plugin;
 	public AddonHandler(Plugin i) { plugin = i; }
-	private Metrics metrics;
+	private Metrics metrics = null;
 	public List<cPlotter> plotters = new ArrayList<cPlotter>();
 	public HashMap<String, xPlotter> graphs = new HashMap<String, xPlotter>();
 	
 	public void addPlotter(cPlotter plotter) {
+		if(metrics == null)
+			this.startMetrics();
 		metrics.addCustomData(plotter);
 		plotters.add(plotter);
 	}
 	
+	public void addPlotters(List<cPlotter> plotters) {
+		if(metrics == null)
+			this.startMetrics();
+		for(cPlotter plotter : plotters) {
+			metrics.addCustomData(plotter);
+			plotters.add(plotter);
+		}
+	}
+	
 	public Metrics.Graph addGraph(String name, xPlotter data) {
+		if(metrics == null)
+			this.startMetrics();
 		Metrics.Graph graph = metrics.createGraph(name);
 		graph.addPlotter(data);
 		graphs.put(name, data);
+		return graph;
+	}
+	
+	public Metrics.Graph addGraphs(String name, List<xPlotter> plotters) {
+		if(metrics == null)
+			this.startMetrics();
+		Metrics.Graph graph = metrics.createGraph(name);
+		for(xPlotter data : plotters) {
+			graph.addPlotter(data);
+		}
 		return graph;
 	}
 	
