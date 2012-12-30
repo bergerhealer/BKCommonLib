@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.metrics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
