@@ -10,7 +10,7 @@ public class AddonHandler {
 	public AddonHandler(Plugin i) { plugin = i; }
 	private Metrics metrics;
 	public List<cPlotter> plotters = new ArrayList<cPlotter>();
-	public HashMap<Metrics.Graph, xPlotter> graphs = new HashMap<Metrics.Graph, xPlotter>();
+	public HashMap<String, xPlotter> graphs = new HashMap<String, xPlotter>();
 	
 	public void addPlotter(cPlotter plotter) {
 		metrics.addCustomData(plotter);
@@ -20,7 +20,7 @@ public class AddonHandler {
 	public Metrics.Graph addGraph(String name, xPlotter data) {
 		Metrics.Graph graph = metrics.createGraph(name);
 		graph.addPlotter(data);
-		graphs.put(graph, data);
+		graphs.put(name, data);
 		return graph;
 	}
 	

@@ -21,6 +21,11 @@ public class cPlotter extends Metrics.Plotter {
         return this.value;
     }
     
+    
+    public void setValue(int value) {
+    	this.value= value;
+    }
+    
     public void increment() {
     	value++;
     }
