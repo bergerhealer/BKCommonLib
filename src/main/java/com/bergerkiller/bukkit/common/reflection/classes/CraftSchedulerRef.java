@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.PriorityQueue;
 
-import org.bukkit.craftbukkit.v1_4_6.scheduler.CraftScheduler;
+import org.bukkit.craftbukkit.v1_4_R1.scheduler.CraftScheduler;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

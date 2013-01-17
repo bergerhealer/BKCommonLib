@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_4_6.Chunk;
-import net.minecraft.server.v1_4_6.ChunkSection;
-import net.minecraft.server.v1_4_6.EnumSkyBlock;
+import net.minecraft.server.v1_4_R1.Chunk;
+import net.minecraft.server.v1_4_R1.ChunkSection;
+import net.minecraft.server.v1_4_R1.EnumSkyBlock;
 
 public class ChunkRef {
 	public static final int XZ_MASK = 0xf;

@@ -20,7 +20,7 @@ public class Common {
 						// Format:
 						// [package].v1_4_5.[trail]
 						builder.setLength(0);
-						builder.append('v').append(a).append('_').append(b).append('_').append(c);
+						builder.append('v').append(a).append('_').append(b).append('_').append('R').append(c);
 						version = builder.toString();
 						if (checkVersion(version)) {
 							a = b = c = 10;
@@ -35,11 +35,11 @@ public class Common {
 	/**
 	 * Defines the net.minecraft.server root path
 	 */
-	public static final String NMS_ROOT = "net.minecraft.server" + MC_VERSION_PACKAGEPART;
+	public static final String NMS_ROOT = "net.minecraft.server"+MC_VERSION_PACKAGEPART;
 	/**
 	 * Defines the org.bukkit.craftbukkit root path
 	 */
-	public static final String CB_ROOT = "org.bukkit.craftbukkit" + MC_VERSION_PACKAGEPART;
+	public static final String CB_ROOT = "org.bukkit.craftbukkit"+MC_VERSION_PACKAGEPART;
 
 	private static boolean checkVersion(String version) {
 		try {
@@ -68,7 +68,7 @@ public class Common {
 	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
 	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 142;
+	public static final int VERSION = 143;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version

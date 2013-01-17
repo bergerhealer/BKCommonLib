@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Map;
-import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import net.minecraft.server.v1_4_6.EntityItem;
-import net.minecraft.server.v1_4_6.Item;
-import net.minecraft.server.v1_4_6.ItemStack;
+import net.minecraft.server.v1_4_R1.EntityItem;
+import net.minecraft.server.v1_4_R1.Item;
+import net.minecraft.server.v1_4_R1.ItemStack;
 
 /**
  * Contains item stack, item and inventory utilities

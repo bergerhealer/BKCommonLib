@@ -12,13 +12,13 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.WorldServer;
+import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_6.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -40,7 +40,7 @@ public class CommonPlugin extends PluginBase {
 	/*
 	 * BKCommonLib Minecraft versioning
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_4_6";
+	public static final String DEPENDENT_MC_VERSION = "v1_4_R1";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
 	/*
 	 * Remaining internal variables

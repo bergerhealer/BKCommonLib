@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.server.v1_4_6.RegionFile;
-import net.minecraft.server.v1_4_6.RegionFileCache;
+import net.minecraft.server.v1_4_R1.RegionFile;
+import net.minecraft.server.v1_4_R1.RegionFileCache;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

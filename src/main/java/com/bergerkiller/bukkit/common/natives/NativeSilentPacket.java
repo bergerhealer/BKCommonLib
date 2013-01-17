@@ -5,8 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
-import net.minecraft.server.v1_4_6.Connection;
-import net.minecraft.server.v1_4_6.Packet;
+import net.minecraft.server.v1_4_R1.Connection;
+import net.minecraft.server.v1_4_R1.Packet;
 
 /**
  * Wraps around another packet to create an undetectable packet type to send to clients undetected

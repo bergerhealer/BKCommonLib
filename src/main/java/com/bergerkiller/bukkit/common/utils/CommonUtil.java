@@ -5,12 +5,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.v1_4_6.DedicatedPlayerList;
-import net.minecraft.server.v1_4_6.MinecraftServer;
+import net.minecraft.server.v1_4_R1.DedicatedPlayerList;
+import net.minecraft.server.v1_4_R1.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_6.CraftServer;
+import org.bukkit.craftbukkit.v1_4_R1.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

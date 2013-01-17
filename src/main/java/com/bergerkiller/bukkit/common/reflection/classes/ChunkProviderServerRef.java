@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import net.minecraft.server.v1_4_6.ChunkProviderServer;
-import net.minecraft.server.v1_4_6.IChunkLoader;
+import net.minecraft.server.v1_4_R1.ChunkProviderServer;
+import net.minecraft.server.v1_4_R1.IChunkLoader;
 
 public class ChunkProviderServerRef {
 	public static final ClassTemplate<ChunkProviderServer> TEMPLATE = ClassTemplate.create(ChunkProviderServer.class);

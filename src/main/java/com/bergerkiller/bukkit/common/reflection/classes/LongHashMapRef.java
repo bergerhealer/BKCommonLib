@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.v1_4_6.LongHashMap;
+import net.minecraft.server.v1_4_R1.LongHashMap;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

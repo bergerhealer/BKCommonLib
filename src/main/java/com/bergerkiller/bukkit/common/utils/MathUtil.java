@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_6.MathHelper;
+import net.minecraft.server.v1_4_R1.MathHelper;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_4_6.TrigMath;
-import org.bukkit.craftbukkit.v1_4_6.util.LongHash;
+import org.bukkit.craftbukkit.v1_4_R1.TrigMath;
+import org.bukkit.craftbukkit.v1_4_R1.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 

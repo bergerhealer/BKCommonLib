@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_R1.EntityPlayer;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

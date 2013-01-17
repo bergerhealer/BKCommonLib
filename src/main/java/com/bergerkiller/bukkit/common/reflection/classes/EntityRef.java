@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
-import net.minecraft.server.v1_4_6.Entity;
+import net.minecraft.server.v1_4_R1.Entity;
 
 public class EntityRef {
 	public static final FieldAccessor<org.bukkit.entity.Entity> bukkitEntity = new SafeField<org.bukkit.entity.Entity>(Entity.class, "bukkitEntity");

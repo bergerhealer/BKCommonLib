@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_4_6.ChunkSection;
+import net.minecraft.server.v1_4_R1.ChunkSection;
 
 public class ChunkSectionRef {
 	public static int getTypeId(ChunkSection section, int x, int y, int z) {

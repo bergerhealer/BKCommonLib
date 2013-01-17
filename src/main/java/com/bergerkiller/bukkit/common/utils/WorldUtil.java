@@ -9,11 +9,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
-import net.minecraft.server.v1_4_6.Entity;
-import net.minecraft.server.v1_4_6.EntityTracker;
-import net.minecraft.server.v1_4_6.EntityTrackerEntry;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldServer;
+import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.EntityTracker;
+import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
+import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_4_R1.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
 

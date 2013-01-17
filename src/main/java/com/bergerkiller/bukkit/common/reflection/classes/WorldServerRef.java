@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
-import net.minecraft.server.v1_4_6.IWorldAccess;
-import net.minecraft.server.v1_4_6.IntHashMap;
-import net.minecraft.server.v1_4_6.PlayerChunkMap;
-import net.minecraft.server.v1_4_6.World;
-import net.minecraft.server.v1_4_6.WorldServer;
+import net.minecraft.server.v1_4_R1.IWorldAccess;
+import net.minecraft.server.v1_4_R1.IntHashMap;
+import net.minecraft.server.v1_4_R1.PlayerChunkMap;
+import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_4_R1.WorldServer;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 

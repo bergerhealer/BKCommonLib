@@ -8,11 +8,11 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
-import net.minecraft.server.v1_4_6.IRecipe;
-import net.minecraft.server.v1_4_6.ItemStack;
-import net.minecraft.server.v1_4_6.MathHelper;
-import net.minecraft.server.v1_4_6.ShapedRecipes;
-import net.minecraft.server.v1_4_6.ShapelessRecipes;
+import net.minecraft.server.v1_4_R1.IRecipe;
+import net.minecraft.server.v1_4_R1.ItemStack;
+import net.minecraft.server.v1_4_R1.MathHelper;
+import net.minecraft.server.v1_4_R1.ShapedRecipes;
+import net.minecraft.server.v1_4_R1.ShapelessRecipes;
 
 public class CraftRecipe {
 	private static final SafeField<ItemStack[]> srItems = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
