@@ -248,7 +248,18 @@ public class ItemUtil {
 	public static void transferInfo(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
 		to.setTypeId(from.getTypeId());
 		to.setDurability(from.getDurability());
-		to.addEnchantments(from.getEnchantments());
+		Map<Enchantment, Integer> it = from.getEnchantments();
+		for(Enchantment e : it.keySet()) {
+			Map<Enchantment, Integer> it2 = to.getEnchantments();
+			for(Enchantment e2 : it2.keySet()) {
+				if(e.conflictsWith(e2))
+					continue;
+			}
+			int a = it.get(e);
+			if(e.canEnchantItem(to) && e.getMaxLevel() <= a) {
+				to.addEnchantment(e, a);
+			}
+		}
 	}
 
 	/**
