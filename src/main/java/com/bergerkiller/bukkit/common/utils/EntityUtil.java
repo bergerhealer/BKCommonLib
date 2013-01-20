@@ -24,7 +24,7 @@ public class EntityUtil extends EntityPropertyUtil {
 
 	public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
 		Entity e = getEntity(NativeUtil.getNative(world), uid);
-		return e == null ? null : e.getBukkitEntity();
+		return e == null ? null : NativeUtil.getEntity(e);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		with.dead = false;
 		// Bukkit entity
 		EntityRef.bukkitEntity.transfer(toreplace, with);
-		((CraftEntity) with.getBukkitEntity()).setHandle(with);
+		((CraftEntity) NativeUtil.getEntity(with)).setHandle(with);
 		// Passenger
 		if (toreplace.passenger != null) {
 			toreplace.passenger.setPassengerOf(with);
@@ -235,7 +235,7 @@ public class EntityUtil extends EntityPropertyUtil {
 			entity.world.addEntity(entity);
 			return true;
 		} else {
-			return entity.getBukkitEntity().teleport(to);
+			return NativeUtil.getEntity(entity).teleport(to);
 		}
 	}
 }

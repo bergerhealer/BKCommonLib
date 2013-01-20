@@ -6,6 +6,8 @@ import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
 
+import com.bergerkiller.bukkit.common.utils.NativeUtil;
+
 /**
  * Fired when an entity moves
  */
@@ -25,7 +27,7 @@ public class EntityMoveEvent extends EntityEvent {
 	 */
 	public void setEntity(Entity entity) {
 		this.nativeEntity = entity;
-		this.entity = entity.getBukkitEntity();
+		this.entity = NativeUtil.getEntity(entity);
 	}
 
 	/**

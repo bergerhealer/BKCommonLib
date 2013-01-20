@@ -64,7 +64,7 @@ class CommonWorldListener extends WorldManager {
 			// Notify it is added
 			CommonPlugin.getInstance().notifyAdded(NativeUtil.getEntity(added));
 			// Event
-			CommonUtil.callEvent(new EntityAddEvent(added.getBukkitEntity()));
+			CommonUtil.callEvent(new EntityAddEvent(NativeUtil.getEntity(added)));
 		}
 	}
 
@@ -78,7 +78,7 @@ class CommonWorldListener extends WorldManager {
 			// Notify it is removed
 			CommonPlugin.getInstance().notifyRemoved(NativeUtil.getEntity(removed));
 			// Event
-			CommonUtil.callEvent(new EntityRemoveEvent(removed.getBukkitEntity()));
+			CommonUtil.callEvent(new EntityRemoveEvent(NativeUtil.getEntity(removed)));
 		}
 	}
 
