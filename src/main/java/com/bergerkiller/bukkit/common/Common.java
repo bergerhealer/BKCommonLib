@@ -68,7 +68,7 @@ public class Common {
 	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
 	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 143;
+	public static final int VERSION = 144;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version
