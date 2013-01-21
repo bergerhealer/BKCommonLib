@@ -154,7 +154,7 @@ public class NativeUtil {
 	}
 
 	public static org.bukkit.entity.Entity getEntity(Entity entity) {
-		return entity == null ? null : NativeUtil.getEntity(entity);
+		return entity == null ? null : (org.bukkit.entity.Entity)entity.getBukkitEntity();
 	}
 
 	public static org.bukkit.Chunk getChunk(Chunk chunk) {
