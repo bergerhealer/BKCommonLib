@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.metrics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.bukkit.plugin.Plugin;
 
@@ -9,31 +8,14 @@ public class AddonHandler {
 	private Plugin plugin;
 	public AddonHandler(Plugin i) { plugin = i; }
 	private Metrics metrics = null;
-	public List<cPlotter> plotters = new ArrayList<cPlotter>();
-	public HashMap<String, xPlotter> graphs = new HashMap<String, xPlotter>();
-	
-	public void addPlotter(cPlotter plotter) {
-		if(metrics == null)
-			this.startMetrics();
-		metrics.addCustomData(plotter);
-		plotters.add(plotter);
-	}
-	
-	public void addPlotters(List<cPlotter> plotters) {
-		if(metrics == null)
-			this.startMetrics();
-		for(cPlotter plotter : plotters) {
-			metrics.addCustomData(plotter);
-			plotters.add(plotter);
-		}
-	}
+	public List<GraphData> graphs = new ArrayList<GraphData>();
 	
 	public Metrics.Graph addGraph(String name, xPlotter data) {
 		if(metrics == null)
 			this.startMetrics();
 		Metrics.Graph graph = metrics.createGraph(name);
 		graph.addPlotter(data);
-		graphs.put(name, data);
+		graphs.add(new GraphData(name, data));
 		return graph;
 	}
 	
@@ -45,6 +27,10 @@ public class AddonHandler {
 			graph.addPlotter(data);
 		}
 		return graph;
+	}
+	
+	public List<GraphData> getGraphs() {
+		return this.graphs;
 	}
 	
 	public void startMetrics() {
