@@ -239,6 +239,8 @@ public class CommonPlugin extends PluginBase {
 		// Validate version
 		if (IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
+			log(Level.INFO, "MC version: "+Bukkit.getVersion());
+			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
 			//send annonymous stats to mcstats.org
 			try {
 				Metrics metrics =  new Metrics(this);
