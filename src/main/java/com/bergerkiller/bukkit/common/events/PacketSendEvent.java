@@ -46,10 +46,20 @@ public class PacketSendEvent extends Event implements Cancellable {
 		this.packet = packet;
 	}
 	
+	/**
+	 * Get the plaer who is receiving the packets from the server
+	 * 
+	 * @return			Player
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 	
+	/**
+	 * Get the packet that is about to be sended
+	 * 
+	 * @return			Packet
+	 */
 	public CommonPacket getPacket() {
 		return packet;
 	}
