@@ -56,8 +56,16 @@ public class CommonPacket {
 	public void setDatawatcher(Object metaData) {
 		if(PacketFieldRef.metaData.containsKey(type)) {
 			String field = PacketFieldRef.metaData.get(type);
-			SafeField.set(packet, field, metaData);
+			write(field, metaData);
 		}
+	}
+	
+	public Object getDatawatcher() {
+		if(PacketFieldRef.metaData.containsKey(type)) {
+			String field = PacketFieldRef.metaData.get(type);
+			return read(field);
+		} else
+			return null;
 	}
 	
 	public int readInt(int index) {
