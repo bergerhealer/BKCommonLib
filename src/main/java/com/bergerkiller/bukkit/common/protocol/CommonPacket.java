@@ -104,7 +104,11 @@ public class CommonPacket {
 		return this.type;
 	}
 	
-	public void write(String field, int count, Object value) {
+	public Packet getHandle() {
+		return this.packet;
+	}
+	
+	public void write(String field, Object value) {
 		try {
 			Field data = packet.getClass().getDeclaredField(field);
 			data.setAccessible(true);

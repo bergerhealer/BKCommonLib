@@ -61,6 +61,13 @@
       <systemPath>${project.basedir}/lib/BleedingMobs.jar</systemPath>
     </dependency>
     <dependency>
+      <groupId>com.bergerkiller.bukkit</groupId>
+      <artifactId>SignLink</artifactId>
+      <version>1.31</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/SignLink</systemPath>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>

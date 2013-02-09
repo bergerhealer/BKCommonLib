@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 public class PacketUtil {
 	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
@@ -33,6 +34,19 @@ public class PacketUtil {
 			packet = new NativeSilentPacket(packet);
 		}
 		ep.playerConnection.sendPacket(packet);
+	}
+	
+	public static void sendCommonPacket(Player player, CommonPacket packet, boolean throughListeners) {
+		EntityPlayer ep = NativeUtil.getNative(player);
+		Packet toSend = packet.getHandle();
+		if (packet == null || player == null)
+			return;
+		if (ep.playerConnection == null || ep.playerConnection.disconnected)
+			return;
+		if (!throughListeners) {
+			toSend = new NativeSilentPacket(packet.getHandle());
+		}
+		ep.playerConnection.sendPacket(toSend);
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Packet packet, boolean throughListeners) {
