@@ -20,11 +20,12 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
-    <!-- Repo for access to CraftBukkit -->
+    <!-- Repo for access to Spigot -->
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+      <id>spigot-repo</id>
+      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
     </repository>
+    <!-- Repo for access to ProtocolLib -->
     <repository>
       <id>comphenix-rep</id>
       <name>Comphenix Repository</name>
@@ -34,9 +35,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
-      <version>1.4.7-R1.0</version>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot</artifactId>
+      <version>1.4.7-R1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>

@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -68,6 +71,11 @@ public class PacketConnection extends PlayerConnection {
 	
 	@Override
 	public void a(Packet10Flying packet) {
+		if(!Common.heavyPackets) {
+			super.a(packet);
+			return;
+		}
+		
 		if(this.canConfirm(packet))
 			super.a(packet);
 	}
@@ -110,6 +118,11 @@ public class PacketConnection extends PlayerConnection {
 	
 	@Override
 	public void a(Packet17EntityLocationAction packet) {
+		if(!Common.heavyPackets) {
+			super.a(packet);
+			return;
+		}
+		
 		if(this.canConfirm(packet))
 			super.a(packet);
 	}
@@ -415,10 +428,16 @@ public class PacketConnection extends PlayerConnection {
 	}
 	
 	private boolean canConfirm(Packet packet) {
+		//Is it worth creating the event?
+		if(!CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList()))
+			//no
+			return true;
+		
 		//create & send event
 		CommonPacket cp = new CommonPacket(packet);
 		PacketReceiveEvent ev = new PacketReceiveEvent(this.player, cp);
-		Bukkit.getServer().getPluginManager().callEvent(ev);
+		CommonUtil.callEvent(ev);
+			
 		
 		//should we send the packet?
 		if(!ev.isCancelled())

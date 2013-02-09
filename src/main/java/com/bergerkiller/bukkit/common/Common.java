@@ -53,6 +53,13 @@ public class Common {
 			return false;
 		}
 	}
+	
+	/**
+	 * Sets if BKC should ignore havy packets
+	 */
+	public static boolean heavyPackets = false;
+	
+	public static boolean spigot = Bukkit.getVersion().contains("Spigot");
 
 	/**
 	 * Checks whether the version specified is compatible with the Minecraft version used on this server
@@ -68,7 +75,7 @@ public class Common {
 	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
 	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 145;
+	public static final int VERSION = 146;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version
