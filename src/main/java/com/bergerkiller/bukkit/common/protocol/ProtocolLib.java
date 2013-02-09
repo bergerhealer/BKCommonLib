@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 
 import net.minecraft.server.v1_4_R1.Packet;
@@ -18,9 +20,11 @@ import com.comphenix.protocol.events.PacketEvent;
 
 public class ProtocolLib {
 	public static void enable(CommonPlugin plugin_) {
+		Set<Integer> set = Packets.Client.getSupported();
+		set.addAll(Packets.Server.getSupported());
 		ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 		pm.addPacketListener(new PacketAdapter(plugin_, ConnectionSide.BOTH,
-				ListenerPriority.NORMAL, Packets.Client.getSupported()) {
+				ListenerPriority.NORMAL, set) {
 			@Override
 			public void onPacketReceiving(PacketEvent event) {
 				PacketContainer packet = event.getPacket();
