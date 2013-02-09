@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,51 +42,70 @@ public class CommonPacket {
 		SafeField.set(packet, field, value);
 	}
 	
-	public void write(int index, Object value) {
-		this.write(this.getField(index), value);
+	public void write(int index, Object value) throws IllegalArgumentException {
+		String field = this.getField(index);
+		if(field != null)
+			this.write(field, value);
+		else
+			throw new IllegalArgumentException("Invalid field index: "+index);
 	}
 	
 	public Object read(String field) {
 		return SafeField.get(packet, field);
 	}
 	
-	public Object read(int index) {
-		return this.read(this.getField(index));
+	public Object read(int index) throws IllegalArgumentException {
+		String field = this.getField(index);
+		if(field != null)
+			return this.read(field);
+		else
+			throw new IllegalArgumentException("Invalid field index: "+index);
 	}
 	
-	public void setDatawatcher(Object metaData) {
-		if(PacketFieldRef.metaData.containsKey(type)) {
-			String field = PacketFieldRef.metaData.get(type);
+	public void setDatawatcher(Object metaData) throws IllegalArgumentException {
+		String field = this.getMetaDataField();
+		if(field != null)
 			write(field, metaData);
-		}
+		else
+			throw new IllegalArgumentException("MetaData field does not exist");
 	}
 	
 	public Object getDatawatcher() {
-		if(PacketFieldRef.metaData.containsKey(type)) {
-			String field = PacketFieldRef.metaData.get(type);
+		String field = this.getMetaDataField();
+		if(field != null)
 			return read(field);
-		} else
+		else
 			return null;
 	}
 	
-	public int readInt(int index) {
+	public int readInt(int index) throws IllegalArgumentException {
 		return (Integer) read(index);
 	}
 	
-	public boolean readBoolean(int index) {
+	public boolean readBoolean(int index) throws IllegalArgumentException {
 		return (Boolean) read(index);
 	}
 	
-	public byte readByte(int index) {
+	public byte readByte(int index) throws IllegalArgumentException {
 		return (Byte) read(index);
 	}
 	
-	public String readString(int index) {
+	public String readString(int index) throws IllegalArgumentException {
 		return (String) read(index);
 	}
 	
 	private String getField(int index) {
-		return PacketFieldRef.fields.get(type).get(index);
+		HashMap<Integer, String> fields = PacketFieldRef.fields.get(type);
+		return fields.containsKey(index) ? fields.get(index) : null;
+	}
+	
+	private String getMetaDataField() {
+		if(type == Packets.MOB_SPAWN)
+			return "s";
+		else if(type == Packets.NAMED_ENTITY_SPAWN)
+			return "i";
+		else
+			return null;
 	}
 	
 	private int countNrs(String str) {
