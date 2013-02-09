@@ -4,5 +4,5 @@ version: 1.45
 author: bergerkiller
 load: startup
 description: Is used in all of my plugins to re-use common functions
-softdepend: [Vault]
+softdepend: [Vault, ProtocolLib]
 dev-url: http://dev.bukkit.org/server-mods/bkcommonlib/

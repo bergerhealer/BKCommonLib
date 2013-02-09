@@ -28,7 +28,8 @@ import com.bergerkiller.bukkit.common.EntityMap;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.metrics.Metrics;
+import com.bergerkiller.bukkit.common.metrics.AddonHandler;
+import com.bergerkiller.bukkit.common.protocol.PacketManager;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -241,13 +242,10 @@ public class CommonPlugin extends PluginBase {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.INFO, "MC version: "+Bukkit.getVersion());
 			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
+			new PacketManager(this).enable();
 			//send annonymous stats to mcstats.org
-			try {
-				Metrics metrics =  new Metrics(this);
-				metrics.start();
-			} catch(Exception e) {
-				log(Level.INFO, "Failed sending stats to mcstats.org");
-			}
+			AddonHandler ah = new AddonHandler(this);
+			ah.startMetrics();
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib update:");
