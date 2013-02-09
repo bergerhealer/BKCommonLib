@@ -70,7 +70,7 @@
       <artifactId>SignLink</artifactId>
       <version>1.31</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/SignLink</systemPath>
+      <systemPath>${project.basedir}/lib/SignLink.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.comphenix.protocol</groupId>
