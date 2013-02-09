@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.protocol;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
@@ -39,8 +38,7 @@ public class CommonPacket {
 	}
 	
 	public void write(String field, Object value) {
-		FieldAccessor<Object> data = new SafeField<Object>(packet, field);
-		data.set(packet, value);
+		SafeField.set(packet, field, value);
 	}
 	
 	public void write(int index, Object value) {
@@ -48,8 +46,7 @@ public class CommonPacket {
 	}
 	
 	public Object read(String field) {
-		FieldAccessor<Object> data = new SafeField<Object>(packet, field);
-		return data.get(field);
+		return SafeField.get(packet, field);
 	}
 	
 	public Object read(int index) {
@@ -59,8 +56,7 @@ public class CommonPacket {
 	public void setDatawatcher(Object metaData) {
 		if(PacketFieldRef.metaData.containsKey(type)) {
 			String field = PacketFieldRef.metaData.get(type);
-			FieldAccessor<Object> data = new SafeField<Object>(packet, field);
-			data.set(packet, metaData);
+			SafeField.set(packet, field, metaData);
 		}
 	}
 	
