@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.protocol;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.bukkit.entity.Player;
+
 import net.minecraft.server.v1_4_R1.Packet;
 
-import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
-import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.comphenix.protocol.Packets;
@@ -33,16 +33,9 @@ public class ProtocolLib {
 				public void onPacketReceiving(PacketEvent event) {
 					PacketContainer packet = event.getPacket();
 					Packet vanilla = (Packet)packet.getHandle();
-					int packetId = event.getPacketID();
+					Player player = event.getPlayer();
 					
-					if(!PacketUtil.supportedPackets.contains(packetId))
-						return;
-					
-					CommonPacket cp = new CommonPacket(vanilla);
-					PacketReceiveEvent ev = new PacketReceiveEvent(event.getPlayer(), cp);
-					PacketUtil.callPacketEvent(ev);
-					
-					if(ev.isCancelled())
+					if(!PacketUtil.callPacketReceiveEvent(player, vanilla))
 						event.setCancelled(true);
 				}
 				
@@ -50,16 +43,9 @@ public class ProtocolLib {
 				public void onPacketSending(PacketEvent event) {
 					PacketContainer packet = event.getPacket();
 					Packet vanilla = (Packet)packet.getHandle();
-					int packetId = event.getPacketID();
+					Player player = event.getPlayer();
 					
-					if(!PacketUtil.supportedPackets.contains(packetId))
-						return;
-					
-					CommonPacket cp = new CommonPacket(vanilla);
-					PacketSendEvent ev = new PacketSendEvent(event.getPlayer(), cp);
-					PacketUtil.callPacketEvent(ev);
-					
-					if(ev.isCancelled())
+					if(!PacketUtil.callPacketSendEvent(player, vanilla))
 						event.setCancelled(true);
 				}
 			});

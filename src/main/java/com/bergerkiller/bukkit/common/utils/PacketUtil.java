@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.Packet;
@@ -18,10 +17,11 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket.Packets;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketManager;
+import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
 public class PacketUtil {
-	public static List<PacketListener> packetListeners = new LinkedList<PacketListener>();
-	public static List<Integer> supportedPackets = new LinkedList<Integer>();
+	@SuppressWarnings("unchecked")
+	public static final ArrayList<PacketListener>[] listeners = new ArrayList[256];
 	
 	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
 		int[] ids = new int[entities.length];
@@ -87,18 +87,34 @@ public class PacketUtil {
 		}
 	}
 	
-	public static void callPacketEvent(PacketReceiveEvent event) {
-		for(PacketListener listener : packetListeners) {
-			if(listener.getSupportedPackets().contains(event.getPacket().getType()))
-				listener.onPacketReceive(event);
-		}
+	public static boolean callPacketReceiveEvent(Player player, Packet packet) {
+		int id = PacketRef.packetID.get(packet);
+		if(!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet);
+			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
+			
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketReceive(ev);
+			}
+			
+			return !ev.isCancelled();
+		} else
+			return true;
 	}
 	
-	public static void callPacketEvent(PacketSendEvent event) {
-		for(PacketListener listener : packetListeners) {
-			if(listener.getSupportedPackets().contains(event.getPacket().getType()))
-				listener.onPacketSend(event);
-		}
+	public static boolean callPacketSendEvent(Player player, Packet packet) {
+		int id = PacketRef.packetID.get(packet);
+		if(!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet);
+			PacketSendEvent ev = new PacketSendEvent(player, cp);
+			
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketSend(ev);
+			}
+			
+			return !ev.isCancelled();
+		} else
+			return true;
 	}
 
 	public static void broadcastPacket(Packet packet, boolean throughListeners) {
@@ -107,11 +123,12 @@ public class PacketUtil {
 		}
 	}
 	
-	public static void addPacketListener(PacketListener listener) {
-		packetListeners.add(listener);
-		for(Packets p : listener.getSupportedPackets()) {
-			if(!supportedPackets.contains(p.getId()))
-				supportedPackets.add(p.getId());
+	public static void addPacketListener(PacketListener listener, Packets... packets) {
+		for(Packets packet : packets) {
+			int id = PacketRef.packetID.get(packet.getPacket());
+			if(listeners[id] == null)
+				listeners[id] = new ArrayList<PacketListener>();
+			listeners[id].add(listener);
 		}
 	}
 
