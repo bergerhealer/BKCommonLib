@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -92,6 +94,24 @@ public class StringUtil {
 			}
 		}
 		return width;
+	}
+	
+	/**
+	 * Get all numbers from a Sting
+	 * 
+	 * @param str String to be checked
+	 * @return Integers the String contained
+	 */
+	public static int countNrs(String str) {
+		String result = "";
+		Pattern pattern = Pattern.compile("\\d+");
+		Matcher matcher = pattern.matcher(str);
+		
+		while(matcher.find()) {
+			result += matcher.group();
+		}
+		
+		return result != "" ? Integer.valueOf(result) : 0;
 	}
 
 	/**

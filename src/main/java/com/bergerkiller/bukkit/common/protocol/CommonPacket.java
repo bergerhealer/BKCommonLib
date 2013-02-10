@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.protocol;
 
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -26,7 +25,7 @@ public class CommonPacket {
 	
 	public CommonPacket(Packet packet) {
 		String name = packet.getClass().getSimpleName();
-		this.type = Packets.getFromInt(countNrs(name));
+		this.type = Packets.getFromInt(StringUtil.countNrs(name));
 		this.packet = packet;
 	}
 	
@@ -106,18 +105,6 @@ public class CommonPacket {
 			return "i";
 		else
 			return null;
-	}
-	
-	private int countNrs(String str) {
-		String result = "";
-		Pattern pattern = Pattern.compile("\\d+");
-		Matcher matcher = pattern.matcher(str);
-		
-		while(matcher.find()) {
-			result += matcher.group();
-		}
-		
-		return result != "" ? Integer.valueOf(result) : 0;
 	}
 	
 	public static enum Packets {
@@ -205,6 +192,10 @@ public class CommonPacket {
 		
 		public Packet getPacket() {
 			return PacketRef.getPacketById.invoke(null, this.id);
+		}
+		
+		public int getId() {
+			return this.id;
 		}
 		
 		public static Packets getFromInt(int from) {

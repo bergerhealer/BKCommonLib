@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-
-import org.bukkit.Bukkit;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -428,15 +427,17 @@ public class PacketConnection extends PlayerConnection {
 	}
 	
 	private boolean canConfirm(Packet packet) {
+		int packetId = StringUtil.countNrs(packet.getClass().getSimpleName());
+		
 		//Is it worth creating the event?
-		if(!CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList()))
+		if(!PacketUtil.supportedPackets.contains(packetId) || !CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList()))
 			//no
 			return true;
 		
 		//create & send event
 		CommonPacket cp = new CommonPacket(packet);
 		PacketReceiveEvent ev = new PacketReceiveEvent(this.player, cp);
-		CommonUtil.callEvent(ev);
+		PacketUtil.callPacketEvent(ev);
 			
 		
 		//should we send the packet?
@@ -450,10 +451,19 @@ public class PacketConnection extends PlayerConnection {
 	
 	@Override
 	public void sendPacket(Packet packet) {
+		int packetId = StringUtil.countNrs(packet.getClass().getSimpleName());
+		
+		//is it worth creating the event?
+		if(!PacketUtil.supportedPackets.contains(packetId) || !CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList())) {
+			//no
+			super.sendPacket(packet);
+			return;
+		}
+		
 		//create & send event
 		CommonPacket cp = new CommonPacket(packet);
 		PacketSendEvent ev = new PacketSendEvent(this.player, cp);
-		Bukkit.getServer().getPluginManager().callEvent(ev);
+		PacketUtil.callPacketEvent(ev);
 		
 		//should we send the packet?
 		if(!ev.isCancelled())

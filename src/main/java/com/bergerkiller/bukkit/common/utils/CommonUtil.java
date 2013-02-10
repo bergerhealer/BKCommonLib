@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import net.minecraft.server.v1_4_R1.DedicatedPlayerList;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
@@ -135,6 +136,22 @@ public class CommonUtil {
 			array[i - 1] = array[random];
 			array[random] = temp;
 		}
+	}
+	
+	/**
+	 * Add a Set to another Set
+	 * 
+	 * @param to Set that receives orther set
+	 * @param from Set to be added to the orther set
+	 * @return new Set
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Set addAllToSet(Set to, Set from) {
+		for(Object i : from) {
+			to.add(i);
+		}
+		
+		return to;
 	}
 
 	/**

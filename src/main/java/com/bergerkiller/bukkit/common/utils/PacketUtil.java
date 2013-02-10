@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.Packet;
 import net.minecraft.server.v1_4_R1.Packet29DestroyEntity;
@@ -8,10 +11,18 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
+import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket.Packets;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketManager;
 
 public class PacketUtil {
+	public static List<PacketListener> packetListeners = new LinkedList<PacketListener>();
+	public static List<Integer> supportedPackets = new LinkedList<Integer>();
+	
 	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
 		int[] ids = new int[entities.length];
 		for (int i = 0; i < ids.length; i++) {
@@ -43,7 +54,7 @@ public class PacketUtil {
 			return;
 		if (ep.playerConnection == null || ep.playerConnection.disconnected)
 			return;
-		if (!throughListeners) {
+		if (!throughListeners && !PacketManager.instance.libaryInstalled) {
 			toSend = new NativeSilentPacket(packet.getHandle());
 		}
 		ep.playerConnection.sendPacket(toSend);
@@ -75,10 +86,32 @@ public class PacketUtil {
 			}
 		}
 	}
+	
+	public static void callPacketEvent(PacketReceiveEvent event) {
+		for(PacketListener listener : packetListeners) {
+			if(listener.getSupportedPackets().contains(event.getPacket().getType()))
+				listener.onPacketReceive(event);
+		}
+	}
+	
+	public static void callPacketEvent(PacketSendEvent event) {
+		for(PacketListener listener : packetListeners) {
+			if(listener.getSupportedPackets().contains(event.getPacket().getType()))
+				listener.onPacketSend(event);
+		}
+	}
 
 	public static void broadcastPacket(Packet packet, boolean throughListeners) {
 		for (Player player : CommonUtil.getOnlinePlayers()) {
 			sendPacket(player, packet, throughListeners);
+		}
+	}
+	
+	public static void addPacketListener(PacketListener listener) {
+		packetListeners.add(listener);
+		for(Packets p : listener.getSupportedPackets()) {
+			if(!supportedPackets.contains(p.getId()))
+				supportedPackets.add(p.getId());
 		}
 	}
 
