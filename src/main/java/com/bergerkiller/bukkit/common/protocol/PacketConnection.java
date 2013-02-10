@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.protocol;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -430,7 +429,7 @@ public class PacketConnection extends PlayerConnection {
 		int packetId = StringUtil.countNrs(packet.getClass().getSimpleName());
 		
 		//Is it worth creating the event?
-		if(!PacketUtil.supportedPackets.contains(packetId) || !CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList()))
+		if(!PacketUtil.supportedPackets.contains(packetId))
 			//no
 			return true;
 		
@@ -441,12 +440,7 @@ public class PacketConnection extends PlayerConnection {
 			
 		
 		//should we send the packet?
-		if(!ev.isCancelled())
-			//yes
-			return true;
-		else
-			//no
-			return false;
+		return !ev.isCancelled();
 	}
 	
 	@Override
@@ -454,7 +448,7 @@ public class PacketConnection extends PlayerConnection {
 		int packetId = StringUtil.countNrs(packet.getClass().getSimpleName());
 		
 		//is it worth creating the event?
-		if(!PacketUtil.supportedPackets.contains(packetId) || !CommonUtil.hasHandlers(PacketReceiveEvent.getHandlerList())) {
+		if(!PacketUtil.supportedPackets.contains(packetId)) {
 			//no
 			super.sendPacket(packet);
 			return;

@@ -14,7 +14,7 @@ public class PacketFieldRef {
 		try {
 			for(Packets packet : Packets.values()) {
 				Packet vp = packet.getPacket();
-				Field[] Allfields = vp.getClass().getFields();
+				Field[] Allfields = vp.getClass().getDeclaredFields();
 				
 				HashMap<Integer, String> fieldNames = new HashMap<Integer, String>();
 				for(Field field : Allfields) {
