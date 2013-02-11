@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket.Packets;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketManager;
+import com.bergerkiller.bukkit.common.protocol.ProtocolLib;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
 public class PacketUtil {
@@ -42,7 +43,11 @@ public class PacketUtil {
 		if (ep.playerConnection == null || ep.playerConnection.disconnected)
 			return;
 		if (!throughListeners) {
-			packet = new NativeSilentPacket(packet);
+			if(PacketManager.instance.libaryInstalled) {
+				ProtocolLib.sendSilenVanillaPacket(player, packet);
+				return;
+			} else
+				packet = new NativeSilentPacket(packet);
 		}
 		ep.playerConnection.sendPacket(packet);
 	}
@@ -50,12 +55,16 @@ public class PacketUtil {
 	public static void sendCommonPacket(Player player, CommonPacket packet, boolean throughListeners) {
 		EntityPlayer ep = NativeUtil.getNative(player);
 		Packet toSend = packet.getHandle();
-		if (packet == null || player == null)
+		if (packet == null || player == null || toSend == null)
 			return;
 		if (ep.playerConnection == null || ep.playerConnection.disconnected)
 			return;
-		if (!throughListeners && !PacketManager.instance.libaryInstalled) {
-			toSend = new NativeSilentPacket(packet.getHandle());
+		if (!throughListeners) {
+			if(PacketManager.instance.libaryInstalled) {
+				ProtocolLib.sendSilenVanillaPacket(player, toSend);
+				return;
+			} else
+				toSend = new NativeSilentPacket(packet.getHandle());
 		}
 		ep.playerConnection.sendPacket(toSend);
 	}

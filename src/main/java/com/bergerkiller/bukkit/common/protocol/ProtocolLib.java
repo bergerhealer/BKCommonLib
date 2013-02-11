@@ -1,10 +1,13 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.entity.Player;
 
 import net.minecraft.server.v1_4_R1.Packet;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -39,5 +42,16 @@ public class ProtocolLib {
 					event.setCancelled(true);
 			}
 		});
+	}
+	
+	public static void sendSilenVanillaPacket(Player player, Packet packet) {
+		ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+		
+		PacketContainer toSend = new PacketContainer(PacketRef.packetID.get(packet), packet);
+		try {
+			pm.sendServerPacket(player, toSend, false);
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Invalid packet target");
+		}
 	}
 }

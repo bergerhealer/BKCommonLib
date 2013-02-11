@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
@@ -67,11 +66,6 @@ public class PacketConnection extends PlayerConnection {
 	
 	@Override
 	public void a(Packet10Flying packet) {
-		if(!Common.heavyPackets) {
-			super.a(packet);
-			return;
-		}
-		
 		if(this.canConfirm(packet))
 			super.a(packet);
 	}
@@ -114,11 +108,6 @@ public class PacketConnection extends PlayerConnection {
 	
 	@Override
 	public void a(Packet17EntityLocationAction packet) {
-		if(!Common.heavyPackets) {
-			super.a(packet);
-			return;
-		}
-		
 		if(this.canConfirm(packet))
 			super.a(packet);
 	}
