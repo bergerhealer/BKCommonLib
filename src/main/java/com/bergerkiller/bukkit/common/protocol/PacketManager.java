@@ -30,16 +30,19 @@ public class PacketManager {
 		
 		pm.registerEvents(new ProtocolListener(), plugin);
 		
-		new Task(plugin) {
-			@Override
-			public void run() {
-				for(Object obj : CommonUtil.getMCServer().getPlayerList().players) {
-					EntityPlayer player = (EntityPlayer)obj;
-					if(!player.playerConnection.disconnected) {
-						player.playerConnection.d();
+		//fix Disconnect.Spam kick happening w/o reason
+		if(!libaryInstalled) {
+			new Task(plugin) {
+				@Override
+				public void run() {
+					for(Object obj : CommonUtil.getMCServer().getPlayerList().players) {
+						EntityPlayer player = (EntityPlayer)obj;
+						if(!player.playerConnection.disconnected) {
+							player.playerConnection.d();
+						}
 					}
 				}
-			}
-		}.start(1, 1);
+			}.start(1, 1);
+		}
 	}
 }

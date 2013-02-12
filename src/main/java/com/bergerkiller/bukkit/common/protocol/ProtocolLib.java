@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import net.minecraft.server.v1_4_R1.Packet;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ConnectionSide;
@@ -25,7 +25,7 @@ public class ProtocolLib {
 			@Override
 			public void onPacketReceiving(PacketEvent event) {
 				PacketContainer packet = event.getPacket();
-				Packet vanilla = (Packet)packet.getHandle();
+				Packet vanilla = (Packet) packet.getHandle();
 				Player player = event.getPlayer();
 				
 				if(!PacketUtil.callPacketReceiveEvent(player, vanilla))
@@ -35,7 +35,7 @@ public class ProtocolLib {
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				PacketContainer packet = event.getPacket();
-				Packet vanilla = (Packet)packet.getHandle();
+				Packet vanilla = (Packet) packet.getHandle();
 				Player player = event.getPlayer();
 				
 				if(!PacketUtil.callPacketSendEvent(player, vanilla))
@@ -47,7 +47,7 @@ public class ProtocolLib {
 	public static void sendSilenVanillaPacket(Player player, Packet packet) {
 		ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 		
-		PacketContainer toSend = new PacketContainer(PacketRef.packetID.get(packet), packet);
+		PacketContainer toSend = new PacketContainer(StringUtil.countNrs(packet.getClass().getSimpleName()), packet);
 		try {
 			pm.sendServerPacket(player, toSend, false);
 		} catch (InvocationTargetException e) {

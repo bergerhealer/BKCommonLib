@@ -20,8 +20,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketManager;
 import com.bergerkiller.bukkit.common.protocol.ProtocolLib;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
+@SuppressWarnings("unchecked")
 public class PacketUtil {
-	@SuppressWarnings("unchecked")
 	public static final ArrayList<PacketListener>[] listeners = new ArrayList[256];
 	
 	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
@@ -138,6 +138,15 @@ public class PacketUtil {
 			if(listeners[id] == null)
 				listeners[id] = new ArrayList<PacketListener>();
 			listeners[id].add(listener);
+		}
+	}
+	
+	public static void removePacketListener(PacketListener listener) {
+		for(int i = 0; i <= 256; i++) {
+			if(!LogicUtil.nullOrEmpty(listeners[i])) {
+				if(listeners[i].contains(listener))
+					listeners[i].remove(listener);
+			}
 		}
 	}
 

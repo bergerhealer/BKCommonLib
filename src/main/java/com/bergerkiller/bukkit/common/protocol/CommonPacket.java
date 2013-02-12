@@ -29,6 +29,11 @@ public class CommonPacket {
 		this.packet = packet;
 	}
 	
+	public CommonPacket(Packet packet, int id) {
+		this.type = Packets.getFromInt(id);
+		this.packet = packet;
+	}
+	
 	public Packets getType() {
 		return this.type;
 	}
@@ -65,16 +70,11 @@ public class CommonPacket {
 		String field = this.getMetaDataField();
 		if(field != null)
 			write(field, metaData);
-		else
-			throw new IllegalArgumentException("MetaData field does not exist");
 	}
 	
 	public Object getDatawatcher() {
 		String field = this.getMetaDataField();
-		if(field != null)
-			return read(field);
-		else
-			return null;
+		return this.read(field);
 	}
 	
 	public int readInt(int index) throws IllegalArgumentException {
@@ -93,18 +93,20 @@ public class CommonPacket {
 		return (String) read(index);
 	}
 	
+	public double readDouble(int index) throws IllegalArgumentException {
+		return (Double) read(index);
+	}
+	
 	private String getField(int index) {
 		HashMap<Integer, String> fields = PacketFieldRef.fields.get(type);
 		return fields.containsKey(index) ? fields.get(index) : null;
 	}
 	
 	private String getMetaDataField() {
-		if(type == Packets.MOB_SPAWN)
-			return "s";
-		else if(type == Packets.NAMED_ENTITY_SPAWN)
-			return "i";
+		if(PacketFieldRef.datawatchers.containsKey(type))
+			return PacketFieldRef.datawatchers.get(type);
 		else
-			return null;
+			throw new IllegalArgumentException("MetaData field does not exist");
 	}
 	
 	public static enum Packets {
