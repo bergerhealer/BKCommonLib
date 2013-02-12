@@ -2,10 +2,8 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import java.util.HashMap;
 
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -24,8 +22,8 @@ public class CommonPacket {
 	}
 	
 	public CommonPacket(Packet packet) {
-		String name = packet.getClass().getSimpleName();
-		this.type = Packets.getFromInt(StringUtil.countNrs(name));
+		int id = PacketRef.packetID.get(packet);
+		this.type = Packets.getFromInt(id);
 		this.packet = packet;
 	}
 	
@@ -43,7 +41,7 @@ public class CommonPacket {
 	}
 	
 	public void write(String field, Object value) {
-		SafeField.set(packet, field, value);
+		PacketFieldRef.write(packet, field, value);
 	}
 	
 	public void write(int index, Object value) throws IllegalArgumentException {
@@ -55,7 +53,7 @@ public class CommonPacket {
 	}
 	
 	public Object read(String field) {
-		return SafeField.get(packet, field);
+		return PacketFieldRef.read(packet, field);
 	}
 	
 	public Object read(int index) throws IllegalArgumentException {
