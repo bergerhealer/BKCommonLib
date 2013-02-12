@@ -111,10 +111,38 @@ public class PacketUtil {
 			return true;
 	}
 	
+	public static boolean callPacketReceiveEvent(Player player, Packet packet, int id) {
+		if(!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
+			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
+			
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketReceive(ev);
+			}
+			
+			return !ev.isCancelled();
+		} else
+			return true;
+	}
+	
 	public static boolean callPacketSendEvent(Player player, Packet packet) {
 		int id = PacketRef.packetID.get(packet);
 		if(!LogicUtil.nullOrEmpty(listeners[id])) {
 			CommonPacket cp = new CommonPacket(packet);
+			PacketSendEvent ev = new PacketSendEvent(player, cp);
+			
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketSend(ev);
+			}
+			
+			return !ev.isCancelled();
+		} else
+			return true;
+	}
+	
+	public static boolean callPacketSendEvent(Player player, Packet packet, int id) {
+		if(!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
 			PacketSendEvent ev = new PacketSendEvent(player, cp);
 			
 			for(PacketListener listener : listeners[id]) {

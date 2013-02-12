@@ -25,20 +25,18 @@ public class ProtocolLib {
 			@Override
 			public void onPacketReceiving(PacketEvent event) {
 				PacketContainer packet = event.getPacket();
-				Packet vanilla = (Packet) packet.getHandle();
 				Player player = event.getPlayer();
 				
-				if(!PacketUtil.callPacketReceiveEvent(player, vanilla))
+				if(!PacketUtil.callPacketReceiveEvent(player, (Packet)packet.getHandle(), event.getPacketID()))
 					event.setCancelled(true);
 			}
 
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				PacketContainer packet = event.getPacket();
-				Packet vanilla = (Packet) packet.getHandle();
 				Player player = event.getPlayer();
 				
-				if(!PacketUtil.callPacketSendEvent(player, vanilla))
+				if(!PacketUtil.callPacketSendEvent(player, (Packet)packet.getHandle(), event.getPacketID()))
 					event.setCancelled(true);
 			}
 		});
