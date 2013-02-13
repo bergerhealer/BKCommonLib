@@ -151,4 +151,14 @@ public class SafeField<T> implements FieldAccessor<T> {
 	public static <T> T get(Class<?> clazz, String fieldname) {
 		return new SafeField<T>(clazz, fieldname).get(null);
 	}
+	
+	/**
+	* Creates a new SafeField instance pointing to the field found in the given class type
+	*
+	* @param type - class type to find the field in
+	* @param name - field name
+	*/
+	public static<T> SafeField<T> create(Class<?> type, String name) {
+		return new SafeField<T>(type, name);
+	}
 }

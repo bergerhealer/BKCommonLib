@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.WorldServer;
 
 import org.bukkit.Bukkit;
@@ -21,15 +22,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.EntityMap;
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.metrics.AddonHandler;
-import com.bergerkiller.bukkit.common.protocol.PacketManager;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
@@ -63,6 +65,7 @@ public class CommonPlugin extends PluginBase {
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	public List<Entity> entities = new ArrayList<Entity>();
+	public boolean libaryInstalled = false;
 
 	public static CommonPlugin getInstance() {
 		return instance;
@@ -243,7 +246,7 @@ public class CommonPlugin extends PluginBase {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.INFO, "MC version: "+Bukkit.getVersion());
 			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
-			new PacketManager(this).enable();
+			this.handleProtocol();
 			PacketFieldRef.init();
 			//send annonymous stats to mcstats.org
 			AddonHandler ah = new AddonHandler(this);
@@ -277,6 +280,33 @@ public class CommonPlugin extends PluginBase {
 		int version = this.getVersionNumber();
 		if (version != Common.VERSION) {
 			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
+		}
+	}
+	
+	private void handleProtocol() {
+		PluginManager pm = this.getServer().getPluginManager();
+		Plugin lib = pm.getPlugin("ProtocolLib");
+		
+		if(lib != null) {
+			libaryInstalled = true;
+			ProtocolLib.enable(this);
+		}
+		
+		pm.registerEvents(new ProtocolListener(), this);
+		
+		//fix Disconnect.Spam kick happening w/o reason
+		if(!libaryInstalled) {
+			new Task(this) {
+				@Override
+				public void run() {
+					for(Object obj : CommonUtil.getMCServer().getPlayerList().players) {
+						EntityPlayer player = (EntityPlayer)obj;
+						if(!player.playerConnection.disconnected) {
+							player.playerConnection.d();
+						}
+					}
+				}
+			}.start(1, 1);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.protocol;
+package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
