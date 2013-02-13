@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
+@Deprecated
 public class PacketRef {
 	public static final ClassTemplate<Packet> TEMPLATE = ClassTemplate.create(Packet.class);
 	public static final MethodAccessor<Packet> getPacketById = TEMPLATE.getMethod("d", int.class);

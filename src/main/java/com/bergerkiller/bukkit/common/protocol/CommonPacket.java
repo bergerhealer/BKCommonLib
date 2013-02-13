@@ -1,32 +1,32 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import java.util.HashMap;
-
-import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.ProtocolLib;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class CommonPacket {
 	private Object packet;
 	private PacketType type;
-	
+
 	public CommonPacket(int id) {
-		this.type = PacketType.getFromInt(id);
+		this.type = PacketType.fromId(id);
 		this.packet = type.getPacket();
 	}
-	
+
 	public CommonPacket(PacketType packet) {
 		this.type = packet;
 		this.packet = type.getPacket();
 	}
 	
 	public CommonPacket(Object packet) {
-		int id = PacketRef.packetID.get(packet);
-		this.type = PacketType.getFromInt(id);
+		int id = PacketFields.DEFAULT.packetID.get(packet);
+		this.type = PacketType.fromId(id);
 		this.packet = packet;
 	}
 	
 	public CommonPacket(Object packet, int id) {
-		this.type = PacketType.getFromInt(id);
+		this.type = PacketType.fromId(id);
 		this.packet = packet;
 	}
 	
@@ -37,40 +37,65 @@ public class CommonPacket {
 	public Object getHandle() {
 		return this.packet;
 	}
-	
+
+	public <T> void write(FieldAccessor<T> fieldAccessor, T value) {
+		fieldAccessor.set(getHandle(), value);
+	}
+
 	public void write(String field, Object value) {
-		PacketFieldRef.write(packet, field, value);
+		try {
+			if(CommonPlugin.getInstance().libaryInstalled) {
+				ProtocolLib.writeDataToPacket(packet, field, value);
+			} else {
+				SafeField.set(packet, field, value);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("Invalid field name: "+field);
+		}
 	}
-	
+
 	public void write(int index, Object value) throws IllegalArgumentException {
-		String field = this.getField(index);
-		if(field != null)
+		String field = type.getField(index);
+		if(field != null) {
 			this.write(field, value);
-		else
+		} else {
 			throw new IllegalArgumentException("Invalid field index: "+index);
+		}
 	}
-	
+
+	public <T> T read(FieldAccessor<T> fieldAccessor) {
+		return fieldAccessor.get(this.getHandle());
+	}
+
 	public Object read(String field) {
-		return PacketFieldRef.read(packet, field);
+		try {
+			if(CommonPlugin.getInstance().libaryInstalled) {
+				return ProtocolLib.readDataFromPacket(packet, field);
+			} else {
+				return SafeField.get(packet, field);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("Invalid field name: "+field);
+		}
 	}
-	
+
 	public Object read(int index) throws IllegalArgumentException {
-		String field = this.getField(index);
-		if(field != null)
+		String field = type.getField(index);
+		if(field != null) {
 			return this.read(field);
-		else
+		} else {
 			throw new IllegalArgumentException("Invalid field index: "+index);
+		}
 	}
-	
+
 	public void setDatawatcher(Object metaData) throws IllegalArgumentException {
-		String field = this.getMetaDataField();
-		if(field != null)
-			write(field, metaData);
+		write(type.getMetaDataField(), metaData);
 	}
 	
 	public Object getDatawatcher() {
-		String field = this.getMetaDataField();
-		return this.read(field);
+		return this.read(type.getMetaDataField());
 	}
 	
 	public int readInt(int index) throws IllegalArgumentException {
@@ -88,20 +113,8 @@ public class CommonPacket {
 	public String readString(int index) throws IllegalArgumentException {
 		return (String) read(index);
 	}
-	
+
 	public double readDouble(int index) throws IllegalArgumentException {
 		return (Double) read(index);
-	}
-	
-	private String getField(int index) {
-		HashMap<Integer, String> fields = PacketFieldRef.fields.get(type);
-		return fields.containsKey(index) ? fields.get(index) : null;
-	}
-	
-	private String getMetaDataField() {
-		if(PacketFieldRef.datawatchers.containsKey(type))
-			return PacketFieldRef.datawatchers.get(type);
-		else
-			throw new IllegalArgumentException("MetaData field does not exist");
 	}
 }

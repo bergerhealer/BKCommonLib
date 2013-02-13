@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.Packet;
@@ -16,14 +17,15 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.ProtocolLib;
 import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
 
 @SuppressWarnings("unchecked")
 public class PacketUtil {
 	public static final ArrayList<PacketListener>[] listeners = new ArrayList[256];
-	
+	public static final Map<Class<?>, Integer> packetsToIds = PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
+
 	public static Packet getEntityDestroyPacket(org.bukkit.entity.Entity... entities) {
 		int[] ids = new int[entities.length];
 		for (int i = 0; i < ids.length; i++) {
@@ -102,9 +104,9 @@ public class PacketUtil {
 		if(player == null || packet == null)
 			return true;
 		
-		return callPacketReceiveEvent(player, packet, PacketRef.packetID.get(packet));
+		return callPacketReceiveEvent(player, packet, PacketFields.DEFAULT.packetID.get(packet));
 	}
-	
+
 	public static boolean callPacketReceiveEvent(Player player, Object packet, int id) {
 		if(player == null || packet == null)
 			return true;
@@ -126,7 +128,7 @@ public class PacketUtil {
 		if(player == null || packet == null)
 			return true;
 		
-		return callPacketSendEvent(player, packet, PacketRef.packetID.get(packet));
+		return callPacketSendEvent(player, packet, PacketFields.DEFAULT.packetID.get(packet));
 	}
 	
 	public static boolean callPacketSendEvent(Player player, Object packet, int id) {
@@ -157,7 +159,7 @@ public class PacketUtil {
 			return;
 		
 		for(PacketType packet : packets) {
-			int id = PacketRef.packetID.get(packet.getPacket());
+			int id = PacketFields.DEFAULT.packetID.get(packet.getPacket());
 			if(listeners[id] == null)
 				listeners[id] = new ArrayList<PacketListener>();
 			listeners[id].add(listener);

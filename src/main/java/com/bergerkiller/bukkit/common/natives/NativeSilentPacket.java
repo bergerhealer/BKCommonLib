@@ -3,7 +3,9 @@ package com.bergerkiller.bukkit.common.natives;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
+
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 import net.minecraft.server.v1_4_R1.Connection;
 import net.minecraft.server.v1_4_R1.Packet;
@@ -13,14 +15,14 @@ import net.minecraft.server.v1_4_R1.Packet;
  */
 public class NativeSilentPacket extends Packet {
 	static {
-		PacketRef.classToIds.put(NativeSilentPacket.class, 0);
+		PacketUtil.packetsToIds.put(NativeSilentPacket.class, 0);
 	}
 
 	private final Packet packet;
 
 	public NativeSilentPacket(Packet packet) {
 		this.packet = packet;
-		PacketRef.packetID.transfer(packet, this);
+		PacketFields.DEFAULT.packetID.transfer(packet, this);
 	}
 
 	@Override

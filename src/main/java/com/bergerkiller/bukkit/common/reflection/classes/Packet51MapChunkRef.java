@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
 
+@Deprecated
 public class Packet51MapChunkRef {
 	public static final ClassTemplate<Packet51MapChunk> TEMPLATE = ClassTemplate.create(Packet51MapChunk.class);
 	public static final FieldAccessor<Integer> size = TEMPLATE.getField("size");

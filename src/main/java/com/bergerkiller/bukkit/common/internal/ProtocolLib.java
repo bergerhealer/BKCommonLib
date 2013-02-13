@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -44,7 +44,7 @@ public class ProtocolLib {
 	public static void sendSilenVanillaPacket(Player player, Object packet) {
 		ProtocolManager pm = ProtocolLibrary.getProtocolManager();
 		
-		PacketContainer toSend = new PacketContainer(PacketRef.packetID.get(packet), packet);
+		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
 		try {
 			pm.sendServerPacket(player, toSend, false);
 		} catch (InvocationTargetException e) {
@@ -61,7 +61,7 @@ public class ProtocolLib {
 	}
 	
 	public static Field[] getFields(Object packet) {
-		int id = PacketRef.packetID.get(packet);
+		int id = PacketFields.DEFAULT.packetID.get(packet);
 		if(Packets.Client.isSupported(id) && Packets.Server.isSupported(id))
 			return packet.getClass().getSuperclass().getDeclaredFields();
 		else

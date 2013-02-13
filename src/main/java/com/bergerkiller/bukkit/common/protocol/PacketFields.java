@@ -1,0 +1,84 @@
+package com.bergerkiller.bukkit.common.protocol;
+
+import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldClasses.NMSPacket42RemoveMobEffect;
+import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldClasses.*;
+
+/**
+ * Constants for the fields contained in the packets
+ */
+public class PacketFields {
+	public static final NMSPacket DEFAULT = new NMSPacket();
+	public static final NMSPacket0KeepAlive KEEP_ALIVE = new NMSPacket0KeepAlive();
+	public static final NMSPacket1Login LOGIN = new NMSPacket1Login();
+	public static final NMSPacket2Handshake HANDSHAKE = new NMSPacket2Handshake();
+	public static final NMSPacket3Chat CHAT = new NMSPacket3Chat();
+	public static final NMSPacket4UpdateTime UPDATE_TIME = new NMSPacket4UpdateTime();
+	public static final NMSPacket5EntityEquipment ENTITY_EQUIPMENT = new NMSPacket5EntityEquipment();
+	public static final NMSPacket6SpawnPosition SPAWN_POSITION = new NMSPacket6SpawnPosition();
+	public static final NMSPacket7UseEntity USE_ENTITY = new NMSPacket7UseEntity();
+	public static final NMSPacket8UpdateHealth UPDATE_HEALTH = new NMSPacket8UpdateHealth();
+	public static final NMSPacket9Respawn RESPAWN = new NMSPacket9Respawn();
+	public static final NMSPacket10Flying FLYING = new NMSPacket10Flying();
+	public static final NMSPacket11PlayerPosition PLAYER_POSITION = new NMSPacket11PlayerPosition();
+	public static final NMSPacket12PlayerLook PLAYER_LOOK = new NMSPacket12PlayerLook();
+	public static final NMSPacket13PlayerLookMove PLAYER_LOOK_MOVE = new NMSPacket13PlayerLookMove();
+	public static final NMSPacket14BlockDig BLOCK_DIG = new NMSPacket14BlockDig();
+	public static final NMSPacket15Place PLACE = new NMSPacket15Place();
+	public static final NMSPacket16BlockItemSwitch BLOCK_ITEM_SWITCH = new NMSPacket16BlockItemSwitch();
+	public static final NMSPacket17EntityLocationAction ENTITY_LOCATION_ACTION = new NMSPacket17EntityLocationAction();
+	public static final NMSPacket18ArmAnimation ARM_ANIMATION = new NMSPacket18ArmAnimation();
+	public static final NMSPacket19EntityAction ENTITY_ACTION = new NMSPacket19EntityAction();
+	public static final NMSPacket20NamedEntitySpawn NAMED_ENTITY_SPAWN = new NMSPacket20NamedEntitySpawn();
+	public static final NMSPacket22Collect COLLECT = new NMSPacket22Collect();
+	public static final NMSPacket23VehicleSpawn VEHICLE_SPAWN = new NMSPacket23VehicleSpawn();
+	public static final NMSPacket24MobSpawn MOB_SPAWN = new NMSPacket24MobSpawn();
+	public static final NMSPacket25EntityPainting ENTITY_PAINTING = new NMSPacket25EntityPainting();
+	public static final NMSPacket26AddExpOrb ADD_EXP_ORB = new NMSPacket26AddExpOrb();
+	public static final NMSPacket28EntityVelocity ENTITY_VELOCITY = new NMSPacket28EntityVelocity();
+	public static final NMSPacket29DestroyEntity DESTROY_ENTITY = new NMSPacket29DestroyEntity();
+	public static final NMSPacket31RelEntityMove REL_ENTITY_MOVE = new NMSPacket31RelEntityMove();
+	public static final NMSPacket32EntityLook ENTITY_LOOK = new NMSPacket32EntityLook();
+	public static final NMSPacket33RelEntityMoveLook REL_ENTITY_MOVE_LOOK = new NMSPacket33RelEntityMoveLook();
+	public static final NMSPacket34EntityTeleport ENTITY_TELEPORT = new NMSPacket34EntityTeleport();
+	public static final NMSPacket35EntityHeadRotation ENTITY_HEAD_ROTATION = new NMSPacket35EntityHeadRotation();
+	public static final NMSPacket38EntityStatus ENTITY_STATUS = new NMSPacket38EntityStatus();
+	public static final NMSPacket39AttachEntity ATTACH_ENTITY = new NMSPacket39AttachEntity();
+	public static final NMSPacket40EntityMetadata ENTITY_METADATA = new NMSPacket40EntityMetadata();
+	public static final NMSPacket41MobEffect MOB_EFFECT = new NMSPacket41MobEffect();
+	public static final NMSPacket42RemoveMobEffect REMOVE_MOB_EFFECT = new NMSPacket42RemoveMobEffect();
+	public static final NMSPacket43SetExperience SET_EXPERIENCE = new NMSPacket43SetExperience();
+	public static final NMSPacket51MapChunk MAP_CHUNK = new NMSPacket51MapChunk();
+	public static final NMSPacket52MultiBlockChange MULTI_BLOCK_CHANGE = new NMSPacket52MultiBlockChange();
+	public static final NMSPacket53BlockChange BLOCK_CHANGE = new NMSPacket53BlockChange();
+	public static final NMSPacket54PlayNoteBlock PLAY_NOTE_BLOCK = new NMSPacket54PlayNoteBlock();
+	public static final NMSPacket55BlockBreakAnimation BLOCK_BREAK_ANIMATION = new NMSPacket55BlockBreakAnimation();
+	public static final NMSPacket56MapChunkBulk MAP_CHUNK_BULK = new NMSPacket56MapChunkBulk();
+	public static final NMSPacket60Explosion EXPLOSION = new NMSPacket60Explosion();
+	public static final NMSPacket61WorldEvent WORLD_EVENT = new NMSPacket61WorldEvent();
+	public static final NMSPacket62NamedSoundEffect NAMED_SOUND_EFFECT = new NMSPacket62NamedSoundEffect();
+	public static final NMSPacket70Bed BED = new NMSPacket70Bed();
+	public static final NMSPacket71Weather WEATHER = new NMSPacket71Weather();
+	public static final NMSPacket100OpenWindow OPEN_WINDOW = new NMSPacket100OpenWindow();
+	public static final NMSPacket101CloseWindow CLOSE_WINDOW = new NMSPacket101CloseWindow();
+	public static final NMSPacket102WindowClick WINDOW_CLICK = new NMSPacket102WindowClick();
+	public static final NMSPacket103SetSlot SET_SLOT = new NMSPacket103SetSlot();
+	public static final NMSPacket104WindowItems WINDOW_ITEMS = new NMSPacket104WindowItems();
+	public static final NMSPacket105CraftProgressBar CRAFT_PROGRESS_BAR = new NMSPacket105CraftProgressBar();
+	public static final NMSPacket106Transaction TRANSACTION = new NMSPacket106Transaction();
+	public static final NMSPacket107SetCreativeSlot SET_CREATIVE_SLOT = new NMSPacket107SetCreativeSlot();
+	public static final NMSPacket108ButtonClick BUTTON_CLICK = new NMSPacket108ButtonClick();
+	public static final NMSPacket130UpdateSign UPDATE_SIGN = new NMSPacket130UpdateSign();
+	public static final NMSPacket131ItemData ITEM_DATA = new NMSPacket131ItemData();
+	public static final NMSPacket132TileEntityData TILE_ENTITY_DATA = new NMSPacket132TileEntityData();
+	public static final NMSPacket200Statistic STATISTIC = new NMSPacket200Statistic();
+	public static final NMSPacket201PlayerInfo PLAYER_INFO = new NMSPacket201PlayerInfo();
+	public static final NMSPacket202Abilities ABILITIES = new NMSPacket202Abilities();
+	public static final NMSPacket203TabComplete TAB_COMPLETE = new NMSPacket203TabComplete();
+	public static final NMSPacket204LocaleAndViewDistance LOCALE_AND_VIEW_DISTANCE = new NMSPacket204LocaleAndViewDistance();
+	public static final NMSPacket205ClientCommand CLIENT_COMMAND = new NMSPacket205ClientCommand();
+	public static final NMSPacket250CustomPayload CUSTOM_PAYLOAD = new NMSPacket250CustomPayload();
+	public static final NMSPacket252KeyResponse KEY_RESPONSE = new NMSPacket252KeyResponse();
+	public static final NMSPacket253KeyRequest KEY_REQUEST = new NMSPacket253KeyRequest();
+	public static final NMSPacket254GetInfo GET_INFO = new NMSPacket254GetInfo();
+	public static final NMSPacket255KickDisconnect KICK_DISCONNECT = new NMSPacket255KickDisconnect();
+}

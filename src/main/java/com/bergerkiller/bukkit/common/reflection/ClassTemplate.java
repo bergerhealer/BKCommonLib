@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -12,10 +13,31 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * Uses reflection to transfer/copy all the fields of a class
  */
 public class ClassTemplate<T> {
-	private final Class<T> type;
-	private final List<Field> fields;
+	private Class<T> type;
+	private List<Field> fields;
 
-	private ClassTemplate(Class<T> type) {
+	/**
+	 * Initializes a new ClassTemplate not pointing to any Class<br>
+	 * Call setClass to define the Class to use
+	 */
+	public ClassTemplate() {
+	}
+
+	/**
+	 * Initializes a new ClassTemplate pointing to the Class specified
+	 * 
+	 * @param type of Class
+	 */
+	public ClassTemplate(Class<T> type) {
+		setClass(type);
+	}
+
+	/**
+	 * Initializes this Class Template to represent the Class and fields of the type specified
+	 * 
+	 * @param type to set the Class to
+	 */
+	protected void setClass(Class<T> type) {
 		this.type = type;
 		this.fields = new ArrayList<Field>();
 		if (this.type != null) {
@@ -31,13 +53,16 @@ public class ClassTemplate<T> {
 		if (clazz == null) {
 			return;
 		}
-		for (Field field : clazz.getDeclaredFields()) {
+		Field[] declared = clazz.getDeclaredFields();
+		ArrayList<Field> newFields = new ArrayList<Field>(declared.length);
+		for (Field field : declared) {
 			if (Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
 			field.setAccessible(true);
-			this.fields.add(field);
+			newFields.add(field);
 		}
+		this.fields.addAll(0, newFields);
 		this.fillFields(clazz.getSuperclass());
 	}
 
@@ -48,6 +73,29 @@ public class ClassTemplate<T> {
 	 */
 	public Class<T> getType() {
 		return this.type;
+	}
+
+	/**
+	 * Gets all the fields declared in this Class
+	 * 
+	 * @return Declared fields
+	 */
+	public List<Field> getFields() {
+		return Collections.unmodifiableList(fields);
+	}
+
+	/**
+	 * Gets a new instance of this Class, using the empty constructor
+	 * 
+	 * @return A new instance, or null if an error occurred/empty constructor is not available
+	 */
+	public T newInstance() {
+		try {
+			return (T) this.type.newInstance();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -122,7 +170,17 @@ public class ClassTemplate<T> {
 		}
 		return builder.toString();
 	}
-	
+
+	/**
+	 * Attempts to find the constructor for this Class using the parameter types
+	 * 
+	 * @param parameterTypes of the constructor
+	 * @return Constructor
+	 */
+	public SafeConstructor<T> getConstructor(Class<?>... parameterTypes) {
+		return new SafeConstructor<T>(this.getType(), parameterTypes);
+	}
+
 	/**
 	 * Attempts to find the field by name
 	 * 

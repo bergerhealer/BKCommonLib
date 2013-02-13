@@ -1,6 +1,13 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import com.bergerkiller.bukkit.common.reflection.classes.PacketRef;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+
+import net.minecraft.server.v1_4_R1.Packet;
 
 public enum PacketType {
 	KEEP_ALIVE(0),
@@ -77,28 +84,95 @@ public enum PacketType {
 	USE_ENTITY(7),
 	UPDATE_HEALTH(8),
 	RESPAWN(9),
-	UNKOWN(-1);
-	
-	
-	private int id;
-	
-	PacketType(int id) {
+	UNKNOWN(-1);
+
+	private final int id;
+	private final ClassTemplate<?> template;
+	private final String[] fieldNames;
+	private final String dataWatcherField;
+	private static final PacketType[] byId = new PacketType[256];
+
+	private PacketType(int id) {
 		this.id = id;
-	}
-	
-	public Object getPacket() {
-		return PacketRef.getPacketById.invoke(null, this.id);
-	}
-	
-	public int getId() {
-		return this.id;
-	}
-	
-	public static PacketType getFromInt(int from) {
-		for(PacketType p : values()) {
-			if(p.id == from)
-				return p;
+		Class<?> type = (Class<?>) Packet.l.get(id);
+		if (type == null) {
+			this.template = null;
+			this.dataWatcherField = null;
+			this.fieldNames = new String[0];
+			return;
 		}
-		return PacketType.UNKOWN;
+		this.template = ClassTemplate.create(type);
+		List<Field> fields = this.template.getFields();
+		this.fieldNames = new String[fields.size()];
+		String dataWatcherField = null;
+		for (int i = 0; i < fields.size(); i++) {
+			Field field = fields.get(i);
+			if (DataWatcherRef.TEMPLATE.isType(field.getType())) {
+				dataWatcherField = field.getName();
+			}
+			fieldNames[i] = field.getName();
+		}
+		this.dataWatcherField = dataWatcherField;
+
+		// Needed?
+		/*
+		Field[] Allfields;
+		if(CommonPlugin.getInstance().libaryInstalled)
+			Allfields = ProtocolLib.getFields(getPacket());
+		else
+			Allfields = type.getDeclaredFields();
+		*/
+	}
+
+	/**
+	 * Constructs a new Packet instance from this Type
+	 * 
+	 * @return Packet
+	 */
+	public Object getPacket() {
+		return template == null ? null : template.newInstance();
+	}
+
+	/**
+	 * Gets the Packet Id of this Packet type
+	 * 
+	 * @return Packet type id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	public String getMetaDataField() {
+		if (dataWatcherField == null) {
+			throw new IllegalArgumentException("MetaData field does not exist");
+		}
+		return dataWatcherField;
+	}
+
+	public String getField(int index) {
+		return (index >= 0 && index < fieldNames.length) ? fieldNames[index] : null;
+	}
+
+	/**
+	 * Gets the Packet Type from a Packet Id
+	 * 
+	 * @param id of the Packet
+	 * @return Packet Type, or UNKNOWN if unknown
+	 */
+	public static PacketType fromId(int id) {
+		if (id >= 0 && id < 256) {
+			return byId[id];
+		} else {
+			return UNKNOWN;
+		}
+	}
+
+	static {
+		Arrays.fill(byId, UNKNOWN);
+		for (PacketType type : values()) {
+			if (type != UNKNOWN) {
+				byId[type.getId()] = type;
+			}
+		}
 	}
 }
