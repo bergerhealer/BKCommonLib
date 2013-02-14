@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.internal.ProtocolLib;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
@@ -44,11 +42,7 @@ public class CommonPacket {
 
 	public void write(String field, Object value) {
 		try {
-			if(CommonPlugin.getInstance().libaryInstalled) {
-				ProtocolLib.writeDataToPacket(packet, field, value);
-			} else {
-				SafeField.set(packet, field, value);
-			}
+			SafeField.set(packet, field, value);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("Invalid field name: "+field);
@@ -70,11 +64,7 @@ public class CommonPacket {
 
 	public Object read(String field) {
 		try {
-			if(CommonPlugin.getInstance().libaryInstalled) {
-				return ProtocolLib.readDataFromPacket(packet, field);
-			} else {
-				return SafeField.get(packet, field);
-			}
+			return SafeField.get(packet, field);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException("Invalid field name: "+field);

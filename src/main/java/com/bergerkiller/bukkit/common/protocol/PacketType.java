@@ -6,8 +6,7 @@ import java.util.List;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-
-import net.minecraft.server.v1_4_R1.Packet;
+import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 
 public enum PacketType {
 	KEEP_ALIVE(0),
@@ -94,7 +93,7 @@ public enum PacketType {
 
 	private PacketType(int id) {
 		this.id = id;
-		Class<?> type = (Class<?>) Packet.l.get(id);
+		final Class<?> type = IntHashMapRef.get(PacketFields.DEFAULT.getStaticFieldValue("l"), id);
 		if (type == null) {
 			this.template = null;
 			this.dataWatcherField = null;

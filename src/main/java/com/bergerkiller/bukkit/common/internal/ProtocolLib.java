@@ -1,19 +1,16 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ConnectionSide;
 import com.comphenix.protocol.events.MonitorAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.FieldUtils;
 
 public class ProtocolLib {
 	
@@ -50,21 +47,5 @@ public class ProtocolLib {
 		} catch (InvocationTargetException e) {
 			throw new IllegalArgumentException("Invalid packet target");
 		}
-	}
-	
-	public static void writeDataToPacket(Object packet, String field, Object value) throws IllegalAccessException {
-		FieldUtils.writeField(packet, field, value);
-	}
-	
-	public static Object readDataFromPacket(Object packet, String field) throws IllegalAccessException {
-		return FieldUtils.readField(packet, field);
-	}
-	
-	public static Field[] getFields(Object packet) {
-		int id = PacketFields.DEFAULT.packetID.get(packet);
-		if(Packets.Client.isSupported(id) && Packets.Server.isSupported(id))
-			return packet.getClass().getSuperclass().getDeclaredFields();
-		else
-			return packet.getClass().getDeclaredFields();
 	}
 }

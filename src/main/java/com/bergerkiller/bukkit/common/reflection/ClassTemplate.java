@@ -203,6 +203,26 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Gets a statically declared field value
+	 * 
+	 * @param name of the static field
+	 * @return Static field value
+	 */
+	public <K> K getStaticFieldValue(String name) {
+		return SafeField.get(getType(), name);
+	}
+
+	/**
+	 * Sets a statically declared field value
+	 * 
+	 * @param name of the static field
+	 * @param value to set the static field to
+	 */
+	public <K> void setStaticFieldValue(String name, K value) {
+		SafeField.setStatic(getType(), name, value);
+	}
+
+	/**
 	 * Attempts to create a new template for the class at the path specified
 	 * 
 	 * @param path to the class

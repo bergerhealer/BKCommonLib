@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.reflection;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -37,12 +36,31 @@ public class NMSClassTemplate extends ClassTemplate<Object> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected void setNMSClass(String className) {
+		// Get rid of nested-class
+		int nestedIdx = className.lastIndexOf('$');
+		if (nestedIdx != -1) {
+			className = className.substring(nestedIdx + 1);
+		}
+		// Remove name appendices
 		if (className.endsWith("Ref")) {
 			className = className.substring(0, className.length() - 3);
 		}
 		if (className.startsWith("NMS")) {
 			className = className.substring(3);
 		}
-		setClass((Class<Object>) CommonUtil.getClass(Common.NMS_ROOT + "." + className));
+		setClass((Class<Object>) CommonUtil.getNMSClass(className));
+		if (getType() == null) {
+			new RuntimeException("Failed to set a valid NMS Class: name = " + className).printStackTrace();
+		}
+	}
+
+	/**
+	 * Creates a new NMS Class Template for the net.minecraft.server Class name specified
+	 * 
+	 * @param name of the class in the NMS package
+	 * @return new Class Template
+	 */
+	public static NMSClassTemplate create(String name) {
+		return new NMSClassTemplate(name);
 	}
 }

@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -306,6 +308,26 @@ public class CommonUtil {
 		} catch (ClassNotFoundException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Tries to get the net.minecraft.server class at the path specified
+	 * 
+	 * @param name of the NMS class
+	 * @return the class, or null if not found
+	 */
+	public static Class<?> getNMSClass(String name) {
+		return getClass(Common.NMS_ROOT + "." + name);
+	}
+
+	/**
+	 * Tries to get the org.bukkit.craftbukkit class at the path specified
+	 * 
+	 * @param name of the CB class
+	 * @return the class, or null if not found
+	 */
+	public static Class<?> getCBClass(String name) {
+		return getClass(Common.CB_ROOT + "." + name);
 	}
 
 	/**

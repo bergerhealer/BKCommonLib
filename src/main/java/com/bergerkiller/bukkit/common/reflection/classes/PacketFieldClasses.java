@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkPosition;
-import net.minecraft.server.v1_4_R1.DataWatcher;
 import net.minecraft.server.v1_4_R1.EntityLiving;
 import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import net.minecraft.server.v1_4_R1.WatchableObject;
@@ -15,6 +14,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
+import com.bergerkiller.bukkit.common.reflection.accessors.DataWatcherFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.accessors.ItemStackFieldAccessor;
 
 public class PacketFieldClasses {
@@ -100,7 +100,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> yaw = getField("f");
 		public final FieldAccessor<Byte> pitch = getField("g");
 		public final FieldAccessor<Integer> heldItemId = getField("h");
-		public final FieldAccessor<DataWatcher> dataWatcher = getField("i");
+		public final DataWatcherFieldAccessor dataWatcher = new DataWatcherFieldAccessor(getField("i"));
 	}
 	public static class NMSPacket22Collect extends NMSPacket {
 	}
@@ -127,7 +127,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> yaw = getField("i");
 		public final FieldAccessor<Byte> pitch = getField("j");
 		public final FieldAccessor<Byte> headYaw = getField("k");
-		public final FieldAccessor<DataWatcher> dataWatcher = getField("s");
+		public final DataWatcherFieldAccessor dataWatcher = new DataWatcherFieldAccessor(getField("s"));
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityLiving.class);
 		public Object newInstance(EntityLiving entityLiving) {
 			return constructor1.newInstance(entityLiving);
