@@ -215,6 +215,7 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public void onLoad() {
+		instance = this;
 		CommonClasses.init(); // Load the classes contained in this library
 	}
 
@@ -238,8 +239,6 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public void enable() {
-		instance = this;
-
 		// Validate version
 		if (IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
