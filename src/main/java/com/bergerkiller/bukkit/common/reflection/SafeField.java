@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -17,6 +18,18 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  */
 public class SafeField<T> implements FieldAccessor<T> {
 	private Field field;
+
+	public SafeField(Field field) {
+		if (!field.isAccessible()) {
+			try {
+				field.setAccessible(true);
+			} catch (SecurityException ex) {
+				ex.printStackTrace();
+				field = null;
+			}
+		}
+		this.field = field;
+	}
 
 	public SafeField(String fieldPath) {
 		if (LogicUtil.nullOrEmpty(fieldPath) || !fieldPath.contains(".")) {
@@ -104,6 +117,41 @@ public class SafeField<T> implements FieldAccessor<T> {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder text = new StringBuilder(20);
+		final int mod = field.getModifiers();
+		if (Modifier.isPublic(mod)) {
+			text.append("public ");
+		} else if (Modifier.isPrivate(mod)) {
+			text.append("private ");
+		} else if (Modifier.isProtected(mod)) {
+			text.append("protected ");
+		}
+		if (Modifier.isStatic(mod)) {
+			text.append("static ");
+		}
+		return text.append(field.getType().getName()).append(" ").append(field.getName()).toString();
+	}
+
+	/**
+	 * Gets the name of this field as declared in the Class
+	 * 
+	 * @return Field name
+	 */
+	public String getName() {
+		return field.getName();
+	}
+
+	/**
+	 * Gets the Class type of this field as declared inthe Class
+	 * 
+	 * @return Field type
+	 */
+	public Class<?> getType() {
+		return field.getType();
 	}
 
 	/**

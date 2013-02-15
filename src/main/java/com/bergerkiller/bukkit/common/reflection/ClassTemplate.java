@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  */
 public class ClassTemplate<T> {
 	private Class<T> type;
-	private List<Field> fields;
+	private List<SafeField<?>> fields;
 
 	/**
 	 * Initializes a new ClassTemplate not pointing to any Class<br>
@@ -39,7 +39,7 @@ public class ClassTemplate<T> {
 	 */
 	protected void setClass(Class<T> type) {
 		this.type = type;
-		this.fields = new ArrayList<Field>();
+		this.fields = new ArrayList<SafeField<?>>();
 		if (this.type != null) {
 			try {
 				this.fillFields(type);
@@ -54,13 +54,11 @@ public class ClassTemplate<T> {
 			return;
 		}
 		Field[] declared = clazz.getDeclaredFields();
-		ArrayList<Field> newFields = new ArrayList<Field>(declared.length);
+		ArrayList<SafeField<?>> newFields = new ArrayList<SafeField<?>>(declared.length);
 		for (Field field : declared) {
-			if (Modifier.isStatic(field.getModifiers())) {
-				continue;
+			if (!Modifier.isStatic(field.getModifiers())) {
+				newFields.add(new SafeField<Object>(field));
 			}
-			field.setAccessible(true);
-			newFields.add(field);
 		}
 		this.fields.addAll(0, newFields);
 		this.fillFields(clazz.getSuperclass());
@@ -80,7 +78,7 @@ public class ClassTemplate<T> {
 	 * 
 	 * @return Declared fields
 	 */
-	public List<Field> getFields() {
+	public List<SafeField<?>> getFields() {
 		return Collections.unmodifiableList(fields);
 	}
 
@@ -135,14 +133,8 @@ public class ClassTemplate<T> {
 	 * @param to instance
 	 */
 	public void transfer(T from, T to) {
-		for (Field field : this.fields) {
-			try {
-				field.set(to, field.get(from));
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
+		for (FieldAccessor<?> field : this.fields) {
+			field.transfer(from, to);
 		}
 	}
 
@@ -159,14 +151,9 @@ public class ClassTemplate<T> {
 	public String toString() {
 		StringBuilder builder = new StringBuilder(500);
 		builder.append("Class path: ").append(this.getType().getName()).append('\n');
-		builder.append("Fields (").append(this.fields.size()).append("):").append('\n');
-		for (Field field : this.fields) {
-			builder.append("    ");
-			if (Modifier.isStatic(field.getModifiers())) {
-				builder.append("static ");
-			}
-			builder.append(field.getType().getName()).append(" ").append(field.getName());
-			builder.append('\n');
+		builder.append("Fields (").append(this.fields.size()).append("):");
+		for (FieldAccessor<?> field : this.fields) {
+			builder.append("\n    ").append(field.toString());
 		}
 		return builder.toString();
 	}

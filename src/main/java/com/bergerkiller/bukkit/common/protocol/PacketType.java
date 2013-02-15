@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 
@@ -101,11 +101,11 @@ public enum PacketType {
 			return;
 		}
 		this.template = ClassTemplate.create(type);
-		List<Field> fields = this.template.getFields();
+		List<SafeField<?>> fields = this.template.getFields();
 		this.fieldNames = new String[fields.size()];
 		String dataWatcherField = null;
 		for (int i = 0; i < fields.size(); i++) {
-			Field field = fields.get(i);
+			SafeField<?> field = fields.get(i);
 			if (DataWatcherRef.TEMPLATE.isType(field.getType())) {
 				dataWatcherField = field.getName();
 			}

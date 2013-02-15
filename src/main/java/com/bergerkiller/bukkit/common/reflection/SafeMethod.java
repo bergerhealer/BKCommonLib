@@ -70,6 +70,15 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 		CommonPlugin.getInstance().handleReflectionMissing("Method", name, source);
 	}
 
+	/**
+	 * Gets the name of this method as declared in the Class
+	 * 
+	 * @return Method name
+	 */
+	public String getName() {
+		return method.getName();
+	}
+
 	@Override
 	public boolean isValid() {
 		return this.method != null;

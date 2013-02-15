@@ -6,6 +6,11 @@ import org.bukkit.Bukkit;
 
 public class Common {
 	/**
+	 * Gets whether the current server software used is the Spigot implementation
+	 */
+	public static final boolean IS_SPIGOT_SERVER = Bukkit.getVersion().contains("Spigot");
+
+	/**
 	 * Defines the Minecraft version that runs on the server<br>
 	 * If none is specified, this value is an empty String
 	 */
@@ -53,13 +58,6 @@ public class Common {
 			return false;
 		}
 	}
-	
-	/**
-	 * Sets if BKC should ignore havy packets
-	 */
-	public static boolean heavyPackets = false;
-	
-	public static boolean spigot = Bukkit.getVersion().contains("Spigot");
 
 	/**
 	 * Checks whether the version specified is compatible with the Minecraft version used on this server
