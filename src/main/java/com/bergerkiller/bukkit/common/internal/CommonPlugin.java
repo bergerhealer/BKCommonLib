@@ -359,7 +359,7 @@ public class CommonPlugin extends PluginBase {
 		} else {
 			//Now uses the onPlayerJoin method (see CommonListener) to deal with this
 			//fix Disconnect.Spam kick happening w/o reason
-			startedTasks.add(new Task(this) {
+			/*startedTasks.add(new Task(this) {
 				@Override
 				public void run() {
 					for (EntityPlayer player : NativeUtil.getOnlinePlayers()) {
@@ -368,7 +368,7 @@ public class CommonPlugin extends PluginBase {
 						}
 					}
 				}
-			}.start(1, 1));
+			}.start(1, 1));*/
 		}
 
 		// Register world listeners
