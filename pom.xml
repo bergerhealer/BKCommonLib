@@ -48,7 +48,7 @@
     <dependency>
       <groupId>com.kellerkindt</groupId>
       <artifactId>ShowCaseStandalone</artifactId>
-      <version>1.43</version>
+      <version>383</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/ShowCaseStandalone.jar</systemPath>
     </dependency>
