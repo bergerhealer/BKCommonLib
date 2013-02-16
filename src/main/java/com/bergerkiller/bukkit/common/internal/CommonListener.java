@@ -7,6 +7,7 @@ import java.util.Iterator;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,6 +41,17 @@ class CommonListener implements Listener {
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, false);
+		}
+		
+		if(name.equalsIgnoreCase("ProtocolLib")) {
+			//Oh no, ProtocolLib has been disabled
+			//Lets init the players to our system
+			for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+				CommonPacketListener.bind(player);
+			}
+			
+			//Lets notify BKCommonLib it has been disabled
+			CommonPlugin.getInstance().isProtocolLibEnabled = false;
 		}
 	}
 

@@ -23,6 +23,16 @@ class CommonPacketListener extends PlayerConnection {
 		TEMPLATE.transfer(previous, listener);
 		ep.playerConnection = listener;
 	}
+	
+	public static void unbind(Player player) {
+		final EntityPlayer ep = NativeUtil.getNative(player);
+		final PlayerConnection previous = ep.playerConnection;
+		if(previous instanceof CommonPacketListener) {
+			PlayerConnection listener = new PlayerConnection(CommonUtil.getMCServer(), previous.networkManager, ep);
+			TEMPLATE.transfer(previous, listener);
+			ep.playerConnection = listener;
+		}
+	}
 
 	@Override
 	public void a(Packet0KeepAlive packet) {
@@ -427,12 +437,15 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private boolean canConfirm(Packet packet) {
+		if(CommonPlugin.getInstance() == null)
+			return true;
+		
 		return CommonPlugin.getInstance().onPacketReceive(NativeUtil.getPlayer(this.player), packet);
 	}
 
 	@Override
 	public void sendPacket(Packet packet) {
-		if (CommonPlugin.getInstance().onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
+		if (CommonPlugin.getInstance() == null || CommonPlugin.getInstance().onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
 			super.sendPacket(packet);
 		}
 	}

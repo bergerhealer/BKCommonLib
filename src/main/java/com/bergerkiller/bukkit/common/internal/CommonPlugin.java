@@ -326,6 +326,10 @@ public class CommonPlugin extends PluginBase {
 			task.stop();
 		}
 		startedTasks.clear();
+		//Transfer PlayerConnection from players back to default
+		for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+			CommonPacketListener.unbind(player);
+		}
 	}
 
 	@Override
@@ -358,17 +362,11 @@ public class CommonPlugin extends PluginBase {
 			CommonProtocolLibHandler.register(this);
 		} else {
 			//Now uses the onPlayerJoin method (see CommonListener) to deal with this
-			//fix Disconnect.Spam kick happening w/o reason
-			/*startedTasks.add(new Task(this) {
-				@Override
-				public void run() {
-					for (EntityPlayer player : NativeUtil.getOnlinePlayers()) {
-						if (!player.playerConnection.disconnected) {
-							player.playerConnection.d();
-						}
-					}
-				}
-			}.start(1, 1));*/
+			/** Lets fix up the player connection from online players */
+			for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+				//bind our custom connection to the player
+				CommonPacketListener.bind(player);
+			}
 		}
 
 		// Register world listeners
