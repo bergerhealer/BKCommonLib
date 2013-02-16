@@ -1,5 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkSection;
 import net.minecraft.server.v1_4_R1.EnumSkyBlock;
@@ -7,6 +14,14 @@ import net.minecraft.server.v1_4_R1.EnumSkyBlock;
 public class ChunkRef {
 	public static final int XZ_MASK = 0xf;
 	public static final int Y_MASK = 0xff;
+	public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("Chunk");
+	public static final FieldAccessor<Integer> x = TEMPLATE.getField("x");
+	public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
+	public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("m");
+	public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("i");
+	public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
+	public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
+	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "f");
 
 	/**
 	 * Gets all chunk sections contained in a chunk

@@ -4,17 +4,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.server.v1_4_R1.RegionFile;
-import net.minecraft.server.v1_4_R1.RegionFileCache;
-
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class RegionFileCacheRef {
-	public static final FieldAccessor<Map<File, RegionFile>> filesField = new SafeField<Map<File, RegionFile>>(RegionFileCache.class, "a");
-	public static final Map<File, RegionFile> FILES;
+	public static final FieldAccessor<Map<File, Object>> filesField = new SafeField<Map<File, Object>>(CommonUtil.getNMSClass("RegionFileCache"), "a");
+	public static final Map<File, Object> FILES;
 	static {
-		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, RegionFile>();
+		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, Object>();
 	}
 
 	/**
@@ -23,7 +21,7 @@ public class RegionFileCacheRef {
 	 * @param file to get the RegionFile of
 	 * @return the Region File, or null if not loaded
 	 */
-	public static RegionFile getFile(File file) {
+	public static Object getFile(File file) {
 		return FILES.get(file);
 	}
 }
