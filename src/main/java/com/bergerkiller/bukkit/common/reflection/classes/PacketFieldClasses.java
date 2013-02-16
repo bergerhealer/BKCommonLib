@@ -2,12 +2,6 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import net.minecraft.server.v1_4_R1.Chunk;
-import net.minecraft.server.v1_4_R1.ChunkPosition;
-import net.minecraft.server.v1_4_R1.EntityLiving;
-import net.minecraft.server.v1_4_R1.Packet51MapChunk;
-import net.minecraft.server.v1_4_R1.WatchableObject;
-
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +15,7 @@ import com.bergerkiller.bukkit.common.reflection.accessors.DifficultyFieldAccess
 import com.bergerkiller.bukkit.common.reflection.accessors.GameModeFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.accessors.ItemStackFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.accessors.WorldTypeFieldAccessor;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class PacketFieldClasses {
 	public static class NMSPacket extends NMSClassTemplate {
@@ -144,8 +139,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> pitch = getField("j");
 		public final FieldAccessor<Byte> headYaw = getField("k");
 		public final DataWatcherFieldAccessor dataWatcher = new DataWatcherFieldAccessor(getField("s"));
-		private final SafeConstructor<Object> constructor1 = getConstructor(EntityLiving.class);
-		public Object newInstance(EntityLiving entityLiving) {
+		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("EntityLiving"));
+		public Object newInstance(Object entityLiving) {
 			return constructor1.newInstance(entityLiving);
 		}
 	}
@@ -226,7 +221,10 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket40EntityMetadata extends NMSPacket {
 		public final FieldAccessor<Integer> passengerId = getField("a");
-		public final FieldAccessor<List<WatchableObject>> watchedObjects = getField("b");
+		
+		/** CraftBukkit uses rawtypes for this, so do we */
+		@SuppressWarnings("rawtypes")
+		public final FieldAccessor<List> watchedObjects = getField("b");
 	}
 	public static class NMSPacket41MobEffect extends NMSPacket {
 	}
@@ -238,31 +236,36 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> size = getField("size");
 		public final FieldAccessor<byte[]> buffer = getField("buffer");
 		public final FieldAccessor<byte[]> inflatedBuffer = getField("inflatedBuffer");
+		private final FieldAccessor<Boolean> e = getField("e");
+		private final FieldAccessor<Integer> a = getField("a");
+		private final FieldAccessor<Integer> b = getField("b");
+		private final FieldAccessor<Integer> c = getField("c");
+		private final FieldAccessor<Integer> d = getField("d");
 		public final FieldAccessor<Boolean> hasBiomeData = new SafeDirectField<Boolean>() {
-			public Boolean get(Object instance) { return ((Packet51MapChunk) instance).e; }
-			public boolean set(Object instance, Boolean value) { ((Packet51MapChunk) instance).e = value; return true; }
+			public Boolean get(Object instance) { return e.get(instance); }
+			public boolean set(Object instance, Boolean value) { e.set(instance, value); return true; }
 		};
 		public final FieldAccessor<Integer> x = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return ((Packet51MapChunk) instance).a; }
-			public boolean set(Object instance, Integer value) { ((Packet51MapChunk) instance).a = value; return true; }
+			public Integer get(Object instance) { return a.get(instance); }
+			public boolean set(Object instance, Integer value) { a.set(instance, value); return true; }
 		};
 		public final FieldAccessor<Integer> z = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return ((Packet51MapChunk) instance).b; }
-			public boolean set(Object instance, Integer value) { ((Packet51MapChunk) instance).b = value; return true; }
+			public Integer get(Object instance) { return b.get(instance); }
+			public boolean set(Object instance, Integer value) { b.set(instance, value); return true; }
 		};
 		public final FieldAccessor<Integer> chunkDataBitMap = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return ((Packet51MapChunk) instance).c; }
-			public boolean set(Object instance, Integer value) { ((Packet51MapChunk) instance).c = value; return true; }
+			public Integer get(Object instance) { return c.get(instance); }
+			public boolean set(Object instance, Integer value) { c.set(instance, value); return true; }
 		};
 		public final FieldAccessor<Integer> chunkBiomeBitMap = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return ((Packet51MapChunk) instance).d; }
-			public boolean set(Object instance, Integer value) { ((Packet51MapChunk) instance).d = value; return true; }
+			public Integer get(Object instance) { return d.get(instance); }
+			public boolean set(Object instance, Integer value) { d.set(instance, value); return true; }
 		};
-		private final SafeConstructor<Object> constructor1 = getConstructor(Chunk.class, boolean.class, int.class);
-		public Object newInstance(Chunk chunk) {
+		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
+		public Object newInstance(Object chunk) {
 			return newInstance(chunk, true, 0xFFFF);
 		}
-		public Object newInstance(Chunk chunk, boolean hasBiomeData, int sectionsMask) {
+		public Object newInstance(Object chunk, boolean hasBiomeData, int sectionsMask) {
 			return constructor1.newInstance(chunk, hasBiomeData, sectionsMask);
 		}
 	}
@@ -305,7 +308,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Double> y = getField("b");
 		public final FieldAccessor<Double> z = getField("c");
 		public final FieldAccessor<Float> radius = getField("d");
-		public final FieldAccessor<List<ChunkPosition>> blocks = getField("e");
+		public final FieldAccessor<List<Object>> blocks = getField("e");
 		public final FieldAccessor<Float> pushMotX = getField("f");
 		public final FieldAccessor<Float> pushMotY = getField("g");
 		public final FieldAccessor<Float> pushMotZ = getField("h");
