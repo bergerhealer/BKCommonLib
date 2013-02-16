@@ -1,15 +1,29 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
-public class PacketConnection extends PlayerConnection {
-	public PacketConnection(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
+class CommonPacketListener extends PlayerConnection {
+	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerConnection");
+
+	public CommonPacketListener(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
 		super(minecraftserver, inetworkmanager, entityplayer);
 	}
-	
+
+	public static void bind(Player player) {
+		final EntityPlayer ep = NativeUtil.getNative(player);
+		final PlayerConnection previous = ep.playerConnection;
+		CommonPacketListener listener = new CommonPacketListener(CommonUtil.getMCServer(), previous.networkManager, ep);
+		TEMPLATE.transfer(previous, listener);
+		ep.playerConnection = listener;
+	}
+
 	@Override
 	public void a(Packet0KeepAlive packet) {
 		if(this.canConfirm(packet))
@@ -411,14 +425,15 @@ public class PacketConnection extends PlayerConnection {
 		if(this.canConfirm(packet))
 			super.a(packet);
 	}
-	
+
 	private boolean canConfirm(Packet packet) {
-		return PacketUtil.callPacketReceiveEvent(NativeUtil.getPlayer(this.player), packet);
+		return CommonPlugin.getInstance().onPacketReceive(NativeUtil.getPlayer(this.player), packet);
 	}
-	
+
 	@Override
 	public void sendPacket(Packet packet) {
-		if(PacketUtil.callPacketSendEvent(NativeUtil.getPlayer(this.player), packet))
+		if (CommonPlugin.getInstance().onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
 			super.sendPacket(packet);
+		}
 	}
 }

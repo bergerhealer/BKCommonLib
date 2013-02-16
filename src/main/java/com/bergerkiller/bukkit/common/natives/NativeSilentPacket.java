@@ -15,13 +15,13 @@ import net.minecraft.server.v1_4_R1.Packet;
  */
 public class NativeSilentPacket extends Packet {
 	static {
-		PacketUtil.packetsToIds.put(NativeSilentPacket.class, 0);
+		PacketUtil.registerPacketToId(NativeSilentPacket.class, 0);
 	}
 
 	private final Packet packet;
 
-	public NativeSilentPacket(Packet packet) {
-		this.packet = packet;
+	public NativeSilentPacket(Object packet) {
+		this.packet = (Packet) packet;
 		PacketFields.DEFAULT.packetID.transfer(packet, this);
 	}
 

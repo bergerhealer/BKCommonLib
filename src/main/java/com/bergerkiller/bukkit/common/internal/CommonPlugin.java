@@ -21,9 +21,10 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftItem;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.EntityMap;
@@ -31,14 +32,22 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
+import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
+import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.metrics.AddonHandler;
+import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
 	/*
 	 * BKCommonLib Minecraft versioning
@@ -52,19 +61,18 @@ public class CommonPlugin extends PluginBase {
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	protected final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
+	protected final List<PacketListener>[] listeners = new ArrayList[256];
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
+	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
-	private int nextTickHandlerId = -1;
-	private int entityMoveHandlerId = -1;
-	private int entityRemoveHandlerId = -1;
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
+	public boolean isProtocolLibEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	public List<Entity> entities = new ArrayList<Entity>();
-	public boolean libaryInstalled = false;
 
 	public static CommonPlugin getInstance() {
 		return instance;
@@ -89,7 +97,6 @@ public class CommonPlugin extends PluginBase {
 		ex.printStackTrace();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void registerMap(EntityMap map) {
 		this.maps.add(new SoftReference(map));
 	}
@@ -169,6 +176,94 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
+	public boolean onPacketSend(Player player, Object packet) {
+		if(player == null || packet == null) {
+			return true;
+		}
+		return onPacketSend(player, packet, PacketFields.DEFAULT.packetID.get(packet));
+	}
+
+	public void addPacketListener(PacketListener listener, int id) {
+		if(listener == null || id < 0 || id >= listeners.length) {
+			return;
+		}
+		if (listeners[id] == null) {
+			listeners[id] = new ArrayList<PacketListener>();
+		}
+		listeners[id].add(listener);
+	}
+
+	public void removePacketListener(PacketListener listener) {
+		if(listener == null) {
+			return;
+		}
+		for(int i = 0; i < listeners.length; i++) {
+			if (!LogicUtil.nullOrEmpty(listeners[i])) {
+				listeners[i].remove(listener);
+			}
+		}
+	}
+
+	public boolean onPacketSend(Player player, Object packet, int id) {
+		if(player == null || packet == null) {
+			return true;
+		}
+
+		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
+			PacketSendEvent ev = new PacketSendEvent(player, cp);
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketSend(ev);
+			}
+			return !ev.isCancelled();
+		} else {
+			return true;
+		}
+	}
+
+	public boolean onPacketReceive(Player player, Object packet) {
+		if(player == null || packet == null) {
+			return true;
+		}
+		return onPacketReceive(player, packet, PacketFields.DEFAULT.packetID.get(packet));
+	}
+
+	public boolean onPacketReceive(Player player, Object packet, int id) {
+		if(player == null || packet == null) {
+			return true;
+		}
+
+		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
+			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
+			for(PacketListener listener : listeners[id]) {
+				listener.onPacketReceive(ev);
+			}
+			return !ev.isCancelled();
+		} else {
+			return true;
+		}
+	}
+
+	public void sendPacket(Player player, Object packet, boolean throughListeners) {
+		if (packet == null || player == null) {
+			return;
+		}
+		final EntityPlayer ep = NativeUtil.getNative(player);
+		if (ep.playerConnection == null || ep.playerConnection.disconnected) {
+			return;
+		}
+		if (throughListeners) {
+			PlayerConnectionRef.sendPacket(ep.playerConnection, packet);
+		} else {
+			if (this.isProtocolLibEnabled) {
+				CommonProtocolLibHandler.sendSilentPacket(player, packet);
+			} else {
+				PlayerConnectionRef.sendPacket(ep.playerConnection, new NativeSilentPacket(packet));
+			}
+		}
+	}
+
 	@Override
 	public void permissions() {
 	}
@@ -226,15 +321,11 @@ public class CommonPlugin extends PluginBase {
 			listener.disable();
 		}
 		worldListeners.clear();
-		if (nextTickHandlerId != -1) {
-			Bukkit.getScheduler().cancelTask(nextTickHandlerId);
+		// Clear running tasks
+		for (Task task : startedTasks) {
+			task.stop();
 		}
-		if (entityMoveHandlerId != -1) {
-			Bukkit.getScheduler().cancelTask(entityMoveHandlerId);
-		}
-		if (entityRemoveHandlerId != -1) {
-			Bukkit.getScheduler().cancelTask(entityRemoveHandlerId);
-		}
+		startedTasks.clear();
 	}
 
 	@Override
@@ -244,7 +335,6 @@ public class CommonPlugin extends PluginBase {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.INFO, "MC version: "+Bukkit.getVersion());
 			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
-			this.handleProtocol();
 			//send annonymous stats to mcstats.org
 			AddonHandler ah = new AddonHandler(this);
 			ah.startMetrics();
@@ -258,13 +348,34 @@ public class CommonPlugin extends PluginBase {
 
 		// Register events and tasks, initialize
 		register(new CommonListener());
-		nextTickHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new NextTickHandler(), 1, 1);
-		entityMoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new MoveEventHandler(), 1, 1);
-		entityRemoveHandlerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new EntityRemovalHandler(), 1, 1);
+		startedTasks.add(new NextTickHandler(this).start(1, 1));
+		startedTasks.add(new MoveEventHandler(this).start(1, 1));
+		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
+
+		// Register protocol handling
+		if (this.isProtocolLibEnabled = (CommonUtil.getPlugin("ProtocolLib") != null)) {
+			//Register this plugin in ProtocolLib
+			CommonProtocolLibHandler.register(this);
+		} else {
+			//Now uses the onPlayerJoin method (see CommonListener) to deal with this
+			//fix Disconnect.Spam kick happening w/o reason
+			startedTasks.add(new Task(this) {
+				@Override
+				public void run() {
+					for (EntityPlayer player : NativeUtil.getOnlinePlayers()) {
+						if (!player.playerConnection.disconnected) {
+							player.playerConnection.d();
+						}
+					}
+				}
+			}.start(1, 1));
+		}
+
 		// Register world listeners
 		for (World world : WorldUtil.getWorlds()) {
 			notifyWorldAdded(world);
 		}
+
 		// Parse BKCommonLib version to int
 		String ver = this.getVersion();
 		int dot1 = ver.indexOf('.');
@@ -279,36 +390,13 @@ public class CommonPlugin extends PluginBase {
 			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
 		}
 	}
-	
-	private void handleProtocol() {
-		PluginManager pm = this.getServer().getPluginManager();
-		Plugin lib = pm.getPlugin("ProtocolLib");
-		
-		if(lib != null) {
-			libaryInstalled = true;
-			ProtocolLib.enable(this);
-		}
-		
-		pm.registerEvents(new ProtocolListener(), this);
-		
-		//fix Disconnect.Spam kick happening w/o reason
-		if(!libaryInstalled) {
-			new Task(this) {
-				@Override
-				public void run() {
-					for(Object obj : CommonUtil.getMCServer().getPlayerList().players) {
-						EntityPlayer player = (EntityPlayer)obj;
-						if(!player.playerConnection.disconnected) {
-							player.playerConnection.d();
-						}
-					}
-				}
-			}.start(1, 1);
-		}
-	}
 
-	private static class EntityRemovalHandler implements Runnable {
-		@SuppressWarnings("unchecked")
+	private static class EntityRemovalHandler extends Task {
+		public EntityRemovalHandler(JavaPlugin plugin) {
+			super(plugin);
+		}
+
+		@Override
 		public void run() {
 			Set<org.bukkit.entity.Entity> entities = getInstance().entitiesToRemove;
 			if (!entities.isEmpty()) {
@@ -334,7 +422,12 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
-	private static class NextTickHandler implements Runnable {
+	private static class NextTickHandler extends Task {
+		public NextTickHandler(JavaPlugin plugin) {
+			super(plugin);
+		}
+
+		@Override
 		public void run() {
 			List<Runnable> nextTick = getInstance().nextTickTasks;
 			List<Runnable> nextSync = getInstance().nextTickSync;
@@ -357,8 +450,12 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
-	private static class MoveEventHandler implements Runnable {
-		@SuppressWarnings("unchecked")
+	private static class MoveEventHandler extends Task {
+		public MoveEventHandler(JavaPlugin plugin) {
+			super(plugin);
+		}
+
+		@Override
 		public void run() {
 			CommonPlugin cp = CommonPlugin.getInstance();
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {

@@ -182,6 +182,19 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket29DestroyEntity extends NMSPacket {
 		public final FieldAccessor<int[]> entityIds = getField("a");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int[].class);
+
+		public Object newInstance(int... entityIds) {
+			return constructor1.newInstance(entityIds);
+		}
+
+		public Object newInstance(org.bukkit.entity.Entity... entities) {
+			int[] ids = new int[entities.length];
+			for (int i = 0; i < ids.length; i++) {
+				ids[i] = entities[i].getEntityId();
+			}
+			return newInstance(ids);
+		}
 	}
 	public static class NMSPacket30Entity extends NMSPacket {
 		public final FieldAccessor<Integer> entityId = getField("a");

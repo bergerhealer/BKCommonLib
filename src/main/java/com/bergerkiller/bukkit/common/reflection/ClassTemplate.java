@@ -132,7 +132,7 @@ public class ClassTemplate<T> {
 	 * @param from instance
 	 * @param to instance
 	 */
-	public void transfer(T from, T to) {
+	public void transfer(Object from, Object to) {
 		for (FieldAccessor<?> field : this.fields) {
 			field.transfer(from, to);
 		}
