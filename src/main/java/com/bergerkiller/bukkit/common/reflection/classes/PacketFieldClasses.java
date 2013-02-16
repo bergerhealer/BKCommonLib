@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
-import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.accessors.DataWatcherFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.accessors.DifficultyFieldAccessor;
@@ -249,32 +248,13 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> size = getField("size");
 		public final FieldAccessor<byte[]> buffer = getField("buffer");
 		public final FieldAccessor<byte[]> inflatedBuffer = getField("inflatedBuffer");
-		private final FieldAccessor<Boolean> e = getField("e");
-		private final FieldAccessor<Integer> a = getField("a");
-		private final FieldAccessor<Integer> b = getField("b");
-		private final FieldAccessor<Integer> c = getField("c");
-		private final FieldAccessor<Integer> d = getField("d");
-		public final FieldAccessor<Boolean> hasBiomeData = new SafeDirectField<Boolean>() {
-			public Boolean get(Object instance) { return e.get(instance); }
-			public boolean set(Object instance, Boolean value) { e.set(instance, value); return true; }
-		};
-		public final FieldAccessor<Integer> x = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return a.get(instance); }
-			public boolean set(Object instance, Integer value) { a.set(instance, value); return true; }
-		};
-		public final FieldAccessor<Integer> z = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return b.get(instance); }
-			public boolean set(Object instance, Integer value) { b.set(instance, value); return true; }
-		};
-		public final FieldAccessor<Integer> chunkDataBitMap = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return c.get(instance); }
-			public boolean set(Object instance, Integer value) { c.set(instance, value); return true; }
-		};
-		public final FieldAccessor<Integer> chunkBiomeBitMap = new SafeDirectField<Integer>() {
-			public Integer get(Object instance) { return d.get(instance); }
-			public boolean set(Object instance, Integer value) { d.set(instance, value); return true; }
-		};
+		public final FieldAccessor<Boolean> hasBiomeData = getField("e");
+		public final FieldAccessor<Integer> x = getField("a");
+		public final FieldAccessor<Integer> z = getField("b");
+		public final FieldAccessor<Integer> chunkDataBitMap = getField("c");
+		public final FieldAccessor<Integer> chunkBiomeBitMap = getField("d");
 		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
+
 		public Object newInstance(Object chunk) {
 			return newInstance(chunk, true, 0xFFFF);
 		}
