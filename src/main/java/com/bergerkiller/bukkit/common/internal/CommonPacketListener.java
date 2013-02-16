@@ -2,35 +2,49 @@ package com.bergerkiller.bukkit.common.internal;
 
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
 class CommonPacketListener extends PlayerConnection {
-	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerConnection");
+	private final PlayerConnection previous;
 
-	public CommonPacketListener(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
-		super(minecraftserver, inetworkmanager, entityplayer);
+	public CommonPacketListener(MinecraftServer minecraftserver, EntityPlayer entityplayer) {
+		super(minecraftserver, entityplayer.playerConnection.networkManager, entityplayer);
+		previous = entityplayer.playerConnection;
+		PlayerConnectionRef.TEMPLATE.transfer(previous, this);
+	}
+
+	public static void bindAll() {
+		for (Player player : CommonUtil.getOnlinePlayers()) {
+			bind(player);
+		}
+	}
+
+	public static void unbindAll() {
+		for (Player player : CommonUtil.getOnlinePlayers()) {
+			unbind(player);
+		}
 	}
 
 	public static void bind(Player player) {
 		final EntityPlayer ep = NativeUtil.getNative(player);
-		final PlayerConnection previous = ep.playerConnection;
-		CommonPacketListener listener = new CommonPacketListener(CommonUtil.getMCServer(), previous.networkManager, ep);
-		TEMPLATE.transfer(previous, listener);
+		if (ep.playerConnection instanceof CommonPacketListener) {
+			return;
+		}
+		CommonPacketListener listener = new CommonPacketListener(CommonUtil.getMCServer(), ep);
 		ep.playerConnection = listener;
 	}
-	
+
 	public static void unbind(Player player) {
 		final EntityPlayer ep = NativeUtil.getNative(player);
 		final PlayerConnection previous = ep.playerConnection;
-		if(previous instanceof CommonPacketListener) {
-			PlayerConnection listener = new PlayerConnection(CommonUtil.getMCServer(), previous.networkManager, ep);
-			TEMPLATE.transfer(previous, listener);
-			ep.playerConnection = listener;
+		if (previous instanceof CommonPacketListener) {
+			PlayerConnection replacement = ((CommonPacketListener) previous).previous;
+			PlayerConnectionRef.TEMPLATE.transfer(previous, replacement);
+			ep.playerConnection = replacement;
 		}
 	}
 

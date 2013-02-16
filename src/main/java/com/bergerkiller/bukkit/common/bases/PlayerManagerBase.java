@@ -10,16 +10,28 @@ public class PlayerManagerBase extends PlayerChunkMap {
 		super(worldserver, viewDistace);
 	}
 
+	/**
+	 * @deprecated use {@link getWorld()} instead
+	 */
+	@Deprecated
 	@Override
 	public final WorldServer a() {
 		return this.getWorld();
 	}
 
+	/**
+	 * @deprecated use {@link containsPlayer()} instead
+	 */
+	@Deprecated
 	@Override
 	public final boolean a(EntityPlayer entityplayer, int x, int z) {
 		return this.containsPlayer(entityplayer, x, z);
 	}
 
+	/**
+	 * @deprecated use {@link addChunksToSend()} instead
+	 */
+	@Deprecated
 	@Override
 	public final void b(EntityPlayer entityplayer) {
 		this.addChunksToSend(entityplayer);

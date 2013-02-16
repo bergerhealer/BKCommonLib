@@ -296,6 +296,15 @@ public class CommonPlugin extends PluginBase {
 				this.vaultPermission = null;
 				this.vaultEnabled = false;
 			}
+		} else if (pluginName.equals("ProtocolLib")) {
+			if (this.isProtocolLibEnabled = enabled) {
+				CommonPacketListener.unbindAll();
+				//Register this plugin in ProtocolLib
+				CommonProtocolLibHandler.register(this);
+			} else {
+				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
+				CommonPacketListener.bindAll();
+			}
 		}
 	}
 
@@ -311,7 +320,8 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void onLoad() {
 		instance = this;
-		CommonClasses.init(); // Load the classes contained in this library
+		// Load the classes contained in this library
+		CommonClasses.init(); 
 	}
 
 	@Override
@@ -326,7 +336,7 @@ public class CommonPlugin extends PluginBase {
 			task.stop();
 		}
 		startedTasks.clear();
-		//Transfer PlayerConnection from players back to default
+		// Transfer PlayerConnection from players back to default
 		for(Player player : Bukkit.getServer().getOnlinePlayers()) {
 			CommonPacketListener.unbind(player);
 		}
@@ -339,9 +349,6 @@ public class CommonPlugin extends PluginBase {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.INFO, "MC version: "+Bukkit.getVersion());
 			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
-			//send annonymous stats to mcstats.org
-			AddonHandler ah = new AddonHandler(this);
-			ah.startMetrics();
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib update:");
@@ -350,24 +357,18 @@ public class CommonPlugin extends PluginBase {
 			return;
 		}
 
+		// Send anonymous statistics to mcstats.org
+		AddonHandler ah = new AddonHandler(this);
+		ah.startMetrics();
+
+		// Register packet listener (may get uninitialized again when ProtocolLib is detected)
+		CommonPacketListener.bindAll();
+
 		// Register events and tasks, initialize
 		register(new CommonListener());
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
-
-		// Register protocol handling
-		if (this.isProtocolLibEnabled = (CommonUtil.getPlugin("ProtocolLib") != null)) {
-			//Register this plugin in ProtocolLib
-			CommonProtocolLibHandler.register(this);
-		} else {
-			//Now uses the onPlayerJoin method (see CommonListener) to deal with this
-			/** Lets fix up the player connection from online players */
-			for(Player player : Bukkit.getServer().getOnlinePlayers()) {
-				//bind our custom connection to the player
-				CommonPacketListener.bind(player);
-			}
-		}
 
 		// Register world listeners
 		for (World world : WorldUtil.getWorlds()) {

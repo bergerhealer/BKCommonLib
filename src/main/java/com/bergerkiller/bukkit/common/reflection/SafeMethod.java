@@ -79,6 +79,21 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 		return method.getName();
 	}
 
+	/**
+	 * Checks whether this method is overrided in the Class specified
+	 * 
+	 * @param type to check
+	 * @return True of this method is overrided in the type specified, False if not
+	 */
+	public boolean isOverridedIn(Class<?> type) {
+		try {
+			Method m = type.getDeclaredMethod(method.getName(), method.getParameterTypes());
+			return m.getDeclaringClass() != method.getDeclaringClass();
+		} catch (Throwable t) {
+			return false;
+		}
+	}
+
 	@Override
 	public boolean isValid() {
 		return this.method != null;

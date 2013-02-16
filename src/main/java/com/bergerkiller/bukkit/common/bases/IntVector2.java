@@ -12,32 +12,14 @@ import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
 /**
  * Represents a class containing two immutable integer coordinates: x and z
  */
-public class IntVector2 {
-	public final int x;
-	public final int z;
+public class IntVector2 extends ChunkCoordIntPair {
 
 	public IntVector2(Chunk chunk) {
 		this(chunk.getX(), chunk.getZ());
 	}
 
 	public IntVector2(final int x, final int z) {
-		this.x = x;
-		this.z = z;
-	}
-
-	@Override
-	public int hashCode() {
-		long key = (long) this.x & 4294967295L | ((long) this.z & 4294967295L) << 32;
-		return ((int) key) ^ ((int) (key >> 32));
-	}
-
-	/**
-	 * Gets a new native Chunk Coord Int Pair class with the values of this IntVector2
-	 * 
-	 * @return pair
-	 */
-	public ChunkCoordIntPair toPair() {
-		return new ChunkCoordIntPair(this.x, this.z);
+		super(x, z);
 	}
 
 	/**
@@ -48,18 +30,6 @@ public class IntVector2 {
 	 */
 	public Chunk toChunk(World world) {
 		return world.getChunkAt(x, z);
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (object == this) {
-			return true;
-		}
-		if (object instanceof IntVector2) {
-			IntVector2 vec = (IntVector2) object;
-			return vec.x == this.x && vec.z == this.z;
-		}
-		return false;
 	}
 
 	public static IntVector2 read(DataInputStream stream) throws IOException {
