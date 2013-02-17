@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
@@ -22,13 +24,14 @@ import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.Block;
 import net.minecraft.server.v1_4_R1.DamageSource;
 import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.EntityHuman;
 import net.minecraft.server.v1_4_R1.EntityItem;
+import net.minecraft.server.v1_4_R1.EntityLiving;
 import net.minecraft.server.v1_4_R1.EntityMinecart;
 import net.minecraft.server.v1_4_R1.ItemStack;
 import net.minecraft.server.v1_4_R1.Vec3D;
 
 public class EntityMinecartBase extends EntityMinecart {
-	private DamageSource damage[] = new DamageSource[Short.MAX_VALUE];
 
 	public EntityMinecartBase(org.bukkit.World world) {
 		super(NativeUtil.getNative(world));
@@ -66,7 +69,12 @@ public class EntityMinecartBase extends EntityMinecart {
 	@Override
 	@Deprecated
 	public final void j_() {
-		this.onTick();
+		try {
+			this.onTick();
+		} catch (Throwable t) {
+			Bukkit.getLogger().severe("En error occurred while performing Minecart tick:");
+			t.printStackTrace();
+		}
 	}
 
 	/**
@@ -120,12 +128,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	@Override
 	@Deprecated
 	public boolean damageEntity(DamageSource source, int i) {
-		if(source.getEntity() == null)
-			return super.damageEntity(source, i);
-		
-		org.bukkit.entity.Entity entity = NativeUtil.getEntity(source.getEntity());
-		this.damage[entity.getEntityId()] = source;
-		return this.damage(entity, i);
+		return this.onEntityDamage(NativeUtil.getEntity(source.getEntity()), i);
 	}
 
 	/**
@@ -164,14 +167,21 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 	
 	/**
+	 * Called when this minecart is damaged by something
 	 * 
-	 * @param entity
-	 * @param damage
-	 * @return
+	 * @param entity that damaged this minecart, null if the source is unknown
+	 * @param damage dealt to this minecart
+	 * @return True if the damage was handled, False if not
 	 */
-	public boolean damage(org.bukkit.entity.Entity entity, int damage) {
-		int eid = entity.getEntityId();
-		DamageSource source = this.damage[eid];
+	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
+		DamageSource source;
+		if (damager instanceof Player) {
+			source = DamageSource.playerAttack(NativeUtil.getNative(damager, EntityHuman.class));
+		} else if (damager instanceof LivingEntity) {
+			source = DamageSource.mobAttack(NativeUtil.getNative(damager, EntityLiving.class));
+		} else {
+			source = DamageSource.GENERIC;
+		}
 		return super.damageEntity(source, damage);
 	}
 
@@ -218,6 +228,10 @@ public class EntityMinecartBase extends EntityMinecart {
 
 	public int getShakingFactor() {
 		return super.j();
+	}
+
+	public Item dropItem(Material material, int amount, float force) {
+		return NativeUtil.getItem(super.a(material.getId(), amount, force));
 	}
 
 	public Item dropItem(org.bukkit.inventory.ItemStack item, float force) {
@@ -293,9 +307,12 @@ public class EntityMinecartBase extends EntityMinecart {
 			Bukkit.getLogger().warning("Another plugin is interacting with the world entity list from another thread, please check your plugins!");
 		}
 	}
-	
+
+	/**
+	 * Performs basic collision logic with nearby minecarts, pushing them aside
+	 */
 	@SuppressWarnings("unchecked")
-	public void handleCollission() {
+	public void handleCollision() {
 		List<Entity> list = this.world.getEntities(this, this.boundingBox.grow(0.2, 0, 0.2));
 		if (list != null && !list.isEmpty()) {
 			for (Entity entity : list) {

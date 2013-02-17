@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import net.minecraft.server.v1_4_R1.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
@@ -13,7 +14,9 @@ import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_4_R1.block.*;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.*;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -74,6 +77,14 @@ public class NativeUtil {
 
 	public static EntityMinecart getNative(Minecart m) {
 		return getNative(m, EntityMinecart.class);
+	}
+
+	public static EntityLiving getNative(LivingEntity l) {
+		return getNative(l, EntityLiving.class);
+	}
+
+	public static EntityHuman getNative(HumanEntity h) {
+		return getNative(h, EntityHuman.class);
 	}
 
 	public static EntityPlayer getNative(Player p) {
