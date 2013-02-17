@@ -125,6 +125,10 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> motX = getField("e");
 		public final FieldAccessor<Integer> motY = getField("f");
 		public final FieldAccessor<Integer> motZ = getField("g");
+		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("Entity"), int.class);
+		public Object newInstance(Object entity, int type) {
+			return constructor1.newInstance(entity, type);
+		}
 	}
 	public static class NMSPacket24MobSpawn extends NMSPacket30Entity {
 		public final FieldAccessor<Integer> entityType = getField("b");

@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.Block;
+import net.minecraft.server.v1_4_R1.DamageSource;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityItem;
 import net.minecraft.server.v1_4_R1.EntityMinecart;
@@ -27,6 +28,7 @@ import net.minecraft.server.v1_4_R1.ItemStack;
 import net.minecraft.server.v1_4_R1.Vec3D;
 
 public class EntityMinecartBase extends EntityMinecart {
+	private DamageSource damage[] = new DamageSource[Short.MAX_VALUE];
 
 	public EntityMinecartBase(org.bukkit.World world) {
 		super(NativeUtil.getNative(world));
@@ -111,6 +113,20 @@ public class EntityMinecartBase extends EntityMinecart {
 	public final void K() {
 		this.markVelocityChanged();
 	}
+	
+	/**
+	 * @deprecated: use {@link damage()} instead
+	 */
+	@Override
+	@Deprecated
+	public boolean damageEntity(DamageSource source, int i) {
+		if(source.getEntity() == null)
+			return super.damageEntity(source, i);
+		
+		org.bukkit.entity.Entity entity = NativeUtil.getEntity(source.getEntity());
+		this.damage[entity.getEntityId()] = source;
+		return this.damage(entity, i);
+	}
 
 	/**
 	 * @deprecated: use {@link dropItem()} instead
@@ -145,6 +161,18 @@ public class EntityMinecartBase extends EntityMinecart {
 	 */
 	public void onTick() {
 		super.j_();
+	}
+	
+	/**
+	 * 
+	 * @param entity
+	 * @param damage
+	 * @return
+	 */
+	public boolean damage(org.bukkit.entity.Entity entity, int damage) {
+		int eid = entity.getEntityId();
+		DamageSource source = this.damage[eid];
+		return super.damageEntity(source, damage);
 	}
 
 	/**
@@ -263,6 +291,18 @@ public class EntityMinecartBase extends EntityMinecart {
 			}
 		} catch (ConcurrentModificationException ex) {
 			Bukkit.getLogger().warning("Another plugin is interacting with the world entity list from another thread, please check your plugins!");
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void handleCollission() {
+		List<Entity> list = this.world.getEntities(this, this.boundingBox.grow(0.2, 0, 0.2));
+		if (list != null && !list.isEmpty()) {
+			for (Entity entity : list) {
+				if (entity != this.passenger && entity.M() && entity instanceof EntityMinecart) {
+					entity.collide(this);
+				}
+			}
 		}
 	}
 
