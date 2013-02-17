@@ -14,22 +14,42 @@ public class DataWatcherRef {
 	public static final MethodAccessor<List> returnAllWatched = TEMPLATE.getMethod("c");
 	public static final MethodAccessor<List> unwatchAndReturnAllWatched = TEMPLATE.getMethod("b");
 
+	/**
+	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
+	 */
+	@Deprecated
 	public static void write(Object datawatcher, int index, Object value) {
 		write.invoke(datawatcher, index, value);
 	}
 	
+	/**
+	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
+	 */
+	@Deprecated
 	public static void watch(Object datawatcher, int index, Object value) {
 		watch.invoke(index, value);
 	}
 	
+	/**
+	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
+	 */
+	@Deprecated
 	public static List getAllWatched(Object datawatcher) {
 		return returnAllWatched.invoke(datawatcher);
 	}
 	
+	/**
+	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
+	 */
+	@Deprecated
 	public static List unwatchAndGetAllWatched(Object datawatcher) {
 		return unwatchAndReturnAllWatched.invoke(datawatcher);
 	}
 
+	/**
+	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
+	 */
+	@Deprecated
 	public static Object create() {
 		return TEMPLATE.newInstance();
 	}

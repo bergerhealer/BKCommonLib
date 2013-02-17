@@ -26,6 +26,16 @@ public class WorldUtil extends ChunkUtil {
 	public static Random getRandom(org.bukkit.World world) {
 		return NativeUtil.getNative(world).random;
 	}
+	
+	/**
+	 * Sets if the spawn chunk should be kept in memory
+	 * 
+	 * @param world World to apply value on
+	 * @param value Keep in memory or not?
+	 */
+	public static void setKeepSpawnInMemory(org.bukkit.World world, boolean value) {
+		NativeUtil.getNative(world).keepSpawnInMemory = value;
+	}
 
 	/**
 	 * Removes a single entity from the world
