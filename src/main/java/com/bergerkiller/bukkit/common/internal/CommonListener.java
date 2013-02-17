@@ -30,14 +30,28 @@ import com.bergerkiller.bukkit.common.utils.NativeUtil;
 class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
+		CommonPlugin plugin = CommonPlugin.getInstance();
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, true);
+		}
+		
+		if(name.equalsIgnoreCase("ProtocolLib")) {
+			//ProtcolLib has been activated, lets stop our protocol engines
+			CommonPacketListener.unbindAll();
+			
+			//Lets notify BKCommonLib it has been enabled
+			plugin.isProtocolLibEnabled = true;
+			
+			//Disable the connection update task if enabled
+			if(plugin.playerConnectionTask.isRunning())
+				plugin.playerConnectionTask.stop();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginDisable(PluginDisableEvent event) {
+		CommonPlugin plugin = CommonPlugin.getInstance();
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, false);
@@ -46,12 +60,14 @@ class CommonListener implements Listener {
 		if(name.equalsIgnoreCase("ProtocolLib")) {
 			//Oh no, ProtocolLib has been disabled
 			//Lets init the players to our system
-			for(Player player : Bukkit.getServer().getOnlinePlayers()) {
-				CommonPacketListener.bind(player);
-			}
+			CommonPacketListener.bindAll();
 			
 			//Lets notify BKCommonLib it has been disabled
-			CommonPlugin.getInstance().isProtocolLibEnabled = false;
+			plugin.isProtocolLibEnabled = false;
+			
+			//Enable the connection update task if disabled
+			if(!plugin.playerConnectionTask.isRunning())
+				plugin.playerConnectionTask.start(1, 1);
 		}
 	}
 

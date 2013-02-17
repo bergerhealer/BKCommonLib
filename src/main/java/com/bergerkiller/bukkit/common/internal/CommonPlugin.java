@@ -71,6 +71,7 @@ public class CommonPlugin extends PluginBase {
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	public boolean isProtocolLibEnabled = false;
+	public Task playerConnectionTask;
 	private Plugin bleedingMobsInstance = null;
 	public List<Entity> entities = new ArrayList<Entity>();
 
@@ -304,6 +305,9 @@ public class CommonPlugin extends PluginBase {
 			} else {
 				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
 				CommonPacketListener.bindAll();
+				
+				//update the playerConnection every tick
+				this.playerConnectionTask.start(1, 1);
 			}
 		}
 	}
@@ -322,6 +326,17 @@ public class CommonPlugin extends PluginBase {
 		instance = this;
 		// Load the classes contained in this library
 		CommonClasses.init(); 
+		
+		this.playerConnectionTask = new Task(this) {
+
+			@Override
+			public void run() {
+				for(Player player : this.getPlugin().getServer().getOnlinePlayers()) {
+					NativeUtil.getNative(player).playerConnection.d();
+				}
+			}
+			
+		};
 	}
 
 	@Override
