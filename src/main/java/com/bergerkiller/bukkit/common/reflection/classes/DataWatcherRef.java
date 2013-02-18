@@ -12,6 +12,7 @@ public class DataWatcherRef {
 	public static final MethodAccessor<Void> watch = TEMPLATE.getMethod("watch", int.class, Object.class);
 	public static final MethodAccessor<List<Object>> returnAllWatched = TEMPLATE.getMethod("c");
 	public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = TEMPLATE.getMethod("b");
+	public static final MethodAccessor<Object> read= TEMPLATE.getMethod("i", int.class);
 
 	/**
 	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead
