@@ -7,6 +7,7 @@ import net.minecraft.server.v1_4_R1.Packet;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -70,17 +71,21 @@ public class PacketUtil {
 		}
 	}
 
-	public static void addPacketListener(PacketListener listener, PacketType... packets) {
+	public static void addPacketListener(Plugin plugin, PacketListener listener, PacketType... packets) {
 		if(listener == null || LogicUtil.nullOrEmpty(packets)) {
 			return;
 		}
 		for (PacketType packetType : packets) {
-			CommonPlugin.getInstance().addPacketListener(listener, packetType.getId());
+			CommonPlugin.getInstance().addPacketListener(plugin, listener, packetType.getId());
 		}
 	}
 
+	public static void removePacketListeners(Plugin plugin) {
+		CommonPlugin.getInstance().removePacketListeners(plugin);
+	}
+
 	public static void removePacketListener(PacketListener listener) {
-		CommonPlugin.getInstance().removePacketListener(listener);
+		CommonPlugin.getInstance().removePacketListener(listener, true);
 	}
 
 	public static void broadcastPacketNearby(Location location, double radius, Object packet) {

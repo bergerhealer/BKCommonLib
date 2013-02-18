@@ -27,9 +27,12 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -206,6 +209,25 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Registers a packet listener for the packet types specified
+	 * 
+	 * @param packetListener to register
+	 * @param packetTypes to register the listener for
+	 */
+	public final void register(PacketListener packetListener, PacketType... packetTypes) {
+		PacketUtil.addPacketListener(this, packetListener, packetTypes);
+	}
+
+	/**
+	 * Unregisters a packet listener
+	 * 
+	 * @param packetListener to unregister
+	 */
+	public final void unregister(PacketListener packetListener) {
+		PacketUtil.removePacketListener(packetListener);
 	}
 
 	/**

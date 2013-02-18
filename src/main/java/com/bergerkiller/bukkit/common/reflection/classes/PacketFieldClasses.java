@@ -5,6 +5,8 @@ import java.util.List;
 
 import net.minecraft.server.v1_4_R1.Vec3D;
 
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -404,6 +406,21 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> y = getField("y");
 		public final FieldAccessor<Integer> z = getField("z");
 		public final FieldAccessor<String[]> lines = getField("lines");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, int.class, int.class, String[].class);
+
+		public Block getBlock(Object packetInstance, World world) {
+			return world.getBlockAt(x.get(packetInstance), y.get(packetInstance), z.get(packetInstance));
+		}
+
+		public void setBlock(Object packetInstance, Block block) {
+			x.set(packetInstance, block.getX());
+			y.set(packetInstance, block.getY());
+			z.set(packetInstance, block.getZ());
+		}
+
+		public Object newInstance(int x, int y, int z, String[] lines) {
+			return constructor1.newInstance(x, y, z, lines);
+		}
 	}
 	public static class NMSPacket131ItemData extends NMSPacket {
 	}

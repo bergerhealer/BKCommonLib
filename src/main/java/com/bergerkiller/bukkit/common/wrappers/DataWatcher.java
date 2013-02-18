@@ -11,13 +11,12 @@ import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
  * @author lenis0012
  * @category Wrappers
  */
-public class DataWatcher {
-	private Object handle;
-	
+public class DataWatcher extends BasicWrapper<Object> {
+
 	public DataWatcher() {
-		this.handle = DataWatcherRef.TEMPLATE.newInstance();
+		setHandle(DataWatcherRef.TEMPLATE.newInstance());
 	}
-	
+
 	/**
 	 * Write a new value to the watched objects
 	 * 
@@ -37,7 +36,7 @@ public class DataWatcher {
 	public void watch(int index, Object value) {
 		DataWatcherRef.watch.invoke(handle, index, value);
 	}
-	
+
 	/**
 	 * Get all watched objects
 	 * 
@@ -46,7 +45,7 @@ public class DataWatcher {
 	public List<Object> getAllWatched() {
 		return DataWatcherRef.returnAllWatched.invoke(handle);
 	}
-	
+
 	/**
 	 * Get all watched objects and unwatch them
 	 * 
@@ -54,14 +53,5 @@ public class DataWatcher {
 	 */
 	public List<Object> unwatchAndGetAllWatched() {
 		return DataWatcherRef.unwatchAndReturnAllWatched.invoke(handle);
-	}
-	
-	/**
-	 * Get the vanilla object
-	 * 
-	 * @return Vanilla object
-	 */
-	public Object getHandle() {
-		return handle;
 	}
 }

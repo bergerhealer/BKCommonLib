@@ -62,6 +62,7 @@ public class CommonPlugin extends PluginBase {
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	protected final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
 	protected final List<PacketListener>[] listeners = new ArrayList[256];
+	protected final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private final List<Task> startedTasks = new ArrayList<Task>();
@@ -184,23 +185,53 @@ public class CommonPlugin extends PluginBase {
 		return onPacketSend(player, packet, PacketFields.DEFAULT.packetID.get(packet));
 	}
 
-	public void addPacketListener(PacketListener listener, int id) {
-		if(listener == null || id < 0 || id >= listeners.length) {
-			return;
+	public void addPacketListener(Plugin plugin, PacketListener listener, int id) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Listener is not allowed to be null");
+		} else if (id < 0 || id >= listeners.length) {
+			throw new IllegalArgumentException("Unknown packet type Id: " + id);
+		} else if (plugin == null) {
+			throw new IllegalArgumentException("Plugin is not allowed to be null");
 		}
 		if (listeners[id] == null) {
 			listeners[id] = new ArrayList<PacketListener>();
 		}
 		listeners[id].add(listener);
+		// Map to plugin list
+		List<PacketListener> list = listenerPlugins.get(plugin);
+		if (list == null) {
+			list = new ArrayList<PacketListener>(2);
+			listenerPlugins.put(plugin, list);
+		}
+		list.add(listener);
 	}
 
-	public void removePacketListener(PacketListener listener) {
+	public void removePacketListeners(Plugin plugin) {
+		List<PacketListener> listeners = listenerPlugins.get(plugin);
+		if (listeners != null) {
+			for (PacketListener listener : listeners) {
+				removePacketListener(listener, false);
+			}
+		}
+	}
+
+	public void removePacketListener(PacketListener listener, boolean fromPlugins) {
 		if(listener == null) {
 			return;
 		}
 		for(int i = 0; i < listeners.length; i++) {
 			if (!LogicUtil.nullOrEmpty(listeners[i])) {
 				listeners[i].remove(listener);
+			}
+		}
+		if (fromPlugins) {
+			// Remove from plugin list
+			for (Plugin plugin : listenerPlugins.keySet().toArray(new Plugin[0])) {
+				List<PacketListener> list = listenerPlugins.get(plugin);
+				// If not null, remove the listener, if empty afterwards remove the entire entry
+				if (list != null && list.remove(listener) && list.isEmpty()) {
+					listenerPlugins.remove(plugin);
+				}
 			}
 		}
 	}
@@ -271,6 +302,9 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
+		if (!enabled) {
+			removePacketListeners(plugin);
+		}
 		if (pluginName.equals("Showcase")) {
 			this.isShowcaseEnabled = enabled;
 			if (enabled) {

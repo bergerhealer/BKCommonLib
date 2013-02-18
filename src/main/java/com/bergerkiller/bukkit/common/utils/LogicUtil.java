@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.server.v1_4_R1.ItemStack;
-
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
@@ -99,16 +97,6 @@ public class LogicUtil {
 	 * @param item to check
 	 * @return True if the item is null or empty
 	 */
-	public static boolean nullOrEmpty(ItemStack item) {
-		return item == null || item.id == 0 || item.count < 1;
-	}
-
-	/**
-	 * Checks if an Item Stack is null or empty
-	 * 
-	 * @param item to check
-	 * @return True if the item is null or empty
-	 */
 	public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
 		return item == null || item.getTypeId() == 0 || item.getAmount() < 1;
 	}
@@ -121,6 +109,29 @@ public class LogicUtil {
 	 */
 	public static boolean nullOrEmpty(Object[] array) {
 		return array == null || array.length == 0;
+	}
+
+	/**
+	 * Checks whether an element index is within range of a collection
+	 * 
+	 * @param collection to check
+	 * @param index to check
+	 * @return True if it is in bounds, False if not
+	 */
+	public static boolean isInBounds(Collection<?> collection, int index) {
+		return collection != null && index >= 0 && index < collection.size();
+	}
+
+	/**
+	 * Checks whether an element index is within range of an array<br>
+	 * Both Object and primitive arrays are supported
+	 * 
+	 * @param array to check
+	 * @param index to check
+	 * @return True if it is in bounds, False if not
+	 */
+	public static boolean isInBounds(Object array, int index) {
+		return array != null && index >= 0 && index < Array.getLength(array);
 	}
 
 	/**

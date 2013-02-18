@@ -1,11 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.DyeColor;
@@ -20,7 +18,7 @@ import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
-import com.bergerkiller.bukkit.common.wrappers.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.conversion.ConversionTable;
 
 public class ParseUtil {
 	private static final Set<String> yesValues = new HashSet<String>();
@@ -144,6 +142,24 @@ public class ParseUtil {
 	}
 
 	/**
+	 * Parses the text specified to a boolean
+	 * 
+	 * @param text to parse
+	 * @param def value to return if the text is not a boolean expression
+	 * @return Parsed value, or the default
+	 */
+	public static Boolean parseBool(String text, Boolean def) {
+		String val = text.toLowerCase(Locale.ENGLISH).trim();
+		if (yesValues.contains(val)) {
+			return true;
+		} else if (noValues.contains(val)) {
+			return false;
+		} else {
+			return def;
+		}
+	}
+
+	/**
 	 * Tries to parse the text specified to a float
 	 * 
 	 * @param text to parse
@@ -242,6 +258,58 @@ public class ParseUtil {
 	public static Integer parseInt(String text, Integer def) {
 		try {
 			return Integer.parseInt(filterNumeric(text));
+		} catch (Exception ex) {
+			return def;
+		}
+	}
+
+	/**
+	 * Tries to parse the text specified to a short
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static float parseShort(String text, short def) {
+		return parseShort(text, Short.valueOf(def)).shortValue();
+	}
+
+	/**
+	 * Tries to parse the text specified to a short
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static Short parseShort(String text, Short def) {
+		try {
+			return Short.parseShort(filterNumeric(text));
+		} catch (Exception ex) {
+			return def;
+		}
+	}
+
+	/**
+	 * Tries to parse the text specified to a byte
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static float parseByte(String text, byte def) {
+		return parseByte(text, Byte.valueOf(def)).byteValue();
+	}
+
+	/**
+	 * Tries to parse the text specified to a byte
+	 * 
+	 * @param text to parse
+	 * @param def to return on failure
+	 * @return Parsed or default value
+	 */
+	public static Byte parseByte(String text, Byte def) {
+		try {
+			return Byte.parseByte(filterNumeric(text));
 		} catch (Exception ex) {
 			return def;
 		}
@@ -468,94 +536,7 @@ public class ParseUtil {
 	 * @param def to return on failure
 	 * @return The convered object, or the default if not possible
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> T convert(Object object, Class<T> type, T def) {
-		if (object == null) {
-			return def;
-		}
-		// Initial cast possible? If so, return there
-		if (type.isAssignableFrom(object.getClass())) {
-			return type.cast(object);
-		}
-		// Initial downgrading
-		if (object instanceof CommonTag) {
-			object = ((CommonTag) object).getData();
-		}
-		if (object instanceof Map) {
-			object = ((Map) object).values();
-		}
-		// Type conversion: forced casts
-		Object rval = def;
-		try {
-			if (type.equals(String.class)) {
-				if (object instanceof Collection) {
-					Collection collection = (Collection) object;
-					StringBuilder builder = new StringBuilder(collection.size() * 100);
-					boolean first = true;
-					for (Object element : collection) {
-						if (!first) {
-							builder.append('\n');
-						}
-						builder.append(convert(element, String.class, ""));
-						first = false;
-					}
-					rval = builder.toString();
-				} else {
-					rval = object.toString();
-				}
-			} else if (type.equals(Material.class)) {
-				rval = parseMaterial(object.toString(), (Material) def);
-			} else if (type.isEnum()) {
-				rval = ParseUtil.parseEnum(type, object.toString(), def);
-			} else if (type.isArray()) {
-				// If not a collection, use a list with the object as single element
-				if (!(object instanceof Collection)) {
-					object = Arrays.asList(object);
-				}
-				// Convert collection to an array
-				rval = LogicUtil.toConvertedArray((Collection) object, type.getComponentType());
-			} else if (type == Byte.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).byteValue();
-				} else {
-					Integer val = parseInt(object.toString(), (Integer) def);
-					rval = val == null ? null : val.byteValue();
-				}
-			} else if (type == Short.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).shortValue();
-				} else {
-					Integer val = parseInt(object.toString(), (Integer) def);
-					rval = val == null ? null : val.shortValue();
-				}
-			} else if (type == Integer.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).intValue();
-				} else {
-					rval = parseInt(object.toString(), (Integer) def);
-				}
-			} else if (type == Double.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).doubleValue();
-				} else {
-					rval = parseDouble(object.toString(), (Double) def);
-				}
-			} else if (type == Float.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).floatValue();
-				} else {
-					rval = parseFloat(object.toString(), (Float) def);
-				}
-			} else if (type == Long.class) {
-				if (object instanceof Number) {
-					rval = ((Number) object).longValue();
-				} else {
-					rval = parseLong(object.toString(), (Long) def);
-				}
-			}
-		} catch (Exception ex) {
-			rval = def;
-		}
-		return (T) rval;
+		return ConversionTable.convert(object, type, def);
 	}
 }

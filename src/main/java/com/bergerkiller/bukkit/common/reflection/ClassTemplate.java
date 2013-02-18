@@ -107,6 +107,18 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Checks whether the specified clazz object can be assigned to the type represented
+	 * by this ClassTemplate. This template taken as A, and clazz as B, this is equivalent to:<br>
+	 * <b>B instanceof A</b>
+	 * 
+	 * @param clazz to check
+	 * @return True if the clazz can be assigned to this template type, False if not
+	 */
+	public boolean isAssignableFrom(Class<?> clazz) {
+		return this.type.isAssignableFrom(clazz);
+	}
+
+	/**
 	 * Checks whether the object class equals the class represented by this Template
 	 * 
 	 * @param object to check
