@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
@@ -38,7 +39,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return Byte
 	 */
 	public byte getByte(int index) {
-		return read(index, Byte.class);
+		return get(index, Byte.class);
 	}
 	
 	/**
@@ -48,7 +49,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return Integer
 	 */
 	public int getInt(int index) {
-		return read(index, Integer.class);
+		return get(index, Integer.class);
 	}
 	
 	/**
@@ -59,7 +60,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return Bukkit ItemStack
 	 */
 	public ItemStack getItemStack(int index) {
-		Object it = read(index, CommonUtil.getNMSClass("ItemStack"));
+		Object it = get(index, CommonUtil.getNMSClass("ItemStack"));
 		return ParseUtil.convert(it, ItemStack.class);
 	}
 	
@@ -70,7 +71,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return Short
 	 */
 	public short getShort(int index) {
-		return read(index, Short.class);
+		return get(index, Short.class);
 	}
 	
 	/**
@@ -80,7 +81,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return String
 	 */
 	public String getString(int index) {
-		return read(index, String.class);
+		return get(index, String.class);
 	}
 	
 	/**
@@ -90,8 +91,8 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @param def Defination
 	 * @return Object
 	 */
-	public <T> T read(int index, T def) {
-		return ParseUtil.convert(read(index), def);
+	public <T> T get(int index, T def) {
+		return ParseUtil.convert(get(index), def);
 	}
 	
 	/**
@@ -102,8 +103,8 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @param def Defination
 	 * @return Object
 	 */
-	public <T> T read(int index, Class<T> type, T def) {
-		return ParseUtil.convert(read(index), type, def);
+	public <T> T get(int index, Class<T> type, T def) {
+		return ParseUtil.convert(get(index), type, def);
 	}
 	
 	/**
@@ -113,8 +114,8 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @param type Object type
 	 * @return Object
 	 */
-	public <T> T read(int index, Class<T> type) {
-		return ParseUtil.convert(read(index), type);
+	public <T> T get(int index, Class<T> type) {
+		return ParseUtil.convert(get(index), type);
 	}
 	
 	/**
@@ -123,8 +124,9 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @param index Object index
 	 * @return Object
 	 */
-	public Object read(int index) {
-		return DataWatcherRef.read.invoke(handle, index);
+	public Object get(int index) {
+		Object watchable = DataWatcherRef.read.invoke(handle, index);
+		return WatchableObjectRef.getHandle.invoke(watchable);
 	}
 	
 	/**
