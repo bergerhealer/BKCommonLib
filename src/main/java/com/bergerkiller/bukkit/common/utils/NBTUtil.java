@@ -3,7 +3,8 @@ package com.bergerkiller.bukkit.common.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
+
+import com.bergerkiller.bukkit.common.natives.NBTTagInfo;
 
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.FoodMetaData;
@@ -11,8 +12,6 @@ import net.minecraft.server.v1_4_R1.InventoryEnderChest;
 import net.minecraft.server.v1_4_R1.MobEffect;
 import net.minecraft.server.v1_4_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_4_R1.NBTTagCompound;
-import net.minecraft.server.v1_4_R1.NBTTagDouble;
-import net.minecraft.server.v1_4_R1.NBTTagFloat;
 import net.minecraft.server.v1_4_R1.NBTTagList;
 import net.minecraft.server.v1_4_R1.PlayerInventory;
 
@@ -22,55 +21,50 @@ import net.minecraft.server.v1_4_R1.PlayerInventory;
 public class NBTUtil {
 
 	/**
-	 * Obtains a double NBT-Tag List from an array of double values
+	 * Creates an NBT Tag handle to store the data specified in<br>
+	 * All primitive types, including byte[] and int[], and list/maps are supported
 	 * 
-	 * @param values
-	 * @return NBT-Tag List with the values
+	 * @param name of the handle
+	 * @param data to store in this handle initially
+	 * @return new handle
 	 */
-	public static NBTTagList doubleArrayToList(double... values) {
-		NBTTagList nbttaglist = new NBTTagList();
-		for (int i = 0; i < values.length; ++i) {
-			nbttaglist.add(new NBTTagDouble((String) null, values[i]));
-		}
-		return nbttaglist;
+	public static Object createHandle(String name, Object data) {
+		return NBTTagInfo.findInfo(name, data).createHandle(name, data);
 	}
 
 	/**
-	 * Obtains a float NBT-Tag List from an array of float values
+	 * Obtains the raw data from an NBT Tag handle<br>
+	 * NBTTagList and NBTTagCompound return a List and Map of NBT Tags respectively
 	 * 
-	 * @param values
-	 * @return NBT-Tag List with the values
+	 * @param nbtTagHandle to get the value of
+	 * @return the NBTTag data
 	 */
-	public static NBTTagList floatArrayToList(float... values) {
-		NBTTagList nbttaglist = new NBTTagList();
-		for (int i = 0; i < values.length; ++i) {
-			nbttaglist.add(new NBTTagFloat((String) null, values[i]));
-		}
-		return nbttaglist;
+	public static Object getData(Object nbtTagHandle) {
+		return NBTTagInfo.findInfo(nbtTagHandle).getData(nbtTagHandle);
 	}
 
 	/**
-	 * Reads an NBT-Tag Compound from an input stream
+	 * Reads an NBTTagCompound handle from an input stream
 	 * 
 	 * @param stream to read from
-	 * @return NBT Tag Compound
+	 * @return NBTTagCompound
 	 * @throws IOException
 	 */
-	public static NBTTagCompound readCompound(InputStream stream) throws IOException {
+	public static Object readCompound(InputStream stream) throws IOException {
 		return NBTCompressedStreamTools.a(stream);
 	}
 
 	/**
-	 * Writes an NBT-Tag Compound to an output stream
+	 * Writes an NBTTagCompound to an output stream
 	 * 
 	 * @param compound to write
 	 * @param stream to write to
 	 * @throws IOException
 	 */
-	public static void writeCompound(NBTTagCompound compound, OutputStream stream) throws IOException {
-		NBTCompressedStreamTools.a(compound, stream);
+	public static void writeCompound(Object compound, OutputStream stream) throws IOException {
+		NBTCompressedStreamTools.a((NBTTagCompound) compound, stream);
 	}
-	
+
 	/**
 	 * Reads a mob effect from an NBT Tag Compound
 	 * 
@@ -79,27 +73,6 @@ public class NBTUtil {
 	 */
 	public static MobEffect loadMobEffect(NBTTagCompound compound) {
 		return MobEffect.b(compound);
-	}
-
-	/**
-	 * Saves an UUID to an NBT Tag Compound
-	 * 
-	 * @param uuid to save
-	 * @param compound to save to
-	 */
-	public static void saveUUID(UUID uuid, NBTTagCompound compound) {
-		compound.setLong("WorldUUIDLeast", uuid.getLeastSignificantBits());
-		compound.setLong("WorldUUIDMost", uuid.getMostSignificantBits());
-	}
-
-	/**
-	 * Loads a new UUID object from an NBT Tag Compound
-	 * 
-	 * @param compound to load from
-	 * @return newly loaded UUID
-	 */
-	public static UUID loadUUID(NBTTagCompound compound) {
-		return new UUID(compound.getLong("WorldUUIDMost"), compound.getLong("WorldUUIDLeast"));
 	}
 
 	/**

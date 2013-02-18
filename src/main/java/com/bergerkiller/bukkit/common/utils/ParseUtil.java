@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.DyeColor;
@@ -19,6 +20,7 @@ import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
+import com.bergerkiller.bukkit.common.wrappers.nbt.CommonTag;
 
 public class ParseUtil {
 	private static final Set<String> yesValues = new HashSet<String>();
@@ -471,11 +473,21 @@ public class ParseUtil {
 		if (object == null) {
 			return def;
 		}
+		// Initial cast possible? If so, return there
+		if (type.isAssignableFrom(object.getClass())) {
+			return type.cast(object);
+		}
+		// Initial downgrading
+		if (object instanceof CommonTag) {
+			object = ((CommonTag) object).getData();
+		}
+		if (object instanceof Map) {
+			object = ((Map) object).values();
+		}
+		// Type conversion: forced casts
 		Object rval = def;
 		try {
-			if (type == object.getClass()) {
-				rval = (T) object;
-			} else if (type.equals(String.class)) {
+			if (type.equals(String.class)) {
 				if (object instanceof Collection) {
 					Collection collection = (Collection) object;
 					StringBuilder builder = new StringBuilder(collection.size() * 100);
@@ -495,14 +507,51 @@ public class ParseUtil {
 				rval = parseMaterial(object.toString(), (Material) def);
 			} else if (type.isEnum()) {
 				rval = ParseUtil.parseEnum(type, object.toString(), def);
+			} else if (type.isArray()) {
+				// If not a collection, use a list with the object as single element
+				if (!(object instanceof Collection)) {
+					object = Arrays.asList(object);
+				}
+				// Convert collection to an array
+				rval = LogicUtil.toConvertedArray((Collection) object, type.getComponentType());
+			} else if (type == Byte.class) {
+				if (object instanceof Number) {
+					rval = ((Number) object).byteValue();
+				} else {
+					Integer val = parseInt(object.toString(), (Integer) def);
+					rval = val == null ? null : val.byteValue();
+				}
+			} else if (type == Short.class) {
+				if (object instanceof Number) {
+					rval = ((Number) object).shortValue();
+				} else {
+					Integer val = parseInt(object.toString(), (Integer) def);
+					rval = val == null ? null : val.shortValue();
+				}
 			} else if (type == Integer.class) {
-				rval = parseInt(object.toString(), (Integer) def);
+				if (object instanceof Number) {
+					rval = ((Number) object).intValue();
+				} else {
+					rval = parseInt(object.toString(), (Integer) def);
+				}
 			} else if (type == Double.class) {
-				rval = parseDouble(object.toString(), (Double) def);
+				if (object instanceof Number) {
+					rval = ((Number) object).doubleValue();
+				} else {
+					rval = parseDouble(object.toString(), (Double) def);
+				}
 			} else if (type == Float.class) {
-				rval = parseFloat(object.toString(), (Float) def);
+				if (object instanceof Number) {
+					rval = ((Number) object).floatValue();
+				} else {
+					rval = parseFloat(object.toString(), (Float) def);
+				}
 			} else if (type == Long.class) {
-				rval = parseLong(object.toString(), (Long) def);
+				if (object instanceof Number) {
+					rval = ((Number) object).longValue();
+				} else {
+					rval = parseLong(object.toString(), (Long) def);
+				}
 			}
 		} catch (Exception ex) {
 			rval = def;

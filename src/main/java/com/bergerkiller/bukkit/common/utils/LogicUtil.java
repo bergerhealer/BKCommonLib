@@ -2,14 +2,56 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import net.minecraft.server.v1_4_R1.ItemStack;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
+	private static final Map<Class<?>, Class<?>> unboxedToBoxed = new HashMap<Class<?>, Class<?>>();
+	private static final Map<Class<?>, Class<?>> boxedToUnboxed = new HashMap<Class<?>, Class<?>>();
+	static {
+		unboxedToBoxed.put(boolean.class, Boolean.class);
+		unboxedToBoxed.put(char.class, Character.class);
+		unboxedToBoxed.put(byte.class, Byte.class);
+		unboxedToBoxed.put(short.class, Short.class);
+		unboxedToBoxed.put(int.class, Integer.class);
+		unboxedToBoxed.put(long.class, Long.class);
+		unboxedToBoxed.put(float.class, Float.class);
+		unboxedToBoxed.put(double.class, Double.class);
+		for (Entry<Class<?>, Class<?>> entry : unboxedToBoxed.entrySet()) {
+			boxedToUnboxed.put(entry.getValue(), entry.getKey());
+		}
+	}
+
+	/**
+	 * Obtains the unboxed type (int) from a boxed type (Integer)<br>
+	 * If the input type has no unboxed type, null is returned
+	 * 
+	 * @param boxedType to convert
+	 * @return the unboxed type
+	 */
+	public static Class<?> getUnboxedType(Class<?> boxedType) {
+		return boxedToUnboxed.get(boxedType);
+	}
+
+	/**
+	 * Obtains the boxed type (Integer) from an unboxed type (int)<br>
+	 * If the input type has no boxed type, null is returned
+	 * 
+	 * @param unboxedType to convert
+	 * @return the boxed type
+	 */
+	public static Class<?> getBoxedType(Class<?> unboxedType) {
+		return unboxedToBoxed.get(unboxedType);
+	}
+
 	/**
 	 * Checks if both values are null or the values equal each other
 	 * 
@@ -143,13 +185,94 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Converts a collection to an Array of a possible primitive type<br>
+	 * If the type is not primitive, a regular array of Objects is created<br>
+	 * Type conversion is possible, allowing a List of String to be turned into Integer[] or int[]<br>
+	 * For this reason, this method is slower than toArray, only use it if type conversion is required
+	 * 
+	 * @param collection to convert
+	 * @param componentType of the array to return (can be primitive)
+	 * @return new Array containing the elements in the collection, as an Object
+	 */
+	public static Object toConvertedArray(Collection<?> collection, Class<?> componentType) {
+		final int size = collection.size();
+		final Iterator<?> iter = collection.iterator();
+		if (componentType.isPrimitive()) {
+			// Check against all primitive array types
+			if (componentType.equals(boolean.class)) {
+				boolean[] array = new boolean[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), false).booleanValue();
+				}
+				return array;
+			}
+			if (componentType.equals(char.class)) {
+				char[] array = new char[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), '\0').charValue();
+				}
+				return array;
+			}
+			if (componentType.equals(byte.class)) {
+				byte[] array = new byte[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), (byte) 0).byteValue();
+				}
+				return array;
+			}
+			if (componentType.equals(short.class)) {
+				short[] array = new short[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), (short) 0).shortValue();
+				}
+				return array;
+			}
+			if (componentType.equals(int.class)) {
+				int[] array = new int[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), 0).intValue();
+				}
+				return array;
+			}
+			if (componentType.equals(long.class)) {
+				long[] array = new long[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), 0L).longValue();
+				}
+				return array;
+			}
+			if (componentType.equals(float.class)) {
+				float[] array = new float[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), 0f).floatValue();
+				}
+				return array;
+			}
+			if (componentType.equals(double.class)) {
+				double[] array = new double[size];
+				for (int i = 0; i < size; i++) {
+					array[i] = ParseUtil.convert(iter.next(), 0.0).doubleValue();
+				}
+				return array;
+			}
+			throw new RuntimeException("Unknown primitive type: " + componentType.getName());
+		} else {
+			Object[] array = createArray(componentType, size);
+			for (int i = 0; i < size; i++) {
+				array[i] = ParseUtil.convert(iter.next(), componentType);
+			}
+			return array;
+		}
+	}
+
+	/**
 	 * Converts a collection to an Array
 	 * 
 	 * @param collection to convert
-	 * @param type of the collection and the array to return
+	 * @param type of the collection and the array to return (can not be primitive)
 	 * @return new Array containing the elements in the collection
 	 */
-	public static <T> T[] toArray(Collection<T> collection, Class<T> type) {
+	public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
 		return collection.toArray(createArray(type, collection.size()));
 	}
 

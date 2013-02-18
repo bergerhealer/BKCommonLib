@@ -41,6 +41,11 @@ public class EntityMinecartBase extends EntityMinecart {
 		super(NativeUtil.getNative(world), locX, locY, locZ, type);
 	}
 
+	/**
+	 * Gets the world this Minecart is in
+	 * 
+	 * @return World
+	 */
 	public org.bukkit.World getWorld() {
 		return NativeUtil.getWorld(world);
 	}
@@ -123,7 +128,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 	
 	/**
-	 * @deprecated: use {@link damage()} instead
+	 * @deprecated: use {@link onEntityDamage(Entity, int)} instead
 	 */
 	@Override
 	@Deprecated
@@ -259,8 +264,8 @@ public class EntityMinecartBase extends EntityMinecart {
 		return true;
 	}
 
-	/*
-	 * Prevents passengers and Minecarts from colliding with Minecarts
+	/**
+	 * Calls onBlockCollision and onEntityCollision on all elements in the list, and filters it
 	 */
 	@SuppressWarnings("unchecked")
 	private void filterCollisionList(List<AxisAlignedBB> list) {
