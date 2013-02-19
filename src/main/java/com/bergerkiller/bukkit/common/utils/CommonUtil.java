@@ -331,34 +331,48 @@ public class CommonUtil {
 	}
 
 	/**
-	 * Gets constants of the class type statically defined in the class itself<br>
-	 * If the class is an enum, the enumeration constants are returned
+	 * Gets constants of the class type statically defined in the class itself.
+	 * If the class is an enum, the enumeration constants are returned.
+	 * Otherwise, only the static fields with theClass type are returned.
 	 * 
 	 * @param theClass to get the class constants of
 	 * @return class constants defined in class 'theClass'
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T[] getClassConstants(Class<T> theClass) {
-		if (theClass.isEnum()) {
+		return getClassConstants(theClass, theClass);
+	}
+
+	/**
+	 * Gets constants of the class type statically defined in the class itself.
+	 * If the type class is an enum, the enumeration constants are returned.
+	 * Otherwise, only the static fields with the same type as the type parameter are returned.
+	 * 
+	 * @param theClass to get the class constants of
+	 * @param type of constants to return from theClass
+	 * @return class constants defined in class 'theClass'
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] getClassConstants(Class<?> theClass, Class<T> type) {
+		if (type.isEnum()) {
 			// Get using enum constants
-			return theClass.getEnumConstants();
+			return type.getEnumConstants();
 		} else {
 			// Get using reflection
 			try {
 				Field[] declaredFields = theClass.getDeclaredFields();
 				ArrayList<T> constants = new ArrayList<T>(declaredFields.length);
 				for (Field field : declaredFields) {
-					if (Modifier.isStatic(field.getModifiers()) && theClass.isAssignableFrom(field.getType())) {
+					if (Modifier.isStatic(field.getModifiers()) && type.isAssignableFrom(field.getType())) {
 						T constant = (T) field.get(null);
 						if (constant != null) {
 							constants.add(constant);
 						}
 					}
 				}
-				return LogicUtil.toArray(constants, theClass);
+				return LogicUtil.toArray(constants, type);
 			} catch (Throwable t) {
 				t.printStackTrace();
-				return LogicUtil.createArray(theClass, 0);
+				return LogicUtil.createArray(type, 0);
 			}
 		}
 	}

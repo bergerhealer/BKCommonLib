@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
@@ -106,7 +108,7 @@ public class ObjectArrayConverter<T> extends BasicConverter<T> {
 			final E[] array = LogicUtil.createArray(componentType, length);
 			final Iterator<?> iter = collection.iterator();
 			for (int i = 0; i < length; i++) {
-				array[i] = ConversionTable.convert(iter.next(), componentType, null);
+				array[i] = Conversion.convert(iter.next(), componentType, null);
 			}
 			return array;
 		}
@@ -127,7 +129,7 @@ public class ObjectArrayConverter<T> extends BasicConverter<T> {
 		// Transfer data to the new array
 		final E[] objectArray = LogicUtil.createArray(componentType, length);
 		for (int i = 0; i < length; i++) {
-			objectArray[i] = ConversionTable.convert(Array.get(primitiveArray, i), componentType, null);
+			objectArray[i] = Conversion.convert(Array.get(primitiveArray, i), componentType, null);
 		}
 		return objectArray;
 	}

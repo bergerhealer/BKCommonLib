@@ -34,8 +34,6 @@ import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
-import com.bergerkiller.bukkit.common.metrics.AddonHandler;
-import com.bergerkiller.bukkit.common.natives.NativeSilentPacket;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -291,7 +289,7 @@ public class CommonPlugin extends PluginBase {
 			if (this.isProtocolLibEnabled) {
 				CommonProtocolLibHandler.sendSilentPacket(player, packet);
 			} else {
-				PlayerConnectionRef.sendPacket(ep.playerConnection, new NativeSilentPacket(packet));
+				PlayerConnectionRef.sendPacket(ep.playerConnection, new CommonSilentPacket(packet));
 			}
 		}
 	}
@@ -405,10 +403,6 @@ public class CommonPlugin extends PluginBase {
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
-
-		// Send anonymous statistics to mcstats.org
-		AddonHandler ah = new AddonHandler(this);
-		ah.startMetrics();
 
 		// Register packet listener (may get uninitialized again when ProtocolLib is detected)
 		CommonPacketListener.bindAll();

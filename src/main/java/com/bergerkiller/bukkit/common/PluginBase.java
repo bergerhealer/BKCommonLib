@@ -21,10 +21,12 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
+import com.bergerkiller.bukkit.common.metrics.AddonHandler;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -45,6 +47,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 public abstract class PluginBase extends JavaPlugin {
 	private String disableMessage = null;
 	private FileConfiguration permissionconfig, localizationconfig;
+	private final BasicConfiguration pluginYaml = new BasicConfiguration();
 	private boolean enabled = false;
 	private boolean wasDisableRequested = false;
 
@@ -544,6 +547,13 @@ public abstract class PluginBase extends JavaPlugin {
 		this.localizationconfig.addHeader("Need help with this file? Please visit:");
 		this.localizationconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/localization/");
 
+		// Load plugin.yml configuration
+		try {
+			this.pluginYaml.loadFromStream(getResource("plugin.yml"));
+		} catch (Exception ex) {
+			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
+		}
+
 		// Load all the commands for this Plugin
 		Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
 		if (commands != null && PluginDescriptionFileRef.commands.isValid()) {
@@ -588,6 +598,15 @@ public abstract class PluginBase extends JavaPlugin {
 				// Plugin was disabled again while enabling
 				return;
 			}
+
+			// Metrics
+			if (this.pluginYaml.get("metrics", false)) {
+				// Send anonymous statistics to mcstats.org
+				AddonHandler ah = new AddonHandler(this);
+				ah.startMetrics();
+			}
+
+			// Done, this plugin is enabled
 			this.enabled = true;
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
@@ -694,6 +713,15 @@ public abstract class PluginBase extends JavaPlugin {
 
 	public final void loadLocalization() {
 		this.localizationconfig.load();
+	}
+
+	/**
+	 * Obtains a configuration instance managed by this PluginBase containing the contents of the plugin.yml
+	 * 
+	 * @return plugin.yml configuration
+	 */
+	public final BasicConfiguration getPluginYaml() {
+		return this.pluginYaml;
 	}
 
 	public final void saveLocalization() {

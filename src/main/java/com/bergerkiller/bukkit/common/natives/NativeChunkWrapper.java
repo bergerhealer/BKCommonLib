@@ -100,8 +100,7 @@ public class NativeChunkWrapper implements Collection<org.bukkit.Chunk> {
 
 	@Override
 	public boolean retainAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		return LogicUtil.retainAll(this, arg0);
 	}
 
 	@Override

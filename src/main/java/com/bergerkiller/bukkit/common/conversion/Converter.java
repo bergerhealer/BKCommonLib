@@ -43,4 +43,13 @@ public interface Converter<T> {
 	 * @return True if casting is supported, False if not
 	 */
 	public boolean isCastingSupported();
+
+	/**
+	 * Checks whether this converter supports registering in the Conversion look-up table.
+	 * If this converter produces something that has to do with reading a field or method, and not
+	 * actual conversion, this should be set to True.
+	 * 
+	 * @return True if Conversion table registration is enabled, False if not
+	 */
+	public boolean isRegisterSupported();
 }

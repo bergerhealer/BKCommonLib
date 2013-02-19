@@ -1,5 +1,9 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
@@ -41,6 +45,55 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 			} else {
 				final String text = value.toString();
 				return LogicUtil.nullOrEmpty(text) ? def : text.charAt(0);
+			}
+		}
+	};
+	public static final PrimitiveConverter<String> toString = new PrimitiveConverter<String>(String.class, "") {
+		@Override
+		public String convert(Object value, String def) {
+			if (value == null) {
+				return def;
+			} else if (value instanceof String) {
+				return (String) value;
+			} else if (value instanceof CharSequence) {
+				return value.toString();
+			} else if (value instanceof char[]) {
+				return String.copyValueOf((char[]) value);
+			}
+			if (value.getClass().isArray()) {
+				if (value.getClass().getComponentType().isPrimitive()) {
+					// Primitive type array - simply append elements with a space
+					final int length = Array.getLength(value);
+					StringBuilder builder = new StringBuilder(length * 5);
+					for (int i = 0; i < length; i++) {
+						if (i > 0) {
+							builder.append(' ');
+						}
+						builder.append(toString.convert(Array.get(value, i), "0"));
+					}
+					return builder.toString();
+				} else {
+					// Let the collection based conversion deal with it
+					value = CollectionConverter.toList.convert(value);
+					if (value == null) {
+						return def;
+					}
+				}
+			}
+			if (value instanceof Collection) {
+				Collection<?> collection = (Collection<?>) value;
+				StringBuilder builder = new StringBuilder(collection.size() * 100);
+				boolean first = true;
+				for (Object element : collection) {
+					if (!first) {
+						builder.append('\n');
+					}
+					builder.append(toString.convert(element, ""));
+					first = false;
+				}
+				return builder.toString();
+			} else {
+				return value.toString();
 			}
 		}
 	};

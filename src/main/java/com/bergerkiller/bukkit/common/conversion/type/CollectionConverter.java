@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 
 /**
  * Converter implementation for converting to various kinds of collections
@@ -61,7 +63,7 @@ public abstract class CollectionConverter<T extends Collection<?>> extends Basic
 			if (type.isArray()) {
 				final int arrayLength = Array.getLength(value);
 				final List<Object> list = new ArrayList<Object>(arrayLength);
-				if (type.isPrimitive()) {
+				if (type.getComponentType().isPrimitive()) {
 					// Slower unpacking logic
 					for (int i = 0; i < arrayLength; i++) {
 						list.add(Array.get(value, i));

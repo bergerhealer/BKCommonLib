@@ -1,7 +1,8 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 import net.minecraft.server.v1_4_R1.*;
@@ -67,5 +68,10 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 
 	public PropertyConverter(Class<T> outputType) {
 		super(outputType);
+	}
+
+	@Override
+	public boolean isRegisterSupported() {
+		return false;
 	}
 }

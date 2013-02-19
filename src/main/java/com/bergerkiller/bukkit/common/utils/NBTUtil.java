@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.bergerkiller.bukkit.common.natives.NBTTagInfo;
+import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
+import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.FoodMetaData;
@@ -19,7 +20,6 @@ import net.minecraft.server.v1_4_R1.PlayerInventory;
  * Contains utility functions for dealing with NBT data
  */
 public class NBTUtil {
-
 	/**
 	 * Creates an NBT Tag handle to store the data specified in<br>
 	 * All primitive types, including byte[] and int[], and list/maps are supported
@@ -29,7 +29,7 @@ public class NBTUtil {
 	 * @return new handle
 	 */
 	public static Object createHandle(String name, Object data) {
-		return NBTTagInfo.findInfo(name, data).createHandle(name, data);
+		return NBTTagInfo.findInfo(data).createHandle(name, data);
 	}
 
 	/**
@@ -41,6 +41,19 @@ public class NBTUtil {
 	 */
 	public static Object getData(Object nbtTagHandle) {
 		return NBTTagInfo.findInfo(nbtTagHandle).getData(nbtTagHandle);
+	}
+
+	/**
+	 * Gets the type Id of the tag used to identify it
+	 * 
+	 * @param nbtTagHandle to read from
+	 * @return tag type id
+	 */
+	public static byte getTypeId(Object nbtTagHandle) {
+		if (nbtTagHandle == null) {
+			return (byte) 0;
+		}
+		return NBTRef.getTypeId.invoke(nbtTagHandle).byteValue();
 	}
 
 	/**

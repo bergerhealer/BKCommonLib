@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_R1.MathHelper;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -315,7 +314,7 @@ public class MathUtil {
 	 * @return chunk coordinate
 	 */
 	public static int toChunk(double loc) {
-		return MathHelper.floor(loc / (double) CHUNK_VALUES);
+		return floor(loc / (double) CHUNK_VALUES);
 	}
 
 	/**

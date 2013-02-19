@@ -1,7 +1,13 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
+
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -96,6 +102,34 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 				} else {
 					return def;
 				}
+			}
+		}
+	};
+	public static final WrapperConverter<CommonTag> toCommonTag = new WrapperConverter<CommonTag>(CommonTag.class) {
+		@Override
+		public CommonTag convert(Object value, CommonTag def) {
+			if (value instanceof CommonTag) {
+				return (CommonTag) value;
+			} else if (NBTRef.NBTBase.isInstance(value)) {
+				return CommonTag.create(value);
+			} else if (value != null) {
+				try {
+					return CommonTag.create(null, value);
+				} catch (Exception ex) {
+				}
+			}
+			return def;
+		}
+	};
+	public static final WrapperConverter<DataWatcher> toDataWatcher = new WrapperConverter<DataWatcher>(DataWatcher.class) {
+		@Override
+		public DataWatcher convert(Object value, DataWatcher def) {
+			if (value instanceof DataWatcher) {
+				return (DataWatcher) value;
+			} else if (DataWatcherRef.TEMPLATE.isInstance(value)) {
+				return null; //TODO new DataWatcher(value);
+			} else {
+				return def;
 			}
 		}
 	};

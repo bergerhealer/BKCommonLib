@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.natives;
+package com.bergerkiller.bukkit.common.internal;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,14 +13,14 @@ import net.minecraft.server.v1_4_R1.Packet;
 /**
  * Wraps around another packet to create an undetectable packet type to send to clients undetected
  */
-public class NativeSilentPacket extends Packet {
+class CommonSilentPacket extends Packet {
 	static {
-		PacketUtil.registerPacketToId(NativeSilentPacket.class, 0);
+		PacketUtil.registerPacketToId(CommonSilentPacket.class, 0);
 	}
 
 	private final Packet packet;
 
-	public NativeSilentPacket(Object packet) {
+	public CommonSilentPacket(Object packet) {
 		this.packet = (Packet) packet;
 		PacketFields.DEFAULT.packetID.transfer(packet, this);
 	}

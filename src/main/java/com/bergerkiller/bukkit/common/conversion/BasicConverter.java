@@ -26,4 +26,9 @@ public abstract class BasicConverter<T> implements Converter<T> {
 	public boolean isCastingSupported() {
 		return false;
 	}
+
+	@Override
+	public boolean isRegisterSupported() {
+		return true;
+	}
 }

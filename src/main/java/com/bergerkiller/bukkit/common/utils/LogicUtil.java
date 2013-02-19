@@ -288,6 +288,27 @@ public class LogicUtil {
 	}
 
 	/**
+	 * A basic retainAll implementation (does not call list.retainAll!)<br>
+	 * After this call all elements not contained in elements are removed<br>
+	 * Essentially all elements are removed except those contained in the elements Collection
+	 * 
+	 * @param collection
+	 * @param elements to retain
+	 * @return True if the list changed, False if not
+	 */
+	public static boolean retainAll(Collection<?> collection, Collection<?> elements) {
+		Iterator<?> iter = collection.iterator();
+		boolean changed = false;
+		while (iter.hasNext()) {
+			if (!elements.contains(iter.next())) {
+				iter.remove();
+				changed = true;
+			}
+		}
+		return changed;
+	}
+
+	/**
 	 * Checks whether one map contains all the contents of another map
 	 * 
 	 * @param map to check for contents

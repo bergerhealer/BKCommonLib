@@ -18,7 +18,7 @@ import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
-import com.bergerkiller.bukkit.common.conversion.ConversionTable;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 
 public class ParseUtil {
 	private static final Set<String> yesValues = new HashSet<String>();
@@ -537,6 +537,6 @@ public class ParseUtil {
 	 * @return The convered object, or the default if not possible
 	 */
 	public static <T> T convert(Object object, Class<T> type, T def) {
-		return ConversionTable.convert(object, type, def);
+		return Conversion.convert(object, type, def);
 	}
 }

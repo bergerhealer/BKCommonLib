@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.natives;
+package com.bergerkiller.bukkit.common.bases;
 
 import java.util.Collections;
 import java.util.List;

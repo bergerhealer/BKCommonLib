@@ -45,6 +45,10 @@ public class Common {
 	 * Defines the org.bukkit.craftbukkit root path
 	 */
 	public static final String CB_ROOT = "org.bukkit.craftbukkit"+MC_VERSION_PACKAGEPART;
+	/**
+	 * Defines the com.bergerkiller.bukkit.common root path of this library
+	 */
+	public static final String COMMON_ROOT = "com.bergerkiller.bukkit.common";
 
 	private static boolean checkVersion(String version) {
 		try {

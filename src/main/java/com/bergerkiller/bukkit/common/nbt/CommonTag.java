@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.wrappers.nbt;
+package com.bergerkiller.bukkit.common.nbt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,25 +9,30 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.AbstractMap.SimpleEntry;
 
-import com.bergerkiller.bukkit.common.natives.NBTTagInfo;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 
 import net.minecraft.server.v1_4_R1.*;
 
-public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
-	protected NBTTagInfo info;
+/**
+ * An NBT Tag wrapper implementation to safely operate on tags<br><br>
+ * 
+ * <b>Data</b> represents actual data stored by the tag.
+ * This can be:<br>
+ * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float, double, byte[], int[], String</u>
+ */
+public class CommonTag extends BasicWrapper {
+	protected final NBTTagInfo info;
 
-	protected CommonTag() {
+	public CommonTag(Object data) {
+		this(null, data);
 	}
 
 	public CommonTag(String name, Object data) {
-		info = NBTTagInfo.findInfo(name, data);
-		super.setHandle(info.createHandle(name, data));
-	}
-
-	protected void setRawData(Object data) {
-		info.setData(handle, data);
+		info = NBTTagInfo.findInfo(data);
+		setHandle(info.createHandle(name, commonToNbt(data)));
 	}
 
 	protected Object getRawData() {
@@ -35,12 +40,43 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	}
 
 	/**
-	 * Gets the data stored by the tag
+	 * Gets the data stored by this tag
 	 * 
 	 * @return Tag data
 	 */
 	public Object getData() {
-		return nbtToCommon(getRawData());
+		return nbtToCommon(getRawData(), false);
+	}
+
+	/**
+	 * Gets the data stored by this tag
+	 * 
+	 * @param type to convert the data to
+	 * @param def value to return when no data is available
+	 * @return Tag data
+	 */
+	public <T> T getData(T def) {
+		return Conversion.convert(getData(), def);
+	}
+
+	/**
+	 * Gets the data stored by this tag
+	 * 
+	 * @param type to convert the data to
+	 * @return Tag data
+	 */
+	public <T> T getData(Class<T> type) {
+		return Conversion.convert(getData(), type);
+	}
+
+	/**
+	 * Gets the data stored by this tag
+	 * 
+	 * @param def value to return when no data is available (can not be null)
+	 * @return Tag data
+	 */
+	public <T> T getData(Class<T> type, T def) {
+		return Conversion.convert(getData(), type, def);
 	}
 
 	/**
@@ -49,7 +85,7 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	 * @param data to set to
 	 */
 	public void setData(Object data) {
-		setRawData(commonToNbt(data));
+		info.setData(handle, commonToNbt(data));
 	}
 
 	/**
@@ -58,7 +94,7 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	 * @return tag name
 	 */
 	public String getName() {
-		return handle.getName();
+		return NBTRef.getName.invoke(handle);
 	}
 
 	/**
@@ -67,30 +103,23 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	 * @param newName to set to
 	 */
 	public void setName(String newName) {
-		handle.setName(newName);
+		NBTRef.setName.invoke(handle, newName);
 	}
 
 	@Override
-	public CommonTag<?> clone() {
-		return create(handle.clone());
+	public String toString() {
+		return handle.toString();
 	}
 
-	/**
-	 * Obtains the value of a given object, converting elements to proper
-	 * wrapped CommonTags if needed
-	 * 
-	 * @param handle
-	 * @return Handle value, or null if none is found or contained
-	 */
-	@SuppressWarnings("unchecked")
-	protected static <T> T getData(Object handle) {
-		return (T) nbtToCommon(NBTUtil.getData(handle));
+	@Override
+	public CommonTag clone() {
+		return create(NBTRef.clone.invoke(handle));
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected static Object commonToNbt(Object data) {
 		if (data instanceof CommonTag) {
-			return ((CommonTag<?>) data).getHandle();
+			return ((CommonTag) data).getHandle();
 		} else if (data instanceof NBTBase || data == null) {
 			return data;
 		} else if (data instanceof Entry) {
@@ -129,12 +158,12 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 			}
 			return tags;
 		} else {
-			throw new RuntimeException("Data can not be converted to a handle: " + data.getClass().getName());
+			return NBTUtil.createHandle(null, data);
 		}
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	protected static Object nbtToCommon(Object data) {
+	protected static Object nbtToCommon(Object data, boolean wrapData) {
 		if (data instanceof NBTBase) {
 			return create(data);
 		} else if (data instanceof CommonTag || data == null) {
@@ -142,8 +171,8 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 		} else if (data instanceof Entry) {
 			Entry old = (Entry) data;
 			// Replace
-			Object newKey = nbtToCommon(old.getKey());
-			Object newValue = nbtToCommon(old.getValue());
+			Object newKey = nbtToCommon(old.getKey(), wrapData);
+			Object newValue = nbtToCommon(old.getValue(), wrapData);
 			// If changed, return new type
 			if (newKey != old.getKey() || newValue != old.getValue()) {
 				return new SimpleEntry(newKey, newValue);
@@ -155,7 +184,7 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 			HashSet<Object> tags = new HashSet<Object>(elems.size());
 			// Replace
 			for (Object value : elems) {
-				tags.add(nbtToCommon(value));
+				tags.add(nbtToCommon(value, wrapData));
 			}
 			return tags;
 		} else if (data instanceof Map) {
@@ -163,7 +192,7 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 			HashMap<String, Object> tags = new HashMap<String, Object>(elems.size());
 			// Replace
 			for (Entry<String, Object> entry : elems.entrySet()) {
-				tags.put(entry.getKey(), nbtToCommon(entry.getValue()));
+				tags.put(entry.getKey(), nbtToCommon(entry.getValue(), wrapData));
 			}
 			return tags;
 		} else if (data instanceof Collection) {
@@ -171,11 +200,13 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 			ArrayList<Object> tags = new ArrayList<Object>(elems.size());
 			// Replace
 			for (Object value : elems) {
-				tags.add(nbtToCommon(value));
+				tags.add(nbtToCommon(value, wrapData));
 			}
 			return tags;
+		} else if (wrapData) {
+			return create(null, data);
 		} else {
-			throw new RuntimeException("Data can not be converted to CommonTag: " + data.getClass().getName());
+			return data;
 		}
 	}
 
@@ -187,7 +218,7 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	 * @param data to store
 	 * @return a new CommonTag instance
 	 */
-	public static CommonTag<?> create(String name, Object data) {
+	public static CommonTag create(String name, Object data) {
 		return create(NBTUtil.createHandle(name, data));
 	}
 
@@ -198,19 +229,19 @@ public class CommonTag<T extends NBTBase> extends BasicWrapper<T> {
 	 * @param handle to create a wrapper class for
 	 * @return Wrapper class suitable for the given handle
 	 */
-	public static CommonTag<?> create(Object handle) {
+	public static CommonTag create(Object handle) {
 		if (handle == null) {
 			return null;
 		}
-		CommonTag<?> tag;
-		if (handle instanceof NBTTagCompound) {
-			tag = new CommonTagCompound();
-		} else if (handle instanceof NBTTagList) {
-			tag = new CommonTagList();
+		CommonTag tag;
+		final String name = NBTRef.getName.invoke(handle);
+		if (NBTRef.NBTTagCompound.isInstance(handle)) {
+			tag = new CommonTagCompound(name, handle);
+		} else if (NBTRef.NBTTagList.isInstance(handle)) {
+			tag = new CommonTagList(name, handle);
 		} else {
-			tag = new CommonTag<NBTBase>();
+			tag = new CommonTag(name, handle);
 		}
-		tag.setHandle(handle);
 		return tag;
 	}
 }

@@ -2,21 +2,15 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.List;
 
-import org.bukkit.inventory.ItemStack;
-
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 /**
- * This class is a wrapper of the DataWatcher class from CraftBukkit
- * DataWatcher ref reflects the correct methods to rite dan read values
- * 
- * @author lenis0012
- * @category Wrappers
+ * This class is a wrapper of the DataWatcher class from CraftBukkit<br>
+ * It is used to store data and to keep track of changes so they can be synchronized
  */
-public class DataWatcher extends BasicWrapper<Object> {
+public class DataWatcher extends BasicWrapper {
 
 	public DataWatcher() {
 		setHandle(DataWatcherRef.TEMPLATE.newInstance());
@@ -28,85 +22,33 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @param index Object index
 	 * @param value Value
 	 */
-	public void write(int index, Object value) {
+	public void set(int index, Object value) {
 		DataWatcherRef.write.invoke(handle, index, value);
 	}
-	
-	/**
-	 * Read a byte from the watched objects
-	 * 
-	 * @param index Object index
-	 * @return Byte
-	 */
-	public byte getByte(int index) {
-		return get(index, Byte.class);
-	}
-	
-	/**
-	 * Read an integer from the watched objects
-	 * 
-	 * @param index Object index
-	 * @return Integer
-	 */
-	public int getInt(int index) {
-		return get(index, Integer.class);
-	}
-	
-	/**
-	 * Read a CraftBukkit itemstack from the watched objects
-	 * And convert it to a Bukkit ItemStack
-	 * 
-	 * @param index Object index
-	 * @return Bukkit ItemStack
-	 */
-	public ItemStack getItemStack(int index) {
-		Object it = get(index, CommonUtil.getNMSClass("ItemStack"));
-		return ParseUtil.convert(it, ItemStack.class);
-	}
-	
-	/**
-	 * Read a short from the watched objects
-	 * 
-	 * @param index Object index
-	 * @return Short
-	 */
-	public short getShort(int index) {
-		return get(index, Short.class);
-	}
-	
-	/**
-	 * Read string from the watched objects
-	 * 
-	 * @param index Object index
-	 * @return String
-	 */
-	public String getString(int index) {
-		return get(index, String.class);
-	}
-	
+
 	/**
 	 * Read an object from the watched objects and convert it
 	 * 
 	 * @param index Object index
-	 * @param def Defination
+	 * @param def value when conversion fails (can not be null)
 	 * @return Object
 	 */
 	public <T> T get(int index, T def) {
-		return ParseUtil.convert(get(index), def);
+		return Conversion.convert(get(index), def);
 	}
-	
+
 	/**
 	 * Read an object from the watched objects and convert it
 	 * 
 	 * @param index Object index
 	 * @param type Object type
-	 * @param def Defination
+	 * @param def value when conversion fails
 	 * @return Object
 	 */
 	public <T> T get(int index, Class<T> type, T def) {
-		return ParseUtil.convert(get(index), type, def);
+		return Conversion.convert(get(index), type, def);
 	}
-	
+
 	/**
 	 * Read an object from the watched objects and convert it
 	 * 
@@ -115,9 +57,9 @@ public class DataWatcher extends BasicWrapper<Object> {
 	 * @return Object
 	 */
 	public <T> T get(int index, Class<T> type) {
-		return ParseUtil.convert(get(index), type);
+		return Conversion.convert(get(index), type);
 	}
-	
+
 	/**
 	 * Read an object from the watched objects
 	 * 
@@ -128,7 +70,7 @@ public class DataWatcher extends BasicWrapper<Object> {
 		Object watchable = DataWatcherRef.read.invoke(handle, index);
 		return WatchableObjectRef.getHandle.invoke(watchable);
 	}
-	
+
 	/**
 	 * Watch an object
 	 * 

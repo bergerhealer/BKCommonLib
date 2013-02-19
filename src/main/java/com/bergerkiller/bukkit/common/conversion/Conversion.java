@@ -3,19 +3,20 @@ package com.bergerkiller.bukkit.common.conversion;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
+import com.bergerkiller.bukkit.common.conversion.type.EmptyConverter;
+import com.bergerkiller.bukkit.common.conversion.type.EnumConverter;
+import com.bergerkiller.bukkit.common.conversion.type.ObjectArrayConverter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Stores all available converters to convert Object values to a requested type
  */
-public class ConversionTable {
+public class Conversion extends ConversionTypes {
 	private static final Map<Class<?>, Converter<Object>> converters = new ConcurrentHashMap<Class<?>, Converter<Object>>();
 	static {
-		registerAll(ArrayConverter.class);
-		registerAll(CollectionConverter.class);
-		registerAll(PrimitiveConverter.class);
-		registerAll(HandleConverter.class);
-		registerAll(WrapperConverter.class);
+		registerAll(ConversionTypes.class);
 	}
 
 	/**
@@ -24,7 +25,7 @@ public class ConversionTable {
 	 * @param convertorConstants class container to register
 	 */
 	public static void registerAll(Class<?> convertorConstants) {
-		for (Object convertor : CommonUtil.getClassConstants(convertorConstants)) {
+		for (Object convertor : CommonUtil.getClassConstants(convertorConstants, Converter.class)) {
 			if (convertor instanceof Converter) {
 				register((Converter<?>) convertor);
 			}
@@ -32,23 +33,31 @@ public class ConversionTable {
 	}
 
 	/**
-	 * Registers a convertor so it can be used to convert to the output type it represents
+	 * Registers a converter so it can be used to convert to the output type it represents.
+	 * If the converter does not support registration, it is ignored
 	 * 
-	 * @param convertor to register
+	 * @param converter to register
 	 */
 	@SuppressWarnings("unchecked")
-	public static void register(Converter<?> convertor) {
-		converters.put(convertor.getOutputType(), (Converter<Object>) convertor);
+	public static void register(Converter<?> converter) {
+		if (!converter.isRegisterSupported()) {
+			return;
+		}
+		converters.put(converter.getOutputType(), (Converter<Object>) converter);
 	}
 
 	/**
-	 * Obtains the converter used to convert to the type specified
+	 * Obtains the converter used to convert to the type specified<br>
+	 * If none is available yet for the type, a new one is created
 	 * 
 	 * @param type to convert to
 	 * @return converter
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> Converter<T> getConverter(Class<T> type) {
+		if (type.isPrimitive()) {
+			type = (Class<T>) LogicUtil.getBoxedType(type);
+		}
 		Converter<T> converter = (Converter<T>) converters.get(type);
 		if (converter == null) {
 			if (type.isArray()) {
@@ -58,22 +67,51 @@ public class ConversionTable {
 				if (!componentType.isPrimitive()) {
 					// Use the ObjectArrayConvertor to deal with this
 					converter = new ObjectArrayConverter(type);
-					converters.put(type, (Converter<Object>) converter);
 				}
+			} else if (type.isEnum()) {
+				// Converting to an enum type - construct a new EnumConverter
+				converter = new EnumConverter<T>(type);
 			} else {
 				// Maybe the requested type is an extension?
 				// If so, put a new casting converter in place to deal with it
 				for (Converter<Object> conv : converters.values()) {
 					if (conv.isCastingSupported() && conv.getOutputType().isAssignableFrom(type)) {
 						converter = new CastingConverter(type, conv);
-						converters.put(type, (Converter<Object>) converter);
 						break;
 					}
 				}
 			}
-			return null;
+			// Resolve to the default casting-based converter if not found
+			if (converter == null) {
+				converter = new EmptyConverter(type);
+			}
+			// Found. Put into map for faster look-up
+			converters.put(type, (Converter<Object>) converter);
 		}
 		return (Converter<T>) converter;
+	}
+
+	/**
+	 * Converts an object to the given type using previously registered converters
+	 * 
+	 * @param value to convert
+	 * @param def value to return on failure (can not be null)
+	 * @return the converted value
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T convert(Object value, T def) {
+		return convert(value, (Class<T>) def.getClass(), def);
+	}
+
+	/**
+	 * Converts an object to the given type using previously registered converters
+	 * 
+	 * @param value to convert
+	 * @param type to convert to
+	 * @return the converted value, or null on failure
+	 */
+	public static <T> T convert(Object value, Class<T> type) {
+		return convert(value, type, null);
 	}
 
 	/**
@@ -92,11 +130,6 @@ public class ConversionTable {
 		if (type.isAssignableFrom(valueType)) {
 			return type.cast(value);
 		}
-		Converter<T> converter = getConverter(type);
-		if (converter != null) {
-			return converter.convert(valueType, def);
-		} else {
-			return def;
-		}
+		return getConverter(type).convert(value, def);
 	}
 }

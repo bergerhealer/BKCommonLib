@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 

@@ -104,8 +104,7 @@ public class NativeEntityWrapper<T extends org.bukkit.entity.Entity> implements 
 
 	@Override
 	public boolean retainAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		return LogicUtil.retainAll(this, arg0);
 	}
 
 	@Override

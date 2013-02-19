@@ -179,8 +179,7 @@ public class NativeChunkEntitiesWrapper implements Collection<org.bukkit.entity.
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+		return LogicUtil.retainAll(this, c);
 	}
 
 	@Override

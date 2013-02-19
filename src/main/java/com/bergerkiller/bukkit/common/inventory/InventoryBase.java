@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.natives.IInventoryBase;
+import com.bergerkiller.bukkit.common.bases.IInventoryBase;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
 /**

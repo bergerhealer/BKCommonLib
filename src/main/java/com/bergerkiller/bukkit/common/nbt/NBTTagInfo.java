@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.natives;
+package com.bergerkiller.bukkit.common.nbt;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -8,23 +8,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
-import com.bergerkiller.bukkit.common.wrappers.nbt.CommonTag;
-
-import net.minecraft.server.v1_4_R1.*;
 
 /**
  * Stores the information to obtain and use NBT Tags
  */
 public class NBTTagInfo {
-	private static final SafeField<Byte> nbtListType = new SafeField<Byte>(NBTTagList.class, "type");
 	private static final Map<Class<?>, NBTTagInfo> dataTags = new HashMap<Class<?>, NBTTagInfo>();
 	private static final Map<Class<?>, NBTTagInfo> nbtTags = new HashMap<Class<?>, NBTTagInfo>();
 
-	private static void registerNBTTag(Class<?> nbtType) {
+	private static void registerNBTTag(String name) {
 		try {
+			Class<?> nbtType = CommonUtil.getNMSClass(name);
 			NBTTagInfo dataTag = new NBTTagInfo(nbtType);
 			Class<?> unboxed = LogicUtil.getUnboxedType(dataTag.dataType);
 			if (unboxed != null) {
@@ -42,47 +40,47 @@ public class NBTTagInfo {
 	}
 
 	static {
-		registerNBTTag(NBTTagByte.class);
-		registerNBTTag(NBTTagShort.class);
-		registerNBTTag(NBTTagInt.class);
-		registerNBTTag(NBTTagLong.class);
-		registerNBTTag(NBTTagFloat.class);
-		registerNBTTag(NBTTagDouble.class);
-		registerNBTTag(NBTTagString.class);
-		registerNBTTag(NBTTagByteArray.class);
-		registerNBTTag(NBTTagIntArray.class);
-		registerNBTTag(NBTTagList.class);
-		registerNBTTag(NBTTagCompound.class);
+		registerNBTTag("NBTTagByte");
+		registerNBTTag("NBTTagShort");
+		registerNBTTag("NBTTagInt");
+		registerNBTTag("NBTTagLong");
+		registerNBTTag("NBTTagFloat");
+		registerNBTTag("NBTTagDouble");
+		registerNBTTag("NBTTagString");
+		registerNBTTag("NBTTagByteArray");
+		registerNBTTag("NBTTagIntArray");
+		registerNBTTag("NBTTagList");
+		registerNBTTag("NBTTagCompound");
 	}
 
-	public static NBTTagInfo findInfo(Object handle) {
-		if (handle == null) {
-			throw new RuntimeException("Can not find proper information for a null handle");
-		}
-		NBTTagInfo info = nbtTags.get(handle.getClass());
-		if (info == null) {
-			throw new RuntimeException("Unsupported NBTTag Handle: " + handle.getClass().getName());
-		}
-		return info;
-	}
-
-	public static NBTTagInfo findInfo(String name, Object data) {
+	public static NBTTagInfo findInfo(Object data) {
 		if (data == null) {
-			throw new RuntimeException("Can not find a tag for null data");
-		}
-		final Class<?> dataType;
-		if (data instanceof List) {
-			dataType = List.class;
-		} else if (data instanceof Map) {
-			dataType = Map.class;
+			throw new RuntimeException("Can not find tag information of null data");
+		} else if (data instanceof CommonTag) {
+			return ((CommonTag) data).info;
+		} else if (NBTRef.NBTBase.isInstance(data)) {
+			// Get from handle
+			NBTTagInfo info = nbtTags.get(data.getClass());
+			if (info == null) {
+				throw new RuntimeException("Unsupported NBTTag Handle: " + data.getClass().getName());
+			}
+			return info;
 		} else {
-			dataType = data.getClass();
+			// Get from data
+			final Class<?> dataType;
+			if (data instanceof List) {
+				dataType = List.class;
+			} else if (data instanceof Map) {
+				dataType = Map.class;
+			} else {
+				dataType = data.getClass();
+			}
+			NBTTagInfo info = dataTags.get(dataType);
+			if (info == null) {
+				throw new RuntimeException("Unknown tag data type: " + dataType.getName());
+			}
+			return info;
 		}
-		NBTTagInfo info = dataTags.get(dataType);
-		if (info == null) {
-			throw new RuntimeException("Unknown tag data type: " + dataType.getName());
-		}
-		return info;
 	}
 
 	public final Class<?> nbtType;
@@ -92,30 +90,27 @@ public class NBTTagInfo {
 
 	public NBTTagInfo(Class<?> nbtClass) throws Throwable {
 		this.nbtType = nbtClass;
-		if (nbtClass.equals(NBTTagList.class)) {
+		if (NBTRef.NBTTagList.isType(nbtClass)) {
 			this.dataField = nbtClass.getDeclaredField("list");
 			this.dataType = List.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
-		} else if (nbtClass.equals(NBTTagCompound.class)) {
+		} else if (NBTRef.NBTTagCompound.isType(nbtClass)) {
 			this.dataField = nbtClass.getDeclaredField("map");
 			this.dataType = Map.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
 		} else {
 			this.dataField = nbtClass.getDeclaredField("data");
-			this.dataType = this.dataField.getType();
-			this.constructor = nbtClass.getDeclaredConstructor(String.class, this.dataType);
+			final Class<?> dataType = this.dataField.getType();
+			this.constructor = nbtClass.getDeclaredConstructor(String.class, dataType);
+			// Box it
+			final Class<?> boxed = LogicUtil.getBoxedType(dataType);
+			if (boxed == null) {
+				this.dataType = dataType;
+			} else {
+				this.dataType = boxed;
+			}
 		}
 		this.dataField.setAccessible(true);
-	}
-
-	public byte getListType(Object handle) {
-		validateHandle(handle);
-		return nbtListType.get(handle);
-	}
-
-	public void setListType(Object handle, byte type) {
-		validateHandle(handle);
-		nbtListType.set(handle, type);
 	}
 
 	public void setData(Object handle, Object data) {
@@ -151,47 +146,52 @@ public class NBTTagInfo {
 
 	@SuppressWarnings("unchecked")
 	public Object createHandle(String name, Object data) {
+		if (data == null) {
+			throw new RuntimeException("Can not create a tag for null data");
+		}
+		if (nbtType.isAssignableFrom(data.getClass())) {
+			NBTRef.setName.invoke(data, name);
+			return data;
+		}
+		if (!dataType.isAssignableFrom(data.getClass())) {
+			throw new RuntimeException("Can not store " + data.getClass().getName() + " in tag " + dataType.getSimpleName());
+		}
+		// Create a new handle from data
 		try {
-			if (data == null) {
-				throw new RuntimeException("Can not create a tag for null data");
-			}
-			if (!dataType.isAssignableFrom(data.getClass())) {
-				throw new RuntimeException("Incompatible data for this type of tag");
-			}
 			final Object handle;
-			if (nbtType.equals(NBTTagList.class)) {
+			if (NBTRef.NBTTagList.isType(nbtType)) {
 				// Create a new list of valid NBT handles
 				List<Object> oldData = (List<Object>) data;
 				ArrayList<Object> newData = new ArrayList<Object>(oldData.size());
 				byte type = 0;
 				for (Object element : oldData) {
-					NBTBase base;
-					if (element instanceof NBTBase) {
-						base = (NBTBase) element;
+					Object base;
+					if (NBTRef.NBTBase.isInstance(element)) {
+						base = element;
 					} else if (element instanceof CommonTag) {
-						base = (NBTBase) ((CommonTag<?>) element).getHandle();
+						base = ((CommonTag) element).getHandle();
 					} else {
-						base = (NBTBase) NBTUtil.createHandle(null, element);
+						base = NBTUtil.createHandle(null, element);
 					}
-					type = base.getTypeId();
+					type = NBTUtil.getTypeId(base);
 				}
 				// Assign this data to a new valid NBT Tag List
 				handle = constructor.newInstance(name);
-				nbtListType.set(handle, type);
+				NBTRef.nbtListType.set(handle, type);
 				dataField.set(handle, newData);
-			} else if (nbtType.equals(NBTTagCompound.class)) {
+			} else if (NBTRef.NBTTagCompound.isType(nbtType)) {
 				// Fix up the map data
 				Map<Object, Object> oldData = (Map<Object, Object>) data;
 				Map<String, Object> newData = new HashMap<String, Object>(oldData.size());
 				for (Entry<Object, Object> entry : oldData.entrySet()) {
-					NBTBase base;
+					Object base;
 					final String key = entry.getKey().toString();
-					if (entry.getValue() instanceof NBTBase) {
-						base = (NBTBase) entry.getValue();
+					if (NBTRef.NBTBase.isInstance(entry.getValue())) {
+						base = entry.getValue();
 					} else if (entry.getValue() instanceof CommonTag) {
-						base = (NBTBase) ((CommonTag<?>) entry.getValue()).getHandle();
+						base = ((CommonTag) entry.getValue()).getHandle();
 					} else {
-						base = (NBTBase) NBTUtil.createHandle(key, entry.getValue());
+						base = NBTUtil.createHandle(key, entry.getValue());
 					}
 					newData.put(key, base);
 				}

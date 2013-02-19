@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.entity.HumanEntity;
 
-import com.bergerkiller.bukkit.common.conversion.HandleConverter;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;

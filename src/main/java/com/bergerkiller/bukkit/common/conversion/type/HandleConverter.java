@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -10,10 +10,12 @@ import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
 
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.wrappers.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.utils.NBTUtil;
 
 /**
  * Converter for converting to internal handles (from wrapper classes)
@@ -148,9 +150,13 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			if (value instanceof NBTBase) {
 				return value;
 			} else if (value instanceof CommonTag) {
-				return ((CommonTag<?>) value).getHandle();
+				return ((CommonTag) value).getHandle();
 			} else {
-				return def;
+				try {
+					return NBTUtil.createHandle(null, value);
+				} catch (Exception ex) {
+					return def;
+				}
 			}
 		}
 
