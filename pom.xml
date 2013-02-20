@@ -37,6 +37,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
+      <scope>provided</scope>
       <version>1.4.7-R1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -67,15 +68,9 @@
       <systemPath>${project.basedir}/lib/BleedingMobs.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>com.bergerkiller.bukkit</groupId>
-      <artifactId>SignLink</artifactId>
-      <version>1.31</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/SignLink.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>com.comphenix.protocol</groupId>
       <artifactId>ProtocolLib</artifactId>
+      <scope>provided</scope>
       <version>2.2.0</version>
     </dependency>
     <dependency>

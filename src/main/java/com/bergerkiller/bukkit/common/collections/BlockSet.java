@@ -1,10 +1,11 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.collections;
 
 import java.util.HashSet;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 public class BlockSet extends HashSet<BlockLocation> {

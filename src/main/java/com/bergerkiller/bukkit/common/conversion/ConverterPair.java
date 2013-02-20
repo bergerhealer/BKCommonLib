@@ -34,6 +34,24 @@ public class ConverterPair<A, B> {
 	}
 
 	/**
+	 * Gets the internally stored Converter A
+	 * 
+	 * @return converter A
+	 */
+	public Converter<A> getConverterA() {
+		return converterA;
+	}
+
+	/**
+	 * Gets the internally stored Converter B
+	 * 
+	 * @return converter B
+	 */
+	public Converter<B> getConverterB() {
+		return converterB;
+	}
+
+	/**
 	 * Converts the value to the output type of converter A
 	 * 
 	 * @param value to convert

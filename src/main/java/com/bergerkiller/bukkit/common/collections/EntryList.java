@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.collections;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;

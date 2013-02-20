@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkSection;
@@ -10,10 +11,11 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_4_R1.util.LongHash;
 import org.bukkit.craftbukkit.v1_4_R1.util.LongHashSet;
 import org.bukkit.craftbukkit.v1_4_R1.util.LongObjectHashMap;
-import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.collections.List2D;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.natives.NativeChunkEntitiesWrapper;
-import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
@@ -22,8 +24,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
-	private static boolean canUseLongObjectHashMap = CommonUtil.getClass(Common.CB_ROOT + ".util.LongObjectHashMap") != null;
-	private static boolean canUseLongHashSet = CommonUtil.getClass(Common.CB_ROOT + ".util.LongHashSet") != null;
+	private static boolean canUseLongObjectHashMap = CommonUtil.getCBClass("util.LongObjectHashMap") != null;
+	private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
 
 	/**
 	 * Gets the height of a given column in a chunk
@@ -146,8 +148,9 @@ public class ChunkUtil {
 	 * @param chunk for which to get the entities
 	 * @return Live collection of entities in the chunk
 	 */
-	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
-		return new NativeChunkEntitiesWrapper(chunk);
+	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
+		List<Object>[] entitySlices = ChunkRef.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
+		return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
 	}
 
 	/**
@@ -156,14 +159,14 @@ public class ChunkUtil {
 	 * @param chunkprovider to get the loaded chunks from
 	 * @return Loaded chunks
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings("rawtypes")
 	public static Collection<org.bukkit.Chunk> getChunks(World world) {
 		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(NativeUtil.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				try {
 					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
-						return new NativeChunkWrapper(((LongObjectHashMap) chunks).values());
+						return NativeUtil.getChunks(((LongObjectHashMap) chunks).values());
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;

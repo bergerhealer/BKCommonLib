@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingIterator;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingListIterator;
@@ -404,12 +404,12 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
 	@Override
 	public ListIterator<CommonTag> listIterator() {
-		return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), WrapperConverter.toCommonTag, HandleConverter.toNBTTagHandle);
+		return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), ConversionPairs.commonTag);
 	}
 
 	@Override
 	public ListIterator<CommonTag> listIterator(int index) {
-		return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), WrapperConverter.toCommonTag, HandleConverter.toNBTTagHandle);
+		return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), ConversionPairs.commonTag);
 	}
 
 	@Override

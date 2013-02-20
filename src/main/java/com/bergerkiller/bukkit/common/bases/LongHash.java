@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
 /**
- * This clas sis coppied from: org.bukkit.craftbukkit.util.LongHash
+ * This class is copied from: org.bukkit.craftbukkit.util.LongHash
  * 
  * All credits go to CraftBukkit
  */

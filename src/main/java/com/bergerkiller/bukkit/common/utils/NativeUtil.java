@@ -20,8 +20,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import com.bergerkiller.bukkit.common.natives.NativeChunkWrapper;
-import com.bergerkiller.bukkit.common.natives.NativeEntityWrapper;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 
@@ -176,13 +178,13 @@ public class NativeUtil {
 		return world == null ? null : world.getWorld();
 	}
 
-	public static Collection<org.bukkit.Chunk> getChunks(Collection<Chunk> chunks) {
-		return new NativeChunkWrapper(chunks);
+	public static Collection<org.bukkit.Chunk> getChunks(Collection<?> chunks) {
+		return new ConvertingCollection<org.bukkit.Chunk>(chunks, ConversionPairs.chunk); 
 	}
 
 	@SuppressWarnings("unchecked")
 	public static Collection<EntityPlayer> getOnlinePlayers() {
-		return CommonUtil.getServerConfig().players;
+		return CommonUtil.getCraftServer().getHandle().players;
 	}
 
 	public static Collection<Player> getPlayers(Collection players) {
@@ -194,7 +196,7 @@ public class NativeUtil {
 	}
 
 	public static <T extends org.bukkit.entity.Entity> Collection<T> getEntities(Collection entities, Class<T> type) {
-		return new NativeEntityWrapper<T>(entities, type);
+		return new ConvertingCollection<T>(entities, Conversion.toEntityHandle, Conversion.getConverter(type));
 	}
 
 	public static org.bukkit.inventory.ItemStack getItemStack(ItemStack itemstack) {

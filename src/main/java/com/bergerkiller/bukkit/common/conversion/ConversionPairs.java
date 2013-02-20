@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 /**
@@ -24,5 +25,6 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, GameMode> gameMode = Conversion.toGameModeHandle.formPair(Conversion.toGameMode);
 	public static final ConverterPair<Object, WorldType> worldType = Conversion.toWorldTypeHandle.formPair(Conversion.toWorldType);
 	public static final ConverterPair<Object, DataWatcher> dataWatcher = Conversion.toDataWatcherHandle.formPair(Conversion.toDataWatcher);
+	public static final ConverterPair<Object, CommonTag> commonTag = Conversion.toNBTTagHandle.formPair(Conversion.toCommonTag);
 	public static final ConverterPair<Integer, BlockFace> paintingFacing = Conversion.toPaintingFacingId.formPair(Conversion.toPaintingFacing);
 }

@@ -97,6 +97,6 @@ public class PacketUtil {
 	}
 
 	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Object packet) {
-		CommonUtil.getServerConfig().sendPacketNearby(x, y, z, radius, NativeUtil.getNative(world).dimension, (Packet) packet);
+		CommonUtil.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, NativeUtil.getNative(world).dimension, (Packet) packet);
 	}
 }

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.List;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
@@ -27,6 +28,7 @@ public class ChunkRef {
 	private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("a", icp, icp, int.class, int.class);
 	public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
 	public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
+	public static final FieldAccessor<List<Object>[]> entitySlices = TEMPLATE.getField("entitySlices");
 	public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
 	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "f");
 

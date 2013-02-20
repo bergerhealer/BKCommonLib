@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import net.minecraft.server.v1_4_R1.DedicatedPlayerList;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
+import net.minecraft.server.v1_4_R1.PlayerFileData;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -117,12 +118,28 @@ public class CommonUtil {
 	}
 
 	/**
-	 * Gets the server configuration manager which deals with server settings
+	 * Gets the Player File Data used to load and save player information on the server
 	 * 
-	 * @return Server Configuration Manager
+	 * @return current Player File Data instance
 	 */
-	public static DedicatedPlayerList getServerConfig() {
-		return getCraftServer().getHandle();
+	public static Object getPlayerFileData() {
+		return getCraftServer().getHandle().playerFileData;
+	}
+
+	/**
+	 * Sets the Player File Data used to load and save player information on the server
+	 * 
+	 * @param playerFileData to set to
+	 */
+	public static void setPlayerFileData(Object playerFileData) {
+		getCraftServer().getHandle().playerFileData = (PlayerFileData) playerFileData;
+	}
+
+	/**
+	 * Saves all player information to file
+	 */
+	public static void savePlayers() {
+		getCraftServer().getHandle().savePlayers();
 	}
 
 	/**
@@ -139,7 +156,7 @@ public class CommonUtil {
 			array[random] = temp;
 		}
 	}
-	
+
 	/**
 	 * Add a Set to another Set
 	 * 
@@ -162,7 +179,7 @@ public class CommonUtil {
 	 * @return online players
 	 */
 	public static Collection<Player> getOnlinePlayers() {
-		return NativeUtil.getPlayers(getServerConfig().players);
+		return NativeUtil.getPlayers(NativeUtil.getOnlinePlayers());
 	}
 
 	/**

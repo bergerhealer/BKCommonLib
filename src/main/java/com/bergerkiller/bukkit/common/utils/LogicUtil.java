@@ -157,11 +157,7 @@ public class LogicUtil {
 	 * @return The list element, or the default value
 	 */
 	public static <T> T getList(List<T> list, int index, T def) {
-		if (index < 0 || list == null || index >= list.size()) {
-			return def;
-		} else {
-			return list.get(index);
-		}
+		return isInBounds(list, index) ? list.get(index) : def;
 	}
 
 	/**
@@ -176,11 +172,7 @@ public class LogicUtil {
 	 * @return The array element, or the default value
 	 */
 	public static <T> T getArray(T[] array, int index, T def) {
-		if (index < 0 || array == null || index >= array.length) {
-			return def;
-		} else {
-			return array[index];
-		}
+		return isInBounds(array, index) ? array[index] : def;
 	}
 
 	/**
