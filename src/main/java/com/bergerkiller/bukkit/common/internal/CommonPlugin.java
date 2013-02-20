@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -394,8 +395,23 @@ public class CommonPlugin extends PluginBase {
 		// Validate version
 		if (IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
-			log(Level.INFO, "MC version: "+Bukkit.getVersion());
-			log(Level.INFO, "Bukkit version: "+Bukkit.getBukkitVersion());
+			final List<String> welcomeMessages = Arrays.asList(
+					"This library is written with stability in mind.", 
+					"No Bukkit moderators were harmed while compiling this piece of art.", 
+					"Have a problem Bukkit can't fix? Write a library!",
+					"Bringing home the bacon since 2011!",
+					"Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
+					"Hosts all the features that are impossible to include in a single Class",
+					"CraftBukkit: redone, reworked, translated and interfaced.",
+					"Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
+					"Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
+					"For all the haters out there: BKCommonLib at least tries!",
+					"Want fries with that? We have hidden fries in the FoodUtil class.",
+					"Not enough wrappers. Needs more wrappers. Moooreee...",
+					"Reflection can open the key to everyone's heart, including CraftBukkit.",
+					"Our love is not permitted by the overlords. We must flee...",
+					"Now a plugin, a new server implementation tomorrow???");
+			log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib update:");

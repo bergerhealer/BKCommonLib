@@ -1,6 +1,6 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
-version: 1.50
+version: 1.49
 authors: [bergerkiller, lenis0012]
 metrics: true
 load: startup
