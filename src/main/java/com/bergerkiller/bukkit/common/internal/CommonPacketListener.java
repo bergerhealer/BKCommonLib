@@ -1,7 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.List;
+import java.util.ListIterator;
+import java.util.logging.Level;
+
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
@@ -9,6 +14,7 @@ import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import net.minecraft.server.v1_4_R1.*;
 
 class CommonPacketListener extends PlayerConnection {
+	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonUtil.getMCServer().ae(), "d");
 	private final PlayerConnection previous;
 
 	public CommonPacketListener(MinecraftServer minecraftserver, EntityPlayer entityplayer) {
@@ -29,13 +35,38 @@ class CommonPacketListener extends PlayerConnection {
 		}
 	}
 
+	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean retry) {
+		//final PlayerConnection old = ep.playerConnection;
+		ep.playerConnection = connection;
+		synchronized (serverPlayerConnections) {
+			// Replace existing
+			ListIterator<PlayerConnection> iter = serverPlayerConnections.listIterator();
+			while (iter.hasNext()) {
+				if (iter.next().player == ep) {
+					iter.set(connection);
+					return;
+				}
+			}
+			if (!retry) {
+				CommonPlugin.getInstance().log(Level.SEVERE, "Failed to (un)register PlayerConnection proxy...bad things may happen!");
+				return;
+			}
+			// We failed to remove it in one go...
+			// Remove the old one the next tick but then fail
+			CommonUtil.nextTick(new Runnable() {
+				public void run() {
+					setPlayerConnection(ep, connection, false);
+				}
+			});
+		}
+	}
+
 	public static void bind(Player player) {
 		final EntityPlayer ep = NativeUtil.getNative(player);
 		if (ep.playerConnection instanceof CommonPacketListener) {
 			return;
 		}
-		CommonPacketListener listener = new CommonPacketListener(CommonUtil.getMCServer(), ep);
-		ep.playerConnection = listener;
+		setPlayerConnection(ep, new CommonPacketListener(CommonUtil.getMCServer(), ep), true);
 	}
 
 	public static void unbind(Player player) {
@@ -44,7 +75,7 @@ class CommonPacketListener extends PlayerConnection {
 		if (previous instanceof CommonPacketListener) {
 			PlayerConnection replacement = ((CommonPacketListener) previous).previous;
 			PlayerConnectionRef.TEMPLATE.transfer(previous, replacement);
-			ep.playerConnection = replacement;
+			setPlayerConnection(ep, replacement, true);
 		}
 	}
 

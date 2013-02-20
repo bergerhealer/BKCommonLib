@@ -35,18 +35,6 @@ class CommonListener implements Listener {
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, true);
 		}
-		
-		if(name.equalsIgnoreCase("ProtocolLib")) {
-			//ProtcolLib has been activated, lets stop our protocol engines
-			CommonPacketListener.unbindAll();
-			
-			//Lets notify BKCommonLib it has been enabled
-			plugin.isProtocolLibEnabled = true;
-			
-			//Disable the connection update task if enabled
-			if(plugin.playerConnectionTask.isRunning())
-				plugin.playerConnectionTask.stop();
-		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -55,19 +43,6 @@ class CommonListener implements Listener {
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, false);
-		}
-		
-		if(name.equalsIgnoreCase("ProtocolLib")) {
-			//Oh no, ProtocolLib has been disabled
-			//Lets init the players to our system
-			CommonPacketListener.bindAll();
-			
-			//Lets notify BKCommonLib it has been disabled
-			plugin.isProtocolLibEnabled = false;
-			
-			//Enable the connection update task if disabled
-			if(!plugin.playerConnectionTask.isRunning())
-				plugin.playerConnectionTask.start(1, 1);
 		}
 	}
 
