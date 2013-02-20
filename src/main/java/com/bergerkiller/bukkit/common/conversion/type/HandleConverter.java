@@ -10,29 +10,29 @@ import org.bukkit.craftbukkit.v1_4_R1.block.*;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 
 /**
- * Converter for converting to internal handles (from wrapper classes)
+ * Converter for converting to internal handles (from wrapper classes)<br>
+ * <b>Do not reference external state-classes while constructing (e.g. reflection classes)</b>
  */
 public abstract class HandleConverter extends BasicConverter<Object> {
-	public static final HandleConverter toEntityHandle = new HandleConverter(Entity.class) {
+	public static final HandleConverter toEntityHandle = new HandleConverter("Entity") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof Entity) {
-				return value;
-			} else if (value instanceof CraftEntity) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CraftEntity) {
 				return ((CraftEntity) value).getHandle();
 			} else {
 				return def;
@@ -44,18 +44,14 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toWorldHandle = new HandleConverter(World.class) {
+	public static final HandleConverter toWorldHandle = new HandleConverter("World") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof World) {
-				return value;
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			org.bukkit.World world = WrapperConverter.toWorld.convert(value);
+			if (world instanceof CraftWorld) {
+				return ((CraftWorld) world).getHandle();
 			} else {
-				org.bukkit.World world = WrapperConverter.toWorld.convert(value);
-				if (world instanceof CraftWorld) {
-					return ((CraftWorld) world).getHandle();
-				} else {
-					return def;
-				}
+				return def;
 			}
 		}
 
@@ -64,27 +60,21 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toChunkHandle = new HandleConverter(Chunk.class) {
+	public static final HandleConverter toChunkHandle = new HandleConverter("Chunk") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof Chunk) {
-				return value;
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			org.bukkit.Chunk chunk = WrapperConverter.toChunk.convert(value);
+			if (chunk instanceof CraftChunk) {
+				return ((CraftChunk) value).getHandle();
 			} else {
-				org.bukkit.Chunk chunk = WrapperConverter.toChunk.convert(value);
-				if (chunk instanceof CraftChunk) {
-					return ((CraftChunk) value).getHandle();
-				} else {
-					return def;
-				}
+				return def;
 			}
 		}
 	};
-	public static final HandleConverter toItemStackHandle = new HandleConverter(ItemStack.class) {
+	public static final HandleConverter toItemStackHandle = new HandleConverter("ItemStack") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof ItemStack) {
-				return value;
-			} else if (value instanceof CraftItemStack) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CraftItemStack) {
 				return CraftItemStackRef.handle.get(value);
 			} else if (value instanceof org.bukkit.inventory.ItemStack) {
 				return CraftItemStack.asNMSCopy((org.bukkit.inventory.ItemStack) value);
@@ -93,12 +83,10 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			}
 		}
 	};
-	public static final HandleConverter toTileEntityHandle = new HandleConverter(TileEntity.class) {
+	public static final HandleConverter toTileEntityHandle = new HandleConverter("TileEntity") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof TileEntity) {
-				return value;
-			} else if (value instanceof CraftSign) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CraftSign) {
 				return BlockStateRef.SIGN.get(value);
 			} else if (value instanceof CraftFurnace) {
 				return BlockStateRef.FURNACE.get(value);
@@ -125,23 +113,19 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toInventoryHandle = new HandleConverter(IInventory.class) {
+	public static final HandleConverter toInventoryHandle = new HandleConverter("IInventory") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof IInventory) {
-				return value;
-			} else if (value instanceof CraftInventory) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CraftInventory) {
 				return LogicUtil.fixNull(((CraftInventory) value).getInventory(), def);
 			}
 			return def;
 		}
 	};
-	public static final HandleConverter toDataWatcherHandle = new HandleConverter(DataWatcher.class) {
+	public static final HandleConverter toDataWatcherHandle = new HandleConverter("DataWatcher") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof DataWatcher) {
-				return value;
-			} else if (value instanceof com.bergerkiller.bukkit.common.wrappers.DataWatcher) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof com.bergerkiller.bukkit.common.wrappers.DataWatcher) {
 				return ((com.bergerkiller.bukkit.common.wrappers.DataWatcher) value).getHandle();
 			} else if (value instanceof Entity) {
 				return ((Entity) value).getDataWatcher();
@@ -150,12 +134,10 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			}
 		}
 	};
-	public static final HandleConverter toNBTTagHandle = new HandleConverter(NBTBase.class) {
+	public static final HandleConverter toNBTTagHandle = new HandleConverter("NBTBase") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof NBTBase) {
-				return value;
-			} else if (value instanceof CommonTag) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CommonTag) {
 				return ((CommonTag) value).getHandle();
 			} else {
 				try {
@@ -171,12 +153,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toItemHandle = new HandleConverter(Item.class) {
+	public static final HandleConverter toItemHandle = new HandleConverter("Item") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof Item) {
-				return value;
-			}
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			Integer id = PropertyConverter.toItemId.convert(value);
 			if (id != null) {
 				int idInt = id.intValue();
@@ -192,12 +171,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toBlockHandle = new HandleConverter(Block.class) {
+	public static final HandleConverter toBlockHandle = new HandleConverter("Block") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (value instanceof Block) {
-				return value;
-			}
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			Integer id = PropertyConverter.toItemId.convert(value);
 			if (id != null) {
 				int idInt = id.intValue();
@@ -213,48 +189,81 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-	public static final HandleConverter toGameModeHandle = new HandleConverter(EnumGamemodeRef.TEMPLATE.getType()) {
+	public static final HandleConverter toGameModeHandle = new HandleConverter("EnumGamemode") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (EnumGamemodeRef.TEMPLATE.isInstance(value)) {
-				return value;
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			GameMode gameMode = Conversion.toGameMode.convert(value);
+			if (gameMode != null) {
+				return EnumGamemodeRef.getFromId.invoke(null, gameMode.getValue());
+			}
+			return def;
+		}
+	};
+	public static final HandleConverter toWorldTypeHandle = new HandleConverter("WorldType") {
+		@Override
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			org.bukkit.WorldType type = Conversion.toWorldType.convert(value);
+			if (type != null) {
+				return WorldTypeRef.getType.invoke(null, type.getName());
 			} else {
-				GameMode gameMode = Conversion.toGameMode.convert(value);
-				if (gameMode != null) {
-					return EnumGamemodeRef.getFromId.invoke(null, gameMode.getValue());
-				}
 				return def;
 			}
 		}
 	};
-	public static final HandleConverter toWorldTypeHandle = new HandleConverter(WorldTypeRef.TEMPLATE.getType()) {
+	public static final HandleConverter toPacketHandle = new HandleConverter("Packet") {
 		@Override
-		public Object convert(Object value, Object def) {
-			if (WorldTypeRef.TEMPLATE.isInstance(value)) {
-				return value;
-			} else {
-				org.bukkit.WorldType type = Conversion.toWorldType.convert(value);
-				if (type != null) {
-					return WorldTypeRef.getType.invoke(null, type.getName());
-				} else {
-					return def;
-				}
-			}
-		}
-	};
-	public static final HandleConverter toPacketHandle = new HandleConverter(PacketFields.DEFAULT.getType()) {
-		@Override
-		public Object convert(Object value, Object def) {
-			if (PacketFields.DEFAULT.isInstance(value)) {
-				return value;
-			} else if (value instanceof CommonPacket) {
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof CommonPacket) {
 				return ((CommonPacket) value).getHandle();
 			} else {
 				return def;
 			}
 		}
 	};
-	
+	public static final HandleConverter toChunkCoordIntPairHandle = new HandleConverter("ChunkCoordIntPair") {
+		@Override
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			return def;
+		}
+	};
+	public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
+		@Override
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof ChunkPosition) {
+				ChunkPosition pos = (ChunkPosition) value;
+				return new ChunkCoordinates(pos.x, pos.y, pos.z);
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final HandleConverter toChunkPositionHandle = new HandleConverter("ChunkPosition") {
+		@Override
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof ChunkCoordinates) {
+				ChunkCoordinates coord = (ChunkCoordinates) value;
+				return new ChunkPosition(coord.x, coord.y, coord.z);
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final HandleConverter toVec3DHandle = new HandleConverter("Vec3D") {
+		@Override
+		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			Vector vec = WrapperConverter.toVector.convert(value);
+			if (vec != null) {
+				return Vec3D.a(vec.getX(), vec.getY(), vec.getZ());
+			} else {
+				return def;
+			}
+		}
+	};
+
+	public HandleConverter(String outputTypeName) {
+		this(CommonUtil.getNMSClass(outputTypeName));
+	}
+
 	@SuppressWarnings("unchecked")
 	public HandleConverter(Class<?> outputType) {
 		super((Class<Object>) outputType);

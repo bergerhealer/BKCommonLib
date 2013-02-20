@@ -3,7 +3,12 @@ package com.bergerkiller.bukkit.common.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
@@ -33,13 +38,17 @@ public class NBTUtil {
 	}
 
 	/**
-	 * Obtains the raw data from an NBT Tag handle<br>
-	 * NBTTagList and NBTTagCompound return a List and Map of NBT Tags respectively
+	 * Obtains the raw data from an NBT Tag handle.
+	 * NBTTagList and NBTTagCompound return a List and Map of NBT Tags respectively.
+	 * If a null handle is specified, null is returned to indicate no data.
 	 * 
 	 * @param nbtTagHandle to get the value of
 	 * @return the NBTTag data
 	 */
 	public static Object getData(Object nbtTagHandle) {
+		if (nbtTagHandle == null) {
+			return null;
+		}
 		return NBTTagInfo.findInfo(nbtTagHandle).getData(nbtTagHandle);
 	}
 
@@ -84,98 +93,111 @@ public class NBTUtil {
 	 * @param compound to read a mob effect from
 	 * @return Loaded MobEffect
 	 */
-	public static MobEffect loadMobEffect(NBTTagCompound compound) {
-		return MobEffect.b(compound);
+	public static Object loadMobEffect(CommonTagCompound compound) {
+		return MobEffect.b((NBTTagCompound) compound.getHandle());
 	}
 
 	/**
-	 * Saves entity data to a new NBT Tag Compound
+	 * Saves entity data to the Tag Compound specified
 	 * 
 	 * @param entity to save
+	 * @param compound to save to, use null to save to a new compound
+	 * @return the compound to which was saved
 	 */
-	public static NBTTagCompound saveToNBT(Entity entity) {
-		NBTTagCompound compound = new NBTTagCompound();
-		entity.d(compound);
+	public static CommonTagCompound saveEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
+		if (compound == null) {
+			compound = new CommonTagCompound();
+		}
+		((Entity) Conversion.toEntityHandle.convert(entity)).d((NBTTagCompound) compound.getHandle());
 		return compound;
 	}
 
 	/**
-	 * Saves entity data to the NBT Tag Compound specified
-	 * 
-	 * @param entity to save
-	 * @param compound to save to
-	 */
-	public static void saveToNBT(Entity entity, NBTTagCompound compound) {
-		entity.d(compound);
-	}
-
-	/**
-	 * Loads entity data from the NBT Tag Compound specified
+	 * Loads an entity with data from the Tag Compound specified
 	 * 
 	 * @param entity to load
 	 * @param compound to load from
 	 */
-	public static void loadFromNBT(Entity entity, NBTTagCompound compound) {
-		entity.e(compound);
+	public static void loadEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
+		((Entity) Conversion.toEntityHandle.convert(entity)).e((NBTTagCompound) compound.getHandle());
 	}
 
 	/**
 	 * Saves food meta data to the NBT Tag Compound specified
 	 * 
 	 * @param foodMetaData to save
-	 * @param compound to save to
+	 * @param compound to save to, use null to save to a new compound
+	 * @return the compound to which was saved
 	 */
-	public static void saveToNBT(FoodMetaData foodMetaData, NBTTagCompound compound) {
-		foodMetaData.b(compound);
+	public static CommonTagCompound saveFoodMetaData(Object foodMetaData, CommonTagCompound compound) {
+		if (compound == null) {
+			compound = new CommonTagCompound();
+		}
+		((FoodMetaData) foodMetaData).b((NBTTagCompound) compound.getHandle());
+		return compound;
 	}
 
 	/**
-	 * Loads the food meta data using the NBT Tag Compound specified
+	 * Loads Food Meta Data with data from the Tag Compound specified
 	 * 
 	 * @param foodMetaData to load
 	 * @param compound to load from
 	 */
-	public static void loadFromNBT(FoodMetaData foodMetaData, NBTTagCompound compound) {
-		foodMetaData.a(compound);
+	public static void loadFoodMetaData(Object foodMetaData, CommonTagCompound compound) {
+		((FoodMetaData) foodMetaData).a((NBTTagCompound) compound.getHandle());
 	}
 
 	/**
-	 * Saves inventory data to an NBT Tag List
+	 * Saves inventory data to the tag list specified
 	 * 
 	 * @param inventory to save
-	 * @return Saved NBT Tag List data
+	 * @param list to save to, use null for a new list
+	 * @return the saved tag list
 	 */
-	public static NBTTagList saveToNBT(PlayerInventory inventory) {
-		return inventory.a(new NBTTagList());
+	public static CommonTagList saveInventory(org.bukkit.inventory.Inventory inventory, CommonTagList list) {
+		final Object inventoryHandle = Conversion.toInventoryHandle.convert(inventory);
+		if (inventoryHandle == null) {
+			throw new IllegalArgumentException("This kind of inventory lacks a handle to load");
+		}
+		if (inventoryHandle instanceof PlayerInventory) {
+			if (list == null) {
+				list = new CommonTagList();
+			}
+			((PlayerInventory) inventoryHandle).a((NBTTagList) list.getHandle());
+		} else if (inventoryHandle instanceof InventoryEnderChest) {			
+			Object handle = ((InventoryEnderChest) inventoryHandle).g();
+			if (list == null) {
+				return (CommonTagList) CommonTag.create(handle);
+			} else {
+				List<?> data = (List<?>) getData(handle);
+				for (Object elem : data) {
+					list.addValue(elem);
+				}
+				return list;
+			}
+		} else {
+			throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
+		}
+		return list;
 	}
 
 	/**
-	 * Loads an NBT Tag List into an inventory
+	 * Loads inventory data from the Tag List specified
 	 * 
 	 * @param inventory to load
 	 * @param list to load from
 	 */
-	public static void loadFromNBT(PlayerInventory inventory, NBTTagList list) {
-		inventory.b(list);
-	}
-
-	/**
-	 * Saves inventory data to an NBT Tag List
-	 * 
-	 * @param inventory to save
-	 * @return Saved NBT Tag List data
-	 */
-	public static NBTTagList saveToNBT(InventoryEnderChest inventory) {
-		return inventory.g();
-	}
-
-	/**
-	 * Loads an NBT Tag List into an inventory
-	 * 
-	 * @param inventory to load
-	 * @param list to load from
-	 */
-	public static void loadFromNBT(InventoryEnderChest inventory, NBTTagList list) {
-		inventory.a(list);
+	public static void loadInventory(org.bukkit.inventory.Inventory inventory, CommonTagList list) {
+		final Object inventoryHandle = Conversion.toInventoryHandle.convert(inventory);
+		NBTTagList nbt = (NBTTagList) list.getHandle();
+		if (inventoryHandle == null) {
+			throw new IllegalArgumentException("This kind of inventory lacks a handle to save");
+		} else if (inventoryHandle instanceof PlayerInventory) {
+			((PlayerInventory) inventoryHandle).b(nbt);
+		} else if (inventoryHandle instanceof InventoryEnderChest) {
+			((InventoryEnderChest) inventoryHandle).a(nbt);
+		} else {
+			throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
+		}
 	}
 }

@@ -115,10 +115,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 	public abstract T convert(String text, T def);
 
 	@Override
-	public T convert(Object value, T def) {
-		if (value == null) {
-			return def;
-		} else if (value instanceof Number) {
+	public T convertSpecial(Object value, Class<?> valueType, T def) {
+		if (value instanceof Number) {
 			return convert((Number) value);
 		} else {
 			return convert(value.toString(), def);

@@ -9,6 +9,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -27,4 +29,7 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, DataWatcher> dataWatcher = Conversion.toDataWatcherHandle.formPair(Conversion.toDataWatcher);
 	public static final ConverterPair<Object, CommonTag> commonTag = Conversion.toNBTTagHandle.formPair(Conversion.toCommonTag);
 	public static final ConverterPair<Integer, BlockFace> paintingFacing = Conversion.toPaintingFacingId.formPair(Conversion.toPaintingFacing);
+	public static final ConverterPair<Object, IntVector3> chunkCoordinates = Conversion.toChunkCoordinatesHandle.formPair(Conversion.toIntVector3);
+	public static final ConverterPair<Object, IntVector3> chunkPosition = Conversion.toChunkPositionHandle.formPair(Conversion.toIntVector3);
+	public static final ConverterPair<Object, IntVector2> chunkIntPair = Conversion.toChunkCoordIntPairHandle.formPair(Conversion.toIntVector2);
 }

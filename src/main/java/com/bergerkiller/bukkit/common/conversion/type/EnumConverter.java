@@ -16,19 +16,12 @@ public class EnumConverter<T> extends BasicConverter<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public T convert(Object value, T def) {
-		if (value == null) {
-			return def;
-		} else if (getOutputType().isAssignableFrom(value.getClass())) {
-			return (T) value;
+	public T convertSpecial(Object value, Class<?> valueType, T def) {
+		String text = ConversionTypes.toString.convert(value);
+		if (text != null) {
+			return ParseUtil.parseEnum(getOutputType(), text, def);
 		} else {
-			String text = ConversionTypes.toString.convert(value);
-			if (text != null) {
-				return ParseUtil.parseEnum(getOutputType(), text, def);
-			} else {
-				return def;
-			}
+			return def;
 		}
 	}
 

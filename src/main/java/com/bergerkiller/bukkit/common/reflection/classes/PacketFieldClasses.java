@@ -282,9 +282,23 @@ public class PacketFieldClasses {
 			return constructor1.newInstance(entityId, dataWatcher, sendUnchangedData);
 		}
 	}
-	public static class NMSPacket41MobEffect extends NMSPacket {
+	public static class NMSPacket41MobEffect extends NMSPacket30Entity {
+		public final FieldAccessor<Byte> effectId = getField("b");
+		public final FieldAccessor<Byte> effectAmplifier = getField("c");
+		public final FieldAccessor<Short> effectDuration = getField("d");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, CommonUtil.getNMSClass("MobEffect"));
+
+		public Object newInstance(int entityId, Object mobEffect) {
+			return constructor1.newInstance(entityId, mobEffect);
+		}
 	}
-	public static class NMSPacket42RemoveMobEffect extends NMSPacket {
+	public static class NMSPacket42RemoveMobEffect extends NMSPacket30Entity {
+		public final FieldAccessor<Byte> effectId = getField("b");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, CommonUtil.getNMSClass("MobEffect"));
+
+		public Object newInstance(int entityId, Object mobEffect) {
+			return constructor1.newInstance(entityId, mobEffect);
+		}
 	}
 	public static class NMSPacket43SetExperience extends NMSPacket {
 	}

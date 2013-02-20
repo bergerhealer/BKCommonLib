@@ -51,10 +51,8 @@ public abstract class CollectionConverter<T extends Collection<?>> extends Basic
 	public abstract T convert(Collection<?> collection);
 
 	@Override
-	public T convert(Object value, T def) {
-		if (value == null) {
-			return def;
-		} else if (value instanceof Collection) {
+	public T convertSpecial(Object value, Class<?> valueType, T def) {
+		if (value instanceof Collection) {
 			return convert((Collection<?>) value);
 		} else if (value instanceof Map) {
 			return convert(((Map<?, ?>) value).values());

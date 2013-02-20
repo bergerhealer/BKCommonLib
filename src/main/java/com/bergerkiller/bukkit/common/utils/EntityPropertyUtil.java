@@ -7,7 +7,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+
 public class EntityPropertyUtil extends EntityGroupingUtil {
+	private static final MethodAccessor<Void> setFirstPlayed = new SafeMethod<Void>(CommonUtil.getCBClass("entity.CraftPlayer"), "setFirstPlayed", long.class);
 
 	public static double getLocX(Entity entity) {
 		return NativeUtil.getNative(entity).locX;
@@ -97,5 +101,15 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 			return NativeUtil.getNative(entity, EntityHuman.class).abilities.isInvulnerable;
 		}
 		return false;
+	}
+
+	/**
+	 * Sets the first time a player played on a server or world
+	 * 
+	 * @param player to set it for
+	 * @param firstPlayed time
+	 */
+	public static void setFirstPlayed(org.bukkit.entity.Player player, long firstPlayed) {
+		setFirstPlayed.invoke(player, firstPlayed);
 	}
 }

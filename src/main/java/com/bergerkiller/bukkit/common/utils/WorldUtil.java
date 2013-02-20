@@ -1,12 +1,16 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_4_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -17,7 +21,9 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityTracker;
 import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
+import net.minecraft.server.v1_4_R1.IDataManager;
 import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_4_R1.WorldNBTStorage;
 import net.minecraft.server.v1_4_R1.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
@@ -98,6 +104,61 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static Collection<Player> getPlayers(org.bukkit.World world) {
 		return NativeUtil.getPlayers(NativeUtil.getNative(world).players);
+	}
+
+	/**
+	 * Gets the folder where world data of a certain world is saved in
+	 * 
+	 * @param world (can not be null)
+	 * @return world folder
+	 */
+	public static File getWorldFolder(org.bukkit.World world) {
+		return getWorldFolder(world.getName());
+	}
+
+	/**
+	 * Gets the folder where world data for a certain world name is saved in
+	 * 
+	 * @param worldName (can not be null)
+	 * @return world folder
+	 */
+	public static File getWorldFolder(String worldName) {
+		return new File(Bukkit.getWorldContainer(), worldName);
+	}
+
+	/**
+	 * Attempts to find a suitable spawn location, searching from the startLocation specified
+	 * 
+	 * @param startLocation to find a spawn from
+	 * @return spawn location, or null if this failed
+	 */
+	public static Location findSpawnLocation(Location startLocation) {
+		WorldServer ws = (WorldServer) Conversion.toWorldHandle.convert(startLocation.getWorld());
+		return new CraftTravelAgent(ws).findOrCreate(startLocation);
+	}
+
+	/**
+	 * Gets the folder where player data of a certain world is saved in
+	 * 
+	 * @param world (can not be null)
+	 * @return players folder
+	 */
+	public static File getPlayersFolder(org.bukkit.World world) {
+		IDataManager man = NativeUtil.getNative(world).getDataManager();
+		if (man instanceof WorldNBTStorage) {
+			return ((WorldNBTStorage) man).getPlayerDir();
+		}
+		return new File(getWorldFolder(world), "players");
+	}
+
+	/**
+	 * Gets the dimension Id of a world
+	 * 
+	 * @param world to get from
+	 * @return world dimension Id
+	 */
+	public static int getDimension(org.bukkit.World world) {
+		return ((World) Conversion.toWorldHandle.convert(world)).worldProvider.dimension;
 	}
 
 	/**

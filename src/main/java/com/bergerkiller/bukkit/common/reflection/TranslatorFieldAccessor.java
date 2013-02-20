@@ -19,6 +19,12 @@ public class TranslatorFieldAccessor<T> implements FieldAccessor<T> {
 
 	@SuppressWarnings("unchecked")
 	public TranslatorFieldAccessor(FieldAccessor<?> base, ConverterPair<?, T> converterPair) {
+		if (base == null) {
+			throw new IllegalArgumentException("Can not construct using a null base");
+		}
+		if (converterPair == null) {
+			throw new IllegalArgumentException("Can not construct using a null converter pair");
+		}
 		this.base = (FieldAccessor<Object>) base;
 		this.converterPair = (ConverterPair<Object, T>) converterPair;
 	}

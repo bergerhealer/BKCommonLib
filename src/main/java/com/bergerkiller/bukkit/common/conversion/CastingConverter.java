@@ -7,25 +7,48 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * 
  * @param <T> - type to cast the output to
  */
-public class CastingConverter<T> extends BasicConverter<T> {
+public class CastingConverter<T> implements Converter<T> {
+	private final Class<T> outputType;
 	private final Converter<?> baseConvertor;
 
 	public CastingConverter(Class<T> outputType, Converter<?> baseConvertor) {
-		super(outputType);
+		this.outputType = outputType;
 		this.baseConvertor = baseConvertor;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public T convert(Object value, T def) {
-		if (value == null) {
-			return def;
-		}
-		Object val = CommonUtil.tryCast(this.baseConvertor.convert(value), this.getOutputType());
+		Object val = CommonUtil.tryCast(baseConvertor.convert(value), this.getOutputType());
 		if (val != null) {
 			return (T) val;
 		} else {
 			return def;
 		}
+	}
+
+	@Override
+	public final T convert(Object value) {
+		return convert(value, null);
+	}
+
+	@Override
+	public Class<T> getOutputType() {
+		return outputType;
+	}
+
+	@Override
+	public boolean isCastingSupported() {
+		return false;
+	}
+
+	@Override
+	public boolean isRegisterSupported() {
+		return true;
+	}
+
+	@Override
+	public <K> ConverterPair<T, K> formPair(Converter<K> converterB) {
+		return new ConverterPair<T, K>(this, converterB);
 	}
 }

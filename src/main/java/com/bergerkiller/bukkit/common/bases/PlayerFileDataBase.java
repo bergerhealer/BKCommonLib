@@ -3,9 +3,12 @@ package com.bergerkiller.bukkit.common.bases;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 import net.minecraft.server.v1_4_R1.EntityHuman;
+import net.minecraft.server.v1_4_R1.IDataManager;
 import net.minecraft.server.v1_4_R1.PlayerFileData;
+import net.minecraft.server.v1_4_R1.WorldNBTStorage;
 
 public abstract class PlayerFileDataBase implements PlayerFileData {
 
@@ -25,6 +28,16 @@ public abstract class PlayerFileDataBase implements PlayerFileData {
 	@Override
 	public final void save(EntityHuman arg0) {
 		save(NativeUtil.getEntity(arg0, HumanEntity.class));
+	}
+
+	@Override
+	public String[] getSeenPlayers() {
+		IDataManager man = NativeUtil.getNative(WorldUtil.getWorlds().iterator().next()).getDataManager();
+		if (man instanceof WorldNBTStorage) {
+			return ((WorldNBTStorage) man).getSeenPlayers();
+		} else {
+			return new String[0];
+		}
 	}
 
 	/**

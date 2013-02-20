@@ -9,6 +9,8 @@ class CommonClasses {
 	 * Then the main server thread class loader is used, which is unable to find (our) net.minecraft.server references
 	 */
 	public static void init() {
+		// Conversion
+		Common.loadClasses(Common.COMMON_ROOT + ".conversion.Conversion");
 		// Reflection classes
 		loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
 		loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashMap", "NetworkManager");

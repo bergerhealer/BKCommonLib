@@ -1,8 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import org.bukkit.World;
+
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 
 public class EntityRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("Entity");
@@ -19,4 +23,5 @@ public class EntityRef {
 	public static final FieldAccessor<Double> motZ = TEMPLATE.getField("motZ");
 	public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
 	public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
+	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 }

@@ -22,10 +22,8 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 
 	public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
 		@Override
-		public Integer convert(Object value, Integer def) {
-			if (value == null) {
-				return def;
-			} else if (value instanceof Material) {
+		public Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
+			if (value instanceof Material) {
 				return ((Material) value).getId();
 			} else if (value instanceof Block) {
 				return ((Block) value).id;
@@ -56,16 +54,12 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	};
 	public static final PropertyConverter<Material> toItemMaterial = new PropertyConverter<Material>(Material.class) {
 		@Override
-		public Material convert(Object value, Material def) {
-			if (value instanceof Material) {
-				return (Material) value;
-			} else {
-				Integer id = toItemId.convert(value);
-				if (id != null) {
-					Material mat = Material.getMaterial(id.intValue());
-					if (mat != null) {
-						return mat;
-					}
+		public Material convertSpecial(Object value, Class<?> valueType, Material def) {
+			Integer id = toItemId.convert(value);
+			if (id != null) {
+				Material mat = Material.getMaterial(id.intValue());
+				if (mat != null) {
+					return mat;
 				}
 			}
 			return def;
@@ -73,22 +67,18 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	};
 	public static final PropertyConverter<Byte> toDifficultyId = new PropertyConverter<Byte>(Byte.class) {
 		@Override
-		public Byte convert(Object value, Byte def) {
-			if (value instanceof Byte) {
-				return (Byte) value;
+		public Byte convertSpecial(Object value, Class<?> valueType, Byte def) {
+			value = WrapperConverter.toDifficulty.convert(value);
+			if (value instanceof Difficulty) {
+				return Byte.valueOf((byte) ((Difficulty) value).getValue());
 			} else {
-				value = WrapperConverter.toDifficulty.convert(value);
-				if (value instanceof Difficulty) {
-					return Byte.valueOf((byte) ((Difficulty) value).getValue());
-				} else {
-					return def;
-				}
+				return def;
 			}
 		}
 	};
 	public static final PropertyConverter<Integer> toPaintingFacingId = new PropertyConverter<Integer>(Integer.class) {
 		@Override
-		public Integer convert(Object value, Integer def) {
+		public Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
 			if (value instanceof Number) {
 				return ((Number) value).intValue();
 			} else {
@@ -106,19 +96,15 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	};
 	public static final PropertyConverter<BlockFace> toPaintingFacing = new PropertyConverter<BlockFace>(BlockFace.class) {
 		@Override
-		public BlockFace convert(Object value, BlockFace def) {
-			if (value instanceof BlockFace) {
-				return (BlockFace) value;
-			} else {
-				Integer id = toPaintingFacingId.convert(value);
-				if (id != null) {
-					final int idInt = id.intValue();
-					if (LogicUtil.isInBounds(paintingFaces, idInt)) {
-						return paintingFaces[idInt];
-					}
+		public BlockFace convertSpecial(Object value, Class<?> valueType, BlockFace def) {
+			Integer id = toPaintingFacingId.convert(value);
+			if (id != null) {
+				final int idInt = id.intValue();
+				if (LogicUtil.isInBounds(paintingFaces, idInt)) {
+					return paintingFaces[idInt];
 				}
-				return def;
 			}
+			return def;
 		}
 	};
 

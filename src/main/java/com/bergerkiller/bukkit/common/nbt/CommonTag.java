@@ -108,7 +108,7 @@ public class CommonTag extends BasicWrapper {
 
 	@Override
 	public String toString() {
-		return handle.toString();
+		return info.toString(handle, 0);
 	}
 
 	@Override

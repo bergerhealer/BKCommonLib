@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.nbt;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
  * Stores the information to obtain and use NBT Tags
@@ -87,6 +89,7 @@ public class NBTTagInfo {
 	public final Constructor<?> constructor;
 	public final Field dataField;
 	public final Class<?> dataType;
+	public final String dataName;
 
 	public NBTTagInfo(Class<?> nbtClass) throws Throwable {
 		this.nbtType = nbtClass;
@@ -94,10 +97,12 @@ public class NBTTagInfo {
 			this.dataField = nbtClass.getDeclaredField("list");
 			this.dataType = List.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
+			this.dataName = "TagList";
 		} else if (NBTRef.NBTTagCompound.isType(nbtClass)) {
 			this.dataField = nbtClass.getDeclaredField("map");
 			this.dataType = Map.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
+			this.dataName = "TagCompound";
 		} else {
 			this.dataField = nbtClass.getDeclaredField("data");
 			final Class<?> dataType = this.dataField.getType();
@@ -109,6 +114,7 @@ public class NBTTagInfo {
 			} else {
 				this.dataType = boxed;
 			}
+			this.dataName = this.dataField.getType().getSimpleName();
 		}
 		this.dataField.setAccessible(true);
 	}
@@ -125,6 +131,36 @@ public class NBTTagInfo {
 		} catch (Throwable t) {
 			throw new RuntimeException("Unable to write data to handle", t);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public String toString(Object handle, int indent) {
+		final String indentTxt = StringUtil.getFilledString("  ", indent);
+		if (!NBTRef.NBTBase.isInstance(handle)) {
+			return indentTxt + "UNKNOWN(\"\"): null";
+		}
+		StringBuilder text = new StringBuilder(100);
+
+		// Data type and name header
+		final String name = NBTRef.getName.invoke(handle);
+		text.append(indentTxt).append(dataName).append("(\"").append(name).append("\"): ");
+
+		// Tag data information
+		Collection<Object> elements;
+		if (NBTRef.NBTTagList.isInstance(handle)) {
+			elements = (List<Object>) getData(handle);
+		} else if (NBTRef.NBTTagCompound.isInstance(handle)) {
+			elements = ((Map<String, Object>) getData(handle)).values();
+		} else {
+			return text.append(getData(handle)).toString();
+		}
+
+		// In case of list and compound: show all values on several lines
+		text.append(elements.size()).append(" entries {");
+		for (Object handleElem : elements) {
+			text.append('\n').append(findInfo(handleElem).toString(handleElem, indent + 1));
+		}
+		return text.append('\n').append(indentTxt).append("}").toString();
 	}
 
 	public Object getData(Object handle) {

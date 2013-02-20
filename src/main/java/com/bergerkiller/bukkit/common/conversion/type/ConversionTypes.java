@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -59,6 +60,9 @@ public class ConversionTypes {
 	public static final HandleConverter toGameModeHandle = HandleConverter.toGameModeHandle;
 	public static final HandleConverter toWorldTypeHandle = HandleConverter.toWorldHandle;
 	public static final HandleConverter toPacketHandle = HandleConverter.toPacketHandle;
+	public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.toChunkCoordIntPairHandle;
+	public static final HandleConverter toChunkCoordinatesHandle = HandleConverter.toChunkCoordinatesHandle;
+	public static final HandleConverter toChunkPositionHandle = HandleConverter.toChunkPositionHandle;
 	// Wrappers
 	public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
 	public static final WrapperConverter<World> toWorld = WrapperConverter.toWorld;
@@ -74,6 +78,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<CommonPacket> toCommonPacket = WrapperConverter.toCommonPacket;
 	public static final WrapperConverter<IntVector2> toIntVector2 = WrapperConverter.toIntVector2;
 	public static final WrapperConverter<IntVector3> toIntVector3 = WrapperConverter.toIntVector3;
+	public static final WrapperConverter<Vector> toVector = WrapperConverter.toVector;
 	// Properties
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;

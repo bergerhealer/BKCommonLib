@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.nbt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -195,8 +198,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	 * @return value at the key
 	 */
 	public UUID getUUID(String key) {
-		Object most = getData(key + "UUIDMost");
-		Object least = getData(key + "UUIDLeast");
+		Object most = getValue(key + "UUIDMost");
+		Object least = getValue(key + "UUIDLeast");
 		if (most instanceof Long && least instanceof Long) {
 			return new UUID((Long) most, (Long) least);
 		} else {
@@ -222,6 +225,55 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 		}
 		putValue(key + "UUIDMost", most);
 		putValue(key + "UUIDLeast", least);
+	}
+
+	/**
+	 * Obtains a CommonTagCompound at the key, if it does not exist
+	 * a new one is created at the key.
+	 * 
+	 * @param key to get or create at
+	 * @return CommonTagCompound
+	 */
+	public CommonTagCompound createCompound(Object key) {
+		if (key == null) {
+			throw new IllegalArgumentException("Can not store elements under null keys");
+		}
+		Object elementHandle = getRawData().get(key);
+		if (!NBTRef.NBTTagCompound.isInstance(elementHandle)) {
+			elementHandle = NBTRef.NBTTagCompound.newInstance();
+			getRawData().put(key.toString(), elementHandle);
+		}
+		return (CommonTagCompound) create(elementHandle);
+	}
+
+	/**
+	 * Obtains a CommonTagList at the key, if it does not exist
+	 * a new one is created at the key.
+	 * 
+	 * @param key to get or create at
+	 * @return CommonTagList
+	 */
+	public CommonTagList createList(Object key) {
+		if (key == null) {
+			throw new IllegalArgumentException("Can not store elements under null keys");
+		}
+		Object elementHandle = getRawData().get(key);
+		if (!NBTRef.NBTTagList.isInstance(elementHandle)) {
+			elementHandle = NBTRef.NBTTagList.newInstance();
+			getRawData().put(key.toString(), elementHandle);
+		}
+		return (CommonTagList) create(elementHandle);
+	}
+
+	/**
+	 * Gets a certain type of tag from this Tag Compound
+	 * 
+	 * @param key to get the tag at
+	 * @param type of tag to get
+	 * @return the tag, or null if this was not possible
+	 */
+	public <T extends CommonTag> T get(Object key, Class<T> type) {
+		return Conversion.convert(get(key), type);
 	}
 
 	@Override
@@ -301,7 +353,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	public Set<Entry<String, CommonTag>> entrySet() {
 		return Collections.unmodifiableSet((Set<Entry<String, CommonTag>>) nbtToCommon(getRawData(), true));
 	}
-	
+
 	/**
 	 * Writes this CommonTagCompound to the OutputStream specified
 	 * 
@@ -313,13 +365,49 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
+	 * Writes this CommonTagCompound to the file specified<br>
+	 * First writes to a temporary file to avoid corrupted files
+	 * 
+	 * @param file to write to
+	 * @throws IOException on failure
+	 */
+	public void writeTo(File file) throws IOException {
+		File tmp = new File(file.toString() + ".tmp");
+		FileOutputStream stream = new FileOutputStream(tmp);
+		try {
+			writeTo(stream);
+			if ((file.exists() && !file.delete()) || !tmp.renameTo(file)) {
+				throw new IOException("No write access for file '" + file.toString() + "'");
+			}
+		} finally {
+			stream.close();
+		}
+	}
+
+	/**
 	 * Reads a CommonTagCompound from the InputStream specified
 	 * 
 	 * @param stream to read from
 	 * @return read compound
-	 * @throws IOException
+	 * @throws IOException on failure
 	 */
 	public static CommonTagCompound readFrom(InputStream stream) throws IOException {
 		return (CommonTagCompound) create(NBTUtil.readCompound(stream));
+	}
+
+	/**
+	 * Reads a CommonTagCompound from the file specified
+	 * 
+	 * @param file to read from
+	 * @return read compound
+	 * @throws IOException on failure
+	 */
+	public static CommonTagCompound readFrom(File file) throws IOException {
+		FileInputStream stream = new FileInputStream(file);
+		try {
+			return readFrom(stream);
+		} finally {
+			stream.close();
+		}
 	}
 }

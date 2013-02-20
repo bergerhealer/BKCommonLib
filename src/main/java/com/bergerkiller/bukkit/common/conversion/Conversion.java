@@ -17,6 +17,7 @@ public class Conversion extends ConversionTypes {
 	private static final Map<Class<?>, Converter<Object>> converters = new ConcurrentHashMap<Class<?>, Converter<Object>>();
 	static {
 		registerAll(ConversionTypes.class);
+		ConversionPairs.class.getModifiers(); // Load this class
 	}
 
 	/**

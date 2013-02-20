@@ -21,12 +21,8 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 	public static final NumberConverter<Double> toDouble = NumberConverter.toDouble;
 	public static final PrimitiveConverter<Boolean> toBool = new PrimitiveConverter<Boolean>(Boolean.class, false) {
 		@Override
-		public Boolean convert(Object value, Boolean def) {
-			if (value == null) {
-				return def;
-			} else if (value instanceof Boolean) {
-				return (Boolean) value;
-			} else if (value instanceof Number) {
+		public Boolean convertSpecial(Object value, Class<?> valueType, Boolean def) {
+			if (value instanceof Number) {
 				return ((Number) value).doubleValue() != 0.0;
 			} else {
 				return ParseUtil.parseBool(value.toString(), def);
@@ -35,12 +31,8 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 	};
 	public static final PrimitiveConverter<Character> toChar = new PrimitiveConverter<Character>(Character.class, '\0') {
 		@Override
-		public Character convert(Object value, Character def) {
-			if (value == null) {
-				return def;
-			} else if (value instanceof Character) {
-				return (Character) value;
-			} else if (value instanceof Number) {
+		public Character convertSpecial(Object value, Class<?> valueType, Character def) {
+			if (value instanceof Number) {
 				return (char) ((Number) value).byteValue();
 			} else {
 				final String text = value.toString();
@@ -50,12 +42,8 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 	};
 	public static final PrimitiveConverter<String> toString = new PrimitiveConverter<String>(String.class, "") {
 		@Override
-		public String convert(Object value, String def) {
-			if (value == null) {
-				return def;
-			} else if (value instanceof String) {
-				return (String) value;
-			} else if (value instanceof CharSequence) {
+		public String convertSpecial(Object value, Class<?> valueType, String def) {
+			if (value instanceof CharSequence) {
 				return value.toString();
 			} else if (value instanceof char[]) {
 				return String.copyValueOf((char[]) value);

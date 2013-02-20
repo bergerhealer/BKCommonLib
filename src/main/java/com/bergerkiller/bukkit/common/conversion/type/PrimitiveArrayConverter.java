@@ -77,13 +77,8 @@ public class PrimitiveArrayConverter<T> extends BasicConverter<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public T convert(Object value, T def) {
-		if (value == null) {
-			return def;
-		} else if (value.getClass().equals(getOutputType())) {
-			return (T) value;
-		} else if (value instanceof Collection) {
+	public T convertSpecial(Object value, Class<?> valueType, T def) {
+		if (value instanceof Collection) {
 			return convert((Collection<?>) value);
 		} else if (value instanceof Map) {
 			return convert(((Map<?, ?>) value).values());

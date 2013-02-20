@@ -1,8 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * An empty converter that does nothing but casting the values to the output type
@@ -16,8 +14,8 @@ public class EmptyConverter<T> extends BasicConverter<T> {
 	}
 
 	@Override
-	public T convert(Object value, T def) {
-		return LogicUtil.fixNull(CommonUtil.tryCast(value, getOutputType()), def);
+	public T convertSpecial(Object value, Class<?> valueType, T def) {
+		return def;
 	}
 
 	@Override

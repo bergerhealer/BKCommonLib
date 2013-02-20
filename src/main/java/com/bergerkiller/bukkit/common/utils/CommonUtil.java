@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import net.minecraft.server.v1_4_R1.EntityHuman;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
 import net.minecraft.server.v1_4_R1.PlayerFileData;
 
@@ -13,12 +14,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_4_R1.CraftServer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -133,6 +136,15 @@ public class CommonUtil {
 	 */
 	public static void setPlayerFileData(Object playerFileData) {
 		getCraftServer().getHandle().playerFileData = (PlayerFileData) playerFileData;
+	}
+
+	/**
+	 * Saves the specified human information to file
+	 * 
+	 * @param human to save
+	 */
+	public static void savePlayer(HumanEntity human) {
+		getCraftServer().getHandle().playerFileData.save((EntityHuman) Conversion.toEntityHandle.convert(human));
 	}
 
 	/**
