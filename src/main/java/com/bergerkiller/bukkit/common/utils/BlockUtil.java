@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import net.minecraft.server.v1_4_R1.Block;
 import net.minecraft.server.v1_4_R1.ChunkCoordinates;
-import net.minecraft.server.v1_4_R1.Packet;
 import net.minecraft.server.v1_4_R1.TileEntity;
 import net.minecraft.server.v1_4_R1.TileEntityChest;
 import net.minecraft.server.v1_4_R1.TileEntityDispenser;
@@ -25,6 +25,9 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 
 /**
@@ -451,12 +454,19 @@ public class BlockUtil extends MaterialUtil {
 		return blocks;
 	}
 
-	public static org.bukkit.World getWorld(TileEntity tile) {
-		return TileEntityRef.world.get(tile).getWorld();
+	public static org.bukkit.World getWorld(Object tileEntity) {
+		return TileEntityRef.world.get(tileEntity);
 	}
 
-	public static Packet getUpdatePacket(TileEntity tile) {
-		return tile.getUpdatePacket();
+	/**
+	 * Obtains a new packet that can be used to update tile entity information to nearby players<br>
+	 * Returns null if none are needed or supported by the tile entity
+	 * 
+	 * @param tileEntity to get the update packet for
+	 * @return update packet
+	 */
+	public static CommonPacket getUpdatePacket(Object tileEntity) {
+		return Conversion.toCommonPacket.convert(((TileEntity) tileEntity).getUpdatePacket());
 	}
 
 	private static final LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();

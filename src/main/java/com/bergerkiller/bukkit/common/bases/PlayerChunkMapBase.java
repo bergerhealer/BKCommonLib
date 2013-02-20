@@ -1,13 +1,17 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import org.bukkit.World;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.PlayerChunkMap;
 import net.minecraft.server.v1_4_R1.WorldServer;
 
-public class PlayerManagerBase extends PlayerChunkMap {
+public class PlayerChunkMapBase extends PlayerChunkMap {
 
-	public PlayerManagerBase(WorldServer worldserver, int viewDistace) {
-		super(worldserver, viewDistace);
+	public PlayerChunkMapBase(World world, int viewDistace) {
+		super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistace);
 	}
 
 	/**
@@ -16,7 +20,7 @@ public class PlayerManagerBase extends PlayerChunkMap {
 	@Deprecated
 	@Override
 	public final WorldServer a() {
-		return this.getWorld();
+		return (WorldServer) Conversion.toWorldHandle.convert(this.getWorld());
 	}
 
 	/**
@@ -41,8 +45,14 @@ public class PlayerManagerBase extends PlayerChunkMap {
 		super.b(entityplayer);
 	}
 
-	public WorldServer getWorld() {
-		return super.a();
+	/**
+	 * Gets the world from this PlayerManager<br>
+	 * Is called by the PlayerChunkInstance initializer as well
+	 * 
+	 * @return World
+	 */
+	public World getWorld() {
+		return Conversion.toWorld.convert(super.a());
 	}
 
 	public boolean containsPlayer(EntityPlayer entityplayer, int chunkX, int chunkZ) {

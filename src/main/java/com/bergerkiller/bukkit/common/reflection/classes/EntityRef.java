@@ -11,4 +11,12 @@ public class EntityRef {
 	public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("aj");
 	public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("ak");
 	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("am");
+	public static final FieldAccessor<Double> locX = TEMPLATE.getField("locX");
+	public static final FieldAccessor<Double> locY = TEMPLATE.getField("locY");
+	public static final FieldAccessor<Double> locZ = TEMPLATE.getField("locZ");
+	public static final FieldAccessor<Double> motX = TEMPLATE.getField("motX");
+	public static final FieldAccessor<Double> motY = TEMPLATE.getField("motY");
+	public static final FieldAccessor<Double> motZ = TEMPLATE.getField("motZ");
+	public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
+	public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
 }

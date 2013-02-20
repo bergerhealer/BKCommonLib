@@ -3,16 +3,16 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.v1_4_R1.LongHashMap;
-
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class LongHashMapRef {
-	private static final FieldAccessor<Object[]> entriesField = new SafeField<Object[]>(LongHashMap.class, "entries");
-	private static final FieldAccessor<Integer> countField = new SafeField<Integer>(LongHashMap.class, "count");
+	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("LongHashMap");
+	private static final FieldAccessor<Object[]> entriesField = TEMPLATE.getField("entries");
+	private static final FieldAccessor<Integer> countField = TEMPLATE.getField("count");
 
-	public static Collection<Object> getValues(LongHashMap instance) {
+	public static Collection<Object> getValues(Object instance) {
 		Object[] entries = getEntries(instance);
 		ArrayList<Object> values = new ArrayList<Object>(entries.length);
 		for (int i = 0; i < entries.length; i++) {
@@ -23,11 +23,11 @@ public class LongHashMapRef {
 		return values;
 	}
 
-	public static Object[] getEntries(LongHashMap instance) {
+	public static Object[] getEntries(Object instance) {
 		return entriesField.get(instance);
 	}
 
-	public static void setEntries(LongHashMap instance, Object[] entries) {
+	public static void setEntries(Object instance, Object[] entries) {
 		entriesField.set(instance, entries);
 		countField.set(instance, entries.length);
 	}

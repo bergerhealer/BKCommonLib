@@ -1,16 +1,26 @@
 package com.bergerkiller.bukkit.common.reflection;
 
+import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
 /**
  * A field accessor that can translate from one type to another to expose a different type than is stored
+ * 
  * @param <T> Type exposed
- * @param <K> Type stored
  */
-public abstract class TranslatorFieldAccessor<T> implements FieldAccessor<T> {
+public class TranslatorFieldAccessor<T> implements FieldAccessor<T> {
 	private final FieldAccessor<Object> base;
+	private final ConverterPair<Object, T> converterPair;
 
 	@SuppressWarnings("unchecked")
-	public TranslatorFieldAccessor(FieldAccessor<?> base) {
+	public TranslatorFieldAccessor(FieldAccessor<?> base, Converter<?> setConverter, Converter<T> getConverter) {
+		this(base, new ConverterPair<Object, T>((Converter<Object>) setConverter, getConverter));
+	}
+
+	@SuppressWarnings("unchecked")
+	public TranslatorFieldAccessor(FieldAccessor<?> base, ConverterPair<?, T> converterPair) {
 		this.base = (FieldAccessor<Object>) base;
+		this.converterPair = (ConverterPair<Object, T>) converterPair;
 	}
 
 	@Override
@@ -41,32 +51,21 @@ public abstract class TranslatorFieldAccessor<T> implements FieldAccessor<T> {
 
 	@Override
 	public T get(Object instance) {
-		return convert(getInternal(instance));
+		return converterPair.convertB(getInternal(instance));
 	}
 
 	@Override
 	public boolean set(Object instance, T value) {
-		return setInternal(instance, revert(value));
+		return setInternal(instance, converterPair.convertA(value));
 	}
 
 	@Override
 	public T transfer(Object from, Object to) {
-		return convert(base.transfer(from, to));
+		return converterPair.convertB(base.transfer(from, to));
 	}
 
-	/**
-	 * Converts the base value from the stored type to the exposed type
-	 * 
-	 * @param value to convert
-	 * @return Value converted to the exposed type
-	 */
-	public abstract T convert(Object value);
-
-	/**
-	 * Reverts the base value from the exposed type to the stored type
-	 * 
-	 * @param value to revert
-	 * @return Value reverted to the stored type
-	 */
-	public abstract Object revert(T value);
+	@Override
+	public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
+		return new TranslatorFieldAccessor<K>(this, converterPair);
+	}
 }

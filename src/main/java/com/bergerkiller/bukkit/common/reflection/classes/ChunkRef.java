@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.Map;
+
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -12,6 +14,7 @@ import net.minecraft.server.v1_4_R1.ChunkSection;
 import net.minecraft.server.v1_4_R1.EnumSkyBlock;
 
 public class ChunkRef {
+	private static final Class<?> icp = CommonUtil.getNMSClass("IChunkProvider");
 	public static final int XZ_MASK = 0xf;
 	public static final int Y_MASK = 0xff;
 	public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("Chunk");
@@ -19,15 +22,27 @@ public class ChunkRef {
 	public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
 	public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("m");
 	public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("i");
+	public static final FieldAccessor<Boolean> seenByPlayer = TEMPLATE.getField("seenByPlayer");
+	private static final MethodAccessor<Void> addEntities = TEMPLATE.getMethod("addEntities");
+	private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("a", icp, icp, int.class, int.class);
 	public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
+	public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
 	public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
 	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "f");
+
+	public static void loadNeighbours(Object chunkHandle, Object chunkProvider1, Object chunkProvider2, int x, int z) {
+		loadNeighbours.invoke(chunkHandle, chunkProvider1, chunkProvider2, x, z);
+	}
+
+	public static void addEntities(Object chunkHandle) {
+		addEntities.invoke(chunkHandle);
+	}
 
 	/**
 	 * Gets all chunk sections contained in a chunk
 	 */
-	public static ChunkSection[] getSections(Chunk chunk) {
-		return chunk.i();
+	public static ChunkSection[] getSections(Object chunkHandle) {
+		return (ChunkSection[]) sections.invoke(chunkHandle);
 	}
 
 	/**

@@ -4,13 +4,21 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Chunk;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldType;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 public class ConversionTypes {
@@ -48,6 +56,9 @@ public class ConversionTypes {
 	public static final HandleConverter toDataWatcherHandle = HandleConverter.toDataWatcherHandle;
 	public static final HandleConverter toNBTTagHandle = HandleConverter.toNBTTagHandle;
 	public static final HandleConverter toBlockHandle = HandleConverter.toBlockHandle;
+	public static final HandleConverter toGameModeHandle = HandleConverter.toGameModeHandle;
+	public static final HandleConverter toWorldTypeHandle = HandleConverter.toWorldHandle;
+	public static final HandleConverter toPacketHandle = HandleConverter.toPacketHandle;
 	// Wrappers
 	public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
 	public static final WrapperConverter<World> toWorld = WrapperConverter.toWorld;
@@ -56,7 +67,17 @@ public class ConversionTypes {
 	public static final WrapperConverter<BlockState> toBlockState = WrapperConverter.toBlockState;
 	public static final WrapperConverter<CommonTag> toCommonTag = WrapperConverter.toCommonTag;
 	public static final WrapperConverter<DataWatcher> toDataWatcher = WrapperConverter.toDataWatcher;
+	public static final WrapperConverter<ItemStack> toItemStack = WrapperConverter.toItemStack;
+	public static final WrapperConverter<Difficulty> toDifficulty = WrapperConverter.toDifficulty;
+	public static final WrapperConverter<WorldType> toWorldType = WrapperConverter.toWorldType;
+	public static final WrapperConverter<GameMode> toGameMode = WrapperConverter.toGameMode;
+	public static final WrapperConverter<CommonPacket> toCommonPacket = WrapperConverter.toCommonPacket;
+	public static final WrapperConverter<IntVector2> toIntVector2 = WrapperConverter.toIntVector2;
+	public static final WrapperConverter<IntVector3> toIntVector3 = WrapperConverter.toIntVector3;
 	// Properties
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
+	public static final PropertyConverter<Byte> toDifficultyId = PropertyConverter.toDifficultyId;
+	public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
+	public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
 }

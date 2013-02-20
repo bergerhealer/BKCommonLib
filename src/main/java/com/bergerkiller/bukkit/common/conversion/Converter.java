@@ -52,4 +52,12 @@ public interface Converter<T> {
 	 * @return True if Conversion table registration is enabled, False if not
 	 */
 	public boolean isRegisterSupported();
+
+	/**
+	 * Creates a new ConverterPair with this converter as A and the specified converter as B
+	 * 
+	 * @param converterB to form a pair with
+	 * @return new ConverterPair
+	 */
+	public <K> ConverterPair<T, K> formPair(Converter<K> converterB);
 }

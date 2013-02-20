@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection;
 
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
 /**
  * Defines the methods to access a certain field
  */
@@ -37,4 +39,12 @@ public interface FieldAccessor<T> {
 	 * @return the old value in the to instance
 	 */
 	T transfer(Object from, Object to);
+
+	/**
+	 * Translates the get and set types using a converter pair
+	 * 
+	 * @param converterPair to use for the translation
+	 * @return translated Field accessor
+	 */
+	<K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair);
 }

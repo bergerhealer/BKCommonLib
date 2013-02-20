@@ -34,6 +34,10 @@ public class PacketUtil {
 		CommonPlugin.getInstance().sendPacket(player, packet, throughListeners);
 	}
 
+	public static void sendCommonPacket(Player player, CommonPacket packet) {
+		sendCommonPacket(player, packet, true);
+	}
+
 	public static void sendCommonPacket(Player player, CommonPacket packet, boolean throughListeners) {
 		sendPacket(player, packet.getHandle(), throughListeners);
 	}

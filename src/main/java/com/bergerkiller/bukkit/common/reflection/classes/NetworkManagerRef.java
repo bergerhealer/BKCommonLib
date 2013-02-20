@@ -1,10 +1,15 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_4_R1.NetworkManager;
+import java.util.List;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class NetworkManagerRef {
-	public static FieldAccessor<Integer> queueSize = new SafeField<Integer>(NetworkManager.class, "y");
+	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("NetworkManager");
+	public static final FieldAccessor<Integer> queueSize = TEMPLATE.getField("y");
+	public static final FieldAccessor<Object> lockObject = TEMPLATE.getField("h");
+	public static final FieldAccessor<List<Object>> lowPriorityQueue = TEMPLATE.getField("lowPriorityQueue");
+	public static final FieldAccessor<List<Object>> highPriorityQueue = TEMPLATE.getField("highPriorityQueue");
 }

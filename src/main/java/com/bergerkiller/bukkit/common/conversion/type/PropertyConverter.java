@@ -1,8 +1,12 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import org.bukkit.Difficulty;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 import net.minecraft.server.v1_4_R1.*;
@@ -14,6 +18,8 @@ import net.minecraft.server.v1_4_R1.*;
  * @param <T> - type of output
  */
 public abstract class PropertyConverter<T> extends BasicConverter<T> {
+	private static final BlockFace[] paintingFaces = {BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST};
+
 	public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
 		@Override
 		public Integer convert(Object value, Integer def) {
@@ -63,6 +69,56 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 				}
 			}
 			return def;
+		}
+	};
+	public static final PropertyConverter<Byte> toDifficultyId = new PropertyConverter<Byte>(Byte.class) {
+		@Override
+		public Byte convert(Object value, Byte def) {
+			if (value instanceof Byte) {
+				return (Byte) value;
+			} else {
+				value = WrapperConverter.toDifficulty.convert(value);
+				if (value instanceof Difficulty) {
+					return Byte.valueOf((byte) ((Difficulty) value).getValue());
+				} else {
+					return def;
+				}
+			}
+		}
+	};
+	public static final PropertyConverter<Integer> toPaintingFacingId = new PropertyConverter<Integer>(Integer.class) {
+		@Override
+		public Integer convert(Object value, Integer def) {
+			if (value instanceof Number) {
+				return ((Number) value).intValue();
+			} else {
+				BlockFace face = Conversion.convert(value, BlockFace.class);
+				if (face != null) {
+					for (int i = 0; i < paintingFaces.length; i++) {
+						if (paintingFaces[i] == face) {
+							return i;
+						}
+					}
+				}
+				return def;
+			}
+		}
+	};
+	public static final PropertyConverter<BlockFace> toPaintingFacing = new PropertyConverter<BlockFace>(BlockFace.class) {
+		@Override
+		public BlockFace convert(Object value, BlockFace def) {
+			if (value instanceof BlockFace) {
+				return (BlockFace) value;
+			} else {
+				Integer id = toPaintingFacingId.convert(value);
+				if (id != null) {
+					final int idInt = id.intValue();
+					if (LogicUtil.isInBounds(paintingFaces, idInt)) {
+						return paintingFaces[idInt];
+					}
+				}
+				return def;
+			}
 		}
 	};
 

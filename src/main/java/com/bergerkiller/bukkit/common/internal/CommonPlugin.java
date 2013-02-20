@@ -276,7 +276,7 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
-		if (packet == null || player == null) {
+		if (!PacketFields.DEFAULT.isInstance(packet) || player == null) {
 			return;
 		}
 		final EntityPlayer ep = NativeUtil.getNative(player);

@@ -1,13 +1,17 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import org.bukkit.World;
+
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import net.minecraft.server.v1_4_R1.ChunkProviderServer;
-import net.minecraft.server.v1_4_R1.IChunkLoader;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 
 public class ChunkProviderServerRef {
-	public static final ClassTemplate<ChunkProviderServer> TEMPLATE = ClassTemplate.create(ChunkProviderServer.class);
-	public static final FieldAccessor<IChunkLoader> chunkLoader = TEMPLATE.getField("e");
+	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("ChunkProviderServer");
+	public static final FieldAccessor<Object> chunkLoader = TEMPLATE.getField("e");
 	public static final FieldAccessor<Object> chunks = TEMPLATE.getField("chunks");
 	public static final FieldAccessor<Object> unloadQueue = TEMPLATE.getField("unloadQueue");
+	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 }

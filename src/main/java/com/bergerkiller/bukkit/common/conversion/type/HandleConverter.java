@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_4_R1.*;
 
+import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_4_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
@@ -11,9 +12,14 @@ import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 
@@ -207,7 +213,48 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
-
+	public static final HandleConverter toGameModeHandle = new HandleConverter(EnumGamemodeRef.TEMPLATE.getType()) {
+		@Override
+		public Object convert(Object value, Object def) {
+			if (EnumGamemodeRef.TEMPLATE.isInstance(value)) {
+				return value;
+			} else {
+				GameMode gameMode = Conversion.toGameMode.convert(value);
+				if (gameMode != null) {
+					return EnumGamemodeRef.getFromId.invoke(null, gameMode.getValue());
+				}
+				return def;
+			}
+		}
+	};
+	public static final HandleConverter toWorldTypeHandle = new HandleConverter(WorldTypeRef.TEMPLATE.getType()) {
+		@Override
+		public Object convert(Object value, Object def) {
+			if (WorldTypeRef.TEMPLATE.isInstance(value)) {
+				return value;
+			} else {
+				org.bukkit.WorldType type = Conversion.toWorldType.convert(value);
+				if (type != null) {
+					return WorldTypeRef.getType.invoke(null, type.getName());
+				} else {
+					return def;
+				}
+			}
+		}
+	};
+	public static final HandleConverter toPacketHandle = new HandleConverter(PacketFields.DEFAULT.getType()) {
+		@Override
+		public Object convert(Object value, Object def) {
+			if (PacketFields.DEFAULT.isInstance(value)) {
+				return value;
+			} else if (value instanceof CommonPacket) {
+				return ((CommonPacket) value).getHandle();
+			} else {
+				return def;
+			}
+		}
+	};
+	
 	@SuppressWarnings("unchecked")
 	public HandleConverter(Class<?> outputType) {
 		super((Class<Object>) outputType);

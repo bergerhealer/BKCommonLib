@@ -31,4 +31,9 @@ public abstract class BasicConverter<T> implements Converter<T> {
 	public boolean isRegisterSupported() {
 		return true;
 	}
+
+	@Override
+	public <K> ConverterPair<T, K> formPair(Converter<K> converterB) {
+		return new ConverterPair<T, K>(this, converterB);
+	}
 }

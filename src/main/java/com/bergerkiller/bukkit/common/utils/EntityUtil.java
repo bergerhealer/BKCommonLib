@@ -5,7 +5,6 @@ import java.util.UUID;
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
 import net.minecraft.server.v1_4_R1.IntHashMap;
 import net.minecraft.server.v1_4_R1.MathHelper;
 import net.minecraft.server.v1_4_R1.World;
@@ -14,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 public class EntityUtil extends EntityPropertyUtil {
@@ -65,10 +65,10 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * 
 	 * @param toreplace Entity, which will be removed
 	 * @param with Entity, which will be added in its place
-	 * @param tracker to use for the new entity
+	 * @param entityTrackerEntry to use for the new entity
 	 */
 	@SuppressWarnings("unchecked")
-	public static void setEntity(final Entity toreplace, final Entity with, EntityTrackerEntry tracker) {
+	public static void setEntity(final Entity toreplace, final Entity with, Object entityTrackerEntry) {
 		// transfer important information
 		with.locX = toreplace.locX;
 		with.locY = toreplace.locY;
@@ -102,7 +102,7 @@ public class EntityUtil extends EntityPropertyUtil {
 		}
 
 		// replace the entity in the 'entities by id' map
-		final IntHashMap entitiesById = WorldServerRef.entitiesById.get(toreplace.world);
+		final IntHashMap entitiesById = (IntHashMap) WorldServerRef.entitiesById.get(toreplace.world);
 		if (entitiesById.d(toreplace.id) == null) {
 			CommonUtil.nextTick(new Runnable() {
 				public void run() {
@@ -124,8 +124,8 @@ public class EntityUtil extends EntityPropertyUtil {
 		}
 
 		// put the new entity tracker
-		tracker.tracker = with;
-		WorldUtil.setTrackerEntry(toreplace, tracker);
+		EntityTrackerEntryRef.tracker.setInternal(entityTrackerEntry, with);
+		WorldUtil.setTrackerEntry(toreplace, entityTrackerEntry);
 	}
 
 	@SuppressWarnings({"unchecked"})

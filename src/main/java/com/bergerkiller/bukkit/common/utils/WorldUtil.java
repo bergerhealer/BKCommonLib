@@ -5,10 +5,15 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
+
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityTracker;
 import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
@@ -45,7 +50,7 @@ public class WorldUtil extends ChunkUtil {
 	public static void removeEntity(org.bukkit.entity.Entity entity) {
 		Entity e = NativeUtil.getNative(entity);
 		e.world.removeEntity(e);
-		getTracker(entity.getWorld()).untrackEntity(e);
+		((EntityTracker) getTracker(entity.getWorld())).untrackEntity(e);
 	}
 
 	/**
@@ -96,12 +101,22 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	/**
+	 * Gets the server a world object is running on
+	 * 
+	 * @param world to get the server of
+	 * @return server
+	 */
+	public static Server getServer(org.bukkit.World world) {
+		return WorldServerRef.getServer(Conversion.toWorldHandle.convert(world));
+	}
+
+	/**
 	 * Gets the Entity Tracker for the world specified
 	 * 
 	 * @param world to get the tracker for
 	 * @return world Entity Tracker
 	 */
-	public static EntityTracker getTracker(org.bukkit.World world) {
+	public static Object getTracker(org.bukkit.World world) {
 		return getTracker(NativeUtil.getNative(world));
 	}
 
@@ -111,7 +126,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @param world to get the tracker for
 	 * @return world Entity Tracker
 	 */
-	public static EntityTracker getTracker(World world) {
+	public static Object getTracker(World world) {
 		return ((WorldServer) world).tracker;
 	}
 
@@ -121,28 +136,28 @@ public class WorldUtil extends ChunkUtil {
 	 * @param entity to get it for
 	 * @return entity tracker entry, or null if none is set
 	 */
-	public static EntityTrackerEntry getTrackerEntry(Entity entity) {
-		return (EntityTrackerEntry) WorldUtil.getTracker(entity.world).trackedEntities.get(entity.id);
+	public static Object getTrackerEntry(Entity entity) {
+		return ((EntityTracker) WorldUtil.getTracker(entity.world)).trackedEntities.get(entity.id);
 	}
 
 	/**
 	 * Sets a new entity tracker entry for the entity specified
 	 * 
 	 * @param entity to set it for
-	 * @param tracker to set to (can be null to remove only)
+	 * @param entityTrackerEntrytracker to set to (can be null to remove only)
 	 * @return the previous tracker entry for the entity, or null if there was none
 	 */
-	public static EntityTrackerEntry setTrackerEntry(Entity entity, EntityTrackerEntry tracker) {
-		EntityTracker t = getTracker(entity.world);
-		Set<EntityTrackerEntry> trackers = EntityTrackerRef.trackerSet.get(t);
+	public static Object setTrackerEntry(Entity entity, Object entityTrackerEntry) {
+		EntityTracker t = (EntityTracker) getTracker(entity.world);
+		Set<Object> trackers = EntityTrackerRef.trackerSet.get(t);
 		synchronized (t) {
-			EntityTrackerEntry old = (EntityTrackerEntry) t.trackedEntities.d(entity.id);
+			Object old = (EntityTrackerEntry) t.trackedEntities.d(entity.id);
 			if (old != null) {
 				trackers.remove(old);
 			}
-			if (tracker != null) {
-				trackers.add(tracker);
-				t.trackedEntities.a(entity.id, tracker);
+			if (entityTrackerEntry != null) {
+				trackers.add(entityTrackerEntry);
+				t.trackedEntities.a(entity.id, entityTrackerEntry);
 			}
 			return old;
 		}

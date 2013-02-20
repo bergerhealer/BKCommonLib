@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -208,5 +209,10 @@ public class SafeField<T> implements FieldAccessor<T> {
 	*/
 	public static<T> SafeField<T> create(Class<?> type, String name) {
 		return new SafeField<T>(type, name);
+	}
+
+	@Override
+	public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
+		return new TranslatorFieldAccessor<K>(this, converterPair);
 	}
 }

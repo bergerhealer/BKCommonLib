@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -224,7 +225,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	 * 
 	 * @return Entity spawn packet
 	 */
-	public Object getSpawnPacket() {
-		return EntityTrackerEntryRef.getSpawnPacket.invoke(this);
+	public CommonPacket getSpawnPacket() {
+		return EntityTrackerEntryRef.getSpawnPacket(this);
 	}
 }
