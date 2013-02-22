@@ -1,9 +1,9 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
-version: 1.49
+version: 1.50
 authors: [bergerkiller, lenis0012]
 metrics: true
 load: startup
 description: Is used in all of my plugins to re-use common functions
-softdepend: [Vault, ProtocolLib]
+softdepend: [Vault, ProtocolLib, Spout]
 dev-url: http://dev.bukkit.org/server-mods/bkcommonlib/

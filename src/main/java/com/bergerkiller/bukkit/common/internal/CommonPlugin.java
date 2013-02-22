@@ -70,12 +70,16 @@ public class CommonPlugin extends PluginBase {
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
-	public boolean isProtocolLibEnabled = false;
+	private boolean isProtocolLibEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	public List<Entity> entities = new ArrayList<Entity>();
 
 	public static CommonPlugin getInstance() {
 		return instance;
+	}
+
+	public boolean isUsingFallBackPacketListener() {
+		return !isProtocolLibEnabled;
 	}
 
 	/**
@@ -338,9 +342,23 @@ public class CommonPlugin extends PluginBase {
 				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
 				CommonPacketListener.bindAll();
 			}
+		} else if (enabled && pluginName.equals("Spout")) {
+			failSpout();
 		}
 	}
 
+	private boolean failSpout() {
+		if (CommonUtil.getPlugin("ProtocolLib") != null) {
+			return false;
+		}
+		log(Level.SEVERE, "BKCommonLib is incompatible with Spout Plugin because packets are intercepted");
+		log(Level.SEVERE, "Install ProtocolLib to restore compatibility with Spout Plugin");
+		log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
+		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
+		Bukkit.getPluginManager().disablePlugin(this);
+		return true;
+	}
+	
 	@Override
 	public int getMinimumLibVersion() {
 		return 0;
@@ -379,6 +397,10 @@ public class CommonPlugin extends PluginBase {
 	public void enable() {
 		// Validate version
 		if (IS_COMPATIBLE) {
+			if (CommonUtil.getPlugin("Spout") != null && failSpout()) {
+				return;
+			}
+
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
 			final List<String> welcomeMessages = Arrays.asList(
 					"This library is written with stability in mind.", 

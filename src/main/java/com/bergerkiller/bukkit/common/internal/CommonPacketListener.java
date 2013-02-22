@@ -481,15 +481,17 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private boolean canConfirm(Packet packet) {
-		if(CommonPlugin.getInstance() == null)
+		final CommonPlugin instance = CommonPlugin.getInstance();
+		if (instance == null) {
 			return true;
-		
-		return CommonPlugin.getInstance().onPacketReceive(NativeUtil.getPlayer(this.player), packet);
+		}
+		return instance.onPacketReceive(NativeUtil.getPlayer(this.player), packet);
 	}
 
 	@Override
 	public void sendPacket(Packet packet) {
-		if (CommonPlugin.getInstance() == null || CommonPlugin.getInstance().onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
+		final CommonPlugin instance = CommonPlugin.getInstance();
+		if (instance == null || instance.onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
 			super.sendPacket(packet);
 		}
 	}
