@@ -9,11 +9,10 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityHumanRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityHuman");
@@ -27,12 +26,9 @@ public class EntityHumanRef {
 	// The below two fields are actually in EntityLiving!
 	public static final FieldAccessor<HashMap<Integer, Object>> mobEffects = TEMPLATE.getField("effects");
 	public static final FieldAccessor<Boolean> updateEffects = TEMPLATE.getField("updateEffects");
-
-	// Abilities (this really needs a wrapper class!)
-	private static final FieldAccessor<Object> abilities = TEMPLATE.getField("abilities");
-	private static final FieldAccessor<Boolean> canInstaBuild = new SafeField<Boolean>(CommonUtil.getNMSClass("PlayerAbilities"), "canInstantlyBuild");
+	public static final TranslatorFieldAccessor<PlayerAbilities> abilities = TEMPLATE.getField("abilities").translate(ConversionPairs.playerAbilities);
 
 	public static boolean canInstaBuild(HumanEntity human) {
-		return canInstaBuild.get(abilities.get(HandleConverter.toEntityHandle.convert(human)));
+		return abilities.get(HandleConverter.toEntityHandle.convert(human)).canInstantlyBuild();
 	}
 }

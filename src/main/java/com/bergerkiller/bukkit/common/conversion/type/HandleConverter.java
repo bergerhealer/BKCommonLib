@@ -1,6 +1,12 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_4_R1.Block;
+import net.minecraft.server.v1_4_R1.ChunkCoordinates;
+import net.minecraft.server.v1_4_R1.ChunkPosition;
+import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.Item;
+import net.minecraft.server.v1_4_R1.Vec3D;
+import net.minecraft.server.v1_4_R1.World;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
@@ -23,6 +29,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
  * Converter for converting to internal handles (from wrapper classes)<br>
@@ -254,6 +261,16 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			Vector vec = WrapperConverter.toVector.convert(value);
 			if (vec != null) {
 				return Vec3D.a(vec.getX(), vec.getY(), vec.getZ());
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final HandleConverter toPlayerAbilitiesHandle = new HandleConverter("PlayerAbilities") {
+		@Override
+		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof PlayerAbilities) {
+				return ((PlayerAbilities) value).getHandle();
 			} else {
 				return def;
 			}

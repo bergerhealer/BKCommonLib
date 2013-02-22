@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class PacketFieldClasses {
 	public static class NMSPacket extends NMSClassTemplate {
@@ -435,6 +436,17 @@ public class PacketFieldClasses {
 	public static class NMSPacket201PlayerInfo extends NMSPacket {
 	}
 	public static class NMSPacket202Abilities extends NMSPacket {
+		public final FieldAccessor<Boolean> isInvulnerable = getField("a");
+		public final FieldAccessor<Boolean> isFlying = getField("b");
+		public final FieldAccessor<Boolean> canFly = getField("c");
+		public final FieldAccessor<Boolean> canInstantlyBuild = getField("d");
+		public final FieldAccessor<Float> flySpeed = getField("e");
+		public final FieldAccessor<Float> walkSpeed = getField("f");
+		private final SafeConstructor<Object> constructor1 = getConstructor(PlayerAbilitiesRef.TEMPLATE.getType());
+
+		public Object newInstance(PlayerAbilities abilities) {
+			return constructor1.newInstance(abilities.getHandle());
+		}
 	}
 	public static class NMSPacket203TabComplete extends NMSPacket {
 	}

@@ -13,7 +13,11 @@ import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
 public class DataWatcher extends BasicWrapper {
 
 	public DataWatcher() {
-		setHandle(DataWatcherRef.TEMPLATE.newInstance());
+		this(DataWatcherRef.TEMPLATE.newInstance());
+	}
+
+	public DataWatcher(Object handle) {
+		setHandle(handle);
 	}
 
 	/**

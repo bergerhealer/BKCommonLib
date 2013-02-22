@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
  * Stores all Converter pairs available
@@ -32,4 +33,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, IntVector3> chunkCoordinates = Conversion.toChunkCoordinatesHandle.formPair(Conversion.toIntVector3);
 	public static final ConverterPair<Object, IntVector3> chunkPosition = Conversion.toChunkPositionHandle.formPair(Conversion.toIntVector3);
 	public static final ConverterPair<Object, IntVector2> chunkIntPair = Conversion.toChunkCoordIntPairHandle.formPair(Conversion.toIntVector2);
+	public static final ConverterPair<Object, PlayerAbilities> playerAbilities = Conversion.toPlayerAbilitiesHandle.formPair(Conversion.toPlayerAbilities);
 }

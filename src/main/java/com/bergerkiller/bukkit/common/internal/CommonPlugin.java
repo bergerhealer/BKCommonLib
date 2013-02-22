@@ -393,7 +393,7 @@ public class CommonPlugin extends PluginBase {
 					"For all the haters out there: BKCommonLib at least tries!",
 					"Want fries with that? We have hidden fries in the FoodUtil class.",
 					"Not enough wrappers. Needs more wrappers. Moooreee...",
-					"Reflection can open the key to everyone's heart, including CraftBukkit.",
+					"Reflection can open the way to everyone's heart, including CraftBukkit.",
 					"Our love is not permitted by the overlords. We must flee...",
 					"Now a plugin, a new server implementation tomorrow???");
 			log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));

@@ -1,5 +1,15 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import net.minecraft.server.v1_4_R1.Chunk;
+import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_4_R1.ChunkCoordinates;
+import net.minecraft.server.v1_4_R1.ChunkPosition;
+import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.ItemStack;
+import net.minecraft.server.v1_4_R1.TileEntity;
+import net.minecraft.server.v1_4_R1.Vec3D;
+import net.minecraft.server.v1_4_R1.World;
+
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
@@ -16,12 +26,12 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-
-import net.minecraft.server.v1_4_R1.*;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
  * Converter for converting to wrapper classes (from handles and other types)
@@ -239,6 +249,16 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 				} else {
 					return def;
 				}
+			}
+		}
+	};
+	public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = new WrapperConverter<PlayerAbilities>(PlayerAbilities.class) {
+		@Override
+		protected PlayerAbilities convertSpecial(Object value, Class<?> valueType, PlayerAbilities def) {
+			if (PlayerAbilitiesRef.TEMPLATE.isInstance(value)) {
+				return new PlayerAbilities(value);
+			} else {
+				return def;
 			}
 		}
 	};

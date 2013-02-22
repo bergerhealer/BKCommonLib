@@ -96,6 +96,8 @@ public class ParseUtil {
 			} else if ((c == ',' || c == '.') && !hasComma) {
 				rval.append('.');
 				hasComma = true;
+			} else if (c == '-' && rval.length() == 0) {
+				rval.append(c);
 			}
 		}
 		return rval.toString();

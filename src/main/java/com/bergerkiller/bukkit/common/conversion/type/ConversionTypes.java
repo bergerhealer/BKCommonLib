@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class ConversionTypes {
 	// Arrays
@@ -63,6 +64,7 @@ public class ConversionTypes {
 	public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.toChunkCoordIntPairHandle;
 	public static final HandleConverter toChunkCoordinatesHandle = HandleConverter.toChunkCoordinatesHandle;
 	public static final HandleConverter toChunkPositionHandle = HandleConverter.toChunkPositionHandle;
+	public static final HandleConverter toPlayerAbilitiesHandle = HandleConverter.toPlayerAbilitiesHandle;
 	// Wrappers
 	public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
 	public static final WrapperConverter<World> toWorld = WrapperConverter.toWorld;
@@ -79,6 +81,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<IntVector2> toIntVector2 = WrapperConverter.toIntVector2;
 	public static final WrapperConverter<IntVector3> toIntVector3 = WrapperConverter.toIntVector3;
 	public static final WrapperConverter<Vector> toVector = WrapperConverter.toVector;
+	public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = WrapperConverter.toPlayerAbilities;
 	// Properties
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
