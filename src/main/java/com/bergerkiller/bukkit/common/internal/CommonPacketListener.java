@@ -36,7 +36,6 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean retry) {
-		//final PlayerConnection old = ep.playerConnection;
 		ep.playerConnection = connection;
 		synchronized (serverPlayerConnections) {
 			// Replace existing

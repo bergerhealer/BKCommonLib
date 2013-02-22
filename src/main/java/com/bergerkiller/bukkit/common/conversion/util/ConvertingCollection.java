@@ -98,21 +98,7 @@ public class ConvertingCollection<T> implements Collection<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <K> K[] toArray(K[] array) {
-		final int size = this.size();
-		if (array.length < size) {
-			array = (K[]) LogicUtil.createArray(array.getClass().getComponentType(), size);
-		}
-		Iterator<T> iter = this.iterator();
-		for (int i = 0; i < array.length; i++) {
-			if (iter.hasNext()) {
-				array[i] = (K) iter.next();
-			} else {
-				array[i] = null;
-				break;
-			}
-		}
-		return array;
+		return CollectionBasics.toArray(this, array);
 	}
 }

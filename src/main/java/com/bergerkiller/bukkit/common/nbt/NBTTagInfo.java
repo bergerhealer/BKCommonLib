@@ -210,6 +210,7 @@ public class NBTTagInfo {
 						base = NBTUtil.createHandle(null, element);
 					}
 					type = NBTUtil.getTypeId(base);
+					newData.add(base);
 				}
 				// Assign this data to a new valid NBT Tag List
 				handle = constructor.newInstance(name);

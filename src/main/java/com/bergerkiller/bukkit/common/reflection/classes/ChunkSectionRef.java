@@ -1,11 +1,20 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class ChunkSectionRef {
 	public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("ChunkSection");
+	public static final FieldAccessor<Object> skyLight = TEMPLATE.getField("skyLight");
+	public static final FieldAccessor<Object> blockLight = TEMPLATE.getField("blockLight");
+	public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("a");
+	public static final MethodAccessor<byte[]> getBlockIds = TEMPLATE.getMethod("g");
+	public static final MethodAccessor<Object> getExtBlockIds = TEMPLATE.getMethod("i");
+	public static final MethodAccessor<Object> getBlockData = TEMPLATE.getMethod("j");
+	public static final MethodAccessor<Object> getBlockLightNibble = TEMPLATE.getMethod("k");
+	public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("l");
 	private static final MethodAccessor<Integer> blocks = TEMPLATE.getMethod("a", int.class, int.class, int.class);
 	private static final MethodAccessor<Void> blocksWithType = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("b", int.class, int.class, int.class);
@@ -14,14 +23,7 @@ public class ChunkSectionRef {
 	private static final MethodAccessor<Void> setSkyLight = TEMPLATE.getMethod("c", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Integer> getBlockLight = TEMPLATE.getMethod("d", int.class, int.class, int.class);
 	private static final MethodAccessor<Void> setBlockLight = TEMPLATE.getMethod("d", int.class, int.class, int.class, int.class);
-	
-	public static final MethodAccessor<Boolean> blockCount = TEMPLATE.getMethod("a");
-	public static final MethodAccessor<byte[]> blockIds = TEMPLATE.getMethod("g");
-	public static final MethodAccessor<Object> extBlockIds = TEMPLATE.getMethod("i");
-	public static final MethodAccessor<Object> blockData = TEMPLATE.getMethod("j");
-	public static final MethodAccessor<Object> blockLight = TEMPLATE.getMethod("k");
-	public static final MethodAccessor<Object> skyLight = TEMPLATE.getMethod("l");
-	
+		
 	public static int getTypeId(Object section, int x, int y, int z) {
 		return blocks.invoke(section, x & 0xf, y  & 0xf, z & 0xf);
 	}

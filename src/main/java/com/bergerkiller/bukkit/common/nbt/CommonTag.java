@@ -146,7 +146,11 @@ public class CommonTag extends BasicWrapper {
 			HashMap<String, Object> tags = new HashMap<String, Object>(elems.size());
 			// Replace
 			for (Entry<String, Object> entry : elems.entrySet()) {
-				tags.put(entry.getKey(), commonToNbt(entry.getValue()));
+				Object value = commonToNbt(entry.getValue());
+				if (NBTRef.NBTBase.isInstance(value)) {
+					NBTRef.setName.invoke(value, entry.getKey());
+				}
+				tags.put(entry.getKey(), value);
 			}
 			return tags;
 		} else if (data instanceof Collection) {
