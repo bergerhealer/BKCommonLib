@@ -4,6 +4,10 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
+/**
+ * @deprecated: Use the wrapper instead
+ */
+@Deprecated
 @SuppressWarnings("unchecked")
 public class IntHashMapRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("IntHashMap");
