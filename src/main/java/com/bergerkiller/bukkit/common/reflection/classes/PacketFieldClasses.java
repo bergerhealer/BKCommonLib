@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -22,7 +23,6 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
@@ -145,7 +145,7 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType(), int.class);
 
 		public Object newInstance(org.bukkit.entity.Entity entity, int type) {
-			return constructor1.newInstance(NativeUtil.getNative(entity), type);
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), type);
 		}
 	}
 	public static class NMSPacket24MobSpawn extends NMSPacket30Entity {
@@ -186,7 +186,7 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor2 = getConstructor(int.class, double.class, double.class, double.class);
 
 		public Object newInstance(org.bukkit.entity.Entity entity) {
-			return constructor1.newInstance(NativeUtil.getNative(entity));
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
 		}
 		public Object newInstance(int entityId, double motX, double motY, double motZ) {
 			return constructor2.newInstance(entityId, motX, motY, motZ);
@@ -251,7 +251,7 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor2 = getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class);
 
 		public Object newInstance(org.bukkit.entity.Entity entity) {
-			return constructor1.newInstance(NativeUtil.getNative(entity));
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
 		}
 		public Object newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch) {
 			return constructor2.newInstance(entityId, x, y, z, yaw, pitch);
@@ -269,7 +269,7 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
 
 		public Object newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-			return constructor1.newInstance(NativeUtil.getNative(passenger), NativeUtil.getNative(vehicle));
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
 		}
 	}
 	public static class NMSPacket40EntityMetadata extends NMSPacket {

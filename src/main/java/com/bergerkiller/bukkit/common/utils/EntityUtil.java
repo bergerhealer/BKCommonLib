@@ -6,11 +6,12 @@ import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.IntHashMap;
-import net.minecraft.server.v1_4_R1.MathHelper;
 import net.minecraft.server.v1_4_R1.World;
-import net.minecraft.server.v1_4_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
@@ -23,15 +24,16 @@ public class EntityUtil extends EntityPropertyUtil {
 	}
 
 	public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
-		Entity e = getEntity(NativeUtil.getNative(world), uid);
-		return e == null ? null : NativeUtil.getEntity(e);
+		Entity e = getEntity(CommonNMS.getNative(world), uid);
+		return Conversion.toEntity.convert(e);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static Entity getEntity(World world, UUID uid) {
 		for (Entity e : (List<Entity>) world.entityList) {
-			if (e.uniqueId.equals(uid))
+			if (e.uniqueId.equals(uid)) {
 				return e;
+			}
 		}
 		return null;
 	}
@@ -42,7 +44,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to add
 	 */
 	public static void addEntity(org.bukkit.entity.Entity entity) {
-		Entity nmsentity = NativeUtil.getNative(entity);
+		Entity nmsentity = CommonNMS.getNative(entity);
 		nmsentity.world.getChunkAt(MathUtil.toChunk(nmsentity.locX), MathUtil.toChunk(nmsentity.locZ));
 		nmsentity.dead = false;
 		nmsentity.world.addEntity(nmsentity);
@@ -55,7 +57,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param toReplace Entity, which will be removed
 	 * @param with Entity, which will be added in its place
 	 */
-	public static void setEntity(Entity toreplace, Entity with) {
+	public static void setEntity(org.bukkit.entity.Entity toreplace, org.bukkit.entity.Entity with) {
 		setEntity(toreplace, with, WorldUtil.getTrackerEntry(toreplace));
 	}
 
@@ -68,64 +70,66 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entityTrackerEntry to use for the new entity
 	 */
 	@SuppressWarnings("unchecked")
-	public static void setEntity(final Entity toreplace, final Entity with, Object entityTrackerEntry) {
+	public static void setEntity(org.bukkit.entity.Entity toreplace, org.bukkit.entity.Entity with, Object entityTrackerEntry) {
+		final Entity replacedHndl = CommonNMS.getNative(toreplace);
+		final Entity withHndl = CommonNMS.getNative(with);
 		// transfer important information
-		with.locX = toreplace.locX;
-		with.locY = toreplace.locY;
-		with.locZ = toreplace.locZ;
-		EntityRef.chunkX.transfer(toreplace, with);
-		EntityRef.chunkY.transfer(toreplace, with);
-		EntityRef.chunkZ.transfer(toreplace, with);
-		with.world = toreplace.world;
-		with.id = toreplace.id;
-		toreplace.dead = true;
-		with.dead = false;
+		withHndl.locX = replacedHndl.locX;
+		withHndl.locY = replacedHndl.locY;
+		withHndl.locZ = replacedHndl.locZ;
+		EntityRef.chunkX.transfer(replacedHndl, withHndl);
+		EntityRef.chunkY.transfer(replacedHndl, withHndl);
+		EntityRef.chunkZ.transfer(replacedHndl, withHndl);
+		withHndl.world = replacedHndl.world;
+		withHndl.id = replacedHndl.id;
+		replacedHndl.dead = true;
+		withHndl.dead = false;
 		// Bukkit entity
-		EntityRef.bukkitEntity.transfer(toreplace, with);
-		((CraftEntity) NativeUtil.getEntity(with)).setHandle(with);
+		EntityRef.bukkitEntity.transfer(replacedHndl, withHndl);
+		((CraftEntity) Conversion.toEntity.convert(withHndl)).setHandle(withHndl);
 		// Passenger
-		if (toreplace.passenger != null) {
-			toreplace.passenger.setPassengerOf(with);
+		if (replacedHndl.passenger != null) {
+			replacedHndl.passenger.setPassengerOf(withHndl);
 		}
 
 		// make sure the chunk is loaded prior to swapping
 		// this may cause the chunk unload to be delayed one tick
-		Chunk chunk = toreplace.world.chunkProvider.getChunkAt(EntityRef.chunkX.get(with), EntityRef.chunkZ.get(with));
+		Chunk chunk = replacedHndl.world.chunkProvider.getChunkAt(EntityRef.chunkX.get(withHndl), EntityRef.chunkZ.get(withHndl));
 
 		// replace the entity in the world
-		List<Entity> worldEntities = toreplace.world.entityList;
+		List<Entity> worldEntities = replacedHndl.world.entityList;
 		for (int i = 0; i < worldEntities.size(); i++) {
-			if (worldEntities.get(i).id == toreplace.id) {
-				toreplace.world.entityList.set(i, with);
+			if (worldEntities.get(i).id == replacedHndl.id) {
+				replacedHndl.world.entityList.set(i, withHndl);
 				break;
 			}
 		}
 
 		// replace the entity in the 'entities by id' map
-		final IntHashMap entitiesById = (IntHashMap) WorldServerRef.entitiesById.get(toreplace.world);
-		if (entitiesById.d(toreplace.id) == null) {
+		final IntHashMap entitiesById = (IntHashMap) WorldServerRef.entitiesById.get(replacedHndl.world);
+		if (entitiesById.d(replacedHndl.id) == null) {
 			CommonUtil.nextTick(new Runnable() {
 				public void run() {
-					entitiesById.a(toreplace.id, with);
+					entitiesById.a(replacedHndl.id, withHndl);
 				}
 			});
 		} else {
-			entitiesById.a(toreplace.id, with);
+			entitiesById.a(replacedHndl.id, withHndl);
 		}
 
 		// replace the entity in the chunk
-		int chunkY = EntityRef.chunkY.get(with);
-		if (!replaceInChunk(chunk, chunkY, toreplace, with)) {
+		int chunkY = EntityRef.chunkY.get(withHndl);
+		if (!replaceInChunk(chunk, chunkY, replacedHndl, withHndl)) {
 			for (int y = 0; y < chunk.entitySlices.length; y++) {
-				if (y != chunkY && replaceInChunk(chunk, y, toreplace, with)) {
+				if (y != chunkY && replaceInChunk(chunk, y, replacedHndl, withHndl)) {
 					break;
 				}
 			}
 		}
 
 		// put the new entity tracker
-		EntityTrackerEntryRef.tracker.setInternal(entityTrackerEntry, with);
-		WorldUtil.setTrackerEntry(toreplace, entityTrackerEntry);
+		EntityTrackerEntryRef.tracker.setInternal(entityTrackerEntry, withHndl);
+		WorldUtil.setTrackerEntry(replacedHndl.getBukkitEntity(), entityTrackerEntry);
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -157,27 +161,15 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * Is near something?
 	 */
 	public static boolean isNearChunk(org.bukkit.entity.Entity entity, final int cx, final int cz, final int chunkview) {
-		return isNearChunk(NativeUtil.getNative(entity), cx, cz, chunkview);
-	}
-
-	public static boolean isNearChunk(Entity entity, final int cx, final int cz, final int chunkview) {
-		if (Math.abs(MathUtil.toChunk(entity.locX) - cx) > chunkview)
-			return false;
-		if (Math.abs(MathUtil.toChunk(entity.locZ) - cz) > chunkview)
-			return false;
-		return true;
+		final int x = MathUtil.toChunk(getLocX(entity)) - cx;
+		final int z = MathUtil.toChunk(getLocZ(entity)) - cz;
+		return Math.abs(x) <= chunkview && Math.abs(z) <= chunkview;
 	}
 
 	public static boolean isNearBlock(org.bukkit.entity.Entity entity, final int bx, final int bz, final int blockview) {
-		return isNearBlock(NativeUtil.getNative(entity), bx, bz, blockview);
-	}
-
-	public static boolean isNearBlock(Entity entity, final int bx, final int bz, final int blockview) {
-		if (Math.abs(MathHelper.floor(entity.locX) - bx) > blockview)
-			return false;
-		if (Math.abs(MathHelper.floor(entity.locZ) - bz) > blockview)
-			return false;
-		return true;
+		final int x = MathUtil.floor(getLocX(entity) - bx);
+		final int z = MathUtil.floor(getLocZ(entity) - bz);
+		return Math.abs(x) <= blockview && Math.abs(z) <= blockview;
 	}
 
 	/**
@@ -200,42 +192,33 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param entity to teleport
 	 * @param to location to teleport to
 	 */
-	public static boolean teleport(org.bukkit.entity.Entity entity, final Location to) {
-		return teleport(NativeUtil.getNative(entity), to);
-	}
-
-	/**
-	 * Teleports an entity
-	 * 
-	 * @param entity to teleport
-	 * @param to location to teleport to
-	 */
-	public static boolean teleport(final Entity entity, final Location to) {
-		WorldServer newworld = NativeUtil.getNative(to.getWorld());
+	public static boolean teleport(final org.bukkit.entity.Entity entity, final Location to) {
+		final Entity entityHandle = CommonNMS.getNative(entity);
+		World newworld = CommonNMS.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
-		if (entity.world != newworld && !(entity instanceof EntityPlayer)) {
-			final Entity passenger = entity.passenger;
+		if (entityHandle.world != newworld && !(entityHandle instanceof EntityPlayer)) {
+			final Entity passenger = entityHandle.passenger;
 			if (passenger != null) {
-				entity.passenger = null;
+				entityHandle.passenger = null;
 				passenger.vehicle = null;
-				if (teleport(passenger, to)) {
+				if (teleport(passenger.getBukkitEntity(), to)) {
 					CommonUtil.nextTick(new Runnable() {
 						public void run() {
-							passenger.setPassengerOf(entity);
+							passenger.setPassengerOf(entityHandle);
 						}
 					});
 				}
 			}
 
 			// teleport this entity
-			entity.world.removeEntity(entity);
-			entity.dead = false;
-			entity.world = newworld;
-			entity.setLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
-			entity.world.addEntity(entity);
+			entityHandle.world.removeEntity(entityHandle);
+			entityHandle.dead = false;
+			entityHandle.world = newworld;
+			entityHandle.setLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
+			entityHandle.world.addEntity(entityHandle);
 			return true;
 		} else {
-			return NativeUtil.getEntity(entity).teleport(to);
+			return entity.teleport(to);
 		}
 	}
 }

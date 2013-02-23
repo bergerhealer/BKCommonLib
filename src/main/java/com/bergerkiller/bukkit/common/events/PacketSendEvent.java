@@ -1,49 +1,43 @@
 package com.bergerkiller.bukkit.common.events;
 
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
-public class PacketSendEvent {
-	private boolean cancelled = false;
-	
-	public boolean isCancelled() {
-		return this.cancelled;
-	}
-
-	public void setCancelled(boolean value) {
-		this.cancelled = value;
-	}
-	
+public class PacketSendEvent implements Cancellable {
+	private boolean cancelled = false;	
 	private Player player;
 	private CommonPacket packet;
-	
-	public PacketSendEvent(EntityPlayer player, CommonPacket packet) {
-		this.player = NativeUtil.getPlayer(player);
-		this.packet = packet;
-	}
-	
+
 	public PacketSendEvent(Player player, CommonPacket packet) {
 		this.player = player;
 		this.packet = packet;
 	}
-	
+
+	@Override
+	public boolean isCancelled() {
+		return this.cancelled;
+	}
+
+	@Override
+	public void setCancelled(boolean value) {
+		this.cancelled = value;
+	}
+
 	/**
-	 * Get the plaer who is receiving the packets from the server
+	 * Get the player who is receiving the packets from the server
 	 * 
-	 * @return			Player
+	 * @return the Player
 	 */
 	public Player getPlayer() {
 		return player;
 	}
-	
+
 	/**
-	 * Get the packet that is about to be sended
+	 * Get the packet that is about to be sent
 	 * 
-	 * @return			Packet
+	 * @return the Packet
 	 */
 	public CommonPacket getPacket() {
 		return packet;

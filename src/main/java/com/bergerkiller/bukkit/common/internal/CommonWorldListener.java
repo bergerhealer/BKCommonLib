@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.EntityHuman;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
@@ -17,7 +16,7 @@ class CommonWorldListener extends WorldManager {
 	private HashSet<EntityPlayer> addedPlayers = new HashSet<EntityPlayer>();
 
 	public CommonWorldListener(org.bukkit.World world) {
-		super(CommonUtil.getMCServer(), NativeUtil.getNative(world));
+		super(CommonUtil.getMCServer(), CommonNMS.getNative(world));
 	}
 
 	public static boolean isValid() {
@@ -62,9 +61,9 @@ class CommonWorldListener extends WorldManager {
 				return;
 			}
 			// Notify it is added
-			CommonPlugin.getInstance().notifyAdded(NativeUtil.getEntity(added));
+			CommonPlugin.getInstance().notifyAdded(CommonNMS.getEntity(added));
 			// Event
-			CommonUtil.callEvent(new EntityAddEvent(NativeUtil.getEntity(added)));
+			CommonUtil.callEvent(new EntityAddEvent(CommonNMS.getEntity(added)));
 		}
 	}
 
@@ -76,9 +75,9 @@ class CommonWorldListener extends WorldManager {
 				return;
 			}
 			// Notify it is removed
-			CommonPlugin.getInstance().notifyRemoved(NativeUtil.getEntity(removed));
+			CommonPlugin.getInstance().notifyRemoved(CommonNMS.getEntity(removed));
 			// Event
-			CommonUtil.callEvent(new EntityRemoveEvent(NativeUtil.getEntity(removed)));
+			CommonUtil.callEvent(new EntityRemoveEvent(CommonNMS.getEntity(removed)));
 		}
 	}
 

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
@@ -61,7 +60,7 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	public static void bind(Player player) {
-		final EntityPlayer ep = NativeUtil.getNative(player);
+		final EntityPlayer ep = CommonNMS.getNative(player);
 		if (ep.playerConnection instanceof CommonPacketListener) {
 			return;
 		}
@@ -69,7 +68,7 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	public static void unbind(Player player) {
-		final EntityPlayer ep = NativeUtil.getNative(player);
+		final EntityPlayer ep = CommonNMS.getNative(player);
 		final PlayerConnection previous = ep.playerConnection;
 		if (previous instanceof CommonPacketListener) {
 			PlayerConnection replacement = ((CommonPacketListener) previous).previous;
@@ -485,13 +484,13 @@ class CommonPacketListener extends PlayerConnection {
 		if (instance == null) {
 			return true;
 		}
-		return instance.onPacketReceive(NativeUtil.getPlayer(this.player), packet);
+		return instance.onPacketReceive(CommonNMS.getPlayer(this.player), packet);
 	}
 
 	@Override
 	public void sendPacket(Packet packet) {
 		final CommonPlugin instance = CommonPlugin.getInstance();
-		if (instance == null || instance.onPacketSend(NativeUtil.getPlayer(this.player), packet)) {
+		if (instance == null || instance.onPacketSend(CommonNMS.getPlayer(this.player), packet)) {
 			super.sendPacket(packet);
 		}
 	}

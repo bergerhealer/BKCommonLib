@@ -2,8 +2,12 @@ package com.bergerkiller.bukkit.common.utils;
 
 import net.minecraft.server.v1_4_R1.Block;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
 /**
  * Contains material properties and helper functions
@@ -62,6 +66,18 @@ public class MaterialUtil {
 	 */
 	public static boolean isType(org.bukkit.block.Block block, int... types) {
 		return isType(block.getTypeId(), types);
+	}
+
+	/**
+	 * Gets the damage resilience of a block to damage dealt by a certain entity
+	 * 
+	 * @param blockId of the block
+	 * @param source of the damage
+	 * @return resilience
+	 */
+	public static float getDamageResilience(int blockId, Entity source) {
+		Block block = (Block) BlockRef.getBlock(blockId);
+		return block == null ? 0.0f : block.a(CommonNMS.getNative(source));
 	}
 
 	/**

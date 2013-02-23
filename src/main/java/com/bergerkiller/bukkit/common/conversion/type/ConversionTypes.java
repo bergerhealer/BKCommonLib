@@ -13,14 +13,17 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class ConversionTypes {
@@ -36,6 +39,8 @@ public class ConversionTypes {
 	public static final PrimitiveArrayConverter<double[]> toDoubleArr = PrimitiveArrayConverter.toDoubleArr;
 	// Collections
 	public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
+	public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = CollectionTypeConverter.toPlayerList;
+	public static final CollectionTypeConverter<List<Object>, List<?>> toPlayerHandleList = CollectionTypeConverter.toPlayerHandleList;
 	public static final CollectionConverter<Set<?>> toSet = CollectionConverter.toSet;
 	// Primitives
 	public static final PrimitiveConverter<String> toString = PrimitiveConverter.toString;
@@ -61,12 +66,15 @@ public class ConversionTypes {
 	public static final HandleConverter toGameModeHandle = HandleConverter.toGameModeHandle;
 	public static final HandleConverter toWorldTypeHandle = HandleConverter.toWorldHandle;
 	public static final HandleConverter toPacketHandle = HandleConverter.toPacketHandle;
+	public static final HandleConverter toVec3DHandle = HandleConverter.toVec3DHandle;
 	public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.toChunkCoordIntPairHandle;
 	public static final HandleConverter toChunkCoordinatesHandle = HandleConverter.toChunkCoordinatesHandle;
 	public static final HandleConverter toChunkPositionHandle = HandleConverter.toChunkPositionHandle;
 	public static final HandleConverter toPlayerAbilitiesHandle = HandleConverter.toPlayerAbilitiesHandle;
+	public static final HandleConverter toEntityTrackerHandle = HandleConverter.toEntityTrackerHandle;
 	// Wrappers
 	public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
+	public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
 	public static final WrapperConverter<World> toWorld = WrapperConverter.toWorld;
 	public static final WrapperConverter<Chunk> toChunk = WrapperConverter.toChunk;
 	public static final WrapperConverter<Block> toBlock = WrapperConverter.toBlock;
@@ -82,6 +90,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<IntVector3> toIntVector3 = WrapperConverter.toIntVector3;
 	public static final WrapperConverter<Vector> toVector = WrapperConverter.toVector;
 	public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = WrapperConverter.toPlayerAbilities;
+	public static final WrapperConverter<EntityTracker> toEntityTracker = WrapperConverter.toEntityTracker;
 	// Properties
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;

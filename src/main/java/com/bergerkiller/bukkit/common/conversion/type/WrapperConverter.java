@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
@@ -31,6 +32,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
@@ -262,7 +264,17 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
-
+	public static final WrapperConverter<EntityTracker> toEntityTracker = new WrapperConverter<EntityTracker>(EntityTracker.class) {
+		@Override
+		protected EntityTracker convertSpecial(Object value, Class<?> valueType, EntityTracker def) {
+			if (EntityTrackerRef.TEMPLATE.isInstance(value)) {
+				return new EntityTracker(value);
+			} else {
+				return def;
+			}
+		}
+	};
+	
 	public WrapperConverter(Class<T> outputType) {
 		super(outputType);
 	}

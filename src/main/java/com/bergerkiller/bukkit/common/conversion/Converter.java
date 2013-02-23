@@ -60,4 +60,12 @@ public interface Converter<T> {
 	 * @return new ConverterPair
 	 */
 	public <K> ConverterPair<T, K> formPair(Converter<K> converterB);
+
+	/**
+	 * Creates a new Converter that uses this base converter, but attempts to cast the result to the type specified
+	 * 
+	 * @param type to cast to
+	 * @return new Casting Converter
+	 */
+	public <K> Converter<K> cast(Class<K> type);
 }

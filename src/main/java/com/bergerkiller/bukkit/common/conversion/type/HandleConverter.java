@@ -6,7 +6,6 @@ import net.minecraft.server.v1_4_R1.ChunkPosition;
 import net.minecraft.server.v1_4_R1.Entity;
 import net.minecraft.server.v1_4_R1.Item;
 import net.minecraft.server.v1_4_R1.Vec3D;
-import net.minecraft.server.v1_4_R1.World;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
@@ -21,15 +20,14 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
-import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
  * Converter for converting to internal handles (from wrapper classes)<br>
@@ -105,11 +103,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 				value = ((BlockState) value).getBlock();
 			}
 			if (value instanceof org.bukkit.block.Block) {
-				// Obtain the tile entity at this block if possible
-				org.bukkit.block.Block b = (org.bukkit.block.Block) value;
-				World world = (World) toWorldHandle.convert(b.getWorld());
-				if (world != null) {
-					return LogicUtil.fixNull(world.getTileEntity(b.getX(), b.getY(), b.getZ()), def);
+				Object tile = TileEntityRef.get((org.bukkit.block.Block) value);
+				if (tile != null) {
+					return tile;
 				}
 			}
 			return def;
@@ -217,16 +213,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			}
 		}
 	};
-	public static final HandleConverter toPacketHandle = new HandleConverter("Packet") {
-		@Override
-		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			if (value instanceof CommonPacket) {
-				return ((CommonPacket) value).getHandle();
-			} else {
-				return def;
-			}
-		}
-	};
+	public static final HandleConverter toPacketHandle = new WrapperHandleConverter("Packet");
 	public static final HandleConverter toChunkCoordIntPairHandle = new HandleConverter("ChunkCoordIntPair") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
@@ -266,16 +253,8 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			}
 		}
 	};
-	public static final HandleConverter toPlayerAbilitiesHandle = new HandleConverter("PlayerAbilities") {
-		@Override
-		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			if (value instanceof PlayerAbilities) {
-				return ((PlayerAbilities) value).getHandle();
-			} else {
-				return def;
-			}
-		}
-	};
+	public static final HandleConverter toPlayerAbilitiesHandle = new WrapperHandleConverter("PlayerAbilities");
+	public static final HandleConverter toEntityTrackerHandle = new WrapperHandleConverter("EntityTracker");
 
 	public HandleConverter(String outputTypeName) {
 		this(CommonUtil.getNMSClass(outputTypeName));

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion;
 
+import java.util.List;
+
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -7,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -14,6 +17,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
@@ -21,6 +25,8 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
  */
 public class ConversionPairs {
 	public static final ConverterPair<Object, Entity> entity = Conversion.toEntityHandle.formPair(Conversion.toEntity);
+	public static final ConverterPair<Object, Player> player = Conversion.toEntityHandle.formPair(Conversion.toPlayer);
+	public static final ConverterPair<List<Object>, List<Player>> playerList = Conversion.toPlayerHandleList.formPair(Conversion.toPlayerList);
 	public static final ConverterPair<Object, World> world = Conversion.toWorldHandle.formPair(Conversion.toWorld);
 	public static final ConverterPair<Object, Chunk> chunk = Conversion.toChunkHandle.formPair(Conversion.toChunk);
 	public static final ConverterPair<Object, ItemStack> itemStack = Conversion.toItemStackHandle.formPair(Conversion.toItemStack);
@@ -34,4 +40,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, IntVector3> chunkPosition = Conversion.toChunkPositionHandle.formPair(Conversion.toIntVector3);
 	public static final ConverterPair<Object, IntVector2> chunkIntPair = Conversion.toChunkCoordIntPairHandle.formPair(Conversion.toIntVector2);
 	public static final ConverterPair<Object, PlayerAbilities> playerAbilities = Conversion.toPlayerAbilitiesHandle.formPair(Conversion.toPlayerAbilities);
+	public static final ConverterPair<Object, EntityTracker> entityTracker = Conversion.toEntityTrackerHandle.formPair(Conversion.toEntityTracker);
 }

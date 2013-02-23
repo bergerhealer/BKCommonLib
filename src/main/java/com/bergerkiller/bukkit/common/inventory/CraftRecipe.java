@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import net.minecraft.server.v1_4_R1.IRecipe;
 import net.minecraft.server.v1_4_R1.ItemStack;
 import net.minecraft.server.v1_4_R1.MathHelper;
@@ -38,7 +39,7 @@ public class CraftRecipe {
 				newinput.add(item);
 			}
 		}
-		this.input = NativeUtil.getItemStacks(newinput.toArray(new ItemStack[0]));
+		this.input = CommonNMS.getItemStacks(newinput.toArray(new ItemStack[0]));
 		List<ItemStack> newoutput = new ArrayList<ItemStack>(1);
 		newoutput.add(output.cloneItemStack());
 		for (ItemStack stack : newinput) {
@@ -48,7 +49,7 @@ public class CraftRecipe {
 				newoutput.add(s);
 			}
 		}
-		this.output = NativeUtil.getItemStacks(newoutput.toArray(new ItemStack[0]));
+		this.output = CommonNMS.getItemStacks(newoutput.toArray(new ItemStack[0]));
 	}
 
 	private final org.bukkit.inventory.ItemStack[] input;

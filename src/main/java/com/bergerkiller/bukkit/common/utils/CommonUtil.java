@@ -22,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonUtil {
@@ -191,7 +192,7 @@ public class CommonUtil {
 	 * @return online players
 	 */
 	public static Collection<Player> getOnlinePlayers() {
-		return NativeUtil.getPlayers(NativeUtil.getOnlinePlayers());
+		return CommonNMS.getPlayers(CommonNMS.getOnlinePlayers());
 	}
 
 	/**

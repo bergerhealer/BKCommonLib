@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.utils;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,14 +14,17 @@ import org.bukkit.craftbukkit.v1_4_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
+import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.EntityTracker;
-import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
 import net.minecraft.server.v1_4_R1.IDataManager;
+import net.minecraft.server.v1_4_R1.Vec3D;
 import net.minecraft.server.v1_4_R1.World;
 import net.minecraft.server.v1_4_R1.WorldNBTStorage;
 import net.minecraft.server.v1_4_R1.WorldServer;
@@ -35,7 +38,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return Random generator of a world
 	 */
 	public static Random getRandom(org.bukkit.World world) {
-		return NativeUtil.getNative(world).random;
+		return CommonNMS.getNative(world).random;
 	}
 	
 	/**
@@ -45,7 +48,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @param value Keep in memory or not?
 	 */
 	public static void setKeepSpawnInMemory(org.bukkit.World world, boolean value) {
-		NativeUtil.getNative(world).keepSpawnInMemory = value;
+		CommonNMS.getNative(world).keepSpawnInMemory = value;
 	}
 
 	/**
@@ -54,9 +57,9 @@ public class WorldUtil extends ChunkUtil {
 	 * @param entity to remove
 	 */
 	public static void removeEntity(org.bukkit.entity.Entity entity) {
-		Entity e = NativeUtil.getNative(entity);
+		Entity e = CommonNMS.getNative(entity);
 		e.world.removeEntity(e);
-		((EntityTracker) getTracker(entity.getWorld())).untrackEntity(e);
+		WorldServerRef.entityTracker.get(e.world).startTracking(entity);
 	}
 
 	/**
@@ -73,7 +76,7 @@ public class WorldUtil extends ChunkUtil {
 			}
 		}
 		// Remove the world from the MinecraftServer worlds mapping
-		NativeUtil.getWorlds().remove(NativeUtil.getNative(world));
+		CommonNMS.getWorlds().remove(CommonNMS.getNative(world));
 	}
 
 	/**
@@ -93,7 +96,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return collection of entities on the world
 	 */
 	public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-		return NativeUtil.getEntities(NativeUtil.getNative(world).entityList);
+		return CommonNMS.getEntities(CommonNMS.getNative(world).entityList);
 	}
 
 	/**
@@ -103,7 +106,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return collection of players on the world
 	 */
 	public static Collection<Player> getPlayers(org.bukkit.World world) {
-		return NativeUtil.getPlayers(NativeUtil.getNative(world).players);
+		return CommonNMS.getPlayers(CommonNMS.getNative(world).players);
 	}
 
 	/**
@@ -144,7 +147,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return players folder
 	 */
 	public static File getPlayersFolder(org.bukkit.World world) {
-		IDataManager man = NativeUtil.getNative(world).getDataManager();
+		IDataManager man = CommonNMS.getNative(world).getDataManager();
 		if (man instanceof WorldNBTStorage) {
 			return ((WorldNBTStorage) man).getPlayerDir();
 		}
@@ -177,18 +180,8 @@ public class WorldUtil extends ChunkUtil {
 	 * @param world to get the tracker for
 	 * @return world Entity Tracker
 	 */
-	public static Object getTracker(org.bukkit.World world) {
-		return getTracker(NativeUtil.getNative(world));
-	}
-
-	/**
-	 * Gets the Entity Tracker for the world specified
-	 * 
-	 * @param world to get the tracker for
-	 * @return world Entity Tracker
-	 */
-	public static Object getTracker(World world) {
-		return ((WorldServer) world).tracker;
+	public static EntityTracker getTracker(org.bukkit.World world) {
+		return WorldServerRef.entityTracker.get(Conversion.toWorldHandle.convert(world));
 	}
 
 	/**
@@ -197,8 +190,8 @@ public class WorldUtil extends ChunkUtil {
 	 * @param entity to get it for
 	 * @return entity tracker entry, or null if none is set
 	 */
-	public static Object getTrackerEntry(Entity entity) {
-		return ((EntityTracker) WorldUtil.getTracker(entity.world)).trackedEntities.get(entity.id);
+	public static Object getTrackerEntry(org.bukkit.entity.Entity entity) {
+		return getTracker(entity.getWorld()).getEntry(entity);
 	}
 
 	/**
@@ -208,20 +201,39 @@ public class WorldUtil extends ChunkUtil {
 	 * @param entityTrackerEntrytracker to set to (can be null to remove only)
 	 * @return the previous tracker entry for the entity, or null if there was none
 	 */
-	public static Object setTrackerEntry(Entity entity, Object entityTrackerEntry) {
-		EntityTracker t = (EntityTracker) getTracker(entity.world);
-		Set<Object> trackers = EntityTrackerRef.trackerSet.get(t);
-		synchronized (t) {
-			Object old = (EntityTrackerEntry) t.trackedEntities.d(entity.id);
-			if (old != null) {
-				trackers.remove(old);
-			}
-			if (entityTrackerEntry != null) {
-				trackers.add(entityTrackerEntry);
-				t.trackedEntities.a(entity.id, entityTrackerEntry);
-			}
-			return old;
-		}
+	public static Object setTrackerEntry(org.bukkit.entity.Entity entity, Object entityTrackerEntry) {
+		return getTracker(entity.getWorld()).setEntry(entity, entityTrackerEntry);
+	}
+
+	/**
+	 * Gets all the entities in the given cuboid area
+	 * 
+	 * @param world to get the entities in
+	 * @param ignore entity to ignore (do not return)
+	 * @param xmin of the cuboid to check
+	 * @param ymin of the cuboid to check
+	 * @param zmin of the cuboid to check
+	 * @param xmax of the cuboid to check
+	 * @param ymax of the cuboid to check
+	 * @param zmax of the cuboid to check
+	 * @return A (referenced) list of entities in the cuboid
+	 */
+	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, 
+			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
+		List<?> list = CommonNMS.getNative(world).getEntities(CommonNMS.getNative(ignore), AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
+	}
+
+	/**
+	 * Calculates the damage factor for an entity exposed to an explosion
+	 * 
+	 * @param explosionPosition of the explosion
+	 * @param entity that was damaged
+	 * @return damage factor
+	 */
+	public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
+		final Vec3D vec = (Vec3D) Conversion.toVec3DHandle.convert(explosionPosition);
+		return CommonNMS.getNative(explosionPosition.getWorld()).a(vec, CommonNMS.getNative(entity).boundingBox);
 	}
 
 	public static void loadChunks(Location location, final int radius) {
@@ -268,6 +280,6 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
-		return NativeUtil.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
+		return CommonNMS.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
 	}
 }

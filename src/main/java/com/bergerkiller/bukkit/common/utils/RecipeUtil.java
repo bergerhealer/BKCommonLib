@@ -14,6 +14,7 @@ import net.minecraft.server.v1_4_R1.TileEntityFurnace;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 
@@ -83,7 +84,7 @@ public class RecipeUtil {
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
-		return NativeUtil.getItemStack(RecipesFurnace.getInstance().getResult(itemid));
+		return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(itemid));
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {

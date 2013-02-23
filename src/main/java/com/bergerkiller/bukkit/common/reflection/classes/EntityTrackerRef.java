@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.Set;
 
 import org.bukkit.Chunk;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -14,9 +15,44 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 public class EntityTrackerRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityTracker");
 	public static final FieldAccessor<Set<Object>> trackerSet = TEMPLATE.getField("b");
-	private static final MethodAccessor<Void> updateMethod = TEMPLATE.getMethod("a", EntityPlayerRef.TEMPLATE.getType(), ChunkRef.TEMPLATE.getType());
+	public static final FieldAccessor<Object> trackedEntities = TEMPLATE.getField("trackedEntities");
+	private static final MethodAccessor<Void> spawnEntities = TEMPLATE.getMethod("a", EntityPlayerRef.TEMPLATE.getType(), ChunkRef.TEMPLATE.getType());
+	private static final MethodAccessor<Void> track = TEMPLATE.getMethod("track", EntityRef.TEMPLATE.getType());
+	private static final MethodAccessor<Void> untrack = TEMPLATE.getMethod("untrackEntity", EntityRef.TEMPLATE.getType());
 
-	public static void updatePlayer(Object entityTrackerInstance, Player player, Chunk chunk) {
-		updateMethod.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(player), Conversion.toChunkHandle.convert(chunk));
+	public static void spawnEntities(Object entityTrackerInstance, Player player, Chunk chunk) {
+		spawnEntities.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(player), Conversion.toChunkHandle.convert(chunk));
+	}
+
+	public static void startTracking(Object entityTrackerInstance, Entity entity) {
+		track.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(entity));
+	}
+
+	public static void stopTracking(Object entityTrackerInstance, Entity entity) {
+		untrack.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(entity));
+	}
+
+	public static Object getEntry(Object entityTrackerInstance, Entity entity) {
+		return IntHashMapRef.get(trackedEntities.get(entityTrackerInstance), entity.getEntityId());
+	}
+
+	public static Object setEntry(Object entityTrackerInstance, Entity entity, Object entityTrackerEntry) {
+		Object previous;
+		final int id = entity.getEntityId();
+		synchronized (entityTrackerInstance) {
+			// Set in tracked entities map
+			Object trackedMap = trackedEntities.get(entityTrackerInstance);
+			previous = IntHashMapRef.remove(trackedMap, id);
+			IntHashMapRef.put(trackedMap, id, entityTrackerEntry);
+
+			// Replace in set
+			Set<Object> trackers = trackerSet.get(entityTrackerInstance);
+			trackers.remove(previous);
+			trackers.add(entityTrackerEntry);
+
+			// Set in tracked entities map
+			IntHashMapRef.put(trackedEntities.get(entityTrackerInstance), entity.getEntityId(), entityTrackerEntry);
+		}
+		return previous;
 	}
 }

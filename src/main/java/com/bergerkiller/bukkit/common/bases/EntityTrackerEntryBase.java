@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
@@ -24,7 +24,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	private final boolean isOnTickOverrided;
 
 	public EntityTrackerEntryBase(org.bukkit.entity.Entity entity, int viewableDistance, int j, boolean mobile) {
-		super(NativeUtil.getNative(entity), viewableDistance, j, mobile);
+		super(CommonNMS.getNative(entity), viewableDistance, j, mobile);
 		this.isOnTickOverrided = onTickMethod.isOverridedIn(getClass());
 	}
 
@@ -106,7 +106,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	@Deprecated
 	@Override
 	public final void a(EntityPlayer entityplayer) {
-		this.removeViewer(NativeUtil.getPlayer(entityplayer));
+		this.removeViewer(CommonNMS.getPlayer(entityplayer));
 	}
 
 	/**
@@ -115,11 +115,11 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	@Deprecated
 	@Override
 	public void clear(EntityPlayer entityplayer) {
-		this.removeViewer(NativeUtil.getPlayer(entityplayer));
+		this.removeViewer(CommonNMS.getPlayer(entityplayer));
 	}
 
 	public void removeViewer(Player player) {
-		super.clear(NativeUtil.getNative(player));
+		super.clear(CommonNMS.getNative(player));
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	public final void track(List arg0) {
 		if (isOnTickOverrided) {
 			// Update viewers
-			this.updateViewers(NativeUtil.getPlayers(arg0));
+			this.updateViewers(CommonNMS.getPlayers(arg0));
 			// perform on tick logic
 			this.onTick();
 		} else {
@@ -197,7 +197,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public final void scanPlayers(List arg0) {
-		updatePlayers(NativeUtil.getPlayers(arg0));
+		updatePlayers(CommonNMS.getPlayers(arg0));
 	}
 
 	public void updatePlayers(Collection<Player> viewers) {
@@ -212,11 +212,11 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	@Deprecated
 	@Override
 	public final void updatePlayer(EntityPlayer arg0) {
-		this.updatePlayer(NativeUtil.getPlayer(arg0));
+		this.updatePlayer(CommonNMS.getPlayer(arg0));
 	}
 
 	public void updatePlayer(Player player) {
-		super.updatePlayer(NativeUtil.getNative(player));
+		super.updatePlayer(CommonNMS.getNative(player));
 	}
 
 	/**

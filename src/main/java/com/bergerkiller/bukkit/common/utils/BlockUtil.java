@@ -3,22 +3,13 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
-import net.minecraft.server.v1_4_R1.Block;
-import net.minecraft.server.v1_4_R1.ChunkCoordinates;
-import net.minecraft.server.v1_4_R1.TileEntity;
-import net.minecraft.server.v1_4_R1.TileEntityChest;
-import net.minecraft.server.v1_4_R1.TileEntityDispenser;
-import net.minecraft.server.v1_4_R1.TileEntityFurnace;
-import net.minecraft.server.v1_4_R1.TileEntitySign;
-import net.minecraft.server.v1_4_R1.World;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
@@ -26,9 +17,13 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block information
@@ -126,34 +121,14 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
-	 * Gets the Chunk Coordinates of a block
-	 * 
-	 * @param block to use
-	 * @return Chunk coordinates
-	 */
-	public static ChunkCoordinates getCoordinates(final org.bukkit.block.Block block) {
-		return new ChunkCoordinates(block.getX(), block.getY(), block.getZ());
-	}
-
-	/**
-	 * Gets the Block at the chunk coordinates specified
+	 * Gets the Block at the coordinates specified
 	 * 
 	 * @param world of the block
 	 * @param at coordinates
-	 * @return Block a the coordinates in the world
+	 * @return Block at the coordinates in the world
 	 */
-	public static org.bukkit.block.Block getBlock(org.bukkit.World world, ChunkCoordinates at) {
+	public static org.bukkit.block.Block getBlock(org.bukkit.World world, IntVector3 at) {
 		return world.getBlockAt(at.x, at.y, at.z);
-	}
-
-	/**
-	 * Gets the Block of a certain tile entity
-	 * 
-	 * @param tileEntityto get the block of
-	 * @return Tile Entity Block
-	 */
-	public static org.bukkit.block.Block getBlock(TileEntity tileEntity) {
-		return tileEntity.world.getWorld().getBlockAt(tileEntity.x, tileEntity.y, tileEntity.z);
 	}
 
 	/**
@@ -268,9 +243,21 @@ public class BlockUtil extends MaterialUtil {
 	 * @param yield of the drop
 	 */
 	public static void dropNaturally(org.bukkit.block.Block block, float yield) {
-		Block b = Block.byId[block.getTypeId()];
-		if (b != null) {
-			b.dropNaturally(NativeUtil.getNative(block.getWorld()), block.getX(), block.getY(), block.getZ(), block.getData(), yield, 0);
+		Object blockHandle = Conversion.toBlockHandle.convert(block.getTypeId());
+		if (blockHandle != null) {
+			BlockRef.dropNaturally(blockHandle, block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getData(), yield);
+		}
+	}
+
+	/**
+	 * Performs ignition logic for a Block, for example, detonating TNT
+	 * 
+	 * @param block to ignite
+	 */
+	public static void ignite(org.bukkit.block.Block block) {
+		Object blockHandle = Conversion.toBlockHandle.convert(block.getTypeId());
+		if (blockHandle != null) {
+			BlockRef.ignite(blockHandle, block.getWorld(), block.getX(), block.getY(), block.getZ());
 		}
 	}
 
@@ -291,7 +278,7 @@ public class BlockUtil extends MaterialUtil {
 	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
 	 */
 	public static void applyPhysics(org.bukkit.block.Block block, int callertypeid) {
-		NativeUtil.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
+		CommonNMS.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
 	}
 
 	/**
@@ -355,54 +342,6 @@ public class BlockUtil extends MaterialUtil {
 		return getState(chestblock, Chest.class);
 	}
 
-	public static <T extends TileEntity> T getTile(org.bukkit.block.Block block, Class<T> type) {
-		try {
-			return type.cast(NativeUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
-		} catch (Exception ex) {
-			return null;
-		}
-	}
-
-	public static <T extends TileEntity> T getTile(BlockState block, Class<T> type) {
-		try {
-			return type.cast(NativeUtil.getNative(block.getWorld()).getTileEntity(block.getX(), block.getY(), block.getZ()));
-		} catch (Exception ex) {
-			return null;
-		}
-	}
-
-	public static TileEntitySign getTile(Sign sign) {
-		return getTile(sign, TileEntitySign.class);
-	}
-
-	public static TileEntityFurnace getTile(Furnace furnace) {
-		return getTile(furnace, TileEntityFurnace.class);
-	}
-
-	public static TileEntityChest getTile(Chest chest) {
-		return getTile(chest, TileEntityChest.class);
-	}
-
-	public static TileEntityDispenser getTile(Dispenser dispenser) {
-		return getTile(dispenser, TileEntityDispenser.class);
-	}
-
-	public static TileEntitySign getTileSign(org.bukkit.block.Block block) {
-		return getTile(block, TileEntitySign.class);
-	}
-
-	public static TileEntityChest getTileChest(org.bukkit.block.Block block) {
-		return getTile(block, TileEntityChest.class);
-	}
-
-	public static TileEntityFurnace getTileFurnace(org.bukkit.block.Block block) {
-		return getTile(block, TileEntityFurnace.class);
-	}
-
-	public static TileEntityDispenser getTileDispenser(org.bukkit.block.Block block) {
-		return getTile(block, TileEntityDispenser.class);
-	}
-
 	public static Collection<BlockState> getBlockStates(org.bukkit.block.Block middle) {
 		return getBlockStates(middle, 0, 0, 0);
 	}
@@ -415,15 +354,10 @@ public class BlockUtil extends MaterialUtil {
 		return getBlockStates(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
-		World nWorld = NativeUtil.getNative(world);
 		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
 			// simplified coding instead
-			TileEntity tile = nWorld.getTileEntity(x, y, z);
-			if (tile != null) {
-				offerTile(tile);
-			}
+			offerTile(TileEntityRef.get(world, x, y, z));
 		} else {
 			// loop through tile entity list
 			int xMin = x - radiusX;
@@ -432,30 +366,27 @@ public class BlockUtil extends MaterialUtil {
 			int xMax = x + radiusX;
 			int yMax = y + radiusY;
 			int zMax = z + radiusZ;
-			for (TileEntity tile : (List<TileEntity>) nWorld.tileEntityList) {
-				if (tile.x < xMin || tile.y < yMin || tile.z < zMin || tile.x > xMax || tile.y > yMax || tile.z > zMax) {
+			int tx, ty, tz;
+			for (Object tile : WorldRef.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
+				tx = TileEntityRef.x.get(tile);
+				ty = TileEntityRef.y.get(tile);
+				tz = TileEntityRef.z.get(tile);
+				if (tx < xMin || ty < yMin || tz < zMin || tx > xMax || ty > yMax || tz > zMax) {
 					continue;
 				}
-				tile = nWorld.getTileEntity(tile.x, tile.y, tile.z);
-				if (tile != null) {
-					offerTile(tile);
-				}
+				// Get again - security against ghost tiles
 			}
 		}
 		// Convert back to Bukkit types
-		ArrayList<BlockState> blocks = new ArrayList<BlockState>(tilebuff.size());
-		for (TileEntity tile : tilebuff) {
-			BlockState state = getBlock(tile).getState();
+		ArrayList<BlockState> blocks = new ArrayList<BlockState>(blockStateBuff.size());
+		for (Object tile : blockStateBuff) {
+			BlockState state = Conversion.toBlockState.convert(tile);
 			if (state != null) {
 				blocks.add(state);
 			}
 		}
-		tilebuff.clear();
+		blockStateBuff.clear();
 		return blocks;
-	}
-
-	public static org.bukkit.World getWorld(Object tileEntity) {
-		return TileEntityRef.world.get(tileEntity);
 	}
 
 	/**
@@ -466,34 +397,39 @@ public class BlockUtil extends MaterialUtil {
 	 * @return update packet
 	 */
 	public static CommonPacket getUpdatePacket(Object tileEntity) {
-		return Conversion.toCommonPacket.convert(((TileEntity) tileEntity).getUpdatePacket());
+		return TileEntityRef.getUpdatePacket(tileEntity);
 	}
 
-	private static final LinkedHashSet<TileEntity> tilebuff = new LinkedHashSet<TileEntity>();
-	private static void offerTile(TileEntity tile) {
-		if (tile instanceof TileEntityChest) {
+	private static final LinkedHashSet<BlockState> blockStateBuff = new LinkedHashSet<BlockState>();
+	private static void offerTile(Object tile) {
+		BlockState state = Conversion.toBlockState.convert(tile);
+		if (state == null) {
+			return;
+		}
+		if (state instanceof Chest) {
 			// find a possible double chest as well
-			World world = NativeUtil.getNative(getWorld(tile));
-			int tmpx, tmpz;
+			int tmpx, tmpy, tmpz;
+			final World world = state.getWorld();
+			tmpy = state.getY();
 			for (BlockFace sface : FaceUtil.AXIS) {
-				tmpx = tile.x + sface.getModX();
-				tmpz = tile.z + sface.getModZ();
-				if (world.getTypeId(tmpx, tile.y, tmpz) == Material.CHEST.getId()) {
-					TileEntity next = world.getTileEntity(tmpx, tile.y, tmpz);
-					if (next != null && next instanceof TileEntityChest) {
+				tmpx = state.getX() + sface.getModX();
+				tmpz = state.getZ() + sface.getModZ();
+				if (world.getBlockTypeIdAt(tmpx, tmpy, tmpz) == Material.CHEST.getId()) {
+					BlockState next = Conversion.toBlockState.convert(TileEntityRef.get(world, tmpx, tmpy, tmpy));
+					if (next instanceof Chest) {
 						if (sface == BlockFace.WEST || sface == BlockFace.SOUTH) {
-							tilebuff.add(next);
-							tilebuff.add(tile);
+							blockStateBuff.add(next);
+							blockStateBuff.add(state);
 						} else {
-							tilebuff.add(tile);
-							tilebuff.add(next);
+							blockStateBuff.add(state);
+							blockStateBuff.add(next);
 						}
 						return;
 					}
 				}
 			}
 		}
-		tilebuff.add(tile);
+		blockStateBuff.add(state);
 	}
 
 	/**

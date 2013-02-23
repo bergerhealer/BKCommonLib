@@ -24,7 +24,6 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener {

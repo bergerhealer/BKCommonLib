@@ -60,7 +60,7 @@ public class DummyWorldServer extends WorldServer {
 		this.entityList = null;
 		this.tileEntityList = null;
 		this.generator = null;
-		WorldServerRef.playerManager.set(this, null);
+		WorldServerRef.playerChunkMap.set(this, null);
 		this.players = null;
 		this.tracker = null;
 		this.worldMaps = null;

@@ -4,6 +4,8 @@ import java.util.Map;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import net.minecraft.server.v1_4_R1.EntityItem;
@@ -343,7 +345,7 @@ public class ItemUtil {
 	 */
 	public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item bitem) {
 		bitem.remove();
-		EntityItem item = NativeUtil.getNative(bitem);
+		EntityItem item = CommonNMS.getNative(bitem);
 		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.getItemStack());
 		newItem.fallDistance = item.fallDistance;
 		newItem.fireTicks = item.fireTicks;
@@ -353,7 +355,7 @@ public class ItemUtil {
 		newItem.motZ = item.motZ;
 		newItem.age = item.age;
 		newItem.world.addEntity(newItem);
-		return NativeUtil.getItem(newItem);
+		return CommonNMS.getItem(newItem);
 	}
 
 	/**
@@ -486,7 +488,7 @@ public class ItemUtil {
 		if (LogicUtil.nullOrEmpty(stack)) {
 			return 0;
 		} else {
-			ItemStack nitem = NativeUtil.getNative(stack);
+			ItemStack nitem = CommonNMS.getNative(stack);
 			if (nitem == null) {
 				return 0;
 			}

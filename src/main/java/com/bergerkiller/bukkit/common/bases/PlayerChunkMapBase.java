@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.PlayerChunkMap;
@@ -20,7 +22,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	@Deprecated
 	@Override
 	public final WorldServer a() {
-		return (WorldServer) Conversion.toWorldHandle.convert(this.getWorld());
+		return CommonNMS.getNative(this.getWorld());
 	}
 
 	/**
@@ -38,11 +40,50 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	@Deprecated
 	@Override
 	public final void b(EntityPlayer entityplayer) {
-		this.addChunksToSend(entityplayer);
+		this.addChunksToSend(CommonNMS.getPlayer(entityplayer));
 	}
 
-	public void addChunksToSend(EntityPlayer entityplayer) {
-		super.b(entityplayer);
+	/**
+	 * @deprecated use {@link addChunksToSend()} instead
+	 */
+	@Deprecated
+	@Override
+	public void addPlayer(EntityPlayer arg0) {
+		this.addPlayer(CommonNMS.getPlayer(arg0));
+	}
+
+	/**
+	 * @deprecated use {@link addChunksToSend()} instead
+	 */
+	@Deprecated
+	@Override
+	public void movePlayer(EntityPlayer arg0) {
+		this.movePlayer(CommonNMS.getPlayer(arg0));
+	}
+
+	/**
+	 * @deprecated use {@link addChunksToSend()} instead
+	 */
+	@Deprecated
+	@Override
+	public void removePlayer(EntityPlayer arg0) {
+		removePlayer(CommonNMS.getPlayer(arg0));
+	}
+
+	public void movePlayer(Player player) {
+		super.movePlayer(CommonNMS.getNative(player));
+	}
+
+	public void addPlayer(Player player) {
+		super.addPlayer(CommonNMS.getNative(player));
+	}
+
+	public void removePlayer(Player player) {
+		super.removePlayer(CommonNMS.getNative(player));
+	}
+
+	public void addChunksToSend(Player player) {
+		super.b(CommonNMS.getNative(player));
 	}
 
 	/**

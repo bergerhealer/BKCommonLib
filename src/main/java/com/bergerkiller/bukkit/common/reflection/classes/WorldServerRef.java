@@ -2,19 +2,18 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import org.bukkit.Server;
-
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
-public class WorldServerRef {
-	public static final ClassTemplate<?> WORLD = NMSClassTemplate.create("World");
+public class WorldServerRef extends WorldRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("WorldServer");
-	public static final FieldAccessor<Object> playerManager = TEMPLATE.getField("manager");
+	public static final FieldAccessor<Object> playerChunkMap = TEMPLATE.getField("manager");
 	public static final FieldAccessor<List<Object>> accessList = TEMPLATE.getField("v");
+	public static final FieldAccessor<EntityTracker> entityTracker = TEMPLATE.getField("tracker").translate(ConversionPairs.entityTracker);
 	/**
 	 * Type: IntHashMap
 	 */
@@ -33,9 +32,4 @@ public class WorldServerRef {
 			return field1.set(instance, value) && field2.set(instance, value);
 		}
 	};
-	private static final MethodAccessor<Server> getServer = TEMPLATE.getMethod("getServer");
-
-	public static Server getServer(Object worldHandle) {
-		return getServer.invoke(worldHandle);
-	}
 }

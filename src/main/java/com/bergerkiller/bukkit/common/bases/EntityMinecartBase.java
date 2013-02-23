@@ -15,10 +15,10 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 
 import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.Block;
@@ -34,11 +34,11 @@ import net.minecraft.server.v1_4_R1.Vec3D;
 public class EntityMinecartBase extends EntityMinecart {
 
 	public EntityMinecartBase(org.bukkit.World world) {
-		super(NativeUtil.getNative(world));
+		super(CommonNMS.getNative(world));
 	}
 
 	public EntityMinecartBase(org.bukkit.World world, double locX, double locY, double locZ, int type) {
-		super(NativeUtil.getNative(world), locX, locY, locZ, type);
+		super(CommonNMS.getNative(world), locX, locY, locZ, type);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	 * @return World
 	 */
 	public org.bukkit.World getWorld() {
-		return NativeUtil.getWorld(world);
+		return CommonNMS.getWorld(world);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	@Override
 	@Deprecated
 	public boolean damageEntity(DamageSource source, int i) {
-		return this.onEntityDamage(NativeUtil.getEntity(source.getEntity()), i);
+		return this.onEntityDamage(CommonNMS.getEntity(source.getEntity()), i);
 	}
 
 	/**
@@ -181,9 +181,9 @@ public class EntityMinecartBase extends EntityMinecart {
 	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
 		DamageSource source;
 		if (damager instanceof Player) {
-			source = DamageSource.playerAttack(NativeUtil.getNative(damager, EntityHuman.class));
+			source = DamageSource.playerAttack(CommonNMS.getNative(damager, EntityHuman.class));
 		} else if (damager instanceof LivingEntity) {
-			source = DamageSource.mobAttack(NativeUtil.getNative(damager, EntityLiving.class));
+			source = DamageSource.mobAttack(CommonNMS.getNative(damager, EntityLiving.class));
 		} else {
 			source = DamageSource.GENERIC;
 		}
@@ -236,11 +236,11 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 
 	public Item dropItem(Material material, int amount, float force) {
-		return NativeUtil.getItem(super.a(material.getId(), amount, force));
+		return CommonNMS.getItem(super.a(material.getId(), amount, force));
 	}
 
 	public Item dropItem(org.bukkit.inventory.ItemStack item, float force) {
-		return NativeUtil.getItem(super.a(NativeUtil.getNative(item), force));
+		return CommonNMS.getItem(super.a(CommonNMS.getNative(item), force));
 	}
 
 	/**
@@ -503,7 +503,7 @@ public class EntityMinecartBase extends EntityMinecart {
 			d11 = this.locY - d4;
 			d12 = this.locZ - d5;
 			if (positionChanged) {
-				Vehicle vehicle = (Vehicle) NativeUtil.getEntity(this);
+				Vehicle vehicle = (Vehicle) CommonNMS.getEntity(this);
 				org.bukkit.block.Block block = world.getWorld().getBlockAt(MathUtil.floor(locX), MathUtil.floor(locY - (double) height), MathUtil.floor(locZ));
 				if (d6 > d0) {
 					block = block.getRelative(BlockFace.EAST);
@@ -560,7 +560,7 @@ public class EntityMinecartBase extends EntityMinecart {
 				if (!flag2) {
 					this.fireTicks++;
 					if (this.fireTicks <= 0) {
-						EntityCombustEvent event = new EntityCombustEvent(NativeUtil.getEntity(this), 8);
+						EntityCombustEvent event = new EntityCombustEvent(CommonNMS.getEntity(this), 8);
 						this.world.getServer().getPluginManager().callEvent(event);
 						if (!event.isCancelled()) {
 							this.setOnFire(event.getDuration());

@@ -41,7 +41,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.NativeUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
@@ -283,7 +282,7 @@ public class CommonPlugin extends PluginBase {
 		if (!PacketFields.DEFAULT.isInstance(packet) || player == null) {
 			return;
 		}
-		final EntityPlayer ep = NativeUtil.getNative(player);
+		final EntityPlayer ep = CommonNMS.getNative(player);
 		if (ep.playerConnection == null || ep.playerConnection.disconnected) {
 			return;
 		}
@@ -527,7 +526,7 @@ public class CommonPlugin extends PluginBase {
 			CommonPlugin cp = CommonPlugin.getInstance();
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
-				for (WorldServer world : NativeUtil.getWorlds()) {
+				for (WorldServer world : CommonNMS.getWorlds()) {
 					cp.entities.addAll(world.entityList);
 					for (Entity entity : cp.entities) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 

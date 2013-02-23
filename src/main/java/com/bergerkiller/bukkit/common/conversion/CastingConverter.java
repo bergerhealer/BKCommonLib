@@ -51,4 +51,9 @@ public class CastingConverter<T> implements Converter<T> {
 	public <K> ConverterPair<T, K> formPair(Converter<K> converterB) {
 		return new ConverterPair<T, K>(this, converterB);
 	}
+
+	@Override
+	public <K> Converter<K> cast(Class<K> type) {
+		return new CastingConverter<K>(type, this);
+	}
 }
