@@ -20,10 +20,10 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
-    <!-- Repo for access to Spigot -->
+    <!-- Repo for access to Craftbukkit -->
     <repository>
-      <id>spigot-repo</id>
-      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
     <!-- Repo for access to ProtocolLib -->
     <repository>
@@ -35,10 +35,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot</artifactId>
-      <scope>provided</scope>
-      <version>1.4.7-R1.1-SNAPSHOT</version>
+      <groupId>org.bukkit</groupId>
+      <artifactId>craftbukkit</artifactId>
+      <version>1.4.7-R0.1</version>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
