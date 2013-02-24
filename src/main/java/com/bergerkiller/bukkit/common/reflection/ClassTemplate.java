@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -209,6 +210,18 @@ public class ClassTemplate<T> {
 	 */
 	public <K> K getStaticFieldValue(String name) {
 		return SafeField.get(getType(), name);
+	}
+
+	/**
+	 * Gets a statically declared field value and uses the
+	 * converter to get the value.
+	 * 
+	 * @param name of the static field
+	 * @param converter to use
+	 * @return Converted static field value
+	 */
+	public <K> K getStaticFieldValue(String name, Converter<K> converter) {
+		return converter.convert(getStaticFieldValue(name));
 	}
 
 	/**

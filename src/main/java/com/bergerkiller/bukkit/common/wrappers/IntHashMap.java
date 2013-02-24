@@ -1,47 +1,54 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 
-@SuppressWarnings("unchecked")
-public class IntHashMap extends BasicWrapper {
-	private static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("IntHashMap");
-	private static final SafeConstructor<Object> constructor = TEMPLATE.getConstructor();
-	private static final MethodAccessor<Object> get = TEMPLATE.getMethod("get", int.class);
-	private static final MethodAccessor<Object> remove = TEMPLATE.getMethod("d", int.class);
-	private static final MethodAccessor<Void> put = TEMPLATE.getMethod("a", int.class, Object.class);
-	private static final MethodAccessor<Object> clear = TEMPLATE.getMethod("c");
-	
+/**
+ * Wrapper class for the nms.IntHashMap implementation
+ * 
+ * @param <T> - value type
+ */
+public class IntHashMap<T> extends BasicWrapper {
+
 	public IntHashMap() {
-		this.setHandle(constructor.newInstance());
+		this.setHandle(IntHashMapRef.constructor.newInstance());
 	}
-	
+
 	public IntHashMap(Object handle) {
 		this.setHandle(handle);
 	}
-	
+
 	/**
 	 * Get a value
 	 * 
 	 * @param key Key
 	 * @return Value
 	 */
-	public <T> T get(int key) {
-		return (T) get.invoke(handle);
+	@SuppressWarnings("unchecked")
+	public T get(int key) {
+		return (T) IntHashMapRef.get.invoke(handle);
 	}
-	
+
+	/**
+	 * Checks whether a key is stored
+	 * 
+	 * @param key to check
+	 * @return True if the key is stored, False if not
+	 */
+	public boolean contains(int key) {
+		return IntHashMapRef.contains.invoke(key);
+	}
+
 	/**
 	 * Remove a value
 	 * 
 	 * @param key Key
 	 * @return Value
 	 */
-	public <T> T remove(int key) {
-		return (T) remove.invoke(handle, key);
+	@SuppressWarnings("unchecked")
+	public T remove(int key) {
+		return (T) IntHashMapRef.remove.invoke(handle, key);
 	}
-	
+
 	/**
 	 * Put a value in the map
 	 * 
@@ -49,13 +56,13 @@ public class IntHashMap extends BasicWrapper {
 	 * @param value Value
 	 */
 	public void put(int key, Object value) {
-		put.invoke(handle, key, value);
+		IntHashMapRef.put.invoke(handle, key, value);
 	}
-	
+
 	/**
 	 * Clear the map
 	 */
 	public void clear() {
-		clear.invoke(handle);
+		IntHashMapRef.clear.invoke(handle);
 	}
 }

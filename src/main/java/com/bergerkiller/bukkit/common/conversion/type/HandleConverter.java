@@ -255,6 +255,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	};
 	public static final HandleConverter toPlayerAbilitiesHandle = new WrapperHandleConverter("PlayerAbilities");
 	public static final HandleConverter toEntityTrackerHandle = new WrapperHandleConverter("EntityTracker");
+	public static final HandleConverter toLongHashMapHandle = new WrapperHandleConverter("LongHashMap");
+	public static final HandleConverter toLongHashSetHandle = new WrapperHandleConverter("LongHashSet");
+	public static final HandleConverter toIntHashMapHandle = new WrapperHandleConverter("IntHashMap");
 
 	public HandleConverter(String outputTypeName) {
 		this(CommonUtil.getNMSClass(outputTypeName));

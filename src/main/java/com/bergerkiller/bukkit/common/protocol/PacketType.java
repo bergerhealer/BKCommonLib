@@ -3,12 +3,11 @@ package com.bergerkiller.bukkit.common.protocol;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 
-@SuppressWarnings("deprecation")
 public enum PacketType {
 	KEEP_ALIVE(0),
 	OPEN_WINDOW(100),
@@ -94,7 +93,7 @@ public enum PacketType {
 
 	private PacketType(int id) {
 		this.id = id;
-		final Class<?> type = IntHashMapRef.get(PacketFields.DEFAULT.getStaticFieldValue("l"), id);
+		final Class<?> type = (Class<?>) PacketFields.DEFAULT.getStaticFieldValue("l", Conversion.toIntHashMap).get(id);
 		if (type == null) {
 			this.template = null;
 			this.dataWatcherField = null;

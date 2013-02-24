@@ -127,28 +127,7 @@ public class CommonNMS {
 	}
 
 	public static Inventory getInventory(IInventory inventory) {
-		if (inventory == null) {
-			return null;
-		}
-		if (inventory instanceof InventoryCrafting) {
-			return new CraftInventoryCrafting((InventoryCrafting) inventory, null);
-		} else if (inventory instanceof PlayerInventory) {
-			return new CraftInventoryPlayer((PlayerInventory) inventory);
-		} else if (inventory instanceof TileEntityFurnace) {
-			return new CraftInventoryFurnace((TileEntityFurnace) inventory);
-		} else if (inventory instanceof ContainerEnchantTableInventory) {
-			return new CraftInventoryEnchanting((ContainerEnchantTableInventory) inventory);
-		} else if (inventory instanceof TileEntityBrewingStand) {
-			return new CraftInventoryBrewer((TileEntityBrewingStand) inventory);
-		} else if (inventory instanceof InventoryMerchant) {
-			return new CraftInventoryMerchant((InventoryMerchant) inventory);
-		} else if (inventory instanceof TileEntityBeacon) {
-			return new CraftInventoryBeacon((TileEntityBeacon) inventory);
-		} else if (inventory instanceof ContainerAnvilInventory) {
-			return new CraftInventoryAnvil((ContainerAnvilInventory) inventory);
-		} else {
-			return new CraftInventory(inventory);
-		}
+		return Conversion.toInventory.convert(inventory);
 	}
 
 	public static <T extends Inventory> T getInventory(IInventory inventory, Class<T> type) {

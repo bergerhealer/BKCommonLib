@@ -13,8 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
@@ -241,6 +243,18 @@ public class EntityMinecartBase extends EntityMinecart {
 
 	public Item dropItem(org.bukkit.inventory.ItemStack item, float force) {
 		return CommonNMS.getItem(super.a(CommonNMS.getNative(item), force));
+	}
+
+	public boolean hasPassenger() {
+		return this.passenger != null;
+	}
+
+	public org.bukkit.entity.Entity getPassenger() {
+		return Conversion.toEntity.convert(this.passenger);
+	}
+
+	public Inventory getInventory() {
+		return Conversion.toInventory.convert(this);
 	}
 
 	/**

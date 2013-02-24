@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -24,6 +25,9 @@ import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class ConversionTypes {
@@ -72,6 +76,9 @@ public class ConversionTypes {
 	public static final HandleConverter toChunkPositionHandle = HandleConverter.toChunkPositionHandle;
 	public static final HandleConverter toPlayerAbilitiesHandle = HandleConverter.toPlayerAbilitiesHandle;
 	public static final HandleConverter toEntityTrackerHandle = HandleConverter.toEntityTrackerHandle;
+	public static final HandleConverter toLongHashMapHandle = HandleConverter.toLongHashMapHandle;
+	public static final HandleConverter toLongHashSetHandle = HandleConverter.toLongHashSetHandle;
+	public static final HandleConverter toIntHashMapHandle = HandleConverter.toIntHashMapHandle;
 	// Wrappers
 	public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
 	public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
@@ -82,6 +89,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<CommonTag> toCommonTag = WrapperConverter.toCommonTag;
 	public static final WrapperConverter<DataWatcher> toDataWatcher = WrapperConverter.toDataWatcher;
 	public static final WrapperConverter<ItemStack> toItemStack = WrapperConverter.toItemStack;
+	public static final WrapperConverter<Inventory> toInventory = WrapperConverter.toInventory;
 	public static final WrapperConverter<Difficulty> toDifficulty = WrapperConverter.toDifficulty;
 	public static final WrapperConverter<WorldType> toWorldType = WrapperConverter.toWorldType;
 	public static final WrapperConverter<GameMode> toGameMode = WrapperConverter.toGameMode;
@@ -91,6 +99,9 @@ public class ConversionTypes {
 	public static final WrapperConverter<Vector> toVector = WrapperConverter.toVector;
 	public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = WrapperConverter.toPlayerAbilities;
 	public static final WrapperConverter<EntityTracker> toEntityTracker = WrapperConverter.toEntityTracker;
+	public static final WrapperConverter<LongHashSet> toLongHashSet = WrapperConverter.toLongHashSet;
+	public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = WrapperConverter.toLongHashMap;
+	public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = WrapperConverter.toIntHashMap;
 	// Properties
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;

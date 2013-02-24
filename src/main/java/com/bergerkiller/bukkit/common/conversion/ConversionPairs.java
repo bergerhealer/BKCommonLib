@@ -10,6 +10,7 @@ import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -18,27 +19,36 @@ import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+
+import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
 
 /**
  * Stores all Converter pairs available
  */
 public class ConversionPairs {
-	public static final ConverterPair<Object, Entity> entity = Conversion.toEntityHandle.formPair(Conversion.toEntity);
-	public static final ConverterPair<Object, Player> player = Conversion.toEntityHandle.formPair(Conversion.toPlayer);
-	public static final ConverterPair<List<Object>, List<Player>> playerList = Conversion.toPlayerHandleList.formPair(Conversion.toPlayerList);
-	public static final ConverterPair<Object, World> world = Conversion.toWorldHandle.formPair(Conversion.toWorld);
-	public static final ConverterPair<Object, Chunk> chunk = Conversion.toChunkHandle.formPair(Conversion.toChunk);
-	public static final ConverterPair<Object, ItemStack> itemStack = Conversion.toItemStackHandle.formPair(Conversion.toItemStack);
-	public static final ConverterPair<Byte, Difficulty> difficulty = PropertyConverter.toDifficultyId.formPair(Conversion.toDifficulty);
-	public static final ConverterPair<Object, GameMode> gameMode = Conversion.toGameModeHandle.formPair(Conversion.toGameMode);
-	public static final ConverterPair<Object, WorldType> worldType = Conversion.toWorldTypeHandle.formPair(Conversion.toWorldType);
-	public static final ConverterPair<Object, DataWatcher> dataWatcher = Conversion.toDataWatcherHandle.formPair(Conversion.toDataWatcher);
-	public static final ConverterPair<Object, CommonTag> commonTag = Conversion.toNBTTagHandle.formPair(Conversion.toCommonTag);
-	public static final ConverterPair<Integer, BlockFace> paintingFacing = Conversion.toPaintingFacingId.formPair(Conversion.toPaintingFacing);
-	public static final ConverterPair<Object, IntVector3> chunkCoordinates = Conversion.toChunkCoordinatesHandle.formPair(Conversion.toIntVector3);
-	public static final ConverterPair<Object, IntVector3> chunkPosition = Conversion.toChunkPositionHandle.formPair(Conversion.toIntVector3);
-	public static final ConverterPair<Object, IntVector2> chunkIntPair = Conversion.toChunkCoordIntPairHandle.formPair(Conversion.toIntVector2);
-	public static final ConverterPair<Object, PlayerAbilities> playerAbilities = Conversion.toPlayerAbilitiesHandle.formPair(Conversion.toPlayerAbilities);
-	public static final ConverterPair<Object, EntityTracker> entityTracker = Conversion.toEntityTrackerHandle.formPair(Conversion.toEntityTracker);
+	public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
+	public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
+	public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);
+	public static final ConverterPair<Object, World> world = toWorldHandle.formPair(toWorld);
+	public static final ConverterPair<Object, Chunk> chunk = toChunkHandle.formPair(toChunk);
+	public static final ConverterPair<Object, ItemStack> itemStack = toItemStackHandle.formPair(toItemStack);
+	public static final ConverterPair<Object, Inventory> inventory = toInventoryHandle.formPair(toInventory);
+	public static final ConverterPair<Byte, Difficulty> difficulty = PropertyConverter.toDifficultyId.formPair(toDifficulty);
+	public static final ConverterPair<Object, GameMode> gameMode = toGameModeHandle.formPair(toGameMode);
+	public static final ConverterPair<Object, WorldType> worldType = toWorldTypeHandle.formPair(toWorldType);
+	public static final ConverterPair<Object, DataWatcher> dataWatcher = toDataWatcherHandle.formPair(toDataWatcher);
+	public static final ConverterPair<Object, CommonTag> commonTag = toNBTTagHandle.formPair(toCommonTag);
+	public static final ConverterPair<Integer, BlockFace> paintingFacing = toPaintingFacingId.formPair(toPaintingFacing);
+	public static final ConverterPair<Object, IntVector3> chunkCoordinates = toChunkCoordinatesHandle.formPair(toIntVector3);
+	public static final ConverterPair<Object, IntVector3> chunkPosition = toChunkPositionHandle.formPair(toIntVector3);
+	public static final ConverterPair<Object, IntVector2> chunkIntPair = toChunkCoordIntPairHandle.formPair(toIntVector2);
+	public static final ConverterPair<Object, PlayerAbilities> playerAbilities = toPlayerAbilitiesHandle.formPair(toPlayerAbilities);
+	public static final ConverterPair<Object, EntityTracker> entityTracker = toEntityTrackerHandle.formPair(toEntityTracker);
+	public static final ConverterPair<Object, LongHashSet> longHashSet = toLongHashSetHandle.formPair(toLongHashSet);
+	public static final ConverterPair<Object, LongHashMap<Object>> longHashMap = toLongHashMapHandle.formPair(toLongHashMap);
+	public static final ConverterPair<Object, IntHashMap<Object>> intHashMap = toIntHashMapHandle.formPair(toIntHashMap);
 }

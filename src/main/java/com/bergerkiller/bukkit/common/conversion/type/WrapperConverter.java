@@ -4,9 +4,18 @@ import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_4_R1.ChunkCoordinates;
 import net.minecraft.server.v1_4_R1.ChunkPosition;
+import net.minecraft.server.v1_4_R1.ContainerAnvilInventory;
+import net.minecraft.server.v1_4_R1.ContainerEnchantTableInventory;
 import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_4_R1.IInventory;
+import net.minecraft.server.v1_4_R1.InventoryCrafting;
+import net.minecraft.server.v1_4_R1.InventoryMerchant;
 import net.minecraft.server.v1_4_R1.ItemStack;
+import net.minecraft.server.v1_4_R1.PlayerInventory;
 import net.minecraft.server.v1_4_R1.TileEntity;
+import net.minecraft.server.v1_4_R1.TileEntityBeacon;
+import net.minecraft.server.v1_4_R1.TileEntityBrewingStand;
+import net.minecraft.server.v1_4_R1.TileEntityFurnace;
 import net.minecraft.server.v1_4_R1.Vec3D;
 import net.minecraft.server.v1_4_R1.World;
 
@@ -14,7 +23,17 @@ import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryAnvil;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryBeacon;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryBrewer;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryCrafting;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryEnchanting;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryFurnace;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryMerchant;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -26,6 +45,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
+import com.bergerkiller.bukkit.common.reflection.classes.LongHashMapRef;
+import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
@@ -33,6 +55,9 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 /**
@@ -150,7 +175,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 		@Override
 		public DataWatcher convertSpecial(Object value, Class<?> valueType, DataWatcher def) {
 			if (DataWatcherRef.TEMPLATE.isInstance(value)) {
-				return null; //TODO new DataWatcher(value);
+				return new DataWatcher(value);
 			} else {
 				return def;
 			}
@@ -161,6 +186,32 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 		public org.bukkit.inventory.ItemStack convertSpecial(Object value, Class<?> valueType, org.bukkit.inventory.ItemStack def) {
 			if (value instanceof ItemStack) {
 				return CraftItemStack.asCraftMirror((ItemStack) value);
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final WrapperConverter<Inventory> toInventory = new WrapperConverter<Inventory>(Inventory.class) {
+		@Override
+		protected Inventory convertSpecial(Object value, Class<?> valueType, Inventory def) {
+			if (value instanceof InventoryCrafting) {
+				return new CraftInventoryCrafting((InventoryCrafting) value, null);
+			} else if (value instanceof PlayerInventory) {
+				return new CraftInventoryPlayer((PlayerInventory) value);
+			} else if (value instanceof TileEntityFurnace) {
+				return new CraftInventoryFurnace((TileEntityFurnace) value);
+			} else if (value instanceof ContainerEnchantTableInventory) {
+				return new CraftInventoryEnchanting((ContainerEnchantTableInventory) value);
+			} else if (value instanceof TileEntityBrewingStand) {
+				return new CraftInventoryBrewer((TileEntityBrewingStand) value);
+			} else if (value instanceof InventoryMerchant) {
+				return new CraftInventoryMerchant((InventoryMerchant) value);
+			} else if (value instanceof TileEntityBeacon) {
+				return new CraftInventoryBeacon((TileEntityBeacon) value);
+			} else if (value instanceof ContainerAnvilInventory) {
+				return new CraftInventoryAnvil((ContainerAnvilInventory) value);
+			} else if (value instanceof IInventory) {
+				return new CraftInventory((IInventory) value);
 			} else {
 				return def;
 			}
@@ -274,8 +325,39 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
-	
-	public WrapperConverter(Class<T> outputType) {
-		super(outputType);
+	public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = new WrapperConverter<LongHashMap<Object>>(LongHashMap.class) {
+		@Override
+		protected LongHashMap<Object> convertSpecial(Object value, Class<?> valueType, LongHashMap<Object> def) {
+			if (LongHashMapRef.TEMPLATE.isInstance(value)) {
+				return new LongHashMap<Object>(value);
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final WrapperConverter<LongHashSet> toLongHashSet = new WrapperConverter<LongHashSet>(LongHashSet.class) {
+		@Override
+		protected LongHashSet convertSpecial(Object value, Class<?> valueType, LongHashSet def) {
+			if (LongHashSetRef.TEMPLATE.isInstance(value)) {
+				return new LongHashSet(value);
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = new WrapperConverter<IntHashMap<Object>>(IntHashMap.class) {
+		@Override
+		protected IntHashMap<Object> convertSpecial(Object value, Class<?> valueType, IntHashMap<Object> def) {
+			if (IntHashMapRef.TEMPLATE.isInstance(value)) {
+				return new IntHashMap<Object>(value);
+			} else {
+				return def;
+			}
+		}
+	};
+
+	@SuppressWarnings("unchecked")
+	public WrapperConverter(Class<?> outputType) {
+		super((Class<T>) outputType);
 	}
 }

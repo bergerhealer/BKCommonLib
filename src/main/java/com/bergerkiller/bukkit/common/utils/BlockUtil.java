@@ -21,7 +21,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 
@@ -237,31 +236,6 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
-	 * Causes a block to drop items as if it was broken
-	 * 
-	 * @param block to spawn the drops for
-	 * @param yield of the drop
-	 */
-	public static void dropNaturally(org.bukkit.block.Block block, float yield) {
-		Object blockHandle = Conversion.toBlockHandle.convert(block.getTypeId());
-		if (blockHandle != null) {
-			BlockRef.dropNaturally(blockHandle, block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getData(), yield);
-		}
-	}
-
-	/**
-	 * Performs ignition logic for a Block, for example, detonating TNT
-	 * 
-	 * @param block to ignite
-	 */
-	public static void ignite(org.bukkit.block.Block block) {
-		Object blockHandle = Conversion.toBlockHandle.convert(block.getTypeId());
-		if (blockHandle != null) {
-			BlockRef.ignite(blockHandle, block.getWorld(), block.getX(), block.getY(), block.getZ());
-		}
-	}
-
-	/**
 	 * Performs Physics at the block specified
 	 * 
 	 * @param block to apply physics to
@@ -430,15 +404,5 @@ public class BlockUtil extends MaterialUtil {
 			}
 		}
 		blockStateBuff.add(state);
-	}
-
-	/**
-	 * Naturally breaks a given block
-	 * 
-	 * @param block to break
-	 */
-	public static void breakBlock(org.bukkit.block.Block block) {
-		dropNaturally(block, 20.0f);
-		block.setTypeId(0);
 	}
 }
