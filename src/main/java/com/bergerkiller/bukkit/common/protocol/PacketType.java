@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 
+@SuppressWarnings("deprecation")
 public enum PacketType {
 	KEEP_ALIVE(0),
 	OPEN_WINDOW(100),

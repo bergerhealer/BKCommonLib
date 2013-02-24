@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -35,6 +36,19 @@ public class FileConfiguration extends BasicConfiguration {
 	 * Loads this File Configuration from file
 	 */
 	public void load() {
+		/** We can't load a file that is null or does not exist */
+		if(this.file == null)
+			throw new IllegalArgumentException("File is null!");
+		
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while creating file '" + this.file + "':");
+				e.printStackTrace();
+			}
+		}
+		
 		try {
 			this.loadFromStream(new FileInputStream(this.file));
 		} catch (Exception ex) {

@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 public class EntityTrackerRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityTracker");
@@ -33,7 +34,7 @@ public class EntityTrackerRef {
 	}
 
 	public static Object getEntry(Object entityTrackerInstance, Entity entity) {
-		return IntHashMapRef.get(trackedEntities.get(entityTrackerInstance), entity.getEntityId());
+		return new IntHashMap(trackedEntities.get(entityTrackerInstance)).get(entity.getEntityId());
 	}
 
 	public static Object setEntry(Object entityTrackerInstance, Entity entity, Object entityTrackerEntry) {
@@ -41,9 +42,9 @@ public class EntityTrackerRef {
 		final int id = entity.getEntityId();
 		synchronized (entityTrackerInstance) {
 			// Set in tracked entities map
-			Object trackedMap = trackedEntities.get(entityTrackerInstance);
-			previous = IntHashMapRef.remove(trackedMap, id);
-			IntHashMapRef.put(trackedMap, id, entityTrackerEntry);
+			IntHashMap trackedMap = new IntHashMap(trackedEntities.get(entityTrackerInstance));
+			previous = trackedMap.remove(id);
+			trackedMap.put(id, entityTrackerEntry);
 
 			// Replace in set
 			Set<Object> trackers = trackerSet.get(entityTrackerInstance);
