@@ -129,7 +129,7 @@ public class EntityUtil extends EntityPropertyUtil {
 
 		// put the new entity tracker
 		EntityTrackerEntryRef.tracker.setInternal(entityTrackerEntry, withHndl);
-		WorldUtil.setTrackerEntry(replacedHndl.getBukkitEntity(), entityTrackerEntry);
+		WorldUtil.setTrackerEntry(withHndl.getBukkitEntity(), entityTrackerEntry);
 	}
 
 	@SuppressWarnings({"unchecked"})

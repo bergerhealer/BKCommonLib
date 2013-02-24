@@ -205,6 +205,11 @@ public class WorldUtil extends ChunkUtil {
 		return getTracker(entity.getWorld()).setEntry(entity, entityTrackerEntry);
 	}
 
+	private static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, AxisAlignedBB area) {
+		List<?> list = CommonNMS.getNative(world).getEntities(CommonNMS.getNative(ignore), area);
+		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
+	}
+
 	/**
 	 * Gets all the entities in the given cuboid area
 	 * 
@@ -220,8 +225,20 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, 
 			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-		List<?> list = CommonNMS.getNative(world).getEntities(CommonNMS.getNative(ignore), AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
-		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
+		return getEntities(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+	}
+
+	/**
+	 * Gets all the entties nearby an entity
+	 * 
+	 * @param entity to get the nearby entities of
+	 * @param radX to look for entities
+	 * @param radY to look for entities
+	 * @param radZ to look for entities
+	 * @return A (referenced) list of entities nearby
+	 */
+	public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
+		return getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).boundingBox.grow(radX, radY, radZ));
 	}
 
 	/**

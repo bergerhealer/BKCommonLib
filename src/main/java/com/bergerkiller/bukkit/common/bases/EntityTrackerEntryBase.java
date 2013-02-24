@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
@@ -19,12 +21,21 @@ import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
 import net.minecraft.server.v1_4_R1.MathHelper;
 import net.minecraft.server.v1_4_R1.Packet;
 
+/**
+ * Base class extension of EntityTrackerEntry.
+ * Really wish we could turn this into a wrapper<>base system instead...
+ */
 public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	private static final SafeMethod<Void> onTickMethod = ClassTemplate.create(EntityTrackerEntryBase.class).getMethod("onTick");
 	private final boolean isOnTickOverrided;
+	/**
+	 * This field (contained in the super class) should not be used, use getViewers() instead
+	 */
+	@Deprecated
+	public final byte trackedPlayers = 0;
 
-	public EntityTrackerEntryBase(org.bukkit.entity.Entity entity, int viewableDistance, int j, boolean mobile) {
-		super(CommonNMS.getNative(entity), viewableDistance, j, mobile);
+	public EntityTrackerEntryBase(org.bukkit.entity.Entity entity, int viewableDistance, int updateRate, boolean mobile) {
+		super(CommonNMS.getNative(entity), viewableDistance, updateRate, mobile);
 		this.isOnTickOverrided = onTickMethod.isOverridedIn(getClass());
 	}
 
@@ -42,6 +53,24 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 
 	public org.bukkit.entity.Entity getTracker() {
 		return EntityTrackerEntryRef.tracker.get(this);
+	}
+
+	/**
+	 * Gets all the viewers this Entity Tracker Entry has
+	 * 
+	 * @return viewers
+	 */
+	public Collection<Player> getViewers() {
+		return new ConvertingCollection<Player>(super.trackedPlayers, ConversionPairs.player);
+	}
+
+	/**
+	 * Gets the view distance for this tracker
+	 * 
+	 * @return view distance
+	 */
+	public int getViewDistance() {
+		return this.b;
 	}
 
 	/**
@@ -140,6 +169,10 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		this.broadcastPacket(packet, true);
 	}
 
+	public void broadcastPacket(Object packet) {
+		broadcastPacket(packet, false);
+	}
+
 	public void broadcastPacket(Object packet, boolean self) {
 		if (self) {
 			super.broadcastIncludingSelf((Packet) packet);
@@ -147,7 +180,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 			super.broadcast((Packet) packet);
 		}
 	}
-
+   
 	private void updateViewers(Collection<Player> viewers) {
 		if (EntityTrackerEntryRef.synched.get(this)) {
 			double lastSyncX = EntityTrackerEntryRef.prevX.get(this);
@@ -185,7 +218,6 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	/**
 	 * Performs per-tick logic for this Entity Tracker entry
 	 */
-	@SuppressWarnings({"unchecked"})
 	public void onTick() {
 		super.track(new ArrayList<Object>(trackedPlayers));
 	}

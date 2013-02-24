@@ -49,9 +49,6 @@ public class EntityTrackerRef {
 			Set<Object> trackers = trackerSet.get(entityTrackerInstance);
 			trackers.remove(previous);
 			trackers.add(entityTrackerEntry);
-
-			// Set in tracked entities map
-			IntHashMapRef.put(trackedEntities.get(entityTrackerInstance), entity.getEntityId(), entityTrackerEntry);
 		}
 		return previous;
 	}
