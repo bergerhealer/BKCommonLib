@@ -1,11 +1,19 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.util.Locale;
+
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.PoweredMinecart;
+import org.bukkit.entity.StorageMinecart;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
@@ -102,6 +110,51 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 				final int idInt = id.intValue();
 				if (LogicUtil.isInBounds(paintingFaces, idInt)) {
 					return paintingFaces[idInt];
+				}
+			}
+			return def;
+		}
+	};
+	public static final PropertyConverter<Material> toMinecartType = new PropertyConverter<Material>(Material.class) {
+		@Override
+		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
+			if (EntityMinecartRef.TEMPLATE.isInstance(value)) {
+				Integer type = (Integer) EntityMinecartRef.type.getInternal(value);
+				return LogicUtil.getArray(EntityUtil.getMinecartTypes(), type, def);
+			} else if (EntityRef.TEMPLATE.isInstance(value) || value instanceof org.bukkit.entity.Entity) {
+				value = Conversion.toEntity.convert(value);
+				if (value instanceof StorageMinecart) {
+					return Material.STORAGE_MINECART;
+				} else if (value instanceof PoweredMinecart) {
+					return Material.POWERED_MINECART;
+				} else if (value instanceof Minecart) {
+					return Material.MINECART;
+				}
+			} else if (value instanceof Integer) {
+				return LogicUtil.getArray(EntityUtil.getMinecartTypes(), (Integer) value, def);
+			} else {
+				final String name = value.toString().toLowerCase(Locale.ENGLISH);
+				if (name.contains("storage") || name.contains("chest")) {
+					return Material.STORAGE_MINECART;
+				} else if (name.contains("power") || name.contains("furnace")) {
+					return Material.POWERED_MINECART;
+				} else if (name.contains("cart")) {
+					return Material.MINECART;
+				}
+			}
+			return def;
+		}
+	};
+	public static final PropertyConverter<Integer> toMinecartTypeId = new PropertyConverter<Integer>(Integer.class) {
+		@Override
+		protected Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
+			Material mat = toMinecartType.convert(value);
+			if (mat != null) {
+				final Material[] types = EntityUtil.getMinecartTypes();
+				for (int i = 0; i < types.length; i++) {
+					if (types[i] == mat) {
+						return i;
+					}
 				}
 			}
 			return def;

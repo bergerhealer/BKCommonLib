@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
@@ -7,8 +9,11 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftMinecart;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
@@ -17,10 +22,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.Block;
@@ -31,16 +42,84 @@ import net.minecraft.server.v1_4_R1.EntityItem;
 import net.minecraft.server.v1_4_R1.EntityLiving;
 import net.minecraft.server.v1_4_R1.EntityMinecart;
 import net.minecraft.server.v1_4_R1.ItemStack;
+import net.minecraft.server.v1_4_R1.NBTTagCompound;
 import net.minecraft.server.v1_4_R1.Vec3D;
 
 public class EntityMinecartBase extends EntityMinecart {
+	/**
+	 * This field (contained in the super class) should not be used, use getPassenger()/setPassenger() instead
+	 */
+	@Deprecated
+	public final byte passenger = 0;
+
+	/**
+	 * This field (contained in the super class) is unsafe, as types can change, use getType/setType instead.
+	 * These use conversion systems in BKCommonLib to always support the latest materials.
+	 */
+	@Deprecated
+	public final byte type = 0;
 
 	public EntityMinecartBase(org.bukkit.World world) {
 		super(CommonNMS.getNative(world));
 	}
 
-	public EntityMinecartBase(org.bukkit.World world, double locX, double locY, double locZ, int type) {
-		super(CommonNMS.getNative(world), locX, locY, locZ, type);
+	public EntityMinecartBase(org.bukkit.World world, double locX, double locY, double locZ, Material type) {
+		super(CommonNMS.getNative(world), locX, locY, locZ, Conversion.toMinecartTypeId.convert(type));
+	}
+
+	/**
+	 * Gets the type of minecart
+	 * 
+	 * @return minecart type
+	 */
+	public Material getType() {
+		return EntityMinecartRef.type.get(this);
+	}
+
+	/**
+	 * Sets the type of minecart this is
+	 * 
+	 * @param type of minecart
+	 */
+	public void setType(Material type) {
+		EntityMinecartRef.type.set(this, type);
+	}
+
+	/**
+	 * Checks whether this Minecart can be entered and ridden by living entities.
+	 * This is similar to {@link isRegularMinecart()}, but supports new future enterable carts.
+	 * 
+	 * @return True if it can be ridden, False if not
+	 */
+	public boolean canBeRidden() {
+		return super.type == 0;
+	}
+
+	/**
+	 * Checks whether this Minecart is the default minecart type
+	 * 
+	 * @return True if it is the default type, False if not
+	 */
+	public boolean isRegularMinecart() {
+		return super.type == 0;
+	}
+
+	/**
+	 * Checks whether this Minecart contains a chest with items and can be opened by players
+	 * 
+	 * @return True if it is a storage minecart, False if not
+	 */
+	public boolean isStorageCart() {
+		return super.type == 1;
+	}
+
+	/**
+	 * Checks whether this Minecart contains a furnace which powers the train using coal
+	 * 
+	 * @return True if it is a powered minecart, False if not
+	 */
+	public boolean isPoweredCart() {
+		return super.type == 2;
 	}
 
 	/**
@@ -50,6 +129,23 @@ public class EntityMinecartBase extends EntityMinecart {
 	 */
 	public org.bukkit.World getWorld() {
 		return CommonNMS.getWorld(world);
+	}
+
+	/**
+	 * Gets all the drops to spawn when this Minecart is broken.
+	 * The default implementation (break up into parts) is executed unless overridden.
+	 * 
+	 * @return items to spawn
+	 */
+	public List<org.bukkit.inventory.ItemStack> getDrops() {
+		final List<org.bukkit.inventory.ItemStack> drops = new ArrayList<org.bukkit.inventory.ItemStack>(2);
+		drops.add(new org.bukkit.inventory.ItemStack(Material.MINECART, 1));
+		if (this.isStorageCart()) {
+			drops.add(new org.bukkit.inventory.ItemStack(Material.CHEST, 1));
+		} else if (this.isPoweredCart()) {
+			drops.add(new org.bukkit.inventory.ItemStack(Material.FURNACE, 1));
+		}
+		return drops;
 	}
 
 	/**
@@ -145,6 +241,61 @@ public class EntityMinecartBase extends EntityMinecart {
 	@Deprecated
 	public final EntityItem a(ItemStack item, float f) {
 		return super.a(item, f);
+	}
+
+	/**
+	 * @deprecated: use {@link onInteract(HumanEntity)} instead
+	 */
+	@Override
+	@Deprecated
+	public boolean a(EntityHuman entityhuman) {
+		return this.onInteract(CommonNMS.getEntity(entityhuman, HumanEntity.class));
+	}
+
+	/**
+	 * Called when a human entity interacts (clicks) on this Minecart.
+	 * 
+	 * @param human that interacted
+	 * @return True if interaction logic occurred, False if not
+	 */
+	public boolean onInteract(HumanEntity human) {
+		return super.a(CommonNMS.getNative(human));
+	}
+
+	/**
+	 * @deprecated: use {@link onLoad(CommonTagCompound)} instead
+	 */
+	@Override
+	@Deprecated
+	public void d(NBTTagCompound arg0) {
+		this.onLoad((CommonTagCompound) CommonTag.create(arg0));
+	}
+
+	/**
+	 * Performs the entity loading logic
+	 * 
+	 * @param data to load from
+	 */
+	public void onLoad(CommonTagCompound data) {
+		super.d((NBTTagCompound) data.getHandle());
+	}
+
+	/**
+	 * @deprecated: use {@link onSave(tag)} instead
+	 */
+	@Override
+	@Deprecated
+	public void b(NBTTagCompound arg0) {
+		this.onSave((CommonTagCompound) CommonTag.create(arg0));
+	}
+
+	/**
+	 * Performs the entity saving logic
+	 * 
+	 * @param data to save to
+	 */
+	public void onSave(CommonTagCompound data) {
+		super.b((NBTTagCompound) data.getHandle());
 	}
 
 	/**
@@ -245,16 +396,82 @@ public class EntityMinecartBase extends EntityMinecart {
 		return CommonNMS.getItem(super.a(CommonNMS.getNative(item), force));
 	}
 
+	/**
+	 * Checks whether this Minecart has a passenger
+	 * 
+	 * @return True if it has a passenger, False if not
+	 */
 	public boolean hasPassenger() {
-		return this.passenger != null;
+		return super.passenger != null;
 	}
 
+	/**
+	 * Gets the current passenger in this Minecart, null if there is none
+	 * 
+	 * @return the passenger entity
+	 */
 	public org.bukkit.entity.Entity getPassenger() {
-		return Conversion.toEntity.convert(this.passenger);
+		return Conversion.toEntity.convert(super.passenger);
+	}
+
+	/**
+	 * Sets the passenger of this Minecart.
+	 * Use null to clear the passenger (eject)
+	 * 
+	 * @param passenger to set to
+	 */
+	public void setPassenger(org.bukkit.entity.Entity passenger) {
+		this.getEntity().setPassenger(passenger);
 	}
 
 	public Inventory getInventory() {
 		return Conversion.toInventory.convert(this);
+	}
+
+	/**
+	 * Obtains the Minecart Bukkit entity
+	 * 
+	 * @return Minecart Bukkit entity
+	 */
+	public Minecart getEntity() {
+		return (Minecart) super.getBukkitEntity();
+	}
+
+	/**
+	 * @deprecated: Use getEntity() instead (issues with CraftBukkit type being exposed)
+	 */
+	@Override
+	@Deprecated
+	public CraftMinecart getBukkitEntity() {
+		return (CraftMinecart) super.getBukkitEntity();
+	}
+
+	/**
+	 * @deprecated: Use getItems() instead (issues with NMS type being exposed)
+	 */
+	@Override
+	@Deprecated
+	public ItemStack[] getContents() {
+		return super.getContents();
+	}
+
+	/**
+	 * @deprecated: Use Bukkit versions or setPassenger instead.
+	 * Also, a minecart can not be a passenger of a vehicle.
+	 */
+	@Override
+	@Deprecated
+	public void setPassengerOf(Entity entity) {
+		super.setPassengerOf(entity);
+	}
+
+	/**
+	 * Gets all the items contained in this Minecart (for storage minecarts)
+	 * 
+	 * @return all items contained
+	 */
+	public List<org.bukkit.inventory.ItemStack> getItems() {
+		return new ConvertingList<org.bukkit.inventory.ItemStack>(Arrays.asList(super.getContents()), ConversionPairs.itemStack);
 	}
 
 	/**
@@ -330,14 +547,10 @@ public class EntityMinecartBase extends EntityMinecart {
 	/**
 	 * Performs basic collision logic with nearby minecarts, pushing them aside
 	 */
-	@SuppressWarnings("unchecked")
 	public void handleCollision() {
-		List<Entity> list = this.world.getEntities(this, this.boundingBox.grow(0.2, 0, 0.2));
-		if (list != null && !list.isEmpty()) {
-			for (Entity entity : list) {
-				if (entity != this.passenger && entity.M() && entity instanceof EntityMinecart) {
-					entity.collide(this);
-				}
+		for (org.bukkit.entity.Entity entity : WorldUtil.getNearbyEntities(this.getBukkitEntity(), 0.2, 0, 0.2)) {
+			if (entity instanceof Minecart && entity != this.getPassenger()) {
+				EntityUtil.doCollision(entity, this.getBukkitEntity());
 			}
 		}
 	}

@@ -343,12 +343,10 @@ public class MathUtil {
 	}
 
 	public static double lerp(double d1, double d2, double stage) {
-		if (Double.isNaN(stage)) {
+		if (Double.isNaN(stage) || stage > 1) {
 			return d2;
 		} else if (stage < 0) {
 			return d1;
-		} else if (stage > 1) {
-			return d2;
 		} else {
 			return d1 * (1 - stage) + d2 * stage;
 		}

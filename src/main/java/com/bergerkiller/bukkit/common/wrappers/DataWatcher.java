@@ -102,4 +102,13 @@ public class DataWatcher extends BasicWrapper {
 	public List<Object> unwatchAndGetAllWatched() {
 		return DataWatcherRef.unwatchAndReturnAllWatched.invoke(handle);
 	}
+
+	/**
+	 * Gets whether this Data Watcher has changed since the last tick
+	 * 
+	 * @return True if it had changed, False if not
+	 */
+	public boolean isChanged() {
+		return DataWatcherRef.isChanged.invoke(handle);
+	}
 }

@@ -108,4 +108,6 @@ public class ConversionTypes {
 	public static final PropertyConverter<Byte> toDifficultyId = PropertyConverter.toDifficultyId;
 	public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
 	public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
+	public static final PropertyConverter<Material> toMinecartType = PropertyConverter.toMinecartType;
+	public static final PropertyConverter<Integer> toMinecartTypeId = PropertyConverter.toMinecartTypeId;
 }

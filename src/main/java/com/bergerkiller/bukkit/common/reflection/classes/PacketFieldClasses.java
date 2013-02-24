@@ -191,6 +191,9 @@ public class PacketFieldClasses {
 		public Object newInstance(int entityId, double motX, double motY, double motZ) {
 			return constructor2.newInstance(entityId, motX, motY, motZ);
 		}
+		public Object newInstance(int entityId, Vector velocity) {
+			return newInstance(entityId, velocity.getX(), velocity.getY(), velocity.getZ());
+		}
 	}
 	public static class NMSPacket29DestroyEntity extends NMSPacket {
 		public final FieldAccessor<int[]> entityIds = getField("a");
@@ -279,8 +282,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<List> watchedObjects = getField("b");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, DataWatcherRef.TEMPLATE.getType(), boolean.class);
 
-		public Object newInstance(int entityId, Object dataWatcher, boolean sendUnchangedData) {
-			return constructor1.newInstance(entityId, dataWatcher, sendUnchangedData);
+		public Object newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
+			return constructor1.newInstance(entityId, dataWatcher.getHandle(), sendUnchangedData);
 		}
 	}
 	public static class NMSPacket41MobEffect extends NMSPacket30Entity {

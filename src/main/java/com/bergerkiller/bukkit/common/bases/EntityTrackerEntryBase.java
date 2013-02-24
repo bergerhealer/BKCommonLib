@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.EntityTrackerEntry;
@@ -33,6 +34,12 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	 */
 	@Deprecated
 	public final byte trackedPlayers = 0;
+
+	/**
+	 * This field (contained in the super class) should not be used, use getTracker() instead
+	 */
+	@Deprecated
+	public final byte tracker = 0;
 
 	public EntityTrackerEntryBase(org.bukkit.entity.Entity entity, int viewableDistance, int updateRate, boolean mobile) {
 		super(CommonNMS.getNative(entity), viewableDistance, updateRate, mobile);
@@ -80,7 +87,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	 * @return True if the tracker changed position, False if not
 	 */
 	public boolean isTrackerPositionChanged() {
-		return EntityRef.positionChanged.get(tracker);
+		return EntityRef.positionChanged.get(super.tracker);
 	}
 
 	/**
@@ -89,31 +96,43 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	 * @return True if the tracker changed velocity, False if not
 	 */
 	public boolean isTrackerVelocityChanged() {
-		return tracker.velocityChanged;
+		return EntityRef.velocityChanged.get(super.tracker);
+	}
+
+	public void setTrackerPositionChanged(boolean changed) {
+		EntityRef.positionChanged.set(super.tracker, changed);
+	}
+
+	public void setTrackerVelocityChanged(boolean changed) {
+		EntityRef.velocityChanged.set(super.tracker, changed);
 	}
 
 	public int getTrackerProtocolX() {
-		return this.tracker.as.a(this.tracker.locX);
+		return super.tracker.as.a(super.tracker.locX);
 	}
 
 	public int getTrackerProtocolY() {
-		return MathUtil.floor(this.tracker.locY * 32.0D);
+		return MathUtil.floor(super.tracker.locY * 32.0D);
 	}
 
 	public int getTrackerProtocolZ() {
-		return this.tracker.as.a(this.tracker.locZ);
+		return super.tracker.as.a(super.tracker.locZ);
 	}
 
 	public int getTrackerProtocolYaw() {
-		return MathHelper.d(this.tracker.yaw * 256.0f / 360.0f);
+		return MathHelper.d(super.tracker.yaw * 256.0f / 360.0f);
 	}
 
 	public int getTrackerProtocolPitch() {
-		return MathHelper.d(this.tracker.pitch * 256.0f / 360.0f);
+		return MathHelper.d(super.tracker.pitch * 256.0f / 360.0f);
+	}
+
+	public DataWatcher getTrackerMetaData() {
+		return new DataWatcher(super.tracker.getDataWatcher());
 	}
 
 	public int getTrackerId() {
-		return tracker.id;
+		return super.tracker.id;
 	}
 
 	/**
@@ -186,14 +205,14 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 			double lastSyncX = EntityTrackerEntryRef.prevX.get(this);
 			double lastSyncY = EntityTrackerEntryRef.prevY.get(this);
 			double lastSyncZ = EntityTrackerEntryRef.prevZ.get(this);
-			if (tracker.e(lastSyncX, lastSyncY, lastSyncZ) <= 16.0) {
+			if (super.tracker.e(lastSyncX, lastSyncY, lastSyncZ) <= 16.0) {
 				return;
 			}
 		}
 		// Update tracking data
-		EntityTrackerEntryRef.prevX.set(this, tracker.locX);
-		EntityTrackerEntryRef.prevY.set(this, tracker.locY);
-		EntityTrackerEntryRef.prevZ.set(this, tracker.locZ);
+		EntityTrackerEntryRef.prevX.set(this, super.tracker.locX);
+		EntityTrackerEntryRef.prevY.set(this, super.tracker.locY);
+		EntityTrackerEntryRef.prevZ.set(this, super.tracker.locZ);
 		EntityTrackerEntryRef.synched.set(this, true);
 		this.updatePlayers(viewers);
 	}
@@ -249,6 +268,16 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 
 	public void updatePlayer(Player player) {
 		super.updatePlayer(CommonNMS.getNative(player));
+	}
+
+	/**
+	 * Performs entity removal logic for this entity, for the player specified
+	 * 
+	 * @param player to 'destroy' (hide) this entity for
+	 */
+	@SuppressWarnings("unchecked")
+	public void doDestroy(Player player) {
+		CommonNMS.getNative(player).removeQueue.add(getTrackerId());
 	}
 
 	/**

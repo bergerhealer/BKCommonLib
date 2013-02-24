@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -207,6 +208,9 @@ public class WorldUtil extends ChunkUtil {
 
 	private static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, AxisAlignedBB area) {
 		List<?> list = CommonNMS.getNative(world).getEntities(CommonNMS.getNative(ignore), area);
+		if (LogicUtil.nullOrEmpty(list)) {
+			return Collections.emptyList();
+		}
 		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
 	}
 

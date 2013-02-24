@@ -173,6 +173,17 @@ public class EntityUtil extends EntityPropertyUtil {
 	}
 
 	/**
+	 * Performs entity on entity collision logic for an entity.
+	 * This will perform the push logic caused by collision.
+	 * 
+	 * @param entity to work on
+	 * @param with the entity to collide
+	 */
+	public static void doCollision(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity with) {
+		CommonNMS.getNative(entity).collide(CommonNMS.getNative(with));
+	}
+
+	/**
 	 * Teleports an entity in the next tick
 	 * 
 	 * @param entity to teleport

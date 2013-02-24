@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 
-public class LongHashSet extends BasicWrapper {
+public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 
 	public LongHashSet() {
 		this.setHandle(LongHashSetRef.constructor1.newInstance());

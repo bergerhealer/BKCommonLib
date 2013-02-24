@@ -4,6 +4,7 @@ import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_4_R1.DamageSource;
 
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
@@ -19,6 +20,16 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
 	private static final MethodAccessor<Void> setFirstPlayed = new SafeMethod<Void>(CommonUtil.getCBClass("entity.CraftPlayer"), "setFirstPlayed", long.class);
+	private static final Material[] minecartTypes = {Material.MINECART, Material.STORAGE_MINECART, Material.POWERED_MINECART};
+
+	/**
+	 * Gets all available types of Minecarts as item materials
+	 * 
+	 * @return minecart types
+	 */
+	public static Material[] getMinecartTypes() {
+		return minecartTypes;
+	}
 
 	public static double getLocX(Entity entity) {
 		return CommonNMS.getNative(entity).locX;

@@ -38,12 +38,15 @@
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
       <version>1.4.7-R1.0</version>
+      <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>Vault</artifactId>
       <version>1.2.23-SNAPSHOT</version>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.kellerkindt</groupId>
@@ -51,6 +54,7 @@
       <version>383</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/ShowCaseStandalone.jar</systemPath>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.narrowtux</groupId>
@@ -58,6 +62,7 @@
       <version>0.7.9</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/ShowCase.jar</systemPath>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>me.snowleo</groupId>
@@ -65,12 +70,14 @@
       <version>3.7</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/BleedingMobs.jar</systemPath>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.comphenix.protocol</groupId>
       <artifactId>ProtocolLib</artifactId>
       <scope>provided</scope>
       <version>2.2.0</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
