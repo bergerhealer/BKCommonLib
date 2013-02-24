@@ -25,7 +25,7 @@ public class IntHashMap<T> extends BasicWrapper {
 	 */
 	@SuppressWarnings("unchecked")
 	public T get(int key) {
-		return (T) IntHashMapRef.get.invoke(handle);
+		return (T) IntHashMapRef.get.invoke(handle, key);
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class IntHashMap<T> extends BasicWrapper {
 	 * @return True if the key is stored, False if not
 	 */
 	public boolean contains(int key) {
-		return IntHashMapRef.contains.invoke(key);
+		return IntHashMapRef.contains.invoke(handle, key);
 	}
 
 	/**

@@ -18,9 +18,8 @@ public class LongHashSet extends BasicWrapper {
 		this.setHandle(handle);
 	}
 
-	@SuppressWarnings("unchecked")
 	public Iterator<Long> iterator() {
-		return (Iterator<Long>) LongHashSetRef.iterator.invoke(handle);
+		return LongHashSetRef.iterator.invoke(handle);
 	}
 
 	public boolean add(int lsw, int msw) {

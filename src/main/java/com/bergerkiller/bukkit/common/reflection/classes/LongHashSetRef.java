@@ -1,12 +1,14 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.Iterator;
+
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class LongHashSetRef {
-	public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("LongHashSet"));
+	public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("util.LongHashSet"));
 	public static final SafeConstructor<?> constructor1 = TEMPLATE.getConstructor();
 	public static final SafeConstructor<?> constructor2 = TEMPLATE.getConstructor(int.class);
 	public static final MethodAccessor<Boolean> add2 = TEMPLATE.getMethod("add", int.class, int.class);
@@ -24,5 +26,5 @@ public class LongHashSetRef {
 	public static final MethodAccessor<Void> rehash1 = TEMPLATE.getMethod("rehash", int.class);
 	public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("isEmpty");
 	public static final MethodAccessor<Integer> size = TEMPLATE.getMethod("size");
-	public static final MethodAccessor<Object> iterator = TEMPLATE.getMethod("iterator");
+	public static final MethodAccessor<Iterator<Long>> iterator = TEMPLATE.getMethod("iterator");
 }
