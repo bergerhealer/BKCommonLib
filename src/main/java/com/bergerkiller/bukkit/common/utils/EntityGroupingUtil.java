@@ -152,7 +152,7 @@ public class EntityGroupingUtil {
 		}
 		for (EntityType type : EntityType.values()) {
 			Class<?> typeEntityClass = type.getEntityClass();
-			if (typeEntityClass != null && typeEntityClass.isInstance(entityClass)) {
+			if (typeEntityClass != null && typeEntityClass.isAssignableFrom(entityClass)) {
 				return getName(type);
 			}
 		}

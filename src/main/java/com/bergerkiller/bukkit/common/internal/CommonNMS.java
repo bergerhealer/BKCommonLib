@@ -9,10 +9,8 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_4_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_4_R1.block.*;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_4_R1.inventory.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -29,8 +27,10 @@ import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
- * Contains utility functions to get to the net.minecraft.server core in the CraftBukkit library<br>
- * Try to avoid using this class as much as possible!
+ * Contains utility functions to get to the net.minecraft.server core in the CraftBukkit library.<br>
+ * This Class should only be used internally by BKCommonLib, as it exposes NMS and CraftBukkit types.<br>
+ * Where possible, methods in this Class will delegate to Conversion constants.<br>
+ * Do NOT use these methods in your converters, it might fail with stack overflow exceptions.
  */
 @SuppressWarnings("rawtypes")
 public class CommonNMS {
@@ -99,7 +99,7 @@ public class CommonNMS {
 	}
 
 	public static Entity getNative(org.bukkit.entity.Entity entity) {
-		return entity instanceof CraftEntity ? ((CraftEntity) entity).getHandle() : null;
+		return (Entity) Conversion.toEntityHandle.convert(entity);
 	}
 
 	public static WorldServer getNative(org.bukkit.World world) {
@@ -107,7 +107,7 @@ public class CommonNMS {
 	}
 
 	public static Chunk getNative(org.bukkit.Chunk chunk) {
-		return chunk instanceof CraftChunk ? ((CraftChunk) chunk).getHandle() : null;
+		return (Chunk) Conversion.toChunkHandle.convert(chunk);
 	}
 
 	public static TileEntitySign getNative(Sign sign) {
@@ -147,7 +147,7 @@ public class CommonNMS {
 	}
 
 	public static org.bukkit.entity.Entity getEntity(Entity entity) {
-		return entity == null ? null : (org.bukkit.entity.Entity)entity.getBukkitEntity();
+		return Conversion.toEntity.convert(entity);
 	}
 
 	public static org.bukkit.Chunk getChunk(Chunk chunk) {

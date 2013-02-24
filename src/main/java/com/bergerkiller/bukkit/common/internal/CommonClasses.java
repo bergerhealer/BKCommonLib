@@ -14,8 +14,8 @@ class CommonClasses {
 		// Reflection classes
 		loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
 		loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashMap", "NetworkManager");
-		loadRef("Packet", "PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache");
-		loadRef("Packet", "NBT", "RegionFile", "TileEntity", "WorldServer", "Chunk", "ChunkSection");
+		loadRef("Packet", "PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader");
+		loadRef("NBT", "RegionFile", "TileEntity", "WorldServer", "Chunk", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
 		// Utility classes (only those that interact with nms)
 		loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
 		loadUtil("Recipe", "Stream", "World");
