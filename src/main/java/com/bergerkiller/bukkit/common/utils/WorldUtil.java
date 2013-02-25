@@ -233,7 +233,7 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	/**
-	 * Gets all the entties nearby an entity
+	 * Gets all the entities nearby an entity
 	 * 
 	 * @param entity to get the nearby entities of
 	 * @param radX to look for entities
@@ -243,6 +243,25 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
 		return getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).boundingBox.grow(radX, radY, radZ));
+	}
+
+	/**
+	 * Gets all the entities nearby a Location
+	 * 
+	 * @param location to get the nearby entities of
+	 * @param radX to look for entities
+	 * @param radY to look for entities
+	 * @param radZ to look for entities
+	 * @return A (referenced) list of entities nearby
+	 */
+	public static List<org.bukkit.entity.Entity> getNearbyEntities(Location location, double radX, double radY, double radZ) {
+		final double xmin = location.getX() - radX;
+		final double ymin = location.getY() - radY;
+		final double zmin = location.getZ() - radZ;
+		final double xmax = location.getX() + radX;
+		final double ymax = location.getY() + radY;
+		final double zmax = location.getZ() + radZ;
+		return getEntities(location.getWorld(), null, xmin, ymin, zmin, xmax, ymax, zmax);
 	}
 
 	/**
