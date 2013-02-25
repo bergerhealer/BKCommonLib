@@ -480,7 +480,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	 * @param e entity with which is collided
 	 * @return True if collision is allowed, False if it is ignored
 	 */
-	public boolean onEntityCollision(Entity e) {
+	public boolean onEntityCollision(org.bukkit.entity.Entity e) {
 		return true;
 	}
 
@@ -517,8 +517,9 @@ public class EntityMinecartBase extends EntityMinecart {
 				isBlock = true;
 				for (Entity e : entityList) {
 					if (e.boundingBox == a) {
-						if (!onEntityCollision(e))
+						if (!onEntityCollision(Conversion.toEntity.convert(e))) {
 							iter.remove();
+						}
 						isBlock = false;
 						break;
 					}
