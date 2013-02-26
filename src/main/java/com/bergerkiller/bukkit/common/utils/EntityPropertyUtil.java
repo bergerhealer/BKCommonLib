@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
@@ -101,6 +102,30 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 
 	public static void setLastZ(Entity entity, double value) {
 		CommonNMS.getNative(entity).lastZ = value;
+	}
+
+	public static int getChunkX(Entity entity) {
+		return EntityRef.chunkX.get(Conversion.toEntityHandle.convert(entity));
+	}
+
+	public static void setChunkX(Entity entity, int chunkX) {
+		EntityRef.chunkX.set(Conversion.toEntityHandle.convert(entity), chunkX);
+	}
+
+	public static int getChunkY(Entity entity) {
+		return EntityRef.chunkY.get(Conversion.toEntityHandle.convert(entity));
+	}
+
+	public static void setChunkY(Entity entity, int chunkY) {
+		EntityRef.chunkY.set(Conversion.toEntityHandle.convert(entity), chunkY);
+	}
+
+	public static int getChunkZ(Entity entity) {
+		return EntityRef.chunkZ.get(Conversion.toEntityHandle.convert(entity));
+	}
+
+	public static void setChunkZ(Entity entity, int chunkZ) {
+		EntityRef.chunkZ.set(Conversion.toEntityHandle.convert(entity), chunkZ);
 	}
 
 	public static void setDead(Entity entity, boolean dead) {

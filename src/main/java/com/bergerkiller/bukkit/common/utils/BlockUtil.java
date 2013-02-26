@@ -349,16 +349,11 @@ public class BlockUtil extends MaterialUtil {
 					continue;
 				}
 				// Get again - security against ghost tiles
+				offerTile(CommonNMS.getNative(world).getTileEntity(tx, ty, tz));
 			}
 		}
 		// Convert back to Bukkit types
-		ArrayList<BlockState> blocks = new ArrayList<BlockState>(blockStateBuff.size());
-		for (Object tile : blockStateBuff) {
-			BlockState state = Conversion.toBlockState.convert(tile);
-			if (state != null) {
-				blocks.add(state);
-			}
-		}
+		ArrayList<BlockState> blocks = new ArrayList<BlockState>(blockStateBuff);
 		blockStateBuff.clear();
 		return blocks;
 	}
