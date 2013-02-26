@@ -279,15 +279,33 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 	}
 
 	/**
-	 * Clears all values contained and sets the contents to the data specified<br>
-	 * Collections, arrays (also primitive) and maps are supported for data types<br>
-	 * Other data types are added as a single element, and may cause an exception if not supported
+	 * Clears all values contained and sets the contents to the data specified.
+	 * Collections, arrays (also primitive) and maps are supported for data types.
+	 * Other data types are added as a single element, and may cause an exception if not supported.<br><br>
+	 * 
+	 * The individual elements can be collections or arrays as well, which allows adding multiple arrays at once.
 	 * 
 	 * @param data to set to
 	 */
-	public void setAllValues(Object data) {
+	public <T> void setAllValues(T... values) {
 		clear();
-		if (data != null) {
+		addAllValues(values);
+	}
+
+	/**
+	 * Adds all the values to this list.
+	 * Collections, arrays (also primitive) and maps are supported for data types.
+	 * Other data types are added as a single element, and may cause an exception if not supported.<br><br>
+	 * 
+	 * The individual elements can be collections or arrays as well, which allows adding multiple arrays at once.
+	 * 
+	 * @param data to set to
+	 */
+	public <T> void addAllValues(T... values) {
+		for (Object data : values) {
+			if (data == null) {
+				continue;
+			}
 			Class<?> dataType = data.getClass();
 			if (data instanceof Collection) {
 				for (Object o : (Collection<?>) data) {

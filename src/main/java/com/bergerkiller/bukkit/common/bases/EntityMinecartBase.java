@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
@@ -264,11 +265,26 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 
 	/**
+	 * @deprecated unsafe internal saving method, use {@link onSave(tag)} instead
+	 */
+	@Override
+	@Deprecated
+    public boolean c(NBTTagCompound nbttagcompound) {
+        if (this.dead) {
+        	return false;
+        } else {
+            nbttagcompound.setString("id", LogicUtil.fixNull(this.Q(), "Minecart"));
+            this.d(nbttagcompound);
+            return true;
+        }
+    }
+
+	/**
 	 * @deprecated: use {@link onLoad(CommonTagCompound)} instead
 	 */
 	@Override
 	@Deprecated
-	public void d(NBTTagCompound arg0) {
+	public void a(NBTTagCompound arg0) {
 		this.onLoad((CommonTagCompound) CommonTag.create(arg0));
 	}
 
@@ -278,7 +294,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	 * @param data to load from
 	 */
 	public void onLoad(CommonTagCompound data) {
-		super.d((NBTTagCompound) data.getHandle());
+		super.a((NBTTagCompound) data.getHandle());
 	}
 
 	/**
@@ -502,7 +518,7 @@ public class EntityMinecartBase extends EntityMinecart {
 	public void handleCollision() {
 		for (org.bukkit.entity.Entity entity : WorldUtil.getNearbyEntities(this.getBukkitEntity(), 0.2, 0, 0.2)) {
 			if (entity instanceof Minecart && entity != this.getPassenger()) {
-				EntityUtil.doCollision(entity, this.getBukkitEntity());
+				EntityUtil.doCollision(entity, this.getEntity());
 			}
 		}
 	}

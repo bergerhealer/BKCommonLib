@@ -113,6 +113,18 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
+	 * Puts a new Tag list at the key, filled with the values specified
+	 * 
+	 * @param key to put at
+	 * @param values to set the elements of the list to
+	 */
+	public <T> void putListValues(String key, T... values) {
+		final CommonTagList list = new CommonTagList(key);
+		list.setAllValues(values);
+		this.put(key, list);
+	}
+
+	/**
 	 * Gets the value associated with a key. This is the value of the tag, not the tag itself.
 	 * Possible returned types:<br>
 	 * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float, double, byte[], int[], String</u>
