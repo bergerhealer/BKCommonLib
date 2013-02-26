@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Map.Entry;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
@@ -19,11 +19,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
  * No get operations should be performed on an empty map, the behaviour is unspecified.
  */
 public class InterpolatedMap {
-	private final EntryList<Double, Double> entries = new EntryList<Double, Double>();
-
-	public EntryList<Double, Double> getEntries() {
-		return entries;
-	}
+	private final List<Entry> entries = new ArrayList<Entry>();
 
 	/**
 	 * Checks whether this Interpolated Map is empty or not
@@ -41,29 +37,26 @@ public class InterpolatedMap {
 	 * @return value
 	 */
 	public double get(double key) {
-		ListIterator<Entry<Double, Double>> listiter = entries.listIterator();
-		Double dKey = Double.valueOf(key);
-		int compare;
-		Entry<Double, Double> entry = null;
+		ListIterator<Entry> listiter = entries.listIterator();
+		Entry entry = null;
 		while (listiter.hasNext()) {
 			entry = listiter.next();
-			compare = entry.getKey().compareTo(dKey);
-			if (compare == 0) {
+			if (entry.key == key) {
 				// Exact match, no need to interpolate
-				return entry.getValue();
-			} else if (compare > 0) {
+				return entry.value;
+			} else if (entry.key > key) {
 				// This is the first time the entry key is larger
 				// Obtain the previous key if available, otherwise we clamp at this first value
 				if (listiter.hasPrevious()) {
 					// We have a previous (lower key) value, interpolate
-					final Entry<Double, Double> previous = listiter.previous();
+					final Entry previous = listiter.previous();
 					// Obtain a stage in the interpolation (value between 0 and 1)
-					final double stage = (key - previous.getKey()) / (entry.getKey() - previous.getKey());
+					final double stage = (key - previous.key) / (entry.key - previous.key);
 					// Interpolate
-					return MathUtil.lerp(previous.getValue(), entry.getValue(), stage);
+					return MathUtil.lerp(previous.value, entry.value, stage);
 				} else {
 					// No previous value, we are at the start, clamp
-					return entry.getValue();
+					return entry.value;
 				}
 			}
 		}
@@ -74,7 +67,7 @@ public class InterpolatedMap {
 			return 0.0;
 		} else {
 			// This is the last entry and also the largest
-			return entry.getValue();
+			return entry.value;
 		}
 	}
 
@@ -92,34 +85,41 @@ public class InterpolatedMap {
 	 * @param value of the entry
 	 */
 	public void put(double key, double value) {
-		ListIterator<Entry<Double, Double>> listiter = entries.listIterator();
-		Entry<Double, Double> newEntry = new SimpleEntry<Double, Double>(key, value);
+		ListIterator<Entry> listiter = entries.listIterator();
+		Entry newEntry = new Entry(key, value);
 		// Deal with an empty list in a quick manner
 		if (entries.isEmpty()) {
 			entries.add(newEntry);
 			return;
 		}
 		// Check if the new entry should be put before the very first element
-		int comp;
-		boolean first = true;
 		while (listiter.hasNext()) {
-			final Entry<Double, Double> entry = listiter.next();
-			comp = newEntry.getKey().compareTo(entry.getKey());
-			if (first && comp < 0) {
-				entries.add(0, newEntry);
-				return;
-			} else if (comp == 0) {
-				entry.setValue(value);
-				return;
-			} else if (comp > 0) {
+			final Entry entry = listiter.next();
+			if (key < entry.key) {
 				// The key is now greater than the previously ticked element
 				// Set a new element at the index
-				listiter.add(newEntry);
+				if (listiter.hasPrevious()) {
+					listiter.previous();
+					listiter.add(newEntry);
+				} else {
+					entries.add(0, newEntry);
+				}
+				return;
+			} else if (key == entry.key) {
+				listiter.set(newEntry);
 				return;
 			}
-			first = false;
 		}
 		// Nothing was added this run, add a new entry at the end
 		entries.add(newEntry);
+	}
+
+	private static class Entry {
+		public final double key, value;
+
+		public Entry(double key, double value) {
+			this.key = key;
+			this.value = value;
+		}
 	}
 }

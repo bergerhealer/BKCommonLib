@@ -129,7 +129,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	}
 
 	public static void setDead(Entity entity, boolean dead) {
-		CommonNMS.getNative(entity).dead = false;
+		CommonNMS.getNative(entity).dead = dead;
 	}
 
 	public static void queueChunkSend(Player player, Chunk chunk) {
