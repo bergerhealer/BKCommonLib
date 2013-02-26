@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.bases;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,6 +45,8 @@ import net.minecraft.server.v1_4_R1.NBTTagCompound;
 import net.minecraft.server.v1_4_R1.Vec3D;
 
 public class EntityMinecartBase extends EntityMinecart {
+	private static final List<AxisAlignedBB> collisionBuffer = new ArrayList<AxisAlignedBB>();
+
 	/**
 	 * This field (contained in the super class) should not be used, use getPassenger()/setPassenger() instead
 	 */
@@ -496,56 +497,6 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 
 	/**
-	 * Calls onBlockCollision and onEntityCollision on all elements in the list, and filters it
-	 */
-	@SuppressWarnings("unchecked")
-	private void filterCollisionList(List<AxisAlignedBB> list) {
-		try {
-			// Shortcut to prevent unneeded logic
-			if (list.isEmpty()) {
-				return;
-			}
-			List<Entity> entityList = this.world.entityList;
-
-			Iterator<AxisAlignedBB> iter = list.iterator();
-			AxisAlignedBB a;
-			boolean isBlock;
-			double dx, dy, dz;
-			BlockFace dir;
-			while (iter.hasNext()) {
-				a = iter.next();
-				isBlock = true;
-				for (Entity e : entityList) {
-					if (e.boundingBox == a) {
-						if (!onEntityCollision(Conversion.toEntity.convert(e))) {
-							iter.remove();
-						}
-						isBlock = false;
-						break;
-					}
-				}
-				if (isBlock) {
-					org.bukkit.block.Block block = this.world.getWorld().getBlockAt(MathUtil.floor(a.a), MathUtil.floor(a.b), MathUtil.floor(a.c));
-
-					dx = this.locX - block.getX() - 0.5;
-					dy = this.locY - block.getY() - 0.5;
-					dz = this.locZ - block.getZ() - 0.5;
-					if (Math.abs(dx) < 0.1 && Math.abs(dz) < 0.1) {
-						dir = dy >= 0.0 ? BlockFace.UP : BlockFace.DOWN;
-					} else {
-						dir = FaceUtil.getDirection(dx, dz, false);
-					}
-					if (!this.onBlockCollision(block, dir)) {
-						iter.remove();
-					}
-				}
-			}
-		} catch (ConcurrentModificationException ex) {
-			Bukkit.getLogger().warning("Another plugin is interacting with the world entity list from another thread, please check your plugins!");
-		}
-	}
-
-	/**
 	 * Performs basic collision logic with nearby minecarts, pushing them aside
 	 */
 	public void handleCollision() {
@@ -557,10 +508,87 @@ public class EntityMinecartBase extends EntityMinecart {
 	}
 
 	/**
+	 * Obtains all entities/blocks that can be collided with, checking collisions along the way.
+	 * This is similar to NMS.World.getCubes, but with inserted events.
+	 * 
+	 * @param bounds
+	 * @return referenced list of collision cubes
+	 */
+	private List<AxisAlignedBB> getCollisions(AxisAlignedBB bounds) {
+		collisionBuffer.clear();
+		final int xmin = MathUtil.floor(bounds.a);
+		final int ymin = MathUtil.floor(bounds.b);
+		final int zmin = MathUtil.floor(bounds.c);
+		final int xmax = MathUtil.floor(bounds.d + 1.0);
+		final int ymax = MathUtil.floor(bounds.e + 1.0);
+		final int zmax = MathUtil.floor(bounds.f + 1.0);
+
+		// Add block collisions
+		int x, y, z;
+		for (x = xmin; x < xmax; ++x) {
+			for (z = zmin; z < zmax; ++z) {
+				if (world.isLoaded(x, 64, z)) {
+					for (y = ymin - 1; y < ymax; ++y) {
+						Block block = Block.byId[world.getTypeId(x, y, z)];
+						if (block != null) {
+							block.a(this.world, x, y, z, bounds, collisionBuffer, this);
+						}
+					}
+				}
+			}
+		}
+
+		// Handle block collisions
+		double dx, dy, dz;
+		BlockFace hitFace;
+		Iterator<AxisAlignedBB> iter = collisionBuffer.iterator();
+		AxisAlignedBB blockBounds;
+		while (iter.hasNext()) {
+			blockBounds = iter.next();
+			// Convert to block and block coordinates
+			org.bukkit.block.Block block = this.getWorld().getBlockAt(MathUtil.floor(blockBounds.a), MathUtil.floor(blockBounds.b), MathUtil.floor(blockBounds.c));
+			dx = this.locX - block.getX() - 0.5;
+			dy = this.locY - block.getY() - 0.5;
+			dz = this.locZ - block.getZ() - 0.5;
+
+			// Find out what direction the block is hit
+			if (Math.abs(dx) < 0.1 && Math.abs(dz) < 0.1) {
+				hitFace = dy >= 0.0 ? BlockFace.UP : BlockFace.DOWN;
+			} else {
+				hitFace = FaceUtil.getDirection(dx, dz, false);
+			}
+			// Block collision event
+			if (!this.onBlockCollision(block, hitFace)) {
+				iter.remove();
+			}
+		}
+
+		// Handle and add entities
+		AxisAlignedBB entityBounds;
+		for (Entity entity : CommonNMS.getEntitiesIn(this.world, this, bounds.grow(0.25, 0.25, 0.25))) {
+			/*
+			 * This part is completely pointless as E() always returns null May
+			 * this ever change, make sure E() is handled correctly.
+			 * 
+			 * entityBounds = entity.E(); if (entityBounds != null &&
+			 * entityBounds.a(bounds)) { collisionBuffer.add(entityBounds); }
+			 */
+
+			entityBounds = entity.boundingBox;
+			// Entity collision event after the null/inBounds check
+			if (entityBounds != null && entityBounds.a(bounds) && onEntityCollision(Conversion.toEntity.convert(entity))) {
+				collisionBuffer.add(entityBounds);
+			}
+		}
+
+		// Done
+		return collisionBuffer;
+	}
+
+	/**
 	 * Cloned move function and updated to include block/entity collision events
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void move(double d0, double d1, double d2) {
 		if (this.Y) {
 			this.boundingBox.d(d0, d1, d2);
@@ -585,11 +613,7 @@ public class EntityMinecartBase extends EntityMinecart {
 			double d7 = d1;
 			double d8 = d2;
 			AxisAlignedBB axisalignedbb = this.boundingBox.clone();
-			List<AxisAlignedBB> list = this.world.getCubes(this, boundingBox.a(d0, d1, d2));
-
-			// ================================================
-			filterCollisionList(list);
-			// ================================================
+			List<AxisAlignedBB> list = this.getCollisions(boundingBox.a(d0, d1, d2));
 
 			// Collision testing using Y
 			for (AxisAlignedBB aabb : list) {
@@ -640,11 +664,7 @@ public class EntityMinecartBase extends EntityMinecart {
 				AxisAlignedBB axisalignedbb1 = this.boundingBox.clone();
 				this.boundingBox.c(axisalignedbb);
 
-				list = world.getCubes(this, this.boundingBox.a(d6, d1, d8));
-
-				// ================================================
-				filterCollisionList(list);
-				// ================================================
+				list = this.getCollisions(this.boundingBox.a(d6, d1, d8));
 
 				for (AxisAlignedBB aabb : list) {
 					d1 = aabb.b(this.boundingBox, d1);

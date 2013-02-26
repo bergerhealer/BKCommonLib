@@ -207,7 +207,7 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	private static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, AxisAlignedBB area) {
-		List<?> list = CommonNMS.getNative(world).getEntities(CommonNMS.getNative(ignore), area);
+		List<?> list = CommonNMS.getEntitiesIn(CommonNMS.getNative(world), CommonNMS.getNative(ignore), area);
 		if (LogicUtil.nullOrEmpty(list)) {
 			return Collections.emptyList();
 		}

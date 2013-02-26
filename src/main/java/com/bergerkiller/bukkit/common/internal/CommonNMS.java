@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.server.v1_4_R1.*;
+
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
@@ -189,5 +190,18 @@ public class CommonNMS {
 			stacks[i] = getItemStack(itemstacks[i]);
 		}
 		return stacks;
+	}
+
+	/**
+	 * Gets all entities in the bounds
+	 * 
+	 * @param world the bounds are in
+	 * @param ignore entity to ignroe
+	 * @param bounds to get the entities inside
+	 * @return referenced list of entities inside the bounds
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Entity> getEntitiesIn(World world, Entity ignore, AxisAlignedBB bounds) {
+		return (List<Entity>) world.getEntities(ignore, bounds.grow(0.25, 0.25, 0.25));
 	}
 }
