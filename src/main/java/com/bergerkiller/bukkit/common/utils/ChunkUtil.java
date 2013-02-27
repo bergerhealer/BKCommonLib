@@ -19,7 +19,9 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
+import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 /**
  * Contains utilities to get and set chunks of a world
@@ -152,6 +154,32 @@ public class ChunkUtil {
 	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
 		List<Object>[] entitySlices = ChunkRef.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
 		return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
+	}
+
+	/**
+	 * Gets whether a given chunk is readily available.
+	 * If this method returns False, the chunk is not yet generated.
+	 * 
+	 * @param world the chunk is in
+	 * @param x - coordinate of the chunk
+	 * @param z - coordinate of the chunk
+	 * @return True if the chunk can be obtained without generating it, False if not
+	 */
+	public static boolean isChunkAvailable(World world, int x, int z) {
+		Object cps = WorldServerRef.chunkProviderServer.get(Conversion.toWorldHandle.convert(world));
+		if (ChunkProviderServerRef.isChunkLoaded.invoke(cps, x, z)) {
+			// Chunk is loaded into memory, True
+			return true;
+		} else {
+			Object chunkLoader = ChunkProviderServerRef.chunkLoader.get(cps);
+			if (ChunkRegionLoaderRef.TEMPLATE.isInstance(chunkLoader)) {
+				// Chunk can be loaded from file
+				return ChunkRegionLoaderRef.chunkExists(chunkLoader, world, x, z);
+			} else {
+				// Unable to find out...
+				return false;
+			}
+		}
 	}
 
 	/**
