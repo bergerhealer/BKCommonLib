@@ -170,6 +170,15 @@ public class EntityGroupingUtil {
 		if (type == EntityType.OCELOT) {
 			return "ocelot";
 		}
-		return type.getName().toLowerCase(Locale.ENGLISH);
+		String name = type.getName();
+		if (name == null) {
+			Class<?> clazz = type.getEntityClass();
+			if (clazz == null) {
+				return "unknown";
+			} else {
+				name = clazz.getSimpleName();
+			}
+		}
+		return name.toLowerCase(Locale.ENGLISH);
 	}
 }
