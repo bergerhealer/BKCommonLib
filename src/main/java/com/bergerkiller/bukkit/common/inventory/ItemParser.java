@@ -94,10 +94,16 @@ public class ItemParser {
 	}
 
 	public boolean match(ItemStack stack) {
+		if (stack == null) {
+			return false;
+		}
 		return this.match(stack.getTypeId(), stack.getData().getData());
 	}
 
 	public boolean match(Material type, int data) {
+		if (type == null) {
+			return false;
+		}
 		return this.match(type.getId(), data);
 	}
 
