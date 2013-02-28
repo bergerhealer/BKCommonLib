@@ -89,11 +89,11 @@ public class CommonPlugin extends PluginBase {
 	 * @param source class in which it is missing
 	 */
 	public void handleReflectionMissing(String type, String name, Class<?> source) {
-		String msg = type + " '" + name + "' does not exist in class file " + source.getSimpleName();
+		String msg = type + " '" + name + "' does not exist in class file " + source.getName();
 		Exception ex = new Exception(msg);
 		for (StackTraceElement elem : ex.getStackTrace()) {
 			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection.classes")) {
-				log(Level.SEVERE, msg + " (Update BKCommonLib?)");
+				log(Level.SEVERE, "[Reflection] " + msg + " (Update BKCommonLib?)");
 				return;
 			}
 		}

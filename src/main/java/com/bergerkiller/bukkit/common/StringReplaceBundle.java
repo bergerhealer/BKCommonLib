@@ -59,7 +59,7 @@ public class StringReplaceBundle {
 		Entry<String, String> entry;
 		while (iter.hasNext()) {
 			entry = iter.next();
-			if (entry.equals(from)) {
+			if (entry.getKey().equals(from)) {
 				iter.remove();
 				return entry.getValue();
 			}
