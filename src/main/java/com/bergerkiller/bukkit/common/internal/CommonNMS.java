@@ -24,7 +24,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -65,10 +64,7 @@ public class CommonNMS {
 	}
 
 	public static ItemStack getNative(org.bukkit.inventory.ItemStack stack) {
-		if (stack instanceof CraftItemStack) {
-			return CraftItemStackRef.handle.get(stack);
-		}
-		return CraftItemStack.asNMSCopy(stack);
+		return (ItemStack) Conversion.toItemStackHandle.convert(stack);
 	}
 
 	public static IInventory getNative(Inventory inv) {
@@ -161,11 +157,6 @@ public class CommonNMS {
 
 	public static Collection<org.bukkit.Chunk> getChunks(Collection<?> chunks) {
 		return new ConvertingCollection<org.bukkit.Chunk>(chunks, ConversionPairs.chunk); 
-	}
-
-	@SuppressWarnings("unchecked")
-	public static Collection<EntityPlayer> getOnlinePlayers() {
-		return CommonUtil.getCraftServer().getHandle().players;
 	}
 
 	public static Collection<Player> getPlayers(Collection players) {

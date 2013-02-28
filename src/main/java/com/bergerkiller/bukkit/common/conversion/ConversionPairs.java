@@ -33,6 +33,8 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
 	public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
 	public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);
+	public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = toItemStackHandleList.formPair(toItemStackList);
+	public static final ConverterPair<Object[], ItemStack[]> itemStackArr = toItemStackHandleArr.formPair(toItemStackArr);
 	public static final ConverterPair<Object, World> world = toWorldHandle.formPair(toWorld);
 	public static final ConverterPair<Object, Chunk> chunk = toChunkHandle.formPair(toChunk);
 	public static final ConverterPair<Object, ItemStack> itemStack = toItemStackHandle.formPair(toItemStack);

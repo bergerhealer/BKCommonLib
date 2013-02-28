@@ -67,7 +67,7 @@ public class Conversion extends ConversionTypes {
 				final Class<?> componentType = type.getComponentType();
 				if (!componentType.isPrimitive()) {
 					// Use the ObjectArrayConvertor to deal with this
-					converter = new ObjectArrayConverter(type);
+					converter = new ObjectArrayConverter(componentType);
 				}
 			} else if (type.isEnum()) {
 				// Converting to an enum type - construct a new EnumConverter

@@ -32,6 +32,8 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class ConversionTypes {
 	// Arrays
+	public static final ObjectArrayConverter<ItemStack[]> toItemStackArr = ObjectArrayConverter.toItemStackArr;
+	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = ObjectArrayConverter.toItemStackHandleArr;
 	public static final ObjectArrayConverter<Object[]> toObjectArr = ObjectArrayConverter.toObjectArr;
 	public static final PrimitiveArrayConverter<boolean[]> toBoolArr = PrimitiveArrayConverter.toBoolArr;
 	public static final PrimitiveArrayConverter<char[]> toCharArr = PrimitiveArrayConverter.toCharArr;
@@ -45,6 +47,8 @@ public class ConversionTypes {
 	public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
 	public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = CollectionTypeConverter.toPlayerList;
 	public static final CollectionTypeConverter<List<Object>, List<?>> toPlayerHandleList = CollectionTypeConverter.toPlayerHandleList;
+	public static final CollectionTypeConverter<List<ItemStack>, List<?>> toItemStackList = CollectionTypeConverter.toItemStackList;
+	public static final CollectionTypeConverter<List<Object>, List<?>> toItemStackHandleList = CollectionTypeConverter.toItemStackHandleList;
 	public static final CollectionConverter<Set<?>> toSet = CollectionConverter.toSet;
 	// Primitives
 	public static final PrimitiveConverter<String> toString = PrimitiveConverter.toString;

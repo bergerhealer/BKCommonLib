@@ -82,7 +82,12 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			if (value instanceof CraftItemStack) {
 				return CraftItemStackRef.handle.get(value);
 			} else if (value instanceof org.bukkit.inventory.ItemStack) {
-				return CraftItemStack.asNMSCopy((org.bukkit.inventory.ItemStack) value);
+				org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
+				Object rval = CraftItemStack.asNMSCopy(stack);
+				if (rval == null) {
+					rval = CraftItemStackRef.newHandleInstance(stack.getTypeId(), stack.getDurability(), stack.getAmount());
+				}
+				return rval;
 			} else {
 				return def;
 			}

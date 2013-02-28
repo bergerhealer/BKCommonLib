@@ -206,9 +206,23 @@ public class SafeField<T> implements FieldAccessor<T> {
 	*
 	* @param type - class type to find the field in
 	* @param name - field name
+	* @return new SafeField
 	*/
-	public static<T> SafeField<T> create(Class<?> type, String name) {
+	public static <T> SafeField<T> create(Class<?> type, String name) {
 		return new SafeField<T>(type, name);
+	}
+
+	/**
+	 * Creates a new SafeField instance pointing to the field found in the given class type.
+	 * Exposes to the outside world using a translator.
+	 * 
+	 * @param type - class type to find the field in
+	 * @param name - field name
+	 * @param converterPair - used to convert between exposed and stored types
+	 * @return new TranslatorFieldAccessor backed by a SafeField
+	 */
+	public static <T> TranslatorFieldAccessor<T> create(Class<?> type, String name, ConverterPair<?, T> converterPair) {
+		return create(type, name).translate(converterPair);
 	}
 
 	@Override

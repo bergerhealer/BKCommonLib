@@ -6,28 +6,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.server.v1_4_R1.CraftingManager;
-import net.minecraft.server.v1_4_R1.IRecipe;
-import net.minecraft.server.v1_4_R1.ItemStack;
 import net.minecraft.server.v1_4_R1.RecipesFurnace;
 import net.minecraft.server.v1_4_R1.TileEntityFurnace;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
 
 public class RecipeUtil {
 	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
 	static {
 		ItemStack item;
 		for (Material material : Material.values()) {
-			item = new ItemStack(material.getId(), 1, 0);
-			if (item.getItem() == null) {
+			item = new ItemStack(material, 1);
+			if (CommonNMS.getNative(item).getItem() == null) {
 				continue;
 			}
-			int fuel = TileEntityFurnace.fuelTime(item);
+			int fuel = TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
 			if (fuel > 0) {
 				fuelTimes.put(material.getId(), fuel);
 			}
@@ -97,13 +98,14 @@ public class RecipeUtil {
 	}
 
 	public static CraftRecipe[] getCraftingRequirements(int itemid, Integer data) {
-		List<CraftRecipe> poss = new ArrayList<CraftRecipe>();
-		for (IRecipe rec : getCraftRecipes()) {
-			ItemStack item = rec.b();
-			if (item != null && item.id == itemid && (data == null || data == item.getData())) {
+		List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
+		for (Object rec : getCraftRecipes()) {
+			ItemStack item = RecipeRef.getOutput(rec);
+			if (item != null && item.getTypeId() == itemid && (data == null || data == item.getDurability())) {
 				CraftRecipe crec = CraftRecipe.create(rec);
-				if (crec != null)
+				if (crec != null) {
 					poss.add(crec);
+				}
 			}
 		}
 		return poss.toArray(new CraftRecipe[0]);
@@ -129,7 +131,7 @@ public class RecipeUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<IRecipe> getCraftRecipes() {
-		return (List<IRecipe>) CraftingManager.getInstance().getRecipes();
+	private static List<Object> getCraftRecipes() {
+		return (List<Object>) CraftingManager.getInstance().getRecipes();
 	}
 }

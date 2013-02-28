@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.CastingConverter;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -22,6 +23,18 @@ public abstract class CollectionTypeConverter<T extends Collection<?>, B extends
 		@Override
 		protected List<Object> convertSpecial(List<?> value, List<Object> def) {
 			return new ConvertingList<Object>(value, ConversionPairs.player.reverse());
+		}
+	};
+	public static final CollectionTypeConverter<List<ItemStack>, List<?>> toItemStackList = new CollectionTypeConverter<List<ItemStack>, List<?>>(CollectionConverter.toList) {
+		@Override
+		protected List<ItemStack> convertSpecial(List<?> value, List<ItemStack> def) {
+			return new ConvertingList<ItemStack>(value, ConversionPairs.itemStack);
+		}
+	};
+	public static final CollectionTypeConverter<List<Object>, List<?>> toItemStackHandleList = new CollectionTypeConverter<List<Object>, List<?>>(CollectionConverter.toList) {
+		@Override
+		protected List<Object> convertSpecial(List<?> value, List<Object> def) {
+			return new ConvertingList<Object>(value, ConversionPairs.itemStack.reverse());
 		}
 	};
 

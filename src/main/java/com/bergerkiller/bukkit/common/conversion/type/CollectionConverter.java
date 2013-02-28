@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -59,21 +60,17 @@ public abstract class CollectionConverter<T extends Collection<?>> extends Basic
 		} else {
 			final Class<?> type = value.getClass();
 			if (type.isArray()) {
-				final int arrayLength = Array.getLength(value);
-				final List<Object> list = new ArrayList<Object>(arrayLength);
 				if (type.getComponentType().isPrimitive()) {
-					// Slower unpacking logic
+					// Slower packing logic
+					final int arrayLength = Array.getLength(value);
+					final List<Object> list = new ArrayList<Object>(arrayLength);
 					for (int i = 0; i < arrayLength; i++) {
 						list.add(Array.get(value, i));
 					}
+					return convert(list);
 				} else {
-					// Simplified logic
-					Object[] array = (Object[]) value;
-					for (int i = 0; i < arrayLength; i++) {
-						list.add(array[i]);
-					}
+					return convert(Arrays.asList((Object[]) value));
 				}
-				return convert(list);
 			} else {
 				return def;
 			}

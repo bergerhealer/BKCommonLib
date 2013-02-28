@@ -1,59 +1,58 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import net.minecraft.server.v1_4_R1.IRecipe;
-import net.minecraft.server.v1_4_R1.ItemStack;
-import net.minecraft.server.v1_4_R1.MathHelper;
-import net.minecraft.server.v1_4_R1.ShapedRecipes;
-import net.minecraft.server.v1_4_R1.ShapelessRecipes;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class CraftRecipe {
-	private static final SafeField<ItemStack[]> srItems = new SafeField<ItemStack[]>(ShapedRecipes.class, "items");
-	private static final SafeField<List<ItemStack>> slIngredients = new SafeField<List<ItemStack>>(ShapelessRecipes.class, "ingredients");
+	private final ItemStack[] input;
+	private final ItemStack[] output;
 
-	private CraftRecipe(ItemStack[] input, ItemStack output) {
-		List<ItemStack> newinput = new ArrayList<ItemStack>(input.length);
+	private CraftRecipe(Collection<ItemStack> input, ItemStack output) {
+		// Convert the input
+		List<ItemStack> newinput = new ArrayList<ItemStack>(input.size());
 		boolean create;
 		for (ItemStack item : input) {
-			if (item == null)
+			if (LogicUtil.nullOrEmpty(item)) {
 				continue;
+			}
+
 			create = true;
 			for (ItemStack newitem : newinput) {
-				if (newitem.id == item.id && newitem.getData() == item.getData()) {
-					newitem.count++;
+				if (newitem.getTypeId() == item.getTypeId() && newitem.getDurability() == item.getDurability()) {
+					ItemUtil.addAmount(newitem, 1);
 					create = false;
 					break;
 				}
 			}
 			if (create) {
-				item = item.cloneItemStack();
-				item.count = 1;
+				item = item.clone();
+				item.setAmount(1);
 				newinput.add(item);
 			}
 		}
-		this.input = CommonNMS.getItemStacks(newinput.toArray(new ItemStack[0]));
+		this.input = newinput.toArray(new ItemStack[0]);
+
+		// Convert the output
 		List<ItemStack> newoutput = new ArrayList<ItemStack>(1);
-		newoutput.add(output.cloneItemStack());
+		newoutput.add(output.clone());
+		// Deal with special cases that demand an additional item (added elsewhere)
 		for (ItemStack stack : newinput) {
-			if (BlockUtil.isType(stack.id, Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.MILK_BUCKET)) {
-				ItemStack s = stack.cloneItemStack();
-				s.id = Material.BUCKET.getId();
-				newoutput.add(s);
+			if (BlockUtil.isType(stack.getTypeId(), Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.MILK_BUCKET)) {
+				newoutput.add(new ItemStack(Material.BUCKET, stack.getAmount()));
 			}
 		}
-		this.output = CommonNMS.getItemStacks(newoutput.toArray(new ItemStack[0]));
+		this.output = newoutput.toArray(new ItemStack[0]);
 	}
-
-	private final org.bukkit.inventory.ItemStack[] input;
-	private final org.bukkit.inventory.ItemStack[] output;
 
 	/**
 	 * Gets the input item at the index specified
@@ -61,7 +60,7 @@ public class CraftRecipe {
 	 * @param index of the item
 	 * @return input Item
 	 */
-	public org.bukkit.inventory.ItemStack getInput(int index) {
+	public ItemStack getInput(int index) {
 		return this.input[index];
 	}
 
@@ -70,7 +69,7 @@ public class CraftRecipe {
 	 * 
 	 * @return input Items
 	 */
-	public org.bukkit.inventory.ItemStack[] getInput() {
+	public ItemStack[] getInput() {
 		return this.input;
 	}
 
@@ -79,7 +78,7 @@ public class CraftRecipe {
 	 * 
 	 * @return output Items
 	 */
-	public org.bukkit.inventory.ItemStack[] getOutput() {
+	public ItemStack[] getOutput() {
 		return this.output;
 	}
 
@@ -91,7 +90,7 @@ public class CraftRecipe {
 	 */
 	public int getInputSize() {
 		int count = 0;
-		for (org.bukkit.inventory.ItemStack item : this.input) {
+		for (ItemStack item : this.input) {
 			count += item.getAmount();
 		}
 		return count;
@@ -105,7 +104,7 @@ public class CraftRecipe {
 	 */
 	public int getOutputSize() {
 		int count = 0;
-		for (org.bukkit.inventory.ItemStack item : this.output) {
+		for (ItemStack item : this.output) {
 			count += item.getAmount();
 		}
 		return count;
@@ -119,7 +118,7 @@ public class CraftRecipe {
 	 * @return the amount of resulting items that were crafted
 	 */
 	public int craftItems(Inventory inventory, int itemlimit) {
-		int lim = MathHelper.floor((double) itemlimit / (double) this.output[0].getAmount());
+		int lim = MathUtil.floor((double) itemlimit / (double) this.output[0].getAmount());
 		return this.craft(inventory, lim) * this.output[0].getAmount();
 	}
 
@@ -144,7 +143,7 @@ public class CraftRecipe {
 	 */
 	public boolean craft(Inventory inventory) {
 		// contains the required items?
-		for (org.bukkit.inventory.ItemStack item : this.input) {
+		for (ItemStack item : this.input) {
 			if (ItemUtil.getItemCount(inventory, item.getTypeId(), item.getDurability()) < item.getAmount()) {
 				return false;
 			}
@@ -154,38 +153,45 @@ public class CraftRecipe {
 			return false;
 		}
 		// actually transfer everything...
-		for (org.bukkit.inventory.ItemStack item : this.input) {
+		for (ItemStack item : this.input) {
 			ItemUtil.removeItems(inventory, item);
 		}
-		for (org.bukkit.inventory.ItemStack item : this.output) {
+		for (ItemStack item : this.output) {
 			ItemUtil.transfer(ItemUtil.cloneItem(item), inventory, Integer.MAX_VALUE);
 		}
 		return true;
 	}
 
-	public static CraftRecipe create(IRecipe recipe) {
-		if (recipe instanceof ShapedRecipes) {
-			return create(srItems.get(recipe), recipe.b());
-		} else if (recipe instanceof ShapelessRecipes) {
-			return create(slIngredients.get(recipe), recipe.b());
+	/**
+	 * Creates a new Craft Recipe from an IRecipe instance.
+	 * This method is not recommended to be used.
+	 * 
+	 * @param recipe to use
+	 * @return the CraftRecipe, or null on failure
+	 */
+	public static CraftRecipe create(Object recipe) {
+		final ItemStack output = RecipeRef.getOutput(recipe);
+		if (RecipeRef.SHAPED_TEMPLATE.isInstance(recipe)) {
+			return create(RecipeRef.shapedInput.get(recipe), output);
+		} else if (RecipeRef.SHAPELESS_TEMPLATE.isInstance(recipe)) {
+			return create(RecipeRef.shapelessInput.get(recipe), output);
 		} else {
 			return null;
 		}
 	}
 
-	public static CraftRecipe create(List<ItemStack> input, ItemStack output) {
-		if (input == null) {
+	public static CraftRecipe create(Collection<ItemStack> input, ItemStack output) {
+		if (LogicUtil.nullOrEmpty(input) || LogicUtil.nullOrEmpty(output)) {
 			return null;
 		} else {
-			return create(input.toArray(new ItemStack[0]), output);
-		}
-	}
-
-	public static CraftRecipe create(ItemStack[] input, ItemStack output) {
-		if (input == null || output == null || input.length == 0) {
-			return null;
-		} else {
-			return new CraftRecipe(input, output);
+			CraftRecipe rval = new CraftRecipe(input, output);
+			// Check that input and output are not causing a loop
+			// For example Sandstone has an infinite crafting loop going on
+			// (You can craft 4 Sandstone using 4 Sandstone...yeah)
+			if (rval.input.length == 1 && rval.output.length == 1 && rval.input[0].getTypeId() == rval.output[0].getTypeId()) {
+				return null;
+			}
+			return rval;
 		}
 	}
 }

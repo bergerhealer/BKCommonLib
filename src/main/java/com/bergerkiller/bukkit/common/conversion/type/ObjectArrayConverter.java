@@ -6,18 +6,29 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.bukkit.inventory.ItemStack;
+
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Converter for converting objects into various kinds of Object[] arrays
  */
 public class ObjectArrayConverter<T> extends BasicConverter<T> {
-	public static final ObjectArrayConverter<Object[]> toObjectArr = new ObjectArrayConverter<Object[]>(Object[].class);
+	public static final ObjectArrayConverter<Object[]> toObjectArr = new ObjectArrayConverter<Object[]>(Object.class);
+	public static final ObjectArrayConverter<ItemStack[]> toItemStackArr = new ObjectArrayConverter<ItemStack[]>(ItemStack.class);
+	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = new ObjectArrayConverter<Object[]>(CommonUtil.getNMSClass("ItemStack"));
 
-	public ObjectArrayConverter(Class<T> outputType) {
-		super(outputType);
+	@SuppressWarnings("unchecked")
+	public ObjectArrayConverter(Class<?> componentOutputType) {
+		super((Class<T>) LogicUtil.getArrayType(componentOutputType));
+	}
+
+	@Override
+	public boolean isCastingSupported() {
+		return false;
 	}
 
 	@Override

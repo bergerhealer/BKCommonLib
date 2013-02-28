@@ -146,6 +146,23 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Obtains the Class instance representing an array of the component type specified.
+	 * For example:<br>
+	 * - Integer.class -> Integer[].class<br>
+	 * - int.class -> int[].class
+	 * 
+	 * @param componentType to convert
+	 * @return array type
+	 */
+	public static Class<?> getArrayType(Class<?> componentType) {
+		if (componentType.isPrimitive()) {
+			return Array.newInstance(componentType, 0).getClass();
+		} else {
+			return CommonUtil.getClass("[L" + componentType.getName() + ";");
+		}
+	}
+
+	/**
 	 * Tries to get a specific element from a list. 
 	 * The default value is returned when:<br>
 	 * - The list is null<br>
