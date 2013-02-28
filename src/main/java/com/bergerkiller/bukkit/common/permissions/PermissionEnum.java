@@ -16,7 +16,7 @@ public abstract class PermissionEnum implements IPermissionDefault {
 	private final String desc;
 
 	protected PermissionEnum(String node, PermissionDefault def, String description) {
-		this(node, def, description, 1);
+		this(node, def, description, 0);
 	}
 
 	protected PermissionEnum(String node, PermissionDefault def, String description, int argCount) {
