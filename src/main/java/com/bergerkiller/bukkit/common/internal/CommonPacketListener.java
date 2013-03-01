@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -34,8 +35,33 @@ class CommonPacketListener extends PlayerConnection {
 		}
 	}
 
-	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean retry) {
-		ep.playerConnection = connection;
+	private static boolean isReplaceable(Object playerConnection) {
+		return playerConnection instanceof CommonPacketListener || playerConnection.getClass() == PlayerConnection.class;
+	}
+
+	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
+		if (isReplaceable(ep.playerConnection)) {
+			// Set it
+			ep.playerConnection = connection;
+			// Perform a little check-up in 10 ticks
+			new Task(CommonPlugin.getInstance()) {
+				@Override
+				public void run() {
+					if (ep.playerConnection != connection) {
+						// Player connection has changed!
+						CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
+					}
+				}
+			}.start(10);
+		} else {
+			// Plugin conflict!
+			CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
+			return;
+		}
+		registerPlayerConnection(ep, connection, true);
+	}
+
+	private static void registerPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean retry) {
 		synchronized (serverPlayerConnections) {
 			// Replace existing
 			ListIterator<PlayerConnection> iter = serverPlayerConnections.listIterator();
@@ -53,7 +79,7 @@ class CommonPacketListener extends PlayerConnection {
 			// Remove the old one the next tick but then fail
 			CommonUtil.nextTick(new Runnable() {
 				public void run() {
-					setPlayerConnection(ep, connection, false);
+					registerPlayerConnection(ep, connection, false);
 				}
 			});
 		}
@@ -64,7 +90,7 @@ class CommonPacketListener extends PlayerConnection {
 		if (ep.playerConnection instanceof CommonPacketListener) {
 			return;
 		}
-		setPlayerConnection(ep, new CommonPacketListener(CommonUtil.getMCServer(), ep), true);
+		setPlayerConnection(ep, new CommonPacketListener(CommonUtil.getMCServer(), ep));
 	}
 
 	public static void unbind(Player player) {
@@ -73,7 +99,7 @@ class CommonPacketListener extends PlayerConnection {
 		if (previous instanceof CommonPacketListener) {
 			PlayerConnection replacement = ((CommonPacketListener) previous).previous;
 			PlayerConnectionRef.TEMPLATE.transfer(previous, replacement);
-			setPlayerConnection(ep, replacement, true);
+			setPlayerConnection(ep, replacement);
 		}
 	}
 

@@ -53,6 +53,10 @@ public class CommonPlugin extends PluginBase {
 	public static final String DEPENDENT_MC_VERSION = "v1_4_R1";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
 	/*
+	 * Known plugins that require ProtocolLib to be installed
+	 */
+	private static final String[] protLibPlugins = {"Spout"};
+	/*
 	 * Remaining internal variables
 	 */
 	private static CommonPlugin instance;
@@ -351,23 +355,28 @@ public class CommonPlugin extends PluginBase {
 				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
 				CommonPacketListener.bindAll();
 			}
-		} else if (enabled && pluginName.equals("Spout")) {
-			failSpout();
+		} else if (enabled && LogicUtil.contains(pluginName, protLibPlugins)) {
+			failPacketListener(plugin.getClass());
 		}
 	}
 
-	private boolean failSpout() {
+	public void failPacketListener(Class<?> playerConnectionType) {
 		if (CommonUtil.getPlugin("ProtocolLib") != null) {
-			return false;
+			return;
 		}
-		log(Level.SEVERE, "BKCommonLib is incompatible with Spout Plugin because packets are intercepted");
-		log(Level.SEVERE, "Install ProtocolLib to restore compatibility with Spout Plugin");
+		Plugin plugin = CommonUtil.getPluginByClass(playerConnectionType);
+		log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
+		if (plugin == null) {
+			log(Level.SEVERE, "This was caused by an unknown source, class: " + playerConnectionType.getName());
+		} else {
+			log(Level.SEVERE, "This was caused by a plugin conflict, namely " + plugin.getName());
+		}
+		log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility between plugins");
 		log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
 		Bukkit.getPluginManager().disablePlugin(this);
-		return true;
 	}
-	
+
 	@Override
 	public int getMinimumLibVersion() {
 		return 0;
@@ -397,17 +406,19 @@ public class CommonPlugin extends PluginBase {
 		}
 		startedTasks.clear();
 		// Transfer PlayerConnection from players back to default
-		for(Player player : Bukkit.getServer().getOnlinePlayers()) {
-			CommonPacketListener.unbind(player);
-		}
+		CommonPacketListener.unbindAll();
 	}
 
 	@Override
 	public void enable() {
 		// Validate version
 		if (IS_COMPATIBLE) {
-			if (CommonUtil.getPlugin("Spout") != null && failSpout()) {
-				return;
+			Plugin plugin;
+			for (String protLibPlugin : protLibPlugins) {
+				if ((plugin = CommonUtil.getPlugin(protLibPlugin)) != null) {
+					failPacketListener(plugin.getClass());
+					return;
+				}
 			}
 
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);

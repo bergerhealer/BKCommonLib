@@ -3,7 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.server.v1_4_R1.EntityHuman;
@@ -19,12 +22,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.SimplePluginManager;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 
 public class CommonUtil {
 	public static final int VIEW = Bukkit.getServer().getViewDistance();
@@ -32,6 +39,7 @@ public class CommonUtil {
 	public static final int CHUNKAREA = VIEWWIDTH * VIEWWIDTH;
 	public static final int BLOCKVIEW = 32 + (VIEW << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
+	private static final FieldAccessor<Collection<Plugin>> pluginsField = new SafeField<Collection<Plugin>>(SimplePluginManager.class, "plugins");
 
 	/**
 	 * Sends a message to a sender<br>
@@ -309,6 +317,29 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Gets all Plugins running on the server WITHOUT allocating a new array if possible.
+	 * If there is no performance requirement to avoid array allocation, use {@link getPlugins()} instead.
+	 * Only use this method inside a <b>synchronized</b> body around the Plugin Manager, for example:
+	 * <pre>
+	 * synchronized (Bukkit.getServer().getPluginManager()) {
+	 * 	for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
+	 *  		System.out.println(plugin.getName());
+	 * 	}
+	 * }
+	 * </pre>
+	 * 
+	 * @return unsafe collection of plugins running on the server
+	 */
+	public static Collection<Plugin> getPluginsUnsafe() {
+		final PluginManager man = Bukkit.getServer().getPluginManager();
+		if (man instanceof SimplePluginManager) {
+			return pluginsField.get(man);
+		} else {
+			return Arrays.asList(man.getPlugins());
+		}
+	}
+
+	/**
 	 * Gets all the Plugins running on the Server
 	 * 
 	 * @return Plugins
@@ -325,6 +356,82 @@ public class CommonUtil {
 	 */
 	public static Plugin getPlugin(String name) {
 		return Bukkit.getServer().getPluginManager().getPlugin(name);
+	}
+
+	/**
+	 * Gets the plugin by inspecting a Class
+	 * 
+	 * @param clazz
+	 * @return the Plugin matching the Class, or null if not found
+	 */
+	public static Plugin getPluginByClass(Class<?> clazz) {
+		return getPluginByClass(clazz.getName());
+	}
+
+	/**
+	 * Gets the plugin by inspecting the path to a Class
+	 * 
+	 * @param classPath of the Class
+	 * @return the Plugin matching the Class, or null if not found
+	 */
+	public static Plugin getPluginByClass(String classPath) {
+		final String packagePath = getPackagePath(classPath);
+		synchronized (Bukkit.getServer().getPluginManager()) {
+			String main;
+			for (Plugin plugin : getPluginsUnsafe()) {
+				main = plugin.getDescription().getMain();
+				if (packagePath.isEmpty()) {
+					// No package name - verify
+					if (!main.contains(".")) {
+						return plugin;
+					}
+				} else {
+					// Package name is there - verify
+					if (main.startsWith(packagePath)) {
+						return plugin;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Obtains the package path of a given Class Path
+	 * 
+	 * @param classPath
+	 * @return package path of the Package the class resides in
+	 */
+	public static String getPackagePath(String classPath) {
+		final int idx = classPath.lastIndexOf('.');
+		return idx == -1 ? "" : classPath.substring(0, idx);
+	}
+
+	/**
+	 * Finds all plugins involved in an array of stack trace elements.
+	 * 
+	 * @param stackTrace to find the plugins for
+	 * @return array of plugins mentioned in the Stack Trace
+	 */
+	public static Plugin[] findPlugins(StackTraceElement[] stackTrace) {
+		return findPlugins(Arrays.asList(stackTrace));
+	}
+
+	/**
+	 * Finds all plugins involved in a list of stack trace elements.
+	 * 
+	 * @param stackTrace to find the plugins for
+	 * @return array of plugins mentioned in the Stack Trace
+	 */
+	public static Plugin[] findPlugins(List<StackTraceElement> stackTrace) {
+		LinkedHashSet<Plugin> found = new LinkedHashSet<Plugin>(3);
+		for (StackTraceElement elem : stackTrace) {
+			Plugin plugin = getPluginByClass(elem.getClassName());
+			if (plugin != null) {
+				found.add(plugin);
+			}
+		}
+		return found.toArray(new Plugin[0]);
 	}
 
 	/**
