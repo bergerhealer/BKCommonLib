@@ -13,7 +13,6 @@ public class DebugUtil {
 	 * Materials that are used: <i>STONE, DIRT, GRASS, WOOD, LOG, IRON_ORE, IRON_BLOCK, GOLD_BLOCK, DIAMOND_BLOCK</i>
 	 * 
 	 * @param block to randomize
-	 * @param materials to pick from
 	 */
 	public static void randomizeBlock(Block block) {
 		randomizeBlock(block, Material.STONE, Material.DIRT, Material.GRASS, Material.WOOD, Material.LOG, 

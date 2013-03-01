@@ -76,12 +76,18 @@ public class PacketUtil {
 	}
 
 	public static void addPacketListener(Plugin plugin, PacketListener listener, PacketType... packets) {
-		if(listener == null || LogicUtil.nullOrEmpty(packets)) {
+		if (listener == null || LogicUtil.nullOrEmpty(packets)) {
 			return;
 		}
-		for (PacketType packetType : packets) {
-			CommonPlugin.getInstance().addPacketListener(plugin, listener, packetType.getId());
+		int[] ids = new int[packets.length];
+		for (int i = 0; i < packets.length; i++) {
+			if (packets[i] == null) {
+				throw new IllegalArgumentException("Can not register a null packet type");
+			} else {
+				ids[i] = packets[i].getId();
+			}
 		}
+		CommonPlugin.getInstance().addPacketListener(plugin, listener, ids);
 	}
 
 	public static void removePacketListeners(Plugin plugin) {

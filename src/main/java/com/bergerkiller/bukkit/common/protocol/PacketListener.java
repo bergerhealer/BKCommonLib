@@ -4,18 +4,18 @@ import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 
 public interface PacketListener {
-	
+
 	/**
 	 * Gets fired when a packet is received
 	 * 
-	 * @param event			Packet event
+	 * @param event	Packet event
 	 */
 	public void onPacketReceive(PacketReceiveEvent event);
-	
+
 	/**
-	 * Gets fired then a packet is sended
+	 * Gets fired then a packet is sent
 	 * 
-	 * @param event			Packet event
+	 * @param event	Packet event
 	 */
 	public void onPacketSend(PacketSendEvent event);
 }

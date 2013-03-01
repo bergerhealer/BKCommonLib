@@ -14,13 +14,10 @@ import java.util.logging.Level;
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -31,6 +28,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -38,9 +36,11 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
@@ -158,7 +158,7 @@ public class CommonPlugin extends PluginBase {
 			if (this.bleedingMobsInstance != null) {
 				try {
 					BleedingMobs bm = (BleedingMobs) this.bleedingMobsInstance;
-					if (bm.isSpawning() || (bm.isWorldEnabled(item.getWorld()) && bm.isParticleItem(((CraftItem) item).getUniqueId()))) {
+					if (bm.isSpawning() || (bm.isWorldEnabled(item.getWorld()) && bm.isParticleItem(item.getUniqueId()))) {
 						return true;
 					}
 				} catch (Throwable t) {
@@ -186,25 +186,34 @@ public class CommonPlugin extends PluginBase {
 		return onPacketSend(player, packet, PacketFields.DEFAULT.packetID.get(packet));
 	}
 
-	public void addPacketListener(Plugin plugin, PacketListener listener, int id) {
+	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Listener is not allowed to be null");
-		} else if (id < 0 || id >= listeners.length) {
-			throw new IllegalArgumentException("Unknown packet type Id: " + id);
 		} else if (plugin == null) {
 			throw new IllegalArgumentException("Plugin is not allowed to be null");
 		}
-		if (listeners[id] == null) {
-			listeners[id] = new ArrayList<PacketListener>();
+		// Registration in BKCommonLib
+		for (int id : ids) {
+			if (id < 0 || id >= listeners.length) {
+				throw new IllegalArgumentException("Unknown packet type Id: " + id);
+			}
+			// Map to listener array
+			if (listeners[id] == null) {
+				listeners[id] = new ArrayList<PacketListener>();
+			}
+			listeners[id].add(listener);
+			// Map to plugin list
+			List<PacketListener> list = listenerPlugins.get(plugin);
+			if (list == null) {
+				list = new ArrayList<PacketListener>(2);
+				listenerPlugins.put(plugin, list);
+			}
+			list.add(listener);
 		}
-		listeners[id].add(listener);
-		// Map to plugin list
-		List<PacketListener> list = listenerPlugins.get(plugin);
-		if (list == null) {
-			list = new ArrayList<PacketListener>(2);
-			listenerPlugins.put(plugin, list);
+		// If ProtocolLib is enabled, register a new listener
+		if (this.isProtocolLibEnabled) {
+			CommonProtocolLibHandler.register(ids);
 		}
-		list.add(listener);
 	}
 
 	public void removePacketListeners(Plugin plugin) {
@@ -279,21 +288,14 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
-		if (!PacketFields.DEFAULT.isInstance(packet) || player == null) {
+		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		final EntityPlayer ep = CommonNMS.getNative(player);
-		if (ep.playerConnection == null || ep.playerConnection.disconnected) {
-			return;
-		}
-		if (throughListeners) {
-			PlayerConnectionRef.sendPacket(ep.playerConnection, packet);
+		if (this.isProtocolLibEnabled) {
+			CommonProtocolLibHandler.sendPacket(player, packet, throughListeners);
 		} else {
-			if (this.isProtocolLibEnabled) {
-				CommonProtocolLibHandler.sendSilentPacket(player, packet);
-			} else {
-				PlayerConnectionRef.sendPacket(ep.playerConnection, new CommonSilentPacket(packet));
-			}
+			final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+			PlayerConnectionRef.sendPacket(connection, packet);
 		}
 	}
 
@@ -334,9 +336,17 @@ public class CommonPlugin extends PluginBase {
 			}
 		} else if (pluginName.equals("ProtocolLib")) {
 			if (this.isProtocolLibEnabled = enabled) {
+				log(Level.INFO, "Now using ProtocolLib to handle packet listeners");
+				//Unregister previous PlayerConnection hooks
 				CommonPacketListener.unbindAll();
-				//Register this plugin in ProtocolLib
-				CommonProtocolLibHandler.register(this);
+				//Register all packets in ProtocolLib
+				Set<Integer> packets = new HashSet<Integer>(10);
+				for (int i = 0; i < listeners.length; i++) {
+					if (!LogicUtil.nullOrEmpty(listeners[i])) {
+						packets.add(i);
+					}
+				}
+				CommonProtocolLibHandler.register(packets);
 			} else {
 				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
 				CommonPacketListener.bindAll();
@@ -526,8 +536,8 @@ public class CommonPlugin extends PluginBase {
 			CommonPlugin cp = CommonPlugin.getInstance();
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
-				for (WorldServer world : CommonNMS.getWorlds()) {
-					cp.entities.addAll(world.entityList);
+				for (World world : WorldUtil.getWorlds()) {
+					cp.entities.addAll(CommonNMS.getNative(world).entityList);
 					for (Entity entity : cp.entities) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {

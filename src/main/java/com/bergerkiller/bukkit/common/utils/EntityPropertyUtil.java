@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_4_R1.DamageSource;
 
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -13,14 +11,11 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
-	private static final MethodAccessor<Void> setFirstPlayed = new SafeMethod<Void>(CommonUtil.getCBClass("entity.CraftPlayer"), "setFirstPlayed", long.class);
 	private static final Material[] minecartTypes = {Material.MINECART, Material.STORAGE_MINECART, Material.POWERED_MINECART};
 
 	/**
@@ -132,23 +127,6 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 		CommonNMS.getNative(entity).dead = dead;
 	}
 
-	public static void queueChunkSend(Player player, Chunk chunk) {
-		queueChunkSend(player, chunk.getX(), chunk.getZ());
-	}
-
-	@SuppressWarnings("unchecked")
-	public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
-		CommonNMS.getNative(player).chunkCoordIntPairQueue.add(new ChunkCoordIntPair(chunkX, chunkZ));
-	}
-
-	public static void cancelChunkSend(Player player, Chunk chunk) {
-		cancelChunkSend(player, chunk.getX(), chunk.getZ());
-	}
-
-	public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
-		CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(new ChunkCoordIntPair(chunkX, chunkZ));
-	}
-
 	/**
 	 * Damages an entity with as cause another entity
 	 * 
@@ -240,15 +218,5 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 			return getAbilities((HumanEntity) entity).isInvulnerable();
 		}
 		return false;
-	}
-
-	/**
-	 * Sets the first time a player played on a server or world
-	 * 
-	 * @param player to set it for
-	 * @param firstPlayed time
-	 */
-	public static void setFirstPlayed(org.bukkit.entity.Player player, long firstPlayed) {
-		setFirstPlayed.invoke(player, firstPlayed);
 	}
 }
