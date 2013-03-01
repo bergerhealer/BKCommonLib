@@ -4,12 +4,13 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class RegionFileCacheRef {
-	public static final FieldAccessor<Map<File, Object>> filesField = new SafeField<Map<File, Object>>(CommonUtil.getNMSClass("RegionFileCache"), "a");
+	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("RegionFileCache");
+	public static final FieldAccessor<Map<File, Object>> filesField = TEMPLATE.getField("a");
 	public static final Map<File, Object> FILES;
 	static {
 		FILES = filesField.isValid() ? filesField.get(null) : new HashMap<File, Object>();
