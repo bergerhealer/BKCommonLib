@@ -16,8 +16,10 @@ import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkProviderServer;
 import net.minecraft.server.v1_4_R1.CrashReport;
 import net.minecraft.server.v1_4_R1.CrashReportSystemDetails;
+import net.minecraft.server.v1_4_R1.IChunkLoader;
 import net.minecraft.server.v1_4_R1.IChunkProvider;
 import net.minecraft.server.v1_4_R1.ReportedException;
+import net.minecraft.server.v1_4_R1.WorldServer;
 
 public class ChunkProviderServerBase extends ChunkProviderServer {
 	public final org.bukkit.Chunk emptyChunk;
@@ -28,10 +30,22 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	}
 
 	public ChunkProviderServerBase(Object chunkProviderServer) {
-		super(((ChunkProviderServer) chunkProviderServer).world, null, null);
+		super(getWorld(chunkProviderServer), getLoader(chunkProviderServer), getGenerator(chunkProviderServer));
 		ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
-		this.emptyChunk = super.emptyChunk.bukkitChunk;
 		this.world = super.world.getWorld();
+		this.emptyChunk = super.emptyChunk.bukkitChunk;
+	}
+
+	private static WorldServer getWorld(Object chunkProviderServer) {
+		return ((ChunkProviderServer) chunkProviderServer).world;
+	}
+
+	private static IChunkLoader getLoader(Object chunkProviderServer) {
+		return (IChunkLoader) ChunkProviderServerRef.chunkLoader.get(chunkProviderServer);
+	}
+
+	private static IChunkProvider getGenerator(Object chunkProviderServer) {
+		return ((ChunkProviderServer) chunkProviderServer).chunkProvider;
 	}
 
 	/**

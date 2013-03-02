@@ -32,8 +32,9 @@ public class ChunkProviderServerRedirect extends ChunkProviderServer {
 
 	public void setBase(Object chunkProviderServer) {
 		this.base = (ChunkProviderServer) chunkProviderServer;
+		ChunkProviderServerRef.TEMPLATE.transfer(this.base, this);
 	}
-	
+
 	@Override
 	public void a() {
 		this.base.a();
