@@ -179,6 +179,50 @@ public class StringUtil {
 	}
 
 	/**
+	 * Replaces a part of the text with the replacement
+	 * 
+	 * @param text to replace a part in
+	 * @param startIndex of the part
+	 * @param endIndex of the part
+	 * @param replacement for this part
+	 */
+	public static String replace(String text, int startIndex, int endIndex, String replacement) {
+		StringBuilder builder = new StringBuilder(text);
+		builder.replace(startIndex, endIndex, replacement);
+		return builder.toString();
+	}
+
+	/**
+	 * Equivalent of {@link String.trim()}, but only trims away the whitespace at the beginning.
+	 * 
+	 * @param text to trim the start of
+	 * @return text trimmed at the start
+	 */
+	public static String trimStart(String text) {
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) != ' ') {
+				return text.substring(i);
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * Equivalent of {@link String.trim()}, but only trims away the whitespace at the end.
+	 * 
+	 * @param text to trim the end of
+	 * @return text trimmed at the end
+	 */
+	public static String trimEnd(String text) {
+		for (int i = text.length() - 1; i >= 0; i--) {
+			if (text.charAt(i) != ' ') {
+				return text.substring(0, i + 1);
+			}
+		}
+		return "";
+	}
+
+	/**
 	 * Removes a single elements from an array
 	 * 
 	 * @param input array

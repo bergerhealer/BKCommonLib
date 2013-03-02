@@ -11,8 +11,10 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 /**
  * A basic YAML configuration implementation
@@ -146,26 +148,95 @@ public class BasicConfiguration extends ConfigurationNode {
 			writeHeader(true, writer, this.getHeader(), 0);
 
 			// Write other headers and the nodes
-			String trimmedLine;
+			IntHashMap<String> anchorData = new IntHashMap<String>();
 			int indent;
+			int anchStart, anchEnd, anchId = -1, anchDepth = 0, anchIndent = 0;
+			boolean wasAnchor;
+			int refStart, refEnd, refId;
+			StringBuilder refData = new StringBuilder();
 			NodeBuilder node = new NodeBuilder(this.getIndent());
 			for (String line : this.getSource().saveToString().split("\n", -1)) {
 				line = StringUtil.colorToAmp(line);
 				indent = StringUtil.getSuccessiveCharCount(line, ' ');
-				trimmedLine = line.substring(indent);
+				line = line.substring(indent);
+				wasAnchor = false;
 				// ===== Logic start =====
 				// Get rid of the unneeded '-characters around certain common names
-				if (trimmedLine.equals("'*':")) {
-					trimmedLine = "*:";
-					line = StringUtil.getFilledString(" ", indent) + trimmedLine;
+				if (line.equals("'*':")) {
+					line = "*:";
 				}
 
 				// Handle a node
-				if (node.handle(trimmedLine, indent)) {
+				if (node.handle(line, indent)) {
+					// Store old anchor data
+					if (anchId >= 0 && node.getDepth() <= anchDepth) {
+						anchorData.put(anchId, refData.toString());
+						refData.setLength(0);
+						anchId = refId = -1;
+					}
+
+					// Saving a new node: Write the node header
 					writeHeader(false, writer, this.getHeader(node.getPath()), indent);
+
+					// Check if the value denotes a reference
+					refStart = line.indexOf("*id", node.getName().length());
+					refEnd = line.indexOf(' ', refStart);
+					if (refEnd == -1) {
+						refEnd = line.length();
+					}
+					if (refStart > 0 && refEnd > refStart) {
+						// This is a reference pointer: get id
+						refId = ParseUtil.parseInt(line.substring(refStart + 3, refEnd), -1);
+						if (refId >= 0) {
+							// Obtain the reference data
+							String data = anchorData.get(refId);
+							if (data != null) {
+								// Replace the line with the new data
+								line = StringUtil.trimEnd(line.substring(0, refStart)) + " " + data;
+							}
+						}
+					}
+
+					// Check if the value denotes a data anchor
+					anchStart = line.indexOf("&id", node.getName().length());
+					anchEnd = line.indexOf(' ', anchStart);
+					if (anchEnd == -1) {
+						anchEnd = line.length();
+					}
+					if (anchStart > 0 && anchEnd > anchStart) {
+						// This is a reference node anchor: get id
+						anchId = ParseUtil.parseInt(line.substring(anchStart + 3, anchEnd), -1);
+						anchDepth = node.getDepth();
+						anchIndent = indent;
+						if (anchId >= 0) {
+							// Fix whitespace after anchor identifier
+							anchEnd += StringUtil.getSuccessiveCharCount(line.substring(anchEnd), ' ');
+
+							// Store the data of this anchor
+							refData.append(line.substring(anchEnd));
+
+							// Remove the variable reference from saved data
+							line = StringUtil.replace(line, anchStart, anchEnd, "");
+						}
+						wasAnchor = true;
+					}
 				}
-				writer.write(line);
-				writer.newLine();
+				if (!wasAnchor && anchId >= 0) {
+					// Not an anchor: append anchor data
+					refData.append('\n').append(StringUtil.getFilledString(" ", indent - anchIndent)).append(line);
+				}
+				// Write the data
+				if (LogicUtil.containsChar('\n', line)) {
+					for (String part : line.split("\n", -1)) {
+						StreamUtil.writeIndent(writer, indent);
+						writer.write(part);
+						writer.newLine();
+					}
+				} else {
+					StreamUtil.writeIndent(writer, indent);
+					writer.write(line);
+					writer.newLine();
+				}
 			}
 		} finally {
 			writer.close();

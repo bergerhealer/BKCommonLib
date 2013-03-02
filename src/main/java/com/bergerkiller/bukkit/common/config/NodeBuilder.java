@@ -45,6 +45,24 @@ public class NodeBuilder {
 	}
 
 	/**
+	 * Gets the name of the current node
+	 * 
+	 * @return node name
+	 */
+	public String getName() {
+		return this.nodes.peekLast();
+	}
+
+	/**
+	 * Gets how deep the current node is in the tree hierarchy
+	 * 
+	 * @return node depth
+	 */
+	public int getDepth() {
+		return this.nodes.size();
+	}
+	
+	/**
 	 * Gets the path to the currently active node
 	 * 
 	 * @return current path

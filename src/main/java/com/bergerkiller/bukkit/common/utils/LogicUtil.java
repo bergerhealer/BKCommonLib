@@ -363,7 +363,7 @@ public class LogicUtil {
 	 * @return True if it is contained, False if not
 	 */
 	public static boolean containsByte(byte value, byte... values) {
-		for (int v : values) {
+		for (byte v : values) {
 			if (v == value) {
 				return true;
 			}
@@ -378,8 +378,24 @@ public class LogicUtil {
 	 * @param values to search in
 	 * @return True if it is contained, False if not
 	 */
+	public static boolean containsChar(char value, CharSequence sequence) {
+		for (int i = 0; i < sequence.length(); i++) {
+			if (sequence.charAt(i) == value) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if a list of characters contains the character specified
+	 * 
+	 * @param value to find
+	 * @param values to search in
+	 * @return True if it is contained, False if not
+	 */
 	public static boolean containsChar(char value, char... values) {
-		for (int v : values) {
+		for (char v : values) {
 			if (v == value) {
 				return true;
 			}
@@ -410,8 +426,8 @@ public class LogicUtil {
 	 * @param values to search in
 	 * @return True if it is contained, False if not
 	 */
-	public static boolean containsBool(byte value, byte... values) {
-		for (int v : values) {
+	public static boolean containsBool(boolean value, boolean... values) {
+		for (boolean v : values) {
 			if (v == value) {
 				return true;
 			}
