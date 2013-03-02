@@ -40,6 +40,7 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
+		final boolean hasCommon = CommonPlugin.getInstance() != null;
 		if (isReplaceable(ep.playerConnection)) {
 			// Set it
 			ep.playerConnection = connection;
@@ -47,13 +48,13 @@ class CommonPacketListener extends PlayerConnection {
 			new Task(CommonPlugin.getInstance()) {
 				@Override
 				public void run() {
-					if (ep.playerConnection != connection) {
+					if (hasCommon && ep.playerConnection != connection) {
 						// Player connection has changed!
 						CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
 					}
 				}
 			}.start(10);
-		} else {
+		} else if (hasCommon) {
 			// Plugin conflict!
 			CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
 			return;
@@ -71,7 +72,7 @@ class CommonPacketListener extends PlayerConnection {
 					return;
 				}
 			}
-			if (!retry) {
+			if (!retry && CommonPlugin.getInstance() != null) {
 				CommonPlugin.getInstance().log(Level.SEVERE, "Failed to (un)register PlayerConnection proxy...bad things may happen!");
 				return;
 			}

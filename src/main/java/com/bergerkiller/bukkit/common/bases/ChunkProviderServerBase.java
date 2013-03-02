@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.bases;
 import java.util.Random;
 
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_4_R1.CraftChunk;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
 
@@ -33,7 +34,9 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 		super(getWorld(chunkProviderServer), getLoader(chunkProviderServer), getGenerator(chunkProviderServer));
 		ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
 		this.world = super.world.getWorld();
-		this.emptyChunk = super.emptyChunk.bukkitChunk;
+		// Empty chunks have no Bukkit chunk - fix this!
+		// Sadly the CraftChunk allows no 'null' handle...
+		this.emptyChunk = new CraftChunk(new Chunk(super.world, 0, 0));
 	}
 
 	private static WorldServer getWorld(Object chunkProviderServer) {
@@ -46,6 +49,15 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 
 	private static IChunkProvider getGenerator(Object chunkProviderServer) {
 		return ((ChunkProviderServer) chunkProviderServer).chunkProvider;
+	}
+
+	/**
+	 * Gets whether this Chunk Provider contains a chunk generator
+	 * 
+	 * @return True if a chunk generator exists, False if not
+	 */
+	public boolean hasGenerator() {
+		return this.chunkProvider != null;
 	}
 
 	/**
@@ -85,7 +97,12 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	@Override
 	@Deprecated
 	public Chunk getChunkAt(int i, int j, Runnable runnable) {
-		return (Chunk) Conversion.toChunkHandle.convert(getBukkitChunkAt(i, j, runnable));
+		org.bukkit.Chunk bchunk = getBukkitChunkAt(i, j, runnable);
+		if (bchunk == this.emptyChunk) {
+			return super.emptyChunk;
+		} else {
+			return (Chunk) Conversion.toChunkHandle.convert(bchunk);
+		}
 	}
 
 	/**
