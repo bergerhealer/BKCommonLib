@@ -276,6 +276,16 @@ public class WorldUtil extends ChunkUtil {
 		return CommonNMS.getNative(explosionPosition.getWorld()).a(vec, CommonNMS.getNative(entity).boundingBox);
 	}
 
+	/**
+	 * Saves a world to disk, waiting until saving has completed before returning.
+	 * This may take significantly long. This method is cross-thread supported.
+	 * 
+	 * @param world to be saved
+	 */
+	public static void saveToDisk(org.bukkit.World world) {
+		CommonNMS.getNative(world).saveLevel();
+	}
+
 	public static void loadChunks(Location location, final int radius) {
 		loadChunks(location.getWorld(), location.getX(), location.getZ(), radius);
 	}

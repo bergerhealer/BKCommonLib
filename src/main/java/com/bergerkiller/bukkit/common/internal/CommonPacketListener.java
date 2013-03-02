@@ -45,15 +45,17 @@ class CommonPacketListener extends PlayerConnection {
 			// Set it
 			ep.playerConnection = connection;
 			// Perform a little check-up in 10 ticks
-			new Task(CommonPlugin.getInstance()) {
-				@Override
-				public void run() {
-					if (hasCommon && ep.playerConnection != connection) {
-						// Player connection has changed!
-						CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
+			if (CommonPlugin.getInstance() != null) {
+				new Task(CommonPlugin.getInstance()) {
+					@Override
+					public void run() {
+						if (hasCommon && ep.playerConnection != connection) {
+							// Player connection has changed!
+							CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
+						}
 					}
-				}
-			}.start(10);
+				}.start(10);
+			}
 		} else if (hasCommon) {
 			// Plugin conflict!
 			CommonPlugin.getInstance().failPacketListener(ep.playerConnection.getClass());
