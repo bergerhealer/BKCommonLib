@@ -390,7 +390,7 @@ public class CommonPlugin extends PluginBase {
 	public void onLoad() {
 		instance = this;
 		// Load the classes contained in this library
-		CommonClasses.init(); 
+		CommonClasses.init();
 	}
 
 	@Override

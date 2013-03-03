@@ -479,7 +479,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 */
 	public void handle(Throwable reason) {
 		if (reason instanceof Exception) {
-			reason.printStackTrace();
+			StackTraceFilter.SERVER.print(reason);
 		} else if (reason instanceof OutOfMemoryError) {
 			log(Level.SEVERE, "The server is running out of memory! Do something!");
 		} else if (reason instanceof NoClassDefFoundError) {
@@ -487,7 +487,7 @@ public abstract class PluginBase extends JavaPlugin {
 		} else {
 			log(Level.SEVERE, "Encountered a critical error and had to be disabled.");
 			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
-			reason.printStackTrace();
+			StackTraceFilter.SERVER.print(reason);
 			Bukkit.getPluginManager().disablePlugin(this);
 		}
 	}
@@ -611,7 +611,7 @@ public abstract class PluginBase extends JavaPlugin {
 		} catch (Throwable t) {
 			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
 			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
-			t.printStackTrace();
+			StackTraceFilter.SERVER.print(t);
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
@@ -647,7 +647,7 @@ public abstract class PluginBase extends JavaPlugin {
 				this.disable();
 			} catch (Throwable t) {
 				log(Level.SEVERE, "An error occurred while disabling:");
-				t.printStackTrace();
+				StackTraceFilter.SERVER.print(t);
 				doDisableMessage = false;
 			}
 			// Remove references to the plugin - it is disabled now

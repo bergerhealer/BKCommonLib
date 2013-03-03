@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.minecraft.server.v1_4_R1.EntityHuman;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
@@ -26,6 +27,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
@@ -214,6 +216,25 @@ public class CommonUtil {
 	 */
 	public static boolean hasPermission(CommandSender sender, String permissionNode) {
 		return CommonPlugin.getInstance().hasPermission(sender, permissionNode);
+	}
+
+	/**
+	 * Prints the filtered (using the SERVER filter) stack trace of an error
+	 * 
+	 * @param error to print
+	 */
+	public static void printFilteredStackTrace(Throwable error) {
+		StackTraceFilter.SERVER.print(error);
+	}
+
+	/**
+	 * Prints the filtered (using the SERVER filter) stack trace of an error
+	 * 
+	 * @param error to print
+	 * @param level of the error
+	 */
+	public static void printFilteredStackTrace(Throwable error, Level level) {
+		StackTraceFilter.SERVER.print(error, level);
 	}
 
 	/**
