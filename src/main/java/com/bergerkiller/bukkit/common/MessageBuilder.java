@@ -16,6 +16,7 @@ public class MessageBuilder {
 	private int currentWidth;
 	private String separator = null;
 	private int sepwidth = 0;
+	private boolean wasAppended = false;
 	private int indent = 0;
 
 	public static final int CHAT_WINDOW_WIDTH = 240;
@@ -47,6 +48,7 @@ public class MessageBuilder {
 		} else {
 			this.separator = separator;
 			this.sepwidth = StringUtil.getWidth(separator);
+			this.wasAppended = false;
 			return this;
 		}
 	}
@@ -202,6 +204,7 @@ public class MessageBuilder {
 			for (String part : text) {
 				this.builder.append(part);
 			}
+			this.wasAppended = true;
 		}
 		return this;
 	}
@@ -254,7 +257,7 @@ public class MessageBuilder {
 			for (int i = 0; i < this.indent; i++) {
 				this.builder.append(' ');
 			}
-		} else if (this.separator != null) {
+		} else if (this.separator != null && this.wasAppended) {
 			this.currentWidth += this.sepwidth;
 			this.builder.append(this.separator);
 		}
