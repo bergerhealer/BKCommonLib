@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -669,13 +668,9 @@ public abstract class PluginBase extends JavaPlugin {
 	@Override
 	public final void onDisable() {
 		// are there any plugins that depend on me?
-		List<String> depend;
 		for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
-			if (plugin.isEnabled()) {
-				depend = (List<String>) plugin.getDescription().getDepend();
-				if (depend != null && depend.contains(this.getName())) {
-					Bukkit.getServer().getPluginManager().disablePlugin(plugin);
-				}
+			if (plugin.isEnabled() && CommonUtil.isDepending(plugin, this)) {
+				Bukkit.getServer().getPluginManager().disablePlugin(plugin);
 			}
 		}
 		this.wasDisableRequested = true;

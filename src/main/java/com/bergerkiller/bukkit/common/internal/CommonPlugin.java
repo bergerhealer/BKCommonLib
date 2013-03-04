@@ -33,6 +33,8 @@ import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
+import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -461,6 +463,15 @@ public class CommonPlugin extends PluginBase {
 		// Register world listeners
 		for (World world : WorldUtil.getWorlds()) {
 			notifyWorldAdded(world);
+		}
+
+		// BKCommonLib Metrics
+		if (hasMetrics()) {
+			// Soft dependencies
+			getMetrics().addGraph(new SoftDependenciesGraph());
+
+			// Depending
+			getMetrics().addGraph(new MyDependingPluginsGraph());
 		}
 
 		// Parse BKCommonLib version to int

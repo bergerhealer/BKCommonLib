@@ -396,6 +396,9 @@ public class CommonUtil {
 	 * @return the Plugin matching the Class, or null if not found
 	 */
 	public static Plugin getPluginByClass(String classPath) {
+		if (classPath.startsWith(Common.COMMON_ROOT)) {
+			return CommonPlugin.getInstance();
+		}
 		final String packagePath = getPackagePath(classPath);
 		synchronized (Bukkit.getServer().getPluginManager()) {
 			String main;
@@ -487,6 +490,30 @@ public class CommonUtil {
 	 */
 	public static Class<?> getCBClass(String name) {
 		return getClass(Common.CB_ROOT + "." + name);
+	}
+
+	/**
+	 * Checks whether a plugin is soft-depending on another plugin
+	 * 
+	 * @param plugin
+	 * @param depending plugin
+	 * @return True if plugin soft-depends on the depending plugin, False if not
+	 */
+	public static boolean isSoftDepending(Plugin plugin, Plugin depending) {
+		final List<String> dep = plugin.getDescription().getSoftDepend();
+		return !LogicUtil.nullOrEmpty(dep) && dep.contains(depending.getName());
+	}
+
+	/**
+	 * Checks whether a plugin is depending on another plugin
+	 * 
+	 * @param plugin
+	 * @param depending plugin
+	 * @return True if plugin depends on the depending plugin, False if not
+	 */
+	public static boolean isDepending(Plugin plugin, Plugin depending) {
+		final List<String> dep = plugin.getDescription().getDepend();
+		return !LogicUtil.nullOrEmpty(dep) && dep.contains(depending.getName());
 	}
 
 	/**

@@ -22,7 +22,7 @@ public class SoftDependenciesGraph extends Graph {
 	}
 
 	@Override
-	public void onUpdate(Plugin plugin) {
+	protected void onUpdate(Plugin plugin) {
 		List<String> dependencies = plugin.getDescription().getSoftDepend();
 		if (LogicUtil.nullOrEmpty(dependencies)) {
 			clearPlotters();
