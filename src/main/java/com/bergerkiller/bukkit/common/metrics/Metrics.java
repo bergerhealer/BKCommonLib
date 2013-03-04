@@ -50,6 +50,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -93,10 +94,6 @@ public class Metrics {
 	 * All of the custom graphs to submit to metrics
 	 */
 	private final Set<Graph> graphs = Collections.synchronizedSet(new HashSet<Graph>());
-	/**
-	 * The default graph, used for addCustomData when you don't want a specific graph
-	 */
-	private final Graph defaultGraph = new Graph("Default");
 	/**
 	 * The plugin configuration file
 	 */
@@ -150,6 +147,21 @@ public class Metrics {
 	}
 
 	/**
+	 * Removes a previously added Graph
+	 * 
+	 * @param name of the Graph to remove
+	 */
+	public void removeGraph(final String name) {
+		if (name == null) {
+			throw new IllegalArgumentException("Graph name cannot be null");
+		}
+
+		synchronized (graphs) {
+			graphs.remove(name);
+		}
+	}
+
+	/**
 	 * Construct and create a Graph that can be used to separate specific plotters to their own graphs on the metrics
 	 * website. Plotters can be added to the graph object returned.
 	 *
@@ -189,25 +201,6 @@ public class Metrics {
 	}
 
 	/**
-	 * Adds a custom data plotter to the default graph
-	 *
-	 * @param plotter The plotter to use to plot custom data
-	 */
-	public void addCustomData(final Plotter plotter) {
-		if (plotter == null) {
-			throw new IllegalArgumentException("Plotter cannot be null");
-		}
-
-		synchronized (graphs) {
-			// Add the plotter to the graph o/
-			defaultGraph.addPlotter(plotter);
-
-			// Ensure the default graph is included in the submitted graphs
-			graphs.add(defaultGraph);
-		}
-	}
-
-	/**
 	 * Start measuring statistics. This will immediately create an updating thread, 
 	 * immediately sending initial data to the metrics backend, and then after that 
 	 * it will post in increments of PING_INTERVAL * 60000 milliseconds.
@@ -238,12 +231,6 @@ public class Metrics {
 							try {
 								// Disable Task, if it is running and the server owner decided to opt-out
 								if (isOptOut()) {
-									// Tell all plotters to stop gathering information.
-									synchronized (graphs) {
-										for (Graph graph : graphs) {
-											graph.onOptOut();
-										}
-									}
 									// End the updating thread
 									return;
 								}
@@ -257,7 +244,7 @@ public class Metrics {
 										@Override
 										public void run() {
 											for (Graph graph : graphBuffer) {
-												graph.onUpdate();
+												graph.onUpdate(plugin);
 											}
 											synchronized (syncLock) {
 												syncLock.notify();
@@ -449,19 +436,18 @@ public class Metrics {
 
 			while (iter.hasNext()) {
 				final Graph graph = iter.next();
-
-				for (Plotter plotter : graph.getPlotters()) {
+				for (Entry<String, Object> entry : graph.getPlotters().entrySet()) {
+					// Ignore null values
+					if (entry.getValue() == null) {
+						continue;
+					}
 					// The key name to send to the metrics server
 					// The format is C-GRAPHNAME-PLOTTERNAME where separator - is defined at the top
 					// Legacy (R4) submitters use the format Custom%s, or CustomPLOTTERNAME
-					final String key = String.format("C%s%s%s%s", CUSTOM_DATA_SEPARATOR, graph.getName(), CUSTOM_DATA_SEPARATOR, plotter.getColumnName());
-
-					// The value to send, which for the foreseeable future is just the string
-					// value of plotter.getValue()
-					final String value = Integer.toString(plotter.getValue());
+					final String key = String.format("C%s%s%s%s", CUSTOM_DATA_SEPARATOR, graph.getName(), CUSTOM_DATA_SEPARATOR, entry.getKey());
 
 					// Add it to the http post data :)
-					encodeDataPair(data, key, value);
+					encodeDataPair(data, key, entry.getValue().toString());
 				}
 			}
 		}
@@ -500,17 +486,15 @@ public class Metrics {
 		} else {
 			// Is this the first update this hour?
 			if (response.contains("OK This is your first update this hour")) {
-				synchronized (graphs) {
-					final Iterator<Graph> iter = graphs.iterator();
-
-					while (iter.hasNext()) {
-						final Graph graph = iter.next();
-
-						for (Plotter plotter : graph.getPlotters()) {
-							plotter.reset();
+				CommonUtil.nextTick(new Runnable() {
+					public void run() {
+						synchronized (graphs) {
+							for (Graph graph : graphs) {
+								graph.onReset(plugin);
+							}
 						}
 					}
-				}
+				});
 			}
 		}
 	}

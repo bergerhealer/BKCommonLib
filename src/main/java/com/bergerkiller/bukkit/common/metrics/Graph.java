@@ -28,8 +28,10 @@
 package com.bergerkiller.bukkit.common.metrics;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.bukkit.plugin.Plugin;
 
 /**
  * Represents a custom graph on the website
@@ -43,8 +45,21 @@ public class Graph {
 	/**
 	 * The set of plotters that are contained within this graph
 	 */
-	private final Set<Plotter> plotters = new LinkedHashSet<Plotter>();
+	private final Map<String, Object> plotters = new LinkedHashMap<String, Object>();
 
+	/**
+	 * Constructs a new default Graph for the plugin.
+	 * The name of this new Graph is "Default".
+	 */
+	public Graph() {
+		this("Default");
+	}
+
+	/**
+	 * Constructs a new Graph with the name specified
+	 * 
+	 * @param name of the Graph
+	 */
 	public Graph(final String name) {
 		this.name = name;
 	}
@@ -66,53 +81,53 @@ public class Graph {
 	}
 
 	/**
-	 * Add a plotter to the graph, which will be used to plot entries.
-	 * The name is used, in combination with a final value of 1.
-	 * This method can be used to add a plotter for an 'enabled' state.
-	 * 
-	 * @param name of the plotter to add
-	 */
-	public void addPlotter(final String name) {
-		addPlotter(name, 1);
-	}
-
-	/**
-	 * Add a plotter to the graph, which will be used to plot entries.
-	 * The name and value is used for the plotter, and are expected to never change.
-	 * In other words: adds an immutable plotter with the final name and value specified.
-	 * 
-	 * @param name of the plotter to add
-	 * @param value of the plotter to add
-	 */
-	public void addPlotter(final String name, final int value) {
-		addPlotter(new ImmutablePlotter(name, value));
-	}
-
-	/**
-	 * Add a plotter to the graph, which will be used to plot entries
-	 *
-	 * @param plotter the plotter to add to the graph
-	 */
-	public void addPlotter(final Plotter plotter) {
-		plotters.add(plotter);
-	}
-
-	/**
 	 * Remove a plotter from the graph
 	 *
-	 * @param plotter the plotter to remove from the graph
+	 * @param name of the plotter to remove from the graph
 	 */
-	public void removePlotter(final Plotter plotter) {
-		plotters.remove(plotter);
+	public void removePlotter(String name) {
+		plotters.remove(name);
 	}
 
 	/**
-	 * Gets an <b>unmodifiable</b> set of the plotter objects in the graph
-	 *
-	 * @return an unmodifiable {@link java.util.Set} of the plotter objects
+	 * Toggles a plotter value on or off. If the state is set to True, the
+	 * number '1' is mapped to the name. If the state is set to False, the
+	 * entire plotter entry is removed, resulting in '0' being mapped.
+	 * 
+	 * @param name of the toggled plotter
+	 * @param state to set the toggled plotter to
 	 */
-	public Set<Plotter> getPlotters() {
-		return Collections.unmodifiableSet(plotters);
+	public void togglePlotter(String name, boolean state) {
+		if (state) {
+			plotters.put(name, 1);
+		} else {
+			plotters.remove(name);
+		}
+	}
+
+	/**
+	 * Add a plotter to the graph, which will be used to plot entries.
+	 * The {@link toString()} method of the value should produce a valid numeric number.
+	 * It is allowed to dynamically produce values this way, but keep in mind that
+	 * the method is called from another thread.
+	 *
+	 * @param name of the plotter
+	 * @param value of the plotter
+	 */
+	public void addPlotter(String name, Object value) {
+		if (name == null) {
+			throw new IllegalArgumentException("Can not add a plotter with a null name");
+		}
+		plotters.put(name, value);
+	}
+
+	/**
+	 * Gets an <b>unmodifiable</b> mapping of the plotter objects in the graph
+	 *
+	 * @return an unmodifiable {@link java.util.Map} of the plotter objects
+	 */
+	public Map<String, Object> getPlotters() {
+		return Collections.unmodifiableMap(plotters);
 	}
 
 	@Override
@@ -134,12 +149,13 @@ public class Graph {
 	 * Called right before this Graph is being sent to the server.
 	 * This is called on the main thread (sync), it is allowed to call Bukkit methods.
 	 */
-	protected void onUpdate() {
+	protected void onUpdate(Plugin plugin) {
 	}
 
 	/**
-	 * Called when the server owner decides to opt-out of BukkitMetrics while the server is running.
+	 * Called right after the graph has been updated on the server.
+	 * This is called on the main thread (sync), it is allowed to call Bukkit methods.
 	 */
-	protected void onOptOut() {
+	protected void onReset(Plugin plugin) {
 	}
 }
