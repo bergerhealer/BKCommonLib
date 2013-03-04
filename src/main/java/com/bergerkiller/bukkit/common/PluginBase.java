@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
-import com.bergerkiller.bukkit.common.metrics.AddonHandler;
+import com.bergerkiller.bukkit.common.metrics.Metrics;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -50,6 +51,7 @@ public abstract class PluginBase extends JavaPlugin {
 	private final BasicConfiguration pluginYaml = new BasicConfiguration();
 	private boolean enabled = false;
 	private boolean wasDisableRequested = false;
+	private Metrics metrics;
 
 	/**
 	 * Logs a message to the server console
@@ -509,6 +511,34 @@ public abstract class PluginBase extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * Gets the Metrics instance for this Plugin, which is used to send statistics to
+	 * <a href="http://mcstats.org/">http://mcstats.org/</a><br>
+	 * To make use of this functionality, first add the following line to the <b>plugin.yml</b>:<br>
+	 * <pre>metrics: true</pre>
+	 * 
+	 * To avoid issues, call {@link hasMetrics()} before using this method to check whether Metrics is available.
+	 * 
+	 * @return the Metrics instance used
+	 * @throws RuntimeException if no metrics is available
+	 */
+	public Metrics getMetrics() {
+		if (metrics == null) {
+			throw new RuntimeException("Metrics is not enabled or failed to initialize for this Plugin.");
+		}
+		return metrics;
+	}
+
+	/**
+	 * Checks whether Metrics is available for this Plugin. Always call this method
+	 * before using {@link getMetrics()} - initialization of Metrics could have failed!
+	 * 
+	 * @return True if Metrics is available, False if not
+	 */
+	public boolean hasMetrics() {
+		return metrics != null;
+	}
+
 	@Override
 	public final void onEnable() {
 		long startTime = System.currentTimeMillis();
@@ -592,6 +622,17 @@ public abstract class PluginBase extends JavaPlugin {
 
 		// ==== Enabling ====
 		try {
+			// Metrics
+			if (this.pluginYaml.get("metrics", false)) {
+				// Send anonymous statistics to mcstats.org
+				try {
+					this.metrics = new Metrics(this);
+				} catch (IOException ex) {
+					log(Level.SEVERE, "Failed to initialize metrics for " + getName());
+					CommonUtil.printFilteredStackTrace(ex);
+				}
+			}
+
 			this.wasDisableRequested = false;
 			this.enable();
 			if (this.wasDisableRequested) {
@@ -599,11 +640,9 @@ public abstract class PluginBase extends JavaPlugin {
 				return;
 			}
 
-			// Metrics
-			if (this.pluginYaml.get("metrics", false)) {
-				// Send anonymous statistics to mcstats.org
-				AddonHandler ah = new AddonHandler(this);
-				ah.startMetrics();
+			// Start Metrics if enabled
+			if (metrics != null) {
+				metrics.start();
 			}
 
 			// Done, this plugin is enabled
@@ -655,6 +694,11 @@ public abstract class PluginBase extends JavaPlugin {
 			if (CommonPlugin.getInstance() != null) {
 				CommonPlugin.getInstance().plugins.remove(this);
 			}
+		}
+		// Disable Metrics if enabled
+		if (metrics != null) {
+			metrics.stop();
+			metrics = null;
 		}
 		// If specified to do so, a disable message is shown
 		if (doDisableMessage) {
