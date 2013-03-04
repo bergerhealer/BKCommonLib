@@ -401,19 +401,11 @@ public class CommonUtil {
 		}
 		final String packagePath = getPackagePath(classPath);
 		synchronized (Bukkit.getServer().getPluginManager()) {
-			String main;
 			for (Plugin plugin : getPluginsUnsafe()) {
-				main = plugin.getDescription().getMain();
-				if (packagePath.isEmpty()) {
-					// No package name - verify
-					if (!main.contains(".")) {
-						return plugin;
-					}
-				} else {
-					// Package name is there - verify
-					if (main.startsWith(packagePath)) {
-						return plugin;
-					}
+				// Compare package paths to see if the main package is below the class package
+				// In the case of packagePath being empty: only if the main is in an empty package
+				if (packagePath.startsWith(getPackagePath(plugin.getDescription().getMain()))) {
+					return plugin;
 				}
 			}
 		}

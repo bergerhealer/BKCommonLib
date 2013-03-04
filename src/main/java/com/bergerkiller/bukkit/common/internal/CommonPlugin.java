@@ -69,6 +69,7 @@ public class CommonPlugin extends PluginBase {
 	protected final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
+	private final List<NextTickListener> nextTickListeners = new ArrayList<NextTickListener>(1);
 	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private boolean vaultEnabled = false;
@@ -116,6 +117,14 @@ public class CommonPlugin extends PluginBase {
 				this.nextTickTasks.add(runnable);
 			}
 		}
+	}
+
+	public void addNextTickListener(NextTickListener listener) {
+		nextTickListeners.add(listener);
+	}
+
+	public void removeNextTickListener(NextTickListener listener) {
+		nextTickListeners.remove(listener);
 	}
 
 	public void notifyAdded(org.bukkit.entity.Entity e) {
@@ -529,6 +538,7 @@ public class CommonPlugin extends PluginBase {
 		public void run() {
 			List<Runnable> nextTick = getInstance().nextTickTasks;
 			List<Runnable> nextSync = getInstance().nextTickSync;
+			List<NextTickListener> nextTickListeners = getInstance().nextTickListeners;
 			synchronized (nextTick) {
 				if (nextTick.isEmpty()) {
 					return;
@@ -536,12 +546,34 @@ public class CommonPlugin extends PluginBase {
 				nextSync.addAll(nextTick);
 				nextTick.clear();
 			}
-			for (Runnable task : nextSync) {
-				try {
-					task.run();
-				} catch (Throwable t) {
-					instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
-					CommonUtil.filterStackTrace(t).printStackTrace();
+			if (nextTickListeners.isEmpty()) {
+				// No time measurement needed
+				for (Runnable task : nextSync) {
+					try {
+						task.run();
+					} catch (Throwable t) {
+						instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
+						CommonUtil.filterStackTrace(t).printStackTrace();
+					}
+				}
+			} else {
+				// Perform time measurement and call next-tick listeners
+				int i;
+				final int listenerCount = nextTickListeners.size();
+				long startTime, delta, endTime = System.nanoTime();
+				for (Runnable task : nextSync) {
+					startTime = endTime;
+					try {
+						task.run();
+					} catch (Throwable t) {
+						instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
+						CommonUtil.filterStackTrace(t).printStackTrace();
+					}
+					endTime = System.nanoTime();
+					delta = endTime - startTime;
+					for (i = 0; i < listenerCount; i++) {
+						nextTickListeners.get(i).onNextTicked(task, delta);
+					}
 				}
 			}
 			nextSync.clear();
