@@ -309,6 +309,9 @@ public class CommonPlugin extends PluginBase {
 		if (this.isProtocolLibEnabled) {
 			CommonProtocolLibHandler.sendPacket(player, packet, throughListeners);
 		} else {
+			if (!throughListeners) {
+				packet = new CommonSilentPacket(packet);
+			}
 			final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
 			PlayerConnectionRef.sendPacket(connection, packet);
 		}

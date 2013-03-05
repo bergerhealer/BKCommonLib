@@ -14,6 +14,7 @@ import net.minecraft.server.v1_4_R1.Packet;
  * Wraps around another packet to create an undetectable packet type to send to clients undetected
  */
 class CommonSilentPacket extends Packet {
+
 	static {
 		PacketUtil.registerPacketToId(CommonSilentPacket.class, 0);
 	}
@@ -22,12 +23,38 @@ class CommonSilentPacket extends Packet {
 
 	public CommonSilentPacket(Object packet) {
 		this.packet = (Packet) packet;
+	}
+
+	/**
+	 * This method is called NetworkManager.a(Packet packet, boolean flag) right before queuing.
+	 * We expect this method to not be called before sending...if it is we have a BIG issue with compatibility here!
+	 * 
+	 * @return something, probably has to do with whether the packet can be ignored
+	 */
+	@Override
+	public boolean e() {
 		PacketFields.DEFAULT.packetID.transfer(packet, this);
+		return this.packet.e();
 	}
 
 	@Override
 	public int a() {
 		return this.packet.a();
+	}
+
+	@Override
+	public boolean a(Packet packet) {
+		return this.packet.a(packet);
+	}
+
+	@Override
+	public boolean a_() {
+		return this.packet.a_();
+	}
+
+	@Override
+	public String toString() {
+		return this.packet.toString();
 	}
 
 	@Override
