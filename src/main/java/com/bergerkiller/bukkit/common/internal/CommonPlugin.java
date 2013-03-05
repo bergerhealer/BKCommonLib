@@ -3,11 +3,14 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -199,6 +202,28 @@ public class CommonPlugin extends PluginBase {
 			return true;
 		}
 		return onPacketSend(player, packet, PacketFields.DEFAULT.packetID.get(packet));
+	}
+
+	public Collection<Plugin> getListening(int id) {
+		if (this.isProtocolLibEnabled) {
+			return CommonProtocolLibHandler.getListening(id);
+		} else if (!LogicUtil.isInBounds(listeners, id)) {
+			return Collections.emptySet();
+		}
+		List<PacketListener> list = listeners[id];
+		if (LogicUtil.nullOrEmpty(list)) {
+			return Collections.emptySet();
+		}
+		List<Plugin> plugins = new ArrayList<Plugin>();
+		for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
+			for (PacketListener listener : list) {
+				if (entry.getValue().contains(listener)) {
+					plugins.add(entry.getKey());
+					break;
+				}
+			}
+		}
+		return plugins;
 	}
 
 	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {

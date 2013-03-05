@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
@@ -17,6 +18,7 @@ import com.comphenix.protocol.events.ConnectionSide;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.events.PacketListener;
 
 class CommonProtocolLibHandler {
 	private static final int MAX_LISTENER_COUNT = 3;
@@ -68,6 +70,17 @@ class CommonProtocolLibHandler {
 		listeners.add(listener);
 		// Register it in ProtocolLib
 		ProtocolLibrary.getProtocolManager().addPacketListener(listener);
+	}
+
+	public static Collection<Plugin> getListening(int packetId) {
+		Integer id = Integer.valueOf(packetId);
+		Set<Plugin> plugins = new HashSet<Plugin>();
+		for (PacketListener listener : ProtocolLibrary.getProtocolManager().getPacketListeners()) {
+			if (listener.getSendingWhitelist().getWhitelist().contains(id)) {
+				plugins.add(listener.getPlugin());
+			}
+		}
+		return plugins;
 	}
 
 	public static void sendPacket(Player player, Object packet, boolean throughListeners) {

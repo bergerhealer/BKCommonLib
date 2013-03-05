@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.Collection;
 import java.util.Map;
 
 import net.minecraft.server.v1_4_R1.Packet;
@@ -104,5 +105,27 @@ public class PacketUtil {
 
 	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Object packet) {
 		CommonUtil.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
+	}
+
+	/**
+	 * Obtains a collection of all plugins currently listening for the Packet type specified.
+	 * Packets of this type can be expected to be handled by these plugins when sending it.
+	 * 
+	 * @param packetId to check
+	 * @return collection of listening plugins
+	 */
+	public static Collection<Plugin> getListenerPlugins(PacketType packetType) {
+		return getListenerPlugins(packetType.getId());
+	}
+
+	/**
+	 * Obtains a collection of all plugins currently listening for the Packet id specified.
+	 * Packets of this type can be expected to be handled by these plugins when sending it.
+	 * 
+	 * @param packetId to check
+	 * @return collection of listening plugins
+	 */
+	public static Collection<Plugin> getListenerPlugins(int packetId) {
+		return CommonPlugin.getInstance().getListening(packetId);
 	}
 }

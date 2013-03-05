@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.server.v1_4_R1.Vec3D;
 
+import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
@@ -357,6 +359,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<byte[]> deflatedData = getField("buffer");
 		public final FieldAccessor<Integer> deflatedSize = getField("size");
 		public final FieldAccessor<Boolean> hasSkyLight = getField("h");
+		private final SafeConstructor<Object> constructor1 = getConstructor(List.class);
+
+		public Object newInstance(List<Chunk> chunks) {
+			return constructor1.newInstance(new ConvertingList<Object>(chunks, ConversionPairs.chunk.reverse()));
+		}
 	}
 	public static class NMSPacket60Explosion extends NMSPacket {
 		public final FieldAccessor<Double> x = getField("a");
