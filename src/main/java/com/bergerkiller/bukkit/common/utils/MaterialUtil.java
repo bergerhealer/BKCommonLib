@@ -4,6 +4,7 @@ import net.minecraft.server.v1_4_R1.Block;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
+import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -121,6 +122,41 @@ public class MaterialUtil {
 	public static final MaterialTypeProperty ISPRESSUREPLATE = new MaterialTypeProperty(Material.WOOD_PLATE, Material.STONE_PLATE);
 
 	/**
+	 * The material is a type of wieldable sword
+	 */
+	public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, 
+			Material.GOLD_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD);
+
+	/**
+	 * The material is a type of wearable boots
+	 */
+	public static final MaterialTypeProperty ISBOOTS = new MaterialTypeProperty(Material.LEATHER_BOOTS, Material.IRON_BOOTS, 
+			Material.GOLD_BOOTS, Material.DIAMOND_BOOTS, Material.CHAINMAIL_BOOTS);
+
+	/**
+	 * The material is a type of wearable leggings
+	 */
+	public static final MaterialTypeProperty ISLEGGINGS = new MaterialTypeProperty(Material.LEATHER_LEGGINGS, Material.IRON_LEGGINGS, 
+			Material.GOLD_LEGGINGS, Material.DIAMOND_LEGGINGS, Material.CHAINMAIL_LEGGINGS);
+
+	/**
+	 * The material is a type of wearable chestplate
+	 */
+	public static final MaterialTypeProperty ISCHESTPLATE = new MaterialTypeProperty(Material.LEATHER_CHESTPLATE, Material.IRON_CHESTPLATE, 
+			Material.GOLD_CHESTPLATE, Material.DIAMOND_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE);
+
+	/**
+	 * The material is a type of wearable helmet
+	 */
+	public static final MaterialTypeProperty ISHELMET = new MaterialTypeProperty(Material.LEATHER_HELMET, Material.IRON_HELMET, 
+			Material.GOLD_HELMET, Material.DIAMOND_HELMET, Material.CHAINMAIL_HELMET);
+
+	/**
+	 * The material is a type of armor
+	 */
+	public static final MaterialTypeProperty ISARMOR = new MaterialTypeProperty(ISBOOTS, ISLEGGINGS, ISCHESTPLATE, ISHELMET);
+
+	/**
 	 * The material can be interacted with, such as buttons and levers
 	 */
 	public static final MaterialTypeProperty ISINTERACTABLE = new MaterialTypeProperty(Material.LEVER, Material.WOOD_DOOR, Material.IRON_DOOR, 
@@ -130,7 +166,7 @@ public class MaterialUtil {
 	/**
 	 * The material causes suffocation to entities inside
 	 */
-	public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialProperty<Boolean>() {
+	public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
 			return Block.i(typeId);
@@ -138,9 +174,29 @@ public class MaterialUtil {
 	};
 
 	/**
+	 * The material is a type of heatable item that can be crafted using a furnace
+	 */
+	public static final MaterialProperty<Boolean> ISHEATABLE = new MaterialBooleanProperty() {
+		@Override
+		public Boolean get(int typeId) {
+			return RecipeUtil.isHeatableItem(typeId);
+		}
+	};
+
+	/**
+	 * The material is a type of fuel that can be burned in a furnace
+	 */
+	public static final MaterialProperty<Boolean> ISFUEL = new MaterialBooleanProperty() {
+		@Override
+		public Boolean get(int typeId) {
+			return RecipeUtil.isFuelItem(typeId);
+		}
+	};
+
+	/**
 	 * The material is a solid block that lets no light through and on which other blocks can be placed
 	 */
-	public static final MaterialProperty<Boolean> ISSOLID = new MaterialProperty<Boolean>() {
+	public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
 			return Block.q[typeId];
@@ -150,7 +206,7 @@ public class MaterialUtil {
 	/**
 	 * The material can supply redstone power and redstone wire connects to it
 	 */
-	public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialProperty<Boolean>() {
+	public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
 			Block block = Block.byId[typeId];
