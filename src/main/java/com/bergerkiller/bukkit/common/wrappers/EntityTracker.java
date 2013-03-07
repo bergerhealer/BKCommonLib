@@ -4,6 +4,7 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
 /**
@@ -13,6 +14,26 @@ public class EntityTracker extends BasicWrapper {
 
 	public EntityTracker(Object entityTrackerHandle) {
 		setHandle(entityTrackerHandle);
+	}
+
+	/**
+	 * Sends a packet to all nearby players (and self if it is a player)
+	 * 
+	 * @param entity near which viewers should be sent
+	 * @param packet to send
+	 */
+	public void sendPacket(Entity entity, CommonPacket packet) {
+		sendPacket(entity, packet.getHandle());
+	}
+
+	/**
+	 * Sends a packet to all nearby players (and self if it is a player)
+	 * 
+	 * @param entity near which viewers should be sent
+	 * @param packet to send
+	 */
+	public void sendPacket(Entity entity, Object packet) {
+		EntityTrackerRef.sendPacket(handle, entity, packet);
 	}
 
 	/**

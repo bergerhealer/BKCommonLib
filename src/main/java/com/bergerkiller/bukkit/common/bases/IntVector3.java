@@ -22,6 +22,11 @@ public class IntVector3 extends ChunkPosition {
 		super(x, y, z);
 	}
 
+	@Override
+	public String toString() {
+		return "{" + x + ", " + y + ", " + z + "}";
+	}
+
 	/**
 	 * Gets the block at the coordinates of this IntVector3 on the world specified
 	 * 

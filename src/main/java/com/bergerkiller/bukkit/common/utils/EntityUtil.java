@@ -205,10 +205,10 @@ public class EntityUtil extends EntityPropertyUtil {
 	 */
 	public static boolean teleport(final org.bukkit.entity.Entity entity, final Location to) {
 		final Entity entityHandle = CommonNMS.getNative(entity);
+		final Entity passenger = entityHandle.passenger;
 		World newworld = CommonNMS.getNative(to.getWorld());
 		WorldUtil.loadChunks(to, 3);
 		if (entityHandle.world != newworld && !(entityHandle instanceof EntityPlayer)) {
-			final Entity passenger = entityHandle.passenger;
 			if (passenger != null) {
 				entityHandle.passenger = null;
 				passenger.vehicle = null;
@@ -229,7 +229,22 @@ public class EntityUtil extends EntityPropertyUtil {
 			entityHandle.world.addEntity(entityHandle);
 			return true;
 		} else {
-			return entity.teleport(to);
+			// If in a vehicle, make sure we eject first
+			if (entityHandle.vehicle != null) {
+				entityHandle.setPassengerOf(null);
+			}
+			// If vehicle, eject the passenger first
+			if (passenger != null) {
+				passenger.vehicle = null;
+				entityHandle.passenger = null;
+			}
+			final boolean succ = entity.teleport(to);
+			// If there was a passenger, let passenger enter again
+			if (passenger != null) {
+				passenger.vehicle = entityHandle;
+				entityHandle.passenger = passenger;
+			}
+			return succ;
 		}
 	}
 }

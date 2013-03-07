@@ -32,6 +32,11 @@ public class IntVector2 extends ChunkCoordIntPair {
 		return world.getChunkAt(x, z);
 	}
 
+	@Override
+	public String toString() {
+		return "{" + x + ", " + z + "}";
+	}
+
 	public static IntVector2 read(DataInputStream stream) throws IOException {
 		return new IntVector2(stream.readInt(), stream.readInt());
 	}
