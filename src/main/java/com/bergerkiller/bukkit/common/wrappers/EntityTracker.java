@@ -47,6 +47,18 @@ public class EntityTracker extends BasicWrapper {
 	}
 
 	/**
+	 * Removes a player viewer, resulting in all entities being removed for the viewer.
+	 * If the player is still referenced in the entity tracker in some way, the entities will
+	 * be re-sent at a later time automatically. This method acts as a 'total respawn' system
+	 * for that reason.
+	 * 
+	 * @param player to remove from this Entity Tracker
+	 */
+	public void removeViewer(Player player) {
+		EntityTrackerRef.removeViewer(handle, player);
+	}
+
+	/**
 	 * Adds an entity to this entity tracker, creating a new entity tracker entry if needed
 	 * 
 	 * @param entity to start tracking

@@ -10,11 +10,13 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 import net.minecraft.server.v1_4_R1.EntityPlayer;
@@ -112,7 +114,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	}
 
 	public int getTrackerProtocolY() {
-		return MathUtil.floor(super.tracker.locY * 32.0D);
+		return MathUtil.floor(super.tracker.locY * 32.0);
 	}
 
 	public int getTrackerProtocolZ() {
@@ -166,7 +168,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		this.removeViewer(CommonNMS.getPlayer(entityplayer));
 	}
 
-	public void removeViewer(Player player) {
+	public synchronized void removeViewer(Player player) {
 		super.clear(CommonNMS.getNative(player));
 	}
 
@@ -188,11 +190,11 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		this.broadcastPacket(packet, true);
 	}
 
-	public void broadcastPacket(Object packet) {
+	public synchronized void broadcastPacket(Object packet) {
 		broadcastPacket(packet, false);
 	}
 
-	public void broadcastPacket(Object packet, boolean self) {
+	public synchronized void broadcastPacket(Object packet, boolean self) {
 		if (self) {
 			super.broadcastIncludingSelf((Packet) packet);
 		} else {
@@ -200,7 +202,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		}
 	}
    
-	private void updateViewers(Collection<Player> viewers) {
+	private synchronized void updateViewers(Collection<Player> viewers) {
 		if (EntityTrackerEntryRef.synched.get(this)) {
 			double lastSyncX = EntityTrackerEntryRef.prevX.get(this);
 			double lastSyncY = EntityTrackerEntryRef.prevY.get(this);
@@ -215,6 +217,23 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		EntityTrackerEntryRef.prevZ.set(this, super.tracker.locZ);
 		EntityTrackerEntryRef.synched.set(this, true);
 		this.updatePlayers(viewers);
+	}
+
+	/**
+	 * Removes all viewers and updates them again one by one.
+	 * This method can be used to re-send this entity to all viewers thread-safe.
+	 * Benefit of this method over teleport is that there is no entity movement smoothing.
+	 */
+	public synchronized void doRespawn() {
+		this.doInstantDestroy();
+		super.trackedPlayers.clear();
+		EntityTrackerEntryRef.synched.set(this, false);
+		// All viewers will receive the new data: make sure position/rotation is synched
+		this.xLoc = this.getTrackerProtocolX();
+		this.yLoc = this.getTrackerProtocolY();
+		this.zLoc = this.getTrackerProtocolZ();
+		this.xRot = this.getTrackerProtocolYaw();
+		this.yRot = this.getTrackerProtocolPitch();
 	}
 
 	/**
@@ -266,7 +285,7 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 		this.updatePlayer(CommonNMS.getPlayer(arg0));
 	}
 
-	public void updatePlayer(Player player) {
+	public synchronized void updatePlayer(Player player) {
 		super.updatePlayer(CommonNMS.getNative(player));
 	}
 
@@ -278,6 +297,22 @@ public class EntityTrackerEntryBase extends EntityTrackerEntry {
 	@SuppressWarnings("unchecked")
 	public void doDestroy(Player player) {
 		CommonNMS.getNative(player).removeQueue.add(getTrackerId());
+	}
+
+	/**
+	 * Instantly sends destroy messages for this entity to all viewing players, without a tick delay
+	 */
+	public void doInstantDestroy() {
+		this.broadcastPacket(PacketFields.DESTROY_ENTITY.newInstance(this.getTrackerId()));
+	}
+
+	/**
+	 * Instantly sends a destroy message for this entity to the player specified, without a tick delay
+	 * 
+	 * @param player to send the destroy message to
+	 */
+	public void doInstantDestroy(Player player) {
+		PacketUtil.sendPacket(player, PacketFields.DESTROY_ENTITY.newInstance(this.getTrackerId()));
 	}
 
 	/**

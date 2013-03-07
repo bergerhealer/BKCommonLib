@@ -23,6 +23,7 @@ public class EntityTrackerRef {
 	private static final MethodAccessor<Void> track = TEMPLATE.getMethod("track", EntityRef.TEMPLATE.getType());
 	private static final MethodAccessor<Void> untrack = TEMPLATE.getMethod("untrackEntity", EntityRef.TEMPLATE.getType());
 	private static final MethodAccessor<Void> sendPacket = TEMPLATE.getMethod("sendPacketToEntity", EntityRef.TEMPLATE.getType(), PacketFields.DEFAULT.getType());
+	private static final MethodAccessor<Void> untrackPlayer = TEMPLATE.getMethod("untrackPlayer", EntityPlayerRef.TEMPLATE.getType());
 
 	public static void sendPacket(Object entityTrackerInstance, Entity entity, Object packet) {
 		sendPacket.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(entity), packet);
@@ -30,6 +31,10 @@ public class EntityTrackerRef {
 
 	public static void spawnEntities(Object entityTrackerInstance, Player player, Chunk chunk) {
 		spawnEntities.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(player), Conversion.toChunkHandle.convert(chunk));
+	}
+
+	public static void removeViewer(Object entityTrackerInstance, Player player) {
+		untrackPlayer.invoke(entityTrackerInstance, Conversion.toEntityHandle.convert(player));
 	}
 
 	public static void startTracking(Object entityTrackerInstance, Entity entity) {
