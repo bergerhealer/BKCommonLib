@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.security.PublicKey;
 import java.util.Collections;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import net.minecraft.server.v1_4_R1.Vec3D;
 
@@ -92,20 +95,53 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Short> foodSaturation = getField("c");
 	}
 	public static class NMSPacket9Respawn extends NMSPacket {
+		public final FieldAccessor<Integer> x = getField("a");
+		public final FieldAccessor<Integer> y = getField("b");
+		public final FieldAccessor<Integer> z = getField("c");
+		public final FieldAccessor<Object> gamemode = getField("d");
+		public final FieldAccessor<Object> worldType = getField("e");
 	}
 	public static class NMSPacket10Flying extends NMSPacket {
+		public final FieldAccessor<Double> x = getField("a");
+		public final FieldAccessor<Double> y = getField("b");
+		public final FieldAccessor<Double> z = getField("c");
+		public final FieldAccessor<Double> stance = getField("stance");
+		public final FieldAccessor<Float> yaw = getField("yaw");
+		public final FieldAccessor<Float> pitch = getField("pitch");
+		public final FieldAccessor<Boolean> onGround = getField("g");
+		public final FieldAccessor<Boolean> hasPos = getField("hasPos");
+		public final FieldAccessor<Boolean> hasLook = getField("hasLook");
 	}
-	public static class NMSPacket11PlayerPosition extends NMSPacket {
+	public static class NMSPacket11PlayerPosition extends NMSPacket10Flying {
 	}
-	public static class NMSPacket12PlayerLook extends NMSPacket {
+	public static class NMSPacket12PlayerLook extends NMSPacket10Flying {
 	}
-	public static class NMSPacket13PlayerLookMove extends NMSPacket {
+	public static class NMSPacket13PlayerLookMove extends NMSPacket10Flying {
 	}
 	public static class NMSPacket14BlockDig extends NMSPacket {
+		public final FieldAccessor<Integer> x = getField("a");
+		public final FieldAccessor<Integer> y = getField("b");
+		public final FieldAccessor<Integer> z = getField("c");
+		public final FieldAccessor<Integer> face = getField("face");
+		public final FieldAccessor<Integer> status = getField("e");
 	}
 	public static class NMSPacket15Place extends NMSPacket {
+		public final FieldAccessor<Integer> x = getField("a");
+		public final FieldAccessor<Integer> y = getField("b");
+		public final FieldAccessor<Integer> z = getField("c");
+		public final FieldAccessor<Integer> direction = getField("d");
+		public final FieldAccessor<ItemStack> itemStack = getField("e").translate(ConversionPairs.itemStack);
+		public final FieldAccessor<Float> cursorX = getField("f");
+		public final FieldAccessor<Float> cursorY = getField("g");
+		public final FieldAccessor<Float> cursorZ = getField("h");
 	}
 	public static class NMSPacket16BlockItemSwitch extends NMSPacket {
+		public final FieldAccessor<Integer> itemInHandIndex = getField("itemInHandIndex");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class);
+		
+		public Object newInstance(int itemInHandIndex) {
+			return constructor1.newInstance(itemInHandIndex);
+		}
 	}
 	public static class NMSPacket17EntityLocationAction extends NMSPacket30Entity {
 		//public final FieldAccessor<Integer> unused = getField("b");
@@ -391,30 +427,75 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket61WorldEvent extends NMSPacket {
+		public final FieldAccessor<Integer> effectId = getField("a");
+		public final FieldAccessor<Integer> x = getField("c");
+		public final FieldAccessor<Integer> y = getField("d");
+		public final FieldAccessor<Integer> z = getField("e");
+		public final FieldAccessor<Integer> data = getField("b");
+		public final FieldAccessor<Boolean> noRelativeVolume = getField("f");
 	}
 	public static class NMSPacket62NamedSoundEffect extends NMSPacket {
+		public final FieldAccessor<String> soundName = getField("a");
+		public final FieldAccessor<Integer> x = getField("b");
+		public final FieldAccessor<Integer> y = getField("c");
+		public final FieldAccessor<Integer> z = getField("d");
+		public final FieldAccessor<Float> volume = getField("e");
+		public final FieldAccessor<Integer> pitch = getField("f");
 	}
 	public static class NMSPacket70Bed extends NMSPacket {
+		public final FieldAccessor<Integer> reason = getField("b");
+		public final FieldAccessor<Integer> gamemode = getField("c");
 	}
-	public static class NMSPacket71Weather extends NMSPacket {
+	public static class NMSPacket71Weather extends NMSPacket30Entity {
+		public final FieldAccessor<Integer> type = getField("e");
+		public final FieldAccessor<Integer> x = getField("b");
+		public final FieldAccessor<Integer> y = getField("c");
+		public final FieldAccessor<Integer> z = getField("d");
 	}
 	public static class NMSPacket100OpenWindow extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Integer> type = getField("b");
+		public final FieldAccessor<String> title = getField("c");
+		public final FieldAccessor<Integer> slotCount = getField("d");
+		public final FieldAccessor<Boolean> newVersion = getField("newVersion");
 	}
 	public static class NMSPacket101CloseWindow extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
 	}
 	public static class NMSPacket102WindowClick extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Integer> slot = getField("slot");
+		public final FieldAccessor<Integer> button = getField("button");
+		public final FieldAccessor<Short> action = getField("d");
+		public final FieldAccessor<ItemStack> item = getField("item").translate(ConversionPairs.itemStack);
+		public final FieldAccessor<Integer> shift = getField("shift");
 	}
 	public static class NMSPacket103SetSlot extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Integer> slot = getField("b");
+		public final FieldAccessor<ItemStack> item = getField("c").translate(ConversionPairs.itemStack);
 	}
 	public static class NMSPacket104WindowItems extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<ItemStack[]> items = getField("b").translate(ConversionPairs.itemStackArr);
 	}
 	public static class NMSPacket105CraftProgressBar extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Integer> count = getField("b");
+		public final FieldAccessor<Integer> data = getField("c");
 	}
 	public static class NMSPacket106Transaction extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Short> action = getField("b");
+		public final FieldAccessor<Boolean> accapted = getField("c");
 	}
 	public static class NMSPacket107SetCreativeSlot extends NMSPacket {
+		public final FieldAccessor<Integer> slot = getField("a");
+		public final FieldAccessor<ItemStack> clicked = getField("b").translate(ConversionPairs.itemStack);
 	}
 	public static class NMSPacket108ButtonClick extends NMSPacket {
+		public final FieldAccessor<Integer> windowId = getField("a");
+		public final FieldAccessor<Integer> enchantment = getField("b");
 	}
 	public static class NMSPacket130UpdateSign extends NMSPacket {
 		public final FieldAccessor<Integer> x = getField("x");
@@ -438,12 +519,25 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket131ItemData extends NMSPacket {
+		public final FieldAccessor<Integer> type = getField("a");
+		public final FieldAccessor<Integer> itemId = getField("b");
+		public final FieldAccessor<byte[]> text = getField("c");
 	}
 	public static class NMSPacket132TileEntityData extends NMSPacket {
+		public final FieldAccessor<Integer> x = getField("a");
+		public final FieldAccessor<Integer> y = getField("b");
+		public final FieldAccessor<Integer> z = getField("c");
+		public final FieldAccessor<Integer> action = getField("d");
+		public final FieldAccessor<Object> data = getField("e");
 	}
 	public static class NMSPacket200Statistic extends NMSPacket {
+		public final FieldAccessor<Integer> id = getField("a");
+		public final FieldAccessor<Integer> amount = getField("b");
 	}
 	public static class NMSPacket201PlayerInfo extends NMSPacket {
+		public final FieldAccessor<String> playerName = getField("a");
+		public final FieldAccessor<Boolean> online = getField("b");
+		public final FieldAccessor<Integer> ping = getField("c");
 	}
 	public static class NMSPacket202Abilities extends NMSPacket {
 		public final FieldAccessor<Boolean> isInvulnerable = getField("a");
@@ -469,15 +563,27 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Boolean> showCape = getField("f");
 	}
 	public static class NMSPacket205ClientCommand extends NMSPacket {
+		public final FieldAccessor<Integer> payload = getField("a");
 	}
 	public static class NMSPacket250CustomPayload extends NMSPacket {
+		public final FieldAccessor<String> tag = getField("tag");
+		public final FieldAccessor<Integer> length = getField("length");
+		public final FieldAccessor<byte[]> data = getField("data");
 	}
 	public static class NMSPacket252KeyResponse extends NMSPacket {
+		public final FieldAccessor<byte[]> sharedSecret = getField("a");
+		public final FieldAccessor<byte[]> tokenResponse = getField("b");
+		public final FieldAccessor<SecretKey> secretKey = getField("c");
 	}
 	public static class NMSPacket253KeyRequest extends NMSPacket {
+		public final FieldAccessor<String> serverId = getField("a");
+		public final FieldAccessor<PublicKey> publicKey = getField("b");
+		public final FieldAccessor<byte[]> verifyToken = getField("c");
 	}
 	public static class NMSPacket254GetInfo extends NMSPacket {
+		public final FieldAccessor<Integer> magic = getField("a");
 	}
 	public static class NMSPacket255KickDisconnect extends NMSPacket {
+		public final FieldAccessor<String> reason = getField("a");
 	}
 }
