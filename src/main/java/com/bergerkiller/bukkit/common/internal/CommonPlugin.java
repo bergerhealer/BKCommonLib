@@ -164,7 +164,7 @@ public class CommonPlugin extends PluginBase {
 			}
 			if (this.isSCSEnabled) {
 				try {
-					if (ShowCaseStandalone.get().isShowCaseItem(item)) {
+					if (ShowCaseStandalone.get().getShopHandler().isShopItem(item)) {
 						return true;
 					}
 				} catch (Throwable t) {
