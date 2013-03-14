@@ -3,14 +3,11 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -31,22 +28,15 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
-import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
-import com.bergerkiller.bukkit.common.protocol.PacketListener;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import com.narrowtux.showcase.Showcase;
 
@@ -66,10 +56,9 @@ public class CommonPlugin extends PluginBase {
 	 */
 	private static CommonPlugin instance;
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
+	private EntityMap<Player, LongHashSet> playerVisibleChunks;
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	protected final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
-	protected final List<PacketListener>[] listeners = new ArrayList[256];
-	protected final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private final List<NextTickListener> nextTickListeners = new ArrayList<NextTickListener>(1);
@@ -81,6 +70,7 @@ public class CommonPlugin extends PluginBase {
 	private boolean isSCSEnabled = false;
 	private boolean isProtocolLibEnabled = false;
 	private Plugin bleedingMobsInstance = null;
+	private PacketHandler packetHandler = new CommonPacketHandler();
 	public List<Entity> entities = new ArrayList<Entity>();
 
 	public static CommonPlugin getInstance() {
@@ -197,149 +187,59 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
-	public boolean onPacketSend(Player player, Object packet) {
-		if(player == null || packet == null) {
-			return true;
+	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
+		synchronized (playerVisibleChunks) {
+			LongHashSet chunks = playerVisibleChunks.get(player);
+			return chunks == null ? null : chunks.contains(chunkX, chunkZ);
 		}
-		return onPacketSend(player, packet, PacketFields.DEFAULT.packetID.get(packet));
 	}
 
-	public Collection<Plugin> getListening(int id) {
-		if (this.isProtocolLibEnabled) {
-			return CommonProtocolLibHandler.getListening(id);
-		} else if (!LogicUtil.isInBounds(listeners, id)) {
-			return Collections.emptySet();
+	public void setChunksAsVisible(Player player, int[] chunkX, int[] chunkZ) {
+		if (chunkX.length != chunkZ.length) {
+			throw new IllegalArgumentException("Chunk X and Z coordinate count is not the same");
 		}
-		List<PacketListener> list = listeners[id];
-		if (LogicUtil.nullOrEmpty(list)) {
-			return Collections.emptySet();
+		synchronized (playerVisibleChunks) {
+			LongHashSet chunks = playerVisibleChunks.get(player);
+			if (chunks == null) {
+				chunks = new LongHashSet();
+				playerVisibleChunks.put(player, chunks);
+			}
+			for (int i = 0; i < chunkX.length; i++) {
+				chunks.add(chunkX[i], chunkZ[i]);
+			}
 		}
-		List<Plugin> plugins = new ArrayList<Plugin>();
-		for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
-			for (PacketListener listener : list) {
-				if (entry.getValue().contains(listener)) {
-					plugins.add(entry.getKey());
-					break;
+	}
+
+	public void setChunkVisible(Player player, int chunkX, int chunkZ, boolean visible) {
+		synchronized (playerVisibleChunks) {
+			LongHashSet chunks = playerVisibleChunks.get(player);
+			if (chunks == null) {
+				if (!visible) {
+					return;
 				}
+				chunks = new LongHashSet();
+				playerVisibleChunks.put(player, chunks);
 			}
-		}
-		return plugins;
-	}
-
-	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
-		if (listener == null) {
-			throw new IllegalArgumentException("Listener is not allowed to be null");
-		} else if (plugin == null) {
-			throw new IllegalArgumentException("Plugin is not allowed to be null");
-		}
-		// Registration in BKCommonLib
-		for (int id : ids) {
-			if (id < 0 || id >= listeners.length) {
-				throw new IllegalArgumentException("Unknown packet type Id: " + id);
-			}
-			// Map to listener array
-			if (listeners[id] == null) {
-				listeners[id] = new ArrayList<PacketListener>();
-			}
-			listeners[id].add(listener);
-			// Map to plugin list
-			List<PacketListener> list = listenerPlugins.get(plugin);
-			if (list == null) {
-				list = new ArrayList<PacketListener>(2);
-				listenerPlugins.put(plugin, list);
-			}
-			list.add(listener);
-		}
-		// If ProtocolLib is enabled, register a new listener
-		if (this.isProtocolLibEnabled) {
-			CommonProtocolLibHandler.register(ids);
-		}
-	}
-
-	public void removePacketListeners(Plugin plugin) {
-		List<PacketListener> listeners = listenerPlugins.get(plugin);
-		if (listeners != null) {
-			for (PacketListener listener : listeners) {
-				removePacketListener(listener, false);
+			if (visible) {
+				chunks.add(chunkX, chunkZ);
+			} else {
+				chunks.remove(chunkX, chunkZ);
 			}
 		}
 	}
 
-	public void removePacketListener(PacketListener listener, boolean fromPlugins) {
-		if(listener == null) {
-			return;
-		}
-		for(int i = 0; i < listeners.length; i++) {
-			if (!LogicUtil.nullOrEmpty(listeners[i])) {
-				listeners[i].remove(listener);
-			}
-		}
-		if (fromPlugins) {
-			// Remove from plugin list
-			for (Plugin plugin : listenerPlugins.keySet().toArray(new Plugin[0])) {
-				List<PacketListener> list = listenerPlugins.get(plugin);
-				// If not null, remove the listener, if empty afterwards remove the entire entry
-				if (list != null && list.remove(listener) && list.isEmpty()) {
-					listenerPlugins.remove(plugin);
-				}
-			}
-		}
+	/**
+	 * Obtains the Packet Handler used for packet listeners/monitors and packet sending
+	 * 
+	 * @return packet handler instance
+	 */
+	public PacketHandler getPacketHandler() {
+		return packetHandler;
 	}
 
-	public boolean onPacketSend(Player player, Object packet, int id) {
-		if(player == null || packet == null) {
-			return true;
-		}
-
-		if (!LogicUtil.nullOrEmpty(listeners[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
-			PacketSendEvent ev = new PacketSendEvent(player, cp);
-			for(PacketListener listener : listeners[id]) {
-				listener.onPacketSend(ev);
-			}
-			return !ev.isCancelled();
-		} else {
-			return true;
-		}
-	}
-
-	public boolean onPacketReceive(Player player, Object packet) {
-		if(player == null || packet == null) {
-			return true;
-		}
-		return onPacketReceive(player, packet, PacketFields.DEFAULT.packetID.get(packet));
-	}
-
-	public boolean onPacketReceive(Player player, Object packet, int id) {
-		if(player == null || packet == null) {
-			return true;
-		}
-
-		if (!LogicUtil.nullOrEmpty(listeners[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
-			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
-			for(PacketListener listener : listeners[id]) {
-				listener.onPacketReceive(ev);
-			}
-			return !ev.isCancelled();
-		} else {
-			return true;
-		}
-	}
-
-	public void sendPacket(Player player, Object packet, boolean throughListeners) {
-		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
-			return;
-		}
-		if (this.isProtocolLibEnabled) {
-			CommonProtocolLibHandler.sendPacket(player, packet, throughListeners);
-		} else {
-			if (!throughListeners) {
-				packet = new CommonSilentPacket(packet);
-			}
-			final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
-			PlayerConnectionRef.sendPacket(connection, packet);
-		}
+	private void setPacketHandler(PacketHandler handler) {
+		this.packetHandler.transfer(handler);
+		this.packetHandler = handler;
 	}
 
 	@Override
@@ -349,7 +249,7 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
 		if (!enabled) {
-			removePacketListeners(plugin);
+			packetHandler.removePacketListeners(plugin);
 		}
 		if (pluginName.equals("Showcase")) {
 			this.isShowcaseEnabled = enabled;
@@ -380,19 +280,16 @@ public class CommonPlugin extends PluginBase {
 		} else if (pluginName.equals("ProtocolLib")) {
 			if (this.isProtocolLibEnabled = enabled) {
 				log(Level.INFO, "Now using ProtocolLib to handle packet listeners");
-				//Unregister previous PlayerConnection hooks
-				CommonPacketListener.unbindAll();
-				//Register all packets in ProtocolLib
-				Set<Integer> packets = new HashSet<Integer>(10);
-				for (int i = 0; i < listeners.length; i++) {
-					if (!LogicUtil.nullOrEmpty(listeners[i])) {
-						packets.add(i);
-					}
-				}
-				CommonProtocolLibHandler.register(packets);
+				// Unregister previous PlayerConnection hooks
+				CommonPlayerConnection.unbindAll();
+				// Obtain all current packet listeners
+				// Register all packets in ProtocolLib
+				setPacketHandler(new ProtocolLibPacketHandler());
 			} else {
 				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
-				CommonPacketListener.bindAll();
+				CommonPlayerConnection.bindAll();
+				//Fall back to default system
+				setPacketHandler(new CommonPacketHandler());				
 			}
 		} else if (enabled && LogicUtil.contains(pluginName, protLibPlugins)) {
 			failPacketListener(plugin.getClass());
@@ -445,7 +342,7 @@ public class CommonPlugin extends PluginBase {
 		}
 		startedTasks.clear();
 		// Transfer PlayerConnection from players back to default
-		CommonPacketListener.unbindAll();
+		CommonPlayerConnection.unbindAll();
 	}
 
 	@Override
@@ -486,13 +383,20 @@ public class CommonPlugin extends PluginBase {
 			return;
 		}
 
+		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
+		playerVisibleChunks = new EntityMap<Player, LongHashSet>();
+
 		// Register packet listener if ProtocolLib is not detected
 		if (CommonUtil.getPlugin("ProtocolLib") == null) {
-			CommonPacketListener.bindAll();
+			CommonPlayerConnection.bindAll();
+		} else {
+			// Instantly set the packet handler - is more efficient
+			packetHandler = new ProtocolLibPacketHandler();
 		}
 
 		// Register events and tasks, initialize
 		register(new CommonListener());
+		register(new CommonPacketMonitor(), PacketType.MAP_CHUNK, PacketType.MAP_CHUNK_BULK);
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));

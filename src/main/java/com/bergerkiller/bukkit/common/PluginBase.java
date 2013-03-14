@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.metrics.Metrics;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -216,7 +217,19 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
-	 * Registers a packet listener for the packet types specified
+	 * Registers a packet monitor for the packet types specified.
+	 * Monitors can only monitor packets, they can not alter them.
+	 * 
+	 * @param packetListener to register
+	 * @param packetTypes to register the listener for
+	 */
+	public final void register(PacketMonitor packetMonitor, PacketType... packetTypes) {
+		PacketUtil.addPacketMonitor(this, packetMonitor, packetTypes);
+	}
+
+	/**
+	 * Registers a packet listener for the packet types specified.
+	 * Listeners are able to modify packets.
 	 * 
 	 * @param packetListener to register
 	 * @param packetTypes to register the listener for

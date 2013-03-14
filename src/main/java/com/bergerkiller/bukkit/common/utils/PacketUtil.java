@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 
@@ -32,7 +33,7 @@ public class PacketUtil {
 	}
 
 	public static void sendPacket(Player player, Object packet, boolean throughListeners) {
-		CommonPlugin.getInstance().sendPacket(player, packet, throughListeners);
+		CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
 	}
 
 	public static void sendCommonPacket(Player player, CommonPacket packet) {
@@ -76,10 +77,7 @@ public class PacketUtil {
 		}
 	}
 
-	public static void addPacketListener(Plugin plugin, PacketListener listener, PacketType... packets) {
-		if (listener == null || LogicUtil.nullOrEmpty(packets)) {
-			return;
-		}
+	private static int[] getIds(PacketType[] packets) {
 		int[] ids = new int[packets.length];
 		for (int i = 0; i < packets.length; i++) {
 			if (packets[i] == null) {
@@ -88,15 +86,62 @@ public class PacketUtil {
 				ids[i] = packets[i].getId();
 			}
 		}
-		CommonPlugin.getInstance().addPacketListener(plugin, listener, ids);
+		return ids;
 	}
 
+	/**
+	 * Adds a single packet monitor. Packet monitors only monitor (not change) packets.
+	 * 
+	 * @param plugin to register for
+	 * @param listener to register
+	 * @param packets to register for
+	 */
+	public static void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType... packets) {
+		if (monitor == null || LogicUtil.nullOrEmpty(packets)) {
+			return;
+		}
+		CommonPlugin.getInstance().getPacketHandler().addPacketMonitor(plugin, monitor, getIds(packets));
+	}
+
+	/**
+	 * Adds a single packet listener. Packet listeners can modify packets.
+	 * 
+	 * @param plugin to register for
+	 * @param listener to register
+	 * @param packets to register for
+	 */
+	public static void addPacketListener(Plugin plugin, PacketListener listener, PacketType... packets) {
+		if (listener == null || LogicUtil.nullOrEmpty(packets)) {
+			return;
+		}
+		CommonPlugin.getInstance().getPacketHandler().addPacketListener(plugin, listener, getIds(packets));
+	}
+
+	/**
+	 * Removes all packet listeners AND monitors of a plugin
+	 * 
+	 * @param plugin to remove the registered monitors and listeners of
+	 */
 	public static void removePacketListeners(Plugin plugin) {
-		CommonPlugin.getInstance().removePacketListeners(plugin);
+		CommonPlugin.getInstance().getPacketHandler().removePacketListeners(plugin);
 	}
 
+	/**
+	 * Removes a single registered packet listener
+	 * 
+	 * @param listener to remove
+	 */
 	public static void removePacketListener(PacketListener listener) {
-		CommonPlugin.getInstance().removePacketListener(listener, true);
+		CommonPlugin.getInstance().getPacketHandler().removePacketListener(listener);
+	}
+
+	/**
+	 * Removes a single registered packet monitor
+	 * 
+	 * @param monitor to remove
+	 */
+	public static void removePacketMonitor(PacketMonitor monitor) {
+		CommonPlugin.getInstance().getPacketHandler().removePacketMonitor(monitor);
 	}
 
 	public static void broadcastPacketNearby(Location location, double radius, Object packet) {
@@ -126,6 +171,6 @@ public class PacketUtil {
 	 * @return collection of listening plugins
 	 */
 	public static Collection<Plugin> getListenerPlugins(int packetId) {
-		return CommonPlugin.getInstance().getListening(packetId);
+		return CommonPlugin.getInstance().getPacketHandler().getListening(packetId);
 	}
 }

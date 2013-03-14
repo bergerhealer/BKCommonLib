@@ -19,7 +19,7 @@ class CommonSilentPacket extends Packet {
 		PacketUtil.registerPacketToId(CommonSilentPacket.class, 0);
 	}
 
-	private final Packet packet;
+	public final Packet packet;
 
 	public CommonSilentPacket(Object packet) {
 		this.packet = (Packet) packet;

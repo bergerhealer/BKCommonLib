@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -116,5 +117,30 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static void setHasPlayedBefore(Player player, boolean playedBefore) {
 		hasPlayedBefore.set(player, playedBefore);
+	}
+
+	/**
+	 * Checks whether a given chunk is visible to the client of a player.
+	 * This actually checks whether the chunk data had been sent, it doesn't do a distance check.
+	 * 
+	 * @param player to check
+	 * @param chunk to check
+	 * @return True if the chunk is visible to the player, False if not
+	 */
+	public static boolean isChunkVisible(Player player, Chunk chunk) {
+		return isChunkVisible(player, chunk.getX(), chunk.getZ());
+	}
+
+	/**
+	 * Checks whether a given chunk is visible to the client of a player.
+	 * This actually checks whether the chunk data had been sent, it doesn't do a distance check.
+	 * 
+	 * @param player to check
+	 * @param chunkX if the chunk to check
+	 * @param chunkZ if the chunk to check
+	 * @return True if the chunk is visible to the player, False if not
+	 */
+	public static boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
+		return CommonPlugin.getInstance().isChunkVisible(player, chunkX, chunkZ);
 	}
 }

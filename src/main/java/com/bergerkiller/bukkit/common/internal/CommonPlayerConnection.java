@@ -13,13 +13,18 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.v1_4_R1.*;
 
-class CommonPacketListener extends PlayerConnection {
+/**
+ * Used (when ProtocolLib is not enabled) to intercept and keep track of packets
+ */
+class CommonPlayerConnection extends PlayerConnection {
 	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonUtil.getMCServer().ae(), "d");
 	private final PlayerConnection previous;
+	private final CommonPacketHandler handler;
 
-	public CommonPacketListener(MinecraftServer minecraftserver, EntityPlayer entityplayer) {
+	private CommonPlayerConnection(MinecraftServer minecraftserver, EntityPlayer entityplayer) {
 		super(minecraftserver, entityplayer.playerConnection.networkManager, entityplayer);
 		previous = entityplayer.playerConnection;
+		handler = (CommonPacketHandler) CommonPlugin.getInstance().getPacketHandler();
 		PlayerConnectionRef.TEMPLATE.transfer(previous, this);
 	}
 
@@ -36,7 +41,7 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private static boolean isReplaceable(Object playerConnection) {
-		return playerConnection instanceof CommonPacketListener || playerConnection.getClass() == PlayerConnection.class;
+		return playerConnection instanceof CommonPlayerConnection || playerConnection.getClass() == PlayerConnection.class;
 	}
 
 	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
@@ -90,17 +95,17 @@ class CommonPacketListener extends PlayerConnection {
 
 	public static void bind(Player player) {
 		final EntityPlayer ep = CommonNMS.getNative(player);
-		if (ep.playerConnection instanceof CommonPacketListener) {
+		if (ep.playerConnection instanceof CommonPlayerConnection) {
 			return;
 		}
-		setPlayerConnection(ep, new CommonPacketListener(CommonUtil.getMCServer(), ep));
+		setPlayerConnection(ep, new CommonPlayerConnection(CommonUtil.getMCServer(), ep));
 	}
 
 	public static void unbind(Player player) {
 		final EntityPlayer ep = CommonNMS.getNative(player);
 		final PlayerConnection previous = ep.playerConnection;
-		if (previous instanceof CommonPacketListener) {
-			PlayerConnection replacement = ((CommonPacketListener) previous).previous;
+		if (previous instanceof CommonPlayerConnection) {
+			PlayerConnection replacement = ((CommonPlayerConnection) previous).previous;
 			PlayerConnectionRef.TEMPLATE.transfer(previous, replacement);
 			setPlayerConnection(ep, replacement);
 		}
@@ -509,17 +514,12 @@ class CommonPacketListener extends PlayerConnection {
 	}
 
 	private boolean canConfirm(Packet packet) {
-		final CommonPlugin instance = CommonPlugin.getInstance();
-		if (instance == null) {
-			return true;
-		}
-		return instance.onPacketReceive(CommonNMS.getPlayer(this.player), packet);
+		return handler.onPacketReceive(CommonNMS.getPlayer(this.player), packet, false);
 	}
 
 	@Override
 	public void sendPacket(Packet packet) {
-		final CommonPlugin instance = CommonPlugin.getInstance();
-		if (instance == null || instance.onPacketSend(CommonNMS.getPlayer(this.player), packet)) {
+		if (handler.onPacketSend(CommonNMS.getPlayer(this.player), packet, false)) {
 			super.sendPacket(packet);
 		}
 	}

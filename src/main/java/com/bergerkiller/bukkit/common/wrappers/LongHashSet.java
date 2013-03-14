@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Iterator;
 
+import org.bukkit.craftbukkit.v1_4_R1.util.LongHash;
+
 import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 
 public class LongHashSet extends BasicWrapper implements Iterable<Long> {
@@ -38,8 +40,8 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 		return LongHashSetRef.contains1.invoke(handle, value);
 	}
 
-	public void remove(int lsw, int msw) {
-		LongHashSetRef.remove2.invoke(handle, lsw, msw);
+	public boolean remove(int msw, int lsw) {
+		return remove(LongHash.toLong(msw, lsw));
 	}
 
 	public boolean remove(long value) {

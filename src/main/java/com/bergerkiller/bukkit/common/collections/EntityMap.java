@@ -16,16 +16,24 @@ public class EntityMap<K extends Entity, T> extends WeakHashMap<K, T> {
 
 	public EntityMap() {
 		super();
-		CommonPlugin.getInstance().registerMap(this);
+		register();
 	}
 
 	public EntityMap(int initialCapacity) {
 		super(initialCapacity);
-		CommonPlugin.getInstance().registerMap(this);
+		register();
 	}
 
 	public EntityMap(Map<? extends K, ? extends T> m) {
 		super(m);
-		CommonPlugin.getInstance().registerMap(this);
+		register();
+	}
+
+	private void register() {
+		CommonPlugin plugin = CommonPlugin.getInstance();
+		if (plugin == null) {
+			throw new IllegalStateException("Can not initialize a new EntityMap when BKCommonLib is not yet enabled!");
+		}
+		plugin.registerMap(this);
 	}
 }
