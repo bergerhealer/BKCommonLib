@@ -26,7 +26,7 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 			return;
 		}
 		try {
-			String className = StringUtil.getBefore(methodPath, ".");
+			String className = StringUtil.getLastBefore(methodPath, ".");
 			String methodName = methodPath.substring(className.length() + 1);
 			load(Class.forName(className), methodName, parameterTypes);
 		} catch (Throwable t) {

@@ -32,7 +32,7 @@ public class NodeBuilder {
 			return false;
 		}
 		int nodeIndex = preceedingSpaces / this.indent;
-		String nodeName = StringUtil.getBefore(line, ":");
+		String nodeName = StringUtil.getLastBefore(line, ":");
 		if (!nodeName.isEmpty()) {
 			// Calculate current path
 			while (this.nodes.size() >= nodeIndex + 1) {

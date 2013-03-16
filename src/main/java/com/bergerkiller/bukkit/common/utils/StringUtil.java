@@ -155,27 +155,51 @@ public class StringUtil {
 	}
 
 	/**
-	 * Gets the text before a given separator in a text
+	 * Gets the text before the first occurrence of a given separator in a text.
+	 * 
+	 * @param text to use
+	 * @param delimiter to find
+	 * @return the text before the first occurrence of the delimiter, or an empty String if not found
+	 */
+	public static String getBefore(String text, String delimiter) {
+		final int index = text.indexOf(delimiter);
+		return index >= 0 ? text.substring(0, index) : "";
+	}
+
+	/**
+	 * Gets the text after the first occurrence of a given separator in a text
+	 * 
+	 * @param text to use
+	 * @param delimiter to find
+	 * @return the text after the first occurrence of the delimiter, or an empty String if not found
+	 */
+	public static String getAfter(String text, String delimiter) {
+		final int index = text.indexOf(delimiter);
+		return index >= 0 ? text.substring(index + delimiter.length()) : "";
+	}
+
+	/**
+	 * Gets the text before the last occurrence of a given separator in a text
 	 * 
 	 * @param text to use
 	 * @param delimiter to find
 	 * @return the text before the delimiter, or an empty String if not found
 	 */
-	public static String getBefore(String text, String delimiter) {
-		int index = text.lastIndexOf(delimiter);
+	public static String getLastBefore(String text, String delimiter) {
+		final int index = text.lastIndexOf(delimiter);
 		return index >= 0 ? text.substring(0, index) : "";
 	}
 
 	/**
-	 * Gets the text after a given separator in a text
+	 * Gets the text after the last occurrence of a given separator in a text
 	 * 
 	 * @param text to use
 	 * @param delimiter to find
-	 * @return the text after the delimiter, or an empty String if not found
+	 * @return the text after the last occurrence of the delimiter, or an empty String if not found
 	 */
-	public static String getAfter(String text, String delimiter) {
-		int index = text.indexOf(delimiter);
-		return index >= 0 ? text.substring(index + 1) : "";
+	public static String getLastAfter(String text, String delimiter) {
+		final int index = text.lastIndexOf(delimiter);
+		return index >= 0 ? text.substring(index + delimiter.length()) : "";
 	}
 
 	/**

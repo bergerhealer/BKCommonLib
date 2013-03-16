@@ -38,7 +38,7 @@ public class SafeField<T> implements FieldAccessor<T> {
 			return;
 		}
 		try {
-			String className = StringUtil.getBefore(fieldPath, ".");
+			String className = StringUtil.getLastBefore(fieldPath, ".");
 			String methodName = fieldPath.substring(className.length() + 1);
 			load(Class.forName(className), methodName);
 		} catch (Throwable t) {
