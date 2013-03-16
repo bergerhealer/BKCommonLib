@@ -457,7 +457,6 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> type = getField("b");
 		public final FieldAccessor<String> title = getField("c");
 		public final FieldAccessor<Integer> slotCount = getField("d");
-		public final FieldAccessor<Boolean> newVersion = getField("newVersion");
 	}
 	public static class NMSPacket101CloseWindow extends NMSPacket {
 		public final FieldAccessor<Integer> windowId = getField("a");
