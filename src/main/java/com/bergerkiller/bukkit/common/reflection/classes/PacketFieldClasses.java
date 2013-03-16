@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 
-import net.minecraft.server.v1_4_R1.Vec3D;
+import net.minecraft.server.v1_5_R1.Vec3D;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
@@ -197,7 +197,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> yaw = getField("i");
 		public final FieldAccessor<Byte> pitch = getField("j");
 		public final FieldAccessor<Byte> headYaw = getField("k");
-		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("s").translate(ConversionPairs.dataWatcher);
+		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("t").translate(ConversionPairs.dataWatcher);
 		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("EntityLiving"));
 		public Object newInstance(Object entityLiving) {
 			return constructor1.newInstance(entityLiving);

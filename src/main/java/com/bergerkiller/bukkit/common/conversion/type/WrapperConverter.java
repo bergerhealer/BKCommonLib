@@ -1,38 +1,38 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_4_R1.Chunk;
-import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_4_R1.ChunkCoordinates;
-import net.minecraft.server.v1_4_R1.ChunkPosition;
-import net.minecraft.server.v1_4_R1.ContainerAnvilInventory;
-import net.minecraft.server.v1_4_R1.ContainerEnchantTableInventory;
-import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.IInventory;
-import net.minecraft.server.v1_4_R1.InventoryCrafting;
-import net.minecraft.server.v1_4_R1.InventoryMerchant;
-import net.minecraft.server.v1_4_R1.ItemStack;
-import net.minecraft.server.v1_4_R1.PlayerInventory;
-import net.minecraft.server.v1_4_R1.TileEntity;
-import net.minecraft.server.v1_4_R1.TileEntityBeacon;
-import net.minecraft.server.v1_4_R1.TileEntityBrewingStand;
-import net.minecraft.server.v1_4_R1.TileEntityFurnace;
-import net.minecraft.server.v1_4_R1.Vec3D;
-import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_5_R1.Chunk;
+import net.minecraft.server.v1_5_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_5_R1.ChunkCoordinates;
+import net.minecraft.server.v1_5_R1.ChunkPosition;
+import net.minecraft.server.v1_5_R1.ContainerAnvilInventory;
+import net.minecraft.server.v1_5_R1.ContainerEnchantTableInventory;
+import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.IInventory;
+import net.minecraft.server.v1_5_R1.InventoryCrafting;
+import net.minecraft.server.v1_5_R1.InventoryMerchant;
+import net.minecraft.server.v1_5_R1.ItemStack;
+import net.minecraft.server.v1_5_R1.PlayerInventory;
+import net.minecraft.server.v1_5_R1.TileEntity;
+import net.minecraft.server.v1_5_R1.TileEntityBeacon;
+import net.minecraft.server.v1_5_R1.TileEntityBrewingStand;
+import net.minecraft.server.v1_5_R1.TileEntityFurnace;
+import net.minecraft.server.v1_5_R1.Vec3D;
+import net.minecraft.server.v1_5_R1.World;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryAnvil;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryBeacon;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryCrafting;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryEnchanting;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryAnvil;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryBeacon;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryBrewer;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryCrafting;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryEnchanting;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryFurnace;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryMerchant;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
@@ -50,6 +50,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.LongHashMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
@@ -95,7 +96,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			} else if (value instanceof Entity) {
 				return ((Entity) value).world.getWorld();
 			} else if (value instanceof TileEntity) {
-				return ((TileEntity) value).world.getWorld();
+				TileEntity tile = (TileEntity) value;
+				return TileEntityRef.world.get(tile);
 			} else if (value instanceof org.bukkit.entity.Entity) {
 				return ((org.bukkit.entity.Entity) value).getWorld();
 			} else if (value instanceof BlockState) {
@@ -130,7 +132,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 				return ((BlockState) value).getBlock();
 			} else if (value instanceof TileEntity) {
 				TileEntity tile = (TileEntity) value;
-				return tile.world.getWorld().getBlockAt(tile.x, tile.y, tile.z);
+				return TileEntityRef.world.get(tile).getBlockAt(tile.x, tile.y, tile.z);
 			} else {
 				return def;
 			}

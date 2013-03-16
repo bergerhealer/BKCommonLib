@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_R1.Block;
+import net.minecraft.server.v1_5_R1.Block;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
@@ -169,7 +169,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
-			return Block.i(typeId);
+			return Block.l(typeId);
 		}
 	};
 
@@ -199,7 +199,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
-			return Block.q[typeId];
+			return Block.s[typeId];
 		}
 	};
 

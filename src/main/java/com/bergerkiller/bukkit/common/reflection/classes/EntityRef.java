@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 public class EntityRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("Entity");
 	public static final FieldAccessor<org.bukkit.entity.Entity> bukkitEntity = TEMPLATE.getField("bukkitEntity");
-	public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("ai");
+	public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("al");
 	public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("aj");
 	public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("ak");
 	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("am");

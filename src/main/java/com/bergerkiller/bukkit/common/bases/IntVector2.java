@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
-import net.minecraft.server.v1_4_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_5_R1.ChunkCoordIntPair;
 
 /**
  * Represents a class containing two immutable integer coordinates: x and z

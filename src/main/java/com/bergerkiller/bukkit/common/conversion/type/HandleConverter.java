@@ -1,20 +1,20 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_4_R1.Block;
-import net.minecraft.server.v1_4_R1.ChunkCoordinates;
-import net.minecraft.server.v1_4_R1.ChunkPosition;
-import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.Item;
-import net.minecraft.server.v1_4_R1.Vec3D;
+import net.minecraft.server.v1_5_R1.Block;
+import net.minecraft.server.v1_5_R1.ChunkCoordinates;
+import net.minecraft.server.v1_5_R1.ChunkPosition;
+import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.Item;
+import net.minecraft.server.v1_5_R1.Vec3D;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_4_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_4_R1.block.*;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_5_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R1.block.*;
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;

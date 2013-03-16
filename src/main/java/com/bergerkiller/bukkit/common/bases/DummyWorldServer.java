@@ -7,17 +7,17 @@ import org.bukkit.World.Environment;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_4_R1.EnumGamemode;
-import net.minecraft.server.v1_4_R1.IChunkLoader;
-import net.minecraft.server.v1_4_R1.IChunkProvider;
-import net.minecraft.server.v1_4_R1.IDataManager;
-import net.minecraft.server.v1_4_R1.NBTTagCompound;
-import net.minecraft.server.v1_4_R1.PlayerFileData;
-import net.minecraft.server.v1_4_R1.WorldData;
-import net.minecraft.server.v1_4_R1.WorldProvider;
-import net.minecraft.server.v1_4_R1.WorldServer;
-import net.minecraft.server.v1_4_R1.WorldSettings;
-import net.minecraft.server.v1_4_R1.WorldType;
+import net.minecraft.server.v1_5_R1.EnumGamemode;
+import net.minecraft.server.v1_5_R1.IChunkLoader;
+import net.minecraft.server.v1_5_R1.IChunkProvider;
+import net.minecraft.server.v1_5_R1.IDataManager;
+import net.minecraft.server.v1_5_R1.NBTTagCompound;
+import net.minecraft.server.v1_5_R1.IPlayerFileData;
+import net.minecraft.server.v1_5_R1.WorldData;
+import net.minecraft.server.v1_5_R1.WorldProvider;
+import net.minecraft.server.v1_5_R1.WorldServer;
+import net.minecraft.server.v1_5_R1.WorldSettings;
+import net.minecraft.server.v1_5_R1.WorldType;
 
 /**
  * A dummy world that can be used to operate on or using worlds without referencing it on the server<br>
@@ -50,7 +50,7 @@ public class DummyWorldServer extends WorldServer {
 	}
 
 	private DummyWorldServer(CommonDummyDataManager datamanager, WorldSettings settings) {
-		super(CommonUtil.getMCServer(), datamanager, getDummyName(), 0, settings, CommonUtil.getMCServer().methodProfiler, Environment.NORMAL, null);
+		super(CommonUtil.getMCServer(), datamanager, getDummyName(), 0, settings, CommonUtil.getMCServer().methodProfiler, CommonUtil.getMCServer().getLogger(), Environment.NORMAL, null);
 		datamanager.initialized = true;
 		// dereference this dummy world again...
 		WorldUtil.removeWorld(this.getWorld());
@@ -106,7 +106,7 @@ public class DummyWorldServer extends WorldServer {
 			return null;
 		}
 
-		public PlayerFileData getPlayerFileData() {
+		public IPlayerFileData getPlayerFileData() {
 			checkAccess();
 			return null;
 		}

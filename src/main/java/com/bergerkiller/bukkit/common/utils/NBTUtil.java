@@ -12,14 +12,14 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
-import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.FoodMetaData;
-import net.minecraft.server.v1_4_R1.InventoryEnderChest;
-import net.minecraft.server.v1_4_R1.MobEffect;
-import net.minecraft.server.v1_4_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_4_R1.NBTTagCompound;
-import net.minecraft.server.v1_4_R1.NBTTagList;
-import net.minecraft.server.v1_4_R1.PlayerInventory;
+import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.FoodMetaData;
+import net.minecraft.server.v1_5_R1.InventoryEnderChest;
+import net.minecraft.server.v1_5_R1.MobEffect;
+import net.minecraft.server.v1_5_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_5_R1.NBTTagCompound;
+import net.minecraft.server.v1_5_R1.NBTTagList;
+import net.minecraft.server.v1_5_R1.PlayerInventory;
 
 /**
  * Contains utility functions for dealing with NBT data
@@ -108,7 +108,7 @@ public class NBTUtil {
 		if (compound == null) {
 			compound = new CommonTagCompound();
 		}
-		((Entity) Conversion.toEntityHandle.convert(entity)).d((NBTTagCompound) compound.getHandle());
+		((Entity) Conversion.toEntityHandle.convert(entity)).e((NBTTagCompound) compound.getHandle());
 		return compound;
 	}
 
@@ -119,7 +119,7 @@ public class NBTUtil {
 	 * @param compound to load from
 	 */
 	public static void loadEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
-		((Entity) Conversion.toEntityHandle.convert(entity)).e((NBTTagCompound) compound.getHandle());
+		((Entity) Conversion.toEntityHandle.convert(entity)).f((NBTTagCompound) compound.getHandle());
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class NBTUtil {
 			}
 			((PlayerInventory) inventoryHandle).a((NBTTagList) list.getHandle());
 		} else if (inventoryHandle instanceof InventoryEnderChest) {			
-			Object handle = ((InventoryEnderChest) inventoryHandle).g();
+			Object handle = ((InventoryEnderChest) inventoryHandle).h();
 			if (list == null) {
 				return (CommonTagList) CommonTag.create(handle);
 			} else {

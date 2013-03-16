@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_4_R1.EntityHuman;
-import net.minecraft.server.v1_4_R1.MinecraftServer;
-import net.minecraft.server.v1_4_R1.PlayerFileData;
+import net.minecraft.server.v1_5_R1.EntityHuman;
+import net.minecraft.server.v1_5_R1.MinecraftServer;
+import net.minecraft.server.v1_5_R1.IPlayerFileData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_4_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_5_R1.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -147,7 +147,7 @@ public class CommonUtil {
 	 * @param playerFileData to set to
 	 */
 	public static void setPlayerFileData(Object playerFileData) {
-		getCraftServer().getHandle().playerFileData = (PlayerFileData) playerFileData;
+		getCraftServer().getHandle().playerFileData = (IPlayerFileData) playerFileData;
 	}
 
 	/**

@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_4_R1.Entity;
+import net.minecraft.server.v1_5_R1.Entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -45,7 +45,7 @@ public class CommonPlugin extends PluginBase {
 	/*
 	 * BKCommonLib Minecraft versioning
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_4_R1";
+	public static final String DEPENDENT_MC_VERSION = "v1_5_R1";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
 	/*
 	 * Known plugins that require ProtocolLib to be installed

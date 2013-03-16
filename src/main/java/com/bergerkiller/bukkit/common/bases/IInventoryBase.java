@@ -3,11 +3,11 @@ package com.bergerkiller.bukkit.common.bases;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.server.v1_4_R1.EntityHuman;
-import net.minecraft.server.v1_4_R1.IInventory;
-import net.minecraft.server.v1_4_R1.ItemStack;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
+import net.minecraft.server.v1_5_R1.EntityHuman;
+import net.minecraft.server.v1_5_R1.IInventory;
+import net.minecraft.server.v1_5_R1.ItemStack;
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -61,12 +61,12 @@ public class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public boolean a_(EntityHuman arg0) {
+	public boolean a(EntityHuman arg0) {
 		return false;
 	}
 
 	@Override
-	public void f() {
+	public void g() {
 	}
 
 	@Override
@@ -132,5 +132,15 @@ public class IInventoryBase implements IInventory {
 
 	@Override
 	public void setItem(int arg0, ItemStack arg1) {
+	}
+
+	@Override
+	public boolean b(int arg0, ItemStack arg1) {
+		return false;
+	}
+
+	@Override
+	public boolean c() {
+		return false;
 	}
 }

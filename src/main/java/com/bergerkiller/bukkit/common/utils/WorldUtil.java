@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_4_R1.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_5_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -22,13 +22,13 @@ import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
-import net.minecraft.server.v1_4_R1.AxisAlignedBB;
-import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.IDataManager;
-import net.minecraft.server.v1_4_R1.Vec3D;
-import net.minecraft.server.v1_4_R1.World;
-import net.minecraft.server.v1_4_R1.WorldNBTStorage;
-import net.minecraft.server.v1_4_R1.WorldServer;
+import net.minecraft.server.v1_5_R1.AxisAlignedBB;
+import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.IDataManager;
+import net.minecraft.server.v1_5_R1.Vec3D;
+import net.minecraft.server.v1_5_R1.World;
+import net.minecraft.server.v1_5_R1.WorldNBTStorage;
+import net.minecraft.server.v1_5_R1.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
 

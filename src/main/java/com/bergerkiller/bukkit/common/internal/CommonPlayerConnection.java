@@ -11,13 +11,13 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 /**
  * Used (when ProtocolLib is not enabled) to intercept and keep track of packets
  */
 class CommonPlayerConnection extends PlayerConnection {
-	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonUtil.getMCServer().ae(), "d");
+	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonUtil.getMCServer().ae(), "c");
 	private final PlayerConnection previous;
 	private final CommonPacketHandler handler;
 

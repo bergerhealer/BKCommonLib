@@ -11,13 +11,12 @@ import org.bukkit.entity.StorageMinecart;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityMinecartRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 /**
  * Converter to convert to a certain property obtained from various kinds of objects<br>
@@ -118,10 +117,11 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	public static final PropertyConverter<Material> toMinecartType = new PropertyConverter<Material>(Material.class) {
 		@Override
 		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
-			if (EntityMinecartRef.TEMPLATE.isInstance(value)) {
+			//TODO: Add new minecart controler system implementation
+			/*if (EntityMinecartRef.TEMPLATE.isInstance(value)) {
 				Integer type = (Integer) EntityMinecartRef.type.getInternal(value);
 				return LogicUtil.getArray(EntityUtil.getMinecartTypes(), type, def);
-			} else if (EntityRef.TEMPLATE.isInstance(value) || value instanceof org.bukkit.entity.Entity) {
+			} else*/ if (EntityRef.TEMPLATE.isInstance(value) || value instanceof org.bukkit.entity.Entity) {
 				value = Conversion.toEntity.convert(value);
 				if (value instanceof StorageMinecart) {
 					return Material.STORAGE_MINECART;

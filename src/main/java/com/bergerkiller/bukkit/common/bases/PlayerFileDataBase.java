@@ -3,22 +3,26 @@ package com.bergerkiller.bukkit.common.bases;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-import net.minecraft.server.v1_4_R1.EntityHuman;
-import net.minecraft.server.v1_4_R1.IDataManager;
-import net.minecraft.server.v1_4_R1.PlayerFileData;
-import net.minecraft.server.v1_4_R1.WorldNBTStorage;
+import net.minecraft.server.v1_5_R1.EntityHuman;
+import net.minecraft.server.v1_5_R1.IDataManager;
+import net.minecraft.server.v1_5_R1.IPlayerFileData;
+import net.minecraft.server.v1_5_R1.NBTTagCompound;
+import net.minecraft.server.v1_5_R1.WorldNBTStorage;
 
-public abstract class PlayerFileDataBase implements PlayerFileData {
+public abstract class PlayerFileDataBase implements IPlayerFileData {
 
 	/**
+	 * @return 
 	 * @deprecated use {@link load(HumanEntity)} instead
 	 */
 	@Deprecated
 	@Override
-	public final void load(EntityHuman arg0) {
-		load(CommonNMS.getEntity(arg0, HumanEntity.class));
+	public final NBTTagCompound load(EntityHuman arg0) {
+		NBTTagCompound tag = (NBTTagCompound) load(CommonNMS.getEntity(arg0, HumanEntity.class)).getHandle();
+		return tag;
 	}
 
 	/**
@@ -45,7 +49,7 @@ public abstract class PlayerFileDataBase implements PlayerFileData {
 	 * 
 	 * @param human to load
 	 */
-	public abstract void load(HumanEntity human);
+	public abstract CommonTagCompound load(HumanEntity human);
 
 	/**
 	 * Saves the human entity data

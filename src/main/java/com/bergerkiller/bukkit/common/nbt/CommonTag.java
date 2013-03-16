@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 /**
  * An NBT Tag wrapper implementation to safely operate on tags<br><br>

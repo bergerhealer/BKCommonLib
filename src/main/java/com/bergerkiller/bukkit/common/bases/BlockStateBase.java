@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_4_R1.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_5_R1.block.CraftBlockState;
 
 /**
  * A base class for a Block State implementation

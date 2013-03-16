@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.minecraft.server.v1_4_R1.*;
+import net.minecraft.server.v1_5_R1.*;
 
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_4_R1.block.*;
-import org.bukkit.craftbukkit.v1_4_R1.inventory.*;
+import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R1.block.*;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -75,8 +75,8 @@ public class CommonNMS {
 		return getNative(item, EntityItem.class);
 	}
 
-	public static EntityMinecart getNative(Minecart m) {
-		return getNative(m, EntityMinecart.class);
+	public static EntityMinecartAbstract getNative(Minecart m) {
+		return getNative(m, EntityMinecartAbstract.class);
 	}
 
 	public static EntityLiving getNative(LivingEntity l) {

@@ -2,13 +2,13 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.server.v1_4_R1.Chunk;
-import net.minecraft.server.v1_4_R1.Entity;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.IntHashMap;
-import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_5_R1.Chunk;
+import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.IntHashMap;
+import net.minecraft.server.v1_5_R1.World;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -31,7 +31,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	@SuppressWarnings("unchecked")
 	public static Entity getEntity(World world, UUID uid) {
 		for (Entity e : (List<Entity>) world.entityList) {
-			if (e.uniqueId.equals(uid)) {
+			if (e.uniqueID.equals(uid)) {
 				return e;
 			}
 		}

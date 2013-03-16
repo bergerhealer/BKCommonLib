@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_4_R1.DamageSource;
+import net.minecraft.server.v1_5_R1.DamageSource;
+import net.minecraft.server.v1_5_R1.Explosion;
+import net.minecraft.server.v1_5_R1.World;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -156,7 +159,10 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, int damage) {
 		DamageSource source;
 		if (cause == DamageCause.BLOCK_EXPLOSION) {
-			source = DamageSource.EXPLOSION;
+			Location loc = entity.getLocation();
+			World worldhandle = CommonNMS.getNative(loc.getWorld());
+			Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0);
+			source = DamageSource.explosion(ex);
 		} else if (cause == DamageCause.CONTACT) {
 			source = DamageSource.CACTUS;
 		} else if (cause == DamageCause.DROWNING) {
@@ -183,6 +189,17 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 			source = DamageSource.GENERIC;
 		}
 		CommonNMS.getNative(entity).damageEntity(source, damage);
+	}
+	
+	/**
+	 * Damages an entity with the reason of an explosion
+	 * 
+	 * @param entity to be demaged
+	 * @param damage of the damage
+	 * @param explosion wich has damaged the player
+	 */
+	public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {
+		CommonNMS.getNative(entity).damageEntity(DamageSource.explosion(explosion), damage);
 	}
 
 	/**

@@ -3,9 +3,11 @@ package com.bergerkiller.bukkit.common.wrappers;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
-import net.minecraft.server.v1_4_R1.Block;
+import net.minecraft.server.v1_5_R1.Block;
+import net.minecraft.server.v1_5_R1.Explosion;
 
 /**
  * Class implementation for Block Info that has a backing handle.
@@ -51,6 +53,8 @@ class BlockInfoImpl extends BlockInfo {
 
 	@Override
 	public void ignite(World world, int x, int y, int z) {
-		BlockRef.ignite.invoke(handle, Conversion.toWorldHandle.convert(world), x, y, z);
+		net.minecraft.server.v1_5_R1.World worldhandle = CommonNMS.getNative(world);
+		Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0);
+		BlockRef.ignite.invoke(handle, worldhandle, x, y, z, ex);
 	}
 }
