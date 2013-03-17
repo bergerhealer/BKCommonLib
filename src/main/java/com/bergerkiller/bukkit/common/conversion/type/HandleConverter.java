@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -85,7 +86,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 				org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
 				Object rval = CraftItemStack.asNMSCopy(stack);
 				if (rval == null) {
-					rval = CraftItemStackRef.newHandleInstance(stack.getTypeId(), stack.getDurability(), stack.getAmount());
+					rval = ItemStackRef.newInstance(stack.getTypeId(), stack.getDurability(), stack.getAmount());
 				}
 				return rval;
 			} else {

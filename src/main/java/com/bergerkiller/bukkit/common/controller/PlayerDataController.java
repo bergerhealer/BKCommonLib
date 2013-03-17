@@ -50,7 +50,7 @@ public class PlayerDataController {
 	 * Assigns this PlayerDataController to the server
 	 */
 	public void assign() {
-		if (this.base == null) {
+		if (this.base != null) {
 			// Already assigned - ignore
 			return;
 		}

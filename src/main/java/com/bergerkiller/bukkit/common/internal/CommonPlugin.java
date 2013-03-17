@@ -94,6 +94,9 @@ public class CommonPlugin extends PluginBase {
 		for (StackTraceElement elem : ex.getStackTrace()) {
 			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection.classes")) {
 				log(Level.SEVERE, "[Reflection] " + msg + " (Update BKCommonLib?)");
+				for (StackTraceElement ste : ex.getStackTrace()) {
+					log(Level.SEVERE, "    at " + ste.toString());
+				}
 				return;
 			}
 		}
