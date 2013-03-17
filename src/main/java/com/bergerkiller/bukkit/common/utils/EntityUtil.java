@@ -47,6 +47,9 @@ public class EntityUtil extends EntityPropertyUtil {
 		Entity nmsentity = CommonNMS.getNative(entity);
 		nmsentity.world.getChunkAt(MathUtil.toChunk(nmsentity.locX), MathUtil.toChunk(nmsentity.locZ));
 		nmsentity.dead = false;
+		// Remove an entity tracker for this entity if it was present
+		WorldUtil.getTracker(entity.getWorld()).stopTracking(entity);
+		// Add the entity to the world
 		nmsentity.world.addEntity(nmsentity);
 	}
 

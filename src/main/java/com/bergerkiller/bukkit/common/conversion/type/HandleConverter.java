@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_5_R1.Block;
+import net.minecraft.server.v1_5_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_5_R1.ChunkCoordinates;
 import net.minecraft.server.v1_5_R1.ChunkPosition;
 import net.minecraft.server.v1_5_R1.Entity;
@@ -17,6 +18,8 @@ import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
@@ -223,7 +226,12 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toChunkCoordIntPairHandle = new HandleConverter("ChunkCoordIntPair") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			return def;
+			if (value instanceof IntVector2) {
+				IntVector2 iv2 = (IntVector2) value;
+				return new ChunkCoordIntPair(iv2.x, iv2.z);
+			} else {
+				return def;
+			}
 		}
 	};
 	public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
@@ -232,6 +240,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			if (value instanceof ChunkPosition) {
 				ChunkPosition pos = (ChunkPosition) value;
 				return new ChunkCoordinates(pos.x, pos.y, pos.z);
+			} else if (value instanceof IntVector3) {
+				IntVector3 iv3 = (IntVector3) value;
+				return new ChunkCoordinates(iv3.x, iv3.y, iv3.z);
 			} else {
 				return def;
 			}
@@ -243,6 +254,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			if (value instanceof ChunkCoordinates) {
 				ChunkCoordinates coord = (ChunkCoordinates) value;
 				return new ChunkPosition(coord.x, coord.y, coord.z);
+			} else if (value instanceof IntVector3) {
+				IntVector3 iv3 = (IntVector3) value;
+				return new ChunkPosition(iv3.x, iv3.y, iv3.z);
 			} else {
 				return def;
 			}

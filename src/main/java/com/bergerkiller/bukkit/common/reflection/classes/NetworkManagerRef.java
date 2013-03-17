@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class NetworkManagerRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("NetworkManager");
-	public static final FieldAccessor<Integer> queueSize = TEMPLATE.getField("y");
+	public static final FieldAccessor<Integer> queueSize = TEMPLATE.getField("z");
 	public static final FieldAccessor<Object> lockObject = TEMPLATE.getField("h");
 	public static final FieldAccessor<List<Object>> lowPriorityQueue = TEMPLATE.getField("lowPriorityQueue");
 	public static final FieldAccessor<List<Object>> highPriorityQueue = TEMPLATE.getField("highPriorityQueue");
