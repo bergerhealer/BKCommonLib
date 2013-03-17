@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 
-import net.minecraft.server.v1_5_R1.IInventory;
-
-import org.bukkit.craftbukkit.v1_5_R1.inventory.CraftInventory;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -13,42 +13,14 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IInventoryBase;
+import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
 /**
  * A basic implementation of Inventory that excludes the getting and setting of item content information
  */
-public abstract class InventoryBase extends CraftInventory implements Inventory {
-	private int maxStackSize = 64;
-
-	public InventoryBase() {
-		this(new BaseInventoryNative());
-	}
-
-	private InventoryBase(BaseInventoryNative internal) {
-		super(internal);
-		internal.owner = this;
-	}
-
-	/*
-	 * This class is needed because CraftInventory uses a private getMaxItemStack method
-	 * To still have proper variable max stack sizes, this class is needed
-	 * Damnit Bukkit, why is something so simplistic made so difficult?
-	 */
-	private static class BaseInventoryNative extends IInventoryBase {
-		private InventoryBase owner;
-
-		@Override
-		public int getMaxStackSize() {
-			return owner.getMaxStackSize();
-		}
-	}
-
-	@Override
-	@Deprecated
-	public IInventory getInventory() {
-		return null;
-	}
+public abstract class InventoryBase implements Inventory {
+	private final CraftInventoryProxy proxy = new CraftInventoryProxy(new IInventoryBase(), this);
 
 	@Override
 	public String getName() {
@@ -115,11 +87,121 @@ public abstract class InventoryBase extends CraftInventory implements Inventory 
 
 	@Override
 	public int getMaxStackSize() {
-		return this.maxStackSize;
+		return proxy.super_getMaxStackSize();
 	}
 
 	@Override
 	public void setMaxStackSize(int size) {
-		this.maxStackSize = size;
+		proxy.super_setMaxStackSize(size);
+	}
+
+	@Override
+	public HashMap<Integer, ItemStack> addItem(ItemStack... items) throws IllegalArgumentException {
+		return proxy.super_addItem(items);
+	}
+
+	@Override
+	public HashMap<Integer, ? extends ItemStack> all(int materialId) {
+		return proxy.super_all(materialId);
+	}
+
+	@Override
+	public HashMap<Integer, ? extends ItemStack> all(Material material) throws IllegalArgumentException {
+		return proxy.super_all(material);
+	}
+
+	@Override
+	public HashMap<Integer, ? extends ItemStack> all(ItemStack item) {
+		return proxy.super_all(item);
+	}
+
+	@Override
+	public void clear(int index) {
+		proxy.super_clear(index);
+	}
+
+	@Override
+	public boolean contains(int materialId) {
+		return proxy.super_contains(materialId);
+	}
+
+	@Override
+	public boolean contains(Material material) throws IllegalArgumentException {
+		return proxy.super_contains(material);
+	}
+
+	@Override
+	public boolean contains(ItemStack item) {
+		return proxy.super_contains(item);
+	}
+
+	@Override
+	public boolean contains(int materialId, int amount) {
+		return proxy.super_contains(materialId, amount);
+	}
+
+	@Override
+	public boolean contains(Material material, int amount) throws IllegalArgumentException {
+		return proxy.super_contains(material, amount);
+	}
+
+	@Override
+	public boolean contains(ItemStack item, int amount) {
+		return proxy.super_contains(item, amount);
+	}
+
+	@Override
+	public boolean containsAtLeast(ItemStack item, int amount) {
+		return proxy.super_containsAtLeast(item, amount);
+	}
+
+	@Override
+	public int first(int materialId) {
+		return proxy.super_first(materialId);
+	}
+
+	@Override
+	public int first(Material material) throws IllegalArgumentException {
+		return proxy.super_first(material);
+	}
+
+	@Override
+	public int first(ItemStack item) {
+		return proxy.super_first(item);
+	}
+
+	@Override
+	public int firstEmpty() {
+		return proxy.super_firstEmpty();
+	}
+
+	@Override
+	public ListIterator<ItemStack> iterator() {
+		return proxy.super_iterator();
+	}
+
+	@Override
+	public ListIterator<ItemStack> iterator(int index) {
+		return proxy.super_iterator(index);
+	}
+
+	@Override
+	public void remove(int materialId) {
+		proxy.super_remove(materialId);
+	}
+
+	@Override
+	public void remove(Material material) throws IllegalArgumentException {
+		proxy.super_remove(material);
+	}
+
+	@Override
+	public void remove(ItemStack item) {
+		proxy.super_remove(item);
+	}
+
+	@Override
+	public HashMap<Integer, ItemStack> removeItem(ItemStack... items) throws IllegalArgumentException {
+		return proxy.super_removeItem(items);
 	}
 }

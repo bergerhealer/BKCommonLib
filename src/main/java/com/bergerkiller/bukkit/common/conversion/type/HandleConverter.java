@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
@@ -128,6 +129,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toInventoryHandle = new HandleConverter("IInventory") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof InventoryProxy) {
+				value = ((InventoryProxy) value).getProxyBase();
+			}
 			if (value instanceof CraftInventory) {
 				return LogicUtil.fixNull(((CraftInventory) value).getInventory(), def);
 			}

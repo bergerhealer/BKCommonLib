@@ -13,7 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 /**
- * An base Inventory that excludes the getting and setting of items<br>
+ * A base Inventory that excludes the getting and setting of items<br>
  * Avoid using this class as much as possible, use the Bukkit versions instead!
  */
 public class IInventoryBase implements IInventory {
