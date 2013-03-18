@@ -1,61 +1,88 @@
 package com.bergerkiller.bukkit.common.entity;
 
+import java.util.List;
+
+import net.minecraft.server.v1_5_R1.EntityMinecartAbstract;
+
+import org.bukkit.Material;
 import org.bukkit.entity.Minecart;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> implements Minecart {
+public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
 	public CommonMinecart(T base) {
 		super(base);
 	}
 
-	@Override
 	public int getDamage() {
-		return base.getDamage();
+		return entity.getDamage();
 	}
 
-	@Override
 	public Vector getDerailedVelocityMod() {
-		return base.getDerailedVelocityMod();
+		return entity.getDerailedVelocityMod();
 	}
 
-	@Override
 	public Vector getFlyingVelocityMod() {
-		return base.getFlyingVelocityMod();
+		return entity.getFlyingVelocityMod();
 	}
 
-	@Override
 	public double getMaxSpeed() {
-		return base.getMaxSpeed();
+		return entity.getMaxSpeed();
 	}
 
-	@Override
 	public boolean isSlowWhenEmpty() {
-		return base.isSlowWhenEmpty();
+		return entity.isSlowWhenEmpty();
 	}
 
-	@Override
 	public void setSlowWhenEmpty(boolean arg0) {
-		base.setSlowWhenEmpty(arg0);
+		entity.setSlowWhenEmpty(arg0);
 	}
 
-	@Override
 	public void setDamage(int arg0) {
-		base.setDamage(arg0);
+		entity.setDamage(arg0);
 	}
 
-	@Override
 	public void setDerailedVelocityMod(Vector arg0) {
-		base.setDerailedVelocityMod(arg0);
+		entity.setDerailedVelocityMod(arg0);
 	}
 
-	@Override
 	public void setFlyingVelocityMod(Vector arg0) {
-		base.setFlyingVelocityMod(arg0);
+		entity.setFlyingVelocityMod(arg0);
 	}
 
-	@Override
 	public void setMaxSpeed(double arg0) {
-		base.setMaxSpeed(arg0);
+		entity.setMaxSpeed(arg0);
 	}
+
+	public void setShakingDirection(int direction) {
+		getHandle(EntityMinecartAbstract.class).j(direction); 
+	}
+
+	public int getShakingDirection() {
+		return getHandle(EntityMinecartAbstract.class).k();
+	}
+
+	public void setShakingFactor(int factor) {
+		getHandle(EntityMinecartAbstract.class).i(factor); 
+	}
+
+	public int getShakingFactor() {
+		return getHandle(EntityMinecartAbstract.class).j();
+	}
+
+	/**
+	 * Gets all the drops to spawn when this Minecart is broken.
+	 * The default implementation (break up into parts) is used.
+	 * 
+	 * @return list of drops (immutable)
+	 */
+	public abstract List<ItemStack> getBrokenDrops();
+
+	/**
+	 * Gets the combined Material type for this Minecart
+	 * 
+	 * @return combined item Material type
+	 */
+	public abstract Material getCombinedItem();
 }

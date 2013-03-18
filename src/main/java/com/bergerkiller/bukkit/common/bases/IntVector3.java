@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 /**
  * Represents a class containing three immutable integer coordinates: x, y and z
@@ -50,6 +51,50 @@ public class IntVector3 implements Comparable<IntVector3> {
 		return this.y == other.y ? (this.z == other.z ? this.x - other.x : this.z - other.z) : this.y - other.y;
 	}
 
+	public IntVector3 subtract(int x, int y, int z) {
+		return new IntVector3(this.x - x, this.y - y, this.z - z);
+	}
+
+	public IntVector3 subtract(IntVector3 other) {
+		return subtract(other.x, other.y, other.z);
+	}
+
+	public IntVector3 subtract(BlockFace face, int length) {
+		return subtract(face.getModX() * length, face.getModY() * length, face.getModZ() * length);
+	}
+
+	public IntVector3 subtract(BlockFace face) {
+		return subtract(face.getModX(), face.getModY(), face.getModZ());
+	}
+
+	public IntVector3 add(int x, int y, int z) {
+		return new IntVector3(this.x + x, this.y + y, this.z + z);
+	}
+
+	public IntVector3 add(IntVector3 other) {
+		return add(other.x, other.y, other.z);
+	}
+
+	public IntVector3 add(BlockFace face, int length) {
+		return add(face.getModX() * length, face.getModY() * length, face.getModZ() * length);
+	}
+
+	public IntVector3 add(BlockFace face) {
+		return add(face.getModX(), face.getModY(), face.getModZ());
+	}
+
+	public int getChunkX() {
+		return x >> 4;
+	}
+
+	public int getChunkY() {
+		return y >> 4;
+	}
+
+	public int getChunkZ() {
+		return z >> 4;
+	}
+
 	/**
 	 * Gets the block at the coordinates of this IntVector3 on the world
 	 * specified
@@ -69,7 +114,7 @@ public class IntVector3 implements Comparable<IntVector3> {
 	 * @return chunk coordinates
 	 */
 	public IntVector2 toChunkCoordinates() {
-		return new IntVector2(x >> 4, z >> 4);
+		return new IntVector2(getChunkX(), getChunkZ());
 	}
 
 	/**

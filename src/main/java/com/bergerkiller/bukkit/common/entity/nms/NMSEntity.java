@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
+import net.minecraft.server.v1_5_R1.EntityHuman;
 
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -33,5 +34,11 @@ public interface NMSEntity {
 
 	public void super_onTick();
 
+	public boolean super_onInteract(EntityHuman interacter);
+	
 	public boolean super_damageEntity(DamageSource damagesource, int damage);
+
+	public void super_onBurn(int damage);
+
+	public void super_die();
 }

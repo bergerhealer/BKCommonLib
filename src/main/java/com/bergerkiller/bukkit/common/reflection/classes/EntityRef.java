@@ -33,10 +33,11 @@ public class EntityRef {
 	public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
 	public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
 	public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
+	public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("c");
 	private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class);
 	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("C");
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
-	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("a_");
+	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("f_");
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 
 	@SuppressWarnings({"rawtypes", "unchecked"})

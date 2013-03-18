@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_5_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
@@ -31,6 +32,54 @@ import net.minecraft.server.v1_5_R1.WorldNBTStorage;
 import net.minecraft.server.v1_5_R1.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
+
+	/**
+	 * Gets the block type Id
+	 * 
+	 * @param world the block is in
+	 * @param blockPos of the block
+	 * @return block type Id
+	 */
+	public static int getBlockTypeId(org.bukkit.World world, IntVector3 blockPos) {
+		return getBlockTypeId(world, blockPos.x, blockPos.y, blockPos.z);
+	}
+
+	/**
+	 * Gets the block data
+	 * 
+	 * @param world the block is in
+	 * @param blockPos of the block
+	 * @return block data
+	 */
+	public static int getBlockData(org.bukkit.World world, IntVector3 blockPos) {
+		return getBlockData(world, blockPos.x, blockPos.y, blockPos.z);
+	}
+
+	/**
+	 * Gets the block data
+	 * 
+	 * @param world the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return block data
+	 */
+	public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
+		return CommonNMS.getNative(world).getData(x, y, z);
+	}
+
+	/**
+	 * Gets the block type Id
+	 * 
+	 * @param world the block is in
+	 * @param x-coordinate of the block
+	 * @param y-coordinate of the block
+	 * @param z-coordinate of the block
+	 * @return block type Id
+	 */
+	public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
+		return CommonNMS.getNative(world).getTypeId(x, y, z);
+	}
 
 	/**
 	 * Gets the shared Random of a world

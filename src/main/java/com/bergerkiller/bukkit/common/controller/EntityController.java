@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -31,7 +32,6 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class EntityController<T extends CommonEntity<?>> {
 	private static final List<AxisAlignedBB> collisionBuffer = new ArrayList<AxisAlignedBB>();
 	protected T entity;
-	private int stepCounter = 1;
 
 	/**
 	 * Called as soon as this Controller is attached to an Entity.
@@ -65,6 +65,13 @@ public class EntityController<T extends CommonEntity<?>> {
 	}
 
 	/**
+	 * Called when this Entity dies (could be called more than one time)
+	 */
+	public void onDie() {
+		entity.getHandle(NMSEntity.class).super_die();
+	}
+
+	/**
 	 * Called every tick to update the entity
 	 */
 	public void onTick() {
@@ -72,10 +79,21 @@ public class EntityController<T extends CommonEntity<?>> {
 	}
 
 	/**
+	 * Called when the entity is interacted by something
+	 * 
+	 * @param interacter that interacted
+	 * @return True if interaction occurred, False if not
+	 */
+	public boolean onInteractBy(HumanEntity interacter) {
+		return entity.getHandle(NMSEntity.class).super_onInteract(CommonNMS.getNative(interacter)); 
+	}
+
+	/**
 	 * Called when the entity is damaged by something
 	 * 
 	 * @param damager that dealt the damage
 	 * @param damage amount
+	 * @return True if damage was dealt, False if not
 	 */
 	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
 		DamageSource source;
@@ -116,7 +134,7 @@ public class EntityController<T extends CommonEntity<?>> {
 	 * @param damage dealt
 	 */
 	public void onBurnDamage(int damage) {
-		//TODO: !!!
+		entity.getHandle(NMSEntity.class).super_onBurn(damage); 
 	}
 
 	/**
@@ -358,7 +376,7 @@ public class EntityController<T extends CommonEntity<?>> {
 			moveDy = handle.locY - oldLocY;
 			moveDz = handle.locZ - oldLocZ;
 			if (entity.isMovementImpaired()) {
-				Vehicle vehicle = (Vehicle) entity.getProxyBase();
+				Vehicle vehicle = (Vehicle) entity.getEntity();
 				org.bukkit.block.Block block = entity.getWorld().getBlockAt(MathUtil.floor(handle.locX), MathUtil.floor(handle.locY - (double) handle.height), MathUtil.floor(handle.locZ));
 				if (oldDx > dx) {
 					block = block.getRelative(BlockFace.EAST);
@@ -390,8 +408,8 @@ public class EntityController<T extends CommonEntity<?>> {
 
 				handle.R += Math.sqrt(moveDx * moveDx + moveDz * moveDz) * 0.6;
 				handle.S += Math.sqrt(moveDx * moveDx + moveDy * moveDy + moveDz * moveDz) * 0.6;
-				if (handle.S > this.stepCounter && typeId > 0) {
-					this.stepCounter = (int) handle.S + 1;
+				if (handle.S > EntityRef.stepCounter.get(entity.getHandle()) && typeId > 0) {
+					EntityRef.stepCounter.set(entity.getHandle(), (int) handle.S + 1);
 					if (handle.H()) {
 						float f = (float) Math.sqrt(handle.motX * handle.motX * 0.2 + handle.motY * handle.motY + handle.motZ * handle.motZ * 0.2) * 0.35F;
 						if (f > 1.0F) {
@@ -414,7 +432,7 @@ public class EntityController<T extends CommonEntity<?>> {
 				if (!flag2) {
 					handle.fireTicks++;
 					if (handle.fireTicks <= 0) {
-						EntityCombustEvent event = new EntityCombustEvent(entity.getProxyBase(), 8);
+						EntityCombustEvent event = new EntityCombustEvent(entity.getEntity(), 8);
 						entity.getServer().getPluginManager().callEvent(event);
 						if (!event.isCancelled()) {
 							handle.setOnFire(event.getDuration());

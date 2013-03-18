@@ -210,4 +210,9 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
 	public boolean teleport(Entity arg0, TeleportCause arg1) {
 		return base.teleport(arg0, arg1);
 	}
+
+	@Override
+	public boolean isOnGround() {
+		return base.isOnGround();
+	}
 }

@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.entity.CommonMinecartRideable;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
+import net.minecraft.server.v1_5_R1.EntityHuman;
 import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
 
 public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntity {
@@ -67,6 +68,48 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 			super.move(dx, dy, dz);
 		} else {
 			controller.onMove(dx, dy, dz);
+		}
+	}
+
+	@Override
+	public void super_onBurn(int damage) {
+		super.burn(damage);
+	}
+
+	@Override
+	public void burn(int damage) {
+		if (controller == null) {
+			super_onBurn(damage);
+		} else {
+			controller.onBurnDamage(damage);
+		}
+	}
+
+	@Override
+	public boolean a_(EntityHuman human) {
+		if (controller == null) {
+			return super_onInteract(human);
+		} else {
+			return controller.onInteractBy(CommonNMS.getHuman(human));
+		}
+	}
+
+	@Override
+	public boolean super_onInteract(EntityHuman interacter) {
+		return super.a_(interacter);
+	}
+
+	@Override
+	public void super_die() {
+		super.die();
+	}
+
+	@Override
+	public void die() {
+		if (controller == null) {
+			super_die();
+		} else {
+			controller.onDie();
 		}
 	}
 }

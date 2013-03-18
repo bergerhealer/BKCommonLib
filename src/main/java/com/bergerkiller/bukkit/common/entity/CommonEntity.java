@@ -3,15 +3,31 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.UUID;
 
+import org.bukkit.EntityEffect;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_5_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import net.minecraft.server.v1_5_R1.Chunk;
 import net.minecraft.server.v1_5_R1.Entity;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
@@ -21,6 +37,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -30,17 +47,40 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
  * 
  * @param <T> - type of Entity
  */
-public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends CommonEntityStore<T> {
-	private Entity entity;
+public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
+	private Entity handle;
+	protected T entity;
 
 	public CommonEntity(T base) {
-		super(base);
+		setEntity(base);
 	}
 
-	@Override
-	public void setProxyBase(T base) {
-		super.setProxyBase(base);
-		this.entity = CommonNMS.getNative(base);
+	/**
+	 * Sets the backing Bukkit Entity
+	 * 
+	 * @param entity to set to
+	 */
+	protected void setEntity(T entity) {
+		this.entity = entity;
+		this.handle = CommonNMS.getNative(entity);
+	}
+
+	/**
+	 * Gets the backing Bukkit Entity
+	 * 
+	 * @return entity
+	 */
+	public T getEntity() {
+		return entity;
+	}
+
+	/**
+	 * Gets the Entity handle
+	 * 
+	 * @return the Entity handle
+	 */
+	public Object getHandle() {
+		return handle;
 	}
 
 	/**
@@ -50,47 +90,47 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return the NMS entity handle, cast to the given type
 	 */
 	public <H> H getHandle(Class<H> type) {
-		return type.cast(entity);
+		return type.cast(handle);
 	}
 
 	public int getChunkX() {
-		return EntityRef.chunkX.get(entity);
+		return EntityRef.chunkX.get(handle);
 	}
 
 	public void setChunkX(int value) {
-		EntityRef.chunkX.set(entity, value);
+		EntityRef.chunkX.set(handle, value);
 	}
 
 	public int getChunkY() {
-		return EntityRef.chunkY.get(entity);
+		return EntityRef.chunkY.get(handle);
 	}
 
 	public void setChunkY(int value) {
-		EntityRef.chunkY.set(entity, value);
+		EntityRef.chunkY.set(handle, value);
 	}
 
 	public int getChunkZ() {
-		return EntityRef.chunkZ.get(entity);
+		return EntityRef.chunkZ.get(handle);
 	}
 
 	public void setChunkZ(int value) {
-		EntityRef.chunkZ.set(entity, value);
+		EntityRef.chunkZ.set(handle, value);
 	}
 
 	public float getYaw() {
-		return entity.yaw;
+		return handle.yaw;
 	}
 
 	public void setYaw(float value) {
-		entity.yaw = value;
+		handle.yaw = value;
 	}
 
 	public float getPitch() {
-		return entity.pitch;
+		return handle.pitch;
 	}
 
 	public void setPitch(float value) {
-		entity.pitch = value;
+		handle.pitch = value;
 	}
 
 	/**
@@ -99,11 +139,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity location: X-coordinate
 	 */
 	public double getLocX() {
-		return entity.locX;
+		return handle.locX;
 	}
 
 	public void setLocX(double value) {
-		entity.locX = value;
+		handle.locX = value;
 	}
 
 	/**
@@ -112,11 +152,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity location: Y-coordinate
 	 */
 	public double getLocY() {
-		return entity.locY;
+		return handle.locY;
 	}
 
 	public void setLocY(double value) {
-		entity.locY = value;
+		handle.locY = value;
 	}
 
 	/**
@@ -125,11 +165,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity location: Z-coordinate
 	 */
 	public double getLocZ() {
-		return entity.locZ;
+		return handle.locZ;
 	}
 
 	public void setLocZ(double value) {
-		entity.locZ = value;
+		handle.locZ = value;
 	}
 
 	/**
@@ -138,11 +178,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity last location: X-coordinate
 	 */
 	public double getLastX() {
-		return entity.lastX;
+		return handle.lastX;
 	}
 
 	public void setLastX(double value) {
-		entity.lastX = value;
+		handle.lastX = value;
 	}
 
 	/**
@@ -151,11 +191,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity last location: Y-coordinate
 	 */
 	public double getLastY() {
-		return entity.lastY;
+		return handle.lastY;
 	}
 
 	public void setLastY(double value) {
-		entity.lastY = value;
+		handle.lastY = value;
 	}
 
 	/**
@@ -164,100 +204,252 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 * @return entity last location: Z-coordinate
 	 */
 	public double getLastZ() {
-		return entity.lastZ;
+		return handle.lastZ;
 	}
 
 	public void setLastZ(double value) {
-		entity.lastZ = value;
+		handle.lastZ = value;
+	}
+
+	public double getMovedX() {
+		return getLocX() - getLastX();
+	}
+
+	public double getMovedY() {
+		return getLocY() - getLastY();
+	}
+
+	public double getMovedZ() {
+		return getLocZ() - getLastZ();
+	}
+
+	public double getMovedXZDistance() {
+		return MathUtil.length(getMovedX(), getMovedZ());
+	}
+
+	public double getMovedXZDistanceSquared() {
+		return MathUtil.lengthSquared(getMovedX(), getMovedZ());
+	}
+
+	public double getMovedDistance() {
+		return MathUtil.length(getMovedX(), getMovedY(), getMovedZ());
+	}
+
+	public double getMovedDistanceSquared() {
+		return MathUtil.lengthSquared(getMovedX(), getMovedY(), getMovedZ());
+	}
+
+	public double distanceTo(double x, double y, double z) {
+		return MathUtil.distance(this.getLocX(), this.getLocY(), this.getLocZ(), x, y, z);
+	}
+
+	public double distanceXZTo(double x, double z) {
+		return MathUtil.distance(getLocX(), getLocZ(), x, z);
+	}
+
+	public double distanceSquaredTo(double x, double y, double z) {
+		return MathUtil.distanceSquared(this.getLocX(), this.getLocY(), this.getLocZ(), x, y, z);
+	}
+
+	public double distanceXZSquaredTo(double x, double z) {
+		return MathUtil.distanceSquared(getLocX(), getLocZ(), x, z);
+	}
+
+	public double distanceXZTo(CommonEntity<?> entity) {
+		return distanceXZTo(entity.getEntity());
+	}
+
+	public double distanceXZTo(org.bukkit.entity.Entity e) {
+		return distanceXZTo(EntityUtil.getLocX(e), EntityUtil.getLocZ(e));
+	}
+
+	public double distanceXZTo(Location l) {
+		return distanceXZTo(l.getX(), l.getZ());
+	}
+
+	public double distanceXZTo(Block b) {
+		return distanceXZTo(b.getX() + 0.5, b.getZ() + 0.5);
+	}
+
+	public double distanceTo(CommonEntity<?> entity) {
+		return distanceTo(entity.getEntity());
+	}
+
+	public double distanceTo(org.bukkit.entity.Entity e) {
+		return distanceTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
+	}
+
+	public double distanceTo(Location l) {
+		return distanceTo(l.getX(), l.getY(), l.getZ());
+	}
+
+	public double distanceTo(Block b) {
+		return distanceTo(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+	}
+
+	public double distanceXZSquaredTo(CommonEntity<?> entity) {
+		return distanceXZSquaredTo(entity.getEntity());
+	}
+
+	public double distanceXZSquaredTo(org.bukkit.entity.Entity e) {
+		return distanceXZSquaredTo(EntityUtil.getLocX(e), EntityUtil.getLocZ(e));
+	}
+
+	public double distanceXZSquaredTo(Location l) {
+		return distanceXZSquaredTo(l.getX(), l.getZ());
+	}
+
+	public double distanceXZSquaredTo(Block b) {
+		return distanceXZSquaredTo(b.getX() + 0.5, b.getZ() + 0.5);
+	}
+
+	public double distanceSquaredTo(CommonEntity<?> entity) {
+		return distanceSquaredTo(entity.getEntity());
+	}
+
+	public double distanceSquaredTo(org.bukkit.entity.Entity e) {
+		return distanceSquaredTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
+	}
+
+	public double distanceSquaredTo(Location l) {
+		return distanceSquaredTo(l.getX(), l.getY(), l.getZ());
+	}
+
+	public double distanceSquaredTo(Block b) {
+		return distanceSquaredTo(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
+	}
+
+	public Vector locOffsetTo(double x, double y, double z) {
+		return new Vector(x - getLocX(), y - getLocY(), z - getLocZ());
+	}
+
+	public Vector locOffsetTo(Location l) {
+		return locOffsetTo(l.getX(), l.getY(), l.getZ());
+	}
+
+	public Vector locOffsetTo(CommonEntity<?> entity) {
+		return locOffsetTo(entity.getEntity());
+	}
+
+	public Vector locOffsetTo(org.bukkit.entity.Entity e) {
+		return locOffsetTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
 	}
 
 	public float getLastYaw() {
-		return entity.lastYaw;
+		return handle.lastYaw;
 	}
 
 	public void setLastYaw(float value) {
-		entity.lastYaw = value;
+		handle.lastYaw = value;
 	}
 
 	public float getLastPitch() {
-		return entity.lastPitch;
+		return handle.lastPitch;
 	}
 
 	public void setLastPitch(float value) {
-		entity.lastPitch = value;
+		handle.lastPitch = value;
 	}
 	
 	public double getMotX() {
-		return entity.motX;
+		return handle.motX;
 	}
 
 	public void setMotX(double value) {
-		entity.motX = value;
+		handle.motX = value;
 	}
 
 	public double getMotY() {
-		return entity.motX;
+		return handle.motX;
 	}
 
 	public void setMotY(double value) {
-		entity.motY = value;
+		handle.motY = value;
 	}
 
 	public double getMotZ() {
-		return entity.motZ;
+		return handle.motZ;
 	}
 
 	public void setMotZ(double value) {
-		entity.motZ = value;
+		handle.motZ = value;
+	}
+
+	public int getLocChunkX() {
+		return MathUtil.toChunk(getLocX());
+	}
+
+	public int getLocChunkY() {
+		return MathUtil.toChunk(getLocY());
+	}
+
+	public int getLocChunkZ() {
+		return MathUtil.toChunk(getLocZ());
+	}
+
+	public int getLocBlockX() {
+		return MathUtil.floor(getLocX());
+	}
+
+	public int getLocBlockY() {
+		return MathUtil.floor(getLocX());
+	}
+
+	public int getLocBlockZ() {
+		return MathUtil.floor(getLocZ());
+	}
+
+	public IntVector3 getLocBlockPos() {
+		return new IntVector3(getLocBlockX(), getLocBlockY(), getLocBlockZ());
 	}
 
 	public void setWorld(World world) {
-		entity.world = CommonNMS.getNative(world);
-		entity.dimension = WorldUtil.getDimension(world);
+		handle.world = CommonNMS.getNative(world);
+		handle.dimension = WorldUtil.getDimension(world);
 	}
 
 	public void setDead(boolean dead) {
-		entity.dead = dead;
+		handle.dead = dead;
 	}
 
 	public float getHeight() {
-		return entity.height;
+		return handle.height;
 	}
 
 	public void setHeight(float height) {
-		entity.height = height;
+		handle.height = height;
 	}
 
 	public float getLength() {
-		return entity.length;
+		return handle.length;
 	}
 
 	public void setLength(float length) {
-		entity.length = length;
+		handle.length = length;
 	}
 
 	public boolean isOnGround() {
-		return entity.onGround;
+		return handle.onGround;
 	}
 
 	public void setOnGround(boolean onGround) {
-		entity.onGround = onGround;
+		handle.onGround = onGround;
 	}
 
 	public boolean isPositionChanged() {
-		return EntityRef.positionChanged.get(entity);
+		return EntityRef.positionChanged.get(handle);
 	}
 
 	public void setPositionChanged(boolean changed) {
-		EntityRef.positionChanged.set(entity, changed);
+		EntityRef.positionChanged.set(handle, changed);
 	}
 
 	public boolean isVelocityChanged() {
-		return EntityRef.velocityChanged.get(entity);
+		return EntityRef.velocityChanged.get(handle);
 	}
 
 	public void setVelocityChanged(boolean changed) {
-		EntityRef.velocityChanged.set(entity, changed);
+		EntityRef.velocityChanged.set(handle, changed);
 	}
 
 	/**
@@ -268,7 +460,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 */
 	public boolean isMovementImpaired() {
 		// Note: this variable is simply wrongly deobfuscated!
-		return entity.positionChanged;
+		return handle.positionChanged;
 	}
 
 	/**
@@ -278,11 +470,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	 */
 	public void setMovementImpaired(boolean impaired) {
 		// Note: this variable is simply wrongly deobfuscated!
-		entity.positionChanged = impaired;
+		handle.positionChanged = impaired;
 	}
 
 	public Random getRandom() {
-		return EntityRef.random.get(entity);
+		return EntityRef.random.get(handle);
 	}
 
 	/**
@@ -313,7 +505,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	}
 
 	public void makeSound(String soundName, float volume, float pitch) {
-		entity.world.makeSound(entity, soundName, volume, pitch);
+		handle.world.makeSound(handle, soundName, volume, pitch);
 	}
 
 	public void makeStepSound(org.bukkit.block.Block block) {
@@ -322,12 +514,203 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 
 	public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
 		if (CommonNMS.isValidBlockId(typeId)) {
-			EntityRef.playStepSound(entity, blockX, blockY, blockZ, typeId);
+			EntityRef.playStepSound(handle, blockX, blockY, blockZ, typeId);
 		}
 	}
 
+	public List<MetadataValue> getMetadata(String arg0) {
+		return entity.getMetadata(arg0);
+	}
+
+	public boolean hasMetadata(String arg0) {
+		return entity.hasMetadata(arg0);
+	}
+
+	public void removeMetadata(String arg0, Plugin arg1) {
+		entity.removeMetadata(arg0, arg1);
+	}
+
+	public void setMetadata(String arg0, MetadataValue arg1) {
+		entity.setMetadata(arg0, arg1);
+	}
+
+	public boolean eject() {
+		return entity.eject();
+	}
+
+	public int getEntityId() {
+		return entity.getEntityId();
+	}
+
+	public float getFallDistance() {
+		return entity.getFallDistance();
+	}
+
+	public int getFireTicks() {
+		return entity.getFireTicks();
+	}
+
+	public EntityDamageEvent getLastDamageCause() {
+		return entity.getLastDamageCause();
+	}
+
+	public Location getLocation() {
+		return entity.getLocation();
+	}
+
+	public Location getLocation(Location arg0) {
+		return entity.getLocation(arg0);
+	}
+
+	public int getMaxFireTicks() {
+		return entity.getMaxFireTicks();
+	}
+
+	public List<org.bukkit.entity.Entity> getNearbyEntities(double radius) {
+		return this.getNearbyEntities(radius, radius, radius);
+	}
+
+	public List<org.bukkit.entity.Entity> getNearbyEntities(double radX, double radY, double radZ) {
+		return WorldUtil.getNearbyEntities(this.getEntity(), radX, radY, radZ);
+	}
+
+	public org.bukkit.entity.Entity getPassenger() {
+		return entity.getPassenger();
+	}
+
+	public Player getPlayerPassenger() {
+		return CommonUtil.tryCast(getPassenger(), Player.class);
+	}
+
+	public boolean hasPassenger() {
+		return handle.passenger != null;
+	}
+
+	public boolean hasPlayerPassenger() {
+		return handle.passenger instanceof EntityPlayer;
+	}
+
+	public Server getServer() {
+		return entity.getServer();
+	}
+
+	public int getTicksLived() {
+		return entity.getTicksLived();
+	}
+
+	public EntityType getType() {
+		return entity.getType();
+	}
+
+	public UUID getUniqueId() {
+		return entity.getUniqueId();
+	}
+
+	public org.bukkit.entity.Entity getVehicle() {
+		return entity.getVehicle();
+	}
+
+	public Vector getVelocity() {
+		return entity.getVelocity();
+	}
+
+	public World getWorld() {
+		return entity.getWorld();
+	}
+
+	public boolean isDead() {
+		return entity.isDead();
+	}
+
+	public boolean isEmpty() {
+		return entity.isEmpty();
+	}
+
+	public boolean isInsideVehicle() {
+		return entity.isInsideVehicle();
+	}
+
+	public boolean isValid() {
+		return entity.isValid();
+	}
+
+	public boolean leaveVehicle() {
+		return entity.leaveVehicle();
+	}
+
+	public void playEffect(EntityEffect arg0) {
+		entity.playEffect(arg0);
+	}
+
+	public void remove() {
+		entity.remove();
+	}
+
+	public void setFallDistance(float arg0) {
+		entity.setFallDistance(arg0);
+	}
+
+	public void setFireTicks(int arg0) {
+		entity.setFireTicks(arg0);
+	}
+
+	public void setLastDamageCause(EntityDamageEvent arg0) {
+		entity.setLastDamageCause(arg0);
+	}
+
+	public boolean setPassenger(org.bukkit.entity.Entity arg0) {
+		return entity.setPassenger(arg0);
+	}
+
+	public void setTicksLived(int arg0) {
+		entity.setTicksLived(arg0);
+	}
+
+	public void setVelocity(Vector arg0) {
+		entity.setVelocity(arg0);
+	}
+
+	public boolean teleport(Location arg0) {
+		return entity.teleport(arg0);
+	}
+
+	public boolean teleport(org.bukkit.entity.Entity arg0) {
+		return entity.teleport(arg0);
+	}
+
+	public boolean teleport(Location arg0, TeleportCause arg1) {
+		return entity.teleport(arg0, arg1);
+	}
+
+	public boolean teleport(org.bukkit.entity.Entity arg0, TeleportCause arg1) {
+		return entity.teleport(arg0, arg1);
+	}
+
+	/**
+	 * Spawns an item as if dropped by this Entity
+	 * 
+	 * @param material of the item to drop
+	 * @param amount of the material to drop
+	 * @param force to drop at
+	 * @return the dropped Item
+	 */
+	public Item spawnItemDrop(Material material, int amount, float force) {
+		return CommonNMS.getItem(handle.a(material.getId(), amount, force));
+	}
+
+	/**
+	 * Spawns an item as if dropped by this Entity
+	 * 
+	 * @param item to drop
+	 * @param force to drop at
+	 * @return the dropped Item
+	 */
+	public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
+		return CommonNMS.getItem(handle.a(CommonNMS.getNative(item), force));
+	}
+
 	private boolean isNMS() {
-		return entity instanceof NMSEntity;
+		return handle instanceof NMSEntity;
 	}
 
 	/**
@@ -356,7 +739,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 	@SuppressWarnings("unchecked")
 	public EntityController<CommonEntity<T>> getController() {
 		if (isNMS()) {
-			return (EntityController<CommonEntity<T>>) ((NMSEntity) entity).getController();
+			return (EntityController<CommonEntity<T>>) ((NMSEntity) handle).getController();
 		} else {
 			return null;
 		}
@@ -378,13 +761,13 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 			// Respawn the entity and attach the controller
 			Class<? extends NMSEntity> type = this.getNMSType();
 			if (type == null) {
-				throw new UnsupportedOperationException("Entity of type '" + base.getClass().getName() + "' has no Controller support!");
+				throw new UnsupportedOperationException("Entity of type '" + entity.getClass().getName() + "' has no Controller support!");
 			}
 			try {
 				ClassTemplate<?> TEMPLATE = ClassTemplate.create(type.getSuperclass());
 				// Store the previous entity information for later use
-				final Entity oldInstance = entity;
-				final org.bukkit.entity.Entity oldBukkitEntity = Conversion.toEntity.convert(entity);
+				final Entity oldInstance = handle;
+				final org.bukkit.entity.Entity oldBukkitEntity = Conversion.toEntity.convert(handle);
 
 				// Create a new entity instance and perform data/property transfer
 				final Entity newInstance = (Entity) type.newInstance();
@@ -420,9 +803,9 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> extends C
 				}
 
 				// *** EntityTrackerEntry ***
-				Object entry = WorldUtil.getTracker(getWorld()).getEntry(base);
+				Object entry = WorldUtil.getTracker(getWorld()).getEntry(entity);
 				if (entry != null) {
-					EntityTrackerEntryRef.tracker.set(entry, base);
+					EntityTrackerEntryRef.tracker.set(entry, entity);
 				}
 
 				// *** World ***

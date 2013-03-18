@@ -8,7 +8,6 @@ import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.entity.minecart.RideableMinecart;
-import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
 
 import net.minecraft.server.v1_5_R1.Entity;
@@ -29,7 +28,6 @@ public class CommonEntityStore<T extends org.bukkit.entity.Entity> extends Entit
 	static {
 		register(ExplosiveMinecart.class, CommonMinecartTNT.class);
 		register(RideableMinecart.class, CommonMinecartRideable.class);
-		register(SpawnerMinecart.class, CommonMinecartMobSpawner.class);
 		register(HopperMinecart.class, CommonMinecartHopper.class);
 		register(PoweredMinecart.class, CommonMinecartFurnace.class);
 		register(StorageMinecart.class, CommonMinecartChest.class);

@@ -132,6 +132,10 @@ public class CommonNMS {
 		return CommonUtil.tryCast(getInventory(inventory), type);
 	}
 
+	public static HumanEntity getHuman(EntityHuman entity) {
+		return getEntity(entity, HumanEntity.class);
+	}
+
 	public static Player getPlayer(EntityPlayer entity) {
 		return getEntity(entity, Player.class);
 	}
