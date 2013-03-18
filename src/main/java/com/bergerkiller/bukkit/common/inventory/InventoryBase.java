@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -17,10 +16,49 @@ import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
 /**
- * A basic implementation of Inventory that excludes the getting and setting of item content information
+ * A basic implementation of Inventory that excludes the getting and setting of item content information.
+ * Uses a backing CraftInventory to perform all utility methods provided by Bukkit.
+ * This ensures that the functionality is up-to-date with the latest bugfixes and additions.
  */
 public abstract class InventoryBase implements Inventory {
 	private final CraftInventoryProxy proxy = new CraftInventoryProxy(new IInventoryBase(), this);
+
+	@Override
+	public abstract int getSize();
+
+	@Override
+	public abstract ItemStack getItem(int index);
+
+	@Override
+	public abstract void setItem(int index, ItemStack item);
+
+	@Override
+	public ItemStack[] getContents() {
+		// Overridden because the NMS IInventory is used in CraftInventory
+		final int size = getSize();
+		ItemStack[] items = new ItemStack[size];
+		for (int i = 0; i < size; i++) {
+			items[i] = ItemUtil.cloneItem(getItem(i));
+		}
+		return items;
+	}
+
+	@Override
+	public void setContents(ItemStack[] items) {
+		// Overridden because the NMS IInventory is used in CraftInventory
+		final int size = getSize();
+		if (size < items.length) {
+			throw new IllegalArgumentException("Invalid inventory size; expected " + size + " or less");
+		}
+		for (int i = 0; i < size; i++) {
+			setItem(i, i >= items.length ? null : items[i]);
+		}
+	}
+
+	@Override
+    public InventoryType getType() {
+    	return InventoryType.CHEST;
+    }
 
 	@Override
 	public String getName() {
@@ -33,56 +71,13 @@ public abstract class InventoryBase implements Inventory {
 	}
 
 	@Override
-	public abstract int getSize();
-
-	@Override
-	public abstract ItemStack getItem(int index);
-
-	@Override
-	public abstract void setItem(int index, ItemStack item);
+	public InventoryHolder getHolder() {
+		return null;
+	}
 
 	@Override
 	public List<HumanEntity> getViewers() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void clear() {
-		final int size = getSize();
-		for (int i = 0; i < size; i++) {
-			setItem(i, null);
-		}
-	}
-
-	@Override
-	public ItemStack[] getContents() {
-		final int size = getSize();
-		ItemStack[] items = new ItemStack[size];
-		for (int i = 0; i < size; i++) {
-			items[i] = ItemUtil.cloneItem(getItem(i));
-		}
-		return items;
-	}
-
-	@Override
-	public void setContents(ItemStack[] items) {
-		final int size = getSize();
-		if (size < items.length) {
-			throw new IllegalArgumentException("Invalid inventory size; expected " + size + " or less");
-		}
-		for (int i = 0; i < size; i++) {
-			setItem(i, i >= items.length ? null : items[i]);
-		}
-	}
-
-	@Override
-	public InventoryType getType() {
-		return null;
-	}
-
-	@Override
-	public InventoryHolder getHolder() {
-		return null;
+		return proxy.super_getViewers();
 	}
 
 	@Override
@@ -113,6 +108,11 @@ public abstract class InventoryBase implements Inventory {
 	@Override
 	public HashMap<Integer, ? extends ItemStack> all(ItemStack item) {
 		return proxy.super_all(item);
+	}
+
+	@Override
+	public void clear() {
+		proxy.super_clear();
 	}
 
 	@Override
@@ -203,5 +203,20 @@ public abstract class InventoryBase implements Inventory {
 	@Override
 	public HashMap<Integer, ItemStack> removeItem(ItemStack... items) throws IllegalArgumentException {
 		return proxy.super_removeItem(items);
+	}
+
+	@Override
+	public int hashCode() {
+		return proxy.super_hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return proxy.super_equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return proxy.super_toString();
 	}
 }

@@ -25,6 +25,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Contains utility functions to get to the net.minecraft.server core in the CraftBukkit library.<br>
@@ -181,6 +182,10 @@ public class CommonNMS {
 			stacks[i] = getItemStack(itemstacks[i]);
 		}
 		return stacks;
+	}
+
+	public static boolean isValidBlockId(int blockId) {
+		return LogicUtil.isInBounds(Block.byId, blockId) && Block.byId[blockId] != null;
 	}
 
 	/**

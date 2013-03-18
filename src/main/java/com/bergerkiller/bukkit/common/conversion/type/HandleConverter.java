@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.proxies.EntityProxy;
 import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
@@ -42,6 +43,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toEntityHandle = new HandleConverter("Entity") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof EntityProxy) {
+				value = ((EntityProxy<?>) value).getProxyBase();
+			}
 			if (value instanceof CraftEntity) {
 				return ((CraftEntity) value).getHandle();
 			} else {

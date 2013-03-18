@@ -24,7 +24,7 @@ public class CraftInventoryProxy extends CraftInventory implements Proxy<Invento
 
 	public CraftInventoryProxy(Object iInventory, Inventory base) {
 		super((IInventory) iInventory);
-		this.base = base;
+		setProxyBase(base);
 	}
 
 	public IInventory super_getInventory() {
@@ -357,5 +357,32 @@ public class CraftInventoryProxy extends CraftInventory implements Proxy<Invento
 
 	public void super_setMaxStackSize(int size) {
 		super.setMaxStackSize(size);
+	}
+
+	@Override
+	public int hashCode() {
+		return base.hashCode();
+	}
+
+	public int super_hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return base.equals(obj);
+	}
+
+	public boolean super_equals(Object obj) {
+		return super.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return base.toString();
+	}
+
+	public String super_toString() {
+		return super.toString();
 	}
 }

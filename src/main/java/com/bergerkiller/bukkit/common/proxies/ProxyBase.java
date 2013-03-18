@@ -15,7 +15,7 @@ public class ProxyBase<T> implements Proxy<T> {
 	protected T base;
 
 	public ProxyBase(T base) {
-		this.base = base;
+		setProxyBase(base);
 	}
 
 	@Override

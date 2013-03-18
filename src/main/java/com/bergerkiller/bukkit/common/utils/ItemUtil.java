@@ -380,7 +380,7 @@ public class ItemUtil {
 	 * @return Cloned item stack
 	 */
 	public static org.bukkit.inventory.ItemStack cloneItem(org.bukkit.inventory.ItemStack stack) {
-		return stack == null ? null : stack.clone();
+		return LogicUtil.clone(stack);
 	}
 
 	/**
@@ -390,11 +390,7 @@ public class ItemUtil {
 	 * @return Cloned item stack array
 	 */
 	public static org.bukkit.inventory.ItemStack[] cloneItems(org.bukkit.inventory.ItemStack[] input) {
-		org.bukkit.inventory.ItemStack[] cloned = new org.bukkit.inventory.ItemStack[input.length];
-		for (int i = 0; i < cloned.length; i++) {
-			cloned[i] = cloneItem(input[i]);
-		}
-		return cloned;
+		return LogicUtil.cloneAll(input);
 	}
 
 	/**

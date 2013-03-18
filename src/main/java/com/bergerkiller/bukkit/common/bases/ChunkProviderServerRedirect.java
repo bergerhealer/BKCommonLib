@@ -21,7 +21,9 @@ public class ChunkProviderServerRedirect extends ChunkProviderServerProxy {
 	@Override
 	public void setProxyBase(Object chunkProviderServer) {
 		super.setProxyBase(chunkProviderServer);
-		ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
+		if (chunkProviderServer != null) {
+			ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
+		}
 	}
 
 	public void setBase(org.bukkit.World world) {

@@ -26,7 +26,7 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
 
 	public ChunkProviderServerProxy(Object worldServer, Object iChunkLoader, Object iChunkProvider, Object base) {
 		super((WorldServer) worldServer, (IChunkLoader) iChunkLoader, (IChunkProvider) iChunkProvider);
-		this.base = (ChunkProviderServer) base;
+		setProxyBase(base);
 	}
 
 	@Override

@@ -122,7 +122,7 @@ public class IInventoryBase implements IInventory {
 
 	@Override
 	public String getName() {
-		return null;
+		return getClass().getSimpleName();
 	}
 
 	@Override

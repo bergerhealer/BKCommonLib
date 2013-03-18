@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -130,6 +131,18 @@ public class LogicUtil {
 	 * @param index to check
 	 * @return True if it is in bounds, False if not
 	 */
+	public static boolean isInBounds(Object[] array, int index) {
+		return array != null && index >= 0 && index < array.length;
+	}
+
+	/**
+	 * Checks whether an element index is within range of an array<br>
+	 * Both Object and primitive arrays are supported
+	 * 
+	 * @param array to check
+	 * @param index to check
+	 * @return True if it is in bounds, False if not
+	 */
 	public static boolean isInBounds(Object array, int index) {
 		return array != null && index >= 0 && index < Array.getLength(array);
 	}
@@ -143,6 +156,54 @@ public class LogicUtil {
 	 */
 	public static <T> T fixNull(T value, T def) {
 		return value == null ? def : value;
+	}
+
+	/**
+	 * Clones a single value
+	 * 
+	 * @param value to clone
+	 * @return cloned value
+	 * @throws RuntimeException if cloning fails
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T clone(T value) {
+		if (value == null) {
+			return null;
+		}
+		// Use reflection to call clone() (it's protected...)
+		try {
+		    return (T) value.getClass().getDeclaredMethod("clone").invoke(value);
+		} catch (Exception ex) {
+			throw new RuntimeException("Cloning was not possible:", ex);
+		}
+	}
+
+	/**
+	 * Clones all elements of an array
+	 * 
+	 * @param values to clone
+	 * @return a new, cloned array of cloned elements
+	 * @throws RuntimeException if cloning fails
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] cloneAll(T[] values) {
+		if (values == null || values.length == 0) {
+			return values;
+		}
+		try {
+			final Class<T> compType = (Class<T>) values.getClass().getComponentType();
+			final Method cloneMethod = compType.getDeclaredMethod("clone");
+			T[] rval = createArray(compType, values.length);
+			for (int i = 0; i < rval.length; i++) {
+				final T value = values[i];
+				if (value != null) {
+					rval[i] = (T) cloneMethod.invoke(value);
+				}
+			}
+		    return rval;
+		} catch (Exception ex) {
+			throw new RuntimeException("Cloning was not possible:", ex);
+		}
 	}
 
 	/**

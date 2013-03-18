@@ -7,7 +7,9 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
+import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 public class WorldServerRef extends WorldRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("WorldServer");
@@ -17,7 +19,7 @@ public class WorldServerRef extends WorldRef {
 	/**
 	 * Type: IntHashMap
 	 */
-	public static final FieldAccessor<Object> entitiesById = TEMPLATE.getField("entitiesById");
+	public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = TEMPLATE.getField("entitiesById").translate(ConversionPairs.intHashMap);
 	public static final FieldAccessor<Object> chunkProviderServer = new SafeDirectField<Object>() {
 		private final FieldAccessor<Object> field1 = TEMPLATE.getField("chunkProviderServer");
 		private final FieldAccessor<Object> field2 = TEMPLATE.getField("chunkProvider");
