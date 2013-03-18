@@ -138,6 +138,15 @@ public class EntityController<T extends CommonEntity<?>> {
 	}
 
 	/**
+	 * Gets the localized name of this Entity. Override this method to change the name.
+	 * 
+	 * @return Localized name
+	 */
+	public String getLocalizedName() {
+		return entity.getHandle(NMSEntity.class).super_getLocalizedName();
+	}
+
+	/**
 	 * Obtains all entities/blocks that can be collided with, checking collisions along the way.
 	 * This is similar to NMS.World.getCubes, but with inserted events.
 	 * 

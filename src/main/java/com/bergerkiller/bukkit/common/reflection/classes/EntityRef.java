@@ -38,6 +38,7 @@ public class EntityRef {
 	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("C");
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("f_");
+	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -62,5 +63,9 @@ public class EntityRef {
 
 	public static boolean hasMovementSound(Object entityHandle) {
 		return hasMovementSound.invoke(entityHandle);
+	}
+
+	public static void setRotation(Object entityHandle, float yaw, float pitch) {
+		setRotation.invoke(entityHandle, yaw, pitch);
 	}
 }

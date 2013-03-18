@@ -4,9 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_5_R1.TrigMath;
-import org.bukkit.craftbukkit.v1_5_R1.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+
+import com.bergerkiller.bukkit.common.bases.LongHash;
 
 /**
  * Multiple Math utilities to compare and calculate using Vectors and raw values
@@ -327,17 +328,6 @@ public class MathUtil {
 		return loc >> CHUNK_BITS;
 	}
 
-	/**
-	 * Merges two ints into a long
-	 * 
-	 * @param msw integer
-	 * @param lsw integer
-	 * @return merged long value
-	 */
-	public static long toLong(int msw, int lsw) {
-		return LongHash.toLong(msw, lsw);
-	}
-
 	public static double useOld(double oldvalue, double newvalue, double peruseold) {
 		return oldvalue + (peruseold * (newvalue - oldvalue));
 	}
@@ -485,6 +475,16 @@ public class MathUtil {
 	 */
 	public static double invert(double value, boolean negative) {
 		return negative ? -value : value;
+	}
+	/**
+	 * Merges two ints into a long
+	 * 
+	 * @param msw integer
+	 * @param lsw integer
+	 * @return merged long value
+	 */
+	public static long toLong(int msw, int lsw) {
+		return longHashToLong(msw, lsw);
 	}
 
 	public static long longHashToLong(int msw, int lsw) {

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -16,8 +15,6 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
@@ -255,14 +252,6 @@ public class WorldUtil extends ChunkUtil {
 		return getTracker(entity.getWorld()).setEntry(entity, entityTrackerEntry);
 	}
 
-	private static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, AxisAlignedBB area) {
-		List<?> list = CommonNMS.getEntitiesIn(CommonNMS.getNative(world), CommonNMS.getNative(ignore), area);
-		if (LogicUtil.nullOrEmpty(list)) {
-			return Collections.emptyList();
-		}
-		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
-	}
-
 	/**
 	 * Gets all the entities in the given cuboid area
 	 * 
@@ -278,7 +267,7 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, 
 			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-		return getEntities(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+		return CommonNMS.getEntities(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
 	}
 
 	/**
@@ -291,7 +280,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return A (referenced) list of entities nearby
 	 */
 	public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
-		return getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).boundingBox.grow(radX, radY, radZ));
+		return CommonNMS.getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).boundingBox.grow(radX, radY, radZ));
 	}
 
 	/**

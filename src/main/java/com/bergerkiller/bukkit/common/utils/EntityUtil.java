@@ -1,13 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.v1_5_R1.Entity;
 import net.minecraft.server.v1_5_R1.EntityPlayer;
 import net.minecraft.server.v1_5_R1.World;
 import org.bukkit.Location;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
@@ -18,15 +16,9 @@ public class EntityUtil extends EntityPropertyUtil {
 	}
 
 	public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
-		Entity e = getEntity(CommonNMS.getNative(world), uid);
-		return Conversion.toEntity.convert(e);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static Entity getEntity(World world, UUID uid) {
-		for (Entity e : (List<Entity>) world.entityList) {
-			if (e.uniqueID.equals(uid)) {
-				return e;
+		for (org.bukkit.entity.Entity entity : WorldUtil.getEntities(world)) {
+			if (entity.getUniqueId().equals(uid)) {
+				return entity;
 			}
 		}
 		return null;

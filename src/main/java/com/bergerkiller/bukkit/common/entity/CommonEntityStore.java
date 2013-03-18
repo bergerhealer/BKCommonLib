@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.entity.Item;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.entity.minecart.PoweredMinecart;
@@ -12,6 +13,7 @@ import org.bukkit.entity.minecart.StorageMinecart;
 
 import net.minecraft.server.v1_5_R1.Entity;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.proxies.EntityProxy;
@@ -31,10 +33,16 @@ public class CommonEntityStore<T extends org.bukkit.entity.Entity> extends Entit
 		register(HopperMinecart.class, CommonMinecartHopper.class);
 		register(PoweredMinecart.class, CommonMinecartFurnace.class);
 		register(StorageMinecart.class, CommonMinecartChest.class);
+		register(Item.class, CommonItem.class);
 	}
 
 	public CommonEntityStore(T base) {
 		super(base);
+	}
+
+	public static boolean hasController(org.bukkit.entity.Entity entity) {
+		final Object handle = Conversion.toEntityHandle.convert(entity);
+		return handle instanceof NMSEntity && ((NMSEntity) handle).getController() != null;
 	}
 
 	@SuppressWarnings("unchecked")

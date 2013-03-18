@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
@@ -29,8 +30,8 @@ import net.minecraft.server.v1_5_R1.EntityPlayer;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
+import com.bergerkiller.bukkit.common.events.EntitySetControllerEvent;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -48,7 +49,10 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
  * @param <T> - type of Entity
  */
 public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
-	private Entity handle;
+	/**
+	 * The minimum x/y/z velocity distance, above which the entity is considered to be moving
+	 */
+	public static final double MIN_MOVE_SPEED = 0.001;
 	protected T entity;
 
 	public CommonEntity(T base) {
@@ -62,7 +66,6 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	protected void setEntity(T entity) {
 		this.entity = entity;
-		this.handle = CommonNMS.getNative(entity);
 	}
 
 	/**
@@ -80,7 +83,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the Entity handle
 	 */
 	public Object getHandle() {
-		return handle;
+		return CommonNMS.getNative(entity);
 	}
 
 	/**
@@ -90,47 +93,63 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the NMS entity handle, cast to the given type
 	 */
 	public <H> H getHandle(Class<H> type) {
-		return type.cast(handle);
+		return type.cast(getHandle());
 	}
 
 	public int getChunkX() {
-		return EntityRef.chunkX.get(handle);
+		return EntityRef.chunkX.get(getHandle());
 	}
 
 	public void setChunkX(int value) {
-		EntityRef.chunkX.set(handle, value);
+		EntityRef.chunkX.set(getHandle(), value);
 	}
 
 	public int getChunkY() {
-		return EntityRef.chunkY.get(handle);
+		return EntityRef.chunkY.get(getHandle());
 	}
 
 	public void setChunkY(int value) {
-		EntityRef.chunkY.set(handle, value);
+		EntityRef.chunkY.set(getHandle(), value);
 	}
 
 	public int getChunkZ() {
-		return EntityRef.chunkZ.get(handle);
+		return EntityRef.chunkZ.get(getHandle());
 	}
 
 	public void setChunkZ(int value) {
-		EntityRef.chunkZ.set(handle, value);
+		EntityRef.chunkZ.set(getHandle(), value);
 	}
 
 	public float getYaw() {
-		return handle.yaw;
+		return getHandle(Entity.class).yaw;
 	}
 
 	public void setYaw(float value) {
-		handle.yaw = value;
+		getHandle(Entity.class).yaw = value;
 	}
 
 	public float getPitch() {
-		return handle.pitch;
+		return getHandle(Entity.class).pitch;
 	}
 
 	public void setPitch(float value) {
-		handle.pitch = value;
+		getHandle(Entity.class).pitch = value;
+	}
+
+	public float getYawDifference(float yawcomparer) {
+		return MathUtil.getAngleDifference(this.getYaw(), yawcomparer);
+	}
+
+	public float getPitchDifference(float pitchcomparer) {
+		return MathUtil.getAngleDifference(this.getPitch(), pitchcomparer);
+	}
+
+	public float getYawDifference(CommonEntity<?> comparer) {
+		return getYawDifference(comparer.getPitch());
+	}
+
+	public float getPitchDifference(CommonEntity<?> comparer) {
+		return getPitchDifference(comparer.getPitch());
 	}
 
 	/**
@@ -139,11 +158,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity location: X-coordinate
 	 */
 	public double getLocX() {
-		return handle.locX;
+		return getHandle(Entity.class).locX;
 	}
 
 	public void setLocX(double value) {
-		handle.locX = value;
+		getHandle(Entity.class).locX = value;
 	}
 
 	/**
@@ -152,11 +171,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity location: Y-coordinate
 	 */
 	public double getLocY() {
-		return handle.locY;
+		return getHandle(Entity.class).locY;
 	}
 
 	public void setLocY(double value) {
-		handle.locY = value;
+		getHandle(Entity.class).locY = value;
 	}
 
 	/**
@@ -165,11 +184,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity location: Z-coordinate
 	 */
 	public double getLocZ() {
-		return handle.locZ;
+		return getHandle(Entity.class).locZ;
 	}
 
 	public void setLocZ(double value) {
-		handle.locZ = value;
+		getHandle(Entity.class).locZ = value;
 	}
 
 	/**
@@ -178,11 +197,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity last location: X-coordinate
 	 */
 	public double getLastX() {
-		return handle.lastX;
+		return getHandle(Entity.class).lastX;
 	}
 
 	public void setLastX(double value) {
-		handle.lastX = value;
+		getHandle(Entity.class).lastX = value;
 	}
 
 	/**
@@ -191,11 +210,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity last location: Y-coordinate
 	 */
 	public double getLastY() {
-		return handle.lastY;
+		return getHandle(Entity.class).lastY;
 	}
 
 	public void setLastY(double value) {
-		handle.lastY = value;
+		getHandle(Entity.class).lastY = value;
 	}
 
 	/**
@@ -204,11 +223,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return entity last location: Z-coordinate
 	 */
 	public double getLastZ() {
-		return handle.lastZ;
+		return getHandle(Entity.class).lastZ;
 	}
 
 	public void setLastZ(double value) {
-		handle.lastZ = value;
+		getHandle(Entity.class).lastZ = value;
 	}
 
 	public double getMovedX() {
@@ -223,6 +242,18 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 		return getLocZ() - getLastZ();
 	}
 
+ 	public boolean hasMovedHorizontally() {
+ 		return Math.abs(this.getMovedX()) > MIN_MOVE_SPEED || Math.abs(this.getMovedZ()) > MIN_MOVE_SPEED;
+ 	}
+ 
+ 	public boolean hasMovedVertically() {
+ 		return Math.abs(this.getMovedX()) > MIN_MOVE_SPEED;
+ 	}
+ 
+ 	public boolean hasMoved() {
+ 		return hasMovedHorizontally() || hasMovedVertically();
+ 	}
+ 
 	public double getMovedXZDistance() {
 		return MathUtil.length(getMovedX(), getMovedZ());
 	}
@@ -336,45 +367,84 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public float getLastYaw() {
-		return handle.lastYaw;
+		return getHandle(Entity.class).lastYaw;
 	}
 
 	public void setLastYaw(float value) {
-		handle.lastYaw = value;
+		getHandle(Entity.class).lastYaw = value;
 	}
 
 	public float getLastPitch() {
-		return handle.lastPitch;
+		return getHandle(Entity.class).lastPitch;
 	}
 
 	public void setLastPitch(float value) {
-		handle.lastPitch = value;
+		getHandle(Entity.class).lastPitch = value;
 	}
-	
+
 	public double getMotX() {
-		return handle.motX;
+		return getHandle(Entity.class).motX;
 	}
 
 	public void setMotX(double value) {
-		handle.motX = value;
+		getHandle(Entity.class).motX = value;
+	}
+
+	public void addMotX(double value) {
+		getHandle(Entity.class).motX += value;
 	}
 
 	public double getMotY() {
-		return handle.motX;
+		return getHandle(Entity.class).motX;
 	}
 
 	public void setMotY(double value) {
-		handle.motY = value;
+		getHandle(Entity.class).motY = value;
+	}
+
+	public void addMotY(double value) {
+		getHandle(Entity.class).motY += value;
 	}
 
 	public double getMotZ() {
-		return handle.motZ;
+		return getHandle(Entity.class).motZ;
 	}
 
 	public void setMotZ(double value) {
-		handle.motZ = value;
+		getHandle(Entity.class).motZ = value;
 	}
 
+	public void addMotZ(double value) {
+		getHandle(Entity.class).motZ += value;
+	}
+
+	public void multiplyVelocity(Vector factor) {
+		multiplyVelocity(factor.getX(), factor.getY(), factor.getZ());
+	}
+
+	public void multiplyVelocity(double factor) {
+		multiplyVelocity(factor, factor, factor);
+	}
+
+	public void multiplyVelocity(double factX, double factY, double factZ) {
+		final Entity handle = getHandle(Entity.class);
+		handle.motX *= factX;
+		handle.motY *= factY;
+		handle.motZ *= factZ;
+	}
+
+	public boolean isMovingHorizontally() {
+		return Math.abs(getMotX()) > MIN_MOVE_SPEED || Math.abs(getMotZ()) > MIN_MOVE_SPEED;
+	}
+
+	public boolean isMovingVertically() {
+		return Math.abs(getMotY()) > MIN_MOVE_SPEED;
+	}
+
+	public boolean isMoving() {
+		return isMovingHorizontally() || isMovingVertically();
+	}
+	
 	public int getLocChunkX() {
 		return MathUtil.toChunk(getLocX());
 	}
@@ -404,52 +474,53 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public void setWorld(World world) {
+		final Entity handle = getHandle(Entity.class);
 		handle.world = CommonNMS.getNative(world);
 		handle.dimension = WorldUtil.getDimension(world);
 	}
 
 	public void setDead(boolean dead) {
-		handle.dead = dead;
+		getHandle(Entity.class).dead = dead;
 	}
 
 	public float getHeight() {
-		return handle.height;
+		return getHandle(Entity.class).height;
 	}
 
 	public void setHeight(float height) {
-		handle.height = height;
+		getHandle(Entity.class).height = height;
 	}
 
 	public float getLength() {
-		return handle.length;
+		return getHandle(Entity.class).length;
 	}
 
 	public void setLength(float length) {
-		handle.length = length;
+		getHandle(Entity.class).length = length;
 	}
 
 	public boolean isOnGround() {
-		return handle.onGround;
+		return getHandle(Entity.class).onGround;
 	}
 
 	public void setOnGround(boolean onGround) {
-		handle.onGround = onGround;
+		getHandle(Entity.class).onGround = onGround;
 	}
 
 	public boolean isPositionChanged() {
-		return EntityRef.positionChanged.get(handle);
+		return EntityRef.positionChanged.get(getHandle());
 	}
 
 	public void setPositionChanged(boolean changed) {
-		EntityRef.positionChanged.set(handle, changed);
+		EntityRef.positionChanged.set(getHandle(), changed);
 	}
 
 	public boolean isVelocityChanged() {
-		return EntityRef.velocityChanged.get(handle);
+		return EntityRef.velocityChanged.get(getHandle());
 	}
 
 	public void setVelocityChanged(boolean changed) {
-		EntityRef.velocityChanged.set(handle, changed);
+		EntityRef.velocityChanged.set(getHandle(), changed);
 	}
 
 	/**
@@ -460,7 +531,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public boolean isMovementImpaired() {
 		// Note: this variable is simply wrongly deobfuscated!
-		return handle.positionChanged;
+		return getHandle(Entity.class).positionChanged;
 	}
 
 	/**
@@ -470,11 +541,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public void setMovementImpaired(boolean impaired) {
 		// Note: this variable is simply wrongly deobfuscated!
-		handle.positionChanged = impaired;
+		getHandle(Entity.class).positionChanged = impaired;
 	}
 
 	public Random getRandom() {
-		return EntityRef.random.get(handle);
+		return EntityRef.random.get(getHandle());
 	}
 
 	/**
@@ -505,6 +576,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public void makeSound(String soundName, float volume, float pitch) {
+		final Entity handle = getHandle(Entity.class);
 		handle.world.makeSound(handle, soundName, volume, pitch);
 	}
 
@@ -514,7 +586,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 
 	public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
 		if (CommonNMS.isValidBlockId(typeId)) {
-			EntityRef.playStepSound(handle, blockX, blockY, blockZ, typeId);
+			EntityRef.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
 		}
 	}
 
@@ -558,12 +630,32 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 		return entity.getLocation();
 	}
 
+	public Location getLastLocation() {
+		return new Location(getWorld(), getLastX(), getLastY(), getLastZ(), getLastYaw(), getLastPitch());
+	}
+
 	public Location getLocation(Location arg0) {
 		return entity.getLocation(arg0);
 	}
 
 	public int getMaxFireTicks() {
 		return entity.getMaxFireTicks();
+	}
+
+	public void setFootLocation(double x, double y, double z, float yaw, float pitch) {
+		getHandle(Entity.class).setPositionRotation(x, y, z, yaw, pitch);
+	}
+
+	public void setLocation(double x, double y, double z, float yaw, float pitch) {
+		getHandle(Entity.class).setLocation(x, y, z, yaw, pitch);
+	}
+
+	public void setRotation(float yaw, float pitch) {
+		EntityRef.setRotation(getHandle(), yaw, pitch);
+	}
+
+	public void setPosition(double x, double y, double z) {
+		getHandle(Entity.class).setPosition(x, y, z);
 	}
 
 	public List<org.bukkit.entity.Entity> getNearbyEntities(double radius) {
@@ -583,11 +675,20 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public boolean hasPassenger() {
-		return handle.passenger != null;
+		return getHandle(Entity.class).passenger != null;
 	}
 
 	public boolean hasPlayerPassenger() {
-		return handle.passenger instanceof EntityPlayer;
+		return getHandle(Entity.class).passenger instanceof EntityPlayer;
+	}
+
+	/**
+	 * Gets whether this type of Entity is a type of Vehicle, allowing entities to enter it
+	 * 
+	 * @return True if this is a Vehicle, False if not
+	 */
+	public boolean isVehicle() {
+		return entity instanceof Vehicle;
 	}
 
 	public Server getServer() {
@@ -612,6 +713,22 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 
 	public Vector getVelocity() {
 		return entity.getVelocity();
+	}
+
+	public double getVelLength() {
+		return MathUtil.length(getMotX(), getMotY(), getMotZ());
+	}
+
+	public double getVelXZLength() {
+		return MathUtil.length(getMotX(), getMotZ());
+	}
+
+	public double getVelLengthSquared() {
+		return MathUtil.lengthSquared(getMotX(), getMotY(), getMotZ());
+	}
+
+	public double getVelXZLengthSquared() {
+		return MathUtil.lengthSquared(getMotX(), getMotZ());
 	}
 
 	public World getWorld() {
@@ -670,6 +787,13 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 		entity.setVelocity(arg0);
 	}
 
+	public void setVelocity(double motX, double motY, double motZ) {
+		final Entity handle = getHandle(Entity.class);
+		handle.motX = motX;
+		handle.motY = motY;
+		handle.motZ = motZ;
+	}
+
 	public boolean teleport(Location arg0) {
 		return entity.teleport(arg0);
 	}
@@ -695,7 +819,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the dropped Item
 	 */
 	public Item spawnItemDrop(Material material, int amount, float force) {
-		return CommonNMS.getItem(handle.a(material.getId(), amount, force));
+		return CommonNMS.getItem(getHandle(Entity.class).a(material.getId(), amount, force));
 	}
 
 	/**
@@ -706,11 +830,11 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the dropped Item
 	 */
 	public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
-		return CommonNMS.getItem(handle.a(CommonNMS.getNative(item), force));
+		return CommonNMS.getItem(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
 	}
 
 	private boolean isNMS() {
-		return handle instanceof NMSEntity;
+		return getHandle() instanceof NMSEntity;
 	}
 
 	/**
@@ -727,7 +851,16 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 * Called after the internal handle Entity has been replaced with a BKC 'NMS' type.
 	 * Any special replacement logic should be performed here
 	 */
-	protected void onNMSReplaced() {
+	protected void onNMSReplaced(Object oldHandle, Object newHandle) {
+	}
+
+	/**
+	 * Checks whether an Entity Controller is assigned to this Entity
+	 * 
+	 * @return True if there is an Entity Controller, False if not
+	 */
+	public boolean hasController() {
+		return getController() != null;
 	}
 
 	/**
@@ -739,7 +872,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	@SuppressWarnings("unchecked")
 	public EntityController<CommonEntity<T>> getController() {
 		if (isNMS()) {
-			return (EntityController<CommonEntity<T>>) ((NMSEntity) handle).getController();
+			return (EntityController<CommonEntity<T>>) ((NMSEntity) getHandle()).getController();
 		} else {
 			return null;
 		}
@@ -766,8 +899,8 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 			try {
 				ClassTemplate<?> TEMPLATE = ClassTemplate.create(type.getSuperclass());
 				// Store the previous entity information for later use
-				final Entity oldInstance = handle;
-				final org.bukkit.entity.Entity oldBukkitEntity = Conversion.toEntity.convert(handle);
+				final Entity oldInstance = getHandle(Entity.class);
+				final org.bukkit.entity.Entity oldBukkitEntity = entity;
 
 				// Create a new entity instance and perform data/property transfer
 				final Entity newInstance = (Entity) type.newInstance();
@@ -828,11 +961,13 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				}
 
 				// End with an Event
-				this.onNMSReplaced();
+				this.onNMSReplaced(oldInstance, newInstance);
 			} catch (Throwable t) {
 				throw new RuntimeException("Failed to set controller:", t);
 			}
 		}
+		// Event
+		CommonUtil.callEvent(new EntitySetControllerEvent(this, controller));
 		// Set the controller
 		if (controller == null) {
 			// Detach

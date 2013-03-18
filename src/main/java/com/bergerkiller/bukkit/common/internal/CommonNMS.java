@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.server.v1_5_R1.*;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.Inventory;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -203,5 +205,13 @@ public class CommonNMS {
 	@SuppressWarnings("unchecked")
 	public static List<Entity> getEntitiesIn(World world, Entity ignore, AxisAlignedBB bounds) {
 		return (List<Entity>) world.getEntities(ignore, bounds.grow(0.25, 0.25, 0.25));
+	}
+
+	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, AxisAlignedBB area) {
+		List<?> list = CommonNMS.getEntitiesIn(CommonNMS.getNative(world), CommonNMS.getNative(ignore), area);
+		if (LogicUtil.nullOrEmpty(list)) {
+			return Collections.emptyList();
+		}
+		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
 	}
 }

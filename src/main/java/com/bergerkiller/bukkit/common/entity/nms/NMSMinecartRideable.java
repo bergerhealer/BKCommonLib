@@ -112,4 +112,18 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 			controller.onDie();
 		}
 	}
+
+	@Override
+	public String super_getLocalizedName() {
+		return super.getLocalizedName();
+	}
+
+	@Override
+	public String getLocalizedName() {
+		if (controller == null) {
+			return super_getLocalizedName();
+		} else {
+			return controller.getLocalizedName();
+		}
+	}
 }

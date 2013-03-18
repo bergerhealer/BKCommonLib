@@ -41,4 +41,6 @@ public interface NMSEntity {
 	public void super_onBurn(int damage);
 
 	public void super_die();
+
+	public String super_getLocalizedName();
 }
