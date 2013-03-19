@@ -13,6 +13,7 @@ import org.bukkit.entity.minecart.StorageMinecart;
 
 import net.minecraft.server.v1_5_R1.Entity;
 
+import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
@@ -42,8 +43,7 @@ public class CommonEntityStore<T extends org.bukkit.entity.Entity> extends Entit
 	}
 
 	public static boolean hasController(org.bukkit.entity.Entity entity) {
-		final Object handle = Conversion.toEntityHandle.convert(entity);
-		return handle instanceof NMSEntity && ((NMSEntity) handle).getController() != null;
+		return getController(entity) != null;
 	}
 
 	/**
@@ -54,14 +54,20 @@ public class CommonEntityStore<T extends org.bukkit.entity.Entity> extends Entit
 	 */
 	public static EntityController<?> getController(org.bukkit.entity.Entity entity) {
 		final Object handle = Conversion.toEntityHandle.convert(entity);
-		return handle instanceof NMSEntity ? ((NMSEntity) handle).getController() : null;
+		if (handle instanceof NMSEntity) {
+			final EntityController<?> controller = ((NMSEntity) handle).getController();
+			if (!(controller instanceof DefaultEntityController)) {
+				return controller;
+			}
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T extends org.bukkit.entity.Entity> CommonEntity<T> get(T entity) {
 		final Entity handle = CommonNMS.getNative(entity);
 		if (handle instanceof NMSEntity) {
-			return (CommonEntity<T>) ((NMSEntity) handle).getCommonEntity();
+			return (CommonEntity<T>) ((NMSEntity) handle).getController().getEntity();
 		}
 		SafeConstructor<?> constr = commonEntities.get(entity.getClass());
 		if (constr == null) {

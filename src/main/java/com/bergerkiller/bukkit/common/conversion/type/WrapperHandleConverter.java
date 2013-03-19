@@ -19,10 +19,7 @@ public class WrapperHandleConverter extends HandleConverter {
 	@Override
 	protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
 		if (value instanceof BasicWrapper) {
-			Object type = CommonUtil.tryCast(((BasicWrapper) value).getHandle(), getOutputType());
-			if (type != null) {
-				return type;
-			}
+			return CommonUtil.tryCast(((BasicWrapper) value).getHandle(), getOutputType(), def);
 		}
 		return def;
 	}

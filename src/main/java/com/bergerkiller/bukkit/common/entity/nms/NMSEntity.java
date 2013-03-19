@@ -4,20 +4,12 @@ import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
 
 import com.bergerkiller.bukkit.common.controller.EntityController;
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
 
 /**
  * Identifier so BKCommonLib knows that this Entity has been replaced.
  * All classes implementing this Interface should have an Empty Constructor.
  */
 public interface NMSEntity {
-	/**
-	 * Gets the common entity assigned to this Entity
-	 * 
-	 * @return Common Entity
-	 */
-	public CommonEntity<?> getCommonEntity();
-
 	/**
 	 * Gets the Entity Controller of this Entity
 	 * 

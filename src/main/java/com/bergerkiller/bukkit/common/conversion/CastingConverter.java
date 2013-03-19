@@ -17,14 +17,8 @@ public class CastingConverter<T> implements Converter<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public T convert(Object value, T def) {
-		Object val = CommonUtil.tryCast(baseConvertor.convert(value), this.getOutputType());
-		if (val != null) {
-			return (T) val;
-		} else {
-			return def;
-		}
+		return (T) CommonUtil.tryCast(baseConvertor.convert(value), this.getOutputType(), def);
 	}
 
 	@Override

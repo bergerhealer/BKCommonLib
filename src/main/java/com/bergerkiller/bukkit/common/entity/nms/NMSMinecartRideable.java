@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.EntityController;
-import com.bergerkiller.bukkit.common.entity.CommonMinecartRideable;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
@@ -9,16 +8,10 @@ import net.minecraft.server.v1_5_R1.EntityHuman;
 import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
 
 public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntity {
-	private CommonMinecartRideable entity;
 	private EntityController<?> controller;
 
 	public NMSMinecartRideable() {
 		super(null);
-	}
-
-	@Override
-	public CommonMinecartRideable getCommonEntity() {
-		return entity;
 	}
 
 	@Override
@@ -29,9 +22,6 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 	@Override
 	public void setController(EntityController<?> controller) {
 		this.controller = controller;
-		if (controller != null) {
-			entity = (CommonMinecartRideable) controller.getEntity();
-		}
 	}
 
 	@Override
@@ -41,11 +31,7 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 
 	@Override
 	public boolean damageEntity(DamageSource damagesource, int damage) {
-    	if (controller == null) {
-    		return super_damageEntity(damagesource, damage);
-    	} else {
-    		return controller.onEntityDamage(CommonNMS.getEntity(damagesource.getEntity()), damage);
-    	}
+		return controller.onEntityDamage(CommonNMS.getEntity(damagesource.getEntity()), damage);
 	}
 
 	@Override
@@ -55,20 +41,12 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 
 	@Override
     public void l_() {
-    	if (controller == null) {
-    		super_onTick();
-    	} else {
-    		controller.onTick();
-    	}
+		controller.onTick();
     }
 
 	@Override
 	public void move(double dx, double dy, double dz) {
-		if (controller == null) {
-			super.move(dx, dy, dz);
-		} else {
-			controller.onMove(dx, dy, dz);
-		}
+		controller.onMove(dx, dy, dz);
 	}
 
 	@Override
@@ -78,20 +56,12 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 
 	@Override
 	public void burn(int damage) {
-		if (controller == null) {
-			super_onBurn(damage);
-		} else {
-			controller.onBurnDamage(damage);
-		}
+		controller.onBurnDamage(damage);
 	}
 
 	@Override
 	public boolean a_(EntityHuman human) {
-		if (controller == null) {
-			return super_onInteract(human);
-		} else {
-			return controller.onInteractBy(CommonNMS.getHuman(human));
-		}
+		return controller.onInteractBy(CommonNMS.getHuman(human));
 	}
 
 	@Override
@@ -106,11 +76,7 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 
 	@Override
 	public void die() {
-		if (controller == null) {
-			super_die();
-		} else {
-			controller.onDie();
-		}
+		controller.onDie();
 	}
 
 	@Override
@@ -120,10 +86,6 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 
 	@Override
 	public String getLocalizedName() {
-		if (controller == null) {
-			return super_getLocalizedName();
-		} else {
-			return controller.getLocalizedName();
-		}
+		return controller.getLocalizedName();
 	}
 }

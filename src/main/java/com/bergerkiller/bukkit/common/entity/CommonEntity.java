@@ -29,6 +29,7 @@ import net.minecraft.server.v1_5_R1.Entity;
 import net.minecraft.server.v1_5_R1.EntityPlayer;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
 import com.bergerkiller.bukkit.common.events.EntitySetControllerEvent;
@@ -872,11 +873,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityController<CommonEntity<T>> getController() {
-		if (isNMS()) {
-			return (EntityController<CommonEntity<T>>) ((NMSEntity) getHandle()).getController();
-		} else {
-			return null;
-		}
+		return (EntityController<CommonEntity<T>>) CommonEntityStore.getController(entity);
 	}
 
 	/**
@@ -889,7 +886,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	public void setController(EntityController<CommonEntity<T>> controller) {
 		if (!isNMS()) {
 			// No controller is requested - no need to do anything
-			if (controller == null) {
+			if (controller == null || controller instanceof DefaultEntityController) {
 				return;
 			}
 			// Respawn the entity and attach the controller
@@ -971,16 +968,18 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				throw new RuntimeException("Failed to set controller:", t);
 			}
 		}
+		final EntityController<CommonEntity<T>> old = getController();
+		if (old != null) {
+			old.onDetached();
+		}
+		// If null, resolve to the default type
+		if (controller == null) {
+			controller = new DefaultEntityController<CommonEntity<T>>();
+		}
 		// Event
 		CommonUtil.callEvent(new EntitySetControllerEvent(this, controller));
 		// Set the controller
-		if (controller == null) {
-			// Detach
-			getController().onDetached();
-		} else {
-			// Attach
-			controller.onAttached(this);
-		}
+		controller.onAttached(this);
 	}
 
 	@SuppressWarnings({"unchecked"})
