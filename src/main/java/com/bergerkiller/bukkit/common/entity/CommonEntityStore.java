@@ -13,6 +13,7 @@ import org.bukkit.entity.minecart.StorageMinecart;
 
 import net.minecraft.server.v1_5_R1.Entity;
 
+import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -43,6 +44,17 @@ public class CommonEntityStore<T extends org.bukkit.entity.Entity> extends Entit
 	public static boolean hasController(org.bukkit.entity.Entity entity) {
 		final Object handle = Conversion.toEntityHandle.convert(entity);
 		return handle instanceof NMSEntity && ((NMSEntity) handle).getController() != null;
+	}
+
+	/**
+	 * Gets the potential Entity Controller that is attached to a given Entity
+	 * 
+	 * @param entity to check
+	 * @return the Entity Controller, or null if none is attached
+	 */
+	public static EntityController<?> getController(org.bukkit.entity.Entity entity) {
+		final Object handle = Conversion.toEntityHandle.convert(entity);
+		return handle instanceof NMSEntity ? ((NMSEntity) handle).getController() : null;
 	}
 
 	@SuppressWarnings("unchecked")

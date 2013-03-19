@@ -41,6 +41,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 /**
@@ -395,7 +396,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public double getMotY() {
-		return getHandle(Entity.class).motX;
+		return getHandle(Entity.class).motY;
 	}
 
 	public void setMotY(double value) {
@@ -462,7 +463,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public int getLocBlockY() {
-		return MathUtil.floor(getLocX());
+		return MathUtil.floor(getLocY());
 	}
 
 	public int getLocBlockZ() {
@@ -901,12 +902,14 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				// Store the previous entity information for later use
 				final Entity oldInstance = getHandle(Entity.class);
 				final org.bukkit.entity.Entity oldBukkitEntity = entity;
-
+				
 				// Create a new entity instance and perform data/property transfer
 				final Entity newInstance = (Entity) type.newInstance();
 				TEMPLATE.transfer(oldInstance, newInstance);
 				oldInstance.dead = true;
 				newInstance.dead = false;
+				oldInstance.valid = false;
+				newInstance.valid = true;
 
 				// Now proceed to replace this NMS Entity in all places imaginable.
 				// First load the chunk so we can at least work on something
@@ -926,6 +929,7 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				// *** Entities By ID Map ***
 				final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
 				if (entitiesById.remove(oldInstance.id) == null) {
+					entitiesById.put(newInstance.id, newInstance);
 					CommonUtil.nextTick(new Runnable() {
 						public void run() {
 							entitiesById.put(newInstance.id, newInstance);
@@ -936,7 +940,8 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				}
 
 				// *** EntityTrackerEntry ***
-				Object entry = WorldUtil.getTracker(getWorld()).getEntry(entity);
+				final EntityTracker tracker = WorldUtil.getTracker(getWorld());
+				Object entry = tracker.getEntry(entity);
 				if (entry != null) {
 					EntityTrackerEntryRef.tracker.set(entry, entity);
 				}
