@@ -11,6 +11,7 @@ import org.bukkit.World;
  * Represents a class containing two immutable integer coordinates: x and z
  */
 public class IntVector2 {
+	public static final IntVector2 ZERO = new IntVector2(0, 0);
 	public final int x, z;
 
 	public IntVector2(Chunk chunk) {
@@ -22,6 +23,46 @@ public class IntVector2 {
 		this.z = z;
 	}
 
+	public IntVector2 add(int x, int z) {
+		return new IntVector2(this.x + x, this.z + z);
+	}
+
+	public IntVector2 add(IntVector2 other) {
+		return add(other.x, other.z);
+	}
+
+	public IntVector2 subtract(int x, int z) {
+		return new IntVector2(this.x - x, this.z - z);
+	}
+
+	public IntVector2 subtract(IntVector2 other) {
+		return subtract(other.x, other.z);
+	}
+
+	public IntVector2 abs() {
+		return new IntVector2(Math.abs(x), Math.abs(z));
+	}
+
+	/**
+	 * Checks whether the x or z coordinate is greater than the value specified
+	 * 
+	 * @param value to check
+	 * @return True if x/z > value, False otherwise
+	 */
+	public boolean greaterThan(int value) {
+		return x > value || z > value;
+	}
+
+	/**
+	 * Checks whether the x or z coordinate is greater/equal than the value specified
+	 * 
+	 * @param value to check
+	 * @return True if x/z >= value, False otherwise
+	 */
+	public boolean greaterEqualThan(int value) {
+		return x >= value || z >= value;
+	}
+	
 	/**
 	 * Gets or loads the chunk at the coordinates of this IntVector2 on the
 	 * world specified

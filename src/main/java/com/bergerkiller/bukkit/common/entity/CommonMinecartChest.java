@@ -8,17 +8,10 @@ import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
-
 public class CommonMinecartChest extends CommonMinecart<StorageMinecart> {
 
 	public CommonMinecartChest(StorageMinecart base) {
 		super(base);
-	}
-
-	@Override
-	protected Class<? extends NMSEntity> getNMSType() {
-		return null;
 	}
 
 	public Inventory getInventory() {

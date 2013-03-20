@@ -7,9 +7,9 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
 
 /**
  * Identifier so BKCommonLib knows that this Entity has been replaced.
- * All classes implementing this Interface should have an Empty Constructor.
+ * All classes implementing this Interface should have the default 'world only' constructor.
  */
-public interface NMSEntity {
+public interface NMSEntityHook {
 	/**
 	 * Gets the Entity Controller of this Entity
 	 * 

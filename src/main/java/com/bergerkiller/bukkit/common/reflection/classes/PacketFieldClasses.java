@@ -148,6 +148,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> blockX = getField("c");
 		public final FieldAccessor<Integer> blockY = getField("d");
 		public final FieldAccessor<Integer> blockZ = getField("e");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, int.class, int.class, int.class, int.class);
+
+		public Object newInstance(int entityId, int action, int blockX, int blockY, int blockZ) {
+			return constructor1.newInstance(entityId, action, blockX, blockY, blockZ);
+		}
 	}
 	public static class NMSPacket18ArmAnimation extends NMSPacket30Entity {
 		public final FieldAccessor<Integer> animation = getField("b");
@@ -300,6 +305,11 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket35EntityHeadRotation extends NMSPacket30Entity {
 		public final FieldAccessor<Byte> headYaw = getField("b");
+		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, byte.class);
+
+		public Object newInstance(int entityId, byte headRotation) {
+			return constructor1.newInstance(entityId, headRotation);
+		}
 	}
 	public static class NMSPacket38EntityStatus extends NMSPacket30Entity {
 		public final FieldAccessor<Byte> status = getField("b");

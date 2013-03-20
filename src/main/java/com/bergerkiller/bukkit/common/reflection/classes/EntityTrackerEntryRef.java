@@ -18,6 +18,7 @@ public class EntityTrackerEntryRef {
 	public static final FieldAccessor<Double> prevX = TEMPLATE.getField("p");
 	public static final FieldAccessor<Double> prevY = TEMPLATE.getField("q");
 	public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("r");
+	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("isMoving");
 	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("b");
 
 	public static final CommonPacket getSpawnPacket(Object instance) {

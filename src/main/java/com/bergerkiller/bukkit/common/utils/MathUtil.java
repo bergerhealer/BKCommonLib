@@ -200,6 +200,17 @@ public class MathUtil {
 	}
 
 	/**
+	 * Gets the floor integer value from a float value
+	 * 
+	 * @param value to get the floor of
+	 * @return floor value
+	 */
+	public static int floor(float value) {
+		int i = (int) value;
+		return value < (float) i ? i - 1 : i;
+	}
+
+	/**
 	 * Moves a Location into the yaw and pitch of the Location in the offset specified
 	 * 
 	 * @param loc to move

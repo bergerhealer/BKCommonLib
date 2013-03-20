@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -28,11 +27,6 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
 
 	public CommonMinecartFurnace(PoweredMinecart base) {
 		super(base);
-	}
-
-	@Override
-	protected Class<? extends NMSEntity> getNMSType() {
-		return null;
 	}
 
 	public int getFuelTicks() {

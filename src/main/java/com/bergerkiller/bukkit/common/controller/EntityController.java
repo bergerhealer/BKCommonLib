@@ -23,59 +23,28 @@ import net.minecraft.server.v1_5_R1.EntityLiving;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
+import com.bergerkiller.bukkit.common.entity.CommonEntityController;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-public class EntityController<T extends CommonEntity<?>> {
+public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
 	private static final List<AxisAlignedBB> collisionBuffer = new ArrayList<AxisAlignedBB>();
-	protected T entity;
-
-	/**
-	 * Called as soon as this Controller is attached to an Entity.
-	 * When overriding, ALWAYS call super.onAttached before doing anything else.
-	 * Not doing so may result in various kinds of errors and/or bugs.
-	 * 
-	 * @param entity this Controller was attached to
-	 */
-	public void onAttached(T entity) {
-		this.entity = entity;
-		entity.getHandle(NMSEntity.class).setController(this);
-	}
-
-	/**
-	 * Called as soon as this Controller is detached from an Entity.
-	 * When overriding, ALWAYS call super.onAttached before doing anything else.
-	 * Not doing so may result in various kinds of errors and/or bugs.
-	 */
-	public void onDetached() {
-		entity.getHandle(NMSEntity.class).setController(null);
-		this.entity = null;
-	}
-
-	/**
-	 * Gets the Entity this controller is attached to, or null if it isn't attached yet
-	 * 
-	 * @return the Entity this controller is attached to
-	 */
-	public T getEntity() {
-		return entity;
-	}
 
 	/**
 	 * Called when this Entity dies (could be called more than one time)
 	 */
 	public void onDie() {
-		entity.getHandle(NMSEntity.class).super_die();
+		entity.getHandle(NMSEntityHook.class).super_die();
 	}
 
 	/**
 	 * Called every tick to update the entity
 	 */
 	public void onTick() {
-		entity.getHandle(NMSEntity.class).super_onTick(); 
+		entity.getHandle(NMSEntityHook.class).super_onTick(); 
 	}
 
 	/**
@@ -85,7 +54,7 @@ public class EntityController<T extends CommonEntity<?>> {
 	 * @return True if interaction occurred, False if not
 	 */
 	public boolean onInteractBy(HumanEntity interacter) {
-		return entity.getHandle(NMSEntity.class).super_onInteract(CommonNMS.getNative(interacter)); 
+		return entity.getHandle(NMSEntityHook.class).super_onInteract(CommonNMS.getNative(interacter)); 
 	}
 
 	/**
@@ -104,7 +73,7 @@ public class EntityController<T extends CommonEntity<?>> {
 		} else {
 			source = DamageSource.GENERIC;
 		}
-		return entity.getHandle(NMSEntity.class).super_damageEntity(source, damage);
+		return entity.getHandle(NMSEntityHook.class).super_damageEntity(source, damage);
 	}
 
 	/**
@@ -134,7 +103,7 @@ public class EntityController<T extends CommonEntity<?>> {
 	 * @param damage dealt
 	 */
 	public void onBurnDamage(int damage) {
-		entity.getHandle(NMSEntity.class).super_onBurn(damage); 
+		entity.getHandle(NMSEntityHook.class).super_onBurn(damage); 
 	}
 
 	/**
@@ -143,7 +112,7 @@ public class EntityController<T extends CommonEntity<?>> {
 	 * @return Localized name
 	 */
 	public String getLocalizedName() {
-		return entity.getHandle(NMSEntity.class).super_getLocalizedName();
+		return entity.getHandle(NMSEntityHook.class).super_getLocalizedName();
 	}
 
 	/**

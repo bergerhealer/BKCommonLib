@@ -7,17 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
-
 public class CommonMinecartHopper extends CommonMinecart<HopperMinecart> {
 
 	public CommonMinecartHopper(HopperMinecart base) {
 		super(base);
-	}
-
-	@Override
-	protected Class<? extends NMSEntity> getNMSType() {
-		return null;
 	}
 
 	@Override

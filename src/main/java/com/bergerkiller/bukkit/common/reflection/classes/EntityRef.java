@@ -21,7 +21,7 @@ public class EntityRef {
 	public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("aj");
 	public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("ak");
 	public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("al");
-	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("am");
+	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("an");
 	public static final FieldAccessor<Boolean> velocityChanged = TEMPLATE.getField("velocityChanged");
 	public static final FieldAccessor<Boolean> justLanded = TEMPLATE.getField("K");
 	public static final FieldAccessor<Double> locX = TEMPLATE.getField("locX");

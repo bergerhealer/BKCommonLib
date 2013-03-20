@@ -31,10 +31,10 @@ import net.minecraft.server.v1_5_R1.EntityPlayer;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
+import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.events.EntitySetControllerEvent;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
@@ -42,6 +42,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
@@ -50,7 +51,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
  * 
  * @param <T> - type of Entity
  */
-public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
+public class CommonEntity<T extends org.bukkit.entity.Entity> {
 	/**
 	 * The minimum x/y/z velocity distance, above which the entity is considered to be moving
 	 */
@@ -96,6 +97,15 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public <H> H getHandle(Class<H> type) {
 		return type.cast(getHandle());
+	}
+
+	/**
+	 * Obtains the DataWatcher to update and keep track of Entity metadata
+	 * 
+	 * @return Entity meta data watcher
+	 */
+	public DataWatcher getMetaData() {
+		return new DataWatcher(getHandle(Entity.class).getDataWatcher());
 	}
 
 	public int getChunkX() {
@@ -152,6 +162,15 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 
 	public float getPitchDifference(CommonEntity<?> comparer) {
 		return getPitchDifference(comparer.getPitch());
+	}
+
+	/**
+	 * Obtains the Entity head rotation angle, or 0.0 if this Entity has no head.
+	 * 
+	 * @return Head rotation, if available
+	 */
+	public float getHeadRotation() {
+		return getHandle(Entity.class).ao();
 	}
 
 	/**
@@ -836,18 +855,8 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	private boolean isNMS() {
-		return getHandle() instanceof NMSEntity;
+		return getHandle() instanceof NMSEntityHook;
 	}
-
-	/**
-	 * Called when the Entity Handle is not a BKC 'NMS' type.
-	 * The purpose of this Method is to return a valid NMS handle type for this CommonEntity.<br><br>
-	 * 
-	 * To indicate a lack of support, let this Method return Null.
-	 * 
-	 * @return NMS type
-	 */
-	protected abstract Class<? extends NMSEntity> getNMSType();
 
 	/**
 	 * Called after the internal handle Entity has been replaced with a BKC 'NMS' type.
@@ -866,10 +875,31 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	/**
+	 * Gets the Entity Network Controller currently assigned to this Entity.
+	 * If none is set, this method returns Null.
+	 * 
+	 * @return Entity Network Controller, or null if not set
+	 */
+	@SuppressWarnings("unchecked")
+	public EntityNetworkController<CommonEntity<T>> getNetworkController() {
+		return (EntityNetworkController<CommonEntity<T>>) CommonEntityStore.getNetworkController(entity);
+	}
+
+	/**
+	 * Sets an Entity Network Controller for this Entity.
+	 * To default back to the default implementation, pass in null.
+	 * 
+	 * @param controller to set to
+	 */
+	public void setNetworkController(EntityNetworkController<CommonEntity<T>> controller) {
+		
+	}
+
+	/**
 	 * Gets the Entity Controller currently assigned to this Entity.
 	 * If none is set, this method returns Null.
 	 * 
-	 * @return Entity controller, or null if not set
+	 * @return Entity Controller, or null if not set
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityController<CommonEntity<T>> getController() {
@@ -889,20 +919,20 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 			if (controller == null || controller instanceof DefaultEntityController) {
 				return;
 			}
-			// Respawn the entity and attach the controller
-			Class<? extends NMSEntity> type = this.getNMSType();
-			if (type == null) {
-				throw new UnsupportedOperationException("Entity of type '" + entity.getClass().getName() + "' has no Controller support!");
+			// Obtain info for conversion
+			final CommonEntityType type = CommonEntityTypeStore.byEntity(entity);
+			if (type == null || !type.hasHookEntity()) {
+				throw new RuntimeException("Entity of type '" + type.entityType + "' has no Controller support!");
 			}
+			// Respawn the entity and attach the controller
 			try {
-				ClassTemplate<?> TEMPLATE = ClassTemplate.create(type.getSuperclass());
 				// Store the previous entity information for later use
 				final Entity oldInstance = getHandle(Entity.class);
 				final org.bukkit.entity.Entity oldBukkitEntity = entity;
-				
+
 				// Create a new entity instance and perform data/property transfer
-				final Entity newInstance = (Entity) type.newInstance();
-				TEMPLATE.transfer(oldInstance, newInstance);
+				final Entity newInstance = (Entity) type.createNMSHookEntity();
+				type.nmsType.transfer(oldInstance, newInstance);
 				oldInstance.dead = true;
 				newInstance.dead = false;
 				oldInstance.valid = false;
@@ -968,18 +998,26 @@ public abstract class CommonEntity<T extends org.bukkit.entity.Entity> {
 				throw new RuntimeException("Failed to set controller:", t);
 			}
 		}
-		final EntityController<CommonEntity<T>> old = getController();
-		if (old != null) {
-			old.onDetached();
-		}
+
 		// If null, resolve to the default type
 		if (controller == null) {
 			controller = new DefaultEntityController<CommonEntity<T>>();
 		}
+
 		// Event
 		CommonUtil.callEvent(new EntitySetControllerEvent(this, controller));
-		// Set the controller
-		controller.onAttached(this);
+
+		// Detach the old controller
+		final EntityController<CommonEntity<T>> old = getController();
+		if (old != null) {
+			old.onDetached();
+			old.entity = null;
+		}
+
+		// Attach the controller
+		getHandle(NMSEntityHook.class).setController(controller);
+		controller.entity = this;
+		controller.onAttached();
 	}
 
 	@SuppressWarnings({"unchecked"})

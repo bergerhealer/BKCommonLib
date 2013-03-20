@@ -5,6 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -235,13 +238,18 @@ public class ClassTemplate<T> {
 	}
 
 	/**
-	 * Attempts to create a new template for the class at the path specified
+	 * Attempts to create a new template for the class at the path specified.
+	 * If the class is not found, a proper warning is printed.
 	 * 
 	 * @param path to the class
 	 * @return a new template, or null if the template could not be made
 	 */
 	public static ClassTemplate<?> create(String path) {
-		return create(CommonUtil.getClass(path));
+		Class<?> type = CommonUtil.getClass(path);
+		if (type == null) {
+			Bukkit.getLogger().log(Level.WARNING, "[BKCommonLib] Class not found: '" + path + "'");
+		}
+		return create(type);
 	}
 
 	/**

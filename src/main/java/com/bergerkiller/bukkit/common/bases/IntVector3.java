@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
  * Represents a class containing three immutable integer coordinates: x, y and z
  */
 public class IntVector3 implements Comparable<IntVector3> {
+	public static final IntVector3 ZERO = new IntVector3(0, 0, 0);
 	public final int x, y, z;
 
 	public IntVector3(Block block) {
@@ -81,6 +82,30 @@ public class IntVector3 implements Comparable<IntVector3> {
 
 	public IntVector3 add(BlockFace face) {
 		return add(face.getModX(), face.getModY(), face.getModZ());
+	}
+
+	public IntVector3 abs() {
+		return new IntVector3(Math.abs(x), Math.abs(y), Math.abs(z));
+	}
+
+	/**
+	 * Checks whether the x, y or z coordinate is greater than the value specified
+	 * 
+	 * @param value to check
+	 * @return True if x/y/z > value, False otherwise
+	 */
+	public boolean greaterThan(int value) {
+		return x > value || y > value || z > value;
+	}
+
+	/**
+	 * Checks whether the x, y or z coordinate is greater/equal than the value specified
+	 * 
+	 * @param value to check
+	 * @return True if x/y/z >= value, False otherwise
+	 */
+	public boolean greaterEqualThan(int value) {
+		return x >= value || y >= value || z >= value;
 	}
 
 	public int getChunkX() {

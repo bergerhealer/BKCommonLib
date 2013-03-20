@@ -7,17 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntity;
-
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
 	public CommonMinecartTNT(ExplosiveMinecart base) {
 		super(base);
-	}
-
-	@Override
-	protected Class<? extends NMSEntity> getNMSType() {
-		return null;
 	}
 
 	@Override

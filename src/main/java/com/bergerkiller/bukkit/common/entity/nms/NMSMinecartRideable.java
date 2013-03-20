@@ -6,12 +6,13 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
 import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
+import net.minecraft.server.v1_5_R1.World;
 
-public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntity {
+public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntityHook {
 	private EntityController<?> controller;
 
-	public NMSMinecartRideable() {
-		super(null);
+	public NMSMinecartRideable(World world) {
+		super(world);
 	}
 
 	@Override

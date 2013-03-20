@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
@@ -136,11 +138,26 @@ public class PlayerUtil extends EntityUtil {
 	 * This actually checks whether the chunk data had been sent, it doesn't do a distance check.
 	 * 
 	 * @param player to check
-	 * @param chunkX if the chunk to check
-	 * @param chunkZ if the chunk to check
+	 * @param chunkX of the chunk to check
+	 * @param chunkZ of the chunk to check
 	 * @return True if the chunk is visible to the player, False if not
 	 */
 	public static boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
 		return CommonPlugin.getInstance().isChunkVisible(player, chunkX, chunkZ);
+	}
+
+	/**
+	 * Checks whether a given chunk has been 'entered' by a player.
+	 * An entered chunk is liable for updates to the client.
+	 * Note that this does not check whether the chunk is actually sent.
+	 * 
+	 * @param player to check
+	 * @param chunkX of the chunk to check
+	 * @param chunkZ of the chunk to check
+	 * @return True if the player entered the chunk, False if not
+	 */
+	public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
+		final EntityPlayer ep = CommonNMS.getNative(player);
+		return ep.o().getPlayerChunkMap().a(ep, chunkX, chunkZ);
 	}
 }
