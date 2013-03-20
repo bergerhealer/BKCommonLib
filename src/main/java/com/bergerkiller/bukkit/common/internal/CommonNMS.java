@@ -194,14 +194,11 @@ public class CommonNMS {
 		return LogicUtil.isInBounds(Block.byId, blockId) && Block.byId[blockId] != null;
 	}
 
-	/**
-	 * Gets all entities in the bounds
-	 * 
-	 * @param world the bounds are in
-	 * @param ignore entity to ignroe
-	 * @param bounds to get the entities inside
-	 * @return referenced list of entities inside the bounds
-	 */
+	public static List<Entity> getEntities(World world, Entity ignore, 
+			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
+		return getEntitiesIn(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+	}
+
 	@SuppressWarnings("unchecked")
 	public static List<Entity> getEntitiesIn(World world, Entity ignore, AxisAlignedBB bounds) {
 		return (List<Entity>) world.getEntities(ignore, bounds.grow(0.25, 0.25, 0.25));

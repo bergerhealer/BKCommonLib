@@ -30,28 +30,60 @@ public class CommonEntityType {
 	public final boolean networkIsMobile;
 
 	public CommonEntityType(EntityType entityType, String nmsName, int networkViewDistance, int networkUpdateInterval, boolean networkIsMobile) {
-		// Bukkit
-		this.entityType = entityType;
-		this.bukkitType = new ClassTemplate(entityType.getEntityClass());
-		// Class names
-		final Class<?> hookType = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.nms.NMS" + nmsName);
-		final Class<?> commonType = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.Common" + nmsName);
-		// Classes
-		this.nmsType = NMSClassTemplate.create("Entity" + nmsName);
-		this.nmsHookType = new ClassTemplate(hookType);
-		this.commonType = new ClassTemplate(LogicUtil.fixNull(commonType, CommonEntity.class));
-		// Constructors
-		this.nmsConstructor = this.nmsType.getConstructor(WorldRef.TEMPLATE.getType());
-		this.commonConstructor = this.commonType.getConstructor(this.bukkitType.getType());
-		if (hookType == null) {
-			this.nmsHookConstructor = null;
-		} else {
-			this.nmsHookConstructor = this.nmsHookType.getConstructor(WorldRef.TEMPLATE.getType());
-		}
-		// Network
+		// Properties first
 		this.networkUpdateInterval = networkUpdateInterval;
 		this.networkViewDistance = networkViewDistance;
 		this.networkIsMobile = networkIsMobile;
+		this.entityType = entityType;
+
+		// Default 'UNKNOWN' instance
+		if (LogicUtil.nullOrEmpty(nmsName)) {
+			this.nmsType = NMSClassTemplate.create("Entity");
+			this.nmsHookType = new ClassTemplate();
+			this.commonType = ClassTemplate.create(CommonEntity.class);
+			this.bukkitType = ClassTemplate.create(Entity.class);
+			this.nmsConstructor = null;
+			this.nmsHookConstructor = null;
+			this.commonConstructor = this.commonType.getConstructor(Entity.class);
+			return;
+		}
+
+		// Obtain Bukkit type
+		this.bukkitType = ClassTemplate.create(entityType.getEntityClass());
+
+		// Obtain Common class type and constructor
+		Class<?> type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.Common" + nmsName);
+		if (type == null) {
+			this.commonType = ClassTemplate.create(CommonEntity.class);
+			this.commonConstructor = this.commonType.getConstructor(Entity.class);
+		} else {
+			this.commonType = ClassTemplate.create(type);
+			this.commonConstructor = this.commonType.getConstructor(this.bukkitType.getType());
+		}
+
+		// Obtain NMS class type and constructor
+		type = CommonUtil.getClass(Common.NMS_ROOT + ".Entity" + nmsName);
+		if (type == null) {
+			this.nmsType = new ClassTemplate();
+			this.nmsConstructor = null;
+		} else {
+			this.nmsType = ClassTemplate.create(type);
+			if (entityType == EntityType.PLAYER) {
+				this.nmsConstructor = null;
+			} else {
+				this.nmsConstructor = this.nmsType.getConstructor(WorldRef.TEMPLATE.getType());
+			}
+		}
+
+		// Obtain NMS Hook class type and constructor
+		type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.nms.NMS" + nmsName);
+		if (type == null) {
+			this.nmsHookType = new ClassTemplate();
+			this.nmsHookConstructor = null;
+		} else {
+			this.nmsHookType = ClassTemplate.create(type);
+			this.nmsHookConstructor = this.nmsHookType.getConstructor(WorldRef.TEMPLATE.getType());
+		}
 	}
 
 	public boolean hasNMSEntity() {

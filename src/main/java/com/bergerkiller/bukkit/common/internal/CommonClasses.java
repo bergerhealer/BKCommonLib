@@ -20,20 +20,26 @@ class CommonClasses {
 		loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
 		loadUtil("Recipe", "Stream", "World");
 		// Remaining classes
-		Common.loadClasses(Common.COMMON_ROOT + ".nbt.NBTTagInfo");
-		Common.loadClasses(Common.COMMON_ROOT + ".reflection.classes.PacketFieldClasses");
+		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityTypeStore");
 	}
 
 	private static void loadRef(String... classNames) {
 		for (int i = 0; i < classNames.length; i++) {
-			classNames[i] = Common.COMMON_ROOT + ".reflection.classes." + classNames[i] + "Ref";
+			classNames[i] = "reflection.classes." + classNames[i] + "Ref";
 		}
-		Common.loadClasses(classNames);
+		loadCommon(classNames);
 	}
 
 	private static void loadUtil(String... classNames) {
 		for (int i = 0; i < classNames.length; i++) {
-			classNames[i] = Common.COMMON_ROOT + ".utils." + classNames[i] + "Util";
+			classNames[i] = "utils." + classNames[i] + "Util";
+		}
+		loadCommon(classNames);
+	}
+
+	private static void loadCommon(String... classNames) {
+		for (int i = 0; i < classNames.length; i++) {
+			classNames[i] = Common.COMMON_ROOT + "." + classNames[i];
 		}
 		Common.loadClasses(classNames);
 	}

@@ -41,9 +41,14 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 	}
 
 	@Override
-    public void l_() {
+	public void l_() {
 		controller.onTick();
-    }
+	}
+
+	@Override
+	public void super_move(double dx, double dy, double dz) {
+		super.move(dx, dy, dz);
+	}
 
 	@Override
 	public void move(double dx, double dy, double dz) {

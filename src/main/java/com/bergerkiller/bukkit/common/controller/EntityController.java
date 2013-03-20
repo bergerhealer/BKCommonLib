@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -21,17 +19,34 @@ import net.minecraft.server.v1_5_R1.Entity;
 import net.minecraft.server.v1_5_R1.EntityHuman;
 import net.minecraft.server.v1_5_R1.EntityLiving;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
-	private static final List<AxisAlignedBB> collisionBuffer = new ArrayList<AxisAlignedBB>();
+
+	/**
+	 * Binds this Entity Controller to an Entity.
+	 * This is called from elsewhere, and should be ignored entirely.
+	 * 
+	 * @param entity to bind with
+	 */
+	public final void bind(T entity) {
+		if (this.entity != null) {
+			this.onDetached();
+		}
+		this.entity = entity;
+		if (this.entity != null) {
+			final Object handle = this.entity.getHandle();
+			if (handle instanceof NMSEntityHook) {
+				((NMSEntityHook) handle).setController(this);
+			}
+			this.onAttached();
+		}
+	}
 
 	/**
 	 * Called when this Entity dies (could be called more than one time)
@@ -114,85 +129,6 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	public String getLocalizedName() {
 		return entity.getHandle(NMSEntityHook.class).super_getLocalizedName();
 	}
-
-	/**
-	 * Obtains all entities/blocks that can be collided with, checking collisions along the way.
-	 * This is similar to NMS.World.getCubes, but with inserted events.
-	 * 
-	 * @param bounds
-	 * @return referenced list of collision cubes
-	 */
-	private List<AxisAlignedBB> getCollisions(AxisAlignedBB bounds) {
-		final Entity handle = entity.getHandle(Entity.class);
-		collisionBuffer.clear();
-		final int xmin = MathUtil.floor(bounds.a);
-		final int ymin = MathUtil.floor(bounds.b);
-		final int zmin = MathUtil.floor(bounds.c);
-		final int xmax = MathUtil.floor(bounds.d + 1.0);
-		final int ymax = MathUtil.floor(bounds.e + 1.0);
-		final int zmax = MathUtil.floor(bounds.f + 1.0);
-
-		// Add block collisions
-		int x, y, z;
-		for (x = xmin; x < xmax; ++x) {
-			for (z = zmin; z < zmax; ++z) {
-				if (handle.world.isLoaded(x, 64, z)) {
-					for (y = ymin - 1; y < ymax; ++y) {
-						Block block = Block.byId[handle.world.getTypeId(x, y, z)];
-						if (block != null) {
-							block.a(handle.world, x, y, z, bounds, collisionBuffer, handle);
-						}
-					}
-				}
-			}
-		}
-
-		// Handle block collisions
-		double dx, dy, dz;
-		BlockFace hitFace;
-		Iterator<AxisAlignedBB> iter = collisionBuffer.iterator();
-		AxisAlignedBB blockBounds;
-		while (iter.hasNext()) {
-			blockBounds = iter.next();
-			// Convert to block and block coordinates
-			org.bukkit.block.Block block = entity.getWorld().getBlockAt(MathUtil.floor(blockBounds.a), MathUtil.floor(blockBounds.b), MathUtil.floor(blockBounds.c));
-			dx = entity.getLocX() - block.getX() - 0.5;
-			dy = entity.getLocY() - block.getY() - 0.5;
-			dz = entity.getLocZ() - block.getZ() - 0.5;
-
-			// Find out what direction the block is hit
-			if (Math.abs(dx) < 0.1 && Math.abs(dz) < 0.1) {
-				hitFace = dy >= 0.0 ? BlockFace.UP : BlockFace.DOWN;
-			} else {
-				hitFace = FaceUtil.getDirection(dx, dz, false);
-			}
-			// Block collision event
-			if (!this.onBlockCollision(block, hitFace)) {
-				iter.remove();
-			}
-		}
-
-		// Handle and add entities
-		AxisAlignedBB entityBounds;
-		for (Entity entity : CommonNMS.getEntitiesIn(handle.world, handle, bounds.grow(0.25, 0.25, 0.25))) {
-			/*
-			 * This part is completely pointless as E() always returns null May
-			 * this ever change, make sure E() is handled correctly.
-			 * 
-			 * entityBounds = entity.E(); if (entityBounds != null &&
-			 * entityBounds.a(bounds)) { collisionBuffer.add(entityBounds); }
-			 */
-
-			entityBounds = entity.boundingBox;
-			// Entity collision event after the null/inBounds check
-			if (entityBounds != null && entityBounds.a(bounds) && onEntityCollision(Conversion.toEntity.convert(entity))) {
-				collisionBuffer.add(entityBounds);
-			}
-		}
-
-		// Done
-		return collisionBuffer;
-	}
 	
 	public void onMove(double dx, double dy, double dz) {
 		final Entity handle = entity.getHandle(Entity.class);
@@ -219,7 +155,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			final double oldDy = dy;
 			final double oldDz = dz;
 			AxisAlignedBB axisalignedbb = handle.boundingBox.clone();
-			List<AxisAlignedBB> list = getCollisions(handle.boundingBox.a(dx, dy, dz));
+			List<AxisAlignedBB> list = EntityControllerCollisionHelper.getCollisions(this, handle.boundingBox.a(dx, dy, dz));
 
 			// Collision testing using Y
 			for (AxisAlignedBB aabb : list) {
@@ -270,7 +206,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				AxisAlignedBB axisalignedbb1 = handle.boundingBox.clone();
 				handle.boundingBox.c(axisalignedbb);
 
-				list = getCollisions(handle.boundingBox.a(oldDx, dy, oldDz));
+				list = EntityControllerCollisionHelper.getCollisions(this, handle.boundingBox.a(oldDx, dy, oldDz));
 
 				// Collision testing using Y
 				for (AxisAlignedBB aabb : list) {

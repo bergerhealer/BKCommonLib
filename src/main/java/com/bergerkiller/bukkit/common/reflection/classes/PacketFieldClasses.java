@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -22,6 +23,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
@@ -40,8 +42,8 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor0 = getConstructor();
 
 		@Override
-		public Object newInstance() {
-			return constructor0.newInstance();
+		public CommonPacket newInstance() {
+			return new CommonPacket(constructor0.newInstance());
 		}
 
 		public int getPacketSize(Object packet) {
@@ -139,19 +141,19 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> itemInHandIndex = getField("itemInHandIndex");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class);
 		
-		public Object newInstance(int itemInHandIndex) {
-			return constructor1.newInstance(itemInHandIndex);
+		public CommonPacket newInstance(int itemInHandIndex) {
+			return new CommonPacket(constructor1.newInstance(itemInHandIndex));
 		}
 	}
 	public static class NMSPacket17EntityLocationAction extends NMSPacket30Entity {
-		//public final FieldAccessor<Integer> unused = getField("b");
-		public final FieldAccessor<Integer> blockX = getField("c");
-		public final FieldAccessor<Integer> blockY = getField("d");
-		public final FieldAccessor<Integer> blockZ = getField("e");
-		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, int.class, int.class, int.class, int.class);
+		public final FieldAccessor<Integer> blockX = getField("b");
+		public final FieldAccessor<Integer> blockY = getField("c");
+		public final FieldAccessor<Integer> blockZ = getField("d");
+		public final FieldAccessor<Integer> action = getField("e");
+		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class, int.class);
 
-		public Object newInstance(int entityId, int action, int blockX, int blockY, int blockZ) {
-			return constructor1.newInstance(entityId, action, blockX, blockY, blockZ);
+		public CommonPacket newInstance(Entity entity, int action, int blockX, int blockY, int blockZ) {
+			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(entity), action, blockX, blockY, blockZ));
 		}
 	}
 	public static class NMSPacket18ArmAnimation extends NMSPacket30Entity {
@@ -187,8 +189,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> motZ = getField("g");
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType(), int.class);
 
-		public Object newInstance(org.bukkit.entity.Entity entity, int type) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), type);
+		public CommonPacket newInstance(org.bukkit.entity.Entity entity, int type) {
+			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(entity), type));
 		}
 	}
 	public static class NMSPacket24MobSpawn extends NMSPacket30Entity {
@@ -204,8 +206,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> headYaw = getField("k");
 		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("t").translate(ConversionPairs.dataWatcher);
 		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("EntityLiving"));
-		public Object newInstance(Object entityLiving) {
-			return constructor1.newInstance(entityLiving);
+		public CommonPacket newInstance(Object entityLiving) {
+			return new CommonPacket(constructor1.newInstance(entityLiving));
 		}
 	}
 	public static class NMSPacket25EntityPainting extends NMSPacket30Entity {
@@ -228,13 +230,13 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType());
 		private final SafeConstructor<Object> constructor2 = getConstructor(int.class, double.class, double.class, double.class);
 
-		public Object newInstance(org.bukkit.entity.Entity entity) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
+		public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
+			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(entity)));
 		}
-		public Object newInstance(int entityId, double motX, double motY, double motZ) {
-			return constructor2.newInstance(entityId, motX, motY, motZ);
+		public CommonPacket newInstance(int entityId, double motX, double motY, double motZ) {
+			return new CommonPacket(constructor2.newInstance(entityId, motX, motY, motZ));
 		}
-		public Object newInstance(int entityId, Vector velocity) {
+		public CommonPacket newInstance(int entityId, Vector velocity) {
 			return newInstance(entityId, velocity.getX(), velocity.getY(), velocity.getZ());
 		}
 	}
@@ -242,10 +244,10 @@ public class PacketFieldClasses {
 		public final FieldAccessor<int[]> entityIds = getField("a");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int[].class);
 
-		public Object newInstance(int... entityIds) {
-			return constructor1.newInstance(entityIds);
+		public CommonPacket newInstance(int... entityIds) {
+			return new CommonPacket(constructor1.newInstance(entityIds));
 		}
-		public Object newInstance(org.bukkit.entity.Entity... entities) {
+		public CommonPacket newInstance(org.bukkit.entity.Entity... entities) {
 			int[] ids = new int[entities.length];
 			for (int i = 0; i < ids.length; i++) {
 				ids[i] = entities[i].getEntityId();
@@ -262,8 +264,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> dz = getField("d");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, byte.class, byte.class, byte.class);
 
-		public Object newInstance(int entityId, byte dx, byte dy, byte dz) {
-			return constructor1.newInstance(entityId, dx, dy, dz);
+		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz) {
+			return new CommonPacket(constructor1.newInstance(entityId, dx, dy, dz));
 		}
 	}
 	public static class NMSPacket32EntityLook extends NMSPacket30Entity {
@@ -271,8 +273,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> dpitch = getField("f");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, byte.class, byte.class);
 
-		public Object newInstance(int entityId, byte dyaw, byte dpitch) {
-			return constructor1.newInstance(entityId, dyaw, dpitch);
+		public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch) {
+			return new CommonPacket(constructor1.newInstance(entityId, dyaw, dpitch));
 		}
 	}
 	public static class NMSPacket33RelEntityMoveLook extends NMSPacket30Entity {
@@ -283,8 +285,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> dpitch = getField("f");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class);
 
-		public Object newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch) {
-			return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch);
+		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch) {
+			return new CommonPacket(constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch));
 		}
 	}
 	public static class NMSPacket34EntityTeleport extends NMSPacket30Entity {
@@ -296,19 +298,19 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType());
 		private final SafeConstructor<Object> constructor2 = getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class);
 
-		public Object newInstance(org.bukkit.entity.Entity entity) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
+		public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
+			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(entity)));
 		}
-		public Object newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch) {
-			return constructor2.newInstance(entityId, x, y, z, yaw, pitch);
+		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch) {
+			return new CommonPacket(constructor2.newInstance(entityId, x, y, z, yaw, pitch));
 		}
 	}
 	public static class NMSPacket35EntityHeadRotation extends NMSPacket30Entity {
 		public final FieldAccessor<Byte> headYaw = getField("b");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, byte.class);
 
-		public Object newInstance(int entityId, byte headRotation) {
-			return constructor1.newInstance(entityId, headRotation);
+		public CommonPacket newInstance(int entityId, byte headRotation) {
+			return new CommonPacket(constructor1.newInstance(entityId, headRotation));
 		}
 	}
 	public static class NMSPacket38EntityStatus extends NMSPacket30Entity {
@@ -319,8 +321,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> vehicleId = getField("b");
 		private final SafeConstructor<Object> constructor1 = getConstructor(EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
 
-		public Object newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
+		public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
+			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle)));
 		}
 	}
 	public static class NMSPacket40EntityMetadata extends NMSPacket {
@@ -330,8 +332,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<List> watchedObjects = getField("b");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, DataWatcherRef.TEMPLATE.getType(), boolean.class);
 
-		public Object newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
-			return constructor1.newInstance(entityId, dataWatcher.getHandle(), sendUnchangedData);
+		public CommonPacket newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
+			return new CommonPacket(constructor1.newInstance(entityId, dataWatcher.getHandle(), sendUnchangedData));
 		}
 	}
 	public static class NMSPacket41MobEffect extends NMSPacket30Entity {
@@ -340,16 +342,16 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Short> effectDuration = getField("d");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, CommonUtil.getNMSClass("MobEffect"));
 
-		public Object newInstance(int entityId, Object mobEffect) {
-			return constructor1.newInstance(entityId, mobEffect);
+		public CommonPacket newInstance(int entityId, Object mobEffect) {
+			return new CommonPacket(constructor1.newInstance(entityId, mobEffect));
 		}
 	}
 	public static class NMSPacket42RemoveMobEffect extends NMSPacket30Entity {
 		public final FieldAccessor<Byte> effectId = getField("b");
 		private final SafeConstructor<Object> constructor1 = getConstructor(int.class, CommonUtil.getNMSClass("MobEffect"));
 
-		public Object newInstance(int entityId, Object mobEffect) {
-			return constructor1.newInstance(entityId, mobEffect);
+		public CommonPacket newInstance(int entityId, Object mobEffect) {
+			return new CommonPacket(constructor1.newInstance(entityId, mobEffect));
 		}
 	}
 	public static class NMSPacket43SetExperience extends NMSPacket {
@@ -365,11 +367,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> chunkBiomeBitMap = getField("d");
 		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
 
-		public Object newInstance(Object chunk) {
+		public CommonPacket newInstance(Object chunk) {
 			return newInstance(chunk, true, 0xFFFF);
 		}
-		public Object newInstance(Object chunk, boolean hasBiomeData, int sectionsMask) {
-			return constructor1.newInstance(chunk, hasBiomeData, sectionsMask);
+		public CommonPacket newInstance(Object chunk, boolean hasBiomeData, int sectionsMask) {
+			return new CommonPacket(constructor1.newInstance(chunk, hasBiomeData, sectionsMask));
 		}
 	}
 	public static class NMSPacket52MultiBlockChange extends NMSPacket {
@@ -407,8 +409,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Boolean> hasSkyLight = getField("h");
 		private final SafeConstructor<Object> constructor1 = getConstructor(List.class);
 
-		public Object newInstance(List<Chunk> chunks) {
-			return constructor1.newInstance(new ConvertingList<Object>(chunks, ConversionPairs.chunk.reverse()));
+		public CommonPacket newInstance(List<Chunk> chunks) {
+			return new CommonPacket(constructor1.newInstance(new ConvertingList<Object>(chunks, ConversionPairs.chunk.reverse())));
 		}
 	}
 	public static class NMSPacket60Explosion extends NMSPacket {
@@ -423,17 +425,17 @@ public class PacketFieldClasses {
 		private final SafeConstructor<Object> constructor1 = getConstructor(double.class, double.class, double.class, float.class, List.class, Vec3D.class);
 
 		@SuppressWarnings("unchecked")
-		public Object newInstance(double x, double y, double z, float radius) {
+		public CommonPacket newInstance(double x, double y, double z, float radius) {
 			return newInstance(x, y, z, radius, Collections.EMPTY_LIST);
 		}
 
-		public Object newInstance(double x, double y, double z, float radius, List<IntVector3> blocks) {
+		public CommonPacket newInstance(double x, double y, double z, float radius, List<IntVector3> blocks) {
 			return newInstance(x, y, z, radius, blocks, null);
 		}
 
-		public Object newInstance(double x, double y, double z, float radius, List<IntVector3> blocks, Vector pushedForce) {
+		public CommonPacket newInstance(double x, double y, double z, float radius, List<IntVector3> blocks, Vector pushedForce) {
 			Vec3D vec = pushedForce == null ? null : Vec3D.a(pushedForce.getX(), pushedForce.getY(), pushedForce.getZ());
-			return constructor1.newInstance(x, y, z, radius, blocks, vec);
+			return new CommonPacket(constructor1.newInstance(x, y, z, radius, blocks, vec));
 		}
 	}
 	public static class NMSPacket61WorldEvent extends NMSPacket {
@@ -523,8 +525,8 @@ public class PacketFieldClasses {
 			z.set(packetInstance, block.getZ());
 		}
 
-		public Object newInstance(int x, int y, int z, String[] lines) {
-			return constructor1.newInstance(x, y, z, lines);
+		public CommonPacket newInstance(int x, int y, int z, String[] lines) {
+			return new CommonPacket(constructor1.newInstance(x, y, z, lines));
 		}
 	}
 	public static class NMSPacket131ItemData extends NMSPacket {
@@ -557,8 +559,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Float> walkSpeed = getField("f");
 		private final SafeConstructor<Object> constructor1 = getConstructor(PlayerAbilitiesRef.TEMPLATE.getType());
 
-		public Object newInstance(PlayerAbilities abilities) {
-			return constructor1.newInstance(abilities.getHandle());
+		public CommonPacket newInstance(PlayerAbilities abilities) {
+			return new CommonPacket(constructor1.newInstance(abilities.getHandle()));
 		}
 	}
 	public static class NMSPacket203TabComplete extends NMSPacket {

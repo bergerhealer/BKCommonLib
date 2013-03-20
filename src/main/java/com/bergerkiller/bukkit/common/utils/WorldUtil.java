@@ -15,12 +15,13 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
-import net.minecraft.server.v1_5_R1.AxisAlignedBB;
 import net.minecraft.server.v1_5_R1.Entity;
 import net.minecraft.server.v1_5_R1.IDataManager;
 import net.minecraft.server.v1_5_R1.Vec3D;
@@ -267,7 +268,8 @@ public class WorldUtil extends ChunkUtil {
 	 */
 	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore, 
 			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-		return CommonNMS.getEntities(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+		List<Entity> list = CommonNMS.getEntities(CommonNMS.getNative(world), CommonNMS.getNative(ignore), xmin, ymin, zmin, xmax, ymax, zmax);
+		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
 	}
 
 	/**

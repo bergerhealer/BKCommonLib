@@ -32,6 +32,8 @@ public interface NMSEntityHook {
 
 	public void super_onBurn(int damage);
 
+	public void super_move(double dx, double dy, double dz);
+
 	public void super_die();
 
 	public String super_getLocalizedName();

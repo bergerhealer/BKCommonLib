@@ -36,11 +36,11 @@ public class PacketUtil {
 		CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
 	}
 
-	public static void sendCommonPacket(Player player, CommonPacket packet) {
-		sendCommonPacket(player, packet, true);
+	public static void sendPacket(Player player, CommonPacket packet) {
+		sendPacket(player, packet, true);
 	}
 
-	public static void sendCommonPacket(Player player, CommonPacket packet, boolean throughListeners) {
+	public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
 		sendPacket(player, packet.getHandle(), throughListeners);
 	}
 

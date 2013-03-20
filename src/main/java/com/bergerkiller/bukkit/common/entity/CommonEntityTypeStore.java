@@ -8,12 +8,16 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 public class CommonEntityTypeStore {
-	public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, "Entity", 80, 3, true);
+	public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, "", 80, 3, true);
 	private static final ClassInstanceMap<CommonEntityType> byNMS = new ClassInstanceMap<CommonEntityType>();
 
 	private static void add(EntityType entityType, String nmsName, int networkViewDistance, int networkUpdateInterval, boolean networkIsMobile) {
-		final CommonEntityType info = new CommonEntityType(entityType, nmsName, networkViewDistance, networkUpdateInterval, networkIsMobile);
-		byNMS.put(info.nmsType, info);
+		try {
+			final CommonEntityType info = new CommonEntityType(entityType, nmsName, networkViewDistance, networkUpdateInterval, networkIsMobile);
+			byNMS.put(info.nmsType, info);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 	public static CommonEntityType byEntity(Entity entity) {

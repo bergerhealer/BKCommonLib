@@ -26,7 +26,7 @@
       <url>http://repo.bukkit.org/content/groups/public</url>
       <snapshots>
         <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
+        <updatePolicy>daily</updatePolicy>
         <checksumPolicy>fail</checksumPolicy>
       </snapshots>
     </repository>

@@ -333,7 +333,13 @@ public class CommonUtil {
 	 * @param runnable to execute
 	 */
 	public static void nextTick(Runnable runnable) {
-		CommonPlugin.getInstance().nextTick(runnable);
+		final CommonPlugin plugin = CommonPlugin.getInstance();
+		if (plugin != null) {
+			plugin.nextTick(runnable);
+		} else if (runnable != null) {
+			// Only option is to just run it instantly...
+			runnable.run();
+		}
 	}
 
 	/**

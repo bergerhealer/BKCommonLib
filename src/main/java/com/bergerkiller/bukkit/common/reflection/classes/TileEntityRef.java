@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -29,7 +30,6 @@ public class TileEntityRef {
 	}
 
 	public static CommonPacket getUpdatePacket(Object tileEntity) {
-		final Object packet = getUpdatePacket.invoke(tileEntity);
-		return packet == null ? null : new CommonPacket(packet);
+		return Conversion.toCommonPacket.convert(getUpdatePacket.invoke(tileEntity));
 	}
 }
