@@ -143,6 +143,33 @@ public class IntVector3 implements Comparable<IntVector3> {
 	}
 
 	/**
+	 * Gets the X-coordinate of the middle of 'the' block
+	 * 
+	 * @return block middle X
+	 */
+	public double midX() {
+		return (double) x + 0.5;
+	}
+
+	/**
+	 * Gets the Y-coordinate of the middle of 'the' block
+	 * 
+	 * @return block middle Y
+	 */
+	public double midY() {
+		return (double) y + 0.5;
+	}
+
+	/**
+	 * Gets the Z-coordinate of the middle of 'the' block
+	 * 
+	 * @return block middle Z
+	 */
+	public double midZ() {
+		return (double) z + 0.5;
+	}
+
+	/**
 	 * Converts this IntVector3 into an IntVector2 using the x/z coordinates
 	 * 
 	 * @return new IntVector2

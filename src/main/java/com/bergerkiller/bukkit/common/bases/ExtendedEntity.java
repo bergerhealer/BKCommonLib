@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_5_R1.CraftSound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -25,11 +24,11 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
+import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -40,6 +39,43 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
  * @param <T> - type of Entity
  */
 public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
+	public final LocationAbstract loc = new LocationAbstract() {
+		public World getWorld() {return ExtendedEntity.this.getWorld();}
+		public LocationAbstract setWorld(World world) {return this;}
+		public double getX() {return ExtendedEntity.this.h().locX;}
+		public double getY() {return ExtendedEntity.this.h().locY;}
+		public double getZ() {return ExtendedEntity.this.h().locZ;}
+		public LocationAbstract setX(double x) {ExtendedEntity.this.h().locX = x; return this;}
+		public LocationAbstract setY(double y) {ExtendedEntity.this.h().locY = y; return this;}
+		public LocationAbstract setZ(double z) {ExtendedEntity.this.h().locZ = z; return this;}
+		public float getYaw() {return ExtendedEntity.this.h().yaw;}
+		public float getPitch() {return ExtendedEntity.this.h().pitch;}
+		public LocationAbstract setYaw(float yaw) {ExtendedEntity.this.h().yaw = yaw; return this;}
+		public LocationAbstract setPitch(float pitch) {ExtendedEntity.this.h().pitch = pitch; return this;}
+	};
+	public final LocationAbstract last = new LocationAbstract() {
+		public World getWorld() {return ExtendedEntity.this.getWorld();}
+		public LocationAbstract setWorld(World world) {return this;}
+		public double getX() {return ExtendedEntity.this.h().lastX;}
+		public double getY() {return ExtendedEntity.this.h().lastY;}
+		public double getZ() {return ExtendedEntity.this.h().lastZ;}
+		public LocationAbstract setX(double x) {ExtendedEntity.this.h().lastX = x; return this;}
+		public LocationAbstract setY(double y) {ExtendedEntity.this.h().lastY = y; return this;}
+		public LocationAbstract setZ(double z) {ExtendedEntity.this.h().lastZ = z; return this;}
+		public float getYaw() {return ExtendedEntity.this.h().lastYaw;}
+		public float getPitch() {return ExtendedEntity.this.h().lastPitch;}
+		public LocationAbstract setYaw(float yaw) {ExtendedEntity.this.h().lastYaw = yaw; return this;}
+		public LocationAbstract setPitch(float pitch) {ExtendedEntity.this.h().lastPitch = pitch; return this;}
+	};
+	public final VectorAbstract vel = new VectorAbstract() {
+		public double getX() {return ExtendedEntity.this.h().motX;}
+		public double getY() {return ExtendedEntity.this.h().motY;}
+		public double getZ() {return ExtendedEntity.this.h().motZ;}
+		public VectorAbstract setX(double x) {ExtendedEntity.this.h().motX = x; return this;}
+		public VectorAbstract setY(double y) {ExtendedEntity.this.h().motY = y; return this;}
+		public VectorAbstract setZ(double z) {ExtendedEntity.this.h().motZ = z; return this;}
+	};
+
 	/**
 	 * The minimum x/y/z velocity distance, above which the entity is considered to be moving
 	 */
@@ -74,6 +110,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public T getEntity() {
 		return entity;
+	}
+
+	/**
+	 * Private method for access the NMS Entity handle
+	 * 
+	 * @return Entity handle
+	 */
+	private Entity h() {
+		return getHandle(Entity.class);
 	}
 
 	/**
@@ -128,38 +173,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		EntityRef.chunkZ.set(getHandle(), value);
 	}
 
-	public float getYaw() {
-		return getHandle(Entity.class).yaw;
-	}
-
-	public void setYaw(float value) {
-		getHandle(Entity.class).yaw = value;
-	}
-
-	public float getPitch() {
-		return getHandle(Entity.class).pitch;
-	}
-
-	public void setPitch(float value) {
-		getHandle(Entity.class).pitch = value;
-	}
-
-	public float getYawDifference(float yawcomparer) {
-		return MathUtil.getAngleDifference(this.getYaw(), yawcomparer);
-	}
-
-	public float getPitchDifference(float pitchcomparer) {
-		return MathUtil.getAngleDifference(this.getPitch(), pitchcomparer);
-	}
-
-	public float getYawDifference(CommonEntity<?> comparer) {
-		return getYawDifference(comparer.getPitch());
-	}
-
-	public float getPitchDifference(CommonEntity<?> comparer) {
-		return getPitchDifference(comparer.getPitch());
-	}
-
 	/**
 	 * Obtains the Entity head rotation angle, or 0.0 if this Entity has no head.
 	 * 
@@ -169,94 +182,16 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return getHandle(Entity.class).ao();
 	}
 
-	/**
-	 * Gets the X-coordinate of the entity location
-	 * 
-	 * @return entity location: X-coordinate
-	 */
-	public double getLocX() {
-		return getHandle(Entity.class).locX;
-	}
-
-	public void setLocX(double value) {
-		getHandle(Entity.class).locX = value;
-	}
-
-	/**
-	 * Gets the Y-coordinate of the entity location
-	 * 
-	 * @return entity location: Y-coordinate
-	 */
-	public double getLocY() {
-		return getHandle(Entity.class).locY;
-	}
-
-	public void setLocY(double value) {
-		getHandle(Entity.class).locY = value;
-	}
-
-	/**
-	 * Gets the Z-coordinate of the entity location
-	 * 
-	 * @return entity location: Z-coordinate
-	 */
-	public double getLocZ() {
-		return getHandle(Entity.class).locZ;
-	}
-
-	public void setLocZ(double value) {
-		getHandle(Entity.class).locZ = value;
-	}
-
-	/**
-	 * Gets the X-coordinate of the entity location at the start of the current tick
-	 * 
-	 * @return entity last location: X-coordinate
-	 */
-	public double getLastX() {
-		return getHandle(Entity.class).lastX;
-	}
-
-	public void setLastX(double value) {
-		getHandle(Entity.class).lastX = value;
-	}
-
-	/**
-	 * Gets the Y-coordinate of the entity location at the start of the current tick
-	 * 
-	 * @return entity last location: Y-coordinate
-	 */
-	public double getLastY() {
-		return getHandle(Entity.class).lastY;
-	}
-
-	public void setLastY(double value) {
-		getHandle(Entity.class).lastY = value;
-	}
-
-	/**
-	 * Gets the Z-coordinate of the entity location at the start of the current tick
-	 * 
-	 * @return entity last location: Z-coordinate
-	 */
-	public double getLastZ() {
-		return getHandle(Entity.class).lastZ;
-	}
-
-	public void setLastZ(double value) {
-		getHandle(Entity.class).lastZ = value;
-	}
-
 	public double getMovedX() {
-		return getLocX() - getLastX();
+		return loc.getX() - last.getX();
 	}
 
 	public double getMovedY() {
-		return getLocY() - getLastY();
+		return loc.getY() - last.getY();
 	}
 
 	public double getMovedZ() {
-		return getLocZ() - getLastZ();
+		return loc.getZ() - last.getZ();
 	}
 
  	public boolean hasMovedHorizontally() {
@@ -287,207 +222,16 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return MathUtil.lengthSquared(getMovedX(), getMovedY(), getMovedZ());
 	}
 
-	public double distanceTo(double x, double y, double z) {
-		return MathUtil.distance(this.getLocX(), this.getLocY(), this.getLocZ(), x, y, z);
-	}
-
-	public double distanceXZTo(double x, double z) {
-		return MathUtil.distance(getLocX(), getLocZ(), x, z);
-	}
-
-	public double distanceSquaredTo(double x, double y, double z) {
-		return MathUtil.distanceSquared(this.getLocX(), this.getLocY(), this.getLocZ(), x, y, z);
-	}
-
-	public double distanceXZSquaredTo(double x, double z) {
-		return MathUtil.distanceSquared(getLocX(), getLocZ(), x, z);
-	}
-
-	public double distanceXZTo(CommonEntity<?> entity) {
-		return distanceXZTo(entity.getEntity());
-	}
-
-	public double distanceXZTo(org.bukkit.entity.Entity e) {
-		return distanceXZTo(EntityUtil.getLocX(e), EntityUtil.getLocZ(e));
-	}
-
-	public double distanceXZTo(Location l) {
-		return distanceXZTo(l.getX(), l.getZ());
-	}
-
-	public double distanceXZTo(Block b) {
-		return distanceXZTo(b.getX() + 0.5, b.getZ() + 0.5);
-	}
-
-	public double distanceTo(CommonEntity<?> entity) {
-		return distanceTo(entity.getEntity());
-	}
-
-	public double distanceTo(org.bukkit.entity.Entity e) {
-		return distanceTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
-	}
-
-	public double distanceTo(Location l) {
-		return distanceTo(l.getX(), l.getY(), l.getZ());
-	}
-
-	public double distanceTo(Block b) {
-		return distanceTo(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
-	}
-
-	public double distanceXZSquaredTo(CommonEntity<?> entity) {
-		return distanceXZSquaredTo(entity.getEntity());
-	}
-
-	public double distanceXZSquaredTo(org.bukkit.entity.Entity e) {
-		return distanceXZSquaredTo(EntityUtil.getLocX(e), EntityUtil.getLocZ(e));
-	}
-
-	public double distanceXZSquaredTo(Location l) {
-		return distanceXZSquaredTo(l.getX(), l.getZ());
-	}
-
-	public double distanceXZSquaredTo(Block b) {
-		return distanceXZSquaredTo(b.getX() + 0.5, b.getZ() + 0.5);
-	}
-
-	public double distanceSquaredTo(CommonEntity<?> entity) {
-		return distanceSquaredTo(entity.getEntity());
-	}
-
-	public double distanceSquaredTo(org.bukkit.entity.Entity e) {
-		return distanceSquaredTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
-	}
-
-	public double distanceSquaredTo(Location l) {
-		return distanceSquaredTo(l.getX(), l.getY(), l.getZ());
-	}
-
-	public double distanceSquaredTo(Block b) {
-		return distanceSquaredTo(b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5);
-	}
-
-	public Vector locOffsetTo(double x, double y, double z) {
-		return new Vector(x - getLocX(), y - getLocY(), z - getLocZ());
-	}
-
-	public Vector locOffsetTo(Location l) {
-		return locOffsetTo(l.getX(), l.getY(), l.getZ());
-	}
-
-	public Vector locOffsetTo(CommonEntity<?> entity) {
-		return locOffsetTo(entity.getEntity());
-	}
-
-	public Vector locOffsetTo(org.bukkit.entity.Entity e) {
-		return locOffsetTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
-	}
-
-	public float getLastYaw() {
-		return getHandle(Entity.class).lastYaw;
-	}
-
-	public void setLastYaw(float value) {
-		getHandle(Entity.class).lastYaw = value;
-	}
-
-	public float getLastPitch() {
-		return getHandle(Entity.class).lastPitch;
-	}
-
-	public void setLastPitch(float value) {
-		getHandle(Entity.class).lastPitch = value;
-	}
-
-	public double getMotX() {
-		return getHandle(Entity.class).motX;
-	}
-
-	public void setMotX(double value) {
-		getHandle(Entity.class).motX = value;
-	}
-
-	public void addMotX(double value) {
-		getHandle(Entity.class).motX += value;
-	}
-
-	public double getMotY() {
-		return getHandle(Entity.class).motY;
-	}
-
-	public void setMotY(double value) {
-		getHandle(Entity.class).motY = value;
-	}
-
-	public void addMotY(double value) {
-		getHandle(Entity.class).motY += value;
-	}
-
-	public double getMotZ() {
-		return getHandle(Entity.class).motZ;
-	}
-
-	public void setMotZ(double value) {
-		getHandle(Entity.class).motZ = value;
-	}
-
-	public void addMotZ(double value) {
-		getHandle(Entity.class).motZ += value;
-	}
-
-	public void multiplyVelocity(Vector factor) {
-		multiplyVelocity(factor.getX(), factor.getY(), factor.getZ());
-	}
-
-	public void multiplyVelocity(double factor) {
-		multiplyVelocity(factor, factor, factor);
-	}
-
-	public void multiplyVelocity(double factX, double factY, double factZ) {
-		final Entity handle = getHandle(Entity.class);
-		handle.motX *= factX;
-		handle.motY *= factY;
-		handle.motZ *= factZ;
-	}
-
 	public boolean isMovingHorizontally() {
-		return Math.abs(getMotX()) > MIN_MOVE_SPEED || Math.abs(getMotZ()) > MIN_MOVE_SPEED;
+		return vel.x.abs() > MIN_MOVE_SPEED || vel.z.abs() > MIN_MOVE_SPEED;
 	}
 
 	public boolean isMovingVertically() {
-		return Math.abs(getMotY()) > MIN_MOVE_SPEED;
+		return vel.y.abs() > MIN_MOVE_SPEED;
 	}
 
 	public boolean isMoving() {
 		return isMovingHorizontally() || isMovingVertically();
-	}
-	
-	public int getLocChunkX() {
-		return MathUtil.toChunk(getLocX());
-	}
-
-	public int getLocChunkY() {
-		return MathUtil.toChunk(getLocY());
-	}
-
-	public int getLocChunkZ() {
-		return MathUtil.toChunk(getLocZ());
-	}
-
-	public int getLocBlockX() {
-		return MathUtil.floor(getLocX());
-	}
-
-	public int getLocBlockY() {
-		return MathUtil.floor(getLocY());
-	}
-
-	public int getLocBlockZ() {
-		return MathUtil.floor(getLocZ());
-	}
-
-	public IntVector3 getLocBlockPos() {
-		return new IntVector3(getLocBlockX(), getLocBlockY(), getLocBlockZ());
 	}
 
 	public void setWorld(World world) {
@@ -648,7 +392,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public Location getLastLocation() {
-		return new Location(getWorld(), getLastX(), getLastY(), getLastZ(), getLastYaw(), getLastPitch());
+		return last.toLocation();
 	}
 
 	public Location getLocation(Location arg0) {
@@ -730,22 +474,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
 	public Vector getVelocity() {
 		return entity.getVelocity();
-	}
-
-	public double getVelLength() {
-		return MathUtil.length(getMotX(), getMotY(), getMotZ());
-	}
-
-	public double getVelXZLength() {
-		return MathUtil.length(getMotX(), getMotZ());
-	}
-
-	public double getVelLengthSquared() {
-		return MathUtil.lengthSquared(getMotX(), getMotY(), getMotZ());
-	}
-
-	public double getVelXZLengthSquared() {
-		return MathUtil.lengthSquared(getMotX(), getMotZ());
 	}
 
 	public World getWorld() {

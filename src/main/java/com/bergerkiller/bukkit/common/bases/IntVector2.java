@@ -74,6 +74,24 @@ public class IntVector2 {
 		return world.getChunkAt(x, z);
 	}
 
+	/**
+	 * Gets the X-coordinate of the middle of 'the' block
+	 * 
+	 * @return block middle X
+	 */
+	public double midX() {
+		return (double) x + 0.5;
+	}
+
+	/**
+	 * Gets the Z-coordinate of the middle of 'the' block
+	 * 
+	 * @return block middle Z
+	 */
+	public double midZ() {
+		return (double) z + 0.5;
+	}
+
 	@Override
 	public int hashCode() {
 		long i = (long) this.x & 4294967295L | ((long) this.z & 4294967295L) << 32;

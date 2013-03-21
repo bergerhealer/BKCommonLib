@@ -32,7 +32,6 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
  * @param <T> - type of Entity
  */
 public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEntity<T> {
-
 	public CommonEntity(T entity) {
 		super(entity);
 	}

@@ -175,7 +175,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Human entity sleeping action
 		if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
 			PacketUtil.sendPacket(viewer, PacketFields.ENTITY_LOCATION_ACTION.newInstance(entity.getEntity(), 
-					0, entity.getLocBlockX(), entity.getLocBlockY(), entity.getLocBlockZ()));
+					0, entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
 		}
 
 		// Initial entity head rotation

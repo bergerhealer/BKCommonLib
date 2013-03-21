@@ -344,14 +344,14 @@ public class FaceUtil {
 		switch (face) {
 			case SOUTH_WEST:
 			case NORTH_WEST:
-				return MathUtil.HALFROOTOFTWO;
+				return -MathUtil.HALFROOTOFTWO;
 			case SOUTH_EAST:
 			case NORTH_EAST:
-				return -MathUtil.HALFROOTOFTWO;
+				return MathUtil.HALFROOTOFTWO;
 			case EAST:
-				return -1;
-			case WEST:
 				return 1;
+			case WEST:
+				return -1;
 			default:
 				return 0;
 		}
@@ -367,14 +367,14 @@ public class FaceUtil {
 		switch (face) {
 			case NORTH_EAST:
 			case NORTH_WEST:
-				return MathUtil.HALFROOTOFTWO;
+				return -MathUtil.HALFROOTOFTWO;
 			case SOUTH_WEST:
 			case SOUTH_EAST:
-				return -MathUtil.HALFROOTOFTWO;
+				return MathUtil.HALFROOTOFTWO;
 			case NORTH:
-				return 1;
-			case SOUTH:
 				return -1;
+			case SOUTH:
+				return 1;
 			default:
 				return 0;
 		}
