@@ -52,7 +52,7 @@ public class CommonEntityType {
 		this.bukkitType = ClassTemplate.create(entityType.getEntityClass());
 
 		// Obtain Common class type and constructor
-		Class<?> type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.Common" + nmsName);
+		Class<?> type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.type.Common" + nmsName);
 		if (type == null) {
 			this.commonType = ClassTemplate.create(CommonEntity.class);
 			this.commonConstructor = this.commonType.getConstructor(Entity.class);

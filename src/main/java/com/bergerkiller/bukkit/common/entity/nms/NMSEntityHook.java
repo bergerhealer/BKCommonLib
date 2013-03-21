@@ -10,18 +10,8 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
  * All classes implementing this Interface should have the default 'world only' constructor.
  */
 public interface NMSEntityHook {
-	/**
-	 * Gets the Entity Controller of this Entity
-	 * 
-	 * @return entity controller
-	 */
 	public EntityController<?> getController();
 
-	/**
-	 * Sets the Entity Controller for this Entity
-	 * 
-	 * @param controller to set to
-	 */
 	public void setController(EntityController<?> controller);
 
 	public void super_onTick();

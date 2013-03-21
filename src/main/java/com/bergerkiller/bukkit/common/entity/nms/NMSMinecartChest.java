@@ -1,20 +1,24 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
+import com.bergerkiller.bukkit.common.controller.DefaultEntityInventoryController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
+import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
-import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
+import net.minecraft.server.v1_5_R1.EntityMinecartChest;
+import net.minecraft.server.v1_5_R1.ItemStack;
 import net.minecraft.server.v1_5_R1.NBTTagCompound;
 import net.minecraft.server.v1_5_R1.World;
 
 @SuppressWarnings("rawtypes")
-public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntityHook {
+public class NMSMinecartChest extends EntityMinecartChest implements NMSEntityInventoryHook {
 	private EntityController<?> controller = new DefaultEntityController(this);
+	private EntityInventoryController<?> inventoryController = new DefaultEntityInventoryController(this);
 
-	public NMSMinecartRideable(World world) {
+	public NMSMinecartChest(World world) {
 		super(world);
 	}
 
@@ -107,5 +111,28 @@ public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEn
 	@Override
 	public String getLocalizedName() {
 		return controller.getLocalizedName();
+	}
+
+	/*
+	 * Inventory Controller
+	 */
+	@Override
+	public EntityInventoryController<?> getInventoryController() {
+		return inventoryController;
+	}
+
+	@Override
+	public void setInventoryController(EntityInventoryController<?> controller) {
+		inventoryController = controller;
+	}
+
+	@Override
+	public void super_setItem(int index, ItemStack item) {
+		super.setItem(index, item);
+	}
+
+	@Override
+	public void setItem(int index, ItemStack item) {
+		inventoryController.onItemSet(index, CommonNMS.getItemStack(item));
 	}
 }

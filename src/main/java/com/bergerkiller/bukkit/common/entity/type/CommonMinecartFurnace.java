@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.entity;
+package com.bergerkiller.bukkit.common.entity.type;
 
 import java.util.Arrays;
 import java.util.List;

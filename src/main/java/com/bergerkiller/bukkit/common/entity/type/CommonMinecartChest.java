@@ -1,21 +1,16 @@
-package com.bergerkiller.bukkit.common.entity;
+package com.bergerkiller.bukkit.common.entity.type;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.StorageMinecart;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class CommonMinecartChest extends CommonMinecart<StorageMinecart> {
+public class CommonMinecartChest extends CommonMinecartInventory<StorageMinecart> {
 
 	public CommonMinecartChest(StorageMinecart base) {
 		super(base);
-	}
-
-	public Inventory getInventory() {
-		return entity.getInventory();
 	}
 
 	@Override

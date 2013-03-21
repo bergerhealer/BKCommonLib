@@ -5,6 +5,7 @@ import net.minecraft.server.v1_5_R1.Entity;
 import net.minecraft.server.v1_5_R1.EntityHuman;
 import net.minecraft.server.v1_5_R1.EntityLiving;
 
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Does nothing but redirect to the default entity behaviour
@@ -21,11 +23,19 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
  */
 public final class DefaultEntityController<T extends CommonEntity<?>> extends EntityController<T> {
 
+	public DefaultEntityController() {
+	}
+
+	@SuppressWarnings("unchecked")
+	public DefaultEntityController(NMSEntityHook entity) {
+		bind((T) CommonEntity.get(CraftEntity.getEntity(CommonUtil.getCraftServer(), (Entity) entity)));
+	}
+
 	@Override
 	public void onDie() {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
-			((NMSEntityHook) handle).super_die();
+			super.onDie();
 		} else {
 			((Entity) handle).die();
 		}
@@ -35,7 +45,7 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 	public void onTick() {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
-			((NMSEntityHook) handle).super_onTick();
+			super.onTick();
 		} else {
 			((Entity) handle).l_();
 		}
@@ -45,7 +55,7 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 	public boolean onInteractBy(HumanEntity interacter) {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
-			return ((NMSEntityHook) handle).super_onInteract(CommonNMS.getNative(interacter));
+			return super.onInteractBy(interacter);
 		} else {
 			return ((Entity) handle).a_(CommonNMS.getNative(interacter));
 		}
@@ -53,6 +63,9 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 
 	@Override
 	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
+		if (entity.getHandle() instanceof NMSEntityHook) {
+			return super.onEntityDamage(damager, damage);
+		}
 		DamageSource source;
 		if (damager instanceof Player) {
 			source = DamageSource.playerAttack(CommonNMS.getNative(damager, EntityHuman.class));
@@ -61,19 +74,14 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 		} else {
 			source = DamageSource.GENERIC;
 		}
-		final Object handle = entity.getHandle();
-		if (handle instanceof NMSEntityHook) {
-			return ((NMSEntityHook) handle).super_damageEntity(source, damage);
-		} else {
-			return ((Entity) handle).damageEntity(source, damage);
-		}
+		return entity.getHandle(Entity.class).damageEntity(source, damage);
 	}
 
 	@Override
 	public void onBurnDamage(int damage) {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
-			((NMSEntityHook) handle).super_onBurn(damage);
+			super.onBurnDamage(damage);
 		} else {
 			EntityRef.burn(handle, damage);
 		}
@@ -83,7 +91,7 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 	public String getLocalizedName() {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
-			return ((NMSEntityHook) handle).super_getLocalizedName();
+			return super.getLocalizedName();
 		} else {
 			return ((Entity) handle).getLocalizedName();
 		}

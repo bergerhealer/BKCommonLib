@@ -6,15 +6,15 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
-import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
+import net.minecraft.server.v1_5_R1.EntityMinecartFurnace;
 import net.minecraft.server.v1_5_R1.NBTTagCompound;
 import net.minecraft.server.v1_5_R1.World;
 
 @SuppressWarnings("rawtypes")
-public class NMSMinecartRideable extends EntityMinecartRideable implements NMSEntityHook {
+public class NMSMinecartFurnace extends EntityMinecartFurnace implements NMSEntityHook {
 	private EntityController<?> controller = new DefaultEntityController(this);
 
-	public NMSMinecartRideable(World world) {
+	public NMSMinecartFurnace(World world) {
 		super(world);
 	}
 

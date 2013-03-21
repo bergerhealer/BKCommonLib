@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.entity;
+package com.bergerkiller.bukkit.common.entity.type;
 
 import java.util.List;
 
@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 
 public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 

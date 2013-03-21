@@ -1,7 +1,9 @@
-package com.bergerkiller.bukkit.common.entity;
+package com.bergerkiller.bukkit.common.entity.type;
 
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 
 public class CommonItem extends CommonEntity<Item> {
 

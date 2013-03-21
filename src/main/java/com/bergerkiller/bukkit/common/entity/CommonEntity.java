@@ -18,7 +18,6 @@ import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
-import com.bergerkiller.bukkit.common.events.EntitySetControllerEvent;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
@@ -261,11 +260,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @param controller to set to
 	 */
 	public void setController(EntityController<CommonEntity<T>> controller) {
-		if (!isHooked() && (controller == null || controller instanceof DefaultEntityController)) {
-			// No controller is requested - no need to do anything
-			return;
-		}
-
 		// Prepare the hook
 		this.prepareHook();
 
@@ -273,17 +267,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		if (controller == null) {
 			controller = new DefaultEntityController<CommonEntity<T>>();
 		}
-
-		// Event
-		CommonUtil.callEvent(new EntitySetControllerEvent(this, controller));
-
-		// Detach the old controller
-		final EntityController<CommonEntity<T>> old = getController();
-		if (old != null) {
-			old.bind(null);
-		}
-
-		// Attach the controller
+		getController().bind(null);
 		controller.bind(this);
 	}
 
@@ -298,7 +282,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	public static <T extends org.bukkit.entity.Entity> CommonEntity<T> get(T entity) {
 		final Object handle = Conversion.toEntityHandle.convert(entity);
 		if (handle instanceof NMSEntityHook) {
-			return (CommonEntity<T>) ((NMSEntityHook) handle).getController().getEntity();
+			EntityController<?> controller = ((NMSEntityHook) handle).getController();
+			if (controller != null) {
+				return (CommonEntity<T>) controller.getEntity();
+			}
 		}
 		return CommonEntityTypeStore.byNMSEntity(handle).createCommonEntity(entity);
 	}
