@@ -20,7 +20,7 @@ class CommonClasses {
 		loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
 		loadUtil("Recipe", "Stream", "World");
 		// Remaining classes
-		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityTypeStore");
+		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityType");
 	}
 
 	private static void loadRef(String... classNames) {

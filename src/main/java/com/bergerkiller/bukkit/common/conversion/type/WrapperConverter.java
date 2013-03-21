@@ -19,10 +19,14 @@ import net.minecraft.server.v1_5_R2.TileEntityFurnace;
 import net.minecraft.server.v1_5_R2.Vec3D;
 import net.minecraft.server.v1_5_R2.World;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
+
+import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryAnvil;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryBeacon;
@@ -33,6 +37,7 @@ import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryFurnace;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryMerchant;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack;
+
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
@@ -43,6 +48,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
@@ -71,7 +77,18 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 		@Override
 		public org.bukkit.entity.Entity convertSpecial(Object value, Class<?> valueType, org.bukkit.entity.Entity def) {
 			if (value instanceof Entity) {
-				return ((Entity) value).getBukkitEntity();
+				final Entity handle = (Entity) value;
+				if (handle.world == null) {
+					// We need this to avoid NPE's for non-spawned entities!
+					org.bukkit.entity.Entity entity = EntityRef.bukkitEntity.get(handle);
+					if (entity == null) {
+						entity = CraftEntity.getEntity((CraftServer) Bukkit.getServer(), handle);
+						EntityRef.bukkitEntity.set(handle, entity);
+					}
+					return entity;
+				} else {
+					return handle.getBukkitEntity();
+				}
 			} else {
 				return def;
 			}

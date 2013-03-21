@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import java.util.List;
+import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import net.minecraft.server.v1_5_R2.EntityPlayer;
@@ -9,7 +11,6 @@ import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
 
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
-import com.bergerkiller.bukkit.common.entity.CommonEntityTypeStore;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 
@@ -30,7 +31,7 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 			this.xLoc = tracker.at.a(tracker.locX);
 			this.zLoc = tracker.at.a(tracker.locZ);
 			// Set proper update interval/viewdistance/mobile
-			final CommonEntityType type = CommonEntityTypeStore.byNMSEntity(tracker);
+			final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
 			this.controller.setMobile(type.networkIsMobile);
 			this.controller.setUpdateInterval(type.networkUpdateInterval);
 			this.controller.setViewDistance(type.networkViewDistance);
@@ -50,7 +51,12 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 		synchronized (controller) {
 			updateTrackers(list);
 			EntityTrackerEntryRef.timeSinceLocationSync.set(this, EntityTrackerEntryRef.timeSinceLocationSync.get(this) + 1);
-			controller.onSync();
+			try {
+				controller.onSync();
+			} catch (Throwable t) {
+				Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to synchronize:");
+				t.printStackTrace();
+			}
 			this.m++;
 		}
 	}
@@ -75,23 +81,43 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 
 	@Override
 	public void a() {
-		controller.makeHiddenForAll();
+		try {
+			controller.makeHiddenForAll();
+		} catch (Throwable t) {
+			Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to hide for all viewers:");
+			t.printStackTrace();
+		}
 	}
 
 	@Override
 	public void clear(EntityPlayer entityplayer) {
-		controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+		try {
+			controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+		} catch (Throwable t) {
+			Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to remove viewer:");
+			t.printStackTrace();
+		}
 	}
 
 	@Override
 	public void a(EntityPlayer entityplayer) {
-		controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+		try {
+			controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+		} catch (Throwable t) {
+			Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to remove viewer:");
+			t.printStackTrace();
+		}
 	}
 
 	@Override
 	public void updatePlayer(EntityPlayer entityplayer) {
 		if (entityplayer != tracker) {
-			controller.updateViewer(CommonNMS.getPlayer(entityplayer));
+			try {
+				controller.updateViewer(CommonNMS.getPlayer(entityplayer));
+			} catch (Throwable t) {
+				Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to update viewer:");
+				t.printStackTrace();
+			}
 		}
 	}
 }

@@ -1,16 +1,14 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.IInventory;
 
-import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public final class DefaultEntityInventoryController<T extends CommonEntity<?>> extends EntityInventoryController<T> {
 
@@ -19,7 +17,7 @@ public final class DefaultEntityInventoryController<T extends CommonEntity<?>> e
 
 	@SuppressWarnings("unchecked")
 	public DefaultEntityInventoryController(NMSEntityHook entity) {
-		bind((T) CommonEntity.get(CraftEntity.getEntity(CommonUtil.getCraftServer(), (Entity) entity)));
+		bind((T) CommonEntity.get(Conversion.toEntity.convert(entity)));
 	}
 
 	@Override

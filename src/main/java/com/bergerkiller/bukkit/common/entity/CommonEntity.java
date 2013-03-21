@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
+import org.bukkit.entity.EntityType;
 
 import net.minecraft.server.v1_5_R2.Chunk;
 import net.minecraft.server.v1_5_R2.Entity;
@@ -87,7 +88,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 				final Object newEntry;
 				if (controller instanceof DefaultEntityNetworkController) {
 					if (oldEntry == null) {
-						final CommonEntityType type = CommonEntityTypeStore.byEntity(entity);
+						final CommonEntityType type = CommonEntityType.byEntity(entity);
 						newEntry = new EntityTrackerEntry(getHandle(Entity.class), 
 								type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
 					} else {
@@ -162,7 +163,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			if (!oldInstanceName.startsWith(Common.NMS_ROOT)) {
 				throw new RuntimeException("Can not assign controllers to a custom Entity Type (" + oldInstanceName + ")");
 			}
-			final CommonEntityType type = CommonEntityTypeStore.byEntity(entity);
+			final CommonEntityType type = CommonEntityType.byEntity(entity);
 			if (!type.hasHookEntity()) {
 				throw new RuntimeException("Entity of type '" + type.entityType + "' has no Controller support!");
 			}
@@ -286,6 +287,30 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 				return (CommonEntity<T>) controller.getEntity();
 			}
 		}
-		return CommonEntityTypeStore.byNMSEntity(handle).createCommonEntity(entity);
+		return CommonEntityType.byNMSEntity(handle).createCommonEntity(entity);
+	}
+
+	/**
+	 * Creates (but does not spawn) a new Common Entity backed by a proper Entity.
+	 * 
+	 * @param entityType to create
+	 * @return a new CommonEntity type instance
+	 */
+	public static CommonEntity<?> create(EntityType entityType) {
+		CommonEntityType type = CommonEntityType.byEntityType(entityType);
+		if (type == CommonEntityType.UNKNOWN) {
+			throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
+		}
+		// Spawn a new NMS Entity
+		Entity handle;
+		if (type.hasHookEntity()) {
+			handle = (Entity) type.createNMSHookEntity();
+		} else if (type.hasNMSEntity()) {
+			handle = (Entity) type.createNMSEntity();
+		} else {
+			throw new RuntimeException("The Entity Type '"  + entityType + "' has no suitable Entity constructor to use!");
+		}
+		// Create a new CommonEntity and done
+		return get(Conversion.toEntity.convert(handle));
 	}
 }

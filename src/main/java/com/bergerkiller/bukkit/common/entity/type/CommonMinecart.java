@@ -100,6 +100,33 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	/**
+	 * Gets the block type for this Minecart
+	 * 
+	 * @return block type
+	 */
+	public Material getBlockType() {
+		return Material.getMaterial(getBlockId());
+	}
+
+	/**
+	 * Gets the block type id for this Minecart
+	 * 
+	 * @return block type id
+	 */
+	public int getBlockId() {
+		return getHandle(EntityMinecartAbstract.class).getDataWatcher().getInt(20) & '\uffff';
+	}
+
+	/**
+	 * Gets the block data for this Minecart
+	 * 
+	 * @return block data
+	 */
+	public int getBlockData() {
+		return getHandle(EntityMinecartAbstract.class).o();
+	}
+
+	/**
 	 * Sets the Block displayed in this Minecart
 	 * 
 	 * @param blockType of the Block

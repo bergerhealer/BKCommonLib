@@ -1,15 +1,16 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
+import net.minecraft.server.v1_5_R2.DamageSource;
+import net.minecraft.server.v1_5_R2.EntityHuman;
+import net.minecraft.server.v1_5_R2.EntityMinecartMobSpawner;
+import net.minecraft.server.v1_5_R2.NBTTagCompound;
+import net.minecraft.server.v1_5_R2.World;
+
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
 
-import net.minecraft.server.v1_5_R1.DamageSource;
-import net.minecraft.server.v1_5_R1.EntityHuman;
-import net.minecraft.server.v1_5_R1.EntityMinecartMobSpawner;
-import net.minecraft.server.v1_5_R1.NBTTagCompound;
-import net.minecraft.server.v1_5_R1.World;
 
 @SuppressWarnings("rawtypes")
 public class NMSMinecartMobSpawner extends EntityMinecartMobSpawner implements NMSEntityHook {

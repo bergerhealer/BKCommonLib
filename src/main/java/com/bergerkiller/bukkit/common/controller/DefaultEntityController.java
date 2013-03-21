@@ -5,16 +5,15 @@ import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.EntityHuman;
 import net.minecraft.server.v1_5_R2.EntityLiving;
 
-import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Does nothing but redirect to the default entity behaviour
@@ -28,7 +27,7 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 
 	@SuppressWarnings("unchecked")
 	public DefaultEntityController(NMSEntityHook entity) {
-		bind((T) CommonEntity.get(CraftEntity.getEntity(CommonUtil.getCraftServer(), (Entity) entity)));
+		bind((T) CommonEntity.get(Conversion.toEntity.convert(entity)));
 	}
 
 	@Override
