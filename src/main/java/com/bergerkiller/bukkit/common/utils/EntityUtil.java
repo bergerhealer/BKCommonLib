@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.UUID;
-import net.minecraft.server.v1_5_R1.Entity;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.World;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
+import net.minecraft.server.v1_5_R2.World;
 import org.bukkit.Location;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;

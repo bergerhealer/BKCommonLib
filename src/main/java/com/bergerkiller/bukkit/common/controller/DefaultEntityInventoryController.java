@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_5_R1.Entity;
-import net.minecraft.server.v1_5_R1.IInventory;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.IInventory;
 
-import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;

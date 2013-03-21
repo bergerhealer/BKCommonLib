@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_5_R1.TileEntityChest;
-import net.minecraft.server.v1_5_R1.TileEntityDispenser;
-import net.minecraft.server.v1_5_R1.TileEntityFurnace;
-import net.minecraft.server.v1_5_R1.TileEntitySign;
+import net.minecraft.server.v1_5_R2.TileEntityChest;
+import net.minecraft.server.v1_5_R2.TileEntityDispenser;
+import net.minecraft.server.v1_5_R2.TileEntityFurnace;
+import net.minecraft.server.v1_5_R2.TileEntitySign;
 
-import org.bukkit.craftbukkit.v1_5_R1.block.CraftChest;
-import org.bukkit.craftbukkit.v1_5_R1.block.CraftDispenser;
-import org.bukkit.craftbukkit.v1_5_R1.block.CraftFurnace;
-import org.bukkit.craftbukkit.v1_5_R1.block.CraftSign;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftChest;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftDispenser;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftFurnace;
+import org.bukkit.craftbukkit.v1_5_R2.block.CraftSign;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;

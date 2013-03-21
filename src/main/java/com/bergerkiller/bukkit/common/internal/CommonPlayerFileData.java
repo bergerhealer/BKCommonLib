@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import net.minecraft.server.v1_5_R1.EntityHuman;
-import net.minecraft.server.v1_5_R1.IPlayerFileData;
-import net.minecraft.server.v1_5_R1.NBTTagCompound;
+import net.minecraft.server.v1_5_R2.EntityHuman;
+import net.minecraft.server.v1_5_R2.IPlayerFileData;
+import net.minecraft.server.v1_5_R2.NBTTagCompound;
 
 class CommonPlayerFileData implements IPlayerFileData {
 	private final IPlayerFileData previous;

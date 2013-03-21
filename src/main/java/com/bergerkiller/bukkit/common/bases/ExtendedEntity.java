@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import net.minecraft.server.v1_5_R1.Entity;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
 
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_5_R1.CraftSound;
+import org.bukkit.craftbukkit.v1_5_R2.CraftSound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;

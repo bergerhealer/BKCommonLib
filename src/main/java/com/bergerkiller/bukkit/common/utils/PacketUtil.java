@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.Collection;
 import java.util.Map;
 
-import net.minecraft.server.v1_5_R1.Packet;
+import net.minecraft.server.v1_5_R2.Packet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;

@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.entity.type;
 
 import java.util.List;
 
-import net.minecraft.server.v1_5_R1.EntityMinecartAbstract;
-import net.minecraft.server.v1_5_R1.EntityMinecartRideable;
+import net.minecraft.server.v1_5_R2.EntityMinecartAbstract;
+import net.minecraft.server.v1_5_R2.EntityMinecartRideable;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Minecart;

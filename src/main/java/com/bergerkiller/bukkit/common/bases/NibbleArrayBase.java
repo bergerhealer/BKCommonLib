@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.reflection.classes.NibbleArrayRef;
 
-import net.minecraft.server.v1_5_R1.NibbleArray;
+import net.minecraft.server.v1_5_R2.NibbleArray;
 
 /**
  * Base class to work with Nibble Array implementations

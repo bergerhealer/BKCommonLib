@@ -12,14 +12,14 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
-import net.minecraft.server.v1_5_R1.Entity;
-import net.minecraft.server.v1_5_R1.FoodMetaData;
-import net.minecraft.server.v1_5_R1.InventoryEnderChest;
-import net.minecraft.server.v1_5_R1.MobEffect;
-import net.minecraft.server.v1_5_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_5_R1.NBTTagCompound;
-import net.minecraft.server.v1_5_R1.NBTTagList;
-import net.minecraft.server.v1_5_R1.PlayerInventory;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.FoodMetaData;
+import net.minecraft.server.v1_5_R2.InventoryEnderChest;
+import net.minecraft.server.v1_5_R2.MobEffect;
+import net.minecraft.server.v1_5_R2.NBTCompressedStreamTools;
+import net.minecraft.server.v1_5_R2.NBTTagCompound;
+import net.minecraft.server.v1_5_R2.NBTTagList;
+import net.minecraft.server.v1_5_R2.PlayerInventory;
 
 /**
  * Contains utility functions for dealing with NBT data

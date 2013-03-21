@@ -4,8 +4,8 @@ import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.MinecraftServer;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
+import net.minecraft.server.v1_5_R2.MinecraftServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
