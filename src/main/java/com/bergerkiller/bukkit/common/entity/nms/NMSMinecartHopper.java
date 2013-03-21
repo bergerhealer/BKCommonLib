@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.controller.DefaultEntityInventoryControlle
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
@@ -22,15 +23,35 @@ public class NMSMinecartHopper extends EntityMinecartHopper implements NMSEntity
 		super(world);
 	}
 
+	/*
+	 * ===================================================================================
+	 * ================The below methods are for all entity types ========================
+	 * ===================================================================================
+	 */
+	private String getSavedName() {
+		return EntityTypesRef.classToNames.get(getClass().getSuperclass());
+	}
+
 	@Override
     public boolean c(NBTTagCompound nbttagcompound) {
         if (this.dead) {
         	return false;
         } else {
-            nbttagcompound.setString("id", "MinecartChest");
+            nbttagcompound.setString("id", getSavedName());
             this.e(nbttagcompound);
             return true;
         }
+    }
+
+	@Override
+    public boolean d(NBTTagCompound nbttagcompound) {
+		if (this.dead || (this.passenger != null && controller.isPlayerTakable())) {
+			return false;
+		} else {
+            nbttagcompound.setString("id", getSavedName());
+            this.e(nbttagcompound);
+            return true;
+		}
     }
 
 	@Override
@@ -112,9 +133,16 @@ public class NMSMinecartHopper extends EntityMinecartHopper implements NMSEntity
 	public String getLocalizedName() {
 		return controller.getLocalizedName();
 	}
+	/*
+	 * ===================================================================================
+	 * =======================================END ========================================
+	 * ===================================================================================
+	 */
 
 	/*
-	 * Inventory Controller
+	 * ===================================================================================
+	 * ============= The below methods are only for inventory holders ====================
+	 * ===================================================================================
 	 */
 	@Override
 	public EntityInventoryController<?> getInventoryController() {

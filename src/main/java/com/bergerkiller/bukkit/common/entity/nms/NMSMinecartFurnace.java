@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.entity.nms;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
@@ -18,15 +19,35 @@ public class NMSMinecartFurnace extends EntityMinecartFurnace implements NMSEnti
 		super(world);
 	}
 
+	/*
+	 * ===================================================================================
+	 * ================The below methods are for all entity types ========================
+	 * ===================================================================================
+	 */
+	private String getSavedName() {
+		return EntityTypesRef.classToNames.get(getClass().getSuperclass());
+	}
+
 	@Override
     public boolean c(NBTTagCompound nbttagcompound) {
         if (this.dead) {
         	return false;
         } else {
-            nbttagcompound.setString("id", "MinecartChest");
+            nbttagcompound.setString("id", getSavedName());
             this.e(nbttagcompound);
             return true;
         }
+    }
+
+	@Override
+    public boolean d(NBTTagCompound nbttagcompound) {
+		if (this.dead || (this.passenger != null && controller.isPlayerTakable())) {
+			return false;
+		} else {
+            nbttagcompound.setString("id", getSavedName());
+            this.e(nbttagcompound);
+            return true;
+		}
     }
 
 	@Override
@@ -108,4 +129,9 @@ public class NMSMinecartFurnace extends EntityMinecartFurnace implements NMSEnti
 	public String getLocalizedName() {
 		return controller.getLocalizedName();
 	}
+	/*
+	 * ===================================================================================
+	 * =======================================END ========================================
+	 * ===================================================================================
+	 */
 }

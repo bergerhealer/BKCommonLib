@@ -122,6 +122,17 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	}
 
 	/**
+	 * Gets whether this Entity Controller allows players to take this Entity with them.
+	 * With this enabled, players take the vehicle with them.
+	 * To disable this default behavior, override this method.
+	 * 
+	 * @return True if players can take the entity with them, False if not
+	 */
+	public boolean isPlayerTakable() {
+		return true;
+	}
+
+	/**
 	 * Gets the localized name of this Entity. Override this method to change the name.
 	 * 
 	 * @return Localized name

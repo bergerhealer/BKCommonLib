@@ -7,15 +7,15 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
 
 import net.minecraft.server.v1_5_R1.DamageSource;
 import net.minecraft.server.v1_5_R1.EntityHuman;
-import net.minecraft.server.v1_5_R1.EntityMinecartTNT;
+import net.minecraft.server.v1_5_R1.EntityMinecartMobSpawner;
 import net.minecraft.server.v1_5_R1.NBTTagCompound;
 import net.minecraft.server.v1_5_R1.World;
 
 @SuppressWarnings("rawtypes")
-public class NMSMinecartTNT extends EntityMinecartTNT implements NMSEntityHook {
+public class NMSMinecartMobSpawner extends EntityMinecartMobSpawner implements NMSEntityHook {
 	private EntityController<?> controller = new DefaultEntityController(this);
 
-	public NMSMinecartTNT(World world) {
+	public NMSMinecartMobSpawner(World world) {
 		super(world);
 	}
 

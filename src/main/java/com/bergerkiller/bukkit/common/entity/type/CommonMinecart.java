@@ -99,6 +99,46 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 		return getHandle(EntityMinecartAbstract.class).getType();
 	}
 
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockType of the Block
+	 */
+	public void setBlock(Material blockType) {
+		setBlock(blockType, 0);
+	}
+
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockId of the Block
+	 */
+	public void setBlock(int blockId) {
+		setBlock(blockId, 0);
+	}
+
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockType of the Block
+	 * @param blockData of the Block
+	 */
+	public void setBlock(Material blockType, int blockData) {
+		setBlock(blockType == null ? 0 : blockType.getId(), blockData);
+	}
+
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockId of the Block
+	 * @param blockData of the Block
+	 */
+	public void setBlock(int blockId, int blockData) {
+		EntityMinecartAbstract handle = getHandle(EntityMinecartAbstract.class);
+		handle.k(blockId);
+		handle.l(blockData);
+	}
+
 	@Override
 	public boolean isVehicle() {
 		return getHandle() instanceof EntityMinecartRideable;

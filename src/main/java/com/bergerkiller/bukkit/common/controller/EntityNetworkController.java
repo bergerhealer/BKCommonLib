@@ -149,7 +149,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param viewer to display this Entity for
 	 */
 	public synchronized void makeVisible(Player viewer) {
-		CommonNMS.getNative(viewer).removeQueue.remove(entity.getEntityId());
+		CommonNMS.getNative(viewer).removeQueue.remove((Object) entity.getEntityId());
 
 		// Spawn packet
 		PacketUtil.sendPacket(viewer, getSpawnPacket());
@@ -216,7 +216,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		if (instant) {
 			PacketUtil.sendPacket(viewer, PacketFields.DESTROY_ENTITY.newInstance(entity.getEntityId()));
 		} else {
-			CommonNMS.getNative(viewer).removeQueue.add(entity.getEntityId());
+			CommonNMS.getNative(viewer).removeQueue.add((Object) entity.getEntityId());
 		}
 	}
 
@@ -394,6 +394,41 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	}
 
 	/**
+	 * Synchronizes everything by first destroying and then respawning this Entity to all viewers
+	 */
+	public synchronized void syncRespawn() {
+		// Hide
+		for (Player viewer : getViewers()) {
+			this.makeHidden(viewer, true);
+		}
+
+		// Update synchronized information
+		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
+		final Vector velocity = this.getProtocolVelocity();
+		handle.j = velocity.getX();
+		handle.k = velocity.getY();
+		handle.l = velocity.getZ();
+		final IntVector3 position = this.getProtocolPosition();
+		handle.xLoc = position.x;
+		handle.yLoc = position.y;
+		handle.zLoc = position.z;
+		final IntVector2 rotation = this.getProtocolRotation();
+		handle.yRot = rotation.x;
+		handle.xRot = rotation.z;
+		final int headYaw = this.getProtocolHeadRotation();
+		handle.i = headYaw;
+
+		// Spawn
+		for (Player viewer : getViewers()) {
+			this.makeVisible(viewer);
+		}
+		// Attach messages (because it is not handled by vehicles)
+		if (entity.hasPassenger()) {
+			broadcast(PacketFields.ATTACH_ENTITY.newInstance(entity.getPassenger(), entity.getEntity()));
+		}
+	}
+
+	/**
 	 * Synchronizes the entity Vehicle
 	 * 
 	 * @param vehicle to synchronize, NULL for no Vehicle
@@ -435,6 +470,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
 	/**
 	 * Synchronizes the entity position / rotation relatively.
+	 * 
+	 * @param position - whether to sync position
+	 * @param rotation - whether to sync rotation
+	 */
+	public synchronized void syncLocation(boolean position, boolean rotation) {
+		syncLocation(position ? getProtocolPosition() : getProtocolPositionSynched(),
+				rotation ? getProtocolRotation() : getProtocolRotationSynched());
+	}
+
+	/**
+	 * Synchronizes the entity position / rotation relatively.
 	 * If the relative change is too big, an absolute update is performed instead.
 	 * 
 	 * @param position (new)
@@ -443,7 +489,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	public synchronized void syncLocation(IntVector3 position, IntVector2 rotation) {
 		final IntVector3 deltaPos = position.subtract(this.getProtocolPositionSynched());
 		final IntVector2 deltaRot = rotation.subtract(this.getProtocolRotationSynched());
-		if (deltaPos.greaterThan(MAX_RELATIVE_DISTANCE)) {
+		if (deltaPos.abs().greaterThan(MAX_RELATIVE_DISTANCE)) {
 			// Perform teleport instead
 			syncLocationAbsolute(position, rotation);
 		} else {
