@@ -11,6 +11,11 @@ import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 public interface CommonEntityInventory<T extends Entity> {
 	public Inventory getInventory();
 
+	/**
+	 * Updates the Inventory (can mean: Update items to viewers)
+	 */
+	public void update();
+
 	public void setInventoryController(EntityInventoryController<CommonEntity<T>> controller);
 
 	public EntityInventoryController<CommonEntity<T>> getInventoryController();

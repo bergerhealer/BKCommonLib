@@ -2,12 +2,8 @@ package com.bergerkiller.bukkit.common.controller;
 
 import net.minecraft.server.v1_5_R2.DamageSource;
 import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityHuman;
-import net.minecraft.server.v1_5_R2.EntityLiving;
 
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -55,19 +51,11 @@ public final class DefaultEntityController extends EntityController {
 	}
 
 	@Override
-	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
+	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, int damage) {
 		if (entity.getHandle() instanceof NMSEntityHook) {
-			return super.onEntityDamage(damager, damage);
+			super.onDamage(damageSource, damage);
 		}
-		DamageSource source;
-		if (damager instanceof Player) {
-			source = DamageSource.playerAttack(CommonNMS.getNative(damager, EntityHuman.class));
-		} else if (damager instanceof LivingEntity) {
-			source = DamageSource.mobAttack(CommonNMS.getNative(damager, EntityLiving.class));
-		} else {
-			source = DamageSource.GENERIC;
-		}
-		return ((Entity) entity.getHandle()).damageEntity(source, damage);
+		((Entity) entity.getHandle()).damageEntity((DamageSource) damageSource.getHandle(), damage);
 	}
 
 	@Override

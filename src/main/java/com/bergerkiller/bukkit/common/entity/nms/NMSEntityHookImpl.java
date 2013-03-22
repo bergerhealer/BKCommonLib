@@ -40,8 +40,9 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public boolean damageEntity(DamageSource damagesource, int damage) {
-		return controller.onEntityDamage(CommonNMS.getEntity(damagesource.getEntity()), damage);
+	public boolean damageEntity(DamageSource damageSource, int damage) {
+		controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
+		return true;
 	}
 
 	@Override

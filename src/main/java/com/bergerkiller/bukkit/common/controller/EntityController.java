@@ -6,8 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
@@ -16,8 +14,6 @@ import net.minecraft.server.v1_5_R2.AxisAlignedBB;
 import net.minecraft.server.v1_5_R2.Block;
 import net.minecraft.server.v1_5_R2.DamageSource;
 import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityHuman;
-import net.minecraft.server.v1_5_R2.EntityLiving;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
@@ -80,18 +76,9 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * 
 	 * @param damager that dealt the damage
 	 * @param damage amount
-	 * @return True if damage was dealt, False if not
 	 */
-	public boolean onEntityDamage(org.bukkit.entity.Entity damager, int damage) {
-		DamageSource source;
-		if (damager instanceof Player) {
-			source = DamageSource.playerAttack(CommonNMS.getNative(damager, EntityHuman.class));
-		} else if (damager instanceof LivingEntity) {
-			source = DamageSource.mobAttack(CommonNMS.getNative(damager, EntityLiving.class));
-		} else {
-			source = DamageSource.GENERIC;
-		}
-		return entity.getHandle(NMSEntityHook.class).super_damageEntity(source, damage);
+	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, int damage) {
+		entity.getHandle(NMSEntityHook.class).super_damageEntity((DamageSource) damageSource.getHandle(), damage);
 	}
 
 	/**

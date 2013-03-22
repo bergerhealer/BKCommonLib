@@ -109,7 +109,7 @@ public class MaterialUtil {
 	/**
 	 * The material is a type of rails
 	 */
-	public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL);
+	public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL);
 
 	/**
 	 * The material is a type of sign (item type is excluded)

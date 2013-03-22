@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import net.minecraft.server.v1_5_R2.IInventory;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
@@ -25,6 +27,11 @@ public abstract class CommonMinecartInventory<T extends Minecart & InventoryHold
 	@Override
 	public Inventory getInventory() {
 		return entity.getInventory();
+	}
+
+	@Override
+	public void update() {
+		getHandle(IInventory.class).update();
 	}
 
 	@Override

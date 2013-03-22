@@ -14,6 +14,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.PoweredRail;
 import org.bukkit.material.Rails;
 import org.bukkit.material.Directional;
 
@@ -34,7 +35,12 @@ public class BlockUtil extends MaterialUtil {
 	 * This alternative does not create a Block State and is preferred if you only need material data
 	 */
 	public static MaterialData getData(org.bukkit.block.Block block) {
-		return block.getType().getNewData(block.getData());
+		final Material type = block.getType();
+		// Temporary hack because Bukkit is updating far too slowly
+		if (type == Material.ACTIVATOR_RAIL) {
+			return new PoweredRail(type, block.getData());
+		}
+		return type.getNewData(block.getData());
 	}
 
 	/**
