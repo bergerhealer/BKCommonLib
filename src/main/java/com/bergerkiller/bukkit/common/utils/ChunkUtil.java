@@ -245,17 +245,25 @@ public class ChunkUtil {
 	 * @param world to set the chunk in
 	 * @param x coordinate of the chunk
 	 * @param z coordinate of the chunk
-	 * @param chunk to set to
+	 * @param chunk to set to (use null to remove)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void setChunk(World world, final int x, final int z, final org.bukkit.Chunk chunk) {
+		final Chunk handle = CommonNMS.getNative(chunk);
+		if (handle != null && handle.bukkitChunk == null) {
+			throw new RuntimeException("Can not put a chunk that has no BukkitChunk");
+		}
 		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
 			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
 					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
-						((LongObjectHashMap) chunks).put(key, CommonNMS.getNative(chunk));
+						if (handle == null) {
+							((LongObjectHashMap) chunks).remove(key);
+						} else {
+							((LongObjectHashMap) chunks).put(key, handle);
+						}
 						return;
 					}
 				} catch (Throwable t) {

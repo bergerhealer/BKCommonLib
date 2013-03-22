@@ -34,17 +34,20 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * 
 	 * @param entity to bind with
 	 */
-	public final void bind(T entity) {
+	@SuppressWarnings("unchecked")
+	public final void bind(CommonEntity<?> entity) {
 		if (this.entity != null) {
 			this.onDetached();
 		}
-		this.entity = entity;
+		this.entity = (T) entity;
 		if (this.entity != null) {
 			final Object handle = this.entity.getHandle();
 			if (handle instanceof NMSEntityHook) {
 				((NMSEntityHook) handle).setController(this);
 			}
-			this.onAttached();
+			if (entity.isSpawned()) {
+				this.onAttached();
+			}
 		}
 	}
 
@@ -59,7 +62,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * Called every tick to update the entity
 	 */
 	public void onTick() {
-		entity.getHandle(NMSEntityHook.class).super_onTick(); 
+		entity.getHandle(NMSEntityHook.class).super_l_();
 	}
 
 	/**
@@ -69,7 +72,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * @return True if interaction occurred, False if not
 	 */
 	public boolean onInteractBy(HumanEntity interacter) {
-		return entity.getHandle(NMSEntityHook.class).super_onInteract(CommonNMS.getNative(interacter)); 
+		return entity.getHandle(NMSEntityHook.class).super_a_(CommonNMS.getNative(interacter)); 
 	}
 
 	/**
@@ -118,7 +121,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * @param damage dealt
 	 */
 	public void onBurnDamage(int damage) {
-		entity.getHandle(NMSEntityHook.class).super_onBurn(damage); 
+		entity.getHandle(NMSEntityHook.class).super_burn(damage); 
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 
@@ -23,6 +24,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -52,7 +54,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		if (entityTrackerEntry instanceof NMSEntityTrackerEntry) {
 			result = ((NMSEntityTrackerEntry) entityTrackerEntry).getController();
 		} else if (entityTrackerEntry instanceof EntityTrackerEntry) {
-			result = new DefaultEntityNetworkController<CommonEntity<T>>();
+			result = new DefaultEntityNetworkController();
 			result.bind(this, entityTrackerEntry);
 		} else {
 			return null;
@@ -64,11 +66,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * Sets an Entity Network Controller for this Entity.
 	 * To stop tracking this minecart, pass in Null.
 	 * To default back to the net.minecraft.server implementation, pass in a new
-	 * {@link com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController DefaultEntityNetworkController} instance.
+	 * {@link com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController DefaultEntityNetworkController} instance.<br>
+	 * <br>
+	 * This method only works if the Entity world has previously been set.
 	 * 
 	 * @param controller to set to
 	 */
-	public void setNetworkController(EntityNetworkController<CommonEntity<T>> controller) {
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public void setNetworkController(EntityNetworkController controller) {
+		if (getWorld() == null) {
+			throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
+		}
 		final EntityTracker tracker = WorldUtil.getTracker(getWorld());
 		synchronized (tracker.getHandle()) {
 			final EntityNetworkController<CommonEntity<T>> oldController = getNetworkController();
@@ -157,85 +165,88 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	@SuppressWarnings("unchecked")
 	protected void prepareHook() {
 		final Entity oldInstance = getHandle(Entity.class);
-		if (!isHooked()) {
-			// Check whether conversion is allowed
-			final String oldInstanceName = oldInstance.getClass().getName();
-			if (!oldInstanceName.startsWith(Common.NMS_ROOT)) {
-				throw new RuntimeException("Can not assign controllers to a custom Entity Type (" + oldInstanceName + ")");
+		if (oldInstance instanceof NMSEntityHook) {
+			// Already hooked
+			return;
+		}
+
+		// Check whether conversion is allowed
+		final String oldInstanceName = oldInstance.getClass().getName();
+		if (!oldInstanceName.startsWith(Common.NMS_ROOT)) {
+			throw new RuntimeException("Can not assign controllers to a custom Entity Type (" + oldInstanceName + ")");
+		}
+		final CommonEntityType type = CommonEntityType.byEntity(entity);
+		if (!type.hasNMSEntity()) {
+			throw new RuntimeException("Entity of type '" + type.entityType + "' has no Controller support!");
+		}
+		// Respawn the entity and attach the controller
+		try {
+			// Store the previous Bukkit entity information for later use
+			final org.bukkit.entity.Entity oldBukkitEntity = entity;
+
+			// Create a new entity instance and perform data/property transfer
+			final Entity newInstance = (Entity) type.createNMSHookEntity(this);
+			type.nmsType.transfer(oldInstance, newInstance);
+			oldInstance.dead = true;
+			newInstance.dead = false;
+			oldInstance.valid = false;
+			newInstance.valid = true;
+
+			// Now proceed to replace this NMS Entity in all places imaginable.
+			// First load the chunk so we can at least work on something
+			Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
+
+			// *** Bukkit Entity ***
+			((CraftEntity) oldBukkitEntity).setHandle(newInstance);
+
+			// *** Passenger/Vehicle ***
+			if (oldInstance.vehicle != null) {
+				oldInstance.vehicle.passenger = newInstance;
 			}
-			final CommonEntityType type = CommonEntityType.byEntity(entity);
-			if (!type.hasHookEntity()) {
-				throw new RuntimeException("Entity of type '" + type.entityType + "' has no Controller support!");
+			if (oldInstance.passenger != null) {
+				oldInstance.passenger.vehicle = newInstance;
 			}
-			// Respawn the entity and attach the controller
-			try {
-				// Store the previous Bukkit entity information for later use
-				final org.bukkit.entity.Entity oldBukkitEntity = entity;
 
-				// Create a new entity instance and perform data/property transfer
-				final Entity newInstance = (Entity) type.createNMSHookEntity();
-				type.nmsType.transfer(oldInstance, newInstance);
-				oldInstance.dead = true;
-				newInstance.dead = false;
-				oldInstance.valid = false;
-				newInstance.valid = true;
+			// *** Entities By ID Map ***
+			final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
+			if (entitiesById.remove(oldInstance.id) == null) {
+				entitiesById.put(newInstance.id, newInstance);
+				CommonUtil.nextTick(new Runnable() {
+					public void run() {
+						entitiesById.put(newInstance.id, newInstance);
+					}
+				});
+			} else {
+				entitiesById.put(newInstance.id, newInstance);
+			}
 
-				// Now proceed to replace this NMS Entity in all places imaginable.
-				// First load the chunk so we can at least work on something
-				Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
+			// *** EntityTrackerEntry ***
+			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
+			Object entry = tracker.getEntry(entity);
+			if (entry != null) {
+				EntityTrackerEntryRef.tracker.set(entry, entity);
+			}
 
-				// *** Bukkit Entity ***
-				((CraftEntity) oldBukkitEntity).setHandle(newInstance);
-
-				// *** Passenger/Vehicle ***
-				if (oldInstance.vehicle != null) {
-					oldInstance.vehicle.passenger = newInstance;
+			// *** World ***
+			ListIterator<Entity> iter = oldInstance.world.entityList.listIterator();
+			while (iter.hasNext()) {
+				if (iter.next().id == oldInstance.id) {
+					iter.set(newInstance);
+					break;
 				}
-				if (oldInstance.passenger != null) {
-					oldInstance.passenger.vehicle = newInstance;
-				}
+			}
 
-				// *** Entities By ID Map ***
-				final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
-				if (entitiesById.remove(oldInstance.id) == null) {
-					entitiesById.put(newInstance.id, newInstance);
-					CommonUtil.nextTick(new Runnable() {
-						public void run() {
-							entitiesById.put(newInstance.id, newInstance);
-						}
-					});
-				} else {
-					entitiesById.put(newInstance.id, newInstance);
-				}
-
-				// *** EntityTrackerEntry ***
-				final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-				Object entry = tracker.getEntry(entity);
-				if (entry != null) {
-					EntityTrackerEntryRef.tracker.set(entry, entity);
-				}
-
-				// *** World ***
-				ListIterator<Entity> iter = oldInstance.world.entityList.listIterator();
-				while (iter.hasNext()) {
-					if (iter.next().id == oldInstance.id) {
-						iter.set(newInstance);
+			// *** Chunk ***
+			final int chunkY = getChunkY();
+			if (!replaceInChunk(chunk, chunkY, oldInstance, newInstance)) {
+				for (int y = 0; y < chunk.entitySlices.length; y++) {
+					if (y != chunkY && replaceInChunk(chunk, y, oldInstance, newInstance)) {
 						break;
 					}
 				}
-
-				// *** Chunk ***
-				final int chunkY = getChunkY();
-				if (!replaceInChunk(chunk, chunkY, oldInstance, newInstance)) {
-					for (int y = 0; y < chunk.entitySlices.length; y++) {
-						if (y != chunkY && replaceInChunk(chunk, y, oldInstance, newInstance)) {
-							break;
-						}
-					}
-				}
-			} catch (Throwable t) {
-				throw new RuntimeException("Failed to set controller:", t);
 			}
+		} catch (Throwable t) {
+			throw new RuntimeException("Failed to set controller:", t);
 		}
 	}
 
@@ -259,16 +270,56 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * 
 	 * @param controller to set to
 	 */
-	public void setController(EntityController<CommonEntity<T>> controller) {
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public void setController(EntityController controller) {
 		// Prepare the hook
 		this.prepareHook();
 
 		// If null, resolve to the default type
 		if (controller == null) {
-			controller = new DefaultEntityController<CommonEntity<T>>();
+			controller = new DefaultEntityController();
 		}
 		getController().bind(null);
 		controller.bind(this);
+	}
+
+	/**
+	 * Spawns this Entity at the Location and using the network controller specified.
+	 * 
+	 * @param location to spawn at
+	 * @param networkController to assign to the Entity after spawning
+	 * @return True if spawning occurred, False if not
+	 * @see {@link spawn(Location location)}
+	 */
+	@SuppressWarnings("rawtypes")
+	public final boolean spawn(Location location, EntityNetworkController networkController) {
+		final boolean spawned = spawn(location);
+		this.setNetworkController(networkController);
+		return spawned;
+	}
+
+	/**
+	 * Spawns this Entity at the Location specified.
+	 * Note that if important properties have to be set beforehand, this should be done first.
+	 * It is recommended to set Entity Controllers before spawning, not after.
+	 * This method will trigger Entity spawning events.
+	 * The network controller can ONLY be set after spawning.
+	 * To be on the safe side, use the Network Controller spawn alternative.
+	 * 
+	 * @param location to spawn at
+	 * @return True if the Entity spawned, False if not (and just teleported)
+	 */
+	public boolean spawn(Location location) {
+		if (this.isSpawned()) {
+			teleport(location);
+			return false;
+		}
+		last.set(loc.set(location));
+		EntityUtil.addEntity(entity);
+		// Perform controller attaching
+		getController().onAttached();
+		getNetworkController().onAttached();
+		return true;
 	}
 
 	/**
@@ -301,16 +352,16 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		if (type == CommonEntityType.UNKNOWN) {
 			throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
 		}
+		final CommonEntity<org.bukkit.entity.Entity> entity = type.createCommonEntity(null);
 		// Spawn a new NMS Entity
 		Entity handle;
-		if (type.hasHookEntity()) {
-			handle = (Entity) type.createNMSHookEntity();
-		} else if (type.hasNMSEntity()) {
-			handle = (Entity) type.createNMSEntity();
+		if (type.hasNMSEntity()) {
+			handle = (Entity) type.createNMSHookEntity(entity);
 		} else {
 			throw new RuntimeException("The Entity Type '"  + entityType + "' has no suitable Entity constructor to use!");
 		}
+		entity.entity = Conversion.toEntity.convert(handle);
 		// Create a new CommonEntity and done
-		return get(Conversion.toEntity.convert(handle));
+		return entity;
 	}
 }

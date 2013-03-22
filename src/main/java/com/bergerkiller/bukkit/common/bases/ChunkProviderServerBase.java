@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.bases;
 import java.util.Random;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
 
@@ -23,7 +22,6 @@ import net.minecraft.server.v1_5_R2.ReportedException;
 import net.minecraft.server.v1_5_R2.WorldServer;
 
 public class ChunkProviderServerBase extends ChunkProviderServer {
-	public final org.bukkit.Chunk emptyChunk;
 	public final org.bukkit.World world;
 
 	public ChunkProviderServerBase(World world) {
@@ -34,9 +32,6 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 		super(getWorld(chunkProviderServer), getLoader(chunkProviderServer), getGenerator(chunkProviderServer));
 		ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
 		this.world = super.world.getWorld();
-		// Empty chunks have no Bukkit chunk - fix this!
-		// Sadly the CraftChunk allows no 'null' handle...
-		this.emptyChunk = new CraftChunk(new Chunk(super.world, 0, 0));
 	}
 
 	private static WorldServer getWorld(Object chunkProviderServer) {
@@ -51,13 +46,10 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 		return ((ChunkProviderServer) chunkProviderServer).chunkProvider;
 	}
 
-	/**
-	 * Gets whether this Chunk Provider contains a chunk generator
-	 * 
-	 * @return True if a chunk generator exists, False if not
-	 */
-	public boolean hasGenerator() {
-		return this.chunkProvider != null;
+	private void checkGenerator() {
+		if (this.chunkProvider == null) {
+			throw new RuntimeException("Chunk provider has no generator set: " + (world == null ? "null" : world.getName()));
+		}
 	}
 
 	/**
@@ -97,12 +89,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	@Override
 	@Deprecated
 	public Chunk getChunkAt(int i, int j, Runnable runnable) {
-		org.bukkit.Chunk bchunk = getBukkitChunkAt(i, j, runnable);
-		if (bchunk == this.emptyChunk) {
-			return super.emptyChunk;
-		} else {
-			return (Chunk) Conversion.toChunkHandle.convert(bchunk);
-		}
+		return (Chunk) Conversion.toChunkHandle.convert(getBukkitChunkAt(i, j, runnable));
 	}
 
 	/**
@@ -114,6 +101,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	 * @return the loaded or obtained Bukkit chunk
 	 */
 	public org.bukkit.Chunk getBukkitChunkAt(int x, int z, Runnable taskWhenFinished) {
+		checkGenerator();
 		return Conversion.toChunk.convert(super.getChunkAt(x, z, taskWhenFinished));
 	}
 
@@ -136,7 +124,13 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	 * @return generated chunk
 	 */
 	public org.bukkit.Chunk generateChunk(int x, int z) {
+		checkGenerator();
 		return Conversion.toChunk.convert(this.chunkProvider.getOrCreateChunk(x, z));
+	}
+
+	@Override
+	public boolean unloadChunks() {
+		return super.unloadChunks();
 	}
 
 	/**
@@ -145,32 +139,31 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	@Override
 	@Deprecated
 	public void getChunkAt(IChunkProvider ichunkprovider, int i, int j) {
+		checkGenerator();
 		Chunk chunk = this.getOrCreateChunk(i, j);
 
 		if (!chunk.done) {
 			chunk.done = true;
-			if (this.chunkProvider != null) {
-				this.chunkProvider.getChunkAt(ichunkprovider, i, j);
+			this.chunkProvider.getChunkAt(ichunkprovider, i, j);
 
-				// CraftBukkit start
-				BlockSand.instaFall = true;
-				final Random random = new Random();
-				random.setSeed(world.getSeed());
-				long xRand = random.nextLong() / 2L * 2L + 1L;
-				long zRand = random.nextLong() / 2L * 2L + 1L;
-				random.setSeed((long) i * xRand + (long) j * zRand ^ world.getSeed());
+			// CraftBukkit start
+			BlockSand.instaFall = true;
+			final Random random = new Random();
+			random.setSeed(world.getSeed());
+			long xRand = random.nextLong() / 2L * 2L + 1L;
+			long zRand = random.nextLong() / 2L * 2L + 1L;
+			random.setSeed((long) i * xRand + (long) j * zRand ^ world.getSeed());
 
-				if (world != null) {
-					for (BlockPopulator populator : world.getPopulators()) {
-						onPopulate(chunk.bukkitChunk, populator, random);
-					}
+			if (world != null) {
+				for (BlockPopulator populator : world.getPopulators()) {
+					onPopulate(chunk.bukkitChunk, populator, random);
 				}
-				BlockSand.instaFall = false;
-				super.world.getServer().getPluginManager().callEvent(new ChunkPopulateEvent(chunk.bukkitChunk));
-				// CraftBukkit end
-
-				chunk.e();
 			}
+			BlockSand.instaFall = false;
+			super.world.getServer().getPluginManager().callEvent(new ChunkPopulateEvent(chunk.bukkitChunk));
+			// CraftBukkit end
+
+			chunk.e();
 		}
 	}
 

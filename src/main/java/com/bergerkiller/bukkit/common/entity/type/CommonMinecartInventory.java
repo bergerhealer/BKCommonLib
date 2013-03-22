@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -27,8 +28,17 @@ public abstract class CommonMinecartInventory<T extends Minecart & InventoryHold
 	}
 
 	@Override
+	public boolean spawn(Location at) {
+		if (super.spawn(at)) {
+			getInventoryController().onAttached();
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void setInventoryController(EntityInventoryController<CommonEntity<T>> controller) {
+	public void setInventoryController(EntityInventoryController controller) {
 		this.prepareHook();
 		if (controller == null) {
 			controller = new DefaultEntityInventoryController();

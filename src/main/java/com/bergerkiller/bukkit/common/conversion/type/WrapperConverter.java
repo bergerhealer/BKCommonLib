@@ -22,6 +22,7 @@ import net.minecraft.server.v1_5_R2.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
 
@@ -197,6 +198,16 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 				return new DataWatcher(value);
 			} else {
 				return def;
+			}
+		}
+	};
+	public static final WrapperConverter<org.bukkit.Material> toMaterial = new WrapperConverter<org.bukkit.Material>(org.bukkit.Material.class) {
+		@Override
+		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
+			if (value instanceof Number) {
+				return LogicUtil.fixNull(Material.getMaterial(((Number) value).intValue()), def);
+			} else {
+				return ParseUtil.parseMaterial(value.toString(), def);
 			}
 		}
 	};

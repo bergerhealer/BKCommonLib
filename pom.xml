@@ -12,6 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.mcversion>v1_5_R2</project.mcversion>
+    <project.cbversion>1.5.1-R0.1-SNAPSHOT</project.cbversion>
   </properties>
 
   <repositories>
@@ -42,17 +44,15 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.5.1-R0.1-SNAPSHOT</version>
+      <version>${project.cbversion}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>net.sf</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.2.3</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/cglib.jar</systemPath>
-      <optional>true</optional>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>2.2.2</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
@@ -118,6 +118,7 @@
 	<defaultGoal>clean install</defaultGoal>
 	<!-- Plugins -->
 	<plugins>
+	  <!-- Needed for shading in CGLib -->
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-shade-plugin</artifactId>
@@ -130,15 +131,13 @@
 			</goals>
 			<configuration>
 			  <shadedArtifactAttached>false</shadedArtifactAttached>
-			  <createDependencyReducedPom>true</createDependencyReducedPom>
-	
+			  <createDependencyReducedPom>false</createDependencyReducedPom>
 			  <relocations>
 				<relocation>
 				  <pattern>net.sf</pattern>
-				  <shadedPattern>com.bergerkiller.net.sf</shadedPattern>
+				  <shadedPattern>com.bergerkiller.bukkit.common.sf</shadedPattern>
 				</relocation>
 			  </relocations>
-			  
 			  <artifactSet>
 				<excludes>
 				  <exclude>org.bukkit:craftbukkit</exclude>
@@ -149,6 +148,36 @@
 		  </execution>
 		</executions>
 	  </plugin>
+
+	  <!-- Clean up (this is to make testing easier) -->
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.4.1</version>
+        <executions>
+          <execution>
+            <id>auto-clean</id>
+            <phase>install</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>original-*.jar</include>
+                    <include>*-shaded.jar</include>
+                  </includes>
+                  <followSymlinks>false</followSymlinks>
+                 </fileset>
+               </filesets>
+             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
 	  <!-- Compiler plugin -->
 	  <plugin>
 	    <groupId>org.apache.maven.plugins</groupId>

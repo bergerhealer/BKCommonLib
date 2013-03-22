@@ -26,6 +26,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -41,7 +42,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	public final LocationAbstract loc = new LocationAbstract() {
 		public World getWorld() {return ExtendedEntity.this.getWorld();}
-		public LocationAbstract setWorld(World world) {return this;}
+		public LocationAbstract setWorld(World world) {ExtendedEntity.this.setWorld(world); return this;}
 		public double getX() {return ExtendedEntity.this.h().locX;}
 		public double getY() {return ExtendedEntity.this.h().locY;}
 		public double getZ() {return ExtendedEntity.this.h().locZ;}
@@ -476,8 +477,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return entity.getVelocity();
 	}
 
+	/**
+	 * Checks whether this Entity is spawned in the world
+	 * 
+	 * @return True if the Entity is spawned, False if not
+	 */
+	public boolean isSpawned() {
+		final Entity handle = h();
+		return handle != null && handle.world != null && handle.world.entityList.contains(handle);
+	}
+
 	public World getWorld() {
-		return entity.getWorld();
+		return Conversion.toWorld.convert(h().world); 
 	}
 
 	public boolean isDead() {

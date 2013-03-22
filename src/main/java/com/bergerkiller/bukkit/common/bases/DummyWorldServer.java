@@ -24,6 +24,8 @@ import net.minecraft.server.v1_5_R2.WorldType;
  * This class can be used to pass worlds into functions where functions require one, to alter internal logic
  */
 public class DummyWorldServer extends WorldServer {
+	public final DummyChunkProviderServer DUMMYCPS;
+
 	@Override
 	protected void a(WorldSettings worldsettings) {
 	};
@@ -55,7 +57,7 @@ public class DummyWorldServer extends WorldServer {
 		// dereference this dummy world again...
 		WorldUtil.removeWorld(this.getWorld());
 		// set some variables to null
-		this.chunkProvider = this.chunkProviderServer = null;
+		this.chunkProvider = this.chunkProviderServer = this.DUMMYCPS = new DummyChunkProviderServer(this);
 		this.generator = null;
 		this.entityList = null;
 		this.tileEntityList = null;
@@ -67,7 +69,7 @@ public class DummyWorldServer extends WorldServer {
 		this.worldProvider = null;
 		this.random = null;
 	}
-
+	
 	private static String getDummyName() {
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {
 			String name = "dummy" + i;

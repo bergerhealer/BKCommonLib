@@ -28,10 +28,6 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
 /**
  * A controller that deals with the server to client network synchronization.
- * Always make sure that the methods in this controller are synchronized.
- * The methods can be called from Threads other than the main Thread.
- * For this reason, avoid calling methods from the main thread. Use the provided
- * {@link onSync} method instead.
  * 
  * @param <T> - type of Common Entity this controller is for
  */
@@ -72,7 +68,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		}
 		this.entity = entity;
 		this.handle = entityTrackerEntry;
-		if (this.entity != null) {
+		if (this.entity != null && this.entity.isSpawned()) {
 			this.onAttached();
 		}
 	}
@@ -91,7 +87,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return viewing players
 	 */
-	public synchronized final Collection<Player> getViewers() {
+	public final Collection<Player> getViewers() {
 		return Collections.unmodifiableCollection(EntityTrackerEntryRef.viewers.get(handle));
 	}
 
@@ -103,7 +99,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return True if the viewer was added, False if the viewer was already added
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized boolean addViewer(Player viewer) {
+	public boolean addViewer(Player viewer) {
 		if (!((EntityTrackerEntry) handle).trackedPlayers.add(Conversion.toEntityHandle.convert(viewer))) {
 			return false;
 		}
@@ -118,7 +114,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param viewer to remove
 	 * @return True if the viewer was removed, False if the viewer wasn't contained
 	 */
-	public synchronized boolean removeViewer(Player viewer) {
+	public boolean removeViewer(Player viewer) {
 		if (!((EntityTrackerEntry) handle).trackedPlayers.remove(Conversion.toEntityHandle.convert(viewer))) {
 			return false;
 		}
@@ -131,7 +127,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param viewer to update
 	 */
-	public synchronized final void updateViewer(Player viewer) {
+	public final void updateViewer(Player viewer) {
 		final IntVector3 pos = this.getProtocolPositionSynched();
 		final double dx = Math.abs(EntityUtil.getLocX(viewer) - (double) (pos.x / 32.0));
 		final double dz = Math.abs(EntityUtil.getLocZ(viewer) - (double) (pos.z / 32.0));
@@ -148,7 +144,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param viewer to display this Entity for
 	 */
-	public synchronized void makeVisible(Player viewer) {
+	public void makeVisible(Player viewer) {
 		CommonNMS.getNative(viewer).removeQueue.remove((Object) entity.getEntityId());
 
 		// Spawn packet
@@ -189,7 +185,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Ensures that the Entity is no longer displayed to any viewers.
 	 * All viewers will see the Entity disappear. This method queues for the next tick.
 	 */
-	public synchronized void makeHiddenForAll() {
+	public void makeHiddenForAll() {
 		for (Player viewer : getViewers()) {
 			makeHidden(viewer);
 		}
@@ -201,7 +197,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param viewer to hide this Entity for
 	 */
-	public synchronized void makeHidden(Player viewer) {
+	public void makeHidden(Player viewer) {
 		makeHidden(viewer, false);
 	}
 
@@ -212,7 +208,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param instant option: True to instantly hide, False to queue it for the next tick
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void makeHidden(Player viewer, boolean instant) {
+	public void makeHidden(Player viewer, boolean instant) {
 		if (instant) {
 			PacketUtil.sendPacket(viewer, PacketFields.DESTROY_ENTITY.newInstance(entity.getEntityId()));
 		} else {
@@ -223,7 +219,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	/**
 	 * Called at a set interval to synchronize data to clients
 	 */
-	public synchronized void onSync() {
+	public void onSync() {
 		if (entity.isDead()) {
 			return;
 		}
@@ -254,7 +250,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Synchronizes the entity Vehicle.
 	 * Updates when the vehicle changes, or if in a Vehicle at a set interval.
 	 */
-	public synchronized void syncVehicle() {
+	public void syncVehicle() {
 		org.bukkit.entity.Entity oldVehicle = this.getVehicleSynched();
 		org.bukkit.entity.Entity newVehicle = entity.getVehicle();
 		if (oldVehicle != newVehicle || (newVehicle != null && isTick(60))) {
@@ -266,7 +262,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Synchronizes the entity location to all clients.
 	 * Based on the distances, relative or absolute movement is performed.
 	 */
-	public synchronized void syncLocation() {
+	public void syncLocation() {
 		// Position
 		final IntVector3 oldPos = this.getProtocolPositionSynched();
 		final IntVector3 newPos = this.getProtocolPosition();
@@ -282,7 +278,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	/**
 	 * Synchronizes the entity head yaw rotation to all Clients.
 	 */
-	public synchronized void syncHeadYaw() {
+	public void syncHeadYaw() {
 		final int oldYaw = this.getProtocolHeadRotationSynched();
 		final int newYaw = this.getProtocolHeadRotation();
 		if (Math.abs(newYaw - oldYaw) >= MIN_RELATIVE_CHANGE) {
@@ -294,7 +290,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Synchronizes the entity metadata to all Clients.
 	 * Metadata changes are read and used.
 	 */
-	public synchronized void syncMeta() {
+	public void syncMeta() {
 		DataWatcher meta = entity.getMetaData();
 		if (meta.isChanged()) {
 			broadcast(PacketFields.ENTITY_METADATA.newInstance(entity.getEntityId(), meta, false), true);
@@ -305,7 +301,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Synchronizes the entity velocity to all Clients.
 	 * Based on a change in Velocity, velocity will be updated.
 	 */
-	public synchronized void syncVelocity() {
+	public void syncVelocity() {
 		if (!this.isMobile()) {
 			return;
 		}
@@ -323,7 +319,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param packet to send
 	 */
-	public synchronized void broadcast(CommonPacket packet) {
+	public void broadcast(CommonPacket packet) {
 		broadcast(packet, false);
 	}
 
@@ -333,7 +329,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param packet to send
 	 * @param self option: True to send to self (if a player), False to not send to self
 	 */
-	public synchronized void broadcast(CommonPacket packet, boolean self) {
+	public void broadcast(CommonPacket packet, boolean self) {
 		if (self && entity.getEntity() instanceof Player) {
 			PacketUtil.sendPacket((Player) entity.getEntity(), packet);
 		}
@@ -350,10 +346,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return spawn packet
 	 */
-	public synchronized CommonPacket getSpawnPacket() {
+	public CommonPacket getSpawnPacket() {
 		final CommonPacket packet = EntityTrackerEntryRef.getSpawnPacket(handle);
 		if (PacketFields.VEHICLE_SPAWN.isInstance(packet)) {
-			// NMS error: They are not using the synchronized position, but the live position
+			// NMS error: They are not using the position, but the live position
 			// This has some big issues when new players join...
 
 			// Position
@@ -369,40 +365,40 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		return packet;
 	}
 
-	public synchronized int getViewDistance() {
+	public int getViewDistance() {
 		return EntityTrackerEntryRef.viewDistance.get(handle);
 	}
 
-	public synchronized void setViewDistance(int blockDistance) {
+	public void setViewDistance(int blockDistance) {
 		EntityTrackerEntryRef.viewDistance.set(handle, blockDistance);
 	}
 
-	public synchronized int getUpdateInterval() {
+	public int getUpdateInterval() {
 		return EntityTrackerEntryRef.updateInterval.get(handle);
 	}
 
-	public synchronized void setUpdateInterval(int tickInterval) {
+	public void setUpdateInterval(int tickInterval) {
 		EntityTrackerEntryRef.updateInterval.set(handle, tickInterval);
 	}
 
-	public synchronized boolean isMobile() {
+	public boolean isMobile() {
 		return EntityTrackerEntryRef.isMobile.get(handle);
 	}
 
-	public synchronized void setMobile(boolean mobile) {
+	public void setMobile(boolean mobile) {
 		EntityTrackerEntryRef.isMobile.set(handle, mobile);
 	}
 
 	/**
 	 * Synchronizes everything by first destroying and then respawning this Entity to all viewers
 	 */
-	public synchronized void syncRespawn() {
+	public void syncRespawn() {
 		// Hide
 		for (Player viewer : getViewers()) {
 			this.makeHidden(viewer, true);
 		}
 
-		// Update synchronized information
+		// Update information
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		final Vector velocity = this.getProtocolVelocity();
 		handle.j = velocity.getX();
@@ -433,7 +429,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param vehicle to synchronize, NULL for no Vehicle
 	 */
-	public synchronized void syncVehicle(org.bukkit.entity.Entity vehicle) {
+	public void syncVehicle(org.bukkit.entity.Entity vehicle) {
 		EntityTrackerEntryRef.vehicle.set(handle, vehicle);
 		broadcast(PacketFields.ATTACH_ENTITY.newInstance(entity.getEntity(), vehicle));
 	}
@@ -441,7 +437,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	/**
 	 * Synchronizes the entity position / rotation absolutely (Teleport packet)
 	 */
-	public synchronized void syncLocationAbsolute() {
+	public void syncLocationAbsolute() {
 		syncLocationAbsolute(getProtocolPosition(), getProtocolRotation());
 	}
 
@@ -451,7 +447,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param position (new)
 	 * @param rotation (new, x = yaw, z = pitch)
 	 */
-	public synchronized void syncLocationAbsolute(IntVector3 position, IntVector2 rotation) {
+	public void syncLocationAbsolute(IntVector3 position, IntVector2 rotation) {
 		// Update protocol values
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		handle.xLoc = position.x;
@@ -474,7 +470,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param position - whether to sync position
 	 * @param rotation - whether to sync rotation
 	 */
-	public synchronized void syncLocation(boolean position, boolean rotation) {
+	public void syncLocation(boolean position, boolean rotation) {
 		syncLocation(position ? getProtocolPosition() : getProtocolPositionSynched(),
 				rotation ? getProtocolRotation() : getProtocolRotationSynched());
 	}
@@ -486,7 +482,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param position (new)
 	 * @param rotation (new, x = yaw, z = pitch)
 	 */
-	public synchronized void syncLocation(IntVector3 position, IntVector2 rotation) {
+	public void syncLocation(IntVector3 position, IntVector2 rotation) {
 		final IntVector3 deltaPos = position.subtract(this.getProtocolPositionSynched());
 		final IntVector2 deltaRot = rotation.subtract(this.getProtocolRotationSynched());
 		if (deltaPos.abs().greaterThan(MAX_RELATIVE_DISTANCE)) {
@@ -534,7 +530,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param headRotation to set to
 	 */
-	public synchronized void syncHeadYaw(int headRotation) {
+	public void syncHeadYaw(int headRotation) {
 		((EntityTrackerEntry) handle).i = headRotation;
 		this.broadcast(PacketFields.ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation));
 	}
@@ -544,7 +540,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param velocity (new)
 	 */
-	public synchronized void syncVelocity(Vector velocity) {
+	public void syncVelocity(Vector velocity) {
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		handle.j = velocity.getX();
 		handle.k = velocity.getY();
@@ -561,7 +557,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Client-synchronized vehicle entity
 	 */
-	public synchronized org.bukkit.entity.Entity getVehicleSynched() {
+	public org.bukkit.entity.Entity getVehicleSynched() {
 		return EntityTrackerEntryRef.vehicle.get(handle);
 	}
 
@@ -570,7 +566,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Client-synchronized entity velocity
 	 */
-	public synchronized Vector getProtocolVelocitySynched() {
+	public Vector getProtocolVelocitySynched() {
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		return new Vector(handle.j, handle.k, handle.l);
 	}
@@ -580,7 +576,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Client-synchronized entity position
 	 */
-	public synchronized IntVector3 getProtocolPositionSynched() {
+	public IntVector3 getProtocolPositionSynched() {
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		return new IntVector3(handle.xLoc, handle.yLoc, handle.zLoc);
 	}
@@ -590,7 +586,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Client-synchronized entity rotation (x = yaw, z = pitch)
 	 */
-	public synchronized IntVector2 getProtocolRotationSynched() {
+	public IntVector2 getProtocolRotationSynched() {
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		return new IntVector2(handle.yRot, handle.xRot);
 	}
@@ -629,7 +625,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Client-synched head-yaw rotation
 	 */
-	public synchronized int getProtocolHeadRotationSynched() {
+	public int getProtocolHeadRotationSynched() {
 		return ((EntityTrackerEntry) handle).i;
 	}
 
@@ -639,7 +635,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return ticks since last location synchronization
 	 */
-	public synchronized int getTicksSinceLocationSync() {
+	public int getTicksSinceLocationSync() {
 		return EntityTrackerEntryRef.timeSinceLocationSync.get(handle);
 	}
 
@@ -648,7 +644,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return True if the update interval was reached, False if not
 	 */
-	public synchronized boolean isUpdateTick() {
+	public boolean isUpdateTick() {
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		return (handle.m % handle.c) == 0;
 	}
@@ -659,7 +655,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param interval in ticks
 	 * @return True if the interval was reached, False if not
 	 */
-	public synchronized boolean isTick(int interval) {
+	public boolean isTick(int interval) {
 		return (((EntityTrackerEntry) handle).m % interval) == 0;
 	}
 
@@ -668,7 +664,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @return Tick time
 	 */
-	public synchronized int getTick() {
+	public int getTick() {
 		return ((EntityTrackerEntry) handle).m;
 	}
 

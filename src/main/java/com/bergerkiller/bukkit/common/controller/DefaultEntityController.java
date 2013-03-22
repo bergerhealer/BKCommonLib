@@ -9,8 +9,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -20,14 +18,10 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
  * 
  * @param <T> - type of Common Entity
  */
-public final class DefaultEntityController<T extends CommonEntity<?>> extends EntityController<T> {
+@SuppressWarnings("rawtypes")
+public final class DefaultEntityController extends EntityController {
 
 	public DefaultEntityController() {
-	}
-
-	@SuppressWarnings("unchecked")
-	public DefaultEntityController(NMSEntityHook entity) {
-		bind((T) CommonEntity.get(Conversion.toEntity.convert(entity)));
 	}
 
 	@Override
@@ -73,7 +67,7 @@ public final class DefaultEntityController<T extends CommonEntity<?>> extends En
 		} else {
 			source = DamageSource.GENERIC;
 		}
-		return entity.getHandle(Entity.class).damageEntity(source, damage);
+		return ((Entity) entity.getHandle()).damageEntity(source, damage);
 	}
 
 	@Override

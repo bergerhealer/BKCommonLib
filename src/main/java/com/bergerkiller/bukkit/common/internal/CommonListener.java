@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
@@ -45,6 +46,13 @@ class CommonListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR)
+	private void onChunkUnload(ChunkUnloadEvent event) {
+		if (event.getChunk() == null) {
+			System.out.println("ATTEMPTED TO UNLOAD NULL CHUNK");
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onWorldInit(final WorldInitEvent event) {
 		CommonUtil.nextTick(new Runnable() {

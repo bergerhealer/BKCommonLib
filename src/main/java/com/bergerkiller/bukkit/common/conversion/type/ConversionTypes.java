@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -93,6 +94,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<CommonTag> toCommonTag = WrapperConverter.toCommonTag;
 	public static final WrapperConverter<DataWatcher> toDataWatcher = WrapperConverter.toDataWatcher;
 	public static final WrapperConverter<ItemStack> toItemStack = WrapperConverter.toItemStack;
+	public static final WrapperConverter<Material> toMaterial = WrapperConverter.toMaterial;
 	public static final WrapperConverter<Inventory> toInventory = WrapperConverter.toInventory;
 	public static final WrapperConverter<Difficulty> toDifficulty = WrapperConverter.toDifficulty;
 	public static final WrapperConverter<WorldType> toWorldType = WrapperConverter.toWorldType;
@@ -112,6 +114,5 @@ public class ConversionTypes {
 	public static final PropertyConverter<Byte> toDifficultyId = PropertyConverter.toDifficultyId;
 	public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
 	public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
-	public static final PropertyConverter<Material> toMinecartType = PropertyConverter.toMinecartType;
-	public static final PropertyConverter<Integer> toMinecartTypeId = PropertyConverter.toMinecartTypeId;
+	public static final PropertyConverter<EntityType> toMinecartType = PropertyConverter.toMinecartType;
 }

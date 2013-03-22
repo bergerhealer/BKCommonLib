@@ -1,18 +1,15 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.util.Locale;
-
 import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.minecart.PoweredMinecart;
-import org.bukkit.entity.minecart.StorageMinecart;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
@@ -114,50 +111,31 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 			return def;
 		}
 	};
-	public static final PropertyConverter<Material> toMinecartType = new PropertyConverter<Material>(Material.class) {
+	public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
 		@Override
-		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
-			//TODO: Add new minecart controler system implementation
-			/*if (EntityMinecartRef.TEMPLATE.isInstance(value)) {
-				Integer type = (Integer) EntityMinecartRef.type.getInternal(value);
-				return LogicUtil.getArray(EntityUtil.getMinecartTypes(), type, def);
-			} else*/ if (EntityRef.TEMPLATE.isInstance(value) || value instanceof org.bukkit.entity.Entity) {
+		protected EntityType convertSpecial(Object value, Class<?> valueType, EntityType def) {
+			if (EntityRef.TEMPLATE.isInstance(value)) {
 				value = Conversion.toEntity.convert(value);
-				if (value instanceof StorageMinecart) {
-					return Material.STORAGE_MINECART;
-				} else if (value instanceof PoweredMinecart) {
-					return Material.POWERED_MINECART;
-				} else if (value instanceof Minecart) {
-					return Material.MINECART;
-				}
-			} else if (value instanceof Integer) {
-				return LogicUtil.getArray(EntityUtil.getMinecartTypes(), (Integer) value, def);
+			}
+			if (value instanceof Minecart) {
+				return ((Minecart) value).getType();
+			} else if (value instanceof CommonMinecart) {
+				return ((CommonMinecart<?>) value).getType();
 			} else {
-				final String name = value.toString().toLowerCase(Locale.ENGLISH);
-				if (name.contains("storage") || name.contains("chest")) {
-					return Material.STORAGE_MINECART;
-				} else if (name.contains("power") || name.contains("furnace")) {
-					return Material.POWERED_MINECART;
-				} else if (name.contains("cart")) {
-					return Material.MINECART;
+				Material material = Conversion.toMaterial.convert(value);
+				if (material == null) {
+					return def;
+				}
+				switch (material) {
+					case POWERED_MINECART : return EntityType.MINECART_FURNACE;
+					case STORAGE_MINECART : return EntityType.MINECART_CHEST;
+					case HOPPER_MINECART : return EntityType.MINECART_HOPPER;
+					//case MOB_SPAWNER_MINECART : return EntityType.MINECART_MOB_SPAWNER; (TODO: missing!)
+					case EXPLOSIVE_MINECART : return EntityType.MINECART_TNT;
+					case MINECART : return EntityType.MINECART;
+					default : return def;
 				}
 			}
-			return def;
-		}
-	};
-	public static final PropertyConverter<Integer> toMinecartTypeId = new PropertyConverter<Integer>(Integer.class) {
-		@Override
-		protected Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
-			Material mat = toMinecartType.convert(value);
-			if (mat != null) {
-				final Material[] types = EntityUtil.getMinecartTypes();
-				for (int i = 0; i < types.length; i++) {
-					if (types[i] == mat) {
-						return i;
-					}
-				}
-			}
-			return def;
 		}
 	};
 

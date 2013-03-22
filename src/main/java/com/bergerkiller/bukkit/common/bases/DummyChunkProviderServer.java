@@ -12,18 +12,13 @@ import net.minecraft.server.v1_5_R2.ChunkProviderServer;
 import net.minecraft.server.v1_5_R2.ChunkRegionLoader;
 import net.minecraft.server.v1_5_R2.IChunkLoader;
 
-public class ChunkProviderServerRedirect extends ChunkProviderServerProxy {
+/**
+ * This class is mainly used by NoLagg chunks - for compatibilities' sake, it is ported to here.
+ */
+public class DummyChunkProviderServer extends ChunkProviderServerProxy {
 
-	public ChunkProviderServerRedirect(Object worldHandle) {
+	DummyChunkProviderServer(Object worldHandle) {
 		super(worldHandle, null, null, null);
-	}
-
-	@Override
-	public void setProxyBase(Object chunkProviderServer) {
-		super.setProxyBase(chunkProviderServer);
-		if (chunkProviderServer != null) {
-			ChunkProviderServerRef.TEMPLATE.transfer(chunkProviderServer, this);
-		}
 	}
 
 	public void setBase(org.bukkit.World world) {
@@ -32,9 +27,6 @@ public class ChunkProviderServerRedirect extends ChunkProviderServerProxy {
 
 	@Override
 	public Chunk getChunkAt(int x, int z, Runnable task) {
-		if (!this.isSyncLoadSuppressed()) {
-			return super.getChunkAt(x, z, task);
-		}
 		if (this.isChunkLoaded(x, z)) {
 			return null; // Ignore, is already loaded
 		}
@@ -48,15 +40,5 @@ public class ChunkProviderServerRedirect extends ChunkProviderServerProxy {
 		}
 		// Ignore attempt to generate the chunk
 		return null;
-	}
-
-	/**
-	 * Whether attempts at loading the chunk in the call itself are suppressed, 
-	 * returning null instead
-	 * 
-	 * @return True if sync loading is suppressed, False if not
-	 */
-	public boolean isSyncLoadSuppressed() {
-		return false;
 	}
 }

@@ -1,6 +1,10 @@
 package com.bergerkiller.bukkit.common.entity;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
+
+import net.minecraft.server.v1_5_R2.IInventory;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -8,7 +12,10 @@ import org.bukkit.entity.EntityType;
 import com.bergerkiller.bukkit.common.ClassInstanceMap;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityClassBuilder;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHookImpl;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHookImpl;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
@@ -26,11 +33,10 @@ public class CommonEntityType {
 	private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
 
 	public final ClassTemplate<?> nmsType;
-	public final ClassTemplate<?> nmsHookType;
 	public final ClassTemplate<?> commonType;
 	public final ClassTemplate<?> bukkitType;
 	private final SafeConstructor<?> nmsConstructor;
-	private final SafeConstructor<?> nmsHookConstructor;
+	private NMSEntityClassBuilder hookBuilder;
 	private final SafeConstructor<?> commonConstructor;
 	public final EntityType entityType;
 	public final int networkUpdateInterval;
@@ -47,11 +53,10 @@ public class CommonEntityType {
 		// Default 'UNKNOWN' instance
 		if (LogicUtil.nullOrEmpty(nmsName)) {
 			this.nmsType = NMSClassTemplate.create("Entity");
-			this.nmsHookType = new ClassTemplate();
 			this.commonType = ClassTemplate.create(CommonEntity.class);
 			this.bukkitType = ClassTemplate.create(Entity.class);
 			this.nmsConstructor = null;
-			this.nmsHookConstructor = null;
+			this.hookBuilder = null;
 			this.commonConstructor = this.commonType.getConstructor(Entity.class);
 			return;
 		}
@@ -82,24 +87,10 @@ public class CommonEntityType {
 				this.nmsConstructor = this.nmsType.getConstructor(WorldRef.TEMPLATE.getType());
 			}
 		}
-
-		// Obtain NMS Hook class type and constructor
-		type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.nms.NMS" + nmsName);
-		if (type == null) {
-			this.nmsHookType = new ClassTemplate();
-			this.nmsHookConstructor = null;
-		} else {
-			this.nmsHookType = ClassTemplate.create(type);
-			this.nmsHookConstructor = this.nmsHookType.getConstructor(WorldRef.TEMPLATE.getType());
-		}
 	}
 
 	public boolean hasNMSEntity() {
 		return nmsConstructor != null;
-	}
-
-	public boolean hasHookEntity() {
-		return nmsHookConstructor != null;
 	}
 
 	public <T extends Entity> CommonEntity<T> createCommonEntity(T entity) {
@@ -110,8 +101,21 @@ public class CommonEntityType {
 		return nmsConstructor.newInstance(new Object[] {null});
 	}
 
-	public NMSEntityHook createNMSHookEntity() {
-		return (NMSEntityHook) nmsHookConstructor.newInstance(new Object[] {null});
+	public NMSEntityHook createNMSHookEntity(CommonEntity<?> commonEntity) {
+		if (!this.hasNMSEntity()) {
+			throw new RuntimeException("Entity of type " + entityType + " has no Hook Entity support!");
+		}
+		// Initialize a new hook builder if needed (this operation is slightly slow!)
+		if (this.hookBuilder == null) {
+			List<Class<?>> callbacks = new ArrayList<Class<?>>();
+			callbacks.add(NMSEntityHookImpl.class);
+			if (IInventory.class.isAssignableFrom(this.nmsType.getType())) {
+				callbacks.add(NMSEntityInventoryHookImpl.class);
+			}
+			this.hookBuilder = new NMSEntityClassBuilder(this.nmsType.getType(), callbacks);
+		}
+		// Create a new instance
+		return (NMSEntityHook) this.hookBuilder.create(commonEntity);
 	}
 
 	/*

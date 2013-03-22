@@ -14,17 +14,20 @@ public class EntityInventoryController<T extends CommonEntity<?>> extends Common
 	 * 
 	 * @param entity to bind with
 	 */
-	public final void bind(T entity) {
+	@SuppressWarnings("unchecked")
+	public final void bind(CommonEntity<?> entity) {
 		if (this.entity != null) {
 			this.onDetached();
 		}
-		this.entity = entity;
+		this.entity = (T) entity;
 		if (this.entity != null) {
 			final Object handle = this.entity.getHandle();
 			if (handle instanceof NMSEntityInventoryHook) {
 				((NMSEntityInventoryHook) handle).setInventoryController(this);
 			}
-			this.onAttached();
+			if (this.entity.isSpawned()) {
+				this.onAttached();
+			}
 		}
 	}
 

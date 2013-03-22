@@ -2,29 +2,95 @@ package com.bergerkiller.bukkit.common.entity.nms;
 
 import net.minecraft.server.v1_5_R2.DamageSource;
 import net.minecraft.server.v1_5_R2.EntityHuman;
+import net.minecraft.server.v1_5_R2.NBTTagCompound;
 
 import com.bergerkiller.bukkit.common.controller.EntityController;
 
 /**
- * Identifier so BKCommonLib knows that this Entity has been replaced.
- * All classes implementing this Interface should have the default 'world only' constructor.
+ * The default methods provided by all Entity types
  */
 public interface NMSEntityHook {
 	public EntityController<?> getController();
 
 	public void setController(EntityController<?> controller);
 
-	public void super_onTick();
+	/**
+	 * onInteractBy super
+	 */
+	public boolean super_a_(EntityHuman human);
 
-	public boolean super_onInteract(EntityHuman interacter);
-	
+	/**
+	 * onInteractBy
+	 */
+	public boolean a_(EntityHuman human);
+
+	/**
+	 * onTick super
+	 */
+	public void super_l_();
+
+	/**
+	 * onTick
+	 */
+	public void l_();
+
+	/**
+	 * Damage Entity super
+	 */
 	public boolean super_damageEntity(DamageSource damagesource, int damage);
 
-	public void super_onBurn(int damage);
+	/**
+	 * Damage Entity
+	 */
+	public boolean damageEntity(DamageSource damagesource, int damage);
 
+	/**
+	 * onBurn super
+	 */
+	public void super_burn(int damage);
+
+	/**
+	 * onBurn
+	 */
+	public void burn(int damage);
+
+	/**
+	 * onMove super
+	 */
 	public void super_move(double dx, double dy, double dz);
 
+	/**
+	 * onMove
+	 */
+	public void move(double dx, double dy, double dz);
+
+	/**
+	 * onDie super
+	 */
 	public void super_die();
 
+	/**
+	 * onDie
+	 */
+	public void die();
+
+	/**
+	 * getLocalizedName super
+	 */
 	public String super_getLocalizedName();
+
+	/**
+	 * getLocalizedName
+	 */
+	public String getLocalizedName();
+
+	/**
+	 * onSave
+	 */
+    public boolean c(NBTTagCompound nbttagcompound);
+
+	/**
+	 * onSave for takeables
+	 */
+    public boolean d(NBTTagCompound nbttagcompound);
 }

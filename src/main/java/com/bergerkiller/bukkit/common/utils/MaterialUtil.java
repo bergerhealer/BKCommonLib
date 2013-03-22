@@ -122,6 +122,12 @@ public class MaterialUtil {
 	public static final MaterialTypeProperty ISPRESSUREPLATE = new MaterialTypeProperty(Material.WOOD_PLATE, Material.STONE_PLATE);
 
 	/**
+	 * The material is a type of Minecart item
+	 */
+	public static final MaterialTypeProperty ISMINECART = new MaterialTypeProperty(Material.MINECART, Material.POWERED_MINECART, 
+			Material.STORAGE_MINECART, Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART);
+
+	/**
 	 * The material is a type of wieldable sword
 	 */
 	public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, 

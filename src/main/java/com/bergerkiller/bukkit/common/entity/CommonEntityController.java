@@ -18,7 +18,7 @@ public class CommonEntityController<T extends CommonEntity<?>> {
 
 	/**
 	 * Called as soon as this Controller is attached to an Entity.
-	 * The entity is already fully attached prior to this method.
+	 * The entity is already fully attached and spawned prior to this method.
 	 * This method is the first time you can access the Entity from this Controller.
 	 */
 	public void onAttached() {

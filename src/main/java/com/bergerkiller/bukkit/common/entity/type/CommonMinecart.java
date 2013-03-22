@@ -5,13 +5,16 @@ import java.util.List;
 import net.minecraft.server.v1_5_R2.EntityMinecartAbstract;
 import net.minecraft.server.v1_5_R2.EntityMinecartRideable;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Minecart;
+import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
@@ -169,6 +172,15 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	@Override
 	public boolean isVehicle() {
 		return getHandle() instanceof EntityMinecartRideable;
+	}
+
+	@Override
+	public boolean spawn(Location at) {
+		if (super.spawn(at)) {
+			CommonUtil.callEvent(new VehicleCreateEvent(entity));
+			return true;
+		}
+		return false;
 	}
 
 	/**

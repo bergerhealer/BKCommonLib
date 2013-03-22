@@ -48,17 +48,15 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void track(List list) {
-		synchronized (controller) {
-			updateTrackers(list);
-			EntityTrackerEntryRef.timeSinceLocationSync.set(this, EntityTrackerEntryRef.timeSinceLocationSync.get(this) + 1);
-			try {
-				controller.onSync();
-			} catch (Throwable t) {
-				Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to synchronize:");
-				t.printStackTrace();
-			}
-			this.m++;
+		updateTrackers(list);
+		EntityTrackerEntryRef.timeSinceLocationSync.set(this, EntityTrackerEntryRef.timeSinceLocationSync.get(this) + 1);
+		try {
+			controller.onSync();
+		} catch (Throwable t) {
+			Bukkit.getLogger().log(Level.SEVERE, "[BKCommonLib] [Network Controller] Failed to synchronize:");
+			t.printStackTrace();
 		}
+		this.m++;
 	}
 
 	@SuppressWarnings("rawtypes")

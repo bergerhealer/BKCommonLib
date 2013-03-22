@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
@@ -40,7 +39,6 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, ItemStack> itemStack = toItemStackHandle.formPair(toItemStack);
 	public static final ConverterPair<Object, Inventory> inventory = toInventoryHandle.formPair(toInventory);
 	public static final ConverterPair<Byte, Difficulty> difficulty = toDifficultyId.formPair(toDifficulty);
-	public static final ConverterPair<Integer, Material> minecartType = toMinecartTypeId.formPair(toMinecartType);
 	public static final ConverterPair<Object, GameMode> gameMode = toGameModeHandle.formPair(toGameMode);
 	public static final ConverterPair<Object, WorldType> worldType = toWorldTypeHandle.formPair(toWorldType);
 	public static final ConverterPair<Object, DataWatcher> dataWatcher = toDataWatcherHandle.formPair(toDataWatcher);
