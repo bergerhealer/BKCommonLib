@@ -106,4 +106,9 @@ public abstract class DoubleAbstract {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return Double.toString(get());
+	}
 }

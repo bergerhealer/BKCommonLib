@@ -2,10 +2,9 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.UUID;
 import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.World;
 import org.bukkit.Location;
 
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
@@ -97,47 +96,6 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @param to location to teleport to
 	 */
 	public static boolean teleport(final org.bukkit.entity.Entity entity, final Location to) {
-		final Entity entityHandle = CommonNMS.getNative(entity);
-		final Entity passenger = entityHandle.passenger;
-		World newworld = CommonNMS.getNative(to.getWorld());
-		WorldUtil.loadChunks(to, 3);
-		if (entityHandle.world != newworld && !(entityHandle instanceof EntityPlayer)) {
-			if (passenger != null) {
-				entityHandle.passenger = null;
-				passenger.vehicle = null;
-				if (teleport(passenger.getBukkitEntity(), to)) {
-					CommonUtil.nextTick(new Runnable() {
-						public void run() {
-							passenger.setPassengerOf(entityHandle);
-						}
-					});
-				}
-			}
-
-			// teleport this entity
-			entityHandle.world.removeEntity(entityHandle);
-			entityHandle.dead = false;
-			entityHandle.world = newworld;
-			entityHandle.setLocation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
-			entityHandle.world.addEntity(entityHandle);
-			return true;
-		} else {
-			// If in a vehicle, make sure we eject first
-			if (entityHandle.vehicle != null) {
-				entityHandle.setPassengerOf(null);
-			}
-			// If vehicle, eject the passenger first
-			if (passenger != null) {
-				passenger.vehicle = null;
-				entityHandle.passenger = null;
-			}
-			final boolean succ = entity.teleport(to);
-			// If there was a passenger, let passenger enter again
-			if (passenger != null) {
-				passenger.vehicle = entityHandle;
-				entityHandle.passenger = passenger;
-			}
-			return succ;
-		}
+		return CommonEntity.get(entity).teleport(to);
 	}
 }

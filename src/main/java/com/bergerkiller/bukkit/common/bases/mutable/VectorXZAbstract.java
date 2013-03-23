@@ -218,4 +218,9 @@ public abstract class VectorXZAbstract {
 	public double distanceSquared(CommonEntity<?> other) {
 		return distanceSquared(other.loc);
 	}
+
+	@Override
+	public String toString() {
+		return "{x=" + getX() + ", z=" + getZ() + "}";
+	}
 }

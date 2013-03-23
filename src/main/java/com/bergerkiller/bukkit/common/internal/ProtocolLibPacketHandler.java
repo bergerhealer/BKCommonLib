@@ -43,6 +43,9 @@ class ProtocolLibPacketHandler implements PacketHandler {
 
 	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, throughListeners);

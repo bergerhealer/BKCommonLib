@@ -267,4 +267,9 @@ public abstract class VectorAbstract {
 	public Vector offsetTo(org.bukkit.entity.Entity e) {
 		return offsetTo(EntityUtil.getLocX(e), EntityUtil.getLocY(e), EntityUtil.getLocZ(e));
 	}
+
+	@Override
+	public String toString() {
+		return "{x=" + getX() + ", y=" + getY() + ", z=" + getZ() + "}";
+	}
 }

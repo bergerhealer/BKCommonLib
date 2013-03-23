@@ -167,6 +167,9 @@ public class CommonPacketHandler implements PacketHandler {
 
 	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}

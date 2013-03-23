@@ -116,4 +116,12 @@ public abstract class LocationAbstract extends VectorAbstract {
 	public float getPitchDifference(CommonEntity<?> entity) {
 		return getPitchDifference(entity.loc);
 	}
+
+	@Override
+	public String toString() {
+		final World w = getWorld();
+		return "{world=" + (w == null ? "null" : w.getName()) + 
+				", x=" + getX() + ", y=" + getY() + ", z=" + getZ() + 
+				", yaw=" + getYaw() + ", pitch=" + getPitch() + "}";
+	}
 }

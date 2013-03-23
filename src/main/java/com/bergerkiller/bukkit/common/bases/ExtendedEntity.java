@@ -550,21 +550,21 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		handle.motZ = motZ;
 	}
 
-	public boolean teleport(Location arg0) {
-		return entity.teleport(arg0);
-	}
+    public boolean teleport(Location location) {
+        return teleport(location, TeleportCause.PLUGIN);
+    }
 
-	public boolean teleport(org.bukkit.entity.Entity arg0) {
-		return entity.teleport(arg0);
-	}
+    public boolean teleport(Location location, TeleportCause cause) {
+    	return entity.teleport(location, cause);
+    }
 
-	public boolean teleport(Location arg0, TeleportCause arg1) {
-		return entity.teleport(arg0, arg1);
-	}
+    public boolean teleport(org.bukkit.entity.Entity destination) {
+        return teleport(destination.getLocation());
+    }
 
-	public boolean teleport(org.bukkit.entity.Entity arg0, TeleportCause arg1) {
-		return entity.teleport(arg0, arg1);
-	}
+    public boolean teleport(org.bukkit.entity.Entity destination, TeleportCause cause) {
+        return teleport(destination.getLocation(), cause);
+    }
 
 	/**
 	 * Spawns an item as if dropped by this Entity
@@ -589,4 +589,22 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return CommonNMS.getItem(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
 	}
 
+	@Override
+	public int hashCode() {
+		return entity == null ? super.hashCode() : entity.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return entity == null ? "null" : entity.toString();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof ExtendedEntity) {
+			return ((ExtendedEntity<?>) object).entity == this.entity;
+		} else {
+			return false;
+		}
+	}
 }
