@@ -104,9 +104,9 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Object> worldType = getField("e");
 	}
 	public static class NMSPacket10Flying extends NMSPacket {
-		public final FieldAccessor<Double> x = getField("a");
-		public final FieldAccessor<Double> y = getField("b");
-		public final FieldAccessor<Double> z = getField("c");
+		public final FieldAccessor<Double> x = getField("x");
+		public final FieldAccessor<Double> y = getField("y");
+		public final FieldAccessor<Double> z = getField("z");
 		public final FieldAccessor<Double> stance = getField("stance");
 		public final FieldAccessor<Float> yaw = getField("yaw");
 		public final FieldAccessor<Float> pitch = getField("pitch");
@@ -325,8 +325,7 @@ public class PacketFieldClasses {
 			return new CommonPacket(constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle)));
 		}
 	}
-	public static class NMSPacket40EntityMetadata extends NMSPacket {
-		public final FieldAccessor<Integer> passengerId = getField("a");
+	public static class NMSPacket40EntityMetadata extends NMSPacket30Entity {
 		/** CraftBukkit uses rawtypes for this, so do we */
 		@SuppressWarnings("rawtypes")
 		public final FieldAccessor<List> watchedObjects = getField("b");

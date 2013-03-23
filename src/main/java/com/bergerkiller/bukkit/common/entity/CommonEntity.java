@@ -3,7 +3,9 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
 
@@ -21,6 +23,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -78,40 +81,38 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
 		}
 		final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-		synchronized (tracker.getHandle()) {
-			final EntityNetworkController<CommonEntity<T>> oldController = getNetworkController();
-			if (oldController == controller) {
-				return;
-			}
-			// Detach previous controller
-			if (oldController != null) {
-				oldController.bind(null, null);
-			}
-			if (controller == null) {
-				// Stop tracking - nothing special
-				tracker.stopTracking(entity);
-			} else {
-				// Obtain previous and new replacement entry
-				final Object oldEntry = tracker.getEntry(entity);
-				final Object newEntry;
-				if (controller instanceof DefaultEntityNetworkController) {
-					if (oldEntry == null) {
-						final CommonEntityType type = CommonEntityType.byEntity(entity);
-						newEntry = new EntityTrackerEntry(getHandle(Entity.class), 
-								type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
-					} else {
-						newEntry = oldEntry;
-					}
+		final EntityNetworkController<CommonEntity<T>> oldController = getNetworkController();
+		if (oldController == controller) {
+			return;
+		}
+		// Detach previous controller
+		if (oldController != null) {
+			oldController.bind(null, null);
+		}
+		if (controller == null) {
+			// Stop tracking - nothing special
+			tracker.stopTracking(entity);
+		} else {
+			// Obtain previous and new replacement entry
+			final Object oldEntry = tracker.getEntry(entity);
+			final Object newEntry;
+			if (controller instanceof DefaultEntityNetworkController) {
+				if (oldEntry == null) {
+					final CommonEntityType type = CommonEntityType.byEntity(entity);
+					newEntry = new EntityTrackerEntry(getHandle(Entity.class), 
+							type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
 				} else {
-					newEntry = new NMSEntityTrackerEntry(entity, controller, oldEntry);
+					newEntry = oldEntry;
 				}
-				// Attach (new?) entry to the world
-				if (oldEntry != newEntry) {
-					tracker.setEntry(entity, newEntry);
-				}
-				// Attach the data to the controller
-				controller.bind(this, newEntry);
+			} else {
+				newEntry = new NMSEntityTrackerEntry(entity, controller, oldEntry);
 			}
+			// Attach (new?) entry to the world
+			if (oldEntry != newEntry) {
+				tracker.setEntry(entity, newEntry);
+			}
+			// Attach the data to the controller
+			controller.bind(this, newEntry);
 		}
 	}
 
@@ -181,9 +182,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		}
 		// Respawn the entity and attach the controller
 		try {
-			// Store the previous Bukkit entity information for later use
-			final org.bukkit.entity.Entity oldBukkitEntity = entity;
-
 			// Create a new entity instance and perform data/property transfer
 			final Entity newInstance = (Entity) type.createNMSHookEntity(this);
 			type.nmsType.transfer(oldInstance, newInstance);
@@ -192,56 +190,66 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			oldInstance.valid = false;
 			newInstance.valid = true;
 
-			// Now proceed to replace this NMS Entity in all places imaginable.
-			// First load the chunk so we can at least work on something
-			Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
-
 			// *** Bukkit Entity ***
-			((CraftEntity) oldBukkitEntity).setHandle(newInstance);
+			((CraftEntity) entity).setHandle(newInstance);
+
+			// *** Give the old entity a new Bukkit Entity ***
+			EntityRef.bukkitEntity.set(oldInstance, CraftEntity.getEntity((CraftServer) Bukkit.getServer(), oldInstance));
 
 			// *** Passenger/Vehicle ***
-			if (oldInstance.vehicle != null) {
-				oldInstance.vehicle.passenger = newInstance;
+			if (newInstance.vehicle != null) {
+				newInstance.vehicle.passenger = newInstance;
 			}
-			if (oldInstance.passenger != null) {
-				oldInstance.passenger.vehicle = newInstance;
-			}
-
-			// *** Entities By ID Map ***
-			final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
-			if (entitiesById.remove(oldInstance.id) == null) {
-				entitiesById.put(newInstance.id, newInstance);
-				CommonUtil.nextTick(new Runnable() {
-					public void run() {
-						entitiesById.put(newInstance.id, newInstance);
-					}
-				});
-			} else {
-				entitiesById.put(newInstance.id, newInstance);
+			if (newInstance.passenger != null) {
+				newInstance.passenger.vehicle = newInstance;
 			}
 
-			// *** EntityTrackerEntry ***
-			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-			Object entry = tracker.getEntry(entity);
-			if (entry != null) {
-				EntityTrackerEntryRef.tracker.set(entry, entity);
-			}
+			// Only do this replacement logic for Entities that are already spawned
+			if (this.isSpawned()) {
+				// Now proceed to replace this NMS Entity in all places imaginable.
+				// First load the chunk so we can at least work on something
+				Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
 
-			// *** World ***
-			ListIterator<Entity> iter = oldInstance.world.entityList.listIterator();
-			while (iter.hasNext()) {
-				if (iter.next().id == oldInstance.id) {
-					iter.set(newInstance);
-					break;
+				// *** Entities By ID Map ***
+				final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
+				if (entitiesById.remove(oldInstance.id) == null) {
+					CommonUtil.nextTick(new Runnable() {
+						public void run() {
+							entitiesById.put(newInstance.id, newInstance);
+						}
+					});
 				}
-			}
+				entitiesById.put(newInstance.id, newInstance);
 
-			// *** Chunk ***
-			final int chunkY = getChunkY();
-			if (!replaceInChunk(chunk, chunkY, oldInstance, newInstance)) {
-				for (int y = 0; y < chunk.entitySlices.length; y++) {
-					if (y != chunkY && replaceInChunk(chunk, y, oldInstance, newInstance)) {
+				// *** EntityTrackerEntry ***
+				final EntityTracker tracker = WorldUtil.getTracker(getWorld());
+				Object entry = tracker.getEntry(entity);
+				if (entry != null) {
+					EntityTrackerEntryRef.tracker.set(entry, entity);
+				}
+				if (hasPassenger()) {
+					entry = tracker.getEntry(getPassenger());
+					if (entry != null) {
+						EntityTrackerEntryRef.vehicle.set(entry, entity);
+					}
+				}
+
+				// *** World ***
+				ListIterator<Entity> iter = oldInstance.world.entityList.listIterator();
+				while (iter.hasNext()) {
+					if (iter.next().id == oldInstance.id) {
+						iter.set(newInstance);
 						break;
+					}
+				}
+
+				// *** Chunk ***
+				final int chunkY = getChunkY();
+				if (!replaceInChunk(chunk, chunkY, oldInstance, newInstance)) {
+					for (int y = 0; y < chunk.entitySlices.length; y++) {
+						if (y != chunkY && replaceInChunk(chunk, y, oldInstance, newInstance)) {
+							break;
+						}
 					}
 				}
 			}

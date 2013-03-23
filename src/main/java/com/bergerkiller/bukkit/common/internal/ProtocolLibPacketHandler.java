@@ -162,6 +162,9 @@ class ProtocolLibPacketHandler implements PacketHandler {
 		private static ListeningWhitelist getWhiteList(ListenerPriority priority, int[] packets, boolean receiving) {
 			List<Integer> supportedPackets = new ArrayList<Integer>();
 			for (int packet : packets) {
+				if (packet == -1) {
+					continue;
+				}
 				if ((receiving && Packets.Client.isSupported(packet)) || (!receiving && Packets.Server.isSupported(packet))) {
 					supportedPackets.add(packet);
 				}

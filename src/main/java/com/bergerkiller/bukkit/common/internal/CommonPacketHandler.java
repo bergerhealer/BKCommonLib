@@ -114,6 +114,9 @@ public class CommonPacketHandler implements PacketHandler {
 		}
 		// Register the listener
 		for (int id : ids) {
+			if (id == -1) {
+				continue;
+			}
 			if (id < 0 || id >= monitors.length) {
 				throw new IllegalArgumentException("Unknown packet type Id: " + id);
 			}
@@ -141,6 +144,9 @@ public class CommonPacketHandler implements PacketHandler {
 		}
 		// Register the listener
 		for (int id : ids) {
+			if (id == -1) {
+				continue;
+			}
 			if (id < 0 || id >= listeners.length) {
 				throw new IllegalArgumentException("Unknown packet type Id: " + id);
 			}

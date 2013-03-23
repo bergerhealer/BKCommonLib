@@ -4,6 +4,7 @@ import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.MinecraftServer;
 
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -23,8 +25,13 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener {
@@ -47,13 +54,6 @@ class CommonListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	private void onChunkUnload(ChunkUnloadEvent event) {
-		if (event.getChunk() == null) {
-			System.out.println("ATTEMPTED TO UNLOAD NULL CHUNK");
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
 	private void onWorldInit(final WorldInitEvent event) {
 		CommonUtil.nextTick(new Runnable() {
 			public void run() {
@@ -73,8 +73,26 @@ class CommonListener implements Listener {
 		}
 	}
 
-	@EventHandler (priority = EventPriority.MONITOR)
-	public void onPlayerJoin(PlayerJoinEvent event) {
+	@EventHandler(priority = EventPriority.LOWEST)
+	private void onVehicleEnter(final VehicleEnterEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
+		// Set the vehicle and passenger handles for Hook entities
+		// This is required to avoid problems with replaced Entities
+		if (CommonNMS.getNative(event.getVehicle()).dead) {
+			// Find the real Entity and redirect the call
+			final org.bukkit.entity.Entity realVehicle = EntityUtil.getEntity(event.getEntered().getWorld(), event.getVehicle().getUniqueId());
+			if (realVehicle != null && realVehicle != event.getVehicle()) {
+				// Perform the event again for the right Bukkit entity/Handle
+				event.setCancelled(true);
+				realVehicle.setPassenger(event.getEntered());
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	private void onPlayerJoin(PlayerJoinEvent event) {
 		if (CommonPlugin.getInstance().isUsingFallBackPacketListener()) {
 			CommonPlayerConnection.bind(event.getPlayer());
 		}

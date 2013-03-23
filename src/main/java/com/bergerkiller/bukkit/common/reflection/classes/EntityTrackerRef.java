@@ -52,17 +52,15 @@ public class EntityTrackerRef {
 	public static Object setEntry(Object entityTrackerInstance, Entity entity, Object entityTrackerEntry) {
 		Object previous;
 		final int id = entity.getEntityId();
-		synchronized (entityTrackerInstance) {
-			// Set in tracked entities map
-			IntHashMap<Object> trackedMap = trackedEntities.get(entityTrackerInstance);
-			previous = trackedMap.remove(id);
-			trackedMap.put(id, entityTrackerEntry);
+		// Set in tracked entities map
+		IntHashMap<Object> trackedMap = trackedEntities.get(entityTrackerInstance);
+		previous = trackedMap.remove(id);
+		trackedMap.put(id, entityTrackerEntry);
 
-			// Replace in set
-			Set<Object> trackers = trackerSet.get(entityTrackerInstance);
-			trackers.remove(previous);
-			trackers.add(entityTrackerEntry);
-		}
+		// Replace in set
+		Set<Object> trackers = trackerSet.get(entityTrackerInstance);
+		trackers.remove(previous);
+		trackers.add(entityTrackerEntry);
 		return previous;
 	}
 }

@@ -42,12 +42,12 @@ import com.narrowtux.showcase.Showcase;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
-	/*
+	/**
 	 * BKCommonLib Minecraft versioning
 	 */
 	public static final String DEPENDENT_MC_VERSION = "v1_5_R2";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
-	/*
+	/**
 	 * Known plugins that require ProtocolLib to be installed
 	 */
 	private static final String[] protLibPlugins = {"Spout"};

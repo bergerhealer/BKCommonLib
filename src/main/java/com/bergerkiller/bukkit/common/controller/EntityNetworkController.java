@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -94,6 +95,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	/**
 	 * Adds a new viewer to this Network Controller.
 	 * Calling this method also results in spawn messages being sent to the viewer.
+	 * When overriding, make sure to always check the super-result before continuing!
 	 * 
 	 * @param viewer to add
 	 * @return True if the viewer was added, False if the viewer was already added
@@ -109,7 +111,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
 	/**
 	 * Removes a viewer from this Network Controller.
-	 * Calling this method also results in destroy messages beint sent to the viewer.
+	 * Calling this method also results in destroy messages being sent to the viewer.
+	 * When overriding, make sure to always check the super-result before continuing!
 	 * 
 	 * @param viewer to remove
 	 * @return True if the viewer was removed, False if the viewer wasn't contained
@@ -132,7 +135,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		final double dx = Math.abs(EntityUtil.getLocX(viewer) - (double) (pos.x / 32.0));
 		final double dz = Math.abs(EntityUtil.getLocZ(viewer) - (double) (pos.z / 32.0));
 		final double view = this.getViewDistance();
-		if (dx <= view && dz <= view && PlayerUtil.isChunkEntered(viewer, entity.getChunkX(), entity.getChunkZ())) {
+		// Only add the viewer if it is in view, and if the viewer can actually see the entity (PlayerChunk)
+		// The ignoreChunkCheck is needed for when a new player spawns (it is not yet added to the PlayerChunk)
+		if (dx <= view && dz <= view && (EntityRef.ignoreChunkCheck.get(entity.getHandle()) || 
+				PlayerUtil.isChunkEntered(viewer, entity.getChunkX(), entity.getChunkZ()))) {
+
 			addViewer(viewer);
 		} else {
 			removeViewer(viewer);

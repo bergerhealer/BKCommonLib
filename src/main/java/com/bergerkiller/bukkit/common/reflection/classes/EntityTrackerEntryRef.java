@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class EntityTrackerEntryRef {
 	public static final FieldAccessor<Integer> updateInterval = TEMPLATE.getField("c");
 	public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("u");
 	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("isMoving");
-	public static final TranslatorFieldAccessor<List<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerList);
+	public static final TranslatorFieldAccessor<Set<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerSet);
 	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("b");
 
 	public static final CommonPacket getSpawnPacket(Object instance) {

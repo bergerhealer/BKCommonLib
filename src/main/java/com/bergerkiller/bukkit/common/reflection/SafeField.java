@@ -82,6 +82,15 @@ public class SafeField<T> implements FieldAccessor<T> {
 		return this.field != null;
 	}
 
+	/**
+	 * Gets whether this Field is a static Field
+	 * 
+	 * @return True if static, False if not
+	 */
+	public boolean isStatic() {
+		return this.field == null ? false : Modifier.isStatic(this.field.getModifiers());
+	}
+
 	@Override
 	public T transfer(Object from, Object to) {
 		if (this.field == null) {

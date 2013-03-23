@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion;
 
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
@@ -32,6 +33,7 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
 	public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
 	public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);
+	public static final ConverterPair<Set<Object>, Set<Player>> playerSet = toPlayerHandleSet.formPair(toPlayerSet);
 	public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = toItemStackHandleList.formPair(toItemStackList);
 	public static final ConverterPair<Object[], ItemStack[]> itemStackArr = toItemStackHandleArr.formPair(toItemStackArr);
 	public static final ConverterPair<Object, World> world = toWorldHandle.formPair(toWorld);

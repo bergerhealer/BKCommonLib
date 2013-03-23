@@ -53,12 +53,14 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 					// Primitive type array - simply append elements with a space
 					final int length = Array.getLength(value);
 					StringBuilder builder = new StringBuilder(length * 5);
+					builder.append('[');
 					for (int i = 0; i < length; i++) {
 						if (i > 0) {
-							builder.append(' ');
+							builder.append(", ");
 						}
 						builder.append(toString.convert(Array.get(value, i), "0"));
 					}
+					builder.append(']');
 					return builder.toString();
 				} else {
 					// Let the collection based conversion deal with it
@@ -71,14 +73,16 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 			if (value instanceof Collection) {
 				Collection<?> collection = (Collection<?>) value;
 				StringBuilder builder = new StringBuilder(collection.size() * 100);
+				builder.append('[');
 				boolean first = true;
 				for (Object element : collection) {
 					if (!first) {
-						builder.append('\n');
+						builder.append(", ");
 					}
-					builder.append(toString.convert(element, ""));
+					builder.append(toString.convert(element, "null"));
 					first = false;
 				}
+				builder.append(']');
 				return builder.toString();
 			} else {
 				return value.toString();

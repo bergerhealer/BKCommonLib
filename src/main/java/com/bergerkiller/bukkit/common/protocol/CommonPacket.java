@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -202,5 +205,52 @@ public class CommonPacket {
 	 */
 	public double readDouble(int index) throws IllegalArgumentException {
 		return (Double) read(index);
+	}
+
+	@Override
+	public String toString() {
+		final Object handle = getHandle();
+		if (handle == null) {
+			return "null";
+		}
+		PacketType type = this.getType();
+		try {
+			if (type != PacketType.UNKNOWN) {
+				StringBuilder builder = new StringBuilder();
+				builder.append(type).append(" {\n");
+				// Find out the right PacketFields class
+				Object fieldsInstance = PacketFields.class.getDeclaredField(type.toString()).get(null);
+				for (SafeField<?> field : ClassTemplate.create(fieldsInstance).getFields()) {
+					if (field.isStatic()) {
+						continue;
+					}
+					Object fieldValue = field.get(fieldsInstance);
+					if (fieldValue instanceof FieldAccessor) {
+						final String name = field.getName();
+						final Object value = ((FieldAccessor<?>) fieldValue).get(handle);
+						builder.append("  ").append(name).append(" = ").append(Conversion.toString.convert(value)).append('\n');
+					}
+				}
+				builder.append("}");
+				return builder.toString();
+			}
+		} catch (Throwable t) {
+		}
+		// Print the fields (error/unknown packet...)
+		StringBuilder builder = new StringBuilder();
+		if (handle.getClass().getName().startsWith(Common.NMS_ROOT)) {
+			builder.append(handle.getClass().getSimpleName());
+		} else {
+			builder.append(handle.getClass().getName());
+		}
+		builder.append(" {\n");
+		for (SafeField<?> field : ClassTemplate.create(handle).getFields()) {
+			if (field.isStatic()) {
+				continue;
+			}
+			builder.append("  ").append(field.getName()).append(" = ").append(Conversion.toString.convert(field.get(handle))).append('\n');
+		}
+		builder.append("}");
+		return builder.toString();
 	}
 }
