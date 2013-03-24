@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.security.PublicKey;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -574,6 +575,30 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket205ClientCommand extends NMSPacket {
 		public final FieldAccessor<Integer> payload = getField("a");
+	}
+	public static class NMSPacket206SetScoreboardObjective extends NMSPacket {
+		public final FieldAccessor<String> name = getField("a");
+		public final FieldAccessor<String> displayName = getField("b");
+		public final FieldAccessor<Integer> action = getField("c");
+	}
+	public static class NMSPacket207SetScoreboardScore extends NMSPacket {
+		public final FieldAccessor<String> name = getField("a");
+		public final FieldAccessor<String> scoreName = getField("b");
+		public final FieldAccessor<Integer> value = getField("c");
+		public final FieldAccessor<Integer> action = getField("d");
+	}
+	public static class NMSPacket208SetScoreboardDisplayObjective extends NMSPacket {
+		public final FieldAccessor<Integer> display = getField("a");
+		public final FieldAccessor<String> name = getField("b");
+	}
+	public static class NMSPacket209SetScoreboardTeam extends NMSPacket {
+		public final FieldAccessor<String> team = getField("a");
+		public final FieldAccessor<String> display = getField("b");
+		public final FieldAccessor<String> prefix = getField("c");
+		public final FieldAccessor<String> suffix = getField("d");
+		public final FieldAccessor<Collection<String>> players = getField("e");
+		public final FieldAccessor<Integer> mode = getField("f");
+		public final FieldAccessor<Integer> friendlyFire = getField("g");
 	}
 	public static class NMSPacket250CustomPayload extends NMSPacket {
 		public final FieldAccessor<String> tag = getField("tag");

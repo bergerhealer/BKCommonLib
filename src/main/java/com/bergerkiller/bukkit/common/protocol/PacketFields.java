@@ -76,6 +76,10 @@ public class PacketFields {
 	public static final NMSPacket203TabComplete TAB_COMPLETE = new NMSPacket203TabComplete();
 	public static final NMSPacket204LocaleAndViewDistance LOCALE_AND_VIEW_DISTANCE = new NMSPacket204LocaleAndViewDistance();
 	public static final NMSPacket205ClientCommand CLIENT_COMMAND = new NMSPacket205ClientCommand();
+	public static final NMSPacket206SetScoreboardObjective SET_SCOREBOARD_OBJECTIVE = new NMSPacket206SetScoreboardObjective();
+	public static final NMSPacket207SetScoreboardScore SET_SCOREBOARD_SCORE = new NMSPacket207SetScoreboardScore();
+	public static final NMSPacket208SetScoreboardDisplayObjective SET_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSPacket208SetScoreboardDisplayObjective();
+	public static final NMSPacket209SetScoreboardTeam SET_SCOREBOARD_TEAM = new NMSPacket209SetScoreboardTeam();
 	public static final NMSPacket250CustomPayload CUSTOM_PAYLOAD = new NMSPacket250CustomPayload();
 	public static final NMSPacket252KeyResponse KEY_RESPONSE = new NMSPacket252KeyResponse();
 	public static final NMSPacket253KeyRequest KEY_REQUEST = new NMSPacket253KeyRequest();
