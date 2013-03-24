@@ -11,16 +11,18 @@ import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard.Display;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 public class CommonObjective {
+	private Display display;
 	private CommonScoreboard scoreboard;
 	private String name;
 	private String displayName;
 	private boolean displayed;
 	private Map<String, CommonScore> scores = new HashMap<String, CommonScore>();
 	
-	protected CommonObjective(CommonScoreboard scoreboard, String name, String displayName) {
+	protected CommonObjective(CommonScoreboard scoreboard, Display display) {
+		this.display = display;
 		this.scoreboard = scoreboard;
-		this.name = name;
-		this.displayName = displayName;
+		this.name = display.getName();
+		this.displayName = display.getDisplayName();
 	}
 	
 	/**
@@ -39,6 +41,25 @@ public class CommonObjective {
 	 */
 	public String getDisplayName() {
 		return this.displayName;
+	}
+	
+	/**
+	 * Get the display from the objective
+	 * 
+	 * @return Display
+	 */
+	public Display getDisplay() {
+		return this.display;
+	}
+	
+	/**
+	 * Change the display name from the objective
+	 * 
+	 * @param value
+	 */
+	public void setDisplayName(String value) {
+		this.displayName = value;
+		this.update();
 	}
 	
 	/**
@@ -113,11 +134,11 @@ public class CommonObjective {
 	 * 
 	 * @param display Display location
 	 */
-	public void show(Display display) {
+	public void show() {
 		if(!this.displayed)
 			this.handle(0);
 		
-		this.display(display);
+		this.display();
 	}
 	
 	/**
@@ -138,15 +159,15 @@ public class CommonObjective {
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
 	
-	private void display(Display type) {
+	private void display() {
 		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_DISPLAY_OBJECTIVE);
 		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.display, type.getId());
+		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display.getId());
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
 	
 	protected static CommonObjective copyFrom(CommonScoreboard board, CommonObjective objective) {
-		CommonObjective obj = new CommonObjective(board, objective.name, objective.displayName);
+		CommonObjective obj = new CommonObjective(board, objective.display);
 		
 		//Copy all scores
 		for(CommonScore score : objective.getScores()) {

@@ -1,17 +1,32 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.bukkit.entity.Player;
 
 public class CommonScoreboard {
-	private Map<String, CommonObjective> objectives = new HashMap<String, CommonObjective>();
+	private static Map<Player, CommonScoreboard> boards = new WeakHashMap<Player, CommonScoreboard>();
+	
+	public static CommonScoreboard get(Player player) {
+		if(boards.containsKey(player))
+			return boards.get(player);
+		else {
+			CommonScoreboard board = new CommonScoreboard(player);
+			boards.put(player, board);
+			return board;
+		}
+	}
+	
+	private CommonObjective[] objectives = new CommonObjective[3];
 	private Player player;
 	
 	public CommonScoreboard(Player player) {
 		this.player = player;
+		for(int i = 0; i < 3; i++) {
+			Display display = Display.fromInt(i);
+			objectives[i] = new CommonObjective(this, display);
+		}
 	}
 	
 	/**
@@ -24,47 +39,13 @@ public class CommonScoreboard {
 	}
 	
 	/**
-	 * Get all the objectives
+	 * Get the scoreboard form a certain display
 	 * 
-	 * @return Objectives
-	 */
-	public Collection<CommonObjective> getObjectives() {
-		return objectives.values();
-	}
-	
-	/**
-	 * Get an objective
-	 * 
-	 * @param name Objective name
+	 * @param display Display
 	 * @return Objective
 	 */
-	public CommonObjective getObjective(String name) {
-		return objectives.get(name);
-	}
-	
-	/**
-	 * Add an onjective
-	 * 
-	 * @param objective Objective
-	 */
-	public void addObjective(CommonObjective objective) {
-		if(getObjective(objective.getName()) != null)
-			throw new IllegalArgumentException("Objective '"+ objective.getName()+"' already exists!");
-		
-		objectives.put(objective.getName(), objective);
-	}
-	
-	/**
-	 * Create an objective and add it
-	 * 
-	 * @param name Objective name
-	 * @param displayName Objective display name
-	 * @return Objective
-	 */
-	public CommonObjective createObjective(String name, String displayName) {
-		CommonObjective obj = new CommonObjective(this, name, displayName);
-		this.addObjective(obj);
-		return obj;
+	public CommonObjective getObjective(Display display) {
+		return this.objectives[display.getId()];
 	}
 	
 	/**
@@ -78,27 +59,48 @@ public class CommonScoreboard {
 		CommonScoreboard board = new CommonScoreboard(player);
 		
 		//Copy all objectives
-		for(CommonObjective obj : from.getObjectives()) {
-			CommonObjective newObj = CommonObjective.copyFrom(board, obj);
-			board.addObjective(newObj);
+		for(int i = 0; i < 3; i++) {
+			Display display = Display.fromInt(i);
+			board.objectives[i] = CommonObjective.copyFrom(board, from.getObjective(display));
 		}
 		
 		return board;
 	}
 	
 	public static enum Display {
-		LIST(0),
-		SIDEBAR(1),
-		BELOWNAME(2);
+		LIST(0, "list", "List"),
+		SIDEBAR(1, "sidebar", "SideBar"),
+		BELOWNAME(2, "belowname", "BelowName");
 		
 		private int id;
+		private String name;
+		private String displayName;
 		
-		Display(int id) {
+		Display(int id, String name, String displayName) {
 			this.id = id;
+			this.name = name;
+			this.displayName = displayName;
 		}
 		
 		public int getId() {
 			return this.id;
+		}
+		
+		public String getName() {
+			return this.name;
+		}
+		
+		public String getDisplayName() {
+			return this.displayName;
+		}
+		
+		public static Display fromInt(int from) {
+			for(Display display : values()) {
+				if(display.id == from)
+					return display;
+			}
+			
+			return null;
 		}
 	}
 }
