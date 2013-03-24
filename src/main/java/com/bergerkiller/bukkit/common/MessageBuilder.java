@@ -223,9 +223,11 @@ public class MessageBuilder {
 	private void prepareAppend(int widthToAppend) {
 		if ((this.currentWidth + widthToAppend + this.sepwidth) > CHAT_WINDOW_WIDTH) {
 			this.newLine();
-		} else if (this.separator != null && !this.isFirstSeparatorCall) {
-			this.currentWidth += this.sepwidth;
-			this.builder.append(this.separator);
+		} else if (this.separator != null) {
+			if (!this.isFirstSeparatorCall) {
+				this.currentWidth += this.sepwidth;
+				this.builder.append(this.separator);
+			}
 			this.isFirstSeparatorCall = false;
 		}
 		this.currentWidth += widthToAppend;
