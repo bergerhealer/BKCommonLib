@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 
 import org.bukkit.Chunk;
@@ -46,6 +49,19 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static void queueChunkSend(Player player, Chunk chunk) {
 		queueChunkSend(player, chunk.getX(), chunk.getZ());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<Player> getNearestPlayers(Player player, double radius) {
+		EntityPlayer handle = CommonNMS.getNative(player);
+		List<Player> list = new ArrayList<Player>();
+		List<EntityPlayer> players = handle.world.a(EntityPlayer.class, handle.boundingBox.grow(radius, radius, radius));
+		
+		for(EntityPlayer ep : players) {
+			list.add(CommonNMS.getPlayer(ep));
+		}
+		
+		return list;
 	}
 
 	/**
