@@ -583,7 +583,7 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket207SetScoreboardScore extends NMSPacket {
 		public final FieldAccessor<String> name = getField("a");
-		public final FieldAccessor<String> scoreName = getField("b");
+		public final FieldAccessor<String> objName = getField("b");
 		public final FieldAccessor<Integer> value = getField("c");
 		public final FieldAccessor<Integer> action = getField("d");
 	}

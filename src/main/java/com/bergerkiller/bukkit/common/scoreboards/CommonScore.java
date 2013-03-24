@@ -8,14 +8,14 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 public class CommonScore {
 	private CommonScoreboard scoreboard;
 	private String name;
-	private String displayName;
+	private String objName;
 	private int value;
 	private boolean created;
 	
-	protected CommonScore(CommonScoreboard scoreboard, String name, String displayName) {
+	protected CommonScore(CommonScoreboard scoreboard, String name, String objName) {
 		this.scoreboard = scoreboard;
 		this.name = name;
-		this.displayName = displayName;
+		this.objName = objName;
 	}
 	
 	/**
@@ -25,15 +25,6 @@ public class CommonScore {
 	 */
 	public String getName() {
 		return this.name;
-	}
-	
-	/**
-	 * Get the display name form the score
-	 * 
-	 * @return Display name
-	 */
-	public String getDisplayName() {
-		return this.displayName;
 	}
 	
 	/**
@@ -63,7 +54,7 @@ public class CommonScore {
 		
 		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_SCORE);
 		packet.write(PacketFields.SET_SCOREBOARD_SCORE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.scoreName, this.displayName);
+		packet.write(PacketFields.SET_SCOREBOARD_SCORE.objName, this.objName);
 		packet.write(PacketFields.SET_SCOREBOARD_SCORE.value, this.value);
 		packet.write(PacketFields.SET_SCOREBOARD_SCORE.action, 0);
 		PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
@@ -95,7 +86,7 @@ public class CommonScore {
 	}
 	
 	protected static CommonScore copyFrom(CommonScoreboard board, CommonScore from) {
-		CommonScore to = new CommonScore(board, from.getName(), from.getDisplayName());
+		CommonScore to = new CommonScore(board, from.name, from.objName);
 		to.setValue(from.getValue());
 		return to;
 	}

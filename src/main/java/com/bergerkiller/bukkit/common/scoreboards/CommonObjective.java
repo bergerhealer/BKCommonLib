@@ -91,8 +91,9 @@ public class CommonObjective {
 	 * @param displayName Score diplay name
 	 * @return Score
 	 */
-	public CommonScore createScore(String name, String displayName) {
-		CommonScore score = new CommonScore(this.scoreboard, name, displayName);
+	public CommonScore createScore(String name, int value) {
+		CommonScore score = new CommonScore(this.scoreboard, name, this.name);
+		score.setValue(value);
 		this.addScore(score);
 		return score;
 	}
