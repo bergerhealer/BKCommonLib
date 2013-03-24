@@ -152,6 +152,7 @@ public class CommonObjective {
 			this.handle(0);
 		
 		this.display();
+		this.displayed = true;
 	}
 	
 	/**
@@ -162,6 +163,7 @@ public class CommonObjective {
 			return;
 		
 		this.handle(1);
+		this.displayed = false;
 	}
 	
 	private void handle(int type) {
