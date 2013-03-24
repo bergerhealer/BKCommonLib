@@ -7,6 +7,8 @@ import java.io.IOException;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+
 /**
  * Represents a class containing two immutable integer coordinates: x and z
  */
@@ -16,6 +18,10 @@ public class IntVector2 {
 
 	public IntVector2(Chunk chunk) {
 		this(chunk.getX(), chunk.getZ());
+	}
+
+	public IntVector2(final double x, final double z) {
+		this(MathUtil.floor(x), MathUtil.floor(z));
 	}
 
 	public IntVector2(final int x, final int z) {
@@ -37,6 +43,26 @@ public class IntVector2 {
 
 	public IntVector2 subtract(IntVector2 other) {
 		return subtract(other.x, other.z);
+	}
+
+	public IntVector2 multiply(int x, int z) {
+		return new IntVector2(this.x * x, this.z * z);
+	}
+
+	public IntVector2 multiply(double x, double z) {
+		return new IntVector2((double) this.x * x, (double) this.z * z);
+	}
+
+	public IntVector2 multiply(int factor) {
+		return multiply(factor, factor);
+	}
+
+	public IntVector2 multiply(double factor) {
+		return multiply(factor, factor);
+	}
+
+	public IntVector2 multiply(IntVector2 other) {
+		return multiply(other.x, other.z);
 	}
 
 	public IntVector2 abs() {

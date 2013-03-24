@@ -279,7 +279,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		final IntVector2 newRot = this.getProtocolRotation();
 		final boolean rotated = newRot.subtract(oldRot).abs().greaterEqualThan(MIN_RELATIVE_CHANGE);
 		// Synchronize
-		syncLocation(moved ? newPos : oldPos, rotated ? newRot : oldRot);
+		syncLocation(moved ? newPos : null, rotated ? newRot : null);
 	}
 
 	/**
@@ -455,6 +455,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param rotation (new, x = yaw, z = pitch)
 	 */
 	public void syncLocationAbsolute(IntVector3 position, IntVector2 rotation) {
+		if (position == null) {
+			position = this.getProtocolPositionSynched();
+		}
+		if (rotation == null) {
+			rotation = this.getProtocolRotationSynched();
+		}
 		// Update protocol values
 		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 		handle.xLoc = position.x;
@@ -478,28 +484,26 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param rotation - whether to sync rotation
 	 */
 	public void syncLocation(boolean position, boolean rotation) {
-		syncLocation(position ? getProtocolPosition() : getProtocolPositionSynched(),
-				rotation ? getProtocolRotation() : getProtocolRotationSynched());
+		syncLocation(position ? getProtocolPosition() : null,
+				rotation ? getProtocolRotation() : null);
 	}
 
 	/**
 	 * Synchronizes the entity position / rotation relatively.
 	 * If the relative change is too big, an absolute update is performed instead.
+	 * Pass in null values to ignore updating it.
 	 * 
 	 * @param position (new)
 	 * @param rotation (new, x = yaw, z = pitch)
 	 */
 	public void syncLocation(IntVector3 position, IntVector2 rotation) {
-		final IntVector3 deltaPos = position.subtract(this.getProtocolPositionSynched());
-		final IntVector2 deltaRot = rotation.subtract(this.getProtocolRotationSynched());
+		final boolean moved = position != null;
+		final boolean rotated = rotation != null;
+		final IntVector3 deltaPos = moved ? position.subtract(this.getProtocolPositionSynched()) : IntVector3.ZERO;
 		if (deltaPos.abs().greaterThan(MAX_RELATIVE_DISTANCE)) {
 			// Perform teleport instead
 			syncLocationAbsolute(position, rotation);
 		} else {
-			// Create a proper relative move/look packet based on the change
-			final boolean moved = !deltaPos.equals(IntVector3.ZERO);
-			final boolean rotated = !deltaRot.equals(IntVector2.ZERO);
-
 			// Update protocol values
 			final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
 			if (moved) {

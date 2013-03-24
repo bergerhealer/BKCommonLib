@@ -3,6 +3,9 @@ package com.bergerkiller.bukkit.common.utils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import com.bergerkiller.bukkit.common.TypedValue;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 /**
  * Contains utilities to debug code, such as logging objects
  */
@@ -76,5 +79,29 @@ public class DebugUtil {
 	 */
 	public static void heartbeat() {
 		CommonUtil.broadcast("HEARTBEAT: " + System.currentTimeMillis());
+	}
+
+	/**
+	 * Gets a debug variable that can be changed using the /debug command
+	 * 
+	 * @param name of the value
+	 * @param value initial (not null)
+	 * @return Typed value for the Variable
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> TypedValue<T> getVariable(String name, T value) {
+		return CommonPlugin.getInstance().getDebugVariable(name, (Class<T>) value.getClass(), value);
+	}
+
+	/**
+	 * Gets a debug variable that can be changed using the /debug command
+	 * 
+	 * @param name of the value
+	 * @param type of value
+	 * @param value initial (can be null)
+	 * @return Typed value for the Variable
+	 */
+	public static <T> TypedValue<T> getVariable(String name, Class<T> type, T value) {
+		return CommonPlugin.getInstance().getDebugVariable(name, type, value);
 	}
 }

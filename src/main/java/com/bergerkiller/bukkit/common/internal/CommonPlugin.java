@@ -16,6 +16,7 @@ import net.milkbowl.vault.permission.Permission;
 import net.minecraft.server.v1_5_R2.Entity;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
@@ -25,8 +26,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.MessageBuilder;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
@@ -35,6 +38,7 @@ import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.kellerkindt.scs.ShowCaseStandalone;
@@ -64,6 +68,7 @@ public class CommonPlugin extends PluginBase {
 	private final List<NextTickListener> nextTickListeners = new ArrayList<NextTickListener>(1);
 	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
+	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
@@ -113,6 +118,15 @@ public class CommonPlugin extends PluginBase {
 				this.nextTickTasks.add(runnable);
 			}
 		}
+	}
+
+	public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
+		TypedValue typed = debugVariables.get(name);
+		if (typed == null || typed.type != type) {
+			typed = new TypedValue(type, value);
+			debugVariables.put(name, typed);
+		}
+		return typed;
 	}
 
 	public void addNextTickListener(NextTickListener listener) {
@@ -543,6 +557,38 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public boolean command(CommandSender sender, String command, String[] args) {
+		if (debugVariables.isEmpty()) {
+			return false;
+		}
+		if (command.equals("commondebug") || command.equals("debug")) {
+			MessageBuilder message = new MessageBuilder();
+			if (args.length == 0) {
+				message.green("This command allows you to tweak debug settings in plugins").newLine();
+				message.green("All debug variables should be cleared in official builds").newLine();
+				message.green("Available debug variables:").newLine();
+				message.setSeparator(ChatColor.YELLOW, " \\ ").setIndent(4);
+				for (String variable : debugVariables.keySet()) {
+					message.green(variable);
+				}
+			} else {
+				final String varname = args[0];
+				final TypedValue value = debugVariables.get(varname);
+				if (value == null) {
+					message.red("No debug variable of name '").yellow(varname).red("'!");
+				} else {
+					message.green("Value of variable '").yellow(varname).green("' ");
+					if (args.length == 1) {
+						message.green("= ");
+					} else {
+						message.green("set to ");
+						value.parseSet(StringUtil.combine(" ", StringUtil.remove(args, 0)));
+					}
+					message.white(value.toString());
+				}
+			}
+			message.send(sender);
+			return true;
+		}
 		return false;
 	}
 }

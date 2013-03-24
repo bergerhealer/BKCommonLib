@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.server.v1_5_R2.EntityPlayer;
@@ -10,6 +9,8 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
@@ -50,18 +51,18 @@ public class PlayerUtil extends EntityUtil {
 	public static void queueChunkSend(Player player, Chunk chunk) {
 		queueChunkSend(player, chunk.getX(), chunk.getZ());
 	}
-	
-	@SuppressWarnings("unchecked")
-	public static List<Player> getNearestPlayers(Player player, double radius) {
+
+	/**
+	 * Gets a (referenced) list of all players nearby another Player
+	 * 
+	 * @param player to get the nearby players of
+	 * @param radius to look around the player for other playrs
+	 * @return list of nearby players
+	 */
+	public static List<Player> getNearbyPlayers(Player player, double radius) {
 		EntityPlayer handle = CommonNMS.getNative(player);
-		List<Player> list = new ArrayList<Player>();
-		List<EntityPlayer> players = handle.world.a(EntityPlayer.class, handle.boundingBox.grow(radius, radius, radius));
-		
-		for(EntityPlayer ep : players) {
-			list.add(CommonNMS.getPlayer(ep));
-		}
-		
-		return list;
+		List<?> nearbyPlayerHandles = handle.world.a(EntityPlayer.class, handle.boundingBox.grow(radius, radius, radius));
+		return new ConvertingList<Player>(nearbyPlayerHandles, ConversionPairs.player);
 	}
 
 	/**

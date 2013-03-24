@@ -484,9 +484,21 @@ public class MathUtil {
 	 * @param negative - True to invert, False to keep the old value
 	 * @return the value or inverted (-value)
 	 */
+	public static float invert(float value, boolean negative) {
+		return negative ? -value : value;
+	}
+
+	/**
+	 * Turns a value negative or keeps it positive based on a boolean input
+	 * 
+	 * @param value to work with
+	 * @param negative - True to invert, False to keep the old value
+	 * @return the value or inverted (-value)
+	 */
 	public static double invert(double value, boolean negative) {
 		return negative ? -value : value;
 	}
+
 	/**
 	 * Merges two ints into a long
 	 * 

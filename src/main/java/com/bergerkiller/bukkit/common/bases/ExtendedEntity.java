@@ -200,7 +200,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
  	}
  
  	public boolean hasMovedVertically() {
- 		return Math.abs(this.getMovedX()) > MIN_MOVE_SPEED;
+ 		return Math.abs(this.getMovedY()) > MIN_MOVE_SPEED;
  	}
  
  	public boolean hasMoved() {
@@ -412,6 +412,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		getHandle(Entity.class).setLocation(x, y, z, yaw, pitch);
 	}
 
+	/**
+	 * Sets the yaw and pitch rotation, while ensuring that there are no 360-turns
+	 * 
+	 * @param yaw to set to
+	 * @param pitch to set to
+	 */
 	public void setRotation(float yaw, float pitch) {
 		EntityRef.setRotation(getHandle(), yaw, pitch);
 	}

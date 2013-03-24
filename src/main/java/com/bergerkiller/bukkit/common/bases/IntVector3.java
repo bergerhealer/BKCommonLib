@@ -8,6 +8,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+
 /**
  * Represents a class containing three immutable integer coordinates: x, y and z
  */
@@ -17,6 +19,10 @@ public class IntVector3 implements Comparable<IntVector3> {
 
 	public IntVector3(Block block) {
 		this(block.getX(), block.getY(), block.getZ());
+	}
+
+	public IntVector3(final double x, final double y, final double z) {
+		this(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
 	}
 
 	public IntVector3(final int x, final int y, final int z) {
@@ -84,6 +90,26 @@ public class IntVector3 implements Comparable<IntVector3> {
 		return add(face.getModX(), face.getModY(), face.getModZ());
 	}
 
+	public IntVector3 multiply(int x, int y, int z) {
+		return new IntVector3(this.x * x, this.y * y, this.z * z);
+	}
+
+	public IntVector3 multiply(double x, double y, double z) {
+		return new IntVector3((double) this.x * x, (double) this.y * y, (double) this.z * z);
+	}
+
+	public IntVector3 multiply(int factor) {
+		return multiply(factor, factor, factor);
+	}
+
+	public IntVector3 multiply(double factor) {
+		return multiply(factor, factor, factor);
+	}
+
+	public IntVector3 multiply(IntVector3 other) {
+		return multiply(other.x, other.y, other.z);
+	}
+	
 	public IntVector3 abs() {
 		return new IntVector3(Math.abs(x), Math.abs(y), Math.abs(z));
 	}

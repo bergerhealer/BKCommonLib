@@ -127,10 +127,15 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 					return def;
 				}
 				switch (material) {
+					case FURNACE :
 					case POWERED_MINECART : return EntityType.MINECART_FURNACE;
+					case CHEST :
 					case STORAGE_MINECART : return EntityType.MINECART_CHEST;
+					case HOPPER :
 					case HOPPER_MINECART : return EntityType.MINECART_HOPPER;
+					//case MOB_SPAWNER :
 					//case MOB_SPAWNER_MINECART : return EntityType.MINECART_MOB_SPAWNER; (TODO: missing!)
+					case TNT :
 					case EXPLOSIVE_MINECART : return EntityType.MINECART_TNT;
 					case MINECART : return EntityType.MINECART;
 					default : return def;

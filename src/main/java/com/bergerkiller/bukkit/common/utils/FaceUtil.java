@@ -191,7 +191,7 @@ public class FaceUtil {
 
 	/**
 	 * Gets the rail direction from a Direction<br>
-	 * NORTH becomes SOUTH and EAST becomes WEST
+	 * NORTH becomes SOUTH and WEST becomes EAST
 	 * 
 	 * @param direction to convert
 	 * @return rail direction

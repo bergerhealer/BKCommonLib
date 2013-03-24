@@ -16,7 +16,7 @@ public class MessageBuilder {
 	private int currentWidth;
 	private String separator = null;
 	private int sepwidth = 0;
-	private boolean wasAppended = false;
+	private boolean isFirstSeparatorCall = true;
 	private int indent = 0;
 
 	public static final int CHAT_WINDOW_WIDTH = 240;
@@ -48,7 +48,7 @@ public class MessageBuilder {
 		} else {
 			this.separator = separator;
 			this.sepwidth = StringUtil.getWidth(separator);
-			this.wasAppended = false;
+			this.isFirstSeparatorCall = true;
 			return this;
 		}
 	}
@@ -71,21 +71,6 @@ public class MessageBuilder {
 	public MessageBuilder setIndent(int indent) {
 		this.indent = indent;
 		return this;
-	}
-
-	public MessageBuilder wordWrap(String... toAppend) {
-		if (this.needsWordWrap(toAppend)) {
-			this.newLine();
-		}
-		return this;
-	}
-
-	public boolean needsWordWrap(String... textToAppend) {
-		return this.needsWordWrap(StringUtil.getWidth(textToAppend));
-	}
-
-	public boolean needsWordWrap(int widthToAppend) {
-		return (this.currentWidth + widthToAppend + this.sepwidth + (this.indent * StringUtil.SPACE_WIDTH)) > CHAT_WINDOW_WIDTH;
 	}
 
 	public MessageBuilder black(Object... text) {
@@ -194,17 +179,11 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder append(ChatColor color, String... text) {
 		if (text != null && text.length > 0) {
-			int width = StringUtil.getWidth(text);
-			if (this.needsWordWrap(width)) {
-				this.newLine();
-			}
-			this.currentWidth += width;
-			this.prepareNewAppend();
+			prepareAppend(StringUtil.getWidth(text));
 			this.builder.append(color.toString());
 			for (String part : text) {
 				this.builder.append(part);
 			}
-			this.wasAppended = true;
 		}
 		return this;
 	}
@@ -220,12 +199,7 @@ public class MessageBuilder {
 			return this.newLine();
 		}
 		// word wrap needed?
-		int width = StringUtil.getWidth(character);
-		if (this.needsWordWrap(width)) {
-			this.newLine();
-		}
-		this.currentWidth += width;
-		this.prepareNewAppend();
+		prepareAppend(StringUtil.getWidth(character));
 		this.builder.append(character);
 		return this;
 	}
@@ -238,12 +212,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder append(String... text) {
 		if (text != null && text.length > 0) {
-			int width = StringUtil.getWidth(text);
-			if (this.needsWordWrap(width)) {
-				this.newLine();
-			}
-			this.currentWidth += width;
-			this.prepareNewAppend();
+			prepareAppend(StringUtil.getWidth(text));
 			for (String part : text) {
 				this.builder.append(part);
 			}
@@ -251,16 +220,15 @@ public class MessageBuilder {
 		return this;
 	}
 
-	private void prepareNewAppend() {
-		if (this.builder.length() == 0) {
-			this.currentWidth += StringUtil.SPACE_WIDTH * this.indent;
-			for (int i = 0; i < this.indent; i++) {
-				this.builder.append(' ');
-			}
-		} else if (this.separator != null && this.wasAppended) {
+	private void prepareAppend(int widthToAppend) {
+		if ((this.currentWidth + widthToAppend + this.sepwidth) > CHAT_WINDOW_WIDTH) {
+			this.newLine();
+		} else if (this.separator != null && !this.isFirstSeparatorCall) {
 			this.currentWidth += this.sepwidth;
 			this.builder.append(this.separator);
+			this.isFirstSeparatorCall = false;
 		}
+		this.currentWidth += widthToAppend;
 	}
 
 	/**
@@ -269,9 +237,12 @@ public class MessageBuilder {
 	 * @return this Message Builder
 	 */
 	public MessageBuilder newLine() {
-		this.builder = new StringBuilder();
+		this.builder = new StringBuilder(30);
+		for (int i = 0; i < this.indent; i++) {
+			this.builder.append(' ');
+		}
+		this.currentWidth = this.indent * StringUtil.SPACE_WIDTH;
 		this.lines.add(this.builder);
-		this.currentWidth = 0;
 		return this;
 	}
 
