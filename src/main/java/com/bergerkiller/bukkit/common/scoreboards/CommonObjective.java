@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.scoreboards;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -117,6 +118,18 @@ public class CommonObjective {
 		score.setValue(value);
 		this.addScore(score);
 		return score;
+	}
+	
+	/**
+	 * Clear all scores
+	 */
+	public void clearScores() {
+		Iterator<String> it = scores.keySet().iterator();
+		while(it.hasNext()) {
+			CommonScore score = this.getScore(it.next());
+			score.remove();
+			it.remove();
+		}
 	}
 	
 	/**
