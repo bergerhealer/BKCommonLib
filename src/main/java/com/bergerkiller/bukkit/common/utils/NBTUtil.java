@@ -1,11 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
+
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
@@ -15,7 +21,9 @@ import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.FoodMetaData;
 import net.minecraft.server.v1_5_R2.InventoryEnderChest;
+import net.minecraft.server.v1_5_R2.ItemStack;
 import net.minecraft.server.v1_5_R2.MobEffect;
+import net.minecraft.server.v1_5_R2.NBTBase;
 import net.minecraft.server.v1_5_R2.NBTCompressedStreamTools;
 import net.minecraft.server.v1_5_R2.NBTTagCompound;
 import net.minecraft.server.v1_5_R2.NBTTagList;
@@ -120,6 +128,47 @@ public class NBTUtil {
 	 */
 	public static void loadEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
 		((Entity) Conversion.toEntityHandle.convert(entity)).f((NBTTagCompound) compound.getHandle());
+	}
+	
+	/**
+	 * Saves an itemstack to a Tag Compound
+	 * 
+	 * @param item ItemStack
+	 * @param compound TagCompound
+	 */
+	public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
+		ItemStack stack = (ItemStack) HandleConverter.toItemStackHandle.convert(item);
+		stack.save((NBTTagCompound) compound.getHandle());
+	}
+	
+	/**
+	 * Sades a tag list to an output
+	 * 
+	 * @param list Tag list
+	 * @param out Output
+	 */
+	public static void saveList(CommonTagList list, DataOutput out) {
+		NBTBase.a((NBTBase) list.getHandle(), out);
+	}
+	
+	/**
+	 * Creates an inventory from a tag list
+	 * 
+	 * @param tags Tag list
+	 * @return Inventory
+	 */
+	public static Inventory createInventory(CommonTagList tags) {
+		Inventory inv = new CraftInventoryCustom(null, tags.size());
+		
+		for(int i = 0; i < tags.size(); i++) {
+			CommonTagCompound tag = (CommonTagCompound) tags.get(i);
+			if(!tag.isEmpty()) {
+				inv.setItem(i, CraftItemStack.asCraftMirror(ItemStack.createStack(
+						(NBTTagCompound) tag.getHandle())));
+			}
+		}
+		
+		return inv;
 	}
 
 	/**
