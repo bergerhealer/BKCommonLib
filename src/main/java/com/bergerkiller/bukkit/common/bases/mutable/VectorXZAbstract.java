@@ -147,6 +147,10 @@ public abstract class VectorXZAbstract {
 		return this;
 	}
 
+	public IntVector2 chunk() {
+		return new IntVector2(x.chunk(), z.chunk());
+	}
+
 	public double length() {
 		return MathUtil.length(getX(), getZ());
 	}

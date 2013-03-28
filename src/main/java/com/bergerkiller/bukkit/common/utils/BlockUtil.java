@@ -263,6 +263,7 @@ public class BlockUtil extends MaterialUtil {
 
 	/**
 	 * Sets the alignment of Rails
+	 * Note that this only supports the rails that can curve.
 	 * 
 	 * @param rails to set the alignment for
 	 * @param from direction
@@ -273,25 +274,18 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
-	 * Sets the alignment of Rails
+	 * Sets the alignment of Rails.
+	 * Note that this only supports the rails that can curve.
 	 * 
 	 * @param rails to set the alignment for
-	 * @param alignment
+	 * @param direction alignment
 	 */
 	public static void setRails(org.bukkit.block.Block rails, BlockFace direction) {
 		Material type = rails.getType();
 		if (type == Material.RAILS) {
-			BlockFace railsDirection;
-			if (direction == BlockFace.NORTH) {
-				railsDirection = BlockFace.SOUTH;
-			} else if (direction == BlockFace.EAST) {
-				railsDirection = BlockFace.WEST;
-			} else {
-				railsDirection = direction;
-			}
 			byte olddata = rails.getData();
 			Rails r = (Rails) type.getNewData(olddata);
-			r.setDirection(railsDirection, r.isOnSlope());
+			r.setDirection(FaceUtil.toRailsDirection(direction), r.isOnSlope());
 			byte newdata = r.getData();
 			if (olddata != newdata) {
 				rails.setData(newdata);

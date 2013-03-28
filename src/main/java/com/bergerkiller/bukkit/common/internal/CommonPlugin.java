@@ -35,7 +35,6 @@ import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -413,7 +412,7 @@ public class CommonPlugin extends PluginBase {
 
 		// Register events and tasks, initialize
 		register(new CommonListener());
-		register(new CommonPacketMonitor(), PacketType.MAP_CHUNK, PacketType.MAP_CHUNK_BULK);
+		register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));

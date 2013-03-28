@@ -13,11 +13,13 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import net.minecraft.server.v1_5_R2.Chunk;
 import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
 import net.minecraft.server.v1_5_R2.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
@@ -33,6 +35,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -340,62 +343,35 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 		// If there was a passenger, teleport it and let passenger enter again
 		if (oldPassenger != null) {
-			final CommonEntity<?> passenger = get(Conversion.toEntity.convert(oldPassenger));
-			if (isWorldChange) {
-				// Do this teleport and enter the next tick
-				if (passenger.teleport(location)) {
-					CommonUtil.nextTick(new Runnable() {
-						public void run() {
-							CommonUtil.nextTick(new Runnable() {
-								public void run() {
-									entityHandle.passenger = oldPassenger;
-									entityHandle.passenger.vehicle = entityHandle;
-									doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
-								}
-							});
-							//passenger.getHandle(Entity.class).setPassengerOf(entityHandle);
-							//oldPassenger.setPassengerOf(entityHandle);
-						}
-					});
-					//entityHandle.passenger = oldPassenger;
-					//entityHandle.passenger.vehicle = entityHandle;
-					//doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
-					//doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
+			final org.bukkit.entity.Entity passenger = Conversion.toEntity.convert(oldPassenger);
+			// Teleport the passenger, but ignore the chunk send check so vehicle is properly spawned to all players
+			EntityRef.ignoreChunkCheck.set(entityHandle, true);
+			final boolean passengerTeleported = get(passenger).teleport(location, cause);
+			EntityRef.ignoreChunkCheck.set(entityHandle, false);
+			if (passengerTeleported) {
+				// Additional logic needed for player passengers
+				if (oldPassenger instanceof EntityPlayer) {
+					final EntityPlayer ep = (EntityPlayer) oldPassenger;
+					// Make sure to undo destroy requests for the vehicle
+					ep.removeQueue.remove((Object) entityHandle.id);
+
+					// Instantly send the chunk the vehicle is currently in
+					// This avoid the player losing track of the vehicle because the chunk is missing
+					final IntVector2 chunk = loc.xz.chunk();
+					PlayerUtil.cancelChunkSend((Player) passenger, chunk);
+					PacketUtil.sendPacket((Player) passenger, PacketFields.MAP_CHUNK.newInstance(ep.world.getChunkAt(chunk.x, chunk.z)));
 				}
-			} else {
-				// Set passenger directly
-				entityHandle.passenger = oldPassenger;
-				entityHandle.passenger.vehicle = entityHandle;
-				doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
+
+				// Set passenger the next tick
+				CommonUtil.nextTick(new Runnable() {
+					public void run() {
+						entityHandle.passenger = oldPassenger;
+						entityHandle.passenger.vehicle = entityHandle;
+						doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
+					}
+				});
 			}
 		}
-		
-		if (oldPassenger != null && (!isWorldChange || get(Conversion.toEntity.convert(oldPassenger)).teleport(location, cause))) {
-			doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
-		}
-
-//		if (isWorldChange && !(entityHandle instanceof EntityPlayer)) {
-//			if (oldPassenger != null) {
-//				entityHandle.passenger = null;
-//				oldPassenger.vehicle = null;
-//				if (get(Conversion.toEntity.convert(oldPassenger)).teleport(location, cause)) {
-//					CommonUtil.nextTick(new Runnable() {
-//						public void run() {
-//							oldPassenger.setPassengerOf(entityHandle);
-//						}
-//					});
-//				}
-//			}
-//		} else {
-//
-//			succ = entity.teleport(location, cause);
-//			// If there was a passenger, let passenger enter again
-//			if (oldPassenger != null) {
-//				doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
-//				oldPassenger.vehicle = entityHandle;
-//				entityHandle.passenger = oldPassenger;
-//			}
-//		}
 		return success;
 	}
 

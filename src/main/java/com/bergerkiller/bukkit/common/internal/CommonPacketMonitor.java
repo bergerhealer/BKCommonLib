@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
  * This is used to keep the 'chunks a player can see' up-to-date.
  */
 class CommonPacketMonitor implements PacketMonitor {
+	public static final PacketType[] TYPES = {PacketType.MAP_CHUNK, PacketType.MAP_CHUNK_BULK};
 
 	@Override
 	public void onMonitorPacketReceive(CommonPacket packet, Player player) {

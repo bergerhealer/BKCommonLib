@@ -139,7 +139,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// The ignoreChunkCheck is needed for when a new player spawns (it is not yet added to the PlayerChunk)
 		if (dx <= view && dz <= view && (EntityRef.ignoreChunkCheck.get(entity.getHandle()) || 
 				PlayerUtil.isChunkEntered(viewer, entity.getChunkX(), entity.getChunkZ()))) {
-
 			addViewer(viewer);
 		} else {
 			removeViewer(viewer);
