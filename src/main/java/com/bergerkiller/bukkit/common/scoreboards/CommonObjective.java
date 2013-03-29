@@ -87,13 +87,13 @@ public class CommonObjective {
 	 * 
 	 * @param score Score
 	 */
-	public void addScore(CommonScore score) {
-		CommonScore old = this.getScore(score.getName());
+	public void addScore(String id, CommonScore score) {
+		CommonScore old = this.getScore(id);
 		if(old != null)
 			old.remove();
 		
 		score.create();
-		scores.put(score.getName(), score);
+		scores.put(id, score);
 	}
 	
 	/**
@@ -101,9 +101,10 @@ public class CommonObjective {
 	 * 
 	 * @param score Score
 	 */
-	public void removeScore(CommonScore score) {
+	public void removeScore(String id) {
+		CommonScore score = this.getScore(id);
 		score.remove();
-		scores.remove(score.getName());
+		scores.remove(id);
 	}
 	
 	/**
@@ -113,10 +114,10 @@ public class CommonObjective {
 	 * @param displayName Score diplay name
 	 * @return Score
 	 */
-	public CommonScore createScore(String name, int value) {
-		CommonScore score = new CommonScore(this.scoreboard, name, this.name);
+	public CommonScore createScore(String id, String displayName, int value) {
+		CommonScore score = new CommonScore(this.scoreboard, displayName, this.name);
 		score.setValue(value);
-		this.addScore(score);
+		this.addScore(id, score);
 		return score;
 	}
 	
@@ -185,9 +186,11 @@ public class CommonObjective {
 		CommonObjective obj = new CommonObjective(board, objective.display);
 		
 		//Copy all scores
-		for(CommonScore score : objective.getScores()) {
+		for(Map.Entry<String, CommonScore> entry : objective.scores.entrySet()) {
+			String id = entry.getKey();
+			CommonScore score = entry.getValue();
 			CommonScore newScore = CommonScore.copyFrom(board, score);
-			obj.addScore(newScore);
+			obj.addScore(id, newScore);
 		}
 		
 		return obj;

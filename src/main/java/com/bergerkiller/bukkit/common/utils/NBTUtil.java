@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,6 +170,16 @@ public class NBTUtil {
 		}
 		
 		return inv;
+	}
+	
+	/**
+	 * Creates a tag list from a DataInputStream
+	 * 
+	 * @param in InputStream
+	 * @return Tag list
+	 */
+	public static CommonTagList createList(DataInputStream in) {
+		return new CommonTagList(NBTBase.b(in));
 	}
 
 	/**
