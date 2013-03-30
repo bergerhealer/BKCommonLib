@@ -43,8 +43,6 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener {
-	private static final MethodAccessor<Void> chunkBreakLink = new SafeMethod<Void>(CommonUtil.getCBClass("CraftChunk"), "breakLink");
-
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
 		CommonPlugin plugin = CommonPlugin.getInstance();
