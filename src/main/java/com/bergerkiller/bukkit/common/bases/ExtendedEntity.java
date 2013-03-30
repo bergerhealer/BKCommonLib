@@ -539,8 +539,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		entity.setLastDamageCause(arg0);
 	}
 
-	public boolean setPassenger(org.bukkit.entity.Entity entity) {
-		return entity.setPassenger(entity);
+	/**
+	 * Sets the passenger of this Vehicle, while throwing possible events
+	 * If the previous passenger could not eject, or if entering didn't happen, False is returned.
+	 * 
+	 * @param passenger to set to
+	 * @return True if the passenger was successfully set, False if not
+	 */
+	public boolean setPassenger(org.bukkit.entity.Entity passenger) {
+		return passenger == null ? entity.eject() : entity.setPassenger(passenger);
 	}
 
 	/**
