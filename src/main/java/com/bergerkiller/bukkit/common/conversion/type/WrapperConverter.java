@@ -48,6 +48,9 @@ import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
@@ -74,6 +77,12 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
  * <T> - type of wrapper
  */
 public abstract class WrapperConverter<T> extends BasicConverter<T> {
+	private static final ClassTemplate<?> ANVIL_TEMPLATE = NMSClassTemplate.create("ContainerAnvil");
+	private static final ClassTemplate<?> ANVIL_INV_TEMPLATE = NMSClassTemplate.create("ContainerAnvilInventory");
+	private static final FieldAccessor<IInventory> anvilInventory = ANVIL_TEMPLATE.getField("f");
+	private static final FieldAccessor<IInventory> anvilResultInventory = ANVIL_TEMPLATE.getField("g");
+	private static final FieldAccessor<Object> anvilOwner = ANVIL_INV_TEMPLATE.getField("a");
+
 	public static final WrapperConverter<org.bukkit.entity.Entity> toEntity = new WrapperConverter<org.bukkit.entity.Entity>(org.bukkit.entity.Entity.class) {
 		@Override
 		public org.bukkit.entity.Entity convertSpecial(Object value, Class<?> valueType, org.bukkit.entity.Entity def) {
@@ -239,7 +248,10 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			} else if (value instanceof TileEntityBeacon) {
 				return new CraftInventoryBeacon((TileEntityBeacon) value);
 			} else if (value instanceof ContainerAnvilInventory) {
-				return new CraftInventoryAnvil((ContainerAnvilInventory) value);
+				final Object anvil = anvilOwner.get(value);
+				final IInventory inventory = anvilInventory.get(anvil);
+				final IInventory result = anvilResultInventory.get(anvil);
+				return new CraftInventoryAnvil(inventory, result);
 			} else if (value instanceof IInventory) {
 				return new CraftInventory((IInventory) value);
 			} else {

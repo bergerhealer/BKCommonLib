@@ -7,7 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
+
 public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
+	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartMobSpawner");
+	private static final FieldAccessor<Object> mobSpawnerHandle = TEMPLATE.getField("a");
 
 	public CommonMinecartMobSpawner(SpawnerMinecart base) {
 		super(base);
@@ -21,5 +28,14 @@ public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
 	@Override
 	public Material getCombinedItem() {
 		return Material.MINECART; //TODO: Missing!
+	}
+
+	/**
+	 * Gets the Mob Spawner used to spawn mobs for this Mob Spawner Minecart
+	 * 
+	 * @return Mob spawner
+	 */
+	public MobSpawner getMobSpawner() {
+		return new MobSpawner(mobSpawnerHandle.get(getHandle()));
 	}
 }
