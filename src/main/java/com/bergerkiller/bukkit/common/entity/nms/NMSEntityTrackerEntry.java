@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 
 public class NMSEntityTrackerEntry extends EntityTrackerEntry {
-	private final EntityNetworkController<?> controller;
+	private EntityNetworkController<?> controller;
 
 	/**
 	 * Initializes a new Entity Tracker Entry hook
@@ -23,26 +23,24 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 	 * @param controller for the tracker entry
 	 * @param previous entity tracker entry that was set to load state from, use Null to ignore
 	 */
-	public NMSEntityTrackerEntry(final Entity entity, final EntityNetworkController<?> controller, final Object previous) {
+	public NMSEntityTrackerEntry(final Entity entity) {
 		super(CommonNMS.getNative(entity), 80, 3, true);
-		this.controller = controller;
-		if (previous == null) {
-			// Fix these two: Wrongly set in Constructor
-			this.xLoc = tracker.at.a(tracker.locX);
-			this.zLoc = tracker.at.a(tracker.locZ);
-			// Set proper update interval/viewdistance/mobile
-			final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
-			this.controller.setMobile(type.networkIsMobile);
-			this.controller.setUpdateInterval(type.networkUpdateInterval);
-			this.controller.setViewDistance(type.networkViewDistance);
-		} else {
-			// Apply all updated live data from the old entity tracker
-			EntityTrackerEntryRef.TEMPLATE.transfer(previous, this);
-		}
+		// Fix these two: Wrongly set in Constructor
+		this.xLoc = tracker.at.a(tracker.locX);
+		this.zLoc = tracker.at.a(tracker.locZ);
+		// Set proper update interval/viewdistance/mobile
+		final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
+		EntityTrackerEntryRef.isMobile.set(this, type.networkIsMobile);
+		EntityTrackerEntryRef.updateInterval.set(this, type.networkUpdateInterval);
+		EntityTrackerEntryRef.viewDistance.set(this, type.networkViewDistance);
 	}
 
 	public EntityNetworkController<?> getController() {
 		return controller;
+	}
+
+	public void setController(EntityNetworkController<?> controller) {
+		this.controller = controller;
 	}
 
 	@Override

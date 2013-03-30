@@ -27,8 +27,10 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -85,38 +87,64 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
 		}
 		final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-		final EntityNetworkController<CommonEntity<T>> oldController = getNetworkController();
-		if (oldController == controller) {
+		final Object storedEntry = tracker.getEntry(entity);
+
+		// Properly handle a previously set controller
+		if (storedEntry instanceof NMSEntityTrackerEntry) {
+			final EntityNetworkController oldController = ((NMSEntityTrackerEntry) storedEntry).getController();
+			if (oldController == controller) {
+				return;
+			} else if (oldController != null) {
+				oldController.onDetached();
+			}
+		}
+
+		// Take care of null controllers - stop tracking
+		if (controller == null) {
+			tracker.stopTracking(entity);
 			return;
 		}
-		// Detach previous controller
-		if (oldController != null) {
-			oldController.bind(null, null);
-		}
-		if (controller == null) {
-			// Stop tracking - nothing special
-			tracker.stopTracking(entity);
-		} else {
-			// Obtain previous and new replacement entry
-			final Object oldEntry = tracker.getEntry(entity);
-			final Object newEntry;
-			if (controller instanceof DefaultEntityNetworkController) {
-				if (oldEntry == null) {
-					final CommonEntityType type = CommonEntityType.byEntity(entity);
-					newEntry = new EntityTrackerEntry(getHandle(Entity.class), 
-							type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
-				} else {
-					newEntry = oldEntry;
-				}
+
+		final Object newEntry;
+		if (controller instanceof DefaultEntityNetworkController) {
+			// Assign the default Entity Tracker Entry
+			if (EntityTrackerEntryRef.TEMPLATE.isType(storedEntry)) {
+				// Nothing to be done here
+				newEntry = storedEntry;
 			} else {
-				newEntry = new NMSEntityTrackerEntry(entity, controller, oldEntry);
+				// Create a new entry
+				final CommonEntityType type = CommonEntityType.byEntity(entity);
+				newEntry = new EntityTrackerEntry(getHandle(Entity.class), type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
+				// Transfer data if needed
+				if (storedEntry != null) {
+					EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
+				}
 			}
-			// Attach (new?) entry to the world
-			if (oldEntry != newEntry) {
-				tracker.setEntry(entity, newEntry);
+		} else {
+			// Assign a new Entity Tracker Entry with controller capabilities
+			if (storedEntry instanceof NMSEntityTrackerEntry) {
+				// Use the previous entry - hotswap the controller
+				newEntry = storedEntry;
+				EntityTrackerEntryRef.viewers.get(newEntry).clear();
+			} else {
+				// Create a new entry from scratch
+				newEntry = new NMSEntityTrackerEntry(this.getEntity());
+				// Transfer possible information over
+				if (storedEntry != null) {
+					EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
+				}
 			}
-			// Attach the data to the controller
-			controller.bind(this, newEntry);
+		}
+
+		// Attach the entry to the controller
+		controller.bind(this, newEntry);
+
+		// Attach (new?) entry to the world
+		if (storedEntry != newEntry) {
+			tracker.setEntry(entity, newEntry);
+
+			// Make sure to update the viewers
+			EntityTrackerEntryRef.scanPlayers(newEntry, getWorld().getPlayers());
 		}
 	}
 
@@ -360,11 +388,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			final boolean passengerTeleported = passenger.teleport(location, cause);
 			EntityRef.ignoreChunkCheck.set(entityHandle, false);
 			if (passengerTeleported) {
-				CommonUtil.nextTick(new Runnable() {
-					public void run() {
-						setPassengerSilent(passenger.getEntity());
+				setPassengerSilent(passenger.getEntity());
+				// For players, set checkMovement to True - some odd issue
+				if (passenger instanceof CommonPlayer) {
+					Object connection = EntityPlayerRef.playerConnection.get(passenger.getHandle());
+					if (connection != null) {
+						PlayerConnectionRef.checkMovement.set(connection, true);
 					}
-				});
+				}
 			}
 		}
 		return true;

@@ -49,6 +49,14 @@ public class EntityTrackerRef {
 		return trackedEntities.get(entityTrackerInstance).get(entity.getEntityId());
 	}
 
+	public static void updatePlayer(Object entityTrackerInstance, Player player) {
+		for (Object entry : trackerSet.get(entityTrackerInstance)) {
+			if (EntityTrackerEntryRef.tracker.get(entry) != player) {
+				EntityTrackerEntryRef.updatePlayer(entry, player);
+			}
+		}
+	}
+
 	public static Object setEntry(Object entityTrackerInstance, Entity entity, Object entityTrackerEntry) {
 		Object previous;
 		final int id = entity.getEntityId();

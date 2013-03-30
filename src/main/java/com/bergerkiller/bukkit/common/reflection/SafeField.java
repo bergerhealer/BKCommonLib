@@ -104,11 +104,15 @@ public class SafeField<T> implements FieldAccessor<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public T get(Object object) {
-		if (this.field == null)
+		if (this.field == null) {
 			return null;
+		}
 		try {
 			return (T) this.field.get(object);
 		} catch (Throwable t) {
+			if (!this.isStatic() && object == null) {
+				throw new IllegalArgumentException("Non-static field requires a non-null instance");
+			}
 			t.printStackTrace();
 			this.field = null;
 			return null;
@@ -122,6 +126,9 @@ public class SafeField<T> implements FieldAccessor<T> {
 				this.field.set(object, value);
 				return true;
 			} catch (Throwable t) {
+				if (!this.isStatic() && object == null) {
+					throw new IllegalArgumentException("Non-static field requires a non-null instance");
+				}
 				t.printStackTrace();
 				this.field = null;
 			}

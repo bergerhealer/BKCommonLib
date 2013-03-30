@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
+import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
@@ -69,7 +70,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		}
 		this.entity = entity;
 		this.handle = entityTrackerEntry;
-		if (this.entity != null && this.entity.isSpawned()) {
+		if (this.handle instanceof NMSEntityTrackerEntry) {
+			((NMSEntityTrackerEntry) this.handle).setController(this);
+		}
+		if (this.entity.isSpawned()) {
 			this.onAttached();
 		}
 	}
@@ -261,7 +265,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			this.syncVelocity();
 		}
 		this.syncMeta();
-		this.syncHeadYaw();
+		this.syncHeadRotation();
 	}
 
 	/**
@@ -271,7 +275,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	public void syncVehicle() {
 		org.bukkit.entity.Entity oldVehicle = this.getVehicleSynched();
 		org.bukkit.entity.Entity newVehicle = entity.getVehicle();
-		if (oldVehicle != newVehicle || (newVehicle != null && isTick(60))) {
+		if (oldVehicle != newVehicle) { // || (newVehicle != null && isTick(60))) { << DISABLED UNTIL IT ACTUALLY WORKS
 			this.syncVehicle(newVehicle);
 		}
 	}
@@ -296,11 +300,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	/**
 	 * Synchronizes the entity head yaw rotation to all Clients.
 	 */
-	public void syncHeadYaw() {
+	public void syncHeadRotation() {
 		final int oldYaw = this.getProtocolHeadRotationSynched();
 		final int newYaw = this.getProtocolHeadRotation();
 		if (Math.abs(newYaw - oldYaw) >= MIN_RELATIVE_CHANGE) {
-			syncHeadYaw(newYaw);
+			syncHeadRotation(newYaw);
 		}
 	}
 
@@ -552,7 +556,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * 
 	 * @param headRotation to set to
 	 */
-	public void syncHeadYaw(int headRotation) {
+	public void syncHeadRotation(int headRotation) {
 		((EntityTrackerEntry) handle).i = headRotation;
 		this.broadcast(PacketFields.ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation));
 	}

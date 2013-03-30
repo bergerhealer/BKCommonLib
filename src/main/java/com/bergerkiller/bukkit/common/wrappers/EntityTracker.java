@@ -59,6 +59,15 @@ public class EntityTracker extends BasicWrapper {
 	}
 
 	/**
+	 * Informs all entities of a new player viewer, sending possible spawn packets
+	 * 
+	 * @param player to update
+	 */
+	public void updateViewer(Player player) {
+		EntityTrackerRef.updatePlayer(handle, player);
+	}
+
+	/**
 	 * Adds an entity to this entity tracker, creating a new entity tracker entry if needed
 	 * 
 	 * @param entity to start tracking

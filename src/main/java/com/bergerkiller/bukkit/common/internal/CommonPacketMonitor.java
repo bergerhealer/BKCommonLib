@@ -33,6 +33,9 @@ class CommonPacketMonitor implements PacketMonitor {
 			int[] chunkX = packet.read(PacketFields.MAP_CHUNK_BULK.bulk_x);
 			int[] chunkZ = packet.read(PacketFields.MAP_CHUNK_BULK.bulk_z);
 			CommonPlugin.getInstance().setChunksAsVisible(player, chunkX, chunkZ);
+		} else {
+			System.out.println(packet);
+			Thread.dumpStack();
 		}
 	}
 }

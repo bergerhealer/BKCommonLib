@@ -33,6 +33,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
@@ -564,7 +565,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 			}
 
 			// Send proper eject packet for the previous passenger
-			sendPacketNearby(PacketFields.ATTACH_ENTITY.newInstance(Conversion.toEntity.convert(handle.passenger), null));
+			if (hasPlayerPassenger()) {
+				PacketUtil.sendPacket(getPlayerPassenger(), PacketFields.ATTACH_ENTITY.newInstance(getPassenger(), null));
+			}
 
 			// Properly set to null
 			handle.passenger.vehicle = null;
@@ -578,7 +581,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 			handle.passenger.vehicle = handle;
 
 			// Send proper eject packet for the new passenger
-			sendPacketNearby(PacketFields.ATTACH_ENTITY.newInstance(newPassenger, this.getEntity()));
+			if (hasPlayerPassenger()) {
+				PacketUtil.sendPacket(getPlayerPassenger(), PacketFields.ATTACH_ENTITY.newInstance(newPassenger, this.getEntity()));
+			}
 		}
 	}
 

@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
@@ -27,8 +29,18 @@ public class EntityTrackerEntryRef {
 	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("isMoving");
 	public static final TranslatorFieldAccessor<Set<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerSet);
 	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("b");
+	private static final MethodAccessor<Void> scanPlayers = TEMPLATE.getMethod("scanPlayers", List.class);
+	private static final MethodAccessor<Void> updatePlayer = TEMPLATE.getMethod("updatePlayer", EntityPlayerRef.TEMPLATE.getType());
 
-	public static final CommonPacket getSpawnPacket(Object instance) {
+	public static CommonPacket getSpawnPacket(Object instance) {
 		return new CommonPacket(getSpawnPacket.invoke(instance));
+	}
+
+	public static void scanPlayers(Object instance, List<Player> players) {
+		scanPlayers.invoke(instance, Conversion.toPlayerHandleList.convert(players));
+	}
+
+	public static void updatePlayer(Object instance, Player player) {
+		updatePlayer.invoke(instance, Conversion.toEntityHandle.convert(player));
 	}
 }

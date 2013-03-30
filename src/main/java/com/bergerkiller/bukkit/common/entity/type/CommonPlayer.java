@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 public class CommonPlayer extends CommonEntity<Player> {
 
@@ -58,6 +59,9 @@ public class CommonPlayer extends CommonEntity<Player> {
 		if (getChunkSendQueue().remove(chunk)) {
 			PacketUtil.sendChunk(getEntity(), getWorld().getChunkAt(chunk.x, chunk.z));
 		}
+
+		// Tell all other entities to send spawn packets
+		WorldUtil.getTracker(getWorld()).updateViewer(entity);
 		return true;
 	}
 
