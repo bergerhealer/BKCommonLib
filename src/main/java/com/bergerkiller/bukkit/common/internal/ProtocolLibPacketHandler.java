@@ -11,12 +11,14 @@ import java.util.Set;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -46,6 +48,10 @@ class ProtocolLibPacketHandler implements PacketHandler {
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
+		}
+		Object handle = Conversion.toEntityHandle.convert(player);
+		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
+			return;
 		}
 		if (PlayerUtil.isDisconnected(player)) {
 			return;

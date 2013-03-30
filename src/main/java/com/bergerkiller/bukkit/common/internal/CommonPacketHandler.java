@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
@@ -170,13 +171,17 @@ public class CommonPacketHandler implements PacketHandler {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
 		}
+		Object handle = Conversion.toEntityHandle.convert(player);
+		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
+			return;
+		}
 		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
 		if (!throughListeners) {
 			packet = new CommonSilentPacket(packet);
 		}
-		final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+		final Object connection = EntityPlayerRef.playerConnection.get(handle);
 		PlayerConnectionRef.sendPacket(connection, packet);
 	}
 
