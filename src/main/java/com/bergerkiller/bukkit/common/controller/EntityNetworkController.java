@@ -198,6 +198,18 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	}
 
 	/**
+	 * Ensures that the Entity is no longer displayed to any viewers.
+	 * All viewers will see the Entity disappear.
+	 * 
+	 * @param instant option: True to instantly hide, False to queue it for the next tick
+	 */
+	public void makeHiddenForAll(boolean instant) {
+		for (Player viewer : getViewers()) {
+			makeHidden(viewer, instant);
+		}
+	}
+
+	/**
 	 * Ensures that the Entity is no longer displayed to the viewer.
 	 * The entity is not instantly hidden; it is queued for the next tick.
 	 * 

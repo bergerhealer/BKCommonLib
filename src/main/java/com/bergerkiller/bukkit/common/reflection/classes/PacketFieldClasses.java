@@ -248,6 +248,9 @@ public class PacketFieldClasses {
 		public CommonPacket newInstance(int... entityIds) {
 			return new CommonPacket(constructor1.newInstance(entityIds));
 		}
+		public CommonPacket newInstance(Collection<Integer> entityIds) {
+			return newInstance(Conversion.toIntArr.convert(entityIds));
+		}
 		public CommonPacket newInstance(org.bukkit.entity.Entity... entities) {
 			int[] ids = new int[entities.length];
 			for (int i = 0; i < ids.length; i++) {
@@ -367,6 +370,9 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> chunkBiomeBitMap = getField("d");
 		private final SafeConstructor<Object> constructor1 = getConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
 
+		public CommonPacket newInstance(Chunk chunk) {
+			return newInstance(Conversion.toChunkHandle.convert(chunk));
+		}
 		public CommonPacket newInstance(Object chunk) {
 			return newInstance(chunk, true, 0xFFFF);
 		}

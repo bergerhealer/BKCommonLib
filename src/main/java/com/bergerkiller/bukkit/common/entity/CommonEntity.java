@@ -13,13 +13,11 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import net.minecraft.server.v1_5_R2.Chunk;
 import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
 import net.minecraft.server.v1_5_R2.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
@@ -27,15 +25,13 @@ import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
+import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -306,80 +302,72 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		}
 		// Preparations prior to teleportation
 		final Entity entityHandle = CommonNMS.getNative(entity);
-		final Entity oldPassenger = entityHandle.passenger;
+		final CommonEntity<?> passenger = get(getPassenger());
 		final World newworld = CommonNMS.getNative(location.getWorld());
 		final boolean isWorldChange = entityHandle.world != newworld;
 		final EntityNetworkController<?> oldNetworkController = getNetworkController();
+		final boolean hasNetworkController = !(oldNetworkController instanceof DefaultEntityNetworkController);
 		WorldUtil.loadChunks(location, 3);
 
 		// If in a vehicle, make sure we eject first
-		if (entityHandle.vehicle != null) {
-			entityHandle.vehicle.passenger = null;
-			entityHandle.vehicle = null;
-			doAttach(Conversion.toEntity.convert(entityHandle), null);
+		if (isInsideVehicle()) {
+			getVehicle().eject();
 		}
+
 		// If vehicle, eject the passenger first
-		if (entityHandle.passenger != null) {
-			entityHandle.passenger.vehicle = null;
-			entityHandle.passenger = null;
-			doAttach(Conversion.toEntity.convert(oldPassenger), null);
+		if (hasPassenger()) {
+			setPassengerSilent(null);
 		}
 
 		// Perform actual teleportation
-		final boolean success;
 		if (!isWorldChange || entity instanceof Player) {
-			success = entity.teleport(location, cause);
+			// First: stop tracking the entity
+			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
+			tracker.stopTracking(entity);
+
+			// Destroy packets are queued: Make sure to send them RIGHT NOW
+			for (Player bukkitPlayer : WorldUtil.getPlayers(getWorld())) {
+				get(bukkitPlayer).flushEntityRemoveQueue();
+			}
+
+			// Teleport
+			final boolean succ = entity.teleport(location, cause);
+
+			// Start tracking the entity again
+			if (!hasNetworkController && !isWorldChange) {
+				tracker.startTracking(entity);
+			}
+
+			if (!succ) {
+				return false;
+			}
 		} else {
+			// Remove from one world and add to the other
 			entityHandle.world.removeEntity(entityHandle);
 			entityHandle.dead = false;
 			entityHandle.world = newworld;
 			entityHandle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			entityHandle.world.addEntity(entityHandle);
-			success = true;
 		}
-		if (isWorldChange && !(oldNetworkController instanceof DefaultEntityNetworkController)) {
+		if (hasNetworkController) {
 			this.setNetworkController(oldNetworkController);
 		}
 
 		// If there was a passenger, teleport it and let passenger enter again
-		if (oldPassenger != null) {
-			final org.bukkit.entity.Entity passenger = Conversion.toEntity.convert(oldPassenger);
+		if (passenger != null) {
 			// Teleport the passenger, but ignore the chunk send check so vehicle is properly spawned to all players
 			EntityRef.ignoreChunkCheck.set(entityHandle, true);
-			final boolean passengerTeleported = get(passenger).teleport(location, cause);
+			final boolean passengerTeleported = passenger.teleport(location, cause);
 			EntityRef.ignoreChunkCheck.set(entityHandle, false);
 			if (passengerTeleported) {
-				// Additional logic needed for player passengers
-				if (oldPassenger instanceof EntityPlayer) {
-					final EntityPlayer ep = (EntityPlayer) oldPassenger;
-					// Make sure to undo destroy requests for the vehicle
-					ep.removeQueue.remove((Object) entityHandle.id);
-
-					// Instantly send the chunk the vehicle is currently in
-					// This avoid the player losing track of the vehicle because the chunk is missing
-					final IntVector2 chunk = loc.xz.chunk();
-					PlayerUtil.cancelChunkSend((Player) passenger, chunk);
-					PacketUtil.sendPacket((Player) passenger, PacketFields.MAP_CHUNK.newInstance(ep.world.getChunkAt(chunk.x, chunk.z)));
-				}
-
-				// Set passenger the next tick
 				CommonUtil.nextTick(new Runnable() {
 					public void run() {
-						entityHandle.passenger = oldPassenger;
-						entityHandle.passenger.vehicle = entityHandle;
-						doAttach(Conversion.toEntity.convert(oldPassenger), Conversion.toEntity.convert(entityHandle));
+						setPassengerSilent(passenger.getEntity());
 					}
 				});
 			}
 		}
-		return success;
-	}
-
-	private static void doAttach(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-		if (!(passenger instanceof Player)) {
-			return;
-		}
-		PacketUtil.sendPacket((Player) passenger, PacketFields.ATTACH_ENTITY.newInstance(passenger, vehicle));
+		return true;
 	}
 
 	/**
@@ -422,14 +410,32 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	}
 
 	/**
+	 * Obtains a (new) {@link CommonPlayer} instance providing additional methods for the Player specified.
+	 * This method never returns null, unless the input Entity is null.
+	 * 
+	 * @param player to get a CommonPlayer for
+	 * @return a (new) CommonPlayer instance for the Player
+	 */
+	public static CommonPlayer get(Player player) {
+		return (CommonPlayer) getByEntity(player);
+	}
+
+	/**
 	 * Obtains a (new) {@link CommonEntity} instance providing additional methods for the Entity specified.
-	 * This method new returns null.
+	 * This method never returns null, unless the input Entity is null.
 	 * 
 	 * @param entity to get a CommonEntity for
 	 * @return a (new) CommonEntity instance for the Entity
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends org.bukkit.entity.Entity> CommonEntity<T> get(T entity) {
+		return getByEntity(entity);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T extends org.bukkit.entity.Entity> CommonEntity<T> getByEntity(T entity) {
+		if (entity == null) {
+			return null;
+		}
 		final Object handle = Conversion.toEntityHandle.convert(entity);
 		if (handle instanceof NMSEntityHook) {
 			EntityController<?> controller = ((NMSEntityHook) handle).getController();

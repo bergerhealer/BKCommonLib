@@ -10,12 +10,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 
 public class PacketUtil {
 	private static final Map<Class<?>, Integer> packetsToIds = PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
@@ -26,6 +28,49 @@ public class PacketUtil {
 
 	public static void registerPacketToId(Class<?> packetClass, int id) {
 		packetsToIds.put(packetClass, id);
+	}
+
+	/**
+	 * Sends all the packets required to properly display a chunk to a player
+	 * 
+	 * @param player to send to
+	 * @param chunk to send the information of
+	 */
+	public static void sendChunk(Player player, org.bukkit.Chunk chunk) {
+		sendChunk(player, chunk, true);
+	}
+
+	/**
+	 * Sends all the packets required to properly display a chunk to a player.
+	 * To only send (Tile)Entity related information, use a 'sendPayload' of False.
+	 * 
+	 * @param player to send to
+	 * @param chunk to send the information of
+	 * @param sendPayload - whether the block data is sent
+	 */
+	public static void sendChunk(final Player player, final org.bukkit.Chunk chunk, boolean sendPayload) {
+		final Object chunkHandle = Conversion.toChunkHandle.convert(chunk);
+		ChunkRef.seenByPlayer.set(chunkHandle, true);
+
+		// Send payload
+		if (sendPayload) {
+			sendPacket(player, PacketFields.MAP_CHUNK.newInstance(chunk));
+		}
+
+		// Tile entities
+		CommonPacket packet;
+		for (Object tile : ChunkRef.tileEntities.get(chunkHandle).values()) {
+			if ((packet = BlockUtil.getUpdatePacket(tile)) != null) {
+				PacketUtil.sendPacket(player, packet);
+			}
+		}
+
+		// Entity spawn messages
+		CommonUtil.nextTick(new Runnable() {
+			public void run() {
+				WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
+			}
+		});
 	}
 
 	public static void sendPacket(Player player, Object packet) {

@@ -28,6 +28,8 @@ import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -537,8 +539,49 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		entity.setLastDamageCause(arg0);
 	}
 
-	public boolean setPassenger(org.bukkit.entity.Entity arg0) {
-		return entity.setPassenger(arg0);
+	public boolean setPassenger(org.bukkit.entity.Entity entity) {
+		return entity.setPassenger(entity);
+	}
+
+	/**
+	 * Sets the passenger of this Vehicle without raising any events
+	 * 
+	 * @param newPassenger to set to
+	 */
+	public void setPassengerSilent(org.bukkit.entity.Entity newPassenger) {
+		final Entity handle = getHandle(Entity.class);
+		if (hasPassenger()) {
+			if (getPassenger() == newPassenger) {
+				// Ignore setting to the same Entity
+				return;
+			}
+
+			// Send proper eject packet for the previous passenger
+			sendPacketNearby(PacketFields.ATTACH_ENTITY.newInstance(Conversion.toEntity.convert(handle.passenger), null));
+
+			// Properly set to null
+			handle.passenger.vehicle = null;
+			handle.passenger = null;
+		}
+
+		// Set the new passenger
+		if (newPassenger != null) {
+			// Properly set it
+			handle.passenger = CommonNMS.getNative(newPassenger);
+			handle.passenger.vehicle = handle;
+
+			// Send proper eject packet for the new passenger
+			sendPacketNearby(PacketFields.ATTACH_ENTITY.newInstance(newPassenger, this.getEntity()));
+		}
+	}
+
+	/**
+	 * Sends a packet to all nearby players in view of this Entity
+	 * 
+	 * @param packet to send
+	 */
+	public void sendPacketNearby(CommonPacket packet) {
+		WorldUtil.getTracker(getWorld()).sendPacket(entity, packet);
 	}
 
 	public void setTicksLived(int arg0) {
