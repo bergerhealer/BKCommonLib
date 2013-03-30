@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -45,6 +46,9 @@ class ProtocolLibPacketHandler implements PacketHandler {
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
+		}
+		if (PlayerUtil.isDisconnected(player)) {
+			return;
 		}
 		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
 		try {

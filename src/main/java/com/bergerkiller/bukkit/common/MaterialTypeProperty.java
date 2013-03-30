@@ -1,18 +1,19 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 
 import org.bukkit.Material;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 /**
  * Can compare a material with an internal whitelist of materials
  */
 public class MaterialTypeProperty extends MaterialBooleanProperty {
-	private int[] allowedTypes;
+	private Material[] allowedTypes;
 
 	/**
 	 * Initializes a new material type property containing all types from
@@ -21,25 +22,13 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	 * @param properties to set the types of
 	 */
 	public MaterialTypeProperty(MaterialTypeProperty... properties) {
-		HashSet<Integer> elems = new HashSet<Integer>();
+		HashSet<Material> elems = new HashSet<Material>();
 		for (MaterialTypeProperty prop : properties) {
-			for (int id : prop.allowedTypes) {
-				elems.add(id);
+			for (Material mat : prop.allowedTypes) {
+				elems.add(mat);
 			}
 		}
-		this.allowedTypes = Conversion.toIntArr.convert(elems);
-	}
-
-	/**
-	 * Initializes a new material type property
-	 * 
-	 * @param allowedMaterials to set
-	 */
-	public MaterialTypeProperty(Material... allowedMaterials) {
-		this.allowedTypes = new int[allowedMaterials.length];
-		for (int i = 0; i < allowedMaterials.length; i++) {
-			this.allowedTypes[i] = allowedMaterials[i].getId();
-		}
+		this.allowedTypes = elems.toArray(new Material[0]);
 	}
 
 	/**
@@ -48,29 +37,29 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	 * @param allowedTypes to set
 	 */
 	public MaterialTypeProperty(int... allowedTypes) {
-		this.allowedTypes = new int[allowedTypes.length];
+		this.allowedTypes = new Material[allowedTypes.length];
 		for (int i = 0; i < allowedTypes.length; i++) {
-			this.allowedTypes[i] = allowedTypes[i];
+			this.allowedTypes[i] = Material.getMaterial(allowedTypes[i]);
 		}
+	}
+
+	/**
+	 * Initializes a new material type property
+	 * 
+	 * @param allowedMaterials to set
+	 */
+	public MaterialTypeProperty(Material... allowedMaterials) {
+		this.allowedTypes = new Material[allowedMaterials.length];
+		System.arraycopy(allowedMaterials, 0, this.allowedTypes, 0, allowedMaterials.length);
 	}
 
 	@Override
 	public Boolean get(int typeId) {
-		return LogicUtil.containsInt(typeId, this.allowedTypes);
+		return MaterialUtil.isType(typeId, this.allowedTypes);
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (int typeId : this.allowedTypes) {
-			final Material mat = Material.getMaterial(typeId);
-			if (mat != null) {
-				if (builder.length() > 0) {
-					builder.append(';');
-				}
-				builder.append(mat.toString().toLowerCase(Locale.ENGLISH));
-			}
-		}
-		return builder.toString();
+	public Collection<Material> getMaterials() {
+		return Collections.unmodifiableList(Arrays.asList(this.allowedTypes));
 	}
 }

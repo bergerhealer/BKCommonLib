@@ -100,7 +100,12 @@ public class MaterialUtil {
 	 * The material is a type of diode (item type excluded)
 	 */
 	public static final MaterialTypeProperty ISDIODE = new MaterialTypeProperty(Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON);
-	
+
+	/**
+	 * The material is a type of comparator (item type excluded)
+	 */
+	public static final MaterialTypeProperty ISCOMPARATOR = new MaterialTypeProperty(Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON);
+
 	/**
 	 * The material is a type of bucket (milk bucket is excluded)
 	 */
@@ -163,11 +168,14 @@ public class MaterialUtil {
 	public static final MaterialTypeProperty ISARMOR = new MaterialTypeProperty(ISBOOTS, ISLEGGINGS, ISCHESTPLATE, ISHELMET);
 
 	/**
-	 * The material can be interacted with, such as buttons and levers
+	 * The material can be interacted with, such as buttons and levers.
+	 * Materials of this type suppress block placement upon interaction.
 	 */
 	public static final MaterialTypeProperty ISINTERACTABLE = new MaterialTypeProperty(Material.LEVER, Material.WOOD_DOOR, Material.IRON_DOOR, 
-			Material.TRAP_DOOR, Material.CHEST, Material.ENDER_CHEST, Material.FURNACE, Material.BURNING_FURNACE, Material.DISPENSER, 
-			Material.WORKBENCH, Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF, Material.BED, Material.CAKE, Material.NOTE_BLOCK, Material.JUKEBOX);
+			Material.TRAP_DOOR, Material.CHEST, Material.HOPPER, Material.DROPPER, Material.ENDER_CHEST, Material.FURNACE, Material.BURNING_FURNACE,
+			Material.DISPENSER, Material.WORKBENCH, Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF, Material.BED, Material.CAKE, 
+			Material.NOTE_BLOCK, Material.JUKEBOX, Material.WOOD_BUTTON, Material.STONE_BUTTON, Material.REDSTONE_COMPARATOR_OFF, 
+			Material.REDSTONE_COMPARATOR_ON, Material.ANVIL, Material.FENCE_GATE);
 
 	/**
 	 * The material causes suffocation to entities inside

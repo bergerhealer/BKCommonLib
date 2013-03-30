@@ -42,6 +42,24 @@ public class PacketFieldClasses {
 		private final MethodAccessor<Integer> packetSize = getMethod("a");
 		private final SafeConstructor<Object> constructor0 = getConstructor();
 
+		/**
+		 * Checks whether a given object is an instance of the class represented by this Packet
+		 * 
+		 * @param packet to check
+		 * @return True if the packet is an instance of this Packet, False if not
+		 */
+		public boolean isInstance(CommonPacket packet) {
+			return super.isInstance(packet.getHandle());
+		}
+
+		@Override
+		public boolean isInstance(Object packet) {
+			if (packet instanceof CommonPacket) {
+				packet = ((CommonPacket) packet).getHandle();
+			}
+			return super.isInstance(packet);
+		}
+
 		@Override
 		public CommonPacket newInstance() {
 			return new CommonPacket(constructor0.newInstance());

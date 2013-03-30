@@ -372,13 +372,13 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
 			// Position
 			final IntVector3 pos = this.getProtocolPositionSynched();
-			PacketFields.VEHICLE_SPAWN.x.set(packet, pos.x);
-			PacketFields.VEHICLE_SPAWN.y.set(packet, pos.y);
-			PacketFields.VEHICLE_SPAWN.z.set(packet, pos.z);
+			packet.write(PacketFields.VEHICLE_SPAWN.x, pos.x);
+			packet.write(PacketFields.VEHICLE_SPAWN.y, pos.y);
+			packet.write(PacketFields.VEHICLE_SPAWN.z, pos.z);
 			// Rotation
 			final IntVector2 rot = this.getProtocolRotationSynched();
-			PacketFields.VEHICLE_SPAWN.yaw.set(packet, (byte) rot.x);
-			PacketFields.VEHICLE_SPAWN.pitch.set(packet, (byte) rot.z);
+			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) rot.x);
+			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) rot.z);
 		}
 		return packet;
 	}
@@ -563,10 +563,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param velocity (new)
 	 */
 	public void syncVelocity(Vector velocity) {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		handle.j = velocity.getX();
-		handle.k = velocity.getY();
-		handle.l = velocity.getZ();
+		setProtocolVelocitySynched(velocity);
 		// If inside a vehicle, there is no use in updating
 		if (entity.isInsideVehicle()) {
 			return;
@@ -581,6 +578,19 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 */
 	public org.bukkit.entity.Entity getVehicleSynched() {
 		return EntityTrackerEntryRef.vehicle.get(handle);
+	}
+
+	/**
+	 * Sets the current synched velocity of the entity according to the viewers of this entity.
+	 * This method can be used instead of syncVelocity to ignore packet sending.
+	 * 
+	 * @param velocity to set to
+	 */
+	public void setProtocolVelocitySynched(Vector velocity) {
+		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
+		handle.j = velocity.getX();
+		handle.k = velocity.getY();
+		handle.l = velocity.getZ();
 	}
 
 	/**
