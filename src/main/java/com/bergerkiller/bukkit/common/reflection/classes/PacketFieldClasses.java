@@ -40,6 +40,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Boolean> lowPriority = getField("lowPriority");
 		public final FieldAccessor<Long> timestamp = getField("timestamp");
 		private final MethodAccessor<Integer> packetSize = getMethod("a");
+		private final MethodAccessor<Void> register = getMethod("a", int.class, boolean.class, boolean.class, Class.class);
 		private final SafeConstructor<Object> constructor0 = getConstructor();
 
 		/**
@@ -67,6 +68,10 @@ public class PacketFieldClasses {
 
 		public int getPacketSize(Object packet) {
 			return packetSize.invoke(packet);
+		}
+		
+		public void register(int id, boolean serverPacket, boolean clientPacket, Class<?> packetClass) {
+			register.invoke(null, id, serverPacket, clientPacket, packetClass);
 		}
 	}
 	public static class NMSPacket0KeepAlive extends NMSPacket {
