@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 
 import net.minecraft.server.v1_5_R2.EntityItem;
 import net.minecraft.server.v1_5_R2.Item;
@@ -336,7 +337,7 @@ public class ItemUtil {
 	 * @return Empty item stack
 	 */
 	public static org.bukkit.inventory.ItemStack emptyItem() {
-		return CraftItemStack.asCraftMirror(new ItemStack(0, 0, 0));
+		return CraftItemStack.asCraftMirror((ItemStack) ItemStackRef.newInstance(0, 0, 0));
 	}
 
 	/**
