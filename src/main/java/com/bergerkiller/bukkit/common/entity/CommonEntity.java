@@ -7,13 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import net.minecraft.server.v1_5_R2.Chunk;
 import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
+import net.minecraft.server.v1_5_R2.IInventory;
 import net.minecraft.server.v1_5_R2.World;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -27,6 +31,7 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
@@ -224,6 +229,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 			// *** Bukkit Entity ***
 			((CraftEntity) entity).setHandle(newInstance);
+			if (entity instanceof InventoryHolder) {
+				Inventory inv = ((InventoryHolder) entity).getInventory();
+				if (inv instanceof CraftInventory && newInstance instanceof IInventory) {
+					SafeField.set(inv, "inventory", newInstance);
+				}
+			}
 
 			// *** Give the old entity a new Bukkit Entity ***
 			EntityRef.bukkitEntity.set(oldInstance, CraftEntity.getEntity((CraftServer) Bukkit.getServer(), oldInstance));
