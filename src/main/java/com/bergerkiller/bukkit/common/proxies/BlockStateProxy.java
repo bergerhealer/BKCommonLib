@@ -135,4 +135,9 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
     	base.removeMetadata(metadataKey, owningPlugin);
     }
+
+	@Override
+	public boolean update(boolean arg0, boolean arg1) {
+		return base.update(arg0, arg1);
+	}
 }
