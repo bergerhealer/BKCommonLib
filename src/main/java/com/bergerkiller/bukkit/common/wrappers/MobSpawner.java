@@ -16,6 +16,15 @@ public class MobSpawner extends BasicWrapper {
 	public String getMobName() {
 		return MobSpawnerAbstractRef.getMobName.invoke(getHandle());
 	}
+	
+	/**
+	 * Sets the name of the mob type spawned by this mob spawner
+	 * 
+	 * @param name of mob
+	 */
+	public void setMobName(String name) {
+		MobSpawnerAbstractRef.setMobName.invoke(getHandle(), name);
+	}
 
 	/**
 	 * Performs the per-tick spawning logic

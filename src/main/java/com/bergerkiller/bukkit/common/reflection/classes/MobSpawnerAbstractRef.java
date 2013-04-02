@@ -24,5 +24,6 @@ public class MobSpawnerAbstractRef {
 	public static final FieldAccessor<Integer> spawnRange = TEMPLATE.getField("spawnRange");
 	
 	public static final MethodAccessor<String> getMobName = TEMPLATE.getMethod("getMobName");
+	public static final MethodAccessor<Void> setMobName = TEMPLATE.getMethod("a", String.class);
 	public static final MethodAccessor<Void> onTick = TEMPLATE.getMethod("g");
 }
