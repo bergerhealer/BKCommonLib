@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 
@@ -30,17 +31,23 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
  */
 public class BlockUtil extends MaterialUtil {
 
+	static {
+		// Temporary hack because Bukkit is updating far too slowly
+		try {
+			if (Material.ACTIVATOR_RAIL.getData() == MaterialData.class) {
+				SafeField.set(Material.ACTIVATOR_RAIL, "ctor", PoweredRail.class.getConstructor(int.class, byte.class));
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
 	/**
 	 * Directly obtains the Material Data from the block<br>
 	 * This alternative does not create a Block State and is preferred if you only need material data
 	 */
 	public static MaterialData getData(org.bukkit.block.Block block) {
-		final Material type = block.getType();
-		// Temporary hack because Bukkit is updating far too slowly
-		if (type == Material.ACTIVATOR_RAIL) {
-			return new PoweredRail(type, block.getData());
-		}
-		return type.getNewData(block.getData());
+		return block.getType().getNewData(block.getData());
 	}
 
 	/**
