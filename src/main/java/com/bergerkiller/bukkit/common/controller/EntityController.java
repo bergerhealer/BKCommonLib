@@ -290,7 +290,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			moveDx = handle.locX - oldLocX;
 			moveDy = handle.locY - oldLocY;
 			moveDz = handle.locZ - oldLocZ;
-			if (entity instanceof Vehicle && entity.isMovementImpaired()) {
+			if (entity.getEntity() instanceof Vehicle && entity.isMovementImpaired()) {
 				Vehicle vehicle = (Vehicle) entity.getEntity();
 				org.bukkit.block.Block block = entity.getWorld().getBlockAt(MathUtil.floor(handle.locX), MathUtil.floor(handle.locY - (double) handle.height), MathUtil.floor(handle.locZ));
 				if (oldDx > dx) {
