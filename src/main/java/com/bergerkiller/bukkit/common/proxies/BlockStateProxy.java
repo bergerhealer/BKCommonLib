@@ -92,11 +92,6 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
     }
 
     @Override
-    public boolean update(boolean force, boolean applyPhysics) {
-    	return base.update(force, applyPhysics);
-    }
-
-    @Override
     public boolean update(boolean force) {
     	return base.update(force);
     }
