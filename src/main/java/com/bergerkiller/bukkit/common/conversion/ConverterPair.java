@@ -1,5 +1,13 @@
 package com.bergerkiller.bukkit.common.conversion;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+
 /**
  * Converts between two different types
  *
@@ -100,5 +108,35 @@ public class ConverterPair<A, B> {
 	 */
 	public ConverterPair<B, A> reverse() {
 		return new ConverterPair<B, A>(converterB, converterA);
+	}
+
+	/**
+	 * Creates a new Converting Collection using this Converter Pair
+	 * 
+	 * @param collection to convert
+	 * @return converting collection
+	 */
+	public Collection<B> convertAll(Collection<?> collection) {
+		return new ConvertingCollection<B>(collection, this);
+	}
+
+	/**
+	 * Creates a new Converting List using this Converter Pair
+	 * 
+	 * @param list to convert
+	 * @return converting list
+	 */
+	public List<B> convertAll(List<?> list) {
+		return new ConvertingList<B>(list, this);
+	}
+
+	/**
+	 * Creates a new Converting Set using this Converter Pair
+	 * 
+	 * @param set to convert
+	 * @return converting set
+	 */
+	public Set<B> convertAll(Set<?> set) {
+		return new ConvertingSet<B>(set, this);
 	}
 }

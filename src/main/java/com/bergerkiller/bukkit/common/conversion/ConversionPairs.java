@@ -9,6 +9,7 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -54,4 +55,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, LongHashSet> longHashSet = toLongHashSetHandle.formPair(toLongHashSet);
 	public static final ConverterPair<Object, LongHashMap<Object>> longHashMap = toLongHashMapHandle.formPair(toLongHashMap);
 	public static final ConverterPair<Object, IntHashMap<Object>> intHashMap = toIntHashMapHandle.formPair(toIntHashMap);
+	public static final ConverterPair<Object, BlockState> blockState = toTileEntityHandle.formPair(toBlockState);
 }

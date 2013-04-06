@@ -167,7 +167,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	};
 	public static final WrapperConverter<BlockState> toBlockState = new WrapperConverter<BlockState>(BlockState.class) {
 		@Override
-		public BlockState convertSpecial(Object value, Class<?> valueType, BlockState def) {
+		public BlockState convertSpecial(Object value, Class<?> valueType, BlockState def) {			
 			org.bukkit.block.Block block = toBlock.convert(value);
 			if (block != null) {
 				return block.getState();

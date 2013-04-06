@@ -10,6 +10,7 @@ import net.minecraft.server.v1_5_R2.ChunkSection;
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.WorldServer;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongHash;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongHashSet;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongObjectHashMap;
@@ -349,5 +350,15 @@ public class ChunkUtil {
 			}
 		}
 		throw new RuntimeException("Failed to set unload queue using a known method");
+	}
+
+	/**
+	 * Obtains all the Block State tile entities available in a Chunk
+	 * 
+	 * @param chunk to get the Block States for
+	 * @return collection of Block States (mutual)
+	 */
+	public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
+		return ConversionPairs.blockState.convertAll(CommonNMS.getNative(chunk).tileEntities.values());
 	}
 }

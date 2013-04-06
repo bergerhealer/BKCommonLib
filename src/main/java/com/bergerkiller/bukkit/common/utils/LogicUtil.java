@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.block.Block;
+
+import com.bergerkiller.bukkit.common.collections.BlockSet;
+
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
@@ -355,6 +359,30 @@ public class LogicUtil {
 	 */
 	public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
 		return collection.toArray(createArray(type, collection.size()));
+	}
+
+	/**
+	 * Removes or adds an element from/to a Collection, and returns whether something has changed.
+	 * 
+	 * @param collection to add or remove an element from
+	 * @param value to remove
+	 * @param add option: True to add, False to remove
+	 * @return True if the collection changed (element removed or added), False if not
+	 */
+	public static boolean addOrRemove(BlockSet collection, Block value, boolean add) {
+		return add ? collection.add(value) : collection.remove(value);
+	}
+
+	/**
+	 * Removes or adds an element from/to a Collection, and returns whether something has changed.
+	 * 
+	 * @param collection to add or remove an element from
+	 * @param value to remove
+	 * @param add option: True to add, False to remove
+	 * @return True if the collection changed (element removed or added), False if not
+	 */
+	public static <T> boolean addOrRemove(Collection<T> collection, T value, boolean add) {
+		return add ? collection.add(value) : collection.remove(value);
 	}
 
 	/**
