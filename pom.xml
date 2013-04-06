@@ -33,16 +33,10 @@
       </snapshots>
     </repository>
     <!-- Repo for access to ProtocolLib -->
-    <!--
     <repository>
       <id>comphenix-repo</id>
       <name>Comphenix Repository</name>
-      <url>http://repo.comphenix.net/content/groups/public</url>
-    </repository>
-    -->
-    <repository>
-      <id>dj-tcraft-repo</id>
-      <url>http://ci.dj-tcraft.nl/plugin/repository/everything/</url>
+      <url>http://assets.comphenix.net/plugin/repository/everything/</url>
     </repository>
     <!-- Repo for access to Objenesis -->
     <repository>
