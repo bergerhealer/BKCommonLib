@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 
@@ -43,11 +44,30 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
+	 * Obtains the Material Data using the material type Id and data value specified
+	 * 
+	 * @param typeId of the material
+	 * @param data for the material
+	 * @return new MaterialData instance for this type of material and data
+	 */
+	public static MaterialData getData(int typeId, byte data) {
+		final Material type = Material.getMaterial(typeId);
+		if (type == null) {
+			return new MaterialData(typeId, data);
+		}
+		// Fix for signs that have no data value
+		if (type == Material.WALL_SIGN && !LogicUtil.containsByte(data, (byte) 0x2, (byte) 0x3, (byte) 0x4, (byte) 0x5)) {
+			data = 0x2;
+		}
+		return type.getNewData(data);
+	}
+
+	/**
 	 * Directly obtains the Material Data from the block<br>
 	 * This alternative does not create a Block State and is preferred if you only need material data
 	 */
 	public static MaterialData getData(org.bukkit.block.Block block) {
-		return block.getType().getNewData(block.getData());
+		return getData(block.getTypeId(), block.getData());
 	}
 
 	/**
@@ -301,14 +321,24 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
+	 * Gets the state of a block, with additional safety measures taken
+	 * 
+	 * @param block to get the state for
+	 * @return the Block State
+	 */
+	public static BlockState getState(org.bukkit.block.Block block) {
+		return BlockStateRef.toBlockState(block);
+	}
+
+	/**
 	 * Gets the State of a block, cast to a certain type
 	 * 
 	 * @param block to get the state for
 	 * @param type to cast to
-	 * @return The block state cast to the type, or null if not possible
+	 * @return The block state cast to the type, or null if casting is not possible
 	 */
 	public static <T extends BlockState> T getState(org.bukkit.block.Block block, Class<T> type) {
-		return CommonUtil.tryCast(block.getState(), type);
+		return CommonUtil.tryCast(getState(block), type);
 	}
 
 	public static Rails getRails(org.bukkit.block.Block railsblock) {
@@ -338,7 +368,7 @@ public class BlockUtil extends MaterialUtil {
 	public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
 		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
 			// simplified coding instead
-			offerTile(TileEntityRef.get(world, x, y, z));
+			offerTile(TileEntityRef.getFromWorld(world, x, y, z));
 		} else {
 			// loop through tile entity list
 			int xMin = x - radiusX;
@@ -391,7 +421,7 @@ public class BlockUtil extends MaterialUtil {
 				tmpx = state.getX() + sface.getModX();
 				tmpz = state.getZ() + sface.getModZ();
 				if (world.getBlockTypeIdAt(tmpx, tmpy, tmpz) == Material.CHEST.getId()) {
-					BlockState next = Conversion.toBlockState.convert(TileEntityRef.get(world, tmpx, tmpy, tmpy));
+					BlockState next = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, tmpx, tmpy, tmpy));
 					if (next instanceof Chest) {
 						if (sface == BlockFace.WEST || sface == BlockFace.SOUTH) {
 							blockStateBuff.add(next);

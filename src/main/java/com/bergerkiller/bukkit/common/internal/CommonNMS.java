@@ -7,12 +7,7 @@ import java.util.List;
 
 import net.minecraft.server.v1_5_R2.*;
 
-import org.bukkit.block.Chest;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Furnace;
-import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_5_R2.block.*;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -25,7 +20,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -108,22 +102,6 @@ public class CommonNMS {
 
 	public static Chunk getNative(org.bukkit.Chunk chunk) {
 		return (Chunk) Conversion.toChunkHandle.convert(chunk);
-	}
-
-	public static TileEntitySign getNative(Sign sign) {
-		return sign instanceof CraftSign ? BlockStateRef.SIGN.get(sign) : null;
-	}
-
-	public static TileEntityFurnace getNative(Furnace furnace) {
-		return furnace instanceof CraftFurnace ? BlockStateRef.FURNACE.get(furnace) : null;
-	}
-
-	public static TileEntityDispenser getNative(Dispenser dispenser) {
-		return dispenser instanceof CraftDispenser ? BlockStateRef.DISPENSER.get(dispenser) : null;
-	}
-
-	public static TileEntityChest getNative(Chest chest) {
-		return chest instanceof CraftChest ? BlockStateRef.CHEST.get(chest) : null;
 	}
 
 	public static Inventory getInventory(IInventory inventory) {

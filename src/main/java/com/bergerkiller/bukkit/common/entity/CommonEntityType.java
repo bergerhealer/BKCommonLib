@@ -9,8 +9,8 @@ import net.minecraft.server.v1_5_R2.IInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import com.bergerkiller.bukkit.common.ClassInstanceMap;
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityClassBuilder;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
@@ -29,7 +29,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonEntityType {
 	public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, "", 80, 3, true);
-	private static final ClassInstanceMap<CommonEntityType> byNMS = new ClassInstanceMap<CommonEntityType>();
+	private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
 	private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
 
 	public final ClassTemplate<?> nmsType;

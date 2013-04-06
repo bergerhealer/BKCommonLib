@@ -124,6 +124,15 @@ public class StringUtil {
 		return MinecraftFont.Font.getChar(character).getWidth();
 	}
 
+	public static int firstIndexOf(String text, char... values) {
+		for (int i = 0; i < text.length(); i++) {
+			if (LogicUtil.containsChar(text.charAt(i), values)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	public static int firstIndexOf(String text, String... values) {
 		return firstIndexOf(text, 0, values);
 	}

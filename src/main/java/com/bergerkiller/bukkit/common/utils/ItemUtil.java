@@ -480,6 +480,18 @@ public class ItemUtil {
 	/**
 	 * Gets the max stacking size for a given item
 	 * 
+	 * @param itemId of the item
+	 * @param def to return for invalid items
+	 * @return max stacking size
+	 */
+	public static int getMaxSize(int itemId, int def) {
+		Item item = LogicUtil.getArray(Item.byId, itemId, null);
+		return item == null ? def : item.getMaxStackSize();
+	}
+
+	/**
+	 * Gets the max stacking size for a given item
+	 * 
 	 * @param stack to get the max stacked size
 	 * @return max stacking size
 	 */
@@ -487,16 +499,7 @@ public class ItemUtil {
 		if (LogicUtil.nullOrEmpty(stack)) {
 			return 0;
 		} else {
-			ItemStack nitem = CommonNMS.getNative(stack);
-			if (nitem == null) {
-				return 0;
-			}
-			Item item = nitem.getItem();
-			if (item == null) {
-				return 0;
-			} else {
-				return item.getMaxStackSize();
-			}
+			return getMaxSize(stack.getTypeId(), 0);
 		}
 	}
 }

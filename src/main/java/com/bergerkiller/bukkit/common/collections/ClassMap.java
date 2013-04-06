@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common;
+package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
  * 
  * @param <T> - type of Value
  */
-public class ClassInstanceMap<T> {
+public class ClassMap<T> {
 	private final LinkedHashMap<Class<?>, T> classes = new LinkedHashMap<Class<?>, T>();
 
 	/**

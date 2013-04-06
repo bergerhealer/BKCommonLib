@@ -12,7 +12,6 @@ import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_5_R2.block.*;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack;
@@ -105,19 +104,12 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toTileEntityHandle = new HandleConverter("TileEntity") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			if (value instanceof CraftSign) {
-				return BlockStateRef.SIGN.get(value);
-			} else if (value instanceof CraftFurnace) {
-				return BlockStateRef.FURNACE.get(value);
-			} else if (value instanceof CraftChest) {
-				return BlockStateRef.CHEST.get(value);
-			} else if (value instanceof CraftDispenser) {
-				return BlockStateRef.DISPENSER.get(value);
-			} else if (value instanceof BlockState) {
-				value = ((BlockState) value).getBlock();
+			if (value instanceof BlockState) {
+				return BlockStateRef.toTileEntity((BlockState) value);
 			}
-			if (value instanceof org.bukkit.block.Block) {
-				Object tile = TileEntityRef.get((org.bukkit.block.Block) value);
+			org.bukkit.block.Block block = Conversion.toBlock.convert(value);
+			if (block != null) {
+				Object tile = TileEntityRef.getFromWorld(block);
 				if (tile != null) {
 					return tile;
 				}

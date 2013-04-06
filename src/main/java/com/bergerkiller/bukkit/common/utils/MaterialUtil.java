@@ -44,7 +44,12 @@ public class MaterialUtil {
 	 * @return True if the material is contained
 	 */
 	public static boolean isType(int material, Material... types) {
-		return isType(Material.getMaterial(material), types);
+		for (Material type : types) {
+			if (type.getId() == material) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

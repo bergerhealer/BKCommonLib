@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.inventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -11,6 +12,8 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * Can be used to match items against, and to provide amounts
  */
 public class ItemParser {
+	public static final char STACK_MULTIPLIER = '^';
+	public static final char[] MULTIPLIER_SIGNS = {'x', 'X', '*', ' ', '@', STACK_MULTIPLIER};
 
 	/**
 	 * Constructs a new Item Parser for any data and infinite amount
@@ -62,11 +65,15 @@ public class ItemParser {
 	 */
 	public static ItemParser parse(String fullname) {
 		fullname = fullname.trim();
-		int index = StringUtil.firstIndexOf(fullname, "x", "X", "*", " ", "@");
+		int index = StringUtil.firstIndexOf(fullname, MULTIPLIER_SIGNS);
 		if (index == -1) {
 			return parse(fullname, null);
 		} else {
-			return parse(fullname.substring(index + 1), fullname.substring(0, index));
+			ItemParser parser = parse(fullname.substring(index + 1), fullname.substring(0, index));
+			if (fullname.charAt(index) == STACK_MULTIPLIER) {
+				parser = parser.multiplyAmount(parser.getMaxStackSize());
+			}
+			return parser;
 		}
 	}
 
@@ -189,11 +196,7 @@ public class ItemParser {
 	}
 
 	public int getMaxStackSize() {
-		if (this.hasData()) {
-			return this.getItemStack(1).getMaxStackSize();
-		} else {
-			return this.getType().getMaxStackSize();
-		}
+		return ItemUtil.getMaxSize(this.getTypeId(), 64);
 	}
 
 	/**

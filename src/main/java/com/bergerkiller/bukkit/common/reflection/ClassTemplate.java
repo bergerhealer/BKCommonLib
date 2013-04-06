@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.objenesis.ObjenesisHelper;
+import org.objenesis.instantiator.ObjectInstantiator;
 
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -19,6 +21,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 public class ClassTemplate<T> {
 	private Class<T> type;
 	private List<SafeField<?>> fields;
+	private ObjectInstantiator instantiator;
 
 	/**
 	 * Initializes a new ClassTemplate not pointing to any Class<br>
@@ -44,7 +47,10 @@ public class ClassTemplate<T> {
 	protected void setClass(Class<T> type) {
 		this.type = type;
 		this.fields = new ArrayList<SafeField<?>>();
-		if (this.type != null) {
+		if (this.type == null) {
+			this.instantiator = null;
+		} else {
+			this.instantiator = ObjenesisHelper.getInstantiatorOf(type);
 			try {
 				this.fillFields(type);
 			} catch (Throwable t) {
@@ -93,7 +99,29 @@ public class ClassTemplate<T> {
 	 */
 	public T newInstance() {
 		try {
-			return (T) this.type.newInstance();
+			return this.type.newInstance();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Gets a new instance of this Class.
+	 * Using useConstructor of False will result in a new instance with all fields set to the default.
+	 * That is, all fields will have 'NULL' values, or for primitives, 0/false/etc.
+	 * 
+	 * @param useConstructor option: True to use the Class default constructor, False to instantiate
+	 * @return a new Class Instance, or null upon failure
+	 */
+	@SuppressWarnings("unchecked")
+	public T newInstance(boolean useConstructor) {
+		try {
+			if (useConstructor) {
+				return this.type.newInstance();
+			} else {
+				return (T) this.instantiator.newInstance();
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

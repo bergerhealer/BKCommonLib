@@ -163,6 +163,24 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Allocates a new array of the same length and writes the contents to this new array.
+	 * Unlike {@link cloneAll}, this method does not individually clone the elements
+	 * 
+	 * @param array to re-allocate as a new array
+	 * @return new array with the contents of the input array
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] cloneArray(T[] array) {
+		if (array == null) {
+			return null;
+		}
+		final int length = array.length;
+		T[] rval = createArray((Class<T>) array.getClass().getComponentType(), length);
+		System.arraycopy(array, 0, rval, 0, length);
+		return rval;
+	}
+
+	/**
 	 * Clones a single value
 	 * 
 	 * @param value to clone

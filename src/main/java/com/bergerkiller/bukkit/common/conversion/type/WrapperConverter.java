@@ -51,6 +51,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
@@ -158,8 +159,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			} else if (value instanceof BlockState) {
 				return ((BlockState) value).getBlock();
 			} else if (value instanceof TileEntity) {
-				TileEntity tile = (TileEntity) value;
-				return TileEntityRef.world.get(tile).getBlockAt(tile.x, tile.y, tile.z);
+				return TileEntityRef.getBlock(value);
 			} else {
 				return def;
 			}
@@ -167,7 +167,11 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	};
 	public static final WrapperConverter<BlockState> toBlockState = new WrapperConverter<BlockState>(BlockState.class) {
 		@Override
-		public BlockState convertSpecial(Object value, Class<?> valueType, BlockState def) {			
+		public BlockState convertSpecial(Object value, Class<?> valueType, BlockState def) {
+			// Alternative construction methods - Tile Entities can not be obtained from the world in some cases
+			if (value instanceof TileEntity) {
+				return BlockStateRef.toBlockState(value);
+			}
 			org.bukkit.block.Block block = toBlock.convert(value);
 			if (block != null) {
 				return block.getState();
