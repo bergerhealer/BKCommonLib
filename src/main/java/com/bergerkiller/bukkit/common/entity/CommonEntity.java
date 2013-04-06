@@ -359,6 +359,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		}
 
 		// Perform actual teleportation
+		final boolean succ;
 		if (!isWorldChange || entity instanceof Player) {
 			// First: stop tracking the entity
 			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
@@ -370,7 +371,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			}
 
 			// Teleport
-			final boolean succ = entity.teleport(location, cause);
+			succ = entity.teleport(location, cause);
 
 			// Start tracking the entity again
 			if (!hasNetworkController && !isWorldChange) {
@@ -378,6 +379,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			}
 
 			if (!succ) {
+				
 				return false;
 			}
 		} else {
@@ -387,9 +389,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			entityHandle.world = newworld;
 			entityHandle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			entityHandle.world.addEntity(entityHandle);
+			succ = true;
 		}
 		if (hasNetworkController) {
 			this.setNetworkController(oldNetworkController);
+		}
+		if (!succ) {
+			return false;
 		}
 
 		// If there was a passenger, teleport it and let passenger enter again

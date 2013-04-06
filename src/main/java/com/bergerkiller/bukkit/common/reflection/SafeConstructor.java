@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.Constructor;
 
+import com.bergerkiller.bukkit.common.conversion.Converter;
+
 /**
  * A safe version of the Constructor
  * 
@@ -19,6 +21,10 @@ public class SafeConstructor<T> {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public SafeConstructor(Constructor<T> constructor) {
+		this.constructor = constructor;
 	}
 
 	/**
@@ -44,5 +50,21 @@ public class SafeConstructor<T> {
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
+	}
+
+	/**
+	 * Obtains a new Class Contructor that uses this contructor and converts the output
+	 * 
+	 * @param converter to use for the output
+	 * @return translated output
+	 */
+	@SuppressWarnings("unchecked")
+	public <K> SafeConstructor<K> translateOutput(final Converter<K> converter) {
+		return new SafeConstructor<K>((Constructor<K>) this.constructor) {
+			@Override
+			public K newInstance(Object... parameters) {
+				return converter.convert(super.newInstance(parameters));
+			}
+		};
 	}
 }

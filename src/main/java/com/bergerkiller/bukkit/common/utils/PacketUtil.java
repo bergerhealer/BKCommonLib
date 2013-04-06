@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
@@ -19,7 +18,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 
 public class PacketUtil {
 	private static final Map<Class<?>, Integer> packetsToIds = PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
@@ -80,16 +78,7 @@ public class PacketUtil {
 	}
 
 	public static void sendPacket(Player player, Object packet, boolean throughListeners) {
-		CommonPlugin plugin = CommonPlugin.getInstance();
-		if (plugin == null) {
-			// Send manually
-			if (packet instanceof CommonPacket) {
-				packet = ((CommonPacket) packet).getHandle();
-			}
-			PlayerConnectionRef.sendPacket(CommonNMS.getNative(player).playerConnection, packet);
-		} else {
-			plugin.getPacketHandler().sendPacket(player, packet, throughListeners);
-		}
+		CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
 	}
 
 	public static void sendPacket(Player player, CommonPacket packet) {
@@ -205,6 +194,9 @@ public class PacketUtil {
 	}
 
 	public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Object packet) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		CommonUtil.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
 	}
 

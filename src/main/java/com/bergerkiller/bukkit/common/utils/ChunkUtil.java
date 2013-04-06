@@ -294,7 +294,7 @@ public class ChunkUtil {
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
-					CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
+					CommonPlugin.LOGGER.log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
 					CommonUtil.filterStackTrace(t).printStackTrace();
 				}
 			}
@@ -344,7 +344,7 @@ public class ChunkUtil {
 					}
 				} catch (Throwable t) {
 					canUseLongHashSet = false;
-					CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
+					CommonPlugin.LOGGER.log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
 					CommonUtil.filterStackTrace(t).printStackTrace();
 				}
 			}

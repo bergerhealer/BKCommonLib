@@ -79,8 +79,8 @@ class CommonPlayerConnection extends PlayerConnection {
 					return;
 				}
 			}
-			if (!retry && CommonPlugin.getInstance() != null) {
-				CommonPlugin.getInstance().log(Level.SEVERE, "Failed to (un)register PlayerConnection proxy...bad things may happen!");
+			if (!retry) {
+				CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to (un)register PlayerConnection proxy...bad things may happen!");
 				return;
 			}
 			// We failed to remove it in one go...

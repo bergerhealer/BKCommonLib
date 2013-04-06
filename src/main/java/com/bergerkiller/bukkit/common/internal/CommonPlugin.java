@@ -27,6 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.MessageBuilder;
+import com.bergerkiller.bukkit.common.ModuleLogger;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
@@ -55,6 +56,10 @@ public class CommonPlugin extends PluginBase {
 	 */
 	private static final String[] protLibPlugins = {"Spout"};
 	/*
+	 * Loggers for internal BKCommonLib processes
+	 */
+	public static final ModuleLogger LOGGER = new ModuleLogger("BKCommonLib");
+	/*
 	 * Remaining internal variables
 	 */
 	private static CommonPlugin instance;
@@ -77,7 +82,14 @@ public class CommonPlugin extends PluginBase {
 	private PacketHandler packetHandler = new CommonPacketHandler();
 	public List<Entity> entities = new ArrayList<Entity>();
 
+	public static boolean hasInstance() {
+		return instance != null;
+	}
+
 	public static CommonPlugin getInstance() {
+		if (instance == null) {
+			throw new RuntimeException("BKCommonLib is not enabled - Plugin Instance can not be obtained! (disjointed Class state?)");
+		}
 		return instance;
 	}
 

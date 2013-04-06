@@ -54,13 +54,23 @@ public abstract class PluginBase extends JavaPlugin {
 	private Metrics metrics;
 
 	/**
+	 * Gets the logger for a specific module in this Plugin
+	 * 
+	 * @param modulePath for the module
+	 * @return a new Module Logger
+	 */
+	public ModuleLogger getModuleLogger(String... modulePath) {
+		return new ModuleLogger(this, modulePath);
+	}
+
+	/**
 	 * Logs a message to the server console
 	 * 
 	 * @param level of the message
 	 * @param message to log
 	 */
 	public void log(Level level, String message) {
-		Bukkit.getLogger().log(level, "[" + this.getName() + "] " + message);
+		this.getLogger().log(level, message);
 	}
 
 	/**
@@ -699,7 +709,7 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 			// Remove references to the plugin - it is disabled now
 			this.enabled = false;
-			if (CommonPlugin.getInstance() != null) {
+			if (CommonPlugin.hasInstance()) {
 				CommonPlugin.getInstance().plugins.remove(this);
 			}
 		}
@@ -708,6 +718,7 @@ public abstract class PluginBase extends JavaPlugin {
 			metrics.stop();
 			metrics = null;
 		}
+
 		// If specified to do so, a disable message is shown
 		if (doDisableMessage) {
 			Bukkit.getLogger().log(Level.INFO, this.disableMessage);

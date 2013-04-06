@@ -163,6 +163,29 @@ public class LogicUtil {
 	}
 
 	/**
+	 * Appends one or more elements to an array
+	 * This method allocates a new Array of the same type as the old array,
+	 * with the size of array + values.
+	 * 
+	 * @param array input array to append to
+	 * @param values to append to array
+	 * @return new Array with the values from array and values
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] appendArray(T[] array, T... values) {
+		if (nullOrEmpty(array)) {
+			return values;
+		}
+		if (nullOrEmpty(values)) {
+			return array;
+		}
+		T[] rval = createArray((Class<T>) array.getClass().getComponentType(), array.length + values.length);
+		System.arraycopy(array, 0, rval, 0, array.length);
+		System.arraycopy(values, 0, rval, array.length, values.length);
+		return rval;
+	}
+
+	/**
 	 * Allocates a new array of the same length and writes the contents to this new array.
 	 * Unlike {@link cloneAll}, this method does not individually clone the elements
 	 * 

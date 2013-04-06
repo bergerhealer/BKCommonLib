@@ -45,7 +45,6 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginEnable(final PluginEnableEvent event) {
-		CommonPlugin plugin = CommonPlugin.getInstance();
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, true);
@@ -54,7 +53,6 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPluginDisable(PluginDisableEvent event) {
-		CommonPlugin plugin = CommonPlugin.getInstance();
 		String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
 		for (PluginBase pb : CommonPlugin.getInstance().plugins) {
 			pb.updateDependency(event.getPlugin(), name, false);
