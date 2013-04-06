@@ -103,7 +103,8 @@ public class CommonObjective {
 	 */
 	public void removeScore(String id) {
 		CommonScore score = this.getScore(id);
-		score.remove();
+		if(score!= null)
+			score.remove();
 		scores.remove(id);
 	}
 	
