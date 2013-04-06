@@ -5,12 +5,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import net.minecraft.server.v1_5_R2.Chunk;
+import net.minecraft.server.v1_5_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_5_R2.ChunkSection;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.WorldServer;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongHash;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongHashSet;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongObjectHashMap;
+import org.bukkit.entity.Player;
+
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -21,6 +25,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
 /**
@@ -154,6 +159,26 @@ public class ChunkUtil {
 	public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
 		List<Object>[] entitySlices = ChunkRef.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
 		return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
+	}
+	
+	/**
+	 * Checks if a chunk is about be loaded
+	 * 
+	 * @param player who will receive the chunk
+	 * @param cx location for the chunk X
+	 * @param cz location for the chunk Z
+	 * @return chunk being loaded soon?
+	 */
+	public static boolean isLoadRequested(Player player, int cx, int cz) {
+		EntityPlayer ep = CommonNMS.getNative(player);
+		List<?> chunkQue = EntityPlayerRef.chunkQueue.get(ep);
+		for(Object location : chunkQue) {
+			ChunkCoordIntPair loc = (ChunkCoordIntPair) location;
+			if(loc.x == cx && loc.z == cz)
+				return true;
+		}
+		
+		return false;
 	}
 
 	/**
