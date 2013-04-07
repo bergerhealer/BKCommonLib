@@ -336,10 +336,14 @@ public class CommonPlugin extends PluginBase {
 		} else {
 			log(Level.SEVERE, "This was caused by a plugin conflict, namely " + plugin.getName());
 		}
-		log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility between plugins");
+		logProtocolLib();
+		Bukkit.getPluginManager().disablePlugin(this);
+	}
+
+	private void logProtocolLib() {
+		log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
 		log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
-		Bukkit.getPluginManager().disablePlugin(this);
 	}
 
 	@Override
@@ -378,11 +382,20 @@ public class CommonPlugin extends PluginBase {
 	public void enable() {
 		// Validate version
 		if (IS_COMPATIBLE) {
-			Plugin plugin;
-			for (String protLibPlugin : protLibPlugins) {
-				if ((plugin = CommonUtil.getPlugin(protLibPlugin)) != null) {
-					failPacketListener(plugin.getClass());
+			if (CommonUtil.getPlugin("ProtocolLib") == null) {
+				if (Common.IS_SPIGOT_SERVER) {
+					log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
+					logProtocolLib();
+					Bukkit.getPluginManager().disablePlugin(this);
 					return;
+				} else {
+					Plugin plugin;
+					for (String protLibPlugin : protLibPlugins) {
+						if ((plugin = CommonUtil.getPlugin(protLibPlugin)) != null) {
+							failPacketListener(plugin.getClass());
+							return;
+						}
+					}
 				}
 			}
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -562,7 +563,18 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	@Override
-	public final void onEnable() {
+	@SuppressWarnings("unchecked")
+	public final void onEnable() {		
+		// First of all, check that all dependencies are properly enabled
+		for (String dep : LogicUtil.fixNull(getDescription().getDepend(), (List<String>) Collections.EMPTY_LIST)) {
+			if (!Bukkit.getPluginManager().isPluginEnabled(dep)) {
+				log(Level.SEVERE, "Could not enable '" + getName() + " v" + getVersion() + "' because dependency '" + dep + "' failed to enable!");
+				log(Level.SEVERE, "Perhaps the dependency has to be updated? Please check the log for any errors related to " + dep);
+				Bukkit.getPluginManager().disablePlugin(this);
+				return;
+			}
+		}
+
 		long startTime = System.currentTimeMillis();
 		if (this.getMinimumLibVersion() > Common.VERSION) {
 			log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
