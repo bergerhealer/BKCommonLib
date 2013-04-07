@@ -72,8 +72,10 @@ public abstract class DataReader {
 
 	/**
 	 * Performs the actual reading from the file
+	 * 
+	 * @return True if reading was successful, False if not (file not found, or other error)
 	 */
-	public final void read() {
+	public boolean read() {
 		try {
 			DataInputStream stream = getStream(new FileInputStream(this.file));
 			try {
@@ -87,11 +89,13 @@ public abstract class DataReader {
 			} finally {
 				stream.close();
 			}
+			return true;
 		} catch (FileNotFoundException ex) {
 			// nothing, we allow non-existence of this file
 		} catch (Throwable t) {
 			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
 			t.printStackTrace();
 		}
+		return false;
 	}
 }

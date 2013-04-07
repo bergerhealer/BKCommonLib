@@ -54,8 +54,10 @@ public abstract class DataWriter {
 
 	/**
 	 * Performs the actual writing to the file
+	 * 
+	 * @return True if writing was successful, False if not
 	 */
-	public final void write() {
+	public boolean write() {
 		try {
 			DataOutputStream stream = this.getStream(new FileOutputStream(this.file));
 			try {
@@ -69,6 +71,7 @@ public abstract class DataWriter {
 			} finally {
 				stream.close();
 			}
+			return true;
 		} catch (FileNotFoundException ex) {
 			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] Failed to access file '" + this.file + "' for saving:");
 			ex.printStackTrace();
@@ -76,5 +79,6 @@ public abstract class DataWriter {
 			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] Failed to save to file '" + this.file + "':");
 			t.printStackTrace();
 		}
+		return false;
 	}
 }
