@@ -377,11 +377,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			if (!hasNetworkController && !isWorldChange) {
 				tracker.startTracking(entity);
 			}
-
-			if (!succ) {
-				
-				return false;
-			}
 		} else {
 			// Remove from one world and add to the other
 			entityHandle.world.removeEntity(entityHandle);
