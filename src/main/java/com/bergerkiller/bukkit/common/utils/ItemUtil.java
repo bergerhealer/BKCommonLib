@@ -502,4 +502,39 @@ public class ItemUtil {
 			return getMaxSize(stack.getTypeId(), 0);
 		}
 	}
+
+	/**
+	 * Checks whether an item has a custom display name set
+	 * 
+	 * @param stack to check
+	 * @return True if a custom name is set, False if not
+	 */
+	public static boolean hasDisplayName(org.bukkit.inventory.ItemStack stack) {
+		return CommonNMS.getNative(stack).hasName();
+	}
+
+	/**
+	 * Gets the current display name of an Item.
+	 * If no name is set, the default Material name is returned instead.
+	 * 
+	 * @param stack to get the display name of
+	 * @return display name
+	 */
+	public static String getDisplayName(org.bukkit.inventory.ItemStack stack) {
+		return CommonNMS.getNative(stack).getName();
+	}
+
+	/**
+	 * Sets the current display name of an Item
+	 * 
+	 * @param stack to set the display name of
+	 * @param displayName to set to, null to reset to the default
+	 */
+	public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
+		if (displayName != null) {
+			CommonNMS.getNative(stack).c(displayName);
+		} else if (hasDisplayName(stack)) {
+			CommonNMS.getNative(stack).tag.remove("display");
+		}
+	}
 }
