@@ -45,12 +45,12 @@ class CommonPlayerConnection extends PlayerConnection {
 	}
 
 	private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
-		final boolean hasCommon = CommonPlugin.getInstance() != null;
+		final boolean hasCommon = CommonPlugin.hasInstance();
 		if (isReplaceable(ep.playerConnection)) {
 			// Set it
 			ep.playerConnection = connection;
 			// Perform a little check-up in 10 ticks
-			if (CommonPlugin.getInstance() != null) {
+			if (CommonPlugin.hasInstance()) {
 				new Task(CommonPlugin.getInstance()) {
 					@Override
 					public void run() {
