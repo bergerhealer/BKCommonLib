@@ -8,6 +8,8 @@ import net.minecraft.server.v1_5_R2.PlayerConnection;
 import org.bukkit.entity.Player;
 import org.spigotmc.netty.PacketListener;
 
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
+
 public class SpigotPacketListener extends PacketListener {
 	public static boolean ENABLED = true;
 	private final CommonPacketHandler handler;
@@ -35,6 +37,13 @@ public class SpigotPacketListener extends PacketListener {
 	@Override
 	public Packet packetQueued(INetworkManager networkManager, Connection connection, Packet packet) {
 		if(!ENABLED || !(connection instanceof PlayerConnection)) {
+			if(ENABLED) {
+				int packetId = PacketFields.DEFAULT.packetID.get(packet);
+				if(packetId == 237) { //Strange bug....
+					return null;
+				}
+			}
+			
 			return super.packetQueued(networkManager, connection, packet);
 		}
 		
