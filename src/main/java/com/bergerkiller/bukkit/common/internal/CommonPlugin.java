@@ -323,7 +323,7 @@ public class CommonPlugin extends PluginBase {
 				if(Common.IS_SPIGOT_SERVER) {
 					//Enable spigot listener again
 					if(SpigotPacketListener.ENABLED) {
-						new SpigotPacketListener();
+						SpigotPacketListener.init();
 					} else {
 						SpigotPacketListener.ENABLED = true;
 					}
@@ -445,7 +445,7 @@ public class CommonPlugin extends PluginBase {
 		// Register packet listener if ProtocolLib is not detected
 		if (CommonUtil.getPlugin("ProtocolLib") == null) {
 			if(Common.IS_SPIGOT_SERVER) {
-				new SpigotPacketListener();
+				SpigotPacketListener.init();
 			} else {
 				CommonPlayerConnection.bindAll();
 			}

@@ -14,9 +14,13 @@ public class SpigotPacketListener extends PacketListener {
 	public static boolean ENABLED = true;
 	private final CommonPacketHandler handler;
 	
-	public SpigotPacketListener() {
+	public static void init() {
+		CommonPlugin.LOGGER.info("Enabling spigot packet listener!");
+		PacketListener.register(new SpigotPacketListener(), CommonPlugin.getInstance());
+	}
+	
+	private SpigotPacketListener() {
 		this.handler = (CommonPacketHandler) CommonPlugin.getInstance().getPacketHandler();
-		PacketListener.register(this, CommonPlugin.getInstance());
 	}
 	
 	@Override
@@ -36,14 +40,12 @@ public class SpigotPacketListener extends PacketListener {
 	
 	@Override
 	public Packet packetQueued(INetworkManager networkManager, Connection connection, Packet packet) {
+		int packetId = PacketFields.DEFAULT.packetID.get(packet);
+		if(packetId == 237) { //Strange bug....
+			return null;
+		}
+		
 		if(!ENABLED || !(connection instanceof PlayerConnection)) {
-			if(ENABLED) {
-				int packetId = PacketFields.DEFAULT.packetID.get(packet);
-				if(packetId == 237) { //Strange bug....
-					return null;
-				}
-			}
-			
 			return super.packetQueued(networkManager, connection, packet);
 		}
 		
