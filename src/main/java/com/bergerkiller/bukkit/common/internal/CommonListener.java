@@ -15,15 +15,18 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -101,6 +104,18 @@ class CommonListener implements Listener {
 	private void onPlayerJoin(PlayerJoinEvent event) {
 		if (CommonPlugin.getInstance().isUsingFallBackPacketListener()) {
 			CommonPlayerConnection.bind(event.getPlayer());
+		}
+	}
+
+	/*
+	 * This is a temporary workaround until the VehicleExitEvent works again
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	private void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		if (!event.isCancelled() && event.getPlayer().getVehicle() == event.getRightClicked()) {
+			// Call a player exit event
+			final Vehicle vehicle = (Vehicle) event.getRightClicked();
+			event.setCancelled(CommonUtil.callEvent(new VehicleExitEvent(vehicle, event.getPlayer())).isCancelled());
 		}
 	}
 }
