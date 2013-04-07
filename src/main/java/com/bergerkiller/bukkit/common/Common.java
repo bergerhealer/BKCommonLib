@@ -4,12 +4,9 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
-public class Common {
-	/**
-	 * Gets whether the current server software used is the Spigot implementation
-	 */
-	public static final boolean IS_SPIGOT_SERVER = Bukkit.getVersion().contains("Spigot");
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
+public class Common {
 	/**
 	 * Defines the Minecraft version that runs on the server<br>
 	 * If none is specified, this value is an empty String
@@ -49,6 +46,10 @@ public class Common {
 	 * Defines the com.bergerkiller.bukkit.common root path of this library
 	 */
 	public static final String COMMON_ROOT = "com.bergerkiller.bukkit.common";
+	/**
+	 * Gets whether the current server software used is the Spigot implementation
+	 */
+	public static final boolean IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
 
 	private static boolean checkVersion(String version) {
 		try {

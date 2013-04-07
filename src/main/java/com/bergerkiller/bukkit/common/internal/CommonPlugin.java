@@ -59,6 +59,7 @@ public class CommonPlugin extends PluginBase {
 	 * Loggers for internal BKCommonLib processes
 	 */
 	public static final ModuleLogger LOGGER = new ModuleLogger("BKCommonLib");
+	public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
 	/*
 	 * Remaining internal variables
 	 */
@@ -109,7 +110,7 @@ public class CommonPlugin extends PluginBase {
 		Exception ex = new Exception(msg);
 		for (StackTraceElement elem : ex.getStackTrace()) {
 			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection.classes")) {
-				log(Level.SEVERE, "[Reflection] " + msg + " (Update BKCommonLib?)");
+				LOGGER_REFLECTION.log(Level.SEVERE, msg + " (Update BKCommonLib?)");
 				for (StackTraceElement ste : ex.getStackTrace()) {
 					log(Level.SEVERE, "    at " + ste.toString());
 				}
