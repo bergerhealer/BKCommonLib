@@ -309,14 +309,28 @@ public class CommonPlugin extends PluginBase {
 		} else if (pluginName.equals("ProtocolLib")) {
 			if (this.isProtocolLibEnabled = enabled) {
 				log(Level.INFO, "Now using ProtocolLib to handle packet listeners");
-				// Unregister previous PlayerConnection hooks
-				CommonPlayerConnection.unbindAll();
+				if(Common.IS_SPIGOT_SERVER) {
+					//Disable spigot listener
+					SpigotPacketListener.ENABLED = false;
+				} else {
+					// Unregister previous PlayerConnection hooks
+					CommonPlayerConnection.unbindAll();
+				}
 				// Obtain all current packet listeners
 				// Register all packets in ProtocolLib
 				setPacketHandler(new ProtocolLibPacketHandler());
 			} else {
-				//Now uses the onPlayerJoin method (see CommonListener) to deal with this
-				CommonPlayerConnection.bindAll();
+				if(Common.IS_SPIGOT_SERVER) {
+					//Enable spigot listener again
+					if(SpigotPacketListener.ENABLED) {
+						new SpigotPacketListener();
+					} else {
+						SpigotPacketListener.ENABLED = true;
+					}
+				} else {
+					//Now uses the onPlayerJoin method (see CommonListener) to deal with this
+					CommonPlayerConnection.bindAll();
+				}
 				//Fall back to default system
 				setPacketHandler(new CommonPacketHandler());				
 			}
@@ -430,7 +444,11 @@ public class CommonPlugin extends PluginBase {
 
 		// Register packet listener if ProtocolLib is not detected
 		if (CommonUtil.getPlugin("ProtocolLib") == null) {
-			CommonPlayerConnection.bindAll();
+			if(Common.IS_SPIGOT_SERVER) {
+				new SpigotPacketListener();
+			} else {
+				CommonPlayerConnection.bindAll();
+			}
 		} else {
 			// Instantly set the packet handler - is more efficient
 			packetHandler = new ProtocolLibPacketHandler();
