@@ -148,6 +148,7 @@ public class BlockStateRef {
 			final BlockState state = STATE.newInstance(false);
 			final Block block = TileEntityRef.getBlock(tileEntity);
 			final int typeId = block.getTypeId();
+			tileField.set(state, tileEntity);
 			world.set(state, block.getWorld());
 			secondWorld.set(state, block.getWorld());
 			chunk.set(state, block.getChunk());

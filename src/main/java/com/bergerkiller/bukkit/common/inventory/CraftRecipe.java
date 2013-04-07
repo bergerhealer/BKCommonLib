@@ -25,6 +25,10 @@ public class CraftRecipe {
 			if (LogicUtil.nullOrEmpty(item)) {
 				continue;
 			}
+			item = item.clone();
+			if (item.getDurability() == Short.MAX_VALUE) {
+				item.setDurability((short) -1);
+			}
 
 			create = true;
 			for (ItemStack newitem : newinput) {
@@ -35,7 +39,6 @@ public class CraftRecipe {
 				}
 			}
 			if (create) {
-				item = item.clone();
 				item.setAmount(1);
 				newinput.add(item);
 			}
