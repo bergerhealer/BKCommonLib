@@ -398,10 +398,10 @@ public class CommonPlugin extends PluginBase {
 		if (IS_COMPATIBLE) {
 			if (CommonUtil.getPlugin("ProtocolLib") == null) {
 				if (Common.IS_SPIGOT_SERVER) {
-					log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
-					logProtocolLib();
-					Bukkit.getPluginManager().disablePlugin(this);
-					return;
+					//log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
+					//logProtocolLib();
+					//Bukkit.getPluginManager().disablePlugin(this);
+					//return;
 				} else {
 					Plugin plugin;
 					for (String protLibPlugin : protLibPlugins) {
