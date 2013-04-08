@@ -33,8 +33,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -236,11 +234,12 @@ public class Metrics {
 								}
 
 								// Update all graphs on the main thread
+								graphBuffer.clear();
 								synchronized (graphs) {
 									graphBuffer.addAll(graphs);
 								}
 								if (!graphBuffer.isEmpty()) {
-									CommonUtil.nextTick(new Runnable() {
+									Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 										@Override
 										public void run() {
 											for (Graph graph : graphBuffer) {
@@ -265,9 +264,9 @@ public class Metrics {
 								// After the first post we set firstPost to false
 								// Each post thereafter will be a ping
 								firstPost = false;
-							} catch (IOException e) {
+							} catch (Throwable t) {
 								if (debug) {
-									Bukkit.getLogger().log(Level.INFO, "[Metrics] " + e.getMessage());
+									Bukkit.getLogger().log(Level.INFO, "[Metrics] " + t.getMessage());
 								}
 							}
 
@@ -486,7 +485,7 @@ public class Metrics {
 		} else {
 			// Is this the first update this hour?
 			if (response.contains("OK This is your first update this hour")) {
-				CommonUtil.nextTick(new Runnable() {
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 					public void run() {
 						synchronized (graphs) {
 							for (Graph graph : graphs) {
