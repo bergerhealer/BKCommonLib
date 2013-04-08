@@ -57,22 +57,23 @@ class EntityControllerCollisionHelper {
 		}
 
 		// Handle block collisions
-		double dx, dy, dz;
 		BlockFace hitFace;
 		Iterator<AxisAlignedBB> iter = collisionBuffer.iterator();
 		AxisAlignedBB blockBounds;
+		double dx, dz;
 		while (iter.hasNext()) {
 			blockBounds = iter.next();
 			// Convert to block and block coordinates
 			org.bukkit.block.Block block = entity.getWorld().getBlockAt(MathUtil.floor(blockBounds.a), MathUtil.floor(blockBounds.b), MathUtil.floor(blockBounds.c));
-			dx = entity.loc.getX() - block.getX() - 0.5;
-			dy = entity.loc.getY() - block.getY() - 0.5;
-			dz = entity.loc.getZ() - block.getZ() - 0.5;
 
 			// Find out what direction the block is hit
-			if (Math.abs(dx) < 0.1 && Math.abs(dz) < 0.1) {
-				hitFace = dy >= 0.0 ? BlockFace.UP : BlockFace.DOWN;
+			if (bounds.e > blockBounds.e) {
+				hitFace = BlockFace.UP;
+			} else if (bounds.b < blockBounds.b) {
+				hitFace = BlockFace.DOWN;
 			} else {
+				dx = entity.loc.getX() - block.getX() - 0.5;
+				dz = entity.loc.getZ() - block.getZ() - 0.5;
 				hitFace = FaceUtil.getDirection(dx, dz, false);
 			}
 			// Block collision event
