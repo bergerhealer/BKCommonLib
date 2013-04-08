@@ -55,6 +55,7 @@ public class CommonPlugin extends PluginBase {
 	 * Known plugins that require ProtocolLib to be installed
 	 */
 	private static final String[] protLibPlugins = {"Spout"};
+	private static boolean useSpigotPacketListener = true;
 	/*
 	 * Loggers for internal BKCommonLib processes
 	 */
@@ -397,11 +398,11 @@ public class CommonPlugin extends PluginBase {
 		// Validate version
 		if (IS_COMPATIBLE) {
 			if (CommonUtil.getPlugin("ProtocolLib") == null) {
-				if (Common.IS_SPIGOT_SERVER) {
-					//log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
-					//logProtocolLib();
-					//Bukkit.getPluginManager().disablePlugin(this);
-					//return;
+				if (!useSpigotPacketListener && Common.IS_SPIGOT_SERVER) {
+					log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
+					logProtocolLib();
+					Bukkit.getPluginManager().disablePlugin(this);
+					return;
 				} else {
 					Plugin plugin;
 					for (String protLibPlugin : protLibPlugins) {
