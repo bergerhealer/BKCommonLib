@@ -33,4 +33,34 @@ public interface PacketHandler {
 	public Collection<Plugin> getListening(int id);
 
 	public void transfer(PacketHandler to);
+
+	/**
+	 * Gets the name of this type of Packet Handler
+	 * 
+	 * @return packet handler name
+	 */
+	public String getName();
+
+	/**
+	 * Called when this Packet Handler has to be enabled.
+	 * This method should take care of registering packet hooks or listeners.
+	 * 
+	 * @return True if the handler successfully enabled, False if not
+	 */
+	public boolean onEnable();
+
+	/**
+	 * Called when this Packet Handler has to be disabled.
+	 * This method should take care of removing any packet hooks or listeners.
+	 * 
+	 * @return True if the handler successfully disabled, False if not
+	 */
+	public boolean onDisable();
+
+	/**
+	 * Called when a new player joins the server and potentially needs a listener hook
+	 * 
+	 * @param player that joined
+	 */
+	public void onPlayerJoin(Player player);
 }

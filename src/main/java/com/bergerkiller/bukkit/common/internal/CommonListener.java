@@ -102,9 +102,7 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPlayerJoin(PlayerJoinEvent event) {
-		if (CommonPlugin.getInstance().isUsingFallBackPacketListener()) {
-			CommonPlayerConnection.bind(event.getPlayer());
-		}
+		CommonPlugin.getInstance().getPacketHandler().onPlayerJoin(event.getPlayer());
 	}
 
 	/*

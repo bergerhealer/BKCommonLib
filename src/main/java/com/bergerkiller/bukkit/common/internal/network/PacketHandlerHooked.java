@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -25,10 +26,11 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 /**
- * Basic packet handler implementation that uses a replaced PlayerConnection for events.
- * Note: Contains a lot of duplicated code, might need some improvements.
+ * Basic packet handler implementation for handling packets using a send/receive hook.
+ * The {@link handlePacketSend} and {@link handlePacketReceive} methods should be called
+ * by an additional listener hook.
  */
-public class CommonPacketHandler implements PacketHandler {
+public abstract class PacketHandlerHooked implements PacketHandler {
 	@SuppressWarnings("unchecked")
 	private final List<PacketListener>[] listeners = new ArrayList[256];
 	@SuppressWarnings("unchecked")
@@ -171,6 +173,9 @@ public class CommonPacketHandler implements PacketHandler {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
 		}
+		if (packet == null) {
+			return;
+		}
 		Object handle = Conversion.toEntityHandle.convert(player);
 		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
 			return;
@@ -240,7 +245,7 @@ public class CommonPacketHandler implements PacketHandler {
 		return Conversion.toIntArr.convert(list);
 	}
 
-	public boolean onPacketSend(Player player, Object packet, boolean wasCancelled) {
+	public boolean handlePacketSend(Player player, Object packet, boolean wasCancelled) {
 		if(player == null || packet == null) {
 			return true;
 		}
@@ -274,7 +279,7 @@ public class CommonPacketHandler implements PacketHandler {
 		return true;
 	}
 
-	public boolean onPacketReceive(Player player, Object packet, boolean wasCancelled) {
+	public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
 		if(player == null || packet == null) {
 			return true;
 		}

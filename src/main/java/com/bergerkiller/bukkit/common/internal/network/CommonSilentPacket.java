@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.network;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

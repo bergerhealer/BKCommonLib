@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.network;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -27,7 +28,10 @@ import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
-class ProtocolLibPacketHandler implements PacketHandler {
+/**
+ * A packet handler implementation that uses ProtocolLib packet listeners
+ */
+public class ProtocolLibPacketHandler implements PacketHandler {
 	private final List<CommonPacketMonitor> monitors = new ArrayList<CommonPacketMonitor>();
 	private final List<CommonPacketListener> listeners = new ArrayList<CommonPacketListener>();
 
@@ -48,6 +52,9 @@ class ProtocolLibPacketHandler implements PacketHandler {
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
+		}
+		if (packet == null) {
+			return;
 		}
 		Object handle = Conversion.toEntityHandle.convert(player);
 		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
@@ -111,6 +118,25 @@ class ProtocolLibPacketHandler implements PacketHandler {
 		for (CommonPacketMonitor monitor : monitors) {
 			to.addPacketMonitor(monitor.getPlugin(), monitor.monitor, monitor.ids);
 		}
+	}
+
+	@Override
+	public boolean onEnable() {
+		return true;
+	}
+
+	@Override
+	public boolean onDisable() {
+		return true;
+	}
+
+	@Override
+	public void onPlayerJoin(Player player) {
+	}
+
+	@Override
+	public String getName() {
+		return "the ProtocolLib library";
 	}
 
 	private static class CommonPacketMonitor extends CommonPacketAdapter {
@@ -200,5 +226,4 @@ class ProtocolLibPacketHandler implements PacketHandler {
 			return sending;
 		}
 	}
-
 }

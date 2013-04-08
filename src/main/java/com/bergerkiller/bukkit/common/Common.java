@@ -65,9 +65,11 @@ public class Common {
 	}
 
 	/**
-	 * Checks whether the version specified is compatible with the Minecraft version used on this server
+	 * Checks whether the version specified is compatible with the
+	 * Minecraft version used on this server
 	 * 
-	 * @param version to check, in the v1_4_5 format where 1, 4 and 5 are the version numbers
+	 * @param version to check, in the v1_4_5_R2 format where 1, 4 and 5
+	 * 			are the version numbers and 2 is the build revision
 	 * @return True if the version is compatible, False if not
 	 */
 	public static boolean isMCVersionCompatible(String version) {
@@ -75,8 +77,10 @@ public class Common {
 	}
 
 	/**
-	 * BKCommonLib version number, use this to set your dependency version for BKCommonLib-using plugins<br>
-	 * <b>Use getVersion() instead if you want the actual, current version! Constants get inlined when compiling!</b>
+	 * BKCommonLib version number, use this to set your dependency version 
+	 * for BKCommonLib-using plugins<br>
+	 * <b>Use getVersion() instead if you want the actual, current version!
+	 * Constants get inlined when compiling!</b>
 	 */
 	public static final int VERSION = 151;
 

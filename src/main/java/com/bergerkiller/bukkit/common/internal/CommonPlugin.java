@@ -34,10 +34,12 @@ import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
+import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
+import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
+import com.bergerkiller.bukkit.common.internal.network.SpigotPacketHandler;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
@@ -51,16 +53,12 @@ public class CommonPlugin extends PluginBase {
 	 */
 	public static final String DEPENDENT_MC_VERSION = "v1_5_R2";
 	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
-	/**
-	 * Known plugins that require ProtocolLib to be installed
-	 */
-	private static final String[] protLibPlugins = {"Spout"};
-	private static boolean useSpigotPacketListener = true;
 	/*
 	 * Loggers for internal BKCommonLib processes
 	 */
 	public static final ModuleLogger LOGGER = new ModuleLogger("BKCommonLib");
 	public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
+	public static final ModuleLogger LOGGER_NETWORK = LOGGER.getModule("Network");
 	/*
 	 * Remaining internal variables
 	 */
@@ -79,9 +77,8 @@ public class CommonPlugin extends PluginBase {
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
-	private boolean isProtocolLibEnabled = false;
 	private Plugin bleedingMobsInstance = null;
-	private PacketHandler packetHandler = new CommonPacketHandler();
+	private PacketHandler packetHandler = null;
 	public List<Entity> entities = new ArrayList<Entity>();
 
 	public static boolean hasInstance() {
@@ -93,10 +90,6 @@ public class CommonPlugin extends PluginBase {
 			throw new RuntimeException("BKCommonLib is not enabled - Plugin Instance can not be obtained! (disjointed Class state?)");
 		}
 		return instance;
-	}
-
-	public boolean isUsingFallBackPacketListener() {
-		return !isProtocolLibEnabled;
 	}
 
 	/**
@@ -267,9 +260,46 @@ public class CommonPlugin extends PluginBase {
 		return packetHandler;
 	}
 
-	private void setPacketHandler(PacketHandler handler) {
-		this.packetHandler.transfer(handler);
-		this.packetHandler = handler;
+	private boolean updatePacketHandler() {
+		try {
+			final Class<? extends PacketHandler> handlerClass;
+			if (CommonUtil.isPluginEnabled("ProtocolLib")) {
+				handlerClass = ProtocolLibPacketHandler.class;
+			} else if (Common.IS_SPIGOT_SERVER) {
+				handlerClass = SpigotPacketHandler.class;
+			} else {
+				handlerClass = CommonPacketHandler.class;
+			}
+			// Register the packet handler
+			if (this.packetHandler != null && this.packetHandler.getClass() == handlerClass) {
+				return true;
+			}
+			final PacketHandler handler = handlerClass.newInstance();
+			if (this.packetHandler != null) {
+				this.packetHandler.transfer(handler);
+				if (!this.packetHandler.onDisable()) {
+					return false;
+				}
+			}
+			this.packetHandler = handler;
+			if (!this.packetHandler.onEnable()) {
+				return false;
+			}
+			LOGGER_NETWORK.log(Level.INFO, "Now using " + handler.getName() + " to provide Packet Listener and Monitor support");
+			return true;
+		} catch (Throwable t) {
+			LOGGER_NETWORK.log(Level.SEVERE, "Failed to register a valid Packet Handler:");
+			t.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Should be called when BKCommonLib is unable to continue running as it does
+	 */
+	public void onCriticalFailure() {
+		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
+		Bukkit.getPluginManager().disablePlugin(CommonPlugin.getInstance());
 	}
 
 	@Override
@@ -307,68 +337,16 @@ public class CommonPlugin extends PluginBase {
 				this.vaultPermission = null;
 				this.vaultEnabled = false;
 			}
-		} else if (pluginName.equals("ProtocolLib")) {
-			if (this.isProtocolLibEnabled = enabled) {
-				log(Level.INFO, "Now using ProtocolLib to handle packet listeners");
-				if(Common.IS_SPIGOT_SERVER) {
-					//Disable spigot listener
-					SpigotPacketListener.ENABLED = false;
-				} else {
-					// Unregister previous PlayerConnection hooks
-					CommonPlayerConnection.unbindAll();
-				}
-				// Obtain all current packet listeners
-				// Register all packets in ProtocolLib
-				setPacketHandler(new ProtocolLibPacketHandler());
-			} else {
-				if(Common.IS_SPIGOT_SERVER) {
-					//Enable spigot listener again
-					if(SpigotPacketListener.ENABLED) {
-						SpigotPacketListener.init();
-					} else {
-						SpigotPacketListener.ENABLED = true;
-					}
-				} else {
-					//Now uses the onPlayerJoin method (see CommonListener) to deal with this
-					CommonPlayerConnection.bindAll();
-				}
-				//Fall back to default system
-				setPacketHandler(new CommonPacketHandler());				
-			}
-		} else if (enabled && LogicUtil.contains(pluginName, protLibPlugins)) {
-			failPacketListener(plugin.getClass());
 		}
-	}
-
-	public void failPacketListener(Class<?> playerConnectionType) {
-		if (CommonUtil.getPlugin("ProtocolLib") != null) {
-			return;
+		if (!this.updatePacketHandler()) {
+			this.onCriticalFailure();
 		}
-		Plugin plugin = CommonUtil.getPluginByClass(playerConnectionType);
-		log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
-		if (plugin == null) {
-			log(Level.SEVERE, "This was caused by an unknown source, class: " + playerConnectionType.getName());
-		} else {
-			log(Level.SEVERE, "This was caused by a plugin conflict, namely " + plugin.getName());
-		}
-		logProtocolLib();
-		Bukkit.getPluginManager().disablePlugin(this);
-	}
-
-	private void logProtocolLib() {
-		log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
-		log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
-		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
 	}
 
 	@Override
 	public int getMinimumLibVersion() {
 		return 0;
 	}
-
-	@Override
-	public void setDisableMessage(String message) {
-	};
 
 	@Override
 	public void onLoad() {
@@ -384,76 +362,64 @@ public class CommonPlugin extends PluginBase {
 			listener.disable();
 		}
 		worldListeners.clear();
+
 		// Clear running tasks
 		for (Task task : startedTasks) {
 			task.stop();
 		}
 		startedTasks.clear();
-		// Transfer PlayerConnection from players back to default
-		CommonPlayerConnection.unbindAll();
+
+		// Disable the packet handlers
+		try {
+			packetHandler.onDisable();
+		} catch (Throwable t) {
+			log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
+			t.printStackTrace();
+		}
+		packetHandler = null;
 	}
 
 	@Override
 	public void enable() {
 		// Validate version
 		if (IS_COMPATIBLE) {
-			if (CommonUtil.getPlugin("ProtocolLib") == null) {
-				if (!useSpigotPacketListener && Common.IS_SPIGOT_SERVER) {
-					log(Level.SEVERE, "The BKCommonLib Packet listener injector is not supported on the Spigot server implementation");
-					logProtocolLib();
-					Bukkit.getPluginManager().disablePlugin(this);
-					return;
-				} else {
-					Plugin plugin;
-					for (String protLibPlugin : protLibPlugins) {
-						if ((plugin = CommonUtil.getPlugin(protLibPlugin)) != null) {
-							failPacketListener(plugin.getClass());
-							return;
-						}
-					}
-				}
-			}
-
 			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
-			final List<String> welcomeMessages = Arrays.asList(
-					"This library is written with stability in mind.", 
-					"No Bukkit moderators were harmed while compiling this piece of art.", 
-					"Have a problem Bukkit can't fix? Write a library!",
-					"Bringing home the bacon since 2011!",
-					"Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
-					"Hosts all the features that are impossible to include in a single Class",
-					"CraftBukkit: redone, reworked, translated and interfaced.",
-					"Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
-					"Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
-					"For all the haters out there: BKCommonLib at least tries!",
-					"Want fries with that? We have hidden fries in the FoodUtil class.",
-					"Not enough wrappers. Needs more wrappers. Moooreee...",
-					"Reflection can open the way to everyone's heart, including CraftBukkit.",
-					"Our love is not permitted by the overlords. We must flee...",
-					"Now a plugin, a new server implementation tomorrow???");
-			log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
-			log(Level.SEVERE, "Please look for an available BKCommonLib update:");
+			log(Level.SEVERE, "Please look for an available BKCommonLib update that is compatible with Minecraft " + Common.MC_VERSION + ":");
 			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
-			Bukkit.getPluginManager().disablePlugin(this);
+			this.onCriticalFailure();
 			return;
 		}
 
+		// Set the packet handler to use before enabling further - it could fail!
+		if (!this.updatePacketHandler()) {
+			this.onCriticalFailure();
+			return;
+		}
+
+		// Welcome message
+		setDisableMessage(null);
+		final List<String> welcomeMessages = Arrays.asList(
+				"This library is written with stability in mind.", 
+				"No Bukkit moderators were harmed while compiling this piece of art.", 
+				"Have a problem Bukkit can't fix? Write a library!",
+				"Bringing home the bacon since 2011!",
+				"Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
+				"Hosts all the features that are impossible to include in a single Class",
+				"CraftBukkit: redone, reworked, translated and interfaced.",
+				"Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
+				"Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
+				"For all the haters out there: BKCommonLib at least tries!",
+				"Want fries with that? We have hidden fries in the FoodUtil class.",
+				"Not enough wrappers. Needs more wrappers. Moooreee...",
+				"Reflection can open the way to everyone's heart, including CraftBukkit.",
+				"Our love is not permitted by the overlords. We must flee...",
+				"Now a plugin, a new server implementation tomorrow???");
+		log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+
 		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
 		playerVisibleChunks = new EntityMap<Player, LongHashSet>();
-
-		// Register packet listener if ProtocolLib is not detected
-		if (CommonUtil.getPlugin("ProtocolLib") == null) {
-			if(Common.IS_SPIGOT_SERVER) {
-				SpigotPacketListener.init();
-			} else {
-				CommonPlayerConnection.bindAll();
-			}
-		} else {
-			// Instantly set the packet handler - is more efficient
-			packetHandler = new ProtocolLibPacketHandler();
-		}
 
 		// Register events and tasks, initialize
 		register(new CommonListener());
@@ -477,14 +443,6 @@ public class CommonPlugin extends PluginBase {
 		}
 
 		// Parse BKCommonLib version to int
-		String ver = this.getVersion();
-		int dot1 = ver.indexOf('.');
-		if (dot1 != -1) {
-			int dot2 = ver.indexOf('.', dot1 + 1);
-			if (dot2 != -1) {
-				ver = ver.substring(0, dot2);
-			}
-		}
 		int version = this.getVersionNumber();
 		if (version != Common.VERSION) {
 			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");

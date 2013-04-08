@@ -382,13 +382,23 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Checks whether the plugin of the given name is enabled on the Server
+	 * 
+	 * @param name to check
+	 * @return True if the plugin is enabled, False if not
+	 */
+	public static boolean isPluginEnabled(String name) {
+		return Bukkit.getPluginManager().isPluginEnabled(name);
+	}
+
+	/**
 	 * Gets a certain Plugin by name
 	 * 
 	 * @param name of the Plugin
 	 * @return Plugin
 	 */
 	public static Plugin getPlugin(String name) {
-		return Bukkit.getServer().getPluginManager().getPlugin(name);
+		return Bukkit.getPluginManager().getPlugin(name);
 	}
 
 	/**

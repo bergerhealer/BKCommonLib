@@ -33,7 +33,7 @@ public class EntityTrackerEntryRef {
 	private static final MethodAccessor<Void> updatePlayer = TEMPLATE.getMethod("updatePlayer", EntityPlayerRef.TEMPLATE.getType());
 
 	public static CommonPacket getSpawnPacket(Object instance) {
-		return new CommonPacket(getSpawnPacket.invoke(instance));
+		return Conversion.toCommonPacket.convert(getSpawnPacket.invoke(instance));
 	}
 
 	public static void scanPlayers(Object instance, List<Player> players) {
