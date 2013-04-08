@@ -33,10 +33,14 @@ class CommonSilentPacket extends Packet {
 	 */
 	@Override
 	public boolean e() {
-		PacketFields.DEFAULT.packetID.transfer(packet, this);
+		updatePacketId();
 		return this.packet.e();
 	}
 
+	public void updatePacketId() {
+		PacketFields.DEFAULT.packetID.transfer(packet, this);
+	}
+	
 	@Override
 	public int a() {
 		return this.packet.a();

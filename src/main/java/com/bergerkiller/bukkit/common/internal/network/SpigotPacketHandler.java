@@ -1,20 +1,34 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import io.netty.channel.Channel;
+
+import java.util.List;
+
 import net.minecraft.server.v1_5_R2.Connection;
 import net.minecraft.server.v1_5_R2.INetworkManager;
 import net.minecraft.server.v1_5_R2.Packet;
 import net.minecraft.server.v1_5_R2.PlayerConnection;
 
 import org.bukkit.entity.Player;
+import org.spigotmc.netty.NettyNetworkManager;
 import org.spigotmc.netty.PacketListener;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 
 /**
  * A packet handler implementation that uses Spigot's netty service
  */
 public class SpigotPacketHandler extends PacketHandlerHooked {
+	private static final ClassTemplate<?> NETTY_NETWORK_TEMPLATE = ClassTemplate.create(NettyNetworkManager.class);
+	private static final FieldAccessor<Boolean> netty_connected = NETTY_NETWORK_TEMPLATE.getField("connected");
+	private static final FieldAccessor<List<Object>> netty_queue = NETTY_NETWORK_TEMPLATE.getField("highPriorityQueue");
+	private static final FieldAccessor<Channel> netty_channel = NETTY_NETWORK_TEMPLATE.getField("channel");
 	private static SpigotPacketListener listener;
 
 	@Override
@@ -44,6 +58,27 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 
 	@Override
 	public void onPlayerJoin(Player player) {
+	}
+
+	@Override
+	public void sendSilentPacket(Player player, Object packet) {
+		Object conn = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+		if (conn != null) {
+			Object networkManager = PlayerConnectionRef.networkManager.get(conn);
+			if (networkManager instanceof NettyNetworkManager) {
+				NettyNetworkManager netty = (NettyNetworkManager) networkManager;
+				if (!netty_connected.get(netty)) {
+					return;
+				}
+
+				// Send it to Netty, bypassing the PacketListener queue
+				netty_queue.get(netty).add(packet);
+				netty_channel.get(netty).write(packet);
+				return;
+			}
+		}
+		// Just send it in the default fashion
+		sendPacket(player, packet, true);
 	}
 
 	private static class SpigotPacketListener extends PacketListener {
@@ -76,13 +111,6 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 			if(handler == null || !(connection instanceof PlayerConnection)) {
 				return super.packetQueued(networkManager, connection, packet);
 			}
-
-			// This really should be fixed another way - it MAY NOT HAPPEN
-			// int packetId = PacketFields.DEFAULT.packetID.get(packet);
-			// if (packetId == 237) { //Strange bug....
-			// 	return null;
-			// }
-
 			PlayerConnection playerConnection = (PlayerConnection) connection;
 			Player player = CommonNMS.getPlayer(playerConnection.player);
 			if (handler.handlePacketSend(player, packet, false)) {

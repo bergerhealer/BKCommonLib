@@ -80,9 +80,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -123,6 +125,12 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	@Override
 	public void onPlayerJoin(Player player) {
 		CommonPlayerConnection.bind(player);
+	}
+
+	@Override
+	public void sendSilentPacket(Player player, Object packet) {
+		final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+		PlayerConnectionRef.sendPacket(connection, new CommonSilentPacket(packet));
 	}
 
 	private static void failPacketListener(Class<?> playerConnectionType) {

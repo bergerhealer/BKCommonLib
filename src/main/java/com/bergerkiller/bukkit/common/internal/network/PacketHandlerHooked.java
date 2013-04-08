@@ -168,6 +168,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 	}
 
+	public abstract void sendSilentPacket(Player player, Object packet);
+
 	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
 		if (packet instanceof CommonPacket) {
@@ -177,17 +179,19 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 			return;
 		}
 		Object handle = Conversion.toEntityHandle.convert(player);
-		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
+		if (!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
 			return;
 		}
 		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		if (!throughListeners) {
-			packet = new CommonSilentPacket(packet);
+		if (throughListeners) {
+			final Object connection = EntityPlayerRef.playerConnection.get(handle);
+			PlayerConnectionRef.sendPacket(connection, packet);
+		} else {
+			handlePacketSendMonitor(player, PacketFields.DEFAULT.packetID.get(packet), packet);
+			sendSilentPacket(player, packet);
 		}
-		final Object connection = EntityPlayerRef.playerConnection.get(handle);
-		PlayerConnectionRef.sendPacket(connection, packet);
 	}
 
 	@Override
@@ -249,58 +253,48 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		if(player == null || packet == null) {
 			return true;
 		}
-		final int id;
-		if (packet instanceof CommonSilentPacket) {
-			// Do not send to listeners, but unwrap for monitors
-			packet = ((CommonSilentPacket) packet).packet;
-			id = PacketFields.DEFAULT.packetID.get(packet);
-		} else {
-			// Handle listeners
-			id = PacketFields.DEFAULT.packetID.get(packet);
-			if (!LogicUtil.nullOrEmpty(listeners[id])) {
-				CommonPacket cp = new CommonPacket(packet, id);
-				PacketSendEvent ev = new PacketSendEvent(player, cp);
-				ev.setCancelled(wasCancelled);
-				for (PacketListener listener : listeners[id]) {
-					listener.onPacketSend(ev);
-				}
-				if (ev.isCancelled()) {
-					return false;
-				}
+		// Handle listeners
+		final int id = PacketFields.DEFAULT.packetID.get(packet);
+		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
+			PacketSendEvent ev = new PacketSendEvent(player, cp);
+			ev.setCancelled(wasCancelled);
+			for (PacketListener listener : listeners[id]) {
+				listener.onPacketSend(ev);
+			}
+			if (ev.isCancelled()) {
+				return false;
 			}
 		}
 		// Handle monitors
-		if (!LogicUtil.nullOrEmpty(monitors[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
-			for (PacketMonitor monitor : monitors[id]) {
+		handlePacketSendMonitor(player, id, packet);
+		return true;
+	}
+
+	private void handlePacketSendMonitor(Player player, int packetId, Object packet) {
+		if (!LogicUtil.nullOrEmpty(monitors[packetId])) {
+			CommonPacket cp = new CommonPacket(packet, packetId);
+			for (PacketMonitor monitor : monitors[packetId]) {
 				monitor.onMonitorPacketSend(cp, player);
 			}
 		}
-		return true;
 	}
 
 	public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
 		if(player == null || packet == null) {
 			return true;
 		}
-		final int id;
-		if (packet instanceof CommonSilentPacket) {
-			// Do not send to listeners, but unwrap for monitors
-			packet = ((CommonSilentPacket) packet).packet;
-			id = PacketFields.DEFAULT.packetID.get(packet);
-		} else {
-			// Handle listeners
-			id = PacketFields.DEFAULT.packetID.get(packet);
-			if (!LogicUtil.nullOrEmpty(listeners[id])) {
-				CommonPacket cp = new CommonPacket(packet, id);
-				PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
-				ev.setCancelled(wasCancelled);
-				for (PacketListener listener : listeners[id]) {
-					listener.onPacketReceive(ev);
-				}
-				if (ev.isCancelled()) {
-					return false;
-				}
+		// Handle listeners
+		final int id = PacketFields.DEFAULT.packetID.get(packet);
+		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+			CommonPacket cp = new CommonPacket(packet, id);
+			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
+			ev.setCancelled(wasCancelled);
+			for (PacketListener listener : listeners[id]) {
+				listener.onPacketReceive(ev);
+			}
+			if (ev.isCancelled()) {
+				return false;
 			}
 		}
 		// Handle monitors
