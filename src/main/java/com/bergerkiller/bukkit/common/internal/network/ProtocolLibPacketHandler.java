@@ -27,6 +27,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.injector.PlayerLoggedOutException;
 
 /**
  * A packet handler implementation that uses ProtocolLib packet listeners
@@ -66,6 +67,8 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, throughListeners);
+		} catch (PlayerLoggedOutException ex) {
+			// Ignore
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException("Error while sending packet!", e);
 		}
