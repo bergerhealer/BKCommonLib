@@ -1,9 +1,13 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import net.minecraft.server.v1_5_R2.Entity;
@@ -112,5 +116,38 @@ class CommonWorldListener extends WorldManager {
 
 	@Override
 	public void a(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
+	}
+
+	@Override
+	public void b(int arg0, int arg1, int arg2, int arg3, int arg4) {
+	}
+
+	@Override
+	public void a(EntityHuman human, String name, double x, double y, double z, float yaw, float pitch) {
+	}
+
+	static {
+		// Validate that ALL methods in WorldManager are properly overrided
+		for (Method method : WorldManager.class.getDeclaredMethods()) {
+			if (!Modifier.isPublic(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
+				continue;
+			}
+			SafeMethod<?> commonMethod = new SafeMethod<Void>(method);
+			if (!commonMethod.isOverridedIn(CommonWorldListener.class)) {
+				StringBuilder msg = new StringBuilder();
+				msg.append("Method ");
+				msg.append(method.getName()).append('(');
+				boolean first = true;
+				for (Class<?> param : method.getParameterTypes()) {
+					if (!first) {
+						msg.append(", ");
+					}
+					msg.append(param.getSimpleName());
+					first = false;
+				}
+				msg.append(") is not overrided in the World Listener!");
+				CommonPlugin.LOGGER.log(Level.WARNING, msg.toString());
+			}
+		}
 	}
 }

@@ -66,7 +66,7 @@ public class CommonPlugin extends PluginBase {
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	private EntityMap<Player, LongHashSet> playerVisibleChunks;
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
-	protected final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
+	private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
 	private final List<NextTickListener> nextTickListeners = new ArrayList<NextTickListener>(1);
@@ -79,7 +79,6 @@ public class CommonPlugin extends PluginBase {
 	private boolean isSCSEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
-	public List<Entity> entities = new ArrayList<Entity>();
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -456,8 +455,8 @@ public class CommonPlugin extends PluginBase {
 
 		@Override
 		public void run() {
-			Set<org.bukkit.entity.Entity> entities = getInstance().entitiesToRemove;
-			if (!entities.isEmpty()) {
+			Set<org.bukkit.entity.Entity> removed = getInstance().entitiesToRemove;
+			if (!removed.isEmpty()) {
 				// Remove from maps
 				Iterator<SoftReference<EntityMap>> iter = CommonPlugin.getInstance().maps.iterator();
 				while (iter.hasNext()) {
@@ -465,17 +464,17 @@ public class CommonPlugin extends PluginBase {
 					if (map == null) {
 						iter.remove();
 					} else if (!map.isEmpty()) {
-						map.keySet().removeAll(entities);
+						map.keySet().removeAll(removed);
 					}
 				}
 				// Fire events
 				if (CommonUtil.hasHandlers(EntityRemoveFromServerEvent.getHandlerList())) {
-					for (org.bukkit.entity.Entity e : entities) {
+					for (org.bukkit.entity.Entity e : removed) {
 						CommonUtil.callEvent(new EntityRemoveFromServerEvent(e));
 					}
 				}
 				// Clear for next run
-				entities.clear();
+				removed.clear();
 			}
 		}
 	}
@@ -532,18 +531,19 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private static class MoveEventHandler extends Task {
+		private final List<Entity> entityBuffer = new ArrayList<Entity>();
+
 		public MoveEventHandler(JavaPlugin plugin) {
 			super(plugin);
 		}
 
 		@Override
 		public void run() {
-			CommonPlugin cp = CommonPlugin.getInstance();
 			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
 				EntityMoveEvent event = new EntityMoveEvent();
 				for (World world : WorldUtil.getWorlds()) {
-					cp.entities.addAll(CommonNMS.getNative(world).entityList);
-					for (Entity entity : cp.entities) {
+					entityBuffer.addAll(CommonNMS.getNative(world).entityList);
+					for (Entity entity : entityBuffer) {
 						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
 								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
 
@@ -551,7 +551,7 @@ public class CommonPlugin extends PluginBase {
 							CommonUtil.callEvent(event);
 						}
 					}
-					cp.entities.clear();
+					entityBuffer.clear();
 				}
 			}
 		}
