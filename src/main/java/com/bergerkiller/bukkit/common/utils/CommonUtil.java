@@ -10,14 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_5_R2.EntityHuman;
-import net.minecraft.server.v1_5_R2.MinecraftServer;
 import net.minecraft.server.v1_5_R2.IPlayerFileData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -28,9 +25,8 @@ import org.bukkit.plugin.SimplePluginManager;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -115,39 +111,12 @@ public class CommonUtil {
 	}
 
 	/**
-	 * Gets the native Minecraft Server which contains the main logic
-	 * 
-	 * @return Minecraft Server
-	 */
-	public static MinecraftServer getMCServer() {
-		return getCraftServer().getServer();
-	}
-
-	/**
-	 * Gets the Craft server
-	 * 
-	 * @return Craft server
-	 */
-	public static CraftServer getCraftServer() {
-		return (CraftServer) Bukkit.getServer();
-	}
-
-	/**
-	 * Gets the Player File Data used to load and save player information on the server
-	 * 
-	 * @return current Player File Data instance
-	 */
-	public static Object getPlayerFileData() {
-		return getCraftServer().getHandle().playerFileData;
-	}
-
-	/**
 	 * Sets the Player File Data used to load and save player information on the server
 	 * 
 	 * @param playerFileData to set to
 	 */
 	public static void setPlayerFileData(Object playerFileData) {
-		getCraftServer().getHandle().playerFileData = (IPlayerFileData) playerFileData;
+		CommonNMS.getCraftServer().getHandle().playerFileData = (IPlayerFileData) playerFileData;
 	}
 
 	/**
@@ -156,14 +125,14 @@ public class CommonUtil {
 	 * @param human to save
 	 */
 	public static void savePlayer(HumanEntity human) {
-		getCraftServer().getHandle().playerFileData.save((EntityHuman) Conversion.toEntityHandle.convert(human));
+		CommonNMS.getCraftServer().getHandle().playerFileData.save(CommonNMS.getNative(human));
 	}
 
 	/**
 	 * Saves all player information to file
 	 */
 	public static void savePlayers() {
-		getCraftServer().getHandle().savePlayers();
+		CommonNMS.getCraftServer().getHandle().savePlayers();
 	}
 
 	/**
@@ -203,7 +172,7 @@ public class CommonUtil {
 	 * @return online players
 	 */
 	public static Collection<Player> getOnlinePlayers() {
-		return new ConvertingList<Player>(CommonUtil.getCraftServer().getHandle().players, ConversionPairs.player);
+		return ConversionPairs.player.convertAll(CommonNMS.getCraftServer().getHandle().players);
 	}
 
 	/**

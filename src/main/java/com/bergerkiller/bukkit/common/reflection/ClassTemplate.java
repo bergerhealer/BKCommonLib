@@ -107,21 +107,16 @@ public class ClassTemplate<T> {
 	}
 
 	/**
-	 * Gets a new instance of this Class.
-	 * Using useConstructor of False will result in a new instance with all fields set to the default.
+	 * Gets a new instance of this Class without calling the Class Constructors.
+	 * Calling this method will result in a new instance with all fields set to the default.
 	 * That is, all fields will have 'NULL' values, or for primitives, 0/false/etc.
 	 * 
-	 * @param useConstructor option: True to use the Class default constructor, False to instantiate
 	 * @return a new Class Instance, or null upon failure
 	 */
 	@SuppressWarnings("unchecked")
-	public T newInstance(boolean useConstructor) {
+	public T newInstanceNull() {
 		try {
-			if (useConstructor) {
-				return this.type.newInstance();
-			} else {
-				return (T) this.instantiator.newInstance();
-			}
+			return (T) this.instantiator.newInstance();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

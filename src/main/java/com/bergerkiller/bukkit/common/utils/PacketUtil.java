@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
@@ -197,7 +198,7 @@ public class PacketUtil {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
 		}
-		CommonUtil.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
+		CommonNMS.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
 	}
 
 	/**

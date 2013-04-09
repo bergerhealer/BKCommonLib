@@ -146,7 +146,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	}
 
 	private static class CommonPlayerConnection extends PlayerConnection {
-		private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonUtil.getMCServer().ae(), "c");
+		private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ae(), "c");
 		private final PlayerConnection previous;
 		private final PacketHandlerHooked handler;
 
@@ -229,7 +229,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			if (ep.playerConnection instanceof CommonPlayerConnection) {
 				return;
 			}
-			setPlayerConnection(ep, new CommonPlayerConnection(CommonUtil.getMCServer(), ep));
+			setPlayerConnection(ep, new CommonPlayerConnection(CommonNMS.getMCServer(), ep));
 		}
 
 		public static void unbind(Player player) {

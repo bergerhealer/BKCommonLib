@@ -145,7 +145,7 @@ public class BlockStateRef {
 		}
 
 		public BlockState newInstance(Object tileEntity) {
-			final BlockState state = STATE.newInstance(false);
+			final BlockState state = STATE.newInstanceNull();
 			final Block block = TileEntityRef.getBlock(tileEntity);
 			final int typeId = block.getTypeId();
 			tileField.set(state, tileEntity);

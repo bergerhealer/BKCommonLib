@@ -16,7 +16,7 @@ class CommonWorldListener extends WorldManager {
 	private HashSet<EntityPlayer> addedPlayers = new HashSet<EntityPlayer>();
 
 	public CommonWorldListener(org.bukkit.World world) {
-		super(CommonUtil.getMCServer(), CommonNMS.getNative(world));
+		super(CommonNMS.getMCServer(), CommonNMS.getNative(world));
 	}
 
 	public static boolean isValid() {

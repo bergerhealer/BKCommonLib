@@ -7,6 +7,8 @@ import java.util.List;
 
 import net.minecraft.server.v1_5_R2.*;
 
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.*;
 import org.bukkit.entity.HumanEntity;
@@ -40,7 +42,7 @@ public class CommonNMS {
 	 */
 	public static List<WorldServer> getWorlds() {
 		try {
-			List<WorldServer> worlds = CommonUtil.getMCServer().worlds;
+			List<WorldServer> worlds = getMCServer().worlds;
 			if (worlds != null) {
 				return worlds;
 			}
@@ -188,5 +190,23 @@ public class CommonNMS {
 			return Collections.emptyList();
 		}
 		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
+	}
+
+	/**
+	 * Gets the native Minecraft Server which contains the main logic
+	 * 
+	 * @return Minecraft Server
+	 */
+	public static MinecraftServer getMCServer() {
+		return getCraftServer().getServer();
+	}
+
+	/**
+	 * Gets the Craft server
+	 * 
+	 * @return Craft server
+	 */
+	public static CraftServer getCraftServer() {
+		return (CraftServer) Bukkit.getServer();
 	}
 }
