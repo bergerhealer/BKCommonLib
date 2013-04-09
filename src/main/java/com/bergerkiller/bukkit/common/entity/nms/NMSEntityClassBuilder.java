@@ -182,12 +182,7 @@ public class NMSEntityClassBuilder {
 			if (callback == null) {
 				return proxy.invokeSuper(instance, args);
 			} else {
-				try {
-					return callback.invoke(instance, args);
-				} catch (Throwable t) {
-					
-					return null;
-				}
+				return callback.invoke(instance, args);
 			}
 		}
 	}
