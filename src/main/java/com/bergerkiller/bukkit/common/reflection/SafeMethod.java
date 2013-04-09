@@ -20,6 +20,15 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 	private Class<?>[] parameterTypes;
 	private boolean isStatic = false;
 
+	public SafeMethod(Method method) {
+		if (method == null) {
+			throw new IllegalArgumentException("Can not construct using a null Method");
+		}
+		this.method = method;
+		this.parameterTypes = this.method.getParameterTypes();
+		this.isStatic = Modifier.isStatic(this.method.getModifiers());
+	}
+
 	public SafeMethod(String methodPath, Class<?>... parameterTypes) {
 		if (LogicUtil.nullOrEmpty(methodPath) || !methodPath.contains(".")) {
 			Bukkit.getLogger().log(Level.SEVERE, "Method path contains no class: " + methodPath);

@@ -1,80 +1,12 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.MinecraftServer;
-import net.minecraft.server.v1_5_R2.Packet;
-import net.minecraft.server.v1_5_R2.Packet0KeepAlive;
-import net.minecraft.server.v1_5_R2.Packet100OpenWindow;
-import net.minecraft.server.v1_5_R2.Packet102WindowClick;
-import net.minecraft.server.v1_5_R2.Packet103SetSlot;
-import net.minecraft.server.v1_5_R2.Packet104WindowItems;
-import net.minecraft.server.v1_5_R2.Packet105CraftProgressBar;
-import net.minecraft.server.v1_5_R2.Packet106Transaction;
-import net.minecraft.server.v1_5_R2.Packet107SetCreativeSlot;
-import net.minecraft.server.v1_5_R2.Packet108ButtonClick;
-import net.minecraft.server.v1_5_R2.Packet10Flying;
-import net.minecraft.server.v1_5_R2.Packet130UpdateSign;
-import net.minecraft.server.v1_5_R2.Packet131ItemData;
-import net.minecraft.server.v1_5_R2.Packet132TileEntityData;
-import net.minecraft.server.v1_5_R2.Packet14BlockDig;
-import net.minecraft.server.v1_5_R2.Packet15Place;
-import net.minecraft.server.v1_5_R2.Packet16BlockItemSwitch;
-import net.minecraft.server.v1_5_R2.Packet17EntityLocationAction;
-import net.minecraft.server.v1_5_R2.Packet18ArmAnimation;
-import net.minecraft.server.v1_5_R2.Packet19EntityAction;
-import net.minecraft.server.v1_5_R2.Packet1Login;
-import net.minecraft.server.v1_5_R2.Packet200Statistic;
-import net.minecraft.server.v1_5_R2.Packet201PlayerInfo;
-import net.minecraft.server.v1_5_R2.Packet202Abilities;
-import net.minecraft.server.v1_5_R2.Packet203TabComplete;
-import net.minecraft.server.v1_5_R2.Packet204LocaleAndViewDistance;
-import net.minecraft.server.v1_5_R2.Packet205ClientCommand;
-import net.minecraft.server.v1_5_R2.Packet20NamedEntitySpawn;
-import net.minecraft.server.v1_5_R2.Packet22Collect;
-import net.minecraft.server.v1_5_R2.Packet23VehicleSpawn;
-import net.minecraft.server.v1_5_R2.Packet24MobSpawn;
-import net.minecraft.server.v1_5_R2.Packet250CustomPayload;
-import net.minecraft.server.v1_5_R2.Packet252KeyResponse;
-import net.minecraft.server.v1_5_R2.Packet253KeyRequest;
-import net.minecraft.server.v1_5_R2.Packet254GetInfo;
-import net.minecraft.server.v1_5_R2.Packet255KickDisconnect;
-import net.minecraft.server.v1_5_R2.Packet25EntityPainting;
-import net.minecraft.server.v1_5_R2.Packet26AddExpOrb;
-import net.minecraft.server.v1_5_R2.Packet28EntityVelocity;
-import net.minecraft.server.v1_5_R2.Packet29DestroyEntity;
-import net.minecraft.server.v1_5_R2.Packet2Handshake;
-import net.minecraft.server.v1_5_R2.Packet30Entity;
-import net.minecraft.server.v1_5_R2.Packet34EntityTeleport;
-import net.minecraft.server.v1_5_R2.Packet35EntityHeadRotation;
-import net.minecraft.server.v1_5_R2.Packet38EntityStatus;
-import net.minecraft.server.v1_5_R2.Packet39AttachEntity;
-import net.minecraft.server.v1_5_R2.Packet3Chat;
-import net.minecraft.server.v1_5_R2.Packet40EntityMetadata;
-import net.minecraft.server.v1_5_R2.Packet41MobEffect;
-import net.minecraft.server.v1_5_R2.Packet42RemoveMobEffect;
-import net.minecraft.server.v1_5_R2.Packet43SetExperience;
-import net.minecraft.server.v1_5_R2.Packet4UpdateTime;
-import net.minecraft.server.v1_5_R2.Packet51MapChunk;
-import net.minecraft.server.v1_5_R2.Packet52MultiBlockChange;
-import net.minecraft.server.v1_5_R2.Packet53BlockChange;
-import net.minecraft.server.v1_5_R2.Packet54PlayNoteBlock;
-import net.minecraft.server.v1_5_R2.Packet55BlockBreakAnimation;
-import net.minecraft.server.v1_5_R2.Packet56MapChunkBulk;
-import net.minecraft.server.v1_5_R2.Packet5EntityEquipment;
-import net.minecraft.server.v1_5_R2.Packet60Explosion;
-import net.minecraft.server.v1_5_R2.Packet61WorldEvent;
-import net.minecraft.server.v1_5_R2.Packet62NamedSoundEffect;
-import net.minecraft.server.v1_5_R2.Packet6SpawnPosition;
-import net.minecraft.server.v1_5_R2.Packet70Bed;
-import net.minecraft.server.v1_5_R2.Packet71Weather;
-import net.minecraft.server.v1_5_R2.Packet7UseEntity;
-import net.minecraft.server.v1_5_R2.Packet8UpdateHealth;
-import net.minecraft.server.v1_5_R2.Packet9Respawn;
-import net.minecraft.server.v1_5_R2.PlayerConnection;
+import net.minecraft.server.v1_5_R2.*;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -84,6 +16,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -149,6 +82,29 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ae(), "c");
 		private final PlayerConnection previous;
 		private final PacketHandlerHooked handler;
+
+		static {
+			// Verify that all receiver methods in PlayerConnection are overrided
+			for (Method method : PlayerConnection.class.getDeclaredMethods()) {
+				if (method.getReturnType() != void.class || method.getParameterTypes().length != 1 
+						|| !Modifier.isPublic(method.getModifiers())) {
+					continue;
+				}
+				Class<?> arg = method.getParameterTypes()[0];
+				if (!Packet.class.isAssignableFrom(arg) || arg == Packet.class) {
+					continue;
+				}
+				SafeMethod<Void> commonMethod = new SafeMethod<Void>(method);
+				if (!commonMethod.isOverridedIn(CommonPlayerConnection.class)) {
+					// NOT OVERRIDED!
+					StringBuilder msg = new StringBuilder(200);
+					msg.append("Receiver handler ").append(method.getName());
+					msg.append('(').append(arg.getSimpleName()).append(')');
+					msg.append(" is not overrided!");
+					CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, msg.toString());
+				}
+			}
+		}
 
 		private CommonPlayerConnection(MinecraftServer minecraftserver, EntityPlayer entityplayer) {
 			super(minecraftserver, entityplayer.playerConnection.networkManager, entityplayer);
@@ -253,7 +209,13 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			if(this.canConfirm(packet))
 				super.a(packet);
 		}
-		
+
+		@Override
+		public void handleContainerClose(Packet101CloseWindow packet) {
+			if (this.canConfirm(packet))
+				super.handleContainerClose(packet);
+		}
+
 		@Override
 		public void a(Packet102WindowClick packet) {
 			if(this.canConfirm(packet))
