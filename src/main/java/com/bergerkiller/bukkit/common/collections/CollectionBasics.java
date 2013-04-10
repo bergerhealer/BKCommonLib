@@ -10,6 +10,56 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Provides basic implementations for various methods used in collections
  */
 public class CollectionBasics {
+
+	/**
+	 * A basic containsAll implementation. (does not call collection.containsAll)
+	 * Calls {@link Collection.contains} for all elements in the elements collection specified
+	 * 
+	 * @param collection to look in
+	 * @param elements to look for
+	 * @return True if all elements are contained, False if not
+	 */
+	public static boolean containsAll(Collection<?> collection, Collection<?> elements) {
+		for (Object value : elements) {
+			if (!collection.contains(value)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * A basic removeAll implementation. (does not call collection.removeAll)
+	 * Calls {@link Collection.remove} for all elements in the elements collection specified
+	 * 
+	 * @param collection to remove from
+	 * @param elements to remove
+	 * @return True if the collection changed, False if not
+	 */
+	public static boolean removeAll(Collection<?> collection, Collection<?> elements) {
+		boolean changed = false;
+		for (Object value : elements) {
+			changed |= collection.remove(value);
+		}
+		return changed;
+	}
+
+	/**
+	 * A basic addAll implementation. (does not call collection.addAll)
+	 * Calls {@link Collection.add} for all elements in the elements collection specified
+	 * 
+	 * @param collection to add to
+	 * @param elements to add
+	 * @return True if the collection changed, False if not
+	 */
+	public static <T> boolean addAll(Collection<T> collection, Collection<? extends T> elements) {
+		boolean changed = false;
+		for (T value : elements) {
+			changed |= collection.add(value);
+		}
+		return changed;
+	}
+
 	/**
 	 * A basic retainAll implementation. (does not call collection.retainAll)
 	 * After this call all elements not contained in elements are removed.
@@ -17,7 +67,7 @@ public class CollectionBasics {
 	 * 
 	 * @param collection
 	 * @param elements to retain
-	 * @return True if the list changed, False if not
+	 * @return True if the collection changed, False if not
 	 */
 	public static boolean retainAll(Collection<?> collection, Collection<?> elements) {
 		Iterator<?> iter = collection.iterator();

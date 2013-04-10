@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_5_R2.util.LongHashSet;
 import org.bukkit.craftbukkit.v1_5_R2.util.LongObjectHashMap;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.collections.FilteringCollectionNull;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -221,7 +222,7 @@ public class ChunkUtil {
 			if (chunks != null) {
 				try {
 					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
-						return CommonNMS.getChunks(((LongObjectHashMap) chunks).values());
+						return new FilteringCollectionNull<org.bukkit.Chunk>(CommonNMS.getChunks(((LongObjectHashMap) chunks).values()));
 					}
 				} catch (Throwable t) {
 					canUseLongObjectHashMap = false;
@@ -231,7 +232,7 @@ public class ChunkUtil {
 			}
 		}
 		// Bukkit alternative
-		return Arrays.asList(world.getLoadedChunks());
+		return new FilteringCollectionNull<org.bukkit.Chunk>(Arrays.asList(world.getLoadedChunks()));
 	}
 
 	/**
