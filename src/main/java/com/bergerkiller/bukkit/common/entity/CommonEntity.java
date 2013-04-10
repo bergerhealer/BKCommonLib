@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventory;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
@@ -29,6 +30,7 @@ import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
+import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -367,7 +369,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 			// Destroy packets are queued: Make sure to send them RIGHT NOW
 			for (Player bukkitPlayer : WorldUtil.getPlayers(getWorld())) {
-				get(bukkitPlayer).flushEntityRemoveQueue();
+				CommonPlayer player = get(bukkitPlayer);
+				if (player != null) {
+					player.flushEntityRemoveQueue();
+				}
 			}
 
 			// Teleport
@@ -453,6 +458,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	}
 
 	/**
+	 * Obtains a (new) {@link CommonItem} instance providing additional methods for the Item specified.
+	 * This method never returns null, unless the input Entity is null.
+	 * 
+	 * @param item to get a CommonItem for
+	 * @return a (new) CommonItem instance for the Item
+	 */
+	public static CommonItem get(Item item) {
+		return get(item, CommonItem.class);
+	}
+
+	/**
 	 * Obtains a (new) {@link CommonPlayer} instance providing additional methods for the Player specified.
 	 * This method never returns null, unless the input Entity is null.
 	 * 
@@ -460,7 +476,20 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @return a (new) CommonPlayer instance for the Player
 	 */
 	public static CommonPlayer get(Player player) {
-		return (CommonPlayer) getByEntity(player);
+		return get(player, CommonPlayer.class);
+	}
+
+	/**
+	 * Obtains a (new) {@link CommonEntity} instance providing additional methods for the Entity specified.
+	 * A specific CommonEntity extension that best fits the input Entity can be requested using this method.
+	 * This method never returns null, unless the input Entity is null.
+	 * 
+	 * @param entity to get a CommonEntity for
+	 * @param type of CommonEntity to get
+	 * @return a (new) CommonEntity type requested, or null if casting failed/entity is invalid
+	 */
+	public static <T extends org.bukkit.entity.Entity, C extends CommonEntity<? extends T>> C get(T entity, Class<C> type) {
+		return CommonUtil.tryCast(get(entity), type);
 	}
 
 	/**
@@ -470,16 +499,15 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @param entity to get a CommonEntity for
 	 * @return a (new) CommonEntity instance for the Entity
 	 */
-	public static <T extends org.bukkit.entity.Entity> CommonEntity<T> get(T entity) {
-		return getByEntity(entity);
-	}
-
 	@SuppressWarnings("unchecked")
-	private static <T extends org.bukkit.entity.Entity> CommonEntity<T> getByEntity(T entity) {
+	public static <T extends org.bukkit.entity.Entity> CommonEntity<T> get(T entity) {
 		if (entity == null) {
 			return null;
 		}
 		final Object handle = Conversion.toEntityHandle.convert(entity);
+		if (handle == null) {
+			return null;
+		}
 		if (handle instanceof NMSEntityHook) {
 			EntityController<?> controller = ((NMSEntityHook) handle).getController();
 			if (controller != null) {
