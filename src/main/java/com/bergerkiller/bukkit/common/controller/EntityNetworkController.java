@@ -381,8 +381,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			packet.write(PacketFields.VEHICLE_SPAWN.z, pos.z);
 			// Rotation
 			final IntVector2 rot = this.getProtocolRotationSynched();
-			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) rot.x);
-			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) rot.z);
+			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) rot.z);
+			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) rot.x);
 		}
 		return packet;
 	}
