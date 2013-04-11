@@ -3,6 +3,12 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.minecraft.server.v1_5_R2.Chunk;
+import net.minecraft.server.v1_5_R2.Entity;
+import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
+import net.minecraft.server.v1_5_R2.IInventory;
+import net.minecraft.server.v1_5_R2.World;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
@@ -14,12 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
-import net.minecraft.server.v1_5_R2.Chunk;
-import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
-import net.minecraft.server.v1_5_R2.IInventory;
-import net.minecraft.server.v1_5_R2.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
