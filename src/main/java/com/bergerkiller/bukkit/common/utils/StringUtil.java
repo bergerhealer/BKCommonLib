@@ -226,6 +226,38 @@ public class StringUtil {
 	}
 
 	/**
+	 * Trims away a piece of text from the end of the input text
+	 * 
+	 * @param text to trim the end of
+	 * @param textToTrim from the ending
+	 * @return text trimmed at the end
+	 */
+	public static String trimEnd(String text, String... textToTrim) {
+		for (String trim : textToTrim) {
+			if (text.endsWith(trim)) {
+				return text.substring(0, text.length() - trim.length());
+			}
+		}
+		return text;
+	}
+
+	/**
+	 * Trims away a piece of text from the beginning of the input text
+	 * 
+	 * @param text to trim the start of
+	 * @param textToTrim from the beginning
+	 * @return text trimmed at the start
+	 */
+	public static String trimStart(String text, String... textToTrim) {
+		for (String trim : textToTrim) {
+			if (text.startsWith(trim)) {
+				return text.substring(trim.length());
+			}
+		}
+		return text;
+	}
+
+	/**
 	 * Equivalent of {@link String.trim()}, but only trims away the whitespace at the beginning.
 	 * 
 	 * @param text to trim the start of

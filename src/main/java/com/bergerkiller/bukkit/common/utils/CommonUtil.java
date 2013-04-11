@@ -545,4 +545,20 @@ public class CommonUtil {
 			}
 		}
 	}
+
+	/**
+	 * Checks whether a given value is an instance of one of the types specified
+	 * 
+	 * @param value to check
+	 * @param types to check against
+	 * @return True if value is an instance of one of the types, False if not
+	 */
+	public static boolean isInstance(Object value, Class<?>... types) {
+		for (Class<?> type : types) {
+			if (type.isInstance(value)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -507,13 +507,56 @@ public abstract class PluginBase extends JavaPlugin {
 			StackTraceFilter.SERVER.print(reason);
 		} else if (reason instanceof OutOfMemoryError) {
 			log(Level.SEVERE, "The server is running out of memory! Do something!");
-		} else if (reason instanceof NoClassDefFoundError) {
-			log(Level.WARNING, "Class is missing (plugin was hot-swapped?): " + reason.getMessage());
 		} else {
-			log(Level.SEVERE, "Encountered a critical error and had to be disabled.");
-			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
+			String pluginCause = getName();
+			if (CommonUtil.isInstance(reason, NoClassDefFoundError.class, NoSuchMethodError.class, NoSuchFieldError.class, IllegalAccessError.class)) {
+				String fixedReason = StringUtil.trimStart(reason.getMessage(), "tried to access ");
+				String path = StringUtil.trimStart(fixedReason, "method ", "field ", "class ");
+				if (path.startsWith("net.minecraft.server")) {
+					log(Level.SEVERE, "This version of the plugin is incompatible with this Minecraft version.");
+				} else if (path.startsWith("org.bukkit.craftbukkit")) {
+					log(Level.SEVERE, "This version of the plugin is incompatible with this CraftBukkit implementation:");
+				} else if (path.startsWith("org.bukkit")) {
+					log(Level.SEVERE, "This version of the plugin is incompatible with the current Bukkit API:");
+				} else {
+					final Plugin plugin = CommonUtil.getPluginByClass(path);
+					if (plugin == this) {
+						if (reason instanceof NoClassDefFoundError) {
+							log(Level.WARNING, "Class is missing (plugin was hot-swapped?): " + reason.getMessage());
+							return;
+						} else {
+							log(Level.SEVERE, "Encountered a compiler error");
+						}
+					} else if (plugin != null) {
+						final String type;
+						if (reason instanceof IllegalAccessError) {
+							if (fixedReason.startsWith("class ")) {
+								type = "Class is inaccessible in";
+							} else if (fixedReason.startsWith("method ")) {
+								type = "Method is inaccessible in";
+							} else if (fixedReason.startsWith("field ")) {
+								type = "Field is inaccessible in";
+							} else {
+								type = "Something is inaccessible in";
+							}
+						} else if (reason instanceof NoClassDefFoundError) {
+							type = "Class is missing from";
+						} else if (reason instanceof NoSuchMethodError) {
+							type = "Method is missing from";
+						} else if (reason instanceof NoSuchFieldError) {
+							type = "Field is missing from";
+						} else {
+							type = "Something is missing from";
+						}
+						pluginCause = getName() + " and " + plugin.getName();
+						log(Level.SEVERE, type + " dependency '" + plugin.getName() + "'");
+					}
+				}
+			} else {
+				log(Level.SEVERE, "Encountered a critical error");
+			}
+			log(Level.SEVERE, "Please, check for an updated version of " + pluginCause + " before reporting this bug!");
 			StackTraceFilter.SERVER.print(reason);
-			Bukkit.getPluginManager().disablePlugin(this);
 		}
 	}
 
