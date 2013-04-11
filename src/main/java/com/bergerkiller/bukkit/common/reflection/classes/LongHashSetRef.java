@@ -33,8 +33,8 @@ public class LongHashSetRef {
 	public static final FieldAccessor<Integer> freeEntries = TEMPLATE.getField("freeEntries");
 	public static final FieldAccessor<Integer> elements = TEMPLATE.getField("elements");
 	public static final FieldAccessor<Integer> modCount = TEMPLATE.getField("modCount");
-	public static final long FREE = TEMPLATE.getStaticFieldValue("FREE");
-	public static final long REMOVED = TEMPLATE.getStaticFieldValue("REMOVED");
+	public static final long FREE = TEMPLATE.<Long>getStaticFieldValue("FREE").longValue();
+	public static final long REMOVED = TEMPLATE.<Long>getStaticFieldValue("REMOVED").longValue();
 	static {
 		if (Common.IS_SPIGOT_SERVER) {
 			// Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases
