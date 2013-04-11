@@ -101,51 +101,51 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 	 * - changed Long to long
 	 */
 	public static class LongIterator {
-        private int index;
-        private int lastReturned = -1;
-        private final Object handle;
+		private int index;
+		private int lastReturned = -1;
+		private final Object handle;
 		private final long[] values;
 
 		public LongIterator(LongHashSet source) {
 			this.handle = source.handle;
 			this.values = LongHashSetRef.values.get(handle);
-            for (index = 0; index < values.length && (values[index] == LongHashSetRef.FREE || values[index] == LongHashSetRef.REMOVED); index++) {
-                // This is just to drive the index forward to the first valid entry
-            }
+			for (index = 0; index < values.length && (values[index] == LongHashSetRef.FREE || values[index] == LongHashSetRef.REMOVED); index++) {
+				// This is just to drive the index forward to the first valid entry
+			}
 		}
 
-        public boolean hasNext() {
-            return index != values.length;
-        }
+		public boolean hasNext() {
+			return index != values.length;
+		}
 
-        public long next() {
-            int length = values.length;
-            if (index >= length) {
-                lastReturned = -2;
-                throw new NoSuchElementException();
-            }
+		public long next() {
+			int length = values.length;
+			if (index >= length) {
+				lastReturned = -2;
+				throw new NoSuchElementException();
+			}
 
-            lastReturned = index;
-            for (index += 1; index < length && (values[index] == LongHashSetRef.FREE || values[index] == LongHashSetRef.REMOVED); index++) {
-                // This is just to drive the index forward to the next valid entry
-            }
+			lastReturned = index;
+			for (index += 1; index < length && (values[index] == LongHashSetRef.FREE || values[index] == LongHashSetRef.REMOVED); index++) {
+				// This is just to drive the index forward to the next valid entry
+			}
 
-            if (values[lastReturned] == LongHashSetRef.FREE) {
-                return LongHashSetRef.FREE;
-            } else {
-                return values[lastReturned];
-            }
-        }
+			if (values[lastReturned] == LongHashSetRef.FREE) {
+				return LongHashSetRef.FREE;
+			} else {
+				return values[lastReturned];
+			}
+		}
 
-        public void remove() {
-            if (lastReturned == -1 || lastReturned == -2) {
-                throw new IllegalStateException();
-            }
+		public void remove() {
+			if (lastReturned == -1 || lastReturned == -2) {
+				throw new IllegalStateException();
+			}
 
-            if (values[lastReturned] != LongHashSetRef.FREE && values[lastReturned] != LongHashSetRef.REMOVED) {
-                values[lastReturned] = LongHashSetRef.REMOVED;
-                LongHashSetRef.elements.set(handle, LongHashSetRef.elements.get(handle) - 1);
-            }
-        }
+			if (values[lastReturned] != LongHashSetRef.FREE && values[lastReturned] != LongHashSetRef.REMOVED) {
+				values[lastReturned] = LongHashSetRef.REMOVED;
+				LongHashSetRef.elements.set(handle, LongHashSetRef.elements.get(handle) - 1);
+			}
+		}
 	}
 }
