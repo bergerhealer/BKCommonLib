@@ -336,6 +336,46 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		controller.bind(this);
 	}
 
+	/**
+	 * Performs all the logic normally performed after ticking a single Entity.
+	 * If onTick is managed externally, this method keeps it compatible.
+	 * Calling this method results in the entity properly moved between chunks, and other logic.
+	 */
+	public void doPostTick() {
+		final int oldcx = getChunkX();
+		final int oldcy = getChunkY();
+		final int oldcz = getChunkZ();
+		final int newcx = loc.x.chunk();
+		final int newcy = loc.y.chunk();
+		final int newcz = loc.z.chunk();
+		final Entity handle = getHandle(Entity.class);
+		final org.bukkit.World world = getWorld();
+
+		// Move between chunks
+		if (!handle.ai || oldcx != newcx || oldcy != newcy || oldcz != newcz) {
+			// Remove from the previous chunk
+			if (handle.ai && world.isChunkLoaded(oldcx, oldcy)) {
+				handle.world.getChunkAt(oldcx, oldcz).a(handle, oldcy);
+			}
+			// Add to the new chunk
+			if (handle.ai = world.isChunkLoaded(newcx, newcz)) {
+				handle.world.getChunkAt(newcx, newcz).a(handle);
+			}
+		}
+
+		// Tick the passenger
+		if (handle.ai && handle.passenger != null) {
+			if (!handle.passenger.dead && handle.passenger.vehicle == handle) {
+				CommonEntity<?> passenger = get(getPassenger());
+				passenger.getController().onTick();
+				passenger.doPostTick();
+			} else {
+				handle.passenger.vehicle = null;
+				handle.passenger = null;
+			}
+		}
+	}
+
 	@Override
 	public boolean teleport(Location location, TeleportCause cause) {
 		if (isDead()) {
