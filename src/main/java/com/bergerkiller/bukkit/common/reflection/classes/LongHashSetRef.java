@@ -29,16 +29,17 @@ public class LongHashSetRef {
 	public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("isEmpty");
 	public static final MethodAccessor<Integer> size = TEMPLATE.getMethod("size");
 	public static final MethodAccessor<Iterator<Long>> iterator = TEMPLATE.getMethod("iterator");
-
+	public static final FieldAccessor<long[]> values = TEMPLATE.getField("values");
+	public static final FieldAccessor<Integer> freeEntries = TEMPLATE.getField("freeEntries");
+	public static final FieldAccessor<Integer> elements = TEMPLATE.getField("elements");
+	public static final FieldAccessor<Integer> modCount = TEMPLATE.getField("modCount");
+	public static final long FREE = TEMPLATE.getStaticFieldValue("FREE");
+	public static final long REMOVED = TEMPLATE.getStaticFieldValue("REMOVED");
 	static {
 		if (Common.IS_SPIGOT_SERVER) {
 			// Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases
 			constructor1 = constructor2 = new SafeConstructor<Object>(null) {
 				private final FieldAccessor<Object> flat = TEMPLATE.getField("flat");
-				private final FieldAccessor<Integer> freeEntries = TEMPLATE.getField("freeEntries");
-				private final FieldAccessor<Integer> elements = TEMPLATE.getField("elements");
-				private final FieldAccessor<Integer> modCount = TEMPLATE.getField("modCount");
-				private final FieldAccessor<long[]> values = TEMPLATE.getField("values");
 
 				@Override
 				public boolean isValid() {
