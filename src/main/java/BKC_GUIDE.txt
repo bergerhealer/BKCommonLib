@@ -1,0 +1,38 @@
+=== For dev-bukkit plugin validation staff ===
+
+The purpose of this file is to give you an idea of how BKCommonLib is built up.
+You can ignore this, but it may help greatly in understanding how it is built up.
+
+1.) Dependencies are shaded in:
+
+CGLib is shaded in at:
+  com\bergerkiller\bukkit\common\sf\cglib
+It is only used here:
+  com\bergerkiller\bukkit\common\entity\nms\NMSClassBuilder
+To construct entities with controller functionality.
+If this is an issue, please contact the authors so they can include about 120
+Entity hook classes in BKCommonLib instead. It's what you like best.
+
+Objensis is shaded in at:
+  com\bergerkiller\bukkit\common\org\objenesis
+It is used in various places to construct classes without calling their constructors.
+Main use cases are constructing a World instance without registering it within the server.
+Another use case is BlockState construction from tile entity - bypassing the Block method
+is needed. Objensis is directly used in ClassTemplate, when calling newInstanceNull.
+
+2.) Internal
+
+The plugin itself, with all plugin-required functionality, is in the internal sub-package.
+In there various listeners and tasks are set up to provide functionality that requires this.
+If you are looking for an /op hack, big chance you'll find it there :) (but you won't)
+
+The same accounts for PluginBase.
+
+3.) There is no code generation going on to bypass package versioning. BKCommonLib
+uses too much NMS to even make this possible. We decided to let it break every new build
+to avoid people using broken software. In addition, we added a Minecraft version check
+before enabling. This avoids people complaining when things break.
+
+4.) Good luck!
+We respect your duty on dev-bukkit and are aware of how many scriptkiddies try to let
+admins run malicious plugins. You are doing an amazing job, so keep it up!

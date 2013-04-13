@@ -13,6 +13,7 @@ public class List2DIterator<T> implements Iterator<T> {
 
 	public List2DIterator(Collection<List<T>> collection2D) {
 		this.collectionIter = collection2D.iterator();
+		this.elemIter = collectionIter.next().iterator();
 	}
 
 	private void nextElem() {
