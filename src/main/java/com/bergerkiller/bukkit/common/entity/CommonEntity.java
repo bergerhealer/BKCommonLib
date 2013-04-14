@@ -348,30 +348,36 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		final int newcx = loc.x.chunk();
 		final int newcy = loc.y.chunk();
 		final int newcz = loc.z.chunk();
-		final Entity handle = getHandle(Entity.class);
 		final org.bukkit.World world = getWorld();
+		final boolean changedChunks = oldcx != newcx || oldcy != newcy || oldcz != newcz;
+		boolean isLoaded = this.isInLoadedChunk();
 
-		// Move between chunks
-		if (!handle.ai || oldcx != newcx || oldcy != newcy || oldcz != newcz) {
-			// Remove from the previous chunk
-			if (handle.ai && world.isChunkLoaded(oldcx, oldcy)) {
-				handle.world.getChunkAt(oldcx, oldcz).a(handle, oldcy);
+		// Handle chunk/slice movement
+		// Remove from the previous chunk
+		if (isLoaded && changedChunks) {
+			final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, oldcx, oldcz);
+			if (chunk != null) {
+				WorldUtil.removeEntity(chunk, entity);
 			}
-			// Add to the new chunk
-			if (handle.ai = world.isChunkLoaded(newcx, newcz)) {
-				handle.world.getChunkAt(newcx, newcz).a(handle);
+		}
+		// Add to the new chunk
+		if (!isLoaded || changedChunks) {
+			final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, newcx, newcz);
+			if (isLoaded = chunk != null) {
+				WorldUtil.addEntity(chunk, entity);
 			}
+			EntityRef.isLoaded.set(getHandle(), isLoaded);
 		}
 
 		// Tick the passenger
-		if (handle.ai && handle.passenger != null) {
-			if (!handle.passenger.dead && handle.passenger.vehicle == handle) {
-				CommonEntity<?> passenger = get(getPassenger());
-				passenger.getController().onTick();
-				passenger.doPostTick();
+		if (isLoaded && hasPassenger()) {
+			final org.bukkit.entity.Entity passenger = getPassenger();
+			if (!passenger.isDead() && passenger.getVehicle() == entity) {
+				CommonEntity<?> commonPassenger = get(passenger);
+				commonPassenger.getController().onTick();
+				commonPassenger.doPostTick();
 			} else {
-				handle.passenger.vehicle = null;
-				handle.passenger = null;
+				setPassengerSilent(null);
 			}
 		}
 	}

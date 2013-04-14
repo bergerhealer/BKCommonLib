@@ -84,7 +84,7 @@ public class ConvertingCollection<T> implements Collection<T> {
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		return base.addAll(new ConvertingCollection<Object>(c, converterPair.reverse()));
+		return base.removeAll(new ConvertingCollection<Object>(c, converterPair.reverse()));
 	}
 
 	@Override

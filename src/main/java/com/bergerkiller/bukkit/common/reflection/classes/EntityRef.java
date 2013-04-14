@@ -35,6 +35,7 @@ public class EntityRef {
 	public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
 	public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("c");
 	public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("p"); //Note: Not sure if the name is correct!
+	public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ai");
 	private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class);
 	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("C");
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);

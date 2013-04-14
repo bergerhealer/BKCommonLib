@@ -362,4 +362,38 @@ public class ChunkUtil {
 	public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
 		return ConversionPairs.blockState.convertAll(CommonNMS.getNative(chunk).tileEntities.values());
 	}
+
+	/**
+	 * Adds an Entity to a Chunk
+	 * 
+	 * @param chunk to add an entity to
+	 * @param entity to add
+	 */
+	public static void addEntity(org.bukkit.Chunk chunk, org.bukkit.entity.Entity entity) {
+		CommonNMS.getNative(chunk).a(CommonNMS.getNative(entity));
+	}
+
+	/**
+	 * Removes an Entity from a Chunk
+	 * 
+	 * @param chunk to remove an entity from
+	 * @param entity to remove
+	 * @return True if the entity has been removed, False if not (not found)
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean removeEntity(org.bukkit.Chunk chunk, org.bukkit.entity.Entity entity) {
+		final List<Object>[] slices = CommonNMS.getNative(chunk).entitySlices;
+		final int sliceY = MathUtil.clamp(MathUtil.toChunk(EntityUtil.getLocY(entity)), 0, slices.length - 1);
+		final Object handle = Conversion.toEntityHandle.convert(entity);
+		if (slices[sliceY].remove(handle)) {
+			return true;
+		} else {
+			for (int y = 0; y < slices.length; y++) {
+				if (y != sliceY && slices[y].remove(handle)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 }

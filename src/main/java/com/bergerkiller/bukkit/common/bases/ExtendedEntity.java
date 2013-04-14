@@ -289,6 +289,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	/**
+	 * Gets whether this Entity is stored in a loaded chunk
+	 * 
+	 * @return True if loaded, False if not
+	 */
+	public boolean isInLoadedChunk() {
+		return EntityRef.isLoaded.get(getHandle());
+	}
+
+	/**
 	 * Gets whether the entity is hitting something, like an Entity or Block.
 	 * If this returns True, then the Entity is unable to move freely.
 	 * 
