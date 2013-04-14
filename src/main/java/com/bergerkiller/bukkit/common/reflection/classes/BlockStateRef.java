@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_5_R2.block.CraftBlockState;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.collections.ClassMap;
+import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -121,17 +122,16 @@ public class BlockStateRef {
 	private static class TileInstantiator {
 		private final FieldAccessor<Object> tileField;
 		private final FieldAccessor<World> secondWorld;
-		protected final ClassTemplate<? extends BlockState> STATE;
+		protected final ClassTemplate<?> STATE;
 		protected final ClassTemplate<?> TILE;
 
 		public TileInstantiator(String name) {
 			this(name, name, name.toLowerCase(Locale.ENGLISH));
 		}
 
-		@SuppressWarnings("unchecked")
 		public TileInstantiator(String tileName, String stateName, String tileFieldName) {
 			this.TILE = NMSClassTemplate.create("TileEntity" + tileName);
-			this.STATE = ClassTemplate.create((Class<? extends BlockState>) CommonUtil.getCBClass("block.Craft" + stateName));
+			this.STATE = CBClassTemplate.create("block.Craft" + stateName);
 			this.tileField = this.STATE.getField(tileFieldName);
 			// Second world, yes, Bukkit is stupid enough to have two world fields. LOL.
 			this.secondWorld = this.STATE.getField("world");
@@ -145,7 +145,7 @@ public class BlockStateRef {
 		}
 
 		public BlockState newInstance(Object tileEntity) {
-			final BlockState state = STATE.newInstanceNull();
+			final BlockState state = (BlockState) STATE.newInstanceNull();
 			final Block block = TileEntityRef.getBlock(tileEntity);
 			final int typeId = block.getTypeId();
 			tileField.set(state, tileEntity);

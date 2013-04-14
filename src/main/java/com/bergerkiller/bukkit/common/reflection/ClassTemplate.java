@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.objenesis.ObjenesisHelper;
 import org.objenesis.instantiator.ObjectInstantiator;
 
 import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -96,8 +96,12 @@ public class ClassTemplate<T> {
 	 * Gets a new instance of this Class, using the empty constructor
 	 * 
 	 * @return A new instance, or null if an error occurred/empty constructor is not available
+	 * @throws IllegalStateException if this ClassTemplate has no (valid) Class set
 	 */
 	public T newInstance() {
+		if (this.type == null) {
+			throw new IllegalStateException("Class was not found or is not set");
+		}
 		try {
 			return this.type.newInstance();
 		} catch (Throwable t) {
@@ -112,9 +116,13 @@ public class ClassTemplate<T> {
 	 * That is, all fields will have 'NULL' values, or for primitives, 0/false/etc.
 	 * 
 	 * @return a new Class Instance, or null upon failure
+	 * @throws IllegalStateException if this ClassTemplate has no (valid) Class set
 	 */
 	@SuppressWarnings("unchecked")
 	public T newInstanceNull() {
+		if (this.instantiator == null) {
+			throw new IllegalStateException("Class was not found or is not set");
+		}
 		try {
 			return (T) this.instantiator.newInstance();
 		} catch (Throwable t) {
@@ -270,7 +278,7 @@ public class ClassTemplate<T> {
 	public static ClassTemplate<?> create(String path) {
 		Class<?> type = CommonUtil.getClass(path);
 		if (type == null) {
-			Bukkit.getLogger().log(Level.WARNING, "[BKCommonLib] Class not found: '" + path + "'");
+			CommonPlugin.LOGGER.log(Level.WARNING, "Class not found: '" + path + "'");
 		}
 		return create(type);
 	}
