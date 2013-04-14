@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,10 +15,23 @@ import org.bukkit.block.Block;
 import org.bukkit.map.MinecraftFont;
 import org.bukkit.map.MapFont.CharacterSprite;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+
 public class StringUtil {
 	public static final char CHAT_STYLE_CHAR = '\u00A7';
 	public static final int SPACE_WIDTH = getWidth(' ');
 	public static final String[] EMPTY_ARRAY = new String[0];
+	private static final char[] CHAT_CODES;
+
+	static {
+		ChatColor[] styles = ChatColor.values();
+		LinkedHashSet<Character> chars = new LinkedHashSet<Character>(styles.length * 2);
+		for (int i = 0; i < styles.length; i++) {
+			chars.add(Character.toLowerCase(styles[i].getChar()));
+			chars.add(Character.toUpperCase(styles[i].getChar()));
+		}
+		CHAT_CODES = Conversion.toCharArr.convert(chars);
+	}
 
 	/**
 	 * Converts a Location to a destination name.
@@ -430,7 +444,7 @@ public class StringUtil {
 	 * @return True if it is a formatting code, False if not
 	 */
 	public static boolean isChatCode(char character) {
-		return LogicUtil.containsChar(character, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r');
+		return LogicUtil.containsChar(character, CHAT_CODES);
 	}
 
 	public static int getSuccessiveCharCount(String value, char character) {

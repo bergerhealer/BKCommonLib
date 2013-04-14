@@ -180,6 +180,18 @@ public class CommonUtil {
 	 * Vault is used for permissions if available, otherwise super permissions are used
 	 * 
 	 * @param sender to check
+	 * @param permissionNode to check (each part is appended with '.' in between)
+	 * @return True if the sender has permission for the node, False if not
+	 */
+	public static boolean hasPermission(CommandSender sender, String[] permissionNode) {
+		return CommonPlugin.getInstance().hasPermission(sender, permissionNode);
+	}
+
+	/**
+	 * Checks whether a given command sender has a given permission<br>
+	 * Vault is used for permissions if available, otherwise super permissions are used
+	 * 
+	 * @param sender to check
 	 * @param permissionNode to check
 	 * @return True if the sender has permission for the node, False if not
 	 */

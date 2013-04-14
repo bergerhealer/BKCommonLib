@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -201,12 +202,47 @@ public class CommonPlugin extends PluginBase {
 		return false;
 	}
 
-	public boolean hasPermission(CommandSender sender, String permissionNode) {
+	private boolean permCheck(CommandSender sender, String node) {
 		if (this.vaultEnabled) {
-			return this.vaultPermission.has(sender, permissionNode);
+			return this.vaultPermission.has(sender, node);
 		} else {
-			return sender.hasPermission(permissionNode);
+			return sender.hasPermission(node);
 		}
+	}
+
+	private boolean permCheck(CommandSender sender, StringBuilder root, String[] args, int argIndex) {
+		// End of the sequence?
+		if (argIndex >= args.length) {
+			return permCheck(sender, root.toString());
+		}
+		int rootLength = root.length();
+		if (rootLength != 0) {
+			root.append('.');
+			rootLength++;
+		}
+		final int newArgIndex = argIndex + 1;
+		// Check permission with original name
+		root.append(args[argIndex].toLowerCase(Locale.ENGLISH));
+		if (permCheck(sender, root, args, newArgIndex)) {
+			return true;
+		}
+
+		// Try with *-signs
+		root.setLength(rootLength);
+		root.append('*');
+		return permCheck(sender, root, args, newArgIndex);
+	}
+
+	public boolean hasPermission(CommandSender sender, String[] permissionNode) {
+		int expectedLength = permissionNode.length;
+		for (String node : permissionNode) {
+			expectedLength += node.length();
+		}
+		return permCheck(sender, new StringBuilder(expectedLength), permissionNode, 0);
+	}
+
+	public boolean hasPermission(CommandSender sender, String permissionNode) {
+		return permCheck(sender, permissionNode.toLowerCase(Locale.ENGLISH)) || hasPermission(sender, permissionNode.split("\\."));
 	}
 
 	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
