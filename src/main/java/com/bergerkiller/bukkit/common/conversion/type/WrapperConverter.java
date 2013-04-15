@@ -1,9 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_5_R2.Chunk;
-import net.minecraft.server.v1_5_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_5_R2.ChunkCoordinates;
-import net.minecraft.server.v1_5_R2.ChunkPosition;
 import net.minecraft.server.v1_5_R2.ContainerAnvilInventory;
 import net.minecraft.server.v1_5_R2.ContainerEnchantTableInventory;
 import net.minecraft.server.v1_5_R2.Entity;
@@ -16,7 +13,6 @@ import net.minecraft.server.v1_5_R2.TileEntity;
 import net.minecraft.server.v1_5_R2.TileEntityBeacon;
 import net.minecraft.server.v1_5_R2.TileEntityBrewingStand;
 import net.minecraft.server.v1_5_R2.TileEntityFurnace;
-import net.minecraft.server.v1_5_R2.Vec3D;
 import net.minecraft.server.v1_5_R2.World;
 
 import org.bukkit.Bukkit;
@@ -62,6 +58,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
@@ -310,9 +307,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	public static final WrapperConverter<IntVector2> toIntVector2 = new WrapperConverter<IntVector2>(IntVector2.class) {
 		@Override
 		public IntVector2 convertSpecial(Object value, Class<?> valueType, IntVector2 def) {
-			if (value instanceof ChunkCoordIntPair) {
-				ChunkCoordIntPair pair = (ChunkCoordIntPair) value;
-				return new IntVector2(pair.x, pair.z);
+			if (VectorRef.isPair(value)) {
+				return VectorRef.getPair(value);
 			} else {
 				return def;
 			}
@@ -321,12 +317,10 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	public static final WrapperConverter<IntVector3> toIntVector3 = new WrapperConverter<IntVector3>(IntVector3.class) {
 		@Override
 		public IntVector3 convertSpecial(Object value, Class<?> valueType, IntVector3 def) {
-			if (value instanceof ChunkPosition) {
-				ChunkPosition pos = (ChunkPosition) value;
-				return new IntVector3(pos.x, pos.y, pos.z);
-			} else if (value instanceof ChunkCoordinates) {
-				ChunkCoordinates coord = (ChunkCoordinates) value;
-				return new IntVector3(coord.x, coord.y, coord.z);
+			if (VectorRef.isPosition(value)) {
+				return VectorRef.getPosition(value);
+			} else if (VectorRef.isCoord(value)) {
+				return VectorRef.getCoord(value);
 			} else {
 				return def;
 			}
@@ -338,9 +332,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			if (value instanceof Location) {
 				Location loc = (Location) value;
 				return new Vector(loc.getX(), loc.getY(), loc.getZ());
-			} else if (value instanceof Vec3D) {
-				Vec3D vec = (Vec3D) value;
-				return new Vector(vec.c, vec.d, vec.e);
+			} else if (VectorRef.isVec(value)) {
+				return VectorRef.getVec(value);
 			} else {
 				IntVector3 v3 = toIntVector3.convert(value);
 				if (value != null) {

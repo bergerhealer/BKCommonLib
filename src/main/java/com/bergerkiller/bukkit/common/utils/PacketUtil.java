@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.StopWatch;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -55,9 +57,8 @@ public class PacketUtil {
 
 		// Send payload
 		if (sendPayload) {
-			sendPacket(player, PacketFields.MAP_CHUNK.newInstance(chunk));
+			sendPacket(player, PacketFields.MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
 		}
-
 		// Tile entities
 		CommonPacket packet;
 		for (Object tile : ChunkRef.tileEntities.get(chunkHandle).values()) {
@@ -69,6 +70,7 @@ public class PacketUtil {
 		// Entity spawn messages
 		CommonUtil.nextTick(new Runnable() {
 			public void run() {
+				StopWatch.instance.start();
 				WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
 			}
 		});

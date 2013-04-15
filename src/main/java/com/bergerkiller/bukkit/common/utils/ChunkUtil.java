@@ -267,6 +267,19 @@ public class ChunkUtil {
 	}
 
 	/**
+	 * Gets, loads or generated a chunk without loading or generating it on the main thread.
+	 * Allows the lazy-loading of chunks without locking the server.
+	 * 
+	 * @param world to obtain the chunk from
+	 * @param x coordinate of the chunk
+	 * @param z coordinate of the chunk
+	 * @param runnable to execute once the chunk is loaded or obtained
+	 */
+	public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
+		CommonNMS.getNative(world).chunkProviderServer.getChunkAt(x, z, runnable);
+	}
+
+	/**
 	 * Sets a given chunk coordinate to contain the chunk specified
 	 * 
 	 * @param world to set the chunk in

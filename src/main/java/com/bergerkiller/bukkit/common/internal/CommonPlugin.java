@@ -248,7 +248,7 @@ public class CommonPlugin extends PluginBase {
 	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
 		synchronized (playerVisibleChunks) {
 			LongHashSet chunks = playerVisibleChunks.get(player);
-			return chunks == null ? null : chunks.contains(chunkX, chunkZ);
+			return chunks == null ? false : chunks.contains(chunkX, chunkZ);
 		}
 	}
 

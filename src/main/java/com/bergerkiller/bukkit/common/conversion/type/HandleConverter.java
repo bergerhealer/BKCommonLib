@@ -1,12 +1,8 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_5_R2.Block;
-import net.minecraft.server.v1_5_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_5_R2.ChunkCoordinates;
-import net.minecraft.server.v1_5_R2.ChunkPosition;
 import net.minecraft.server.v1_5_R2.Entity;
 import net.minecraft.server.v1_5_R2.Item;
-import net.minecraft.server.v1_5_R2.Vec3D;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
@@ -29,6 +25,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -228,7 +225,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			if (value instanceof IntVector2) {
 				IntVector2 iv2 = (IntVector2) value;
-				return new ChunkCoordIntPair(iv2.x, iv2.z);
+				return VectorRef.newPair(iv2.x, iv2.z);
 			} else {
 				return def;
 			}
@@ -237,12 +234,14 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			if (value instanceof ChunkPosition) {
-				ChunkPosition pos = (ChunkPosition) value;
-				return new ChunkCoordinates(pos.x, pos.y, pos.z);
+			if (VectorRef.isPosition(value)) {
+				final int x = VectorRef.getPositionX(value);
+				final int y = VectorRef.getPositionY(value);
+				final int z = VectorRef.getPositionZ(value);
+				return VectorRef.newCoord(x, y, z);
 			} else if (value instanceof IntVector3) {
 				IntVector3 iv3 = (IntVector3) value;
-				return new ChunkCoordinates(iv3.x, iv3.y, iv3.z);
+				return VectorRef.newCoord(iv3.x, iv3.y, iv3.z);
 			} else {
 				return def;
 			}
@@ -251,12 +250,14 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toChunkPositionHandle = new HandleConverter("ChunkPosition") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			if (value instanceof ChunkCoordinates) {
-				ChunkCoordinates coord = (ChunkCoordinates) value;
-				return new ChunkPosition(coord.x, coord.y, coord.z);
+			if (VectorRef.isCoord(value)) {
+				final int x = VectorRef.getCoordX(value);
+				final int y = VectorRef.getCoordX(value);
+				final int z = VectorRef.getCoordX(value);
+				return VectorRef.newPosition(x, y, z);
 			} else if (value instanceof IntVector3) {
 				IntVector3 iv3 = (IntVector3) value;
-				return new ChunkPosition(iv3.x, iv3.y, iv3.z);
+				return VectorRef.newPosition(iv3.x, iv3.y, iv3.z);
 			} else {
 				return def;
 			}
@@ -267,7 +268,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			Vector vec = WrapperConverter.toVector.convert(value);
 			if (vec != null) {
-				return Vec3D.a(vec.getX(), vec.getY(), vec.getZ());
+				return VectorRef.newVec(vec.getX(), vec.getY(), vec.getZ());
 			} else {
 				return def;
 			}
