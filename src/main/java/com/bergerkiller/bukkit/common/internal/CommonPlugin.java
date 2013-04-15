@@ -386,6 +386,9 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void onLoad() {
 		instance = this;
+		if (!IS_COMPATIBLE) {
+			return;
+		}
 		// Load the classes contained in this library
 		CommonClasses.init();
 	}

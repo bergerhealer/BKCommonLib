@@ -11,7 +11,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.StopWatch;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -70,7 +69,6 @@ public class PacketUtil {
 		// Entity spawn messages
 		CommonUtil.nextTick(new Runnable() {
 			public void run() {
-				StopWatch.instance.start();
 				WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
 			}
 		});
