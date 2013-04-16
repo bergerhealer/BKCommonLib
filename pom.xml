@@ -86,6 +86,14 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>regalowl.hyperconomy</groupId>
+      <artifactId>hyperconomy</artifactId>
+      <version>0.967</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/hyperconomy-0.967.jar</systemPath>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>com.kellerkindt</groupId>
       <artifactId>ShowCaseStandalone</artifactId>
       <version>383</version>

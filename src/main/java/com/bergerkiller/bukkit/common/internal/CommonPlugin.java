@@ -26,6 +26,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import regalowl.hyperconomy.HyperConomy;
+
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.MessageBuilder;
 import com.bergerkiller.bukkit.common.ModuleLogger;
@@ -78,6 +80,7 @@ public class CommonPlugin extends PluginBase {
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
+	private boolean isHyperConomyEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
 
@@ -170,8 +173,8 @@ public class CommonPlugin extends PluginBase {
 						return true;
 					}
 				} catch (Throwable t) {
-					Bukkit.getLogger().log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
-					t.printStackTrace();
+					log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
+					handle(t);
 					this.isShowcaseEnabled = false;
 				}
 			}
@@ -181,9 +184,20 @@ public class CommonPlugin extends PluginBase {
 						return true;
 					}
 				} catch (Throwable t) {
-					Bukkit.getLogger().log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
-					t.printStackTrace();
+					log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
+					handle(t);
 					this.isSCSEnabled = false;
+				}
+			}
+			if (this.isHyperConomyEnabled) {
+				try {
+					if (HyperConomy.hyperAPI.isItemDisplay(item)) {
+						return true;
+					}
+				} catch (Throwable t) {
+					log(Level.SEVERE, "HyperConomy item verification failed (update needed?), contact the authors!");
+					handle(t);
+					this.isHyperConomyEnabled = false;
 				}
 			}
 			if (this.bleedingMobsInstance != null) {
@@ -347,14 +361,16 @@ public class CommonPlugin extends PluginBase {
 			packetHandler.removePacketListeners(plugin);
 		}
 		if (pluginName.equals("Showcase")) {
-			this.isShowcaseEnabled = enabled;
-			if (enabled) {
+			if (this.isShowcaseEnabled = enabled) {
 				log(Level.INFO, "Showcase detected: Showcased items will be ignored");
 			}
 		} else if (pluginName.equals("ShowCaseStandalone")) {
-			this.isSCSEnabled = enabled;
-			if (enabled) {
+			if (this.isSCSEnabled = enabled) {
 				log(Level.INFO, "Showcase Standalone detected: Showcased items will be ignored");
+			}
+		} else if (pluginName.equals("HyperConomy")) {
+			if (this.isHyperConomyEnabled = enabled) {
+				log(Level.INFO, "HyperConomy detected: Showcased items will be ignored");
 			}
 		} else if (pluginName.equals("BleedingMobs")) {
 			this.bleedingMobsInstance = enabled ? plugin : null;
