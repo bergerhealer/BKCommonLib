@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 
 /**
  * Player - specific operations and tools
@@ -69,22 +70,22 @@ public class PlayerUtil extends EntityUtil {
 	 * Adds the chunk coordinates to the player chunk sending queue
 	 * 
 	 * @param player
-	 * @param chunkX - coordinate
-	 * @param chunkZ - coordinate
+	 * @param coordinates
 	 */
-	public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
-		queueChunkSend(player, new IntVector2(chunkX, chunkZ));
+	public static void queueChunkSend(Player player, IntVector2 coordinates) {
+		queueChunkSend(player, coordinates.x, coordinates.z);
 	}
 
 	/**
 	 * Adds the chunk coordinates to the player chunk sending queue
 	 * 
 	 * @param player
-	 * @param coordinates
+	 * @param chunkX - coordinate
+	 * @param chunkZ - coordinate
 	 */
 	@SuppressWarnings("unchecked")
-	public static void queueChunkSend(Player player, IntVector2 coordinates) {
-		CommonNMS.getNative(player).chunkCoordIntPairQueue.add(coordinates);
+	public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
+		CommonNMS.getNative(player).chunkCoordIntPairQueue.add(VectorRef.newPair(chunkX, chunkZ));
 	}
 
 	/**
@@ -101,21 +102,21 @@ public class PlayerUtil extends EntityUtil {
 	 * Removes the chunk coordinates from the player chunk sending queue
 	 * 
 	 * @param player
-	 * @param chunkX - coordinate
-	 * @param chunkZ - coordinate
+	 * @param coordinates
 	 */
-	public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
-		cancelChunkSend(player, new IntVector2(chunkX, chunkZ));
+	public static void cancelChunkSend(Player player, IntVector2 coordinates) {
+		cancelChunkSend(player, coordinates.x, coordinates.z);
 	}
 
 	/**
 	 * Removes the chunk coordinates from the player chunk sending queue
 	 * 
 	 * @param player
-	 * @param coordinates
+	 * @param chunkX - coordinate
+	 * @param chunkZ - coordinate
 	 */
-	public static void cancelChunkSend(Player player, IntVector2 coordinates) {
-		CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(coordinates);
+	public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
+		CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(VectorRef.newPair(chunkX, chunkZ));
 	}
 
 	/**
