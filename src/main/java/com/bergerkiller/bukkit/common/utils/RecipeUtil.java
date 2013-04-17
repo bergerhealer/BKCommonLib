@@ -97,11 +97,18 @@ public class RecipeUtil {
 		return RecipesFurnace.getInstance().recipes.keySet();
 	}
 
-	public static CraftRecipe[] getCraftingRequirements(int itemid, Integer data) {
+	/**
+	 * Gets all Crafting Recipes able to produce the ItemStack specified
+	 * 
+	 * @param itemid of the item to craft
+	 * @param data of the item to craft (-1 for any data)
+	 * @return the Crafting Recipes that can craft the item specified
+	 */
+	public static CraftRecipe[] getCraftingRequirements(int itemid, int data) {
 		List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
 		for (Object rec : getCraftRecipes()) {
 			ItemStack item = RecipeRef.getOutput(rec);
-			if (item != null && item.getTypeId() == itemid && (data == null || data == item.getDurability())) {
+			if (item != null && item.getTypeId() == itemid && (data == -1 || data == item.getDurability())) {
 				CraftRecipe crec = CraftRecipe.create(rec);
 				if (crec != null) {
 					poss.add(crec);
@@ -111,6 +118,12 @@ public class RecipeUtil {
 		return poss.toArray(new CraftRecipe[0]);
 	}
 
+	/**
+	 * Crafts items specified in an Inventory
+	 * 
+	 * @param parser that specified the item type, data and amount to craft
+	 * @param source inventory to craft in
+	 */
 	public static void craftItems(ItemParser parser, Inventory source) {
 		if (parser.hasType()) {
 			final int limit;
@@ -119,12 +132,19 @@ public class RecipeUtil {
 			} else {
 				limit = Integer.MAX_VALUE;
 			}
-			Integer data = parser.hasData() ? (int) parser.getData() : null;
-			craftItems(parser.getTypeId(), data, source, limit);
+			craftItems(parser.getTypeId(), parser.getData(), source, limit);
 		}
 	}
 
-	public static void craftItems(int itemid, Integer data, Inventory source, int limit) {
+	/**
+	 * Crafts items specified in an Inventory
+	 * 
+	 * @param itemid of the item to craft
+	 * @param data of the item to craft (-1 for any data)
+	 * @param source inventory to craft in
+	 * @param limit amount of items to craft
+	 */
+	public static void craftItems(int itemid, int data, Inventory source, int limit) {
 		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
 			limit -= rec.craftItems(source, limit);
 		}
