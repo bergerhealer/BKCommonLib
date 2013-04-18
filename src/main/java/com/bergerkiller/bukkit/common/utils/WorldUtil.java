@@ -107,7 +107,7 @@ public class WorldUtil extends ChunkUtil {
 	public static void removeEntity(org.bukkit.entity.Entity entity) {
 		Entity e = CommonNMS.getNative(entity);
 		e.world.removeEntity(e);
-		WorldServerRef.entityTracker.get(e.world).startTracking(entity);
+		WorldServerRef.entityTracker.get(e.world).stopTracking(entity);
 	}
 
 	/**
