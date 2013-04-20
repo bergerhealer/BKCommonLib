@@ -50,7 +50,7 @@ public class PacketFieldClasses {
 		 * @return True if the packet is an instance of this Packet, False if not
 		 */
 		public boolean isInstance(CommonPacket packet) {
-			return super.isInstance(packet.getHandle());
+			return packet != null && super.isInstance(packet.getHandle());
 		}
 
 		@Override

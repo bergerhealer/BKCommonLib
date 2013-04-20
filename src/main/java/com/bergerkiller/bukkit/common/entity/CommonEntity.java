@@ -38,6 +38,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -202,7 +203,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	/**
 	 * Replaces the current entity, if needed, with the BKCommonLib Hook entity type
 	 */
-	@SuppressWarnings("unchecked")
 	protected void prepareHook() {
 		final Entity oldInstance = getHandle(Entity.class);
 		if (oldInstance instanceof NMSEntityHook) {
@@ -280,19 +280,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 				}
 
 				// *** World ***
-				ListIterator<Entity> iter = oldInstance.world.entityList.listIterator();
-				while (iter.hasNext()) {
-					if (iter.next().id == oldInstance.id) {
-						iter.set(newInstance);
-						break;
-					}
-				}
+				replaceInList(oldInstance.world.entityList, newInstance);
+				replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
 
 				// *** Chunk ***
 				final int chunkY = getChunkY();
-				if (!replaceInChunk(chunk, chunkY, oldInstance, newInstance)) {
+				if (!replaceInChunk(chunk, chunkY, newInstance)) {
 					for (int y = 0; y < chunk.entitySlices.length; y++) {
-						if (y != chunkY && replaceInChunk(chunk, y, oldInstance, newInstance)) {
+						if (y != chunkY && replaceInChunk(chunk, y, newInstance)) {
 							break;
 						}
 					}
@@ -303,14 +298,21 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		}
 	}
 
-	@SuppressWarnings({"unchecked"})
-	private static boolean replaceInChunk(Chunk chunk, int chunkY, Entity toreplace, Entity with) {
-		List<Entity> list = chunk.entitySlices[chunkY];
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).id == toreplace.id) {
-				list.set(i, with);
-				//set invalid
-				chunk.m = true;
+	private static boolean replaceInChunk(Chunk chunk, int chunkY, Entity entity) {
+		if (replaceInList(chunk.entitySlices[chunkY], entity)) {
+			chunk.m = true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private static boolean replaceInList(List list, Entity entity) {
+		ListIterator<Entity> iter = list.listIterator();
+		while (iter.hasNext()) {
+			if (iter.next().id == entity.id)  {
+				iter.set(entity);
 				return true;
 			}
 		}

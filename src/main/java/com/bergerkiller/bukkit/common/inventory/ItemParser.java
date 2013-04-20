@@ -9,7 +9,8 @@ import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
- * Can be used to match items against, and to provide amounts
+ * Can be used to match items against, and to provide amounts.
+ * Material AIR is designated for invalid (or failed-to-parse) Item Parsers.
  */
 public class ItemParser {
 	public static final char STACK_MULTIPLIER = '^';
@@ -91,7 +92,11 @@ public class ItemParser {
 		// parse amount
 		parser.amount = ParseUtil.parseInt(amount, -1);
 		// parse material from name
-		parser.type = ParseUtil.parseMaterial(name, null);
+		if (LogicUtil.nullOrEmpty(name)) {
+			parser.type = null;
+		} else {
+			parser.type = ParseUtil.parseMaterial(name, Material.AIR);
+		}
 		// parse material data from name if needed
 		if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname)) {
 			Byte dat = ParseUtil.parseMaterialData(dataname, parser.type, null);
