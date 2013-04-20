@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
@@ -56,7 +58,7 @@ public class BasicConfiguration extends ConfigurationNode {
 	 * 
 	 * @param stream to read from
 	 */
-	public void loadFromStream(InputStream stream) throws Exception {
+	public void loadFromStream(InputStream stream) throws IOException {
 		try {
 			InputStreamReader reader = new InputStreamReader(stream);
 			StringBuilder builder = new StringBuilder();
@@ -102,7 +104,11 @@ public class BasicConfiguration extends ConfigurationNode {
 			} finally {
 				input.close();
 			}
-			this.getSource().loadFromString(builder.toString());
+			try {
+				this.getSource().loadFromString(builder.toString());
+			} catch (InvalidConfigurationException e) {
+				throw new IOException("YAML file is corrupt", e);
+			}
 		} catch (FileNotFoundException ex) {
 			// Ignored
 		}
@@ -130,7 +136,7 @@ public class BasicConfiguration extends ConfigurationNode {
 	 * 
 	 * @param stream to write to
 	 */
-	public void saveToStream(OutputStream stream) throws Exception {
+	public void saveToStream(OutputStream stream) throws IOException {
 		// Get rid of newline characters in text - Bukkit bug prevents proper saving
 		for (String key : this.getSource().getKeys(true)) {
 			Object value = this.getSource().get(key);

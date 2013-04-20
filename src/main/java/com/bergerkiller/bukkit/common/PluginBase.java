@@ -607,7 +607,7 @@ public abstract class PluginBase extends JavaPlugin {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public final void onEnable() {		
+	public final void onEnable() {
 		// First of all, check that all dependencies are properly enabled
 		for (String dep : LogicUtil.fixNull(getDescription().getDepend(), (List<String>) Collections.EMPTY_LIST)) {
 			if (!Bukkit.getPluginManager().isPluginEnabled(dep)) {

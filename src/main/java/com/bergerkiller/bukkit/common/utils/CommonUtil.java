@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,10 +27,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
-import org.yaml.snakeyaml.Yaml;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
+import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -243,31 +243,93 @@ public class CommonUtil {
 		}
 		return rval.toArray(new StackTraceElement[0]);
 	}
-	
+
 	/**
-	 * Checks all plugin files to check if a plugin fikle exists
+	 * Checks all plugin files to check if a plugin file exists
 	 * 
 	 * @param name of the plugin
 	 * @return Plugin exists?
 	 */
 	public static boolean isPluginInDirectory(String name) {
 		File dir = new File("plugins");
-		for(File file : dir.listFiles()) {
+		if (!dir.exists()) {
+			return false;
+		}
+		for (File file : dir.listFiles()) {
 			try {
-				JarFile jarFile = new JarFile(file);
-				InputStream inputStream = jarFile.getInputStream(jarFile.getEntry("plugin.yml"));
-				Yaml yaml = new Yaml();
-				HashMap<?, ?> content = (HashMap<?, ?>)yaml.load(inputStream);
-				String pluginName = (String) content.get("name");
-				if(name.equals(pluginName)) {
+				BasicConfiguration config = getPluginConfiguration(file, "plugin.yml");
+				String pluginName = config.get("name", String.class);
+				if (name.equals(pluginName)) {
 					return true;
 				}
 			} catch(IOException e) {
-				continue;
 			}
 		}
-		
 		return false;
+	}
+
+	/**
+	 * Obtains a new YAML Configuration instance for a yaml file contained within a plugin Jar file
+	 * 
+	 * @param pluginJarFile to get a YAML configuration instance of
+	 * @param configResourcePath to the configuration resource
+	 * @return a new Configuration instance, filled with data from the YAML file
+	 * @throws IOException if loading fails or the file can not be found
+	 */
+	public static BasicConfiguration getPluginConfiguration(File pluginJarFile, String configResourcePath) throws IOException {
+		InputStream stream = getPluginResource(pluginJarFile, configResourcePath);
+		try {
+			BasicConfiguration config = new BasicConfiguration();
+			config.loadFromStream(stream);
+			return config;
+		} finally {
+			stream.close();
+		}
+	}
+
+	/**
+	 * Obtains a new InputStream to the resource found in the given Plugin Jar file
+	 * 
+	 * @param pluginJarFile to get a resource of
+	 * @param resourcePath to the resource
+	 * @return an InputStream to the resource
+	 * @throws IOException if loading fails or the file can not be found
+	 */
+	public static InputStream getPluginResource(File pluginJarFile, String resourcePath) throws IOException {
+		// First, find the plugin by Jar file (avoids Jar File decompression times)
+		// Then we can use the ClassLoader of this Jar File to load the resource instead
+		synchronized (Bukkit.getPluginManager()) {
+			for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
+				File file = getPluginJarFile(plugin);
+				if (pluginJarFile.equals(file)) {
+					return plugin.getResource(resourcePath);
+				}
+			}
+		}
+
+		// Not found, stick to reading the JarFile ourselves
+		final JarFile jarFile = new JarFile(pluginJarFile);
+		return jarFile.getInputStream(jarFile.getEntry(resourcePath));
+	}
+
+	/**
+	 * Gets the Jar File where a given Plugin is loaded from.
+	 * If the plugin is not in a Jar file, null is returned instead.
+	 * 
+	 * @param plugin to get the Jar File of
+	 * @return the Jar File in which the plugin resides, or null if none found
+	 */
+	public static File getPluginJarFile(Plugin plugin) {
+		final Class<?> pluginClass = plugin.getClass();
+		try {
+			URI uri = pluginClass.getProtectionDomain().getCodeSource().getLocation().toURI();
+			File file = new File(uri);
+			if (file.exists()) {
+				return file;
+			}
+		} catch (Exception e) {
+		}
+		return null;
 	}
 
 	/**
