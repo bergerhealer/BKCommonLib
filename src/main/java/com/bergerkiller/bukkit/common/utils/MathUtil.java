@@ -271,19 +271,11 @@ public class MathUtil {
 		double sinpitch = Math.sin(angle);
 		double cospitch = Math.cos(angle);
 
-		double newx = 0.0;
-		double newy = 0.0;
-		double newz = 0.0;
-		newz -= x * cosyaw;
-		newz -= y * sinyaw * sinpitch;
-		newz -= z * sinyaw * cospitch;
-		newx += x * sinyaw;
-		newx -= y * cosyaw * sinpitch;
-		newx -= z * cosyaw * cospitch;
-		newy += y * cospitch;
-		newy -= z * sinpitch;
-
-		return new Vector(newx, newy, newz);
+		Vector vector = new Vector();
+		vector.setX((x * sinyaw) - (y * cosyaw * sinpitch) - (z * cosyaw * cospitch));
+		vector.setY((y * cospitch) - (z * sinpitch));
+		vector.setZ(-(x * cosyaw) - (y * sinyaw * sinpitch) - (z * sinyaw * cospitch));
+		return vector;
 	}
 
 	/**

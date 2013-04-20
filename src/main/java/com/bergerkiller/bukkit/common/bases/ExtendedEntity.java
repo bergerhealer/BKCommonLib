@@ -525,6 +525,26 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return entity.isValid();
 	}
 
+	/**
+	 * Gets whether the Entity is submerged in water (subsequently, extinguising any fire).
+	 * This method does not update the state, it merely reads it.
+	 * 
+	 * @return True if this Entity is in water, False if not
+	 */
+	public boolean isInWater() {
+		return h().G();
+	}
+
+	/**
+	 * Gets whether the Entity is submerged in water (subsequently, extinguising any fire)
+	 * 
+	 * @param update option: True to update this state by checking for water blocks nearby
+	 * @return True if this Entity is in water, False if not
+	 */
+	public boolean isInWater(boolean update) {
+		return update ? h().H() : h().G();
+	}
+
 	public boolean leaveVehicle() {
 		return entity.leaveVehicle();
 	}

@@ -34,6 +34,18 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 @SuppressWarnings("rawtypes")
 public class CommonNMS {
 
+	public static double getMiddleX(AxisAlignedBB aabb) {
+		return 0.5 * (aabb.a + aabb.d);
+	}
+
+	public static double getMiddleY(AxisAlignedBB aabb) {
+		return 0.5 * (aabb.b + aabb.e);
+	}
+
+	public static double getMiddleZ(AxisAlignedBB aabb) {
+		return 0.5 * (aabb.c + aabb.f);
+	}
+
 	/**
 	 * Obtains the internal list of native Minecraft server worlds<br>
 	 * Gets the MinecraftServer.worlds value

@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
@@ -130,7 +131,14 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	public String getLocalizedName() {
 		return entity.getHandle(NMSEntityHook.class).super_getLocalizedName();
 	}
-	
+
+	/**
+	 * Performs Entity movement logic, to move the Entity and handle collisions
+	 * 
+	 * @param dx offset to move
+	 * @param dy offset to move
+	 * @param dz offset to move
+	 */
 	public void onMove(double dx, double dy, double dz) {
 		final Entity handle = entity.getHandle(Entity.class);
 		if (handle.Z) {
@@ -148,9 +156,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dx *= 0.25;
 				dy *= 0.05;
 				dz *= 0.25;
-				handle.motX = 0.0;
-				handle.motY = 0.0;
-				handle.motZ = 0.0;
+				entity.vel.setZero();
 			}
 			final double oldDx = dx;
 			final double oldDy = dy;
@@ -164,9 +170,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			}
 			handle.boundingBox.d(0.0, dy, 0.0);
 			if (!handle.L && oldDy != dy) {
-				dz = 0.0D;
-				dy = 0.0D;
-				dx = 0.0D;
+				dx = dy = dz = 0.0;
 			}
 			boolean isOnGround = handle.onGround || oldDy != dy && oldDy < 0.0;
 
@@ -176,9 +180,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			}
 			handle.boundingBox.d(dx, 0.0, 0.0);
 			if (!handle.L && oldDx != dx) {
-				dz = 0.0;
-				dy = 0.0;
-				dx = 0.0;
+				dx = dy = dz = 0.0;
 			}
 
 			// Collision testing using Z
@@ -187,15 +189,12 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			}
 			handle.boundingBox.d(0.0, 0.0, dz);
 			if (!handle.L && oldDz != dz) {
-				dz = 0.0;
-				dy = 0.0;
-				dx = 0.0;
+				dx = dy = dz = 0.0;
 			}
 
 			double moveDx;
 			double moveDy;
 			double moveDz;
-
 			if (handle.Y > 0.0f && handle.Y < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
 				moveDx = dx;
 				moveDy = dy;
@@ -215,9 +214,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				}
 				handle.boundingBox.d(0.0, dy, 0.0);
 				if (!handle.L && oldDy != dy) {
-					dz = 0.0;
-					dy = 0.0;
-					dx = 0.0;
+					dx = dy = dz = 0.0;
 				}
 
 				// Collision testing using X
@@ -226,9 +223,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				}
 				handle.boundingBox.d(dx, 0.0, 0.0D);
 				if (!handle.L && oldDx != dx) {
-					dz = 0.0;
-					dy = 0.0;
-					dx = 0.0;
+					dx = dy = dz = 0.0;
 				}
 
 				// Collision testing using Z
@@ -237,15 +232,11 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				}
 				handle.boundingBox.d(0.0, 0.0, dz);
 				if (!handle.L && oldDz != dz) {
-					dz = 0.0;
-					dy = 0.0;
-					dx = 0.0;
+					dx = dy = dz = 0.0;
 				}
 
 				if (!handle.L && oldDy != dy) {
-					dz = 0.0;
-					dy = 0.0;
-					dx = 0.0;
+					dx = dy = dz = 0.0;
 				} else {
 					dy = (double) -handle.Y;
 					for (int k = 0; k < list.size(); k++) {
@@ -266,33 +257,33 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				}
 			}
 
-			handle.locX = (handle.boundingBox.a + handle.boundingBox.d) / 2D;
-			handle.locY = (handle.boundingBox.b + (double) handle.height) - (double) handle.Y;
-			handle.locZ = (handle.boundingBox.c + handle.boundingBox.f) / 2D;
+			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
+			handle.locY = handle.boundingBox.b + (double) handle.height - (double) handle.Y;
+			handle.locZ = CommonNMS.getMiddleZ(handle.boundingBox);
 			entity.setMovementImpaired(oldDx != dx || oldDz != dz);
+			handle.onGround = oldDy != dy && oldDy < 0.0;
 			handle.H = oldDy != dy;
-			handle.onGround = oldDy != dy && oldDy < 0.0D;
 			handle.I = entity.isMovementImpaired() || handle.H;
 			EntityRef.updateFalling(handle, dy, handle.onGround);
 
+			// ================ Collision slowdown caused by ==============
 			if (oldDy != dy) {
 				handle.motY = 0.0;
 			}
-			// ========Math.abs check to prevent collision slowdown=====
-			if (oldDx != dx && Math.abs(handle.motX) > Math.abs(handle.motZ)) {
+			if (oldDx != dx && entity.vel.x.abs() > entity.vel.z.abs()) {
 				handle.motX = 0.0;
 			}
-			if (oldDz != dz && Math.abs(handle.motZ) > Math.abs(handle.motX)) {
+			if (oldDz != dz && entity.vel.z.abs() > entity.vel.x.abs()) {
 				handle.motZ = 0.0;
 			}
-			// ===========================================================================
+			// =============================================================
 
 			moveDx = handle.locX - oldLocX;
 			moveDy = handle.locY - oldLocY;
 			moveDz = handle.locZ - oldLocZ;
 			if (entity.getEntity() instanceof Vehicle && entity.isMovementImpaired()) {
 				Vehicle vehicle = (Vehicle) entity.getEntity();
-				org.bukkit.block.Block block = entity.getWorld().getBlockAt(MathUtil.floor(handle.locX), MathUtil.floor(handle.locY - (double) handle.height), MathUtil.floor(handle.locZ));
+				org.bukkit.block.Block block = entity.getWorld().getBlockAt(entity.loc.x.block(), MathUtil.floor(handle.locY - (double) handle.height), entity.loc.z.block());
 				if (oldDx > dx) {
 					block = block.getRelative(BlockFace.EAST);
 				} else if (oldDx < dx) {
@@ -302,8 +293,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				} else if (oldDz < dz) {
 					block = block.getRelative(BlockFace.NORTH);
 				}
-				VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, block);
-				entity.getServer().getPluginManager().callEvent(event);
+				CommonUtil.callEvent(new VehicleBlockCollisionEvent(vehicle, block));
 			}
 
 			// Update entity movement sounds
@@ -321,14 +311,14 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					moveDy = 0.0;
 				}
 
-				handle.R += Math.sqrt(moveDx * moveDx + moveDz * moveDz) * 0.6;
-				handle.S += Math.sqrt(moveDx * moveDx + moveDy * moveDy + moveDz * moveDz) * 0.6;
+				handle.R += MathUtil.length(moveDx, moveDz) * 0.6;
+				handle.S += MathUtil.length(moveDx, moveDy, moveDz) * 0.6;
 				if (handle.S > EntityRef.stepCounter.get(entity.getHandle()) && typeId > 0) {
 					EntityRef.stepCounter.set(entity.getHandle(), (int) handle.S + 1);
-					if (handle.H()) {
-						float f = (float) Math.sqrt(handle.motX * handle.motX * 0.2 + handle.motY * handle.motY + handle.motZ * handle.motZ * 0.2) * 0.35F;
-						if (f > 1.0F) {
-							f = 1.0F;
+					if (entity.isInWater(true)) {
+						float f = (float) Math.sqrt(entity.vel.y.squared() + 0.2 * entity.vel.xz.lengthSquared()) * 0.35f;
+						if (f > 1.0f) {
+							f = 1.0f;
 						}
 						entity.makeRandomSound(Sound.SWIM, f, 1.0f);
 					}
@@ -341,15 +331,14 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			EntityRef.updateBlockCollision(handle);
 
 			// Fire tick calculation (check using block collision)
-			boolean flag2 = handle.G();
-			if (handle.world.e(handle.boundingBox.shrink(0.001D, 0.001D, 0.001D))) {
+			final boolean isInWater = entity.isInWater();
+			if (handle.world.e(handle.boundingBox.shrink(0.001, 0.001, 0.001))) {
 				onBurnDamage(1);
-				if (!flag2) {
+				if (!isInWater) {
 					handle.fireTicks++;
 					if (handle.fireTicks <= 0) {
 						EntityCombustEvent event = new EntityCombustEvent(entity.getEntity(), 8);
-						entity.getServer().getPluginManager().callEvent(event);
-						if (!event.isCancelled()) {
+						if (!CommonUtil.callEvent(event).isCancelled()) {
 							handle.setOnFire(event.getDuration());
 						}
 					} else {
@@ -359,7 +348,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			} else if (handle.fireTicks <= 0) {
 				handle.fireTicks = -handle.maxFireTicks;
 			}
-			if (flag2 && handle.fireTicks > 0) {
+			if (isInWater && handle.fireTicks > 0) {
 				entity.makeRandomSound(Sound.FIZZ, 0.7f, 1.6f);
 				handle.fireTicks = -handle.maxFireTicks;
 			}

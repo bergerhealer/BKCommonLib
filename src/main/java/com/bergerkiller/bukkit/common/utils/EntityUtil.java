@@ -10,10 +10,25 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class EntityUtil extends EntityPropertyUtil {
 
+	/**
+	 * Finds an Entity that has the given entity UUID and is of the type specified from a world
+	 * 
+	 * @param world to find the Entity
+	 * @param uid of the Entity to find
+	 * @param type Class of the Entity to find
+	 * @return the found Entity, or null if not found
+	 */
 	public static <T extends org.bukkit.entity.Entity> T getEntity(org.bukkit.World world, UUID uid, Class<T> type) {
 		return CommonUtil.tryCast(getEntity(world, uid), type);
 	}
 
+	/**
+	 * Finds an Entity that has the given entity UUID from a world
+	 * 
+	 * @param world to find the Entity
+	 * @param uid of the Entity to find
+	 * @return the found Entity, or null if not found
+	 */
 	public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
 		for (org.bukkit.entity.Entity entity : WorldUtil.getEntities(world)) {
 			if (entity.getUniqueId().equals(uid)) {

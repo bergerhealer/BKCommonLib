@@ -237,6 +237,26 @@ public class FaceUtil {
 	}
 
 	/**
+	 * Gets the BlockFace.UP or BlockFace.DOWN constant based on the up parameter
+	 * 
+	 * @param up parameter
+	 * @return UP if up is true, DOWN if up is false
+	 */
+	public static BlockFace getVertical(boolean up) {
+		return up ? BlockFace.UP : BlockFace.DOWN;
+	}
+
+	/**
+	 * Gets the BlockFace.UP or BlockFace.DOWN based on the delta-y parameter
+	 * 
+	 * @param dy parameter
+	 * @return UP if dy >= 0, DOWN if dy < 0
+	 */
+	public static BlockFace getVertical(double dy) {
+		return getVertical(dy >= 0.0);
+	}
+
+	/**
 	 * Gets whether two faces have a sub-cardinal difference or less
 	 * 
 	 * @param face1 to check

@@ -18,6 +18,11 @@ public abstract class DoubleAbstract {
 	 */
 	public abstract DoubleAbstract set(double value);
 
+	public double squared() {
+		final double value = get();
+		return value * value;
+	}
+
 	public double abs() {
 		return Math.abs(get());
 	}
