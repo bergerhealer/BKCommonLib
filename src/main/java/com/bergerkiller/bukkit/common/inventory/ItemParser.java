@@ -118,10 +118,15 @@ public class ItemParser {
 		if (this.hasType() && typeid != this.getTypeId()) {
 			return false;
 		}
-		if (this.hasData() && data != this.getData()) {
+		if (!this.hasData() || data == this.getData()) {
+			return true;
+		}
+		// Take in account certain items/blocks with bit fields
+		if (this.getType() == Material.LEAVES) {
+			return (data & 0x3) == this.getData();
+		} else {
 			return false;
 		}
-		return true;
 	}
 
 	/**
