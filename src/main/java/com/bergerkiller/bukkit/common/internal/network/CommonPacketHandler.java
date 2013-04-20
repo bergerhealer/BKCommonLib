@@ -38,15 +38,9 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	@Override
 	public boolean onEnable() {
 		for (String incompatibility : incompatibilities) {
-			if(CommonUtil.isPluginInDirectory(incompatibility)) {
+			if (CommonUtil.isPluginInDirectory(incompatibility)) {
 				// Fail!
-				Plugin plugin = CommonUtil.getPlugin(incompatibility);
-				if(plugin != null) {
-					failPacketListener(plugin.getClass());
-				} else {
-					failPacketListener(incompatibility);
-				}
-				
+				failPacketListener(incompatibility);
 				return false;
 			}
 		}
@@ -73,19 +67,20 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
 	private static void failPacketListener(Class<?> playerConnectionType) {
 		Plugin plugin = CommonUtil.getPluginByClass(playerConnectionType);
-		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
 		if (plugin == null) {
-			CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by an unknown source, class: " + playerConnectionType.getName());
+			showFailureMessage("an unknown source, class: " + playerConnectionType.getName());
 		} else {
-			CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by a plugin conflict, namely " + plugin.getName());
+			failPacketListener(plugin.getName());
 		}
-		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
-		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 	}
-	
+
 	private static void failPacketListener(String pluginName) {
+		showFailureMessage("a plugin conflict, namely " + pluginName);
+	}
+
+	private static void showFailureMessage(String causeName) {
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
-		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by a plugin conflict, namely " + pluginName);
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by " + causeName);
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 	}

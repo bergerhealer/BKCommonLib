@@ -143,9 +143,9 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 		final Entity handle = entity.getHandle(Entity.class);
 		if (handle.Z) {
 			handle.boundingBox.d(dx, dy, dz);
-			handle.locX = (handle.boundingBox.a + handle.boundingBox.d) / 2.0D;
+			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
 			handle.locY = (handle.boundingBox.b + (double) handle.height) - (double) handle.Y;
-			handle.locZ = (handle.boundingBox.c + handle.boundingBox.f) / 2.0D;
+			handle.locZ = CommonNMS.getMiddleZ(handle.boundingBox);
 		} else {
 			handle.Y *= 0.4f;
 			final double oldLocX = handle.locX;
@@ -221,7 +221,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				for (AxisAlignedBB aabb : list) {
 					dx = aabb.a(handle.boundingBox, dx);
 				}
-				handle.boundingBox.d(dx, 0.0, 0.0D);
+				handle.boundingBox.d(dx, 0.0, 0.0);
 				if (!handle.L && oldDx != dx) {
 					dx = dy = dz = 0.0;
 				}
@@ -298,9 +298,9 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 
 			// Update entity movement sounds
 			if (EntityRef.hasMovementSound(handle) && handle.vehicle == null) {
-				int bX = MathUtil.floor(handle.locX);
-				int bY = MathUtil.floor(handle.locY - 0.2D - (double) handle.height);
-				int bZ = MathUtil.floor(handle.locZ);
+				int bX = entity.loc.x.block();
+				int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.height);
+				int bZ = entity.loc.z.block();
 				int typeId = handle.world.getTypeId(bX, bY, bZ);
 
 				// Some special type cases (this is sooooooo hacked in...)

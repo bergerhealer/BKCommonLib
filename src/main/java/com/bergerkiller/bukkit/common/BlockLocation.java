@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -34,6 +35,15 @@ public class BlockLocation {
 	 */
 	public BlockLocation(Block block) {
 		this(block.getWorld(), block.getX(), block.getY(), block.getZ());
+	}
+
+	/**
+	 * Initializes a new Block Location using a Location
+	 * 
+	 * @param location to use
+	 */
+	public BlockLocation(Location location) {
+		this(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
 
 	/**
@@ -104,6 +114,16 @@ public class BlockLocation {
 			return null;
 		}
 		return world.getChunkAt(this.x >> 4, this.z >> 4);
+	}
+
+	/**
+	 * Gets the Location from this Block Location
+	 * 
+	 * @return the Location of the middle of the Block, or null if the world is not loaded
+	 */
+	public Location getLocation() {
+		World world = this.getWorld();
+		return world == null ? null : new Location(world, this.x + 0.5, this.y + 0.5, this.z + 0.5);
 	}
 
 	/**

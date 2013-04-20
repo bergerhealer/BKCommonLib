@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
 /**
  * A wrapper class around a Thread that can:<br>
  * - Create an infinite loop that can be stopped externally<br>
@@ -47,7 +49,7 @@ public abstract class AsyncTask implements Runnable {
 						task.run();
 					}
 				} catch (Throwable t) {
-					t.printStackTrace();
+					CommonUtil.printFilteredStackTrace(t);
 				}
 				task.running = false;
 			}
@@ -123,8 +125,9 @@ public abstract class AsyncTask implements Runnable {
 	 * @return True if stopped, False if not
 	 */
 	public static boolean stop(AsyncTask task) {
-		if (task == null)
+		if (task == null) {
 			return false;
+		}
 		task.stop();
 		return true;
 	}
