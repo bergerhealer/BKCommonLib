@@ -38,10 +38,15 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	@Override
 	public boolean onEnable() {
 		for (String incompatibility : incompatibilities) {
-			Plugin plugin = CommonUtil.getPlugin(incompatibility);
-			if (plugin != null) {
+			if(CommonUtil.isPluginInDirectory(incompatibility)) {
 				// Fail!
-				failPacketListener(plugin.getClass());
+				Plugin plugin = CommonUtil.getPlugin(incompatibility);
+				if(plugin != null) {
+					failPacketListener(plugin.getClass());
+				} else {
+					failPacketListener(incompatibility);
+				}
+				
 				return false;
 			}
 		}
@@ -74,6 +79,13 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		} else {
 			CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by a plugin conflict, namely " + plugin.getName());
 		}
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
+	}
+	
+	private static void failPacketListener(String pluginName) {
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by a plugin conflict, namely " + pluginName);
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 	}

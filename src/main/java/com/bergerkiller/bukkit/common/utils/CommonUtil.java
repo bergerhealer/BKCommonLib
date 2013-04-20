@@ -1,13 +1,18 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 import net.minecraft.server.v1_5_R2.IPlayerFileData;
@@ -22,6 +27,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
+import org.yaml.snakeyaml.Yaml;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
@@ -236,6 +242,32 @@ public class CommonUtil {
 			}
 		}
 		return rval.toArray(new StackTraceElement[0]);
+	}
+	
+	/**
+	 * Checks all plugin files to check if a plugin fikle exists
+	 * 
+	 * @param name of the plugin
+	 * @return Plugin exists?
+	 */
+	public static boolean isPluginInDirectory(String name) {
+		File dir = new File("plugins");
+		for(File file : dir.listFiles()) {
+			try {
+				JarFile jarFile = new JarFile(file);
+				InputStream inputStream = jarFile.getInputStream(jarFile.getEntry("plugin.yml"));
+				Yaml yaml = new Yaml();
+				HashMap<?, ?> content = (HashMap<?, ?>)yaml.load(inputStream);
+				String pluginName = (String) content.get("name");
+				if(name.equals(pluginName)) {
+					return true;
+				}
+			} catch(IOException e) {
+				continue;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
