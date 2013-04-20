@@ -46,32 +46,12 @@ public class ClassTemplate<T> {
 	 */
 	protected void setClass(Class<T> type) {
 		this.type = type;
-		this.fields = new ArrayList<SafeField<?>>();
+		this.fields = null;
 		if (this.type == null) {
 			this.instantiator = null;
 		} else {
 			this.instantiator = ObjenesisHelper.getInstantiatorOf(type);
-			try {
-				this.fillFields(type);
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
 		}
-	}
-
-	private void fillFields(Class<?> clazz) {
-		if (clazz == null) {
-			return;
-		}
-		Field[] declared = clazz.getDeclaredFields();
-		ArrayList<SafeField<?>> newFields = new ArrayList<SafeField<?>>(declared.length);
-		for (Field field : declared) {
-			if (!Modifier.isStatic(field.getModifiers())) {
-				newFields.add(new SafeField<Object>(field));
-			}
-		}
-		this.fields.addAll(0, newFields);
-		this.fillFields(clazz.getSuperclass());
 	}
 
 	/**
@@ -89,7 +69,28 @@ public class ClassTemplate<T> {
 	 * @return Declared fields
 	 */
 	public List<SafeField<?>> getFields() {
+		if (type == null) {
+			return Collections.emptyList();
+		}
+		if (fields == null) {
+			fields = fillFields(new ArrayList<SafeField<?>>(), type);
+		}
 		return Collections.unmodifiableList(fields);
+	}
+
+	private static List<SafeField<?>> fillFields(List<SafeField<?>> fields, Class<?> clazz) {
+		if (clazz == null) {
+			return fields;
+		}
+		Field[] declared = clazz.getDeclaredFields();
+		ArrayList<SafeField<?>> newFields = new ArrayList<SafeField<?>>(declared.length);
+		for (Field field : declared) {
+			if (!Modifier.isStatic(field.getModifiers())) {
+				newFields.add(new SafeField<Object>(field));
+			}
+		}
+		fields.addAll(0, newFields);
+		return fillFields(fields, clazz.getSuperclass());
 	}
 
 	/**
@@ -180,7 +181,7 @@ public class ClassTemplate<T> {
 	 * @param to instance
 	 */
 	public void transfer(Object from, Object to) {
-		for (FieldAccessor<?> field : this.fields) {
+		for (FieldAccessor<?> field : this.getFields()) {
 			field.transfer(from, to);
 		}
 	}
@@ -198,8 +199,8 @@ public class ClassTemplate<T> {
 	public String toString() {
 		StringBuilder builder = new StringBuilder(500);
 		builder.append("Class path: ").append(this.getType().getName()).append('\n');
-		builder.append("Fields (").append(this.fields.size()).append("):");
-		for (FieldAccessor<?> field : this.fields) {
+		builder.append("Fields (").append(this.getFields().size()).append("):");
+		for (FieldAccessor<?> field : this.getFields()) {
 			builder.append("\n    ").append(field.toString());
 		}
 		return builder.toString();
