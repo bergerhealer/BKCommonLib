@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import net.minecraft.server.v1_5_R2.Block;
+import net.minecraft.server.v1_5_R2.Item;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
@@ -228,8 +230,19 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
-			Block block = Block.byId[typeId];
+			final Block block = Block.byId[typeId];
 			return block == null ? false : block.isPowerSource();
+		}
+	};
+
+	/**
+	 * The material has a data value that further defines the type of Item or Block
+	 */
+	public static final MaterialProperty<Boolean> HASDATA = new MaterialBooleanProperty() {
+		@Override
+		public Boolean get(int typeId) {
+			final Item item = LogicUtil.getArray(Item.byId, typeId, null);
+			return item == null ? false : item.m();
 		}
 	};
 
