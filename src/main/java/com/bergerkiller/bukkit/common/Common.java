@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -8,19 +9,44 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class Common {
 	/**
-	 * Defines the Minecraft version that runs on the server<br>
-	 * If none is specified, this value is an empty String
+	 * Defines the Minecraft version that runs on the server.
+	 * To get the package path used, use {@link MC_VERSION_PACKAGEPART} instead.
+	 * The package path version is more accurate to use for version checking.
 	 */
 	public static final String MC_VERSION;
+	/**
+	 * Defines the Minecraft version, parsed to the package addition, that runs on the server.
+	 * If none is specified, this value is an empty String.
+	 * Otherwise, the value is of the format: v1_2_R3
+	 */
+	public static final String MC_VERSION_PACKAGEPART;
+	/**
+	 * Defines the net.minecraft.server root path
+	 */
+	public static final String NMS_ROOT;
+	/**
+	 * Defines the org.bukkit.craftbukkit root path
+	 */
+	public static final String CB_ROOT;
+	/**
+	 * Defines the com.bergerkiller.bukkit.common root path of this library
+	 */
+	public static final String COMMON_ROOT;
+	/**
+	 * Gets whether the current server software used is the Spigot implementation
+	 */
+	public static final boolean IS_SPIGOT_SERVER;
+
 	static {
 		String version = "";
 		if (!checkVersion(version)) {
 			StringBuilder builder = new StringBuilder();
-			for (int a = 0; a < 10; a++) {
-				for (int b = 0; b < 10; b++) {
-					for (int c = 0; c < 10; c++) {
+			int a, b, c;
+			for (a = 0; a < 10; a++) {
+				for (b = 0; b < 10; b++) {
+					for (c = 0; c < 10; c++) {
 						// Format:
-						// [package].v1_4_5.[trail]
+						// [package].v1_4_R5.[trail]
 						builder.setLength(0);
 						builder.append('v').append(a).append('_').append(b).append('_').append('R').append(c);
 						version = builder.toString();
@@ -31,25 +57,27 @@ public class Common {
 				}
 			}
 		}
+		String part = version.isEmpty() ? "" : ("." + version);
+		MC_VERSION_PACKAGEPART = version;
+		NMS_ROOT = "net.minecraft.server" + part;
+		CB_ROOT = "org.bukkit.craftbukkit" + part;
+		COMMON_ROOT = "com.bergerkiller.bukkit.common";
+		IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
+		// Find out the MC_VERSION using the CraftServer
+		try {
+			// Load required classes
+			Class<?> server = CommonUtil.getCBClass("CraftServer");
+			Class<?> minecraftServer = CommonUtil.getNMSClass("MinecraftServer");
+			// Get methods and instances
+			Method getServer = server.getDeclaredMethod("getServer");
+			Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
+			Method getVersion = minecraftServer.getDeclaredMethod("getVersion");
+			// Get the version
+			version = (String) getVersion.invoke(minecraftServerInstance);
+		} catch (Throwable t) {
+		}
 		MC_VERSION = version;
 	}
-	private static final String MC_VERSION_PACKAGEPART = MC_VERSION.isEmpty() ? "" : ("." + MC_VERSION);
-	/**
-	 * Defines the net.minecraft.server root path
-	 */
-	public static final String NMS_ROOT = "net.minecraft.server"+MC_VERSION_PACKAGEPART;
-	/**
-	 * Defines the org.bukkit.craftbukkit root path
-	 */
-	public static final String CB_ROOT = "org.bukkit.craftbukkit"+MC_VERSION_PACKAGEPART;
-	/**
-	 * Defines the com.bergerkiller.bukkit.common root path of this library
-	 */
-	public static final String COMMON_ROOT = "com.bergerkiller.bukkit.common";
-	/**
-	 * Gets whether the current server software used is the Spigot implementation
-	 */
-	public static final boolean IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
 
 	private static boolean checkVersion(String version) {
 		try {
@@ -73,7 +101,7 @@ public class Common {
 	 * @return True if the version is compatible, False if not
 	 */
 	public static boolean isMCVersionCompatible(String version) {
-		return MC_VERSION.isEmpty() || version.equals(MC_VERSION);
+		return MC_VERSION_PACKAGEPART.isEmpty() || version.equals(MC_VERSION_PACKAGEPART);
 	}
 
 	/**

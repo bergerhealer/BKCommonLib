@@ -2,7 +2,9 @@ package com.bergerkiller.bukkit.common.internal.network;
 
 import io.netty.channel.Channel;
 
+import java.util.AbstractList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.minecraft.server.v1_5_R2.Connection;
 import net.minecraft.server.v1_5_R2.INetworkManager;
@@ -13,11 +15,13 @@ import org.bukkit.entity.Player;
 import org.spigotmc.netty.NettyNetworkManager;
 import org.spigotmc.netty.PacketListener;
 
+import com.bergerkiller.bukkit.common.ToggledState;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 
@@ -29,7 +33,22 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 	private static final FieldAccessor<Boolean> netty_connected = NETTY_NETWORK_TEMPLATE.getField("connected");
 	private static final FieldAccessor<List<Object>> netty_queue = NETTY_NETWORK_TEMPLATE.getField("highPriorityQueue");
 	private static final FieldAccessor<Channel> netty_channel = NETTY_NETWORK_TEMPLATE.getField("channel");
+	private static final FieldAccessor<ReentrantLock> netty_writeLock;
 	private static SpigotPacketListener listener;
+	private static boolean useOldSystem;
+	private static ToggledState useOldSystemChecked = new ToggledState();
+
+	static {
+		FieldAccessor<ReentrantLock> lock = null;
+		try {
+			lock = new SafeField<ReentrantLock>(NETTY_NETWORK_TEMPLATE.getType().getDeclaredField("writeLock"));
+		} catch (NoSuchFieldException ex) {
+			// Ignore
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		netty_writeLock = lock;
+	}
 
 	@Override
 	public String getName() {
@@ -62,6 +81,8 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 
 	@Override
 	public void sendSilentPacket(Player player, Object packet) {
+		// NOTE: Below code is all obtained from Spigot source
+		// It may change at ANY time, so keeping it up-to-date is very important
 		Object conn = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
 		if (conn != null) {
 			Object networkManager = PlayerConnectionRef.networkManager.get(conn);
@@ -70,10 +91,30 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 				if (!netty_connected.get(netty)) {
 					return;
 				}
+				List<Object> highQueue = netty_queue.get(netty);
+
+				// Find out what mode of sending is needed (it changed at some point)
+				if (useOldSystemChecked.set()) {
+					final Class<?> c = highQueue.getClass();
+					useOldSystem = c.getSuperclass().equals(AbstractList.class) && c.getEnclosingClass() != null;
+				}
 
 				// Send it to Netty, bypassing the PacketListener queue
-				netty_queue.get(netty).add(packet);
-				netty_channel.get(netty).write(packet);
+				if (useOldSystem) {
+					highQueue.add(packet);
+					netty_channel.get(netty).write(packet);
+				} else {
+					ReentrantLock writeLock = netty_writeLock.get(netty);
+					writeLock.lock();
+					try {
+						highQueue.add(packet);
+					} finally {
+	                    // If we still have a lock, we need to get rid of that
+	                    if (writeLock.isHeldByCurrentThread()) {
+	                        writeLock.unlock();
+	                    }
+					}
+				}
 				return;
 			}
 		}

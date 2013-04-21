@@ -437,7 +437,13 @@ public class CommonPlugin extends PluginBase {
 	public void enable() {
 		// Validate version
 		if (IS_COMPATIBLE) {
-			log(Level.INFO, "BKCommonLib is running on Minecraft " + DEPENDENT_MC_VERSION);
+			String version = "Minecraft " + Common.MC_VERSION;
+			if (Common.MC_VERSION_PACKAGEPART.isEmpty()) {
+				version += " (Non-versioned package)";
+			} else {
+				version += " (" + DEPENDENT_MC_VERSION + ")";
+			}
+			log(Level.INFO, "BKCommonLib is running on " + version);
 		} else {
 			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib update that is compatible with Minecraft " + Common.MC_VERSION + ":");
