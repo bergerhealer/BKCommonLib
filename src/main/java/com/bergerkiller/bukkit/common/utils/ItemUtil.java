@@ -251,20 +251,15 @@ public class ItemUtil {
 	 * @param to which Item Stack to transfer the info to
 	 */
 	public static void transferInfo(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
+		// Transfer type and durability
 		to.setTypeId(from.getTypeId());
 		to.setDurability(from.getDurability());
-		Map<Enchantment, Integer> it = from.getEnchantments();
-		for(Enchantment e : it.keySet()) {
-			Map<Enchantment, Integer> it2 = to.getEnchantments();
-			for(Enchantment e2 : it2.keySet()) {
-				if(e.conflictsWith(e2))
-					continue;
-			}
-			int a = it.get(e);
-			if(e.canEnchantItem(to) && e.getMaxLevel() <= a) {
-				to.addEnchantment(e, a);
-			}
+		// Remove previous enchantments
+		for (Enchantment ench : to.getEnchantments().keySet()) {
+			to.removeEnchantment(ench);
 		}
+		// Add new enchantments
+		to.addEnchantments(from.getEnchantments());
 	}
 
 	/**
@@ -322,7 +317,7 @@ public class ItemUtil {
 				countToRemove -= item.getAmount();
 				inventory.setItem(i, null);
 			} else {
-				addAmount(item, -countToRemove);
+				subtractAmount(item, countToRemove);
 				countToRemove = 0;
 				inventory.setItem(i, item);
 				break;

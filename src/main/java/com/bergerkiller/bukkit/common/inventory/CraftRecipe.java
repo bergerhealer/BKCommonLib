@@ -114,6 +114,21 @@ public class CraftRecipe {
 	}
 
 	/**
+	 * Checks whether the input items of this recipe are contained within an Inventory
+	 * 
+	 * @param inventory to check
+	 * @return True if the items are available, False if not
+	 */
+	public boolean containsInput(Inventory inventory) {
+		for (ItemStack item : this.input) {
+			if (ItemUtil.getItemCount(inventory, item.getTypeId(), item.getDurability()) < item.getAmount()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Performs this recipe multiple times in the inventory specified
 	 * 
 	 * @param inventory to craft in
@@ -126,6 +141,16 @@ public class CraftRecipe {
 	}
 
 	/**
+	 * Performs this recipe once in the inventory specified
+	 * 
+	 * @param inventory to craft in
+	 * @return True if crafting occurred, False if not
+	 */
+	public boolean craft(Inventory inventory) {
+		return craft(inventory, 1) == 1;
+	}
+
+	/**
 	 * Performs this recipe multiple times in the inventory specified
 	 * 
 	 * @param inventory to craft in
@@ -133,36 +158,60 @@ public class CraftRecipe {
 	 * @return the amount of times it crafted
 	 */
 	public int craft(Inventory inventory, int limit) {
-		int amount;
-		for (amount = 0; amount < limit && craft(inventory); amount++);
-		return amount;
-	}
+		// Before cloning everything, check whether we can craft at all
+		if (!this.containsInput(inventory)) {
+			return 0;
+		}
 
-	/**
-	 * Performs this recipe once in the inventory specified
-	 * 
-	 * @param inventory to craft in
-	 * @return True if crafting occurred, False if not
-	 */
-	public boolean craft(Inventory inventory) {
-		// contains the required items?
-		for (ItemStack item : this.input) {
-			if (ItemUtil.getItemCount(inventory, item.getTypeId(), item.getDurability()) < item.getAmount()) {
-				return false;
+		// Create a (temporary) clone of the inventory to work with
+		final ItemStack[] items = inventory.getContents();
+		final int size = items.length;
+		final Inventory inventoryClone = new InventoryBaseImpl(items, true);
+		int amount, i;
+
+		// Craft items until the limit is reached, or crafting is impossible
+		// Below is the craftloop label, which is used to break out of crafting
+		craftloop:
+		for (amount = 0; amount < limit; amount++) {
+			// input item check
+			if (!this.containsInput(inventoryClone)) {
+				break;
+			}
+
+			// remove ingredients from inventory
+			for (ItemStack item : this.input) {
+				ItemUtil.removeItems(inventoryClone, item);
+			}
+
+			// add resulting items to inventory
+			for (ItemStack item : this.output) {
+				ItemStack cloned = ItemUtil.cloneItem(item);
+				ItemUtil.transfer(cloned, inventoryClone, Integer.MAX_VALUE);
+				// Could not add result (full), unsuccessful
+				if (!LogicUtil.nullOrEmpty(cloned)) {
+					break craftloop;
+				}
+			}
+
+			// Crafting was successful, transfer items over
+			// Be sure NOT to produce new ItemStack instances!
+			for (i = 0; i < size; i++) {
+				ItemStack newItem = inventoryClone.getItem(i);
+				if (LogicUtil.nullOrEmpty(newItem)) {
+					items[i] = null;
+				} else if (items[i] == null) {
+					items[i] = newItem.clone();
+				} else {
+					// Transfer info and amount
+					ItemUtil.transferInfo(newItem, items[i]);
+					items[i].setAmount(newItem.getAmount());
+				}
 			}
 		}
-		// contains enough room to put in the results?
-		if (!ItemUtil.canTransferAll(this.output, inventory)) {
-			return false;
-		}
-		// actually transfer everything...
-		for (ItemStack item : this.input) {
-			ItemUtil.removeItems(inventory, item);
-		}
-		for (ItemStack item : this.output) {
-			ItemUtil.transfer(ItemUtil.cloneItem(item), inventory, Integer.MAX_VALUE);
-		}
-		return true;
+
+		// Update input inventory with the new items
+		inventory.setContents(items);
+		return amount;
 	}
 
 	/**
