@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -289,6 +288,17 @@ public class BlockUtil extends MaterialUtil {
 	}
 
 	/**
+	 * Obtains a new packet that can be used to update tile entity information to nearby players<br>
+	 * Returns null if none are needed or supported by the tile entity
+	 * 
+	 * @param tileEntity to get the update packet for
+	 * @return update packet
+	 */
+	public static CommonPacket getUpdatePacket(Object tileEntity) {
+		return TileEntityRef.getUpdatePacket(tileEntity);
+	}
+
+	/**
 	 * Sets the alignment of Rails
 	 * Note that this only supports the rails that can curve.
 	 * 
@@ -365,76 +375,43 @@ public class BlockUtil extends MaterialUtil {
 		return getBlockStates(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
 	}
 
+	private static final ArrayList<BlockState> blockStateBuff = new ArrayList<BlockState>();
+
 	public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
-		if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
-			// simplified coding instead
-			offerTile(TileEntityRef.getFromWorld(world, x, y, z));
-		} else {
-			// loop through tile entity list
-			int xMin = x - radiusX;
-			int yMin = y - radiusY;
-			int zMin = z - radiusZ;
-			int xMax = x + radiusX;
-			int yMax = y + radiusY;
-			int zMax = z + radiusZ;
-			int tx, ty, tz;
-			for (Object tile : WorldRef.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
-				tx = TileEntityRef.x.get(tile);
-				ty = TileEntityRef.y.get(tile);
-				tz = TileEntityRef.z.get(tile);
-				if (tx < xMin || ty < yMin || tz < zMin || tx > xMax || ty > yMax || tz > zMax) {
-					continue;
-				}
-				// Get again - security against ghost tiles
-				offerTile(CommonNMS.getNative(world).getTileEntity(tx, ty, tz));
-			}
-		}
-		// Convert back to Bukkit types
-		ArrayList<BlockState> blocks = new ArrayList<BlockState>(blockStateBuff);
-		blockStateBuff.clear();
-		return blocks;
-	}
-
-	/**
-	 * Obtains a new packet that can be used to update tile entity information to nearby players<br>
-	 * Returns null if none are needed or supported by the tile entity
-	 * 
-	 * @param tileEntity to get the update packet for
-	 * @return update packet
-	 */
-	public static CommonPacket getUpdatePacket(Object tileEntity) {
-		return TileEntityRef.getUpdatePacket(tileEntity);
-	}
-
-	private static final LinkedHashSet<BlockState> blockStateBuff = new LinkedHashSet<BlockState>();
-	private static void offerTile(Object tile) {
-		BlockState state = Conversion.toBlockState.convert(tile);
-		if (state == null) {
-			return;
-		}
-		if (state instanceof Chest) {
-			// find a possible double chest as well
-			int tmpx, tmpy, tmpz;
-			final World world = state.getWorld();
-			tmpy = state.getY();
-			for (BlockFace sface : FaceUtil.AXIS) {
-				tmpx = state.getX() + sface.getModX();
-				tmpz = state.getZ() + sface.getModZ();
-				if (world.getBlockTypeIdAt(tmpx, tmpy, tmpz) == Material.CHEST.getId()) {
-					BlockState next = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, tmpx, tmpy, tmpy));
-					if (next instanceof Chest) {
-						if (sface == BlockFace.WEST || sface == BlockFace.SOUTH) {
-							blockStateBuff.add(next);
-							blockStateBuff.add(state);
-						} else {
-							blockStateBuff.add(state);
-							blockStateBuff.add(next);
-						}
-						return;
+		try {
+			if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
+				// simplified coding instead
+				offerTile(world, x, y, z);
+			} else {
+				// loop through tile entity list
+				int xMin = x - radiusX;
+				int yMin = y - radiusY;
+				int zMin = z - radiusZ;
+				int xMax = x + radiusX;
+				int yMax = y + radiusY;
+				int zMax = z + radiusZ;
+				int tx, ty, tz;
+				for (Object tile : WorldRef.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
+					tx = TileEntityRef.x.get(tile);
+					ty = TileEntityRef.y.get(tile);
+					tz = TileEntityRef.z.get(tile);
+					if (tx < xMin || ty < yMin || tz < zMin || tx > xMax || ty > yMax || tz > zMax) {
+						continue;
 					}
+					// Get again - security against ghost tiles
+					offerTile(world, tx, ty, tz);
 				}
 			}
+			return new ArrayList<BlockState>(blockStateBuff);
+		} finally {
+			blockStateBuff.clear();
 		}
-		blockStateBuff.add(state);
+	}
+
+	private static void offerTile(World world, int x, int y, int z) {
+		BlockState state = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, x, y, z));
+		if (state != null) {
+			blockStateBuff.add(state);
+		}
 	}
 }
