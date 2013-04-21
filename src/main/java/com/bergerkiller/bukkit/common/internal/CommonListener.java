@@ -39,6 +39,8 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
+import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -103,6 +105,8 @@ class CommonListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPlayerJoin(PlayerJoinEvent event) {
 		CommonPlugin.getInstance().getPacketHandler().onPlayerJoin(event.getPlayer());
+		CommonTeam team = CommonScoreboard.get(event.getPlayer()).getTeam();
+		team.send(event.getPlayer()); //Send playe team to player
 	}
 
 	/*
