@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.zip.ZipEntry;
 
 import net.minecraft.server.v1_5_R2.IPlayerFileData;
 
@@ -302,14 +303,22 @@ public class CommonUtil {
 			for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
 				File file = getPluginJarFile(plugin);
 				if (pluginJarFile.equals(file)) {
-					return plugin.getResource(resourcePath);
+					InputStream stream = plugin.getResource(resourcePath);
+					if (stream == null) {
+						throw new IOException("Resource not found: " + resourcePath);
+					}
+					return stream;
 				}
 			}
 		}
 
 		// Not found, stick to reading the JarFile ourselves
 		final JarFile jarFile = new JarFile(pluginJarFile);
-		return jarFile.getInputStream(jarFile.getEntry(resourcePath));
+		final ZipEntry entry = jarFile.getEntry(resourcePath);
+		if (entry == null) {
+			throw new IOException("Resource not found: " + resourcePath);
+		}
+		return jarFile.getInputStream(entry);
 	}
 
 	/**
