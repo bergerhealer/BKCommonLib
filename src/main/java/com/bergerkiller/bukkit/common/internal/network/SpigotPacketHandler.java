@@ -109,10 +109,10 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 					try {
 						highQueue.add(packet);
 					} finally {
-	                    // If we still have a lock, we need to get rid of that
-	                    if (writeLock.isHeldByCurrentThread()) {
-	                        writeLock.unlock();
-	                    }
+						// If we still have a lock, we need to get rid of that
+						if (writeLock.isHeldByCurrentThread()) {
+							writeLock.unlock();
+						}
 					}
 				}
 				return;
