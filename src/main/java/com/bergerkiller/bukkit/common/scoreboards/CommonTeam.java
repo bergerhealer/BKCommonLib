@@ -19,8 +19,11 @@ public class CommonTeam {
 	private String suffix;
 	private FriendlyFireType friendlyFire;
 	private List<String> players;
+	private boolean sendToAll;
 	
-	public CommonTeam(String name) {
+	//Do NOT construct teams from outside
+	//Use CommonScoreboard.newTeam(String name)
+	protected CommonTeam(String name) {
 		this.name = name;
 		this.displayName = name;
 		this.prefix = "";
@@ -53,6 +56,10 @@ public class CommonTeam {
 		return this.players;
 	}
 	
+	public boolean shouldSendToAll() {
+		return this.sendToAll;
+	}
+	
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 		this.update();
@@ -73,13 +80,26 @@ public class CommonTeam {
 		this.update();
 	}
 	
+	public void setSendToAll(boolean sendToAll) {
+		this.sendToAll = sendToAll;
+	}
+	
 	public void addPlayer(OfflinePlayer player) {
 		players.add(player.getName());
 		
-		for(String user : players) {
-			Player p = Bukkit.getPlayer(user);
-			if(p != null && p.isOnline()) {
+		if(this.sendToAll) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(3));
+		} else {
+			if(player != null && player.isOnline()) {
+				PacketUtil.sendPacket((Player) player, this.getPacket(0));
+			}
+			
+			for(String user : players) {
+				Player p = Bukkit.getPlayer(user);
+				if(p != null && p.isOnline()) {
+					PacketUtil.sendPacket(p, this.getPacket(3));
+				}
 			}
 		}
 	}
@@ -87,37 +107,61 @@ public class CommonTeam {
 	public void removePlayer(OfflinePlayer player) {
 		players.remove(player.getName());
 		
-		for(String user : players) {
-			Player p = Bukkit.getPlayer(user);
-			if(p != null && p.isOnline()) {
+		if(this.sendToAll) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(4));
+		} else {
+			if(player != null && player.isOnline()) {
+				PacketUtil.sendPacket((Player) player, this.getPacket(1));
+			}
+			
+			for(String user : players) {
+				Player p = Bukkit.getPlayer(user);
+				if(p != null && p.isOnline()) {
+					PacketUtil.sendPacket(p, this.getPacket(4));
+				}
 			}
 		}
 	}
 	
 	public void show() {
-		for(String user : players) {
-			Player p = Bukkit.getPlayer(user);
-			if(p != null && p.isOnline()) {
+		if(this.sendToAll) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(0));
+		} else {
+			for(String user : players) {
+				Player p = Bukkit.getPlayer(user);
+				if(p != null && p.isOnline()) {
+					PacketUtil.sendPacket(p, this.getPacket(0));
+				}
 			}
 		}
 	}
 	
 	public void hide() {
-		for(String user : players) {
-			Player p = Bukkit.getPlayer(user);
-			if(p != null && p.isOnline()) {
+		if(this.sendToAll) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(1));
+		} else {
+			for(String user : players) {
+				Player p = Bukkit.getPlayer(user);
+				if(p != null && p.isOnline()) {
+					PacketUtil.sendPacket(p, this.getPacket(1));
+				}
 			}
 		}
 	}
 	
 	private void update() {
-		for(String user : players) {
-			Player p = Bukkit.getPlayer(user);
-			if(p != null && p.isOnline()) {
+		if(this.sendToAll) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(2));
+		} else {
+			for(String user : players) {
+				Player p = Bukkit.getPlayer(user);
+				if(p != null && p.isOnline()) {
+					PacketUtil.sendPacket(p, this.getPacket(2));
+				}
 			}
 		}
 	}

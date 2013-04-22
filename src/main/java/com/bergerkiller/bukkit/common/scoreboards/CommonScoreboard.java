@@ -1,13 +1,24 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 public class CommonScoreboard {
 	private static Map<Player, CommonScoreboard> boards = new WeakHashMap<Player, CommonScoreboard>();
+	private static List<CommonTeam> teams = new ArrayList<CommonTeam>();
 	public static CommonTeam dummyTeam = new CommonTeam("dummy") {
 		public void addPlayer(OfflinePlayer player) {}
 		public void removePlayer(OfflinePlayer player) {}
@@ -18,6 +29,7 @@ public class CommonScoreboard {
 		public void setSuffix(String suffic) {}
 		public void setFriendlyFire(FriendlyFireType friendlyFire) {}
 		public void send(Player player) {}
+		public void setSendToAll(boolean sendToAll) {}
 	};
 	
 	public static CommonScoreboard get(Player player) {
@@ -90,7 +102,72 @@ public class CommonScoreboard {
 	 * @return New team
 	 */
 	public static CommonTeam newTeam(String name) {
-		return new CommonTeam(name);
+		CommonTeam team = new CommonTeam(name);
+		teams.add(team);
+		return team;
+	}
+	
+	/**
+	 * Load a team form the disk
+	 * 
+	 * @param team Team name
+	 * @return Team form disk (new team if failed)
+	 */
+	public static CommonTeam loadTeam(String name) {
+		CommonTeam team = null;
+		
+		try {
+			File dir = CommonPlugin.getInstance().getDataFolder();
+			dir.mkdir();
+			dir = new File(dir, "teams");
+			dir.mkdir();
+			File file = new File(dir, name + ".bin");
+			if(file.exists()) {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+				team = (CommonTeam) ois.readObject();
+				ois.close();
+			}
+		} catch(Exception e) {
+			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to load team form disk", e);
+		}
+		
+		if(team == null) {
+			//Failed to load team
+			team = new CommonTeam(name);
+		}
+		
+		teams.add(team);
+		return team;
+	}
+	
+	/**
+	 * Save a team to the disk
+	 * 
+	 * @param team Team to save
+	 */
+	public static void saveTeam(CommonTeam team) {
+		try {
+			File dir = CommonPlugin.getInstance().getDataFolder();
+			dir.mkdir();
+			dir = new File(dir, "teams");
+			dir.mkdir();
+			File file = new File(dir, team.getName() + ".bin");
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+			oos.writeObject(team);
+			oos.flush();
+			oos.close();
+		} catch(Exception e) {
+			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed ot save team to disk", e);
+		}
+	}
+	
+	/**
+	 * Get all registered teams by BKCommonLib
+	 * 
+	 * @return All registered teams
+	 */
+	public static CommonTeam[] getTeams() {
+		return teams.toArray(new CommonTeam[0]);
 	}
 	
 	/**
