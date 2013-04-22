@@ -5,8 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -18,7 +17,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public class CommonScoreboard {
 	private static Map<Player, CommonScoreboard> boards = new WeakHashMap<Player, CommonScoreboard>();
-	private static List<CommonTeam> teams = new ArrayList<CommonTeam>();
+	private static Map<String, CommonTeam> teams = new HashMap<String, CommonTeam>();
 	public static CommonTeam dummyTeam = new CommonTeam("dummy") {
 		public void addPlayer(OfflinePlayer player) {}
 		public void removePlayer(OfflinePlayer player) {}
@@ -103,7 +102,7 @@ public class CommonScoreboard {
 	 */
 	public static CommonTeam newTeam(String name) {
 		CommonTeam team = new CommonTeam(name);
-		teams.add(team);
+		teams.put(name, team);
 		return team;
 	}
 	
@@ -136,7 +135,7 @@ public class CommonScoreboard {
 			team = new CommonTeam(name);
 		}
 		
-		teams.add(team);
+		teams.put(name, team);
 		return team;
 	}
 	
@@ -167,7 +166,17 @@ public class CommonScoreboard {
 	 * @return All registered teams
 	 */
 	public static CommonTeam[] getTeams() {
-		return teams.toArray(new CommonTeam[0]);
+		return teams.values().toArray(new CommonTeam[0]);
+	}
+	
+	/**
+	 * Get a team by name
+	 * 
+	 * @param name Team name
+	 * @return Team (null if not found)
+	 */
+	public static CommonTeam getTeam(String name) {
+		return teams.get(name);
 	}
 	
 	/**
