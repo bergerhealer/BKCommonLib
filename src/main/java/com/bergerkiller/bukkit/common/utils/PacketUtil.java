@@ -24,6 +24,10 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 public class PacketUtil {
 	private static final Map<Class<?>, Integer> packetsToIds = PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
 
+	public static Collection<Class<?>> getPacketClasses() {
+		return packetsToIds.keySet();
+	}
+
 	public static int getPacketId(Class<?> packetClass) {
 		return packetsToIds.get(packetClass);
 	}

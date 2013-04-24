@@ -56,6 +56,7 @@ public class PacketFields {
 	public static final NMSPacket60Explosion EXPLOSION = new NMSPacket60Explosion();
 	public static final NMSPacket61WorldEvent WORLD_EVENT = new NMSPacket61WorldEvent();
 	public static final NMSPacket62NamedSoundEffect NAMED_SOUND_EFFECT = new NMSPacket62NamedSoundEffect();
+	public static final NMSPacket63WorldParticles WORLD_PARTICLES = new NMSPacket63WorldParticles();
 	public static final NMSPacket70Bed BED = new NMSPacket70Bed();
 	public static final NMSPacket71Weather WEATHER = new NMSPacket71Weather();
 	public static final NMSPacket100OpenWindow OPEN_WINDOW = new NMSPacket100OpenWindow();

@@ -3,7 +3,9 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.security.PublicKey;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.crypto.SecretKey;
 
@@ -12,6 +14,7 @@ import net.minecraft.server.v1_5_R2.Vec3D;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Block;
@@ -20,10 +23,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -31,6 +36,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
@@ -496,6 +502,35 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Float> volume = getField("e");
 		public final FieldAccessor<Integer> pitch = getField("f");
 	}
+	public static class NMSPacket63WorldParticles extends NMSPacket {
+		public final FieldAccessor<String> effectName = getField("a");
+		public final FieldAccessor<Float> x = getField("b");
+		public final FieldAccessor<Float> y = getField("c");
+		public final FieldAccessor<Float> z = getField("d");
+		public final FieldAccessor<Float> randomX = getField("e");
+		public final FieldAccessor<Float> randomY = getField("f");
+		public final FieldAccessor<Float> randomZ = getField("g");
+		public final FieldAccessor<Float> speed = getField("h");
+		public final FieldAccessor<Integer> particleCount = getField("i");
+
+		public CommonPacket newInstance(String name, int count, Location location, double randomness, double speed) {
+			return newInstance(name, count, location.getX(), location.getY(), location.getZ(), randomness, randomness, randomness, speed);
+		}
+
+		public CommonPacket newInstance(String name, int count, double x, double y, double z, double rx, double ry, double rz, double speed) {
+			final CommonPacket packet = newInstance();
+			packet.write(this.effectName, name);
+			packet.write(this.particleCount, count);
+			packet.write(this.x, (float) x);
+			packet.write(this.y, (float) y);
+			packet.write(this.z, (float) z);
+			packet.write(this.randomX, (float) rx);
+			packet.write(this.randomY, (float) ry);
+			packet.write(this.randomZ, (float) rz);
+			packet.write(this.speed, (float) speed);
+			return packet;
+		}
+	}
 	public static class NMSPacket70Bed extends NMSPacket {
 		public final FieldAccessor<Integer> reason = getField("b");
 		public final FieldAccessor<Integer> gamemode = getField("c");
@@ -662,5 +697,23 @@ public class PacketFieldClasses {
 	}
 	public static class NMSPacket255KickDisconnect extends NMSPacket {
 		public final FieldAccessor<String> reason = getField("a");
+	}
+
+	static {
+		// Validate that all packet types are implemented
+		final HashSet<String> implemented = new HashSet<String>(256);
+		for (Class<?> subClass : PacketFieldClasses.class.getDeclaredClasses()) {
+			implemented.add(subClass.getSimpleName());
+		}
+		for (Class<?> packetClass : PacketUtil.getPacketClasses()) {
+			// Ignore custom packet types
+			if (!packetClass.getName().startsWith(Common.NMS_ROOT)) {
+				continue;
+			}
+			// Get name of packet according to the classes in this Class
+			if (!implemented.contains("NMS" + packetClass.getSimpleName())) {
+				CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet not implemented: " + packetClass.getSimpleName());
+			}
+		}
 	}
 }
