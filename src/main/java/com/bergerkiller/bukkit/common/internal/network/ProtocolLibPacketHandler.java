@@ -142,6 +142,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		return "the ProtocolLib library";
 	}
 
+	@Override
+	public long getPendingBytes(Player player) {
+		return CommonPacketHandler.calculatePendingBytes(player);
+	}
+
 	private static class CommonPacketMonitor extends CommonPacketAdapter {
 		public final PacketMonitor monitor;
 

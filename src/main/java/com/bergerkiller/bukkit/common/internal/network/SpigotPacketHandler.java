@@ -1,10 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
-import io.netty.channel.Channel;
-
-import java.util.AbstractList;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import java.lang.reflect.Field;
+import java.util.Queue;
 
 import net.minecraft.server.v1_5_R2.Connection;
 import net.minecraft.server.v1_5_R2.INetworkManager;
@@ -15,11 +12,10 @@ import org.bukkit.entity.Player;
 import org.spigotmc.netty.NettyNetworkManager;
 import org.spigotmc.netty.PacketListener;
 
-import com.bergerkiller.bukkit.common.ToggledState;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
@@ -29,25 +25,19 @@ import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
  * A packet handler implementation that uses Spigot's netty service
  */
 public class SpigotPacketHandler extends PacketHandlerHooked {
-	private static final ClassTemplate<?> NETTY_NETWORK_TEMPLATE = ClassTemplate.create(NettyNetworkManager.class);
-	private static final FieldAccessor<Boolean> netty_connected = NETTY_NETWORK_TEMPLATE.getField("connected");
-	private static final FieldAccessor<List<Object>> netty_queue = NETTY_NETWORK_TEMPLATE.getField("highPriorityQueue");
-	private static final FieldAccessor<Channel> netty_channel = NETTY_NETWORK_TEMPLATE.getField("channel");
-	private static final FieldAccessor<ReentrantLock> netty_writeLock;
+	private static final FieldAccessor<PacketListener[]> bakedListeners = SafeField.create(PacketListener.class, "baked");
+	private static final FieldAccessor<Queue<Packet>> realPacketQueue;
+	private static final PacketListener[] EMPTY_PACKETLISTENER_ARRAY = new PacketListener[0];
 	private static SpigotPacketListener listener;
-	private static boolean useOldSystem;
-	private static ToggledState useOldSystemChecked = new ToggledState();
 
 	static {
-		FieldAccessor<ReentrantLock> lock = null;
+		FieldAccessor<Queue<Packet>> realQueue = null;
 		try {
-			lock = new SafeField<ReentrantLock>(NETTY_NETWORK_TEMPLATE.getType().getDeclaredField("writeLock"));
-		} catch (NoSuchFieldException ex) {
-			// Ignore
+			Field field = NettyNetworkManager.class.getDeclaredField("realQueue");
+			realQueue = new SafeField<Queue<Packet>>(field);
 		} catch (Throwable t) {
-			t.printStackTrace();
 		}
-		netty_writeLock = lock;
+		realPacketQueue = realQueue;
 	}
 
 	@Override
@@ -88,38 +78,45 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 			Object networkManager = PlayerConnectionRef.networkManager.get(conn);
 			if (networkManager instanceof NettyNetworkManager) {
 				NettyNetworkManager netty = (NettyNetworkManager) networkManager;
-				if (!netty_connected.get(netty)) {
-					return;
-				}
-				List<Object> highQueue = netty_queue.get(netty);
+				synchronized (netty) {
+					// Temporarily clear the baked listeners
+					final PacketListener[] oldBaked = bakedListeners.get(null);
+					bakedListeners.set(null, EMPTY_PACKETLISTENER_ARRAY);
 
-				// Find out what mode of sending is needed (it changed at some point)
-				if (useOldSystemChecked.set()) {
-					final Class<?> c = highQueue.getClass();
-					useOldSystem = c.getSuperclass().equals(AbstractList.class) && c.getEnclosingClass() != null;
-				}
+					// Queue
+					netty.queue((Packet) packet);
 
-				// Send it to Netty, bypassing the PacketListener queue
-				if (useOldSystem) {
-					highQueue.add(packet);
-					netty_channel.get(netty).write(packet);
-				} else {
-					ReentrantLock writeLock = netty_writeLock.get(netty);
-					writeLock.lock();
-					try {
-						highQueue.add(packet);
-					} finally {
-						// If we still have a lock, we need to get rid of that
-						if (writeLock.isHeldByCurrentThread()) {
-							writeLock.unlock();
-						}
-					}
+					// Restore
+					bakedListeners.set(null, oldBaked);
 				}
 				return;
 			}
 		}
 		// Just send it in the default fashion
 		sendPacket(player, packet, true);
+	}
+
+	@Override
+	public long getPendingBytes(Player player) {
+		// Old version of Spigot - there is no way to get the size (it's internal)
+		if (realPacketQueue == null) {
+			return 0L;
+		}
+		final Object playerHandle = Conversion.toEntityHandle.convert(player);
+		final Object playerConnection = EntityPlayerRef.playerConnection.get(playerHandle);
+		final Object nm = PlayerConnectionRef.networkManager.get(playerConnection);
+		// We can only work on Netty Network manager implementations, other INetworkManager implementations are unknown to us
+		if (!(nm instanceof NettyNetworkManager)) {
+			return 0L;
+		}
+		synchronized (nm) {
+			Queue<Packet> queue = realPacketQueue.get(nm);
+			long queuedsize = 0;
+			for (Packet p : queue) {
+				queuedsize += PacketFields.DEFAULT.getPacketSize(p) + 1;
+			}
+			return queuedsize;
+		}
 	}
 
 	private static class SpigotPacketListener extends PacketListener {

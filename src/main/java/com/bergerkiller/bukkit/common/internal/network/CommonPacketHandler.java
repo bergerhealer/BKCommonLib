@@ -15,9 +15,11 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -66,6 +68,40 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		PlayerConnectionRef.sendPacket(connection, new CommonSilentPacket(packet));
 	}
 
+	@Override
+	public long getPendingBytes(Player player) {
+		return calculatePendingBytes(player);
+	}
+
+	protected static long calculatePendingBytes(Player player) {
+		final Object playerHandle = Conversion.toEntityHandle.convert(player);
+		final Object playerConnection = EntityPlayerRef.playerConnection.get(playerHandle);
+		final Object nm = PlayerConnectionRef.networkManager.get(playerConnection);
+		// We can only work on Network manager implementations, INetworkManager implementations are unknown to us
+		if (!NetworkManagerRef.TEMPLATE.isInstance(nm)) {
+			return 0L;
+		}
+		Object lockObject = NetworkManagerRef.lockObject.get(nm);
+		if (lockObject == null) {
+			return 0L;
+		}
+		List<Object> low = NetworkManagerRef.lowPriorityQueue.get(nm);
+		List<Object> high = NetworkManagerRef.highPriorityQueue.get(nm);
+		if (low == null || high == null) {
+			return 0L;
+		}
+		long queuedsize = 0;
+		synchronized (lockObject) {
+			for (Object p : low) {
+				queuedsize += PacketFields.DEFAULT.getPacketSize(p) + 1;
+			}
+			for (Object p : high) {
+				queuedsize += PacketFields.DEFAULT.getPacketSize(p) + 1;
+			}
+		}
+		return queuedsize;
+	}
+	
 	private static void failPacketListener(Class<?> playerConnectionType) {
 		Plugin plugin = CommonUtil.getPluginByClass(playerConnectionType);
 		if (plugin == null) {
