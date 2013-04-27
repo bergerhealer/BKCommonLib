@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
-public class CommonTeam {
+public class CommonTeam implements Serializable {
+	private static final long serialVersionUID = -2928363541719230386L;
 	private String name;
 	private String displayName;
 	private String prefix;
