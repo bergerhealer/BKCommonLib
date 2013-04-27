@@ -19,6 +19,7 @@ public class CommonScoreboard {
 	private static Map<Player, CommonScoreboard> boards = new WeakHashMap<Player, CommonScoreboard>();
 	private static Map<String, CommonTeam> teams = new HashMap<String, CommonTeam>();
 	public static CommonTeam dummyTeam = new CommonTeam("dummy") {
+		private static final long serialVersionUID = 2284488822613734842L;
 		public void addPlayer(OfflinePlayer player) {}
 		public void removePlayer(OfflinePlayer player) {}
 		public void show() {}
