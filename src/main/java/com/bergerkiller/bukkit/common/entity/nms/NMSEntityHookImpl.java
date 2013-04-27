@@ -82,7 +82,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 
 	@Override
 	public boolean d(NBTTagCompound nbttagcompound) {
-		if (this.controller.getEntity().isDead() || (this.controller.getEntity().hasPassenger() && controller.isPlayerTakable())) {
+		if (this.controller.getEntity().isDead() || (this.controller.getEntity().hasPlayerPassenger() && controller.isPlayerTakable())) {
 			return false;
 		} else {
 			nbttagcompound.setString("id", getSavedName());
