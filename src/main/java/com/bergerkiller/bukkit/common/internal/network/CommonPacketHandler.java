@@ -29,6 +29,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	 * Known plugins that malfunction with the default packet handler
 	 */
 	private static final String[] incompatibilities = {"Spout"};
+	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ae(), "c");
 
 	@Override
 	public String getName() {
@@ -72,6 +73,9 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		} else {
 			failPacketListener(plugin.getName());
 		}
+		if (CommonPlugin.hasInstance()) {
+			CommonPlugin.getInstance().onCriticalFailure();
+		}
 	}
 
 	private static void failPacketListener(String pluginName) {
@@ -86,7 +90,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	}
 
 	private static class CommonPlayerConnection extends PlayerConnection {
-		private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ae(), "c");
 		private final PlayerConnection previous;
 		private final PacketHandlerHooked handler;
 
@@ -137,30 +140,27 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		}
 
 		private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
-			final boolean hasCommon = CommonPlugin.hasInstance();
 			if (isReplaceable(ep.playerConnection)) {
 				// Set it
 				ep.playerConnection = connection;
+				// Register
+				registerPlayerConnection(ep, connection, true);
 				// Perform a little check-up in 10 ticks
 				if (CommonPlugin.hasInstance()) {
 					new Task(CommonPlugin.getInstance()) {
 						@Override
 						public void run() {
-							if (hasCommon && ep.playerConnection != connection) {
+							if (ep.playerConnection != connection) {
 								// Player connection has changed!
 								failPacketListener(ep.playerConnection.getClass());
-								CommonPlugin.getInstance().onCriticalFailure();
 							}
 						}
 					}.start(10);
 				}
-			} else if (hasCommon) {
+			} else {
 				// Plugin conflict!
 				failPacketListener(ep.playerConnection.getClass());
-				CommonPlugin.getInstance().onCriticalFailure();
-				return;
 			}
-			registerPlayerConnection(ep, connection, true);
 		}
 
 		private static void registerPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean retry) {
@@ -174,11 +174,19 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 					}
 				}
 				if (!retry) {
-					CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to (un)register PlayerConnection proxy...bad things may happen!");
+					StringBuilder msg = new StringBuilder(100);
+					msg.append("Failed to ");
+					if (connection instanceof CommonPlayerConnection) {
+						msg.append("register");
+					} else {
+						msg.append("unregister");
+					}
+					msg.append(" PlayerConnection proxy for ").append(ep.name).append("...bad things may happen!");
+					CommonPlugin.LOGGER.log(Level.SEVERE, msg.toString());
 					return;
 				}
-				// We failed to remove it in one go...
-				// Remove the old one the next tick but then fail
+				// We failed to set it in one go...
+				// Set the next tick but then fail
 				CommonUtil.nextTick(new Runnable() {
 					public void run() {
 						registerPlayerConnection(ep, connection, false);

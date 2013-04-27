@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -225,7 +226,11 @@ public class NMSEntityClassBuilder {
 
 		@Override
 		public Object invoke(Object instance, Object[] args) throws Throwable {
-			return callbackMethod.invoke(callbackInstance, args);
+			try {
+				return callbackMethod.invoke(callbackInstance, args);
+			} catch (InvocationTargetException ex) {
+				throw ex.getCause();
+			}
 		}
 
 		@Override

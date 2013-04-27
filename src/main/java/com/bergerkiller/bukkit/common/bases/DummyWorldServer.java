@@ -13,6 +13,11 @@ public class DummyWorldServer extends WorldServer {
 	private static final ClassTemplate<DummyWorldServer> TEMPLATE = ClassTemplate.create(DummyWorldServer.class);
 	public DummyChunkProviderServer DUMMYCPS;
 
+	/**
+	 * It is impossible to use this constructor, it is merely there to allow extending classes.
+	 * Use ClassTemplate.newInstanceNull instead.
+	 */
+	@Deprecated
 	protected DummyWorldServer() {
 		super(constrFail(), null, null, 12, null, null, null, null, null);
 	}

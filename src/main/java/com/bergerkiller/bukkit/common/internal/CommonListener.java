@@ -73,22 +73,16 @@ class CommonListener implements Listener {
 		});
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onWorldUnload(WorldUnloadEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		CommonWorldListener listener = CommonPlugin.getInstance().worldListeners.remove(event.getWorld());
 		if (listener != null) {
 			listener.disable();
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onVehicleEnter(final VehicleEnterEvent event) {
-		if (event.isCancelled()) {
-			return;
-		}
 		// Set the vehicle and passenger handles for Hook entities
 		// This is required to avoid problems with replaced Entities
 		if (CommonNMS.getNative(event.getVehicle()).dead) {
@@ -121,9 +115,9 @@ class CommonListener implements Listener {
 	/*
 	 * This is a temporary workaround until the VehicleExitEvent works again
 	 */
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-		if (!event.isCancelled() && event.getPlayer().getVehicle() == event.getRightClicked()) {
+		if (event.getPlayer().getVehicle() == event.getRightClicked() && event.getRightClicked() instanceof Vehicle) {
 			// Call a player exit event
 			final Vehicle vehicle = (Vehicle) event.getRightClicked();
 			event.setCancelled(CommonUtil.callEvent(new VehicleExitEvent(vehicle, event.getPlayer())).isCancelled());

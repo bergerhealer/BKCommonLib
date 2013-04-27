@@ -2,11 +2,13 @@ package com.bergerkiller.bukkit.common.conversion;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.conversion.type.EmptyConverter;
 import com.bergerkiller.bukkit.common.conversion.type.EnumConverter;
 import com.bergerkiller.bukkit.common.conversion.type.ObjectArrayConverter;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -16,8 +18,12 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 public class Conversion extends ConversionTypes {
 	private static final Map<Class<?>, Converter<Object>> converters = new ConcurrentHashMap<Class<?>, Converter<Object>>();
 	static {
-		registerAll(ConversionTypes.class);
-		ConversionPairs.class.getModifiers(); // Load this class
+		try {
+			registerAll(ConversionTypes.class);
+			ConversionPairs.class.getModifiers(); // Load this class
+		} catch (Throwable t) {
+			CommonPlugin.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+		}
 	}
 
 	/**

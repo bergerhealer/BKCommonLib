@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -417,7 +418,38 @@ public class CommonUtil {
 	 * @param runnable to execute
 	 */
 	public static void nextTick(Runnable runnable) {
-		CommonPlugin.getInstance().nextTick(runnable);
+		if (runnable == null) {
+			return;
+		}
+		if (CommonPlugin.hasInstance()) {
+			// Use BKCommonLib next tick task
+			CommonPlugin.getInstance().nextTick(runnable);
+		} else {
+			// Try to find out what plugin this Runnable belongs to
+			Plugin plugin = CommonUtil.getPluginByClass(runnable.getClass());
+			if (plugin == null) {
+				// Well...ain't that a pickle.
+				// Maybe there is some other plugin we can dump this to?
+				// It's a fallback...it does not have to be fair or perfect!
+				synchronized (Bukkit.getPluginManager()) {
+					Iterator<Plugin> iter = getPluginsUnsafe().iterator();
+					while (iter.hasNext()) {
+						plugin = iter.next();
+						if (plugin.isEnabled()) {
+							Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable);
+							return;
+						}
+					}
+				}
+				// Well now we just don't know...
+				CommonPlugin.LOGGER.log(Level.SEVERE, "Unable to properly schedule next-tick task: " + runnable.getClass().getName());
+				CommonPlugin.LOGGER.log(Level.SEVERE, "The task is executed right away instead...we might recover!");
+				runnable.run();
+			} else {
+				// Use the supposed plugin this Class belongs to
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable);
+			}
+		}
 	}
 
 	/**
@@ -438,7 +470,7 @@ public class CommonUtil {
 	 * If there is no performance requirement to avoid array allocation, use {@link getPlugins()} instead.
 	 * Only use this method inside a <b>synchronized</b> body around the Plugin Manager, for example:
 	 * <pre>
-	 * synchronized (Bukkit.getServer().getPluginManager()) {
+	 * synchronized (Bukkit.getPluginManager()) {
 	 * 	for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
 	 *  		System.out.println(plugin.getName());
 	 * 	}
@@ -448,7 +480,7 @@ public class CommonUtil {
 	 * @return unsafe collection of plugins running on the server
 	 */
 	public static Collection<Plugin> getPluginsUnsafe() {
-		final PluginManager man = Bukkit.getServer().getPluginManager();
+		final PluginManager man = Bukkit.getPluginManager();
 		if (man instanceof SimplePluginManager) {
 			return pluginsField.get(man);
 		} else {
@@ -462,7 +494,7 @@ public class CommonUtil {
 	 * @return Plugins
 	 */
 	public static Plugin[] getPlugins() {
-		return Bukkit.getServer().getPluginManager().getPlugins();
+		return Bukkit.getPluginManager().getPlugins();
 	}
 
 	/**

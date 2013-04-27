@@ -60,6 +60,7 @@ public class CommonPlugin extends PluginBase {
 	 * Loggers for internal BKCommonLib processes
 	 */
 	public static final ModuleLogger LOGGER = new ModuleLogger("BKCommonLib");
+	public static final ModuleLogger LOGGER_CONVERSION = LOGGER.getModule("Conversion");
 	public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
 	public static final ModuleLogger LOGGER_NETWORK = LOGGER.getModule("Network");
 	/*
@@ -106,10 +107,10 @@ public class CommonPlugin extends PluginBase {
 		String msg = type + " '" + name + "' does not exist in class file " + source.getName();
 		Exception ex = new Exception(msg);
 		for (StackTraceElement elem : ex.getStackTrace()) {
-			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection.classes")) {
+			if (elem.getClassName().startsWith(Common.COMMON_ROOT + ".reflection.classes")) {
 				LOGGER_REFLECTION.log(Level.SEVERE, msg + " (Update BKCommonLib?)");
 				for (StackTraceElement ste : ex.getStackTrace()) {
-					log(Level.SEVERE, "    at " + ste.toString());
+					log(Level.SEVERE, "at " + ste.toString());
 				}
 				return;
 			}
@@ -122,10 +123,8 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	public void nextTick(Runnable runnable) {
-		if (runnable != null) {
-			synchronized (this.nextTickTasks) {
-				this.nextTickTasks.add(runnable);
-			}
+		synchronized (this.nextTickTasks) {
+			this.nextTickTasks.add(runnable);
 		}
 	}
 
@@ -348,7 +347,7 @@ public class CommonPlugin extends PluginBase {
 	 */
 	public void onCriticalFailure() {
 		log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
-		Bukkit.getPluginManager().disablePlugin(CommonPlugin.getInstance());
+		Bukkit.getPluginManager().disablePlugin(this);
 	}
 
 	@Override

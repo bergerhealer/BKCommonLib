@@ -1,10 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
@@ -18,51 +14,45 @@ import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
+import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 
 public class ParseUtil {
-	private static final Set<String> yesValues = new HashSet<String>();
-	private static final Set<String> noValues = new HashSet<String>();
-	private static final HashMap<String, Material> MAT_SPECIAL = new HashMap<String, Material>();
-	private static final StringReplaceBundle MAT_REPLACE = new StringReplaceBundle();
+	private static final StringMap<Boolean> BOOL_NAME_MAP = new StringMap<Boolean>();
+	private static final StringMap<Material> MAT_NAME_MAP = new StringMap<Material>();
+	private static final StringReplaceBundle MAT_ALIASES = new StringReplaceBundle();
 
 	static {
-		yesValues.addAll(Arrays.asList("yes", "allow", "allowed", "true", "ye", "y", "t", "on", "enabled", "enable"));
-		noValues.addAll(Arrays.asList("no", "none", "deny", "denied", "false", "n", "f", "off", "disabled", "disable"));
-		// Material replacement algorithm
-		MAT_REPLACE.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-		MAT_REPLACE.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
-		MAT_REPLACE.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
-		MAT_REPLACE.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
-		MAT_REPLACE.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
-		MAT_REPLACE.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN").add("STONEBRICK", "SMOOTHBRICK");
-		// Special name cases
-		MAT_SPECIAL.put("CROP", Material.CROPS);
-		MAT_SPECIAL.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
-		MAT_SPECIAL.put("BUTTON", Material.STONE_BUTTON);
-		MAT_SPECIAL.put("PISTON", Material.PISTON_BASE);
-		MAT_SPECIAL.put("STICKPISTON", Material.PISTON_STICKY_BASE);
-		MAT_SPECIAL.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
-		MAT_SPECIAL.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
-		MAT_SPECIAL.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
-		MAT_SPECIAL.put("GOLDAPPLE", Material.GOLDEN_APPLE);
-		MAT_SPECIAL.put("APPLEGOLD", Material.GOLDEN_APPLE);
-	}
+		// Boolean representing text values
+		for (String trueValue : new String[] {"yes", "allow", "allowed", "true", "ye", "y", "t", "on", "enabled", "enable"}) {
+			BOOL_NAME_MAP.putUpper(trueValue, Boolean.TRUE);
+		}
+		for (String falseValue : new String[] {"no", "none", "deny", "denied", "false", "n", "f", "off", "disabled", "disable"}) {
+			BOOL_NAME_MAP.putUpper(falseValue, Boolean.FALSE);
+		}
 
-	private static Material parseMaterialMain(String name, Material def) {
-		Material m = parseEnum(Material.class, name, null);
-		if (m != null) {
-			return m;
+		// Material by name mapping
+		for (Material material : Material.values()) {
+			MAT_NAME_MAP.put(material.toString(), material);
 		}
-		m = MAT_SPECIAL.get(name);
-		if (m != null)  {
-			return m;
-		}
-		if (name.endsWith("S")) {
-			return parseMaterialMain(name.substring(0, name.length() - 1), def);
-		} else {
-			return def;
-		}
+		MAT_NAME_MAP.put("CROP", Material.CROPS);
+		MAT_NAME_MAP.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
+		MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
+		MAT_NAME_MAP.put("PISTON", Material.PISTON_BASE);
+		MAT_NAME_MAP.put("STICKPISTON", Material.PISTON_STICKY_BASE);
+		MAT_NAME_MAP.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
+		MAT_NAME_MAP.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
+		MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
+		MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
+		MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
+
+		// Material by name aliases
+		MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
+		MAT_ALIASES.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
+		MAT_ALIASES.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
+		MAT_ALIASES.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
+		MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
+		MAT_ALIASES.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN").add("STONEBRICK", "SMOOTHBRICK");
 	}
 
 	/**
@@ -129,8 +119,7 @@ public class ParseUtil {
 	 * @return True if it is a boolean, False if it isn't
 	 */
 	public static boolean isBool(String text) {
-		text = text.toLowerCase(Locale.ENGLISH).trim();
-		return yesValues.contains(text) || noValues.contains(text);
+		return BOOL_NAME_MAP.containsKeyUpper(text);
 	}
 
 	/**
@@ -140,7 +129,7 @@ public class ParseUtil {
 	 * @return Parsed value, false when not a known yes value
 	 */
 	public static boolean parseBool(String text) {
-		return yesValues.contains(text.toLowerCase(Locale.ENGLISH).trim());
+		return parseBool(text, Boolean.FALSE).booleanValue();
 	}
 
 	/**
@@ -151,14 +140,7 @@ public class ParseUtil {
 	 * @return Parsed value, or the default
 	 */
 	public static Boolean parseBool(String text, Boolean def) {
-		String val = text.toLowerCase(Locale.ENGLISH).trim();
-		if (yesValues.contains(val)) {
-			return true;
-		} else if (noValues.contains(val)) {
-			return false;
-		} else {
-			return def;
-		}
+		return LogicUtil.fixNull(BOOL_NAME_MAP.getUpper(text), def);
 	}
 
 	/**
@@ -438,14 +420,33 @@ public class ParseUtil {
 		if (LogicUtil.nullOrEmpty(text)) {
 			return def;
 		}
-		// from ID
+		// From ID
 		try {
 			Material m = Material.getMaterial(Integer.parseInt(text));
 			return m == null ? def : m;
 		} catch (Exception ex) {
 		}
-		text = MAT_REPLACE.replace(text.trim().toUpperCase(Locale.ENGLISH));
-		return parseMaterialMain(text, def);
+		// Replace aliases and find the corresponding Material
+		String matName = MAT_ALIASES.replace(text.trim().toUpperCase(Locale.ENGLISH));
+		Material mat;
+		while (true) {
+			// First consult the name mapping (faster)
+			mat = MAT_NAME_MAP.get(matName);
+			if (mat != null)  {
+				return mat;
+			}
+			// Parse it (slower)
+			mat = parseEnum(Material.class, matName, null);
+			if (mat != null) {
+				return mat;
+			}
+			// Handle a 'multiple' in the name (sadly, no ES)
+			if (matName.endsWith("S")) {
+				matName = matName.substring(0, matName.length() - 1);
+			} else {
+				return def;
+			}
+		}
 	}
 
 	/**

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import org.bukkit.Material;
@@ -14,52 +13,55 @@ import org.bukkit.entity.NPC;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Squid;
 
+import com.bergerkiller.bukkit.common.collections.StringMap;
+
 /**
  * Contains entity naming and grouping functions to categorize entities
  */
 public class EntityGroupingUtil {
-	public static final String[] animalNames;
-	public static final String[] monsterNames;
-	public static final String[] npcNames;
+	private static final StringMap<EntityCategory> entityCategories = new StringMap<EntityCategory>();
 
 	static {
-		ArrayList<String> animals = new ArrayList<String>();
-		ArrayList<String> monsters = new ArrayList<String>();
-		ArrayList<String> npcs = new ArrayList<String>();
-		try {
-			for (EntityType type : EntityType.values()) {
-				if (isAnimal(type)) {
-					animals.add(getName(type));
-				}
-				if (isMonster(type)) {
-					monsters.add(getName(type));
-				}
-				if (isNPC(type)) {
-					npcs.add(getName(type));
-				}
-			}
-		} catch (Throwable t) {
-			t.printStackTrace();
+		// Note: These categories are ONLY used to map by name
+		for (EntityType type : EntityType.values()) {
+			entityCategories.putLower(getName(type), getCategory(type));
 		}
-		animalNames = animals.toArray(new String[0]);
-		monsterNames = monsters.toArray(new String[0]);
-		npcNames = npcs.toArray(new String[0]);
+	}
+
+	public static EntityCategory getCategory(String name) {
+		return LogicUtil.fixNull(entityCategories.getLower(name), EntityCategory.OTHER);
+	}
+
+	public static EntityCategory getCategory(EntityType type) {
+		return getCategory(type.getEntityClass());
+	}
+
+	public static EntityCategory getCategory(Class<? extends Entity> entityClass) {
+		if (isAnimal(entityClass)) {
+			return EntityCategory.ANIMAL;
+		} else if (isMonster(entityClass)) {
+			return EntityCategory.MONSTER;
+		} else if (isNPC(entityClass)) {
+			return EntityCategory.NPC;
+		} else {
+			return EntityCategory.OTHER;
+		}
 	}
 
 	public static boolean isMob(String name) {
-		return isAnimal(name) || isMonster(name) || isNPC(name);
+		return getCategory(name).isMob();
 	}
 
 	public static boolean isNPC(String name) {
-		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), npcNames);
+		return getCategory(name) == EntityCategory.NPC;
 	}
 
 	public static boolean isAnimal(String name) {
-		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), animalNames);
+		return getCategory(name) == EntityCategory.ANIMAL;
 	}
 
 	public static boolean isMonster(String name) {
-		return LogicUtil.contains(name.toLowerCase(Locale.ENGLISH), monsterNames);
+		return getCategory(name) == EntityCategory.MONSTER;
 	}
 
 	public static boolean isMob(Entity entity) {
@@ -180,5 +182,22 @@ public class EntityGroupingUtil {
 			}
 		}
 		return name.toLowerCase(Locale.ENGLISH);
+	}
+
+	/**
+	 * Represents a certain category of entities
+	 */
+	public static enum EntityCategory {
+		ANIMAL(true), MONSTER(true), NPC(true), OTHER(false);
+
+		private final boolean isMob;
+
+		private EntityCategory(boolean isMob) {
+			this.isMob = isMob;
+		}
+
+		public boolean isMob() {
+			return isMob;
+		}
 	}
 }
