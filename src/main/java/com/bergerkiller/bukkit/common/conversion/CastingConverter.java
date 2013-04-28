@@ -18,7 +18,7 @@ public class CastingConverter<T> implements Converter<T> {
 
 	@Override
 	public T convert(Object value, T def) {
-		return (T) CommonUtil.tryCast(baseConvertor.convert(value), this.getOutputType(), def);
+		return CommonUtil.tryCast(baseConvertor.convert(value), this.getOutputType(), def);
 	}
 
 	@Override

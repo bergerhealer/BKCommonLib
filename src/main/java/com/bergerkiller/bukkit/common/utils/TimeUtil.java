@@ -2,12 +2,11 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+
+import com.bergerkiller.bukkit.common.collections.StringMap;
 
 public class TimeUtil {
-	private static final Map<String, Integer> times = new HashMap<String, Integer>();
+	private static final StringMap<Integer> times = new StringMap<Integer>();
 	static {
 		times.put("dawn", 22000);
 		times.put("sunrise", 23000);
@@ -42,7 +41,7 @@ public class TimeUtil {
 			}
 		} catch (Exception ex) {
 			// Or some shortcuts
-			Integer time = times.get(timeName.toLowerCase(Locale.ENGLISH));
+			Integer time = times.getLower(timeName);
 			if (time != null) {
 				return time.longValue();
 			}

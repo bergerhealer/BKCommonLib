@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -311,87 +310,6 @@ public class LogicUtil {
 	}
 
 	/**
-	 * Converts a collection to an Array of a possible primitive type<br>
-	 * If the type is not primitive, a regular array of Objects is created<br>
-	 * Type conversion is possible, allowing a List of String to be turned into Integer[] or int[]<br>
-	 * For this reason, this method is slower than toArray, only use it if type conversion is required
-	 * 
-	 * @param collection to convert
-	 * @param componentType of the array to return (can be primitive)
-	 * @return new Array containing the elements in the collection, as an Object
-	 */
-	public static Object toConvertedArray(Collection<?> collection, Class<?> componentType) {
-		final int size = collection.size();
-		final Iterator<?> iter = collection.iterator();
-		if (componentType.isPrimitive()) {
-			// Check against all primitive array types
-			if (componentType.equals(boolean.class)) {
-				boolean[] array = new boolean[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), false).booleanValue();
-				}
-				return array;
-			}
-			if (componentType.equals(char.class)) {
-				char[] array = new char[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), '\0').charValue();
-				}
-				return array;
-			}
-			if (componentType.equals(byte.class)) {
-				byte[] array = new byte[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), (byte) 0).byteValue();
-				}
-				return array;
-			}
-			if (componentType.equals(short.class)) {
-				short[] array = new short[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), (short) 0).shortValue();
-				}
-				return array;
-			}
-			if (componentType.equals(int.class)) {
-				int[] array = new int[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), 0).intValue();
-				}
-				return array;
-			}
-			if (componentType.equals(long.class)) {
-				long[] array = new long[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), 0L).longValue();
-				}
-				return array;
-			}
-			if (componentType.equals(float.class)) {
-				float[] array = new float[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), 0f).floatValue();
-				}
-				return array;
-			}
-			if (componentType.equals(double.class)) {
-				double[] array = new double[size];
-				for (int i = 0; i < size; i++) {
-					array[i] = ParseUtil.convert(iter.next(), 0.0).doubleValue();
-				}
-				return array;
-			}
-			throw new RuntimeException("Unknown primitive type: " + componentType.getName());
-		} else {
-			Object[] array = createArray(componentType, size);
-			for (int i = 0; i < size; i++) {
-				array[i] = ParseUtil.convert(iter.next(), componentType);
-			}
-			return array;
-		}
-	}
-
-	/**
 	 * Converts a collection to an Array
 	 * 
 	 * @param collection to convert
@@ -427,27 +345,6 @@ public class LogicUtil {
 	}
 
 	/**
-	 * A basic retainAll implementation (does not call list.retainAll!)<br>
-	 * After this call all elements not contained in elements are removed<br>
-	 * Essentially all elements are removed except those contained in the elements Collection
-	 * 
-	 * @param collection
-	 * @param elements to retain
-	 * @return True if the list changed, False if not
-	 */
-	public static boolean retainAll(Collection<?> collection, Collection<?> elements) {
-		Iterator<?> iter = collection.iterator();
-		boolean changed = false;
-		while (iter.hasNext()) {
-			if (!elements.contains(iter.next())) {
-				iter.remove();
-				changed = true;
-			}
-		}
-		return changed;
-	}
-
-	/**
 	 * Checks whether one map contains all the contents of another map
 	 * 
 	 * @param map to check for contents
@@ -470,7 +367,7 @@ public class LogicUtil {
 	}
 
 	/**
-	 * Checks if a list of values contains the value specified
+	 * Checks if an array of values contains the value specified
 	 * 
 	 * @param value to find
 	 * @param values to search in

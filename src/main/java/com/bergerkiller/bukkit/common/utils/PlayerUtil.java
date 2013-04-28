@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -24,7 +25,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
  * Player - specific operations and tools
  */
 public class PlayerUtil extends EntityUtil {
-	private static final ClassTemplate<?> CRAFTPLAYER = ClassTemplate.create(CommonUtil.getCBClass("entity.CraftPlayer"));
+	private static final ClassTemplate<?> CRAFTPLAYER = CBClassTemplate.create("entity.CraftPlayer");
 	private static final MethodAccessor<Void> setFirstPlayed = CRAFTPLAYER.getMethod("setFirstPlayed", long.class);
 	private static final FieldAccessor<Boolean> hasPlayedBefore = CRAFTPLAYER.getField("hasPlayedBefore");
 

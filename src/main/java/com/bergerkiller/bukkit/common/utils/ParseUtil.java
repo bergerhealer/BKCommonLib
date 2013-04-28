@@ -16,6 +16,7 @@ import org.bukkit.material.Wool;
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.NumberConverter;
 
 public class ParseUtil {
 	private static final StringMap<Boolean> BOOL_NAME_MAP = new StringMap<Boolean>();
@@ -33,7 +34,7 @@ public class ParseUtil {
 
 		// Material by name mapping
 		for (Material material : Material.values()) {
-			MAT_NAME_MAP.put(material.toString(), material);
+			MAT_NAME_MAP.putUpper(material.toString(), material);
 		}
 		MAT_NAME_MAP.put("CROP", Material.CROPS);
 		MAT_NAME_MAP.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
@@ -162,11 +163,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Float parseFloat(String text, Float def) {
-		try {
-			return Float.parseFloat(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toFloat.convert(text, def);
 	}
 
 	/**
@@ -188,11 +185,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Double parseDouble(String text, Double def) {
-		try {
-			return Double.parseDouble(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toDouble.convert(text, def);
 	}
 
 	/**
@@ -214,11 +207,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Long parseLong(String text, Long def) {
-		try {
-			return Long.parseLong(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toLong.convert(text, def);
 	}
 
 	/**
@@ -240,11 +229,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Integer parseInt(String text, Integer def) {
-		try {
-			return Integer.parseInt(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toInt.convert(text, def);
 	}
 
 	/**
@@ -266,11 +251,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Short parseShort(String text, Short def) {
-		try {
-			return Short.parseShort(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toShort.convert(text, def);
 	}
 
 	/**
@@ -292,11 +273,7 @@ public class ParseUtil {
 	 * @return Parsed or default value
 	 */
 	public static Byte parseByte(String text, Byte def) {
-		try {
-			return Byte.parseByte(filterNumeric(text));
-		} catch (Exception ex) {
-			return def;
-		}
+		return NumberConverter.toByte.convert(text, def);
 	}
 
 	/**

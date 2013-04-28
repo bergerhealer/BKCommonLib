@@ -90,7 +90,7 @@ public class WorldUtil extends ChunkUtil {
 	}
 	
 	/**
-	 * Sets if the spawn chunk should be kept in memory
+	 * Sets if the spawn chunk area should be kept in memory
 	 * 
 	 * @param world World to apply value on
 	 * @param value Keep in memory or not?

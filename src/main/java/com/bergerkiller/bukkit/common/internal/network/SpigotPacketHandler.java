@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * A packet handler implementation that uses Spigot's netty service
@@ -73,24 +74,20 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 	public void sendSilentPacket(Player player, Object packet) {
 		// NOTE: Below code is all obtained from Spigot source
 		// It may change at ANY time, so keeping it up-to-date is very important
-		Object conn = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
-		if (conn != null) {
-			Object networkManager = PlayerConnectionRef.networkManager.get(conn);
-			if (networkManager instanceof NettyNetworkManager) {
-				NettyNetworkManager netty = (NettyNetworkManager) networkManager;
-				synchronized (netty) {
-					// Temporarily clear the baked listeners
-					final PacketListener[] oldBaked = bakedListeners.get(null);
-					bakedListeners.set(null, EMPTY_PACKETLISTENER_ARRAY);
+		NettyNetworkManager netty = CommonUtil.tryCast(EntityPlayerRef.getNetworkManager(player), NettyNetworkManager.class);
+		if (netty != null) {
+			synchronized (netty) {
+				// Temporarily clear the baked listeners
+				final PacketListener[] oldBaked = bakedListeners.get(null);
+				bakedListeners.set(null, EMPTY_PACKETLISTENER_ARRAY);
 
-					// Queue
-					netty.queue((Packet) packet);
+				// Queue
+				netty.queue((Packet) packet);
 
-					// Restore
-					bakedListeners.set(null, oldBaked);
-				}
-				return;
+				// Restore
+				bakedListeners.set(null, oldBaked);
 			}
+			return;
 		}
 		// Just send it in the default fashion
 		sendPacket(player, packet, true);

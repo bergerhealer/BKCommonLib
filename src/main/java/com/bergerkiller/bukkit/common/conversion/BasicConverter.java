@@ -36,13 +36,10 @@ public abstract class BasicConverter<T> implements Converter<T> {
 	public final T convert(Object value, T def) {
 		if (value == null) {
 			return def;
+		} else if (getOutputType().isInstance(value)) {
+			return (T) value;
 		} else {
-			Class<?> type = value.getClass();
-			if (getOutputType().isAssignableFrom(type)) {
-				return (T) value;
-			} else {
-				return convertSpecial(value, type, def);
-			}
+			return convertSpecial(value, value.getClass(), def);
 		}
 	}
 

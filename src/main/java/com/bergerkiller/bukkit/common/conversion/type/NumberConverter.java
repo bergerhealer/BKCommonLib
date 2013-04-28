@@ -18,8 +18,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Byte convert(String text, Byte def) {
-			return ParseUtil.parseByte(text, def);
+		protected Byte parse(String text) throws NumberFormatException {
+			return Byte.valueOf(text);
 		}
 	};
 	public static final NumberConverter<Short> toShort = new NumberConverter<Short>(Short.class, (short) 0) {
@@ -32,8 +32,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Short convert(String text, Short def) {
-			return ParseUtil.parseShort(text, def);
+		protected Short parse(String text) throws NumberFormatException {
+			return Short.valueOf(text);
 		}
 	};
 	public static final NumberConverter<Integer> toInt = new NumberConverter<Integer>(Integer.class, 0) {
@@ -46,8 +46,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Integer convert(String text, Integer def) {
-			return ParseUtil.parseInt(text, def);
+		protected Integer parse(String text) throws NumberFormatException {
+			return Integer.valueOf(text);
 		}
 	};
 	public static final NumberConverter<Long> toLong = new NumberConverter<Long>(Long.class, (long) 0) {
@@ -60,8 +60,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Long convert(String text, Long def) {
-			return ParseUtil.parseLong(text, def);
+		protected Long parse(String text) throws NumberFormatException {
+			return Long.valueOf(text);
 		}
 	};
 	public static final NumberConverter<Float> toFloat = new NumberConverter<Float>(Float.class, 0.0f) {
@@ -74,8 +74,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Float convert(String text, Float def) {
-			return ParseUtil.parseFloat(text, def);
+		protected Float parse(String text) throws NumberFormatException {
+			return Float.valueOf(text);
 		}
 	};
 	public static final NumberConverter<Double> toDouble = new NumberConverter<Double>(Double.class, 0.0) {
@@ -88,8 +88,8 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 		}
 
 		@Override
-		public Double convert(String text, Double def) {
-			return ParseUtil.parseDouble(text, def);
+		protected Double parse(String text) throws NumberFormatException {
+			return Double.valueOf(text);
 		}
 	};
 
@@ -106,13 +106,28 @@ public abstract class NumberConverter<T> extends PrimitiveConverter<T> {
 	public abstract T convert(Number number);
 
 	/**
+	 * Parses the number from text (internal method)
+	 * 
+	 * @param text to parse
+	 * @return the parsed value
+	 * @throws NumberFormatException if parsing fails
+	 */
+	protected abstract T parse(String text) throws NumberFormatException;
+
+	/**
 	 * Converts the input text to the output type
 	 * 
 	 * @param text to convert
 	 * @param def value to return when conversion fails
 	 * @return converted output type
 	 */
-	public abstract T convert(String text, T def);
+	public T convert(String text, T def) {
+		try {
+			return parse(ParseUtil.filterNumeric(text));
+		} catch (NumberFormatException ex) {
+			return def;
+		}
+	}
 
 	@Override
 	public T convertSpecial(Object value, Class<?> valueType, T def) {

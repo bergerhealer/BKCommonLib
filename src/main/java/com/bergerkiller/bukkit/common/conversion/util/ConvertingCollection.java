@@ -6,7 +6,6 @@ import java.util.Iterator;
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Wraps around another collection of unknown contents and performs conversions automatically.
@@ -89,7 +88,7 @@ public class ConvertingCollection<T> implements Collection<T> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return LogicUtil.retainAll(this, c);
+		return CollectionBasics.retainAll(this, c);
 	}
 
 	@Override

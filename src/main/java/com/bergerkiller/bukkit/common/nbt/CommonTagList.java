@@ -9,6 +9,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
@@ -412,7 +413,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		return LogicUtil.retainAll(this, c);
+		return CollectionBasics.retainAll(this, c);
 	}
 
 	@Override

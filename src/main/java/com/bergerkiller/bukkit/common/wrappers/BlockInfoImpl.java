@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import org.bukkit.World;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
 import net.minecraft.server.v1_5_R2.Block;
 import net.minecraft.server.v1_5_R2.Explosion;
+import net.minecraft.server.v1_5_R2.World;
 
 /**
  * Class implementation for Block Info that has a backing handle.
@@ -47,13 +46,13 @@ class BlockInfoImpl extends BlockInfo {
 	}
 
 	@Override
-	public void dropNaturally(World world, int x, int y, int z, int data, float yield, int chance) {
+	public void dropNaturally(org.bukkit.World world, int x, int y, int z, int data, float yield, int chance) {
 		BlockRef.dropNaturally.invoke(handle, Conversion.toWorldHandle.convert(world), x, y, z, data, yield, chance);
 	}
 
 	@Override
-	public void ignite(World world, int x, int y, int z) {
-		net.minecraft.server.v1_5_R2.World worldhandle = CommonNMS.getNative(world);
+	public void ignite(org.bukkit.World world, int x, int y, int z) {
+		World worldhandle = CommonNMS.getNative(world);
 		Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0);
 		BlockRef.ignite.invoke(handle, worldhandle, x, y, z, ex);
 	}
