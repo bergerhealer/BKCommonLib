@@ -138,6 +138,26 @@ public class PlayerUtil extends EntityUtil {
 	public static void setHasPlayedBefore(Player player, boolean playedBefore) {
 		hasPlayedBefore.set(player, playedBefore);
 	}
+	
+	/**
+	 * Get the ping fomr a player
+	 * 
+	 * @param player to get ping from
+	 * @return Ping (in ms)
+	 */
+	public static int getPing(Player player) {
+		return CommonNMS.getNative(player).ping;
+	}
+	
+	/**
+	 * Change the pinf form a player
+	 * 
+	 * @param player to change ping for
+	 * @param ping to replace with (in ms)
+	 */
+	public static void setPing(Player player, int ping) {
+		CommonNMS.getNative(player).ping = ping;
+	}
 
 	/**
 	 * Checks whether a given chunk is visible to the client of a player.

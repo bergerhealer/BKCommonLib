@@ -13,5 +13,4 @@ public class EntityPlayerRef extends EntityHumanRef {
 	public static final FieldAccessor<List<?>> chunkQueue = TEMPLATE.getField("chunkCoordIntPairQueue");
 	public static final FieldAccessor<Object> playerConnection = TEMPLATE.getField("playerConnection");
 	public static final FieldAccessor<Boolean> disconnected = new SafeField<Boolean>(CommonUtil.getNMSClass("PlayerConnection"), "disconnected");
-	public static final FieldAccessor<Integer> ping = TEMPLATE.getField("ping");
 }
