@@ -216,6 +216,10 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private boolean permCheck(CommandSender sender, String node) {
+		// This check avoids the *-permissions granting all OP-players permission for everything
+		if (Bukkit.getPluginManager().getPermission(node) == null) {
+			return false;
+		}
 		if (this.vaultEnabled) {
 			return this.vaultPermission.has(sender, node);
 		} else {
