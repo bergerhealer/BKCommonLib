@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -218,7 +219,7 @@ public class CommonPlugin extends PluginBase {
 	private boolean permCheck(CommandSender sender, String node) {
 		// This check avoids the *-permissions granting all OP-players permission for everything
 		if (Bukkit.getPluginManager().getPermission(node) == null) {
-			return false;
+			Bukkit.getPluginManager().addPermission(new org.bukkit.permissions.Permission(node, PermissionDefault.FALSE));
 		}
 		if (this.vaultEnabled) {
 			return this.vaultPermission.has(sender, node);
