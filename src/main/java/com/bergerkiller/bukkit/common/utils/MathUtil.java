@@ -46,6 +46,29 @@ public class MathUtil {
 	public static double distanceSquared(double x1, double y1, double z1, double x2, double y2, double z2) {
 		return lengthSquared(x1 - x2, y1 - y2, z1 - z2);
 	}
+	
+	/**
+	 * Gets a percentage and round it with a cusotm amound of decimals
+	 * 
+	 * @param subtotal to get percentags for
+	 * @param total to use as 100% value
+	 * @param decimals to round with
+	 * @return Percentage for subtotal with custom decimals
+	 */
+	public static double getPercentage(int subtotal, int total, int decimals) {
+		return round(getPercentage(subtotal, total), decimals);
+	}
+	
+	/**
+	 * Gets a percentags of 2 values
+	 * 
+	 * @param subtotal to get percentage for
+	 * @param total to sue as 100% value
+	 * @return percentage
+	 */
+	public static double getPercentage(int subtotal, int total) {
+		return ((float) subtotal / (float) total) * 100;
+	}
 
 	/**
 	 * Gets the angle difference between two angles
