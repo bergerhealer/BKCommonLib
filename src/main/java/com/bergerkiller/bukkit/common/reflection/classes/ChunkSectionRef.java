@@ -14,7 +14,7 @@ public class ChunkSectionRef {
 	public static final MethodAccessor<Object> getExtBlockIds = TEMPLATE.getMethod("getExtendedIdArray");
 	public static final MethodAccessor<Object> getBlockData = TEMPLATE.getMethod("getDataArray");
 	public static final MethodAccessor<Object> getBlockLightNibble = TEMPLATE.getMethod("getEmittedLightArray");
-	public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("getEmittedLightArray");
+	public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("getSkyLightArray");
 	private static final MethodAccessor<Integer> blocks = TEMPLATE.getMethod("getTypeId", int.class, int.class, int.class);
 	private static final MethodAccessor<Void> blocksWithType = TEMPLATE.getMethod("setTypeId", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("getData", int.class, int.class, int.class);
