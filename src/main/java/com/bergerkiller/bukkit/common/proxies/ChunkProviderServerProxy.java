@@ -2,15 +2,15 @@ package com.bergerkiller.bukkit.common.proxies;
 
 import java.util.List;
 
-import net.minecraft.server.v1_5_R2.Chunk;
-import net.minecraft.server.v1_5_R2.ChunkPosition;
-import net.minecraft.server.v1_5_R2.ChunkProviderServer;
-import net.minecraft.server.v1_5_R2.EnumCreatureType;
-import net.minecraft.server.v1_5_R2.IChunkLoader;
-import net.minecraft.server.v1_5_R2.IChunkProvider;
-import net.minecraft.server.v1_5_R2.IProgressUpdate;
-import net.minecraft.server.v1_5_R2.World;
-import net.minecraft.server.v1_5_R2.WorldServer;
+import net.minecraft.server.v1_5_R3.Chunk;
+import net.minecraft.server.v1_5_R3.ChunkPosition;
+import net.minecraft.server.v1_5_R3.ChunkProviderServer;
+import net.minecraft.server.v1_5_R3.EnumCreatureType;
+import net.minecraft.server.v1_5_R3.IChunkLoader;
+import net.minecraft.server.v1_5_R3.IChunkProvider;
+import net.minecraft.server.v1_5_R3.IProgressUpdate;
+import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.v1_5_R3.WorldServer;
 
 /**
  * A chunk provider server proxy class.

@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_5_R2.TileEntity;
+import net.minecraft.server.v1_5_R3.TileEntity;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;

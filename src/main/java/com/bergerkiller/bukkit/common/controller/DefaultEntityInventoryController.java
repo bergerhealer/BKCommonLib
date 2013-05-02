@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_5_R2.IInventory;
+import net.minecraft.server.v1_5_R3.IInventory;
 
 import org.bukkit.inventory.ItemStack;
 

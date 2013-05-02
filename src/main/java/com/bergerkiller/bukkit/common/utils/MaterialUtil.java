@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_5_R2.Block;
-import net.minecraft.server.v1_5_R2.Item;
+import net.minecraft.server.v1_5_R3.Block;
+import net.minecraft.server.v1_5_R3.Item;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;

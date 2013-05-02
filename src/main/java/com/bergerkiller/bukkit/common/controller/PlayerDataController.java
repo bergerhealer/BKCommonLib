@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.controller;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -9,10 +9,10 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import net.minecraft.server.v1_5_R2.DedicatedPlayerList;
-import net.minecraft.server.v1_5_R2.EntityHuman;
-import net.minecraft.server.v1_5_R2.IPlayerFileData;
-import net.minecraft.server.v1_5_R2.NBTTagCompound;
+import net.minecraft.server.v1_5_R3.DedicatedPlayerList;
+import net.minecraft.server.v1_5_R3.EntityHuman;
+import net.minecraft.server.v1_5_R3.IPlayerFileData;
+import net.minecraft.server.v1_5_R3.NBTTagCompound;
 
 /**
  * A controller for dealing with player data loading and saving.
