@@ -140,6 +140,11 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * @param dz offset to move
 	 */
 	public void onMove(double dx, double dy, double dz) {
+		//Don't do anything if we aren't moving 
+		if(dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
+			return;
+		}
+		
 		final Entity handle = entity.getHandle(Entity.class);
 		if (handle.Z) {
 			handle.boundingBox.d(dx, dy, dz);
