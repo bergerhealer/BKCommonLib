@@ -4,16 +4,16 @@ import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.MinecraftServer;
+import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.MinecraftServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R3.CraftChunk;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;

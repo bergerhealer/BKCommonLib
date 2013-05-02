@@ -1,16 +1,16 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_5_R2.Block;
-import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.Item;
+import net.minecraft.server.v1_5_R3.Block;
+import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.v1_5_R3.Item;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_5_R2.CraftChunk;
-import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_5_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;

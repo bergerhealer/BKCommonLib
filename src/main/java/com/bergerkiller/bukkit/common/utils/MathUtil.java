@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_5_R2.TrigMath;
+import org.bukkit.craftbukkit.v1_5_R3.TrigMath;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 

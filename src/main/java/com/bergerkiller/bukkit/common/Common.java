@@ -110,7 +110,7 @@ public class Common {
 	 * <b>Use getVersion() instead if you want the actual, current version!
 	 * Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 151;
+	public static final int VERSION = 152;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version

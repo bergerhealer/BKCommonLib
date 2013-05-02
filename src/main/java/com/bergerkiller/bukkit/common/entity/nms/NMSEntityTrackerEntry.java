@@ -5,8 +5,8 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.Entity;
 
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.EntityTrackerEntry;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.EntityTrackerEntry;
 
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;

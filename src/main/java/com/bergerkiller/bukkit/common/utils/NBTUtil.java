@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftInventoryCustom;
-import org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -19,16 +19,16 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
-import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.FoodMetaData;
-import net.minecraft.server.v1_5_R2.InventoryEnderChest;
-import net.minecraft.server.v1_5_R2.ItemStack;
-import net.minecraft.server.v1_5_R2.MobEffect;
-import net.minecraft.server.v1_5_R2.NBTBase;
-import net.minecraft.server.v1_5_R2.NBTCompressedStreamTools;
-import net.minecraft.server.v1_5_R2.NBTTagCompound;
-import net.minecraft.server.v1_5_R2.NBTTagList;
-import net.minecraft.server.v1_5_R2.PlayerInventory;
+import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.v1_5_R3.FoodMetaData;
+import net.minecraft.server.v1_5_R3.InventoryEnderChest;
+import net.minecraft.server.v1_5_R3.ItemStack;
+import net.minecraft.server.v1_5_R3.MobEffect;
+import net.minecraft.server.v1_5_R3.NBTBase;
+import net.minecraft.server.v1_5_R3.NBTCompressedStreamTools;
+import net.minecraft.server.v1_5_R3.NBTTagCompound;
+import net.minecraft.server.v1_5_R3.NBTTagList;
+import net.minecraft.server.v1_5_R3.PlayerInventory;
 
 /**
  * Contains utility functions for dealing with NBT data

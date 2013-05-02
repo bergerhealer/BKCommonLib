@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_5_R2.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_5_R3.CraftTravelAgent;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -22,12 +22,12 @@ import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
-import net.minecraft.server.v1_5_R2.Entity;
-import net.minecraft.server.v1_5_R2.IDataManager;
-import net.minecraft.server.v1_5_R2.Vec3D;
-import net.minecraft.server.v1_5_R2.World;
-import net.minecraft.server.v1_5_R2.WorldNBTStorage;
-import net.minecraft.server.v1_5_R2.WorldServer;
+import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.v1_5_R3.IDataManager;
+import net.minecraft.server.v1_5_R3.Vec3D;
+import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.v1_5_R3.WorldNBTStorage;
+import net.minecraft.server.v1_5_R3.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
 

@@ -17,7 +17,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
-import net.minecraft.server.v1_5_R2.IPlayerFileData;
+import net.minecraft.server.v1_5_R3.IPlayerFileData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

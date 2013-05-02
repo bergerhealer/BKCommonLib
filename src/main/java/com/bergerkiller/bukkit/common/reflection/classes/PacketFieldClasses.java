@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 import javax.crypto.SecretKey;
 
-import net.minecraft.server.v1_5_R2.Vec3D;
+import net.minecraft.server.v1_5_R3.Vec3D;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;

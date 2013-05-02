@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import net.minecraft.server.v1_5_R2.IInventory;
+import net.minecraft.server.v1_5_R3.IInventory;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
