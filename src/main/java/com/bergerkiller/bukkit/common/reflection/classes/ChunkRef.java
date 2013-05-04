@@ -11,7 +11,6 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.ChunkSection;
 import net.minecraft.server.v1_5_R3.EnumSkyBlock;
 
 public class ChunkRef {

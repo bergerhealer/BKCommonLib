@@ -115,7 +115,7 @@ public class ChunkUtil {
 		if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
 			return;
 		}
-		ChunkSection[] sections = ChunkRef.getSections(CommonNMS.getNative(chunk));
+		ChunkSection[] sections = (ChunkSection[]) ChunkRef.getSections(CommonNMS.getNative(chunk));
 		final int secIndex = y >> 4;
 		ChunkSection section = sections[secIndex];
 		if (section == null) {
