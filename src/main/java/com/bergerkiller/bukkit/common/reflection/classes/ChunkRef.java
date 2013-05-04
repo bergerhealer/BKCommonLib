@@ -54,8 +54,8 @@ public class ChunkRef {
 	/**
 	 * Gets all chunk sections contained in a chunk
 	 */
-	public static ChunkSection[] getSections(Object chunkHandle) {
-		return (ChunkSection[]) sections.invoke(chunkHandle);
+	public static Object[] getSections(Object chunkHandle) {
+		return sections.invoke(chunkHandle);
 	}
 
 	/**
