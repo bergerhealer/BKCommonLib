@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.controller;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -13,6 +14,8 @@ import net.minecraft.server.v1_5_R3.EntityTrackerEntry;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
+import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
@@ -56,6 +59,64 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	public static final int ABSOLUTE_UPDATE_INTERVAL = 400;
 
 	private Object handle;
+
+	/**
+	 * Obtains the velocity as the clients know it, allowing it to be read from or written to
+	 */
+	public final VectorAbstract velSynched = new VectorAbstract() {
+		public double getX() {return ((EntityTrackerEntry) handle).j;}
+		public double getY() {return ((EntityTrackerEntry) handle).k;}
+		public double getZ() {return ((EntityTrackerEntry) handle).l;}
+		public VectorAbstract setX(double x) {((EntityTrackerEntry) handle).j = x; return this;}
+		public VectorAbstract setY(double y) {((EntityTrackerEntry) handle).k = y; return this;}
+		public VectorAbstract setZ(double z) {((EntityTrackerEntry) handle).l = z; return this;}
+	};
+	/**
+	 * Obtains the live protocol velocity, allowing it to be read from or written to
+	 */
+	public final VectorAbstract velLive = new VectorAbstract() {
+		public double getX() {return entity.vel.getX();}
+		public double getY() {return entity.vel.getY();}
+		public double getZ() {return entity.vel.getZ();}
+		public VectorAbstract setX(double x) {entity.vel.setX(x); return this;}
+		public VectorAbstract setY(double y) {entity.vel.setY(y); return this;}
+		public VectorAbstract setZ(double z) {entity.vel.setZ(z); return this;}
+	};
+	/**
+	 * Obtains the protocol location as the clients know it, allowing it to be read from or written to
+	 */
+	public final IntLocationAbstract locSynched = new IntLocationAbstract() {
+		public World getWorld() {return entity.getWorld();}
+		public IntLocationAbstract setWorld(World world) {entity.setWorld(world); return this;}
+		public int getX() {return ((EntityTrackerEntry) handle).xLoc;}
+		public int getY() {return ((EntityTrackerEntry) handle).yLoc;}
+		public int getZ() {return ((EntityTrackerEntry) handle).zLoc;}
+		public IntLocationAbstract setX(int x) {((EntityTrackerEntry) handle).xLoc = x; return this;}
+		public IntLocationAbstract setY(int y) {((EntityTrackerEntry) handle).yLoc = y; return this;}
+		public IntLocationAbstract setZ(int z) {((EntityTrackerEntry) handle).zLoc = z; return this;}
+		public int getYaw() {return ((EntityTrackerEntry) handle).yRot;}
+		public int getPitch() {return ((EntityTrackerEntry) handle).xRot;}
+		public IntLocationAbstract setYaw(int yaw) {((EntityTrackerEntry) handle).yRot = yaw; return this;}
+		public IntLocationAbstract setPitch(int pitch) {((EntityTrackerEntry) handle).xRot = pitch; return this;}
+	};
+	/**
+	 * Obtains the protocol location as it is live, on the server. Read is mainly supported, writing to it is not recommended.
+	 * Although it has valid setters, the loss of accuracy of the protocol values make it rather pointless to use.
+	 */
+	public final IntLocationAbstract locLive = new IntLocationAbstract() {
+		public World getWorld() {return entity.getWorld();}
+		public IntLocationAbstract setWorld(World world) {entity.setWorld(world); return this;}
+		public int getX() {return protLoc(entity.loc.getX());}
+		public int getY() {return MathUtil.floor(entity.loc.getY() * 32.0);}
+		public int getZ() {return protLoc(entity.loc.getZ());}
+		public IntLocationAbstract setX(int x) {entity.loc.setX(x >> 5); return this;}
+		public IntLocationAbstract setY(int y) {entity.loc.setY(y >> 5); return this;}
+		public IntLocationAbstract setZ(int z) {entity.loc.setZ(z >> 5); return this;}
+		public int getYaw() {return protRot(entity.loc.getYaw());}
+		public int getPitch() {return protRot(entity.loc.getPitch());}
+		public IntLocationAbstract setYaw(int yaw) {entity.loc.setYaw((float) yaw / 256.0f * 360.0f); return this;}
+		public IntLocationAbstract setPitch(int pitch) {entity.loc.setPitch((float) pitch / 256.0f * 360.0f); return this;}
+	};
 
 	/**
 	 * Binds this Entity Network Controller to an Entity.

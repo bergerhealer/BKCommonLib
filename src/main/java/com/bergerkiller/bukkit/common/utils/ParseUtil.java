@@ -427,16 +427,29 @@ public class ParseUtil {
 	}
 
 	/**
+	 * Old version of parseMaterialData - please use the int version, as data is more than a byte
+	 */
+	@Deprecated
+	public static Byte parseMaterialData(String text, Material material, Byte def) {
+		final int data = parseMaterialData(text, material, -1);
+		if (data < 0 || data > 255) {
+			return def;
+		} else {
+			return Byte.valueOf((byte) data);
+		}
+	}
+
+	/**
 	 * Tries to parse the text to a data value for a Material
 	 * 
 	 * @param text to parse
 	 * @param material to parse the text against
-	 * @param def to return on failure
+	 * @param def to return on failure (hint: use -1)
 	 * @return Parsed or default value
 	 */
-	public static Byte parseMaterialData(String text, Material material, Byte def) {
+	public static int parseMaterialData(String text, Material material, int def) {
 		try {
-			return Byte.parseByte(text);
+			return Integer.parseInt(text);
 		} catch (NumberFormatException ex) {
 			if (material == Material.WOOD) {
 				TreeSpecies ts = parseTreeSpecies(text, null);

@@ -70,23 +70,19 @@ public abstract class DoubleAbstract {
 	}
 
 	public DoubleAbstract add(double value) {
-		set(get() + value);
-		return this;
+		return set(get() + value);
 	}
 
 	public DoubleAbstract subtract(double value) {
-		set(get() - value);
-		return this;
+		return set(get() - value);
 	}
 
 	public DoubleAbstract multiply(double value) {
-		set(get() * value);
-		return this;
+		return set(get() * value);
 	}
 
 	public DoubleAbstract divide(double value) {
-		set(get() / value);
-		return this;
+		return set(get() / value);
 	}
 
 	public DoubleAbstract fixNaN() {
