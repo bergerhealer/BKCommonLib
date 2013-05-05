@@ -13,8 +13,6 @@ import org.bukkit.block.Block;
 import org.bukkit.map.MinecraftFont;
 import org.bukkit.map.MapFont.CharacterSprite;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-
 public class StringUtil {
 	public static final char CHAT_STYLE_CHAR = '\u00A7';
 	public static final int SPACE_WIDTH = getWidth(' ');
@@ -28,7 +26,12 @@ public class StringUtil {
 			chars.add(Character.toLowerCase(styles[i].getChar()));
 			chars.add(Character.toUpperCase(styles[i].getChar()));
 		}
-		CHAT_CODES = Conversion.toCharArr.convert(chars);
+		CHAT_CODES = new char[chars.size()];
+		int i = 0;
+		for (Character c : chars) {
+			CHAT_CODES[i] = c.charValue();
+			i++;
+		}
 	}
 
 	/**
