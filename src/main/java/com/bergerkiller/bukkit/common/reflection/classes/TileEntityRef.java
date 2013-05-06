@@ -23,6 +23,10 @@ public class TileEntityRef {
 	public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
 	private static final MethodAccessor<Object> getUpdatePacket = TEMPLATE.getMethod("getUpdatePacket");
 
+	public static boolean hasWorld(Object tileEntity) {
+		return ((TileEntity) tileEntity).getWorld() != null;
+	}
+
 	public static Object getFromWorld(Block block) {
 		return getFromWorld(block.getWorld(), block.getX(), block.getY(), block.getZ());
 	}

@@ -109,7 +109,7 @@ public class BlockStateRef {
 		if (tileEntity != null) {
 			TileInstantiator inst = tileToInst.get(tileEntity);
 			if (inst != null) {
-				return inst.newInstance(tileEntity);
+				return inst.newInstance(block, tileEntity);
 			}
 		}
 		// All BlockState types REQUIRE a tile entity, just return the default BlockState here
@@ -117,6 +117,9 @@ public class BlockStateRef {
 	}
 
 	public static BlockState toBlockState(Object tileEntity) {
+		if (tileEntity == null || !TileEntityRef.hasWorld(tileEntity)) {
+			throw new IllegalArgumentException("Tile Entity is null or has no world set");
+		}
 		TileInstantiator inst = tileToInst.get(tileEntity);
 		if (inst == null) {
 			return toBlockState(TileEntityRef.getBlock(tileEntity));
@@ -151,8 +154,11 @@ public class BlockStateRef {
 		}
 
 		public BlockState newInstance(Object tileEntity) {
+			return newInstance(TileEntityRef.getBlock(tileEntity), tileEntity);
+		}
+
+		public BlockState newInstance(Block block, Object tileEntity) {
 			final BlockState state = (BlockState) STATE.newInstanceNull();
-			final Block block = TileEntityRef.getBlock(tileEntity);
 			final int typeId = block.getTypeId();
 			tileField.set(state, tileEntity);
 			world.set(state, block.getWorld());
