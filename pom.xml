@@ -13,8 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_5_R3</project.mcversion>
-    <project.cbversion>1.5.2-R0.1-SNAPSHOT</project.cbversion>
-    <project.spigotversion>1.5.2-R0.1-SNAPSHOT</project.spigotversion>
+    <project.libversion>1.5.2-R0.2-SNAPSHOT</project.libversion>
   </properties>
 
   <repositories>
@@ -23,10 +22,10 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
-    <!-- Repo for access to Craftbukkit -->
+    <!-- Repo for access to Libigot -->
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+      <id>libigot-repo</id>
+      <url>http://repo.libigot.org/</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>daily</updatePolicy>
@@ -45,25 +44,13 @@
       <name>Maven repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
-    <!-- Repo for access to Spigot -->
-    <repository>
-      <id>md-5 repository</id>
-      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-    </repository>
   </repositories>
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
-      <version>${project.cbversion}</version>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot</artifactId>
-      <version>${project.spigotversion}</version>
+      <groupId>org.libigot</groupId>
+      <artifactId>libigot</artifactId>
+      <version>${project.libversion}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
@@ -134,20 +121,19 @@
 
   <!-- Build -->
   <build>
-    <!-- Resources -->
-    <resources>
-	  <resource>
-	    <directory>src/main/java/</directory>
-		<includes>
-          <include>**</include>
-		</includes>
-        <!-- Don't add source files to target jar -->
-	    <excludes>
-		  <exclude>com/bergerkiller/bukkit/**/*.java</exclude>
-		</excludes>
-	  </resource>
+  	<defaultGoal>clean install</defaultGoal>
+
+	<!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
+	<resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>plugin.yml</include>
+        </includes>
+      </resource>
 	</resources>
-	<defaultGoal>clean install</defaultGoal>
+
 	<!-- Plugins -->
 	<plugins>
 	  <!-- Needed for shading in CGLib -->
@@ -173,6 +159,14 @@
 				  <pattern>org.objenesis</pattern>
 				  <shadedPattern>com.bergerkiller.bukkit.common.org.objenesis</shadedPattern>
 				</relocation>
+                <relocation>
+                   <pattern>org.bukkit.craftbukkit</pattern>
+                   <shadedPattern>org.bukkit.craftbukkit.${project.mcversion}</shadedPattern>
+                </relocation>
+                <relocation>
+                   <pattern>net.minecraft.server</pattern>
+                   <shadedPattern>net.minecraft.server.${project.mcversion}</shadedPattern>
+                </relocation>
 			  </relocations>
 			  <artifactSet>
 				<excludes>
