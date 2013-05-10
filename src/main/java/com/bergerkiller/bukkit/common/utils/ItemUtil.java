@@ -61,9 +61,16 @@ public class ItemUtil {
 		int startAmount = from.getAmount();
 		int fromAmount = startAmount;
 		for (org.bukkit.inventory.ItemStack item : to.getContents()) {
-			fromAmount -= testTransfer(from, item);
+			if (LogicUtil.nullOrEmpty(item)) {
+				// Full transfer is possible (empty slot)
+				fromAmount -= getMaxSize(from);
+			} else if (equalsIgnoreAmount(from, item)) {
+				// Stack transfer is possible (same item slot)
+				fromAmount -= getMaxSize(item) - item.getAmount();
+			}
 			if (fromAmount <= 0) {
-				break;
+				// All items could be transferred!
+				return startAmount;
 			}
 		}
 		return startAmount - fromAmount;
