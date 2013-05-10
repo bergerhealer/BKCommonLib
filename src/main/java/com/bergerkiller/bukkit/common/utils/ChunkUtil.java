@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkCoordIntPair;
 import net.minecraft.server.ChunkSection;
-import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.WorldServer;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -115,11 +114,11 @@ public class ChunkUtil {
 		if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
 			return;
 		}
-		ChunkSection[] sections = (ChunkSection[]) ChunkRef.getSections(CommonNMS.getNative(chunk));
+		Object[] sections = ChunkRef.getSections(CommonNMS.getNative(chunk));
 		final int secIndex = y >> 4;
-		ChunkSection section = sections[secIndex];
+		Object section = sections[secIndex];
 		if (section == null) {
-			section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !((net.minecraft.server.World)chunk.getWorld()).worldProvider.f);
+			section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.f);
 		}
 		ChunkSectionRef.setTypeId(section, x, y, z, typeId);
 		ChunkSectionRef.setData(section, x, y, z, data);
@@ -140,7 +139,7 @@ public class ChunkUtil {
 		boolean result = y >= 0 && y <= chunk.getWorld().getMaxHeight();
 		WorldServer world = CommonNMS.getNative(chunk.getWorld());
 		if (result) {
-			result = ChunkRef.setBlock(CommonNMS.getNative(chunk), x, y, z, typeId, data);
+			result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, typeId, data);
             world.methodProfiler.a("checkLight");
             world.z(x, y, z);
             world.methodProfiler.b();
@@ -162,7 +161,7 @@ public class ChunkUtil {
 		List<Object>[] entitySlices = ChunkRef.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
 		return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
 	}
-	
+
 	/**
 	 * Checks if a chunk is about be loaded
 	 * 
@@ -172,14 +171,13 @@ public class ChunkUtil {
 	 * @return chunk being loaded soon?
 	 */
 	public static boolean isLoadRequested(Player player, int cx, int cz) {
-		EntityPlayer ep = CommonNMS.getNative(player);
-		List<?> chunkQue = EntityPlayerRef.chunkQueue.get(ep);
-		for(Object location : chunkQue) {
+		List<?> chunkQue = EntityPlayerRef.chunkQueue.get(Conversion.toEntityHandle.convert(player));
+		for (Object location : chunkQue) {
 			ChunkCoordIntPair loc = (ChunkCoordIntPair) location;
-			if(loc.x == cx && loc.z == cz)
+			if (loc.x == cx && loc.z == cz) {
 				return true;
+			}
 		}
-		
 		return false;
 	}
 
