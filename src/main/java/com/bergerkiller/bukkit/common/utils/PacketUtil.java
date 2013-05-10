@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import net.minecraft.server.v1_5_R3.Packet;
+import net.minecraft.server.Packet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -202,7 +202,7 @@ public class PacketUtil {
 		if (packet instanceof CommonPacket) {
 			packet = ((CommonPacket) packet).getHandle();
 		}
-		CommonNMS.getCraftServer().getHandle().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
+		CommonNMS.getPlayerList().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
 	}
 
 	/**

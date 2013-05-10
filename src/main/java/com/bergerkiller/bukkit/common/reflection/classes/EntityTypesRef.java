@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 
-import net.minecraft.server.v1_5_R3.EntityTypes;
+import net.minecraft.server.EntityTypes;
 
 @SuppressWarnings("rawtypes")
 public class EntityTypesRef {

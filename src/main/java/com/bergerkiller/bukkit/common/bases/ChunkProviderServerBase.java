@@ -11,15 +11,15 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-import net.minecraft.server.v1_5_R3.BlockSand;
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.ChunkProviderServer;
-import net.minecraft.server.v1_5_R3.CrashReport;
-import net.minecraft.server.v1_5_R3.CrashReportSystemDetails;
-import net.minecraft.server.v1_5_R3.IChunkLoader;
-import net.minecraft.server.v1_5_R3.IChunkProvider;
-import net.minecraft.server.v1_5_R3.ReportedException;
-import net.minecraft.server.v1_5_R3.WorldServer;
+import net.minecraft.server.BlockSand;
+import net.minecraft.server.Chunk;
+import net.minecraft.server.ChunkProviderServer;
+import net.minecraft.server.CrashReport;
+import net.minecraft.server.CrashReportSystemDetails;
+import net.minecraft.server.IChunkLoader;
+import net.minecraft.server.IChunkProvider;
+import net.minecraft.server.ReportedException;
+import net.minecraft.server.WorldServer;
 
 public class ChunkProviderServerBase extends ChunkProviderServer {
 	public final org.bukkit.World world;

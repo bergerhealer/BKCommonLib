@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.internal.network;
 import java.lang.reflect.Field;
 import java.util.Queue;
 
-import net.minecraft.server.v1_5_R3.Connection;
-import net.minecraft.server.v1_5_R3.INetworkManager;
-import net.minecraft.server.v1_5_R3.Packet;
-import net.minecraft.server.v1_5_R3.PlayerConnection;
+import net.minecraft.server.Connection;
+import net.minecraft.server.INetworkManager;
+import net.minecraft.server.Packet;
+import net.minecraft.server.PlayerConnection;
 
 import org.bukkit.entity.Player;
 import org.spigotmc.netty.NettyNetworkManager;

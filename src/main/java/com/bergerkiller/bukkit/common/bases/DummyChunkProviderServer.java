@@ -1,16 +1,16 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import org.bukkit.craftbukkit.v1_5_R3.chunkio.ChunkIOExecutor;
+import org.bukkit.craftbukkit.chunkio.ChunkIOExecutor;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.proxies.ChunkProviderServerProxy;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.ChunkProviderServer;
-import net.minecraft.server.v1_5_R3.ChunkRegionLoader;
-import net.minecraft.server.v1_5_R3.IChunkLoader;
+import net.minecraft.server.Chunk;
+import net.minecraft.server.ChunkProviderServer;
+import net.minecraft.server.ChunkRegionLoader;
+import net.minecraft.server.IChunkLoader;
 
 /**
  * This class is mainly used by NoLagg chunks - for compatibilities' sake, it is ported to here.

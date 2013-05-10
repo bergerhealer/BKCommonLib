@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.server.v1_5_R3.*;
+import net.minecraft.server.*;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.*;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.inventory.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -22,6 +21,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -210,15 +210,15 @@ public class CommonNMS {
 	 * @return Minecraft Server
 	 */
 	public static MinecraftServer getMCServer() {
-		return getCraftServer().getServer();
+		return (MinecraftServer) CraftServerRef.getServer.invoke(Bukkit.getServer());
 	}
 
 	/**
-	 * Gets the Craft server
+	 * Gets the native Minecraft Server Player List, which keeps track of player-related information
 	 * 
-	 * @return Craft server
+	 * @return Minecraft Server Player List
 	 */
-	public static CraftServer getCraftServer() {
-		return (CraftServer) Bukkit.getServer();
+	public static DedicatedPlayerList getPlayerList() {
+		return (DedicatedPlayerList) CraftServerRef.getPlayerList.invoke(Bukkit.getServer());
 	}
 }

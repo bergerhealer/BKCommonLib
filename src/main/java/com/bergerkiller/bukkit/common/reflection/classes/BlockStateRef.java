@@ -2,14 +2,14 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Locale;
 
-import net.minecraft.server.v1_5_R3.TileEntitySkull;
+import net.minecraft.server.TileEntitySkull;
 
 import org.bukkit.Chunk;
 import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_5_R3.block.CraftBlockState;
+import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.collections.ClassMap;

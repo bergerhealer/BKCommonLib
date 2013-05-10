@@ -3,17 +3,15 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.Entity;
-import net.minecraft.server.v1_5_R3.EntityTrackerEntry;
-import net.minecraft.server.v1_5_R3.IInventory;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.Chunk;
+import net.minecraft.server.Entity;
+import net.minecraft.server.EntityTrackerEntry;
+import net.minecraft.server.IInventory;
+import net.minecraft.server.World;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -239,7 +237,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			}
 
 			// *** Give the old entity a new Bukkit Entity ***
-			EntityRef.bukkitEntity.set(oldInstance, CraftEntity.getEntity((CraftServer) Bukkit.getServer(), oldInstance));
+			EntityRef.bukkitEntity.set(oldInstance, EntityRef.createEntity(oldInstance));
 
 			// *** Passenger/Vehicle ***
 			if (newInstance.vehicle != null) {

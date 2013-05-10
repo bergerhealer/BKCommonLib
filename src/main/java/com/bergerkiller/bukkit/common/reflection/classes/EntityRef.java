@@ -2,11 +2,14 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -44,6 +47,9 @@ public class EntityRef {
 	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", int.class);
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 
+	private static final ClassTemplate<?> CRAFT_TEMPLATE = CBClassTemplate.create("entity.CraftEntity");
+	private static final MethodAccessor<Entity> getCraftEntity = CRAFT_TEMPLATE.getMethod("getEntity", CraftServerRef.TEMPLATE.getType(), TEMPLATE.getType());
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static final SafeConstructor entityItemConstr = new SafeConstructor(CommonUtil.getNMSClass("EntityItem"), 
 			WorldRef.TEMPLATE.getType(), double.class, double.class, double.class);
@@ -74,5 +80,9 @@ public class EntityRef {
 
 	public static void burn(Object entityHandle, int damage) {
 		burn.invoke(entityHandle, damage);
+	}
+
+	public static Entity createEntity(Object entityHandle) {
+		return getCraftEntity.invoke(null, Bukkit.getServer(), entityHandle);
 	}
 }

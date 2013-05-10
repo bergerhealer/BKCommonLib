@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 import java.util.Arrays;
 import java.util.List;
 
-import net.minecraft.server.v1_5_R3.EntityMinecartHopper;
+import net.minecraft.server.EntityMinecartHopper;
 
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;

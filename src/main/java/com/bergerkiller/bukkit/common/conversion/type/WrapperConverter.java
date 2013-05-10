@@ -1,39 +1,36 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.ContainerAnvilInventory;
-import net.minecraft.server.v1_5_R3.ContainerEnchantTableInventory;
-import net.minecraft.server.v1_5_R3.Entity;
-import net.minecraft.server.v1_5_R3.IInventory;
-import net.minecraft.server.v1_5_R3.InventoryCrafting;
-import net.minecraft.server.v1_5_R3.InventoryMerchant;
-import net.minecraft.server.v1_5_R3.ItemStack;
-import net.minecraft.server.v1_5_R3.PlayerInventory;
-import net.minecraft.server.v1_5_R3.TileEntity;
-import net.minecraft.server.v1_5_R3.TileEntityBeacon;
-import net.minecraft.server.v1_5_R3.TileEntityBrewingStand;
-import net.minecraft.server.v1_5_R3.TileEntityFurnace;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.Chunk;
+import net.minecraft.server.ContainerAnvilInventory;
+import net.minecraft.server.ContainerEnchantTableInventory;
+import net.minecraft.server.Entity;
+import net.minecraft.server.IInventory;
+import net.minecraft.server.InventoryCrafting;
+import net.minecraft.server.InventoryMerchant;
+import net.minecraft.server.ItemStack;
+import net.minecraft.server.PlayerInventory;
+import net.minecraft.server.TileEntity;
+import net.minecraft.server.TileEntityBeacon;
+import net.minecraft.server.TileEntityBrewingStand;
+import net.minecraft.server.TileEntityFurnace;
+import net.minecraft.server.World;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
 
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryAnvil;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryBeacon;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryCrafting;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryEnchanting;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
+import org.bukkit.craftbukkit.inventory.CraftInventoryAnvil;
+import org.bukkit.craftbukkit.inventory.CraftInventoryBeacon;
+import org.bukkit.craftbukkit.inventory.CraftInventoryBrewer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryCrafting;
+import org.bukkit.craftbukkit.inventory.CraftInventoryEnchanting;
+import org.bukkit.craftbukkit.inventory.CraftInventoryFurnace;
+import org.bukkit.craftbukkit.inventory.CraftInventoryMerchant;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
@@ -90,7 +87,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 					// We need this to avoid NPE's for non-spawned entities!
 					org.bukkit.entity.Entity entity = EntityRef.bukkitEntity.get(handle);
 					if (entity == null) {
-						entity = CraftEntity.getEntity((CraftServer) Bukkit.getServer(), handle);
+						entity = EntityRef.createEntity(handle);
 						EntityRef.bukkitEntity.set(handle, entity);
 					}
 					return entity;

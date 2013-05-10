@@ -12,9 +12,9 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-import net.minecraft.server.v1_5_R3.AxisAlignedBB;
-import net.minecraft.server.v1_5_R3.Block;
-import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.Block;
+import net.minecraft.server.Entity;
 
 /**
  * Class that deals with AABB-collision resolving for Entity Controllers.

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_5_R3.*;
+import net.minecraft.server.*;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

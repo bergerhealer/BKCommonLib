@@ -17,7 +17,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
-import net.minecraft.server.v1_5_R3.IPlayerFileData;
+import net.minecraft.server.IPlayerFileData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -124,7 +124,7 @@ public class CommonUtil {
 	 * @param playerFileData to set to
 	 */
 	public static void setPlayerFileData(Object playerFileData) {
-		CommonNMS.getCraftServer().getHandle().playerFileData = (IPlayerFileData) playerFileData;
+		CommonNMS.getPlayerList().playerFileData = (IPlayerFileData) playerFileData;
 	}
 
 	/**
@@ -133,14 +133,14 @@ public class CommonUtil {
 	 * @param human to save
 	 */
 	public static void savePlayer(HumanEntity human) {
-		CommonNMS.getCraftServer().getHandle().playerFileData.save(CommonNMS.getNative(human));
+		CommonNMS.getPlayerList().playerFileData.save(CommonNMS.getNative(human));
 	}
 
 	/**
 	 * Saves all player information to file
 	 */
 	public static void savePlayers() {
-		CommonNMS.getCraftServer().getHandle().savePlayers();
+		CommonNMS.getPlayerList().savePlayers();
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class CommonUtil {
 	 * @return online players
 	 */
 	public static Collection<Player> getOnlinePlayers() {
-		return ConversionPairs.player.convertAll(CommonNMS.getCraftServer().getHandle().players);
+		return ConversionPairs.player.convertAll(CommonNMS.getPlayerList().players);
 	}
 
 	/**

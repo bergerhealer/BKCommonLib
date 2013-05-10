@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_5_R3.DamageSource;
-import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.DamageSource;
+import net.minecraft.server.Entity;
 
 import org.bukkit.entity.HumanEntity;
 

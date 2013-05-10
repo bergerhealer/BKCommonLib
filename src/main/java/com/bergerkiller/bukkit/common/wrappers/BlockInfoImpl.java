@@ -4,9 +4,9 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
-import net.minecraft.server.v1_5_R3.Block;
-import net.minecraft.server.v1_5_R3.Explosion;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.Block;
+import net.minecraft.server.Explosion;
+import net.minecraft.server.World;
 
 /**
  * Class implementation for Block Info that has a backing handle.

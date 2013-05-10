@@ -10,8 +10,8 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.EnumSkyBlock;
+import net.minecraft.server.Chunk;
+import net.minecraft.server.EnumSkyBlock;
 
 public class ChunkRef {
 	private static final Class<?> icp = CommonUtil.getNMSClass("IChunkProvider");

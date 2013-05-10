@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
-import net.minecraft.server.v1_5_R3.*;
+import net.minecraft.server.*;
 
 /**
  * Converter to convert to a certain property obtained from various kinds of objects<br>

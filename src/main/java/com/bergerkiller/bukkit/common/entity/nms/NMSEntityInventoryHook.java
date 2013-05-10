@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 
-import net.minecraft.server.v1_5_R3.ItemStack;
+import net.minecraft.server.ItemStack;
 
 public interface NMSEntityInventoryHook {
 	public EntityInventoryController<?> getInventoryController();

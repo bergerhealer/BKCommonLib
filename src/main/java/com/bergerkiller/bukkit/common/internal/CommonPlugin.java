@@ -14,7 +14,7 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.Entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

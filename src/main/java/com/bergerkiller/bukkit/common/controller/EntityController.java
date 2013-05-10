@@ -10,10 +10,10 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
-import net.minecraft.server.v1_5_R3.AxisAlignedBB;
-import net.minecraft.server.v1_5_R3.Block;
-import net.minecraft.server.v1_5_R3.DamageSource;
-import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.Block;
+import net.minecraft.server.DamageSource;
+import net.minecraft.server.Entity;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;

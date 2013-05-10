@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.List;
 
-import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;

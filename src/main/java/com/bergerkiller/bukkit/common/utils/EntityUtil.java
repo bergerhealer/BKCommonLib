@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.UUID;
-import net.minecraft.server.v1_5_R3.Entity;
+import net.minecraft.server.Entity;
 import org.bukkit.Location;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;

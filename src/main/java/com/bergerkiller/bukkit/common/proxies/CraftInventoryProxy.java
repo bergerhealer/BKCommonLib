@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.server.v1_5_R3.IInventory;
+import net.minecraft.server.IInventory;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;

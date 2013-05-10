@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_5_R3.block.CraftBlockState;
+import org.bukkit.craftbukkit.block.CraftBlockState;
 
 import com.bergerkiller.bukkit.common.proxies.BlockStateProxy;
 

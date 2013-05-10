@@ -5,10 +5,10 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
-import net.minecraft.server.v1_5_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_5_R3.ChunkCoordinates;
-import net.minecraft.server.v1_5_R3.ChunkPosition;
-import net.minecraft.server.v1_5_R3.Vec3D;
+import net.minecraft.server.ChunkCoordIntPair;
+import net.minecraft.server.ChunkCoordinates;
+import net.minecraft.server.ChunkPosition;
+import net.minecraft.server.Vec3D;
 
 /**
  * All NMS Vector related classes can be used here.

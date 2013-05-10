@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_5_R3.DamageSource;
-import net.minecraft.server.v1_5_R3.Explosion;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.DamageSource;
+import net.minecraft.server.Explosion;
+import net.minecraft.server.World;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

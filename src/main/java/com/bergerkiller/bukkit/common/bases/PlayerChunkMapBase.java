@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
-import net.minecraft.server.v1_5_R3.EntityPlayer;
-import net.minecraft.server.v1_5_R3.PlayerChunkMap;
-import net.minecraft.server.v1_5_R3.WorldServer;
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.PlayerChunkMap;
+import net.minecraft.server.WorldServer;
 
 public class PlayerChunkMapBase extends PlayerChunkMap {
 

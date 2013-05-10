@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -9,10 +7,10 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import net.minecraft.server.v1_5_R3.DedicatedPlayerList;
-import net.minecraft.server.v1_5_R3.EntityHuman;
-import net.minecraft.server.v1_5_R3.IPlayerFileData;
-import net.minecraft.server.v1_5_R3.NBTTagCompound;
+import net.minecraft.server.DedicatedPlayerList;
+import net.minecraft.server.EntityHuman;
+import net.minecraft.server.IPlayerFileData;
+import net.minecraft.server.NBTTagCompound;
 
 /**
  * A controller for dealing with player data loading and saving.
@@ -54,7 +52,7 @@ public class PlayerDataController {
 			// Already assigned - ignore
 			return;
 		}
-		DedicatedPlayerList playerList = ((CraftServer) Bukkit.getServer()).getHandle();
+		DedicatedPlayerList playerList = CommonNMS.getPlayerList();
 		this.base = playerList.playerFileData;
 		playerList.playerFileData = new Translator(this);
 	}
@@ -65,7 +63,7 @@ public class PlayerDataController {
 	 * @return the currently assigned Player Data Controller
 	 */
 	public static PlayerDataController get() {
-		final IPlayerFileData base = ((CraftServer) Bukkit.getServer()).getHandle().playerFileData;
+		final IPlayerFileData base = CommonNMS.getPlayerList().playerFileData;
 		final PlayerDataController controller;
 		if (base instanceof Translator) {
 			controller = ((Translator) base).controller;

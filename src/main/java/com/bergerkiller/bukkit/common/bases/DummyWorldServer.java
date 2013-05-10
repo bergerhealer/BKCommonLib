@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 
-import net.minecraft.server.v1_5_R3.MinecraftServer;
-import net.minecraft.server.v1_5_R3.WorldServer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldServer;
 
 /**
  * A dummy world that can be used to operate on or using worlds without referencing it on the server<br>
