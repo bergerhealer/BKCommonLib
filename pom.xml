@@ -162,10 +162,16 @@
                 <relocation>
                    <pattern>org.bukkit.craftbukkit</pattern>
                    <shadedPattern>org.bukkit.craftbukkit.${project.mcversion}</shadedPattern>
+                   <excludes>
+                     <exclude>org.bukkit.craftbukkit.${project.mcversion}.**.*</exclude>
+                   </excludes>
                 </relocation>
                 <relocation>
                    <pattern>net.minecraft.server</pattern>
                    <shadedPattern>net.minecraft.server.${project.mcversion}</shadedPattern>
+                   <excludes>
+                     <exclude>net.minecraft.server.${project.mcversion}.**.*</exclude>
+                   </excludes>
                 </relocation>
 			  </relocations>
 			  <artifactSet>
