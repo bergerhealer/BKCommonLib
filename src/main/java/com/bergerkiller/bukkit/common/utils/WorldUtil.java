@@ -12,6 +12,7 @@ import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftTravelAgent;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -24,6 +25,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
 import net.minecraft.server.Entity;
 import net.minecraft.server.IDataManager;
+import net.minecraft.server.MovingObjectPosition;
 import net.minecraft.server.Vec3D;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldNBTStorage;
@@ -371,5 +373,52 @@ public class WorldUtil extends ChunkUtil {
 
 	public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
 		return CommonNMS.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
+	}
+
+	/**
+	 * Performs a ray tracing operation from one point to the other, and obtains the (first) block hit
+	 * 
+	 * @param world to ray trace in
+	 * @param startX to start ray tracing from
+	 * @param startY to start ray tracing from
+	 * @param startZ to start ray tracing from
+	 * @param endX to stop ray tracing (outer limit)
+	 * @param endY to stop ray tracing (outer limit)
+	 * @param endZ to stop ray tracing (outer limit)
+	 * @return the hit Block, or null if none was found (AIR)
+	 */
+	public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
+		MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(CommonNMS.newVec3D(startX, startY, startZ),
+				CommonNMS.newVec3D(endX, endY, endZ), false);
+		return mop == null ? null : world.getBlockAt(mop.b, mop.c, mop.d);
+	}
+
+	/**
+	 * Performs a ray tracing operation from one point to the other, and obtains the (first) block hit
+	 * 
+	 * @param startLocation to start ray tracing from
+	 * @param direction to which to ray trace
+	 * @param maxLength limit of ray tracing
+	 * @return the hit Block, or null if none was found (AIR)
+	 */
+	public static Block rayTraceBlock(Location startLocation, Vector direction, double maxLength) {
+		final double startX = startLocation.getX();
+		final double startY = startLocation.getY();
+		final double startZ = startLocation.getZ();
+		final double endX = startX + direction.getX() * maxLength;
+		final double endY = startY + direction.getY() * maxLength;
+		final double endZ = startZ + direction.getZ() * maxLength;
+		return rayTraceBlock(startLocation.getWorld(), startX, startY, startZ, endX, endY, endZ);
+	}
+
+	/**
+	 * Performs a ray tracing operation from one point to the other, and obtains the (first) block hit
+	 * 
+	 * @param startLocation to start ray tracing from, direction from Location is used
+	 * @param maxLength limit of ray tracing
+	 * @return the hit Block, or null if none was found (AIR)
+	 */
+	public static Block rayTraceBlock(Location startLocation, double maxLength) {
+		return rayTraceBlock(startLocation, startLocation.getDirection(), maxLength);
 	}
 }

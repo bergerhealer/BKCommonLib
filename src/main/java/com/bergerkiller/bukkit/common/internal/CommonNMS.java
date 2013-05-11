@@ -46,6 +46,10 @@ public class CommonNMS {
 		return 0.5 * (aabb.c + aabb.f);
 	}
 
+	public static Vec3D newVec3D(double x, double y, double z) {
+		return Vec3D.a(x, y, z);
+	}
+
 	/**
 	 * Obtains the internal list of native Minecraft server worlds<br>
 	 * Gets the MinecraftServer.worlds value

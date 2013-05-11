@@ -4,6 +4,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.ChunkCoordIntPair;
 import net.minecraft.server.ChunkCoordinates;
@@ -17,7 +18,7 @@ import net.minecraft.server.Vec3D;
 public class VectorRef {
 
 	public static Object newVec(double x, double y, double z) {
-		return Vec3D.a(x, y, z);
+		return CommonNMS.newVec3D(x, y, z);
 	}
 
 	public static Vector getVec(Object vec3D) {
