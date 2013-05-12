@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,6 +66,11 @@ public class CommonPlugin extends PluginBase {
 	public static final ModuleLogger LOGGER_CONVERSION = LOGGER.getModule("Conversion");
 	public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
 	public static final ModuleLogger LOGGER_NETWORK = LOGGER.getModule("Network");
+	public static final ModuleLogger LOGGER_TIMINGS = LOGGER.getModule("Timings");
+	/*
+	 * Timings class
+	 */
+	public static final TimingsRootListener TIMINGS = new TimingsRootListener();
 	/*
 	 * Remaining internal variables
 	 */
@@ -89,10 +93,6 @@ public class CommonPlugin extends PluginBase {
 	private boolean isHyperConomyEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
-
-	public static List<TimingsListener> getTimings() {
-		return instance == null ? Collections.EMPTY_LIST : instance.timingsListeners;
-	}
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -177,24 +177,6 @@ public class CommonPlugin extends PluginBase {
 				iter.remove();
 			}
 		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private static class NextTickListenerProxy implements TimingsListener {
-		private final NextTickListener listener;
-
-		public NextTickListenerProxy(NextTickListener listener) {
-			this.listener = listener;
-		}
-
-		@Override
-		public void onNextTicked(Runnable runnable, long executionTime) {
-			this.listener.onNextTicked(runnable, executionTime);
-		}
-
-		public void onChunkLoad(Chunk chunk, long executionTime) {}
-		public void onChunkGenerate(Chunk chunk, long executionTime) {}
-		public void onChunkUnloading(World world, long executionTime) {}
 	}
 
 	public void addTimingsListener(TimingsListener listener) {
@@ -572,6 +554,43 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
+	@Override
+	public boolean command(CommandSender sender, String command, String[] args) {
+		if (debugVariables.isEmpty()) {
+			return false;
+		}
+		if (command.equals("commondebug") || command.equals("debug")) {
+			MessageBuilder message = new MessageBuilder();
+			if (args.length == 0) {
+				message.green("This command allows you to tweak debug settings in plugins").newLine();
+				message.green("All debug variables should be cleared in official builds").newLine();
+				message.green("Available debug variables:").newLine();
+				message.setSeparator(ChatColor.YELLOW, " \\ ").setIndent(4);
+				for (String variable : debugVariables.keySet()) {
+					message.green(variable);
+				}
+			} else {
+				final String varname = args[0];
+				final TypedValue value = debugVariables.get(varname);
+				if (value == null) {
+					message.red("No debug variable of name '").yellow(varname).red("'!");
+				} else {
+					message.green("Value of variable '").yellow(varname).green("' ");
+					if (args.length == 1) {
+						message.green("= ");
+					} else {
+						message.green("set to ");
+						value.parseSet(StringUtil.combine(" ", StringUtil.remove(args, 0)));
+					}
+					message.white(value.toString());
+				}
+			}
+			message.send(sender);
+			return true;
+		}
+		return false;
+	}
+
 	private static class EntityRemovalHandler extends Task {
 		public EntityRemovalHandler(JavaPlugin plugin) {
 			super(plugin);
@@ -612,7 +631,6 @@ public class CommonPlugin extends PluginBase {
 		public void run() {
 			List<Runnable> nextTick = getInstance().nextTickTasks;
 			List<Runnable> nextSync = getInstance().nextTickSync;
-			List<TimingsListener> timingsListeners = getTimings();
 			synchronized (nextTick) {
 				if (nextTick.isEmpty()) {
 					return;
@@ -620,7 +638,7 @@ public class CommonPlugin extends PluginBase {
 				nextSync.addAll(nextTick);
 				nextTick.clear();
 			}
-			if (timingsListeners.isEmpty()) {
+			if (!TIMINGS.isActive()) {
 				// No time measurement needed
 				for (Runnable task : nextSync) {
 					try {
@@ -632,8 +650,6 @@ public class CommonPlugin extends PluginBase {
 				}
 			} else {
 				// Perform time measurement and call next-tick listeners
-				int i;
-				final int listenerCount = timingsListeners.size();
 				long startTime, delta, endTime = System.nanoTime();
 				for (Runnable task : nextSync) {
 					startTime = endTime;
@@ -645,9 +661,7 @@ public class CommonPlugin extends PluginBase {
 					}
 					endTime = System.nanoTime();
 					delta = endTime - startTime;
-					for (i = 0; i < listenerCount; i++) {
-						timingsListeners.get(i).onNextTicked(task, delta);
-					}
+					TIMINGS.onNextTicked(task, delta);
 				}
 			}
 			nextSync.clear();
@@ -681,40 +695,85 @@ public class CommonPlugin extends PluginBase {
 		}
 	}
 
-	@Override
-	public boolean command(CommandSender sender, String command, String[] args) {
-		if (debugVariables.isEmpty()) {
-			return false;
+	@SuppressWarnings("deprecation")
+	private static class NextTickListenerProxy implements TimingsListener {
+		private final NextTickListener listener;
+
+		public NextTickListenerProxy(NextTickListener listener) {
+			this.listener = listener;
 		}
-		if (command.equals("commondebug") || command.equals("debug")) {
-			MessageBuilder message = new MessageBuilder();
-			if (args.length == 0) {
-				message.green("This command allows you to tweak debug settings in plugins").newLine();
-				message.green("All debug variables should be cleared in official builds").newLine();
-				message.green("Available debug variables:").newLine();
-				message.setSeparator(ChatColor.YELLOW, " \\ ").setIndent(4);
-				for (String variable : debugVariables.keySet()) {
-					message.green(variable);
-				}
-			} else {
-				final String varname = args[0];
-				final TypedValue value = debugVariables.get(varname);
-				if (value == null) {
-					message.red("No debug variable of name '").yellow(varname).red("'!");
-				} else {
-					message.green("Value of variable '").yellow(varname).green("' ");
-					if (args.length == 1) {
-						message.green("= ");
-					} else {
-						message.green("set to ");
-						value.parseSet(StringUtil.combine(" ", StringUtil.remove(args, 0)));
+
+		@Override
+		public void onNextTicked(Runnable runnable, long executionTime) {
+			this.listener.onNextTicked(runnable, executionTime);
+		}
+
+		public void onChunkLoad(Chunk chunk, long executionTime) {}
+		public void onChunkGenerate(Chunk chunk, long executionTime) {}
+		public void onChunkUnloading(World world, long executionTime) {}
+	}
+
+	public static class TimingsRootListener implements TimingsListener {
+
+		/**
+		 * Gets whether timings are active, and should be informed of information
+		 * 
+		 * @return True if active, False if not
+		 */
+		public boolean isActive() {
+			return instance != null && !instance.timingsListeners.isEmpty();
+		}
+
+		@Override
+		public void onNextTicked(Runnable runnable, long executionTime) {
+			if (isActive()) {
+				try {
+					for (int i = 0; i < instance.timingsListeners.size(); i++) {
+						instance.timingsListeners.get(i).onNextTicked(runnable, executionTime);
 					}
-					message.white(value.toString());
+				} catch (Throwable t) {
+					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
 				}
 			}
-			message.send(sender);
-			return true;
 		}
-		return false;
+
+		@Override
+		public void onChunkLoad(Chunk chunk, long executionTime) {
+			if (isActive()) {
+				try {
+					for (int i = 0; i < instance.timingsListeners.size(); i++) {
+						instance.timingsListeners.get(i).onChunkLoad(chunk, executionTime);
+					}
+				} catch (Throwable t) {
+					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+				}
+			}
+		}
+
+		@Override
+		public void onChunkGenerate(Chunk chunk, long executionTime) {
+			if (isActive()) {
+				try {
+					for (int i = 0; i < instance.timingsListeners.size(); i++) {
+						instance.timingsListeners.get(i).onChunkGenerate(chunk, executionTime);
+					}
+				} catch (Throwable t) {
+					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+				}
+			}
+		}
+
+		@Override
+		public void onChunkUnloading(World world, long executionTime) {
+			if (isActive()) {
+				try {
+					for (int i = 0; i < instance.timingsListeners.size(); i++) {
+						instance.timingsListeners.get(i).onChunkUnloading(world, executionTime);
+					}
+				} catch (Throwable t) {
+					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+				}
+			}
+		}
 	}
 }

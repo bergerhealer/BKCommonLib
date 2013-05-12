@@ -66,18 +66,14 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 	@Override
 	public Chunk loadChunk(int x, int z) {
 		// Perform chunk load from file timings
-		List<TimingsListener> listeners = CommonPlugin.getTimings();
-		if (listeners.isEmpty()) {
+		if (!CommonPlugin.TIMINGS.isActive()) {
 			return super.loadChunk(x, z);
 		} else {
 			long time = System.nanoTime();
 			Chunk nmsChunk = super.loadChunk(x, z);
 			if (nmsChunk != null) {
 				time = System.nanoTime() - time;
-				org.bukkit.Chunk chunk = Conversion.toChunk.convert(nmsChunk);
-				for (TimingsListener listener : listeners) {
-					listener.onChunkLoad(chunk, time);
-				}
+				CommonPlugin.TIMINGS.onChunkLoad(Conversion.toChunk.convert(nmsChunk), time);
 			}
 			return nmsChunk;
 		}
@@ -86,8 +82,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 	@Override
 	public Chunk getChunkAt(int x, int z, Runnable runnable) {
 		// Perform chunk generation timings
-		List<TimingsListener> listeners = CommonPlugin.getTimings();
-		if (listeners.isEmpty()) {
+		if (!CommonPlugin.TIMINGS.isActive()) {
 			return super.getChunkAt(x, z, runnable);
 		}
 
@@ -124,15 +119,9 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 			}
 
 			// Generate the chunk
+			long time = System.nanoTime();
 			try {
-				long time = System.nanoTime();
 				chunk = CommonNMS.getChunk(this.chunkProvider.getOrCreateChunk(x, z));
-				if (chunk != null) {
-					time = System.nanoTime() - time;
-					for (TimingsListener listener : listeners) {
-						listener.onChunkGenerate(chunk, time);
-					}
-				}
 			} catch (Throwable throwable) {
 				CrashReport crashreport = CrashReport.a(throwable, "Exception generating new chunk");
 				CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Chunk to be generated");
@@ -140,6 +129,10 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 				crashreportsystemdetails.a("Position hash", Long.valueOf(MathUtil.longHashToLong(x, z)));
 				crashreportsystemdetails.a("Generator", this.chunkProvider.getName());
 				throw new ReportedException(crashreport);
+			}
+			if (chunk != null) {
+				time = System.nanoTime() - time;
+				CommonPlugin.TIMINGS.onChunkGenerate(chunk, time);
 			}
 		}
 
@@ -176,8 +169,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 	@Override
 	public boolean unloadChunks() {
 		// Perform chunk unload timings
-		List<TimingsListener> listeners = CommonPlugin.getTimings();
-		if (listeners.isEmpty()) {
+		if (!CommonPlugin.TIMINGS.isActive()) {
 			return super.unloadChunks();
 		} else {
 			long time = System.nanoTime();
@@ -185,10 +177,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 				return super.unloadChunks();
 			} finally {
 				time = System.nanoTime() - time;
-				org.bukkit.World world = getWorld();
-				for (TimingsListener listener : listeners) {
-					listener.onChunkUnloading(world, time);
-				}
+				CommonPlugin.TIMINGS.onChunkUnloading(getWorld(), time);
 			}
 		}
 	}
