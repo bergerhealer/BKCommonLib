@@ -8,6 +8,7 @@ import net.minecraft.server.IInventory;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
@@ -16,6 +17,7 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityClassBuilder;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHookImpl;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHookImpl;
+import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
@@ -66,13 +68,19 @@ public class CommonEntityType {
 
 		// Obtain Common class type and constructor
 		Class<?> type = CommonUtil.getClass(Common.COMMON_ROOT + ".entity.type.Common" + nmsName);
+		Class<?> entityClass = this.bukkitType.getType();
 		if (type == null) {
-			this.commonType = ClassTemplate.create(CommonEntity.class);
-			this.commonConstructor = this.commonType.getConstructor(Entity.class);
-		} else {
-			this.commonType = ClassTemplate.create(type);
-			this.commonConstructor = this.commonType.getConstructor(this.bukkitType.getType());
+			// No specifics - try to find a sub-category
+			if (LivingEntity.class.isAssignableFrom(this.bukkitType.getType())) {
+				type = CommonLivingEntity.class;
+				entityClass = LivingEntity.class;
+			} else {
+				type = CommonEntity.class;
+				entityClass = Entity.class;
+			}
 		}
+		this.commonType = ClassTemplate.create(type);
+		this.commonConstructor = this.commonType.getConstructor(entityClass);
 
 		// Obtain NMS class type and constructor
 		type = CommonUtil.getClass(Common.NMS_ROOT + ".Entity" + nmsName);

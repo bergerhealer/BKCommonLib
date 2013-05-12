@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftSound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -287,45 +286,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
 	public void setVelocityChanged(boolean changed) {
 		EntityRef.velocityChanged.set(getHandle(), changed);
-	}
-
-	/**
-	 * Gets the height of the head of this Entity
-	 * 
-	 * @return Entity head height, or 0.0 if there is no head
-	 */
-	public float getHeadHeight() {
-		return getHandle(Entity.class).getHeadHeight();
-	}
-
-	/**
-	 * Gets the location of the head of this Entity.
-	 * If this Entity has no head, the regular Location is returned instead.
-	 * 
-	 * @return Entity head location
-	 */
-	public Location getHeadLocation() {
-		return getLocation().add(0.0, getHeadHeight(), 0.0);
-	}
-
-	/**
-	 * Performs ray tracing from the head of this Entity towards where this Entity looks.
-	 * The maximum interaction distance (5.0) is used.
-	 * 
-	 * @return the first Block hit, or null if none was found (AIR)
-	 */
-	public Block getTargetBlock() {
-		return getTargetBlock(5.0);
-	}
-
-	/**
-	 * Performs ray tracing from the head of this Entity towards where this Entity looks.
-	 * 
-	 * @param maxDistance to ray trace
-	 * @return the first Block hit, or null if none was found (AIR)
-	 */
-	public Block getTargetBlock(double maxDistance) {
-		return WorldUtil.rayTraceBlock(getHeadLocation(), maxDistance);
 	}
 
 	/**

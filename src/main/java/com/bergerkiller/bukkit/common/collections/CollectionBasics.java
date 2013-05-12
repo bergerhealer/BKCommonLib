@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,27 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Provides basic implementations for various methods used in collections
  */
 public class CollectionBasics {
+
+	/**
+	 * Sets all Elements in a Collection by first clearing the old elements and then adding the new elements
+	 * 
+	 * @param collection to set the contents of
+	 * @param elements to set to
+	 */
+	public static <T, E extends T> void setAll(Collection<T> collection, E... elements) {
+		setAll(collection, Arrays.asList(elements));
+	}
+
+	/**
+	 * Sets all Elements in a Collection by first clearing the old elements and then adding the new elements
+	 * 
+	 * @param collection to set the contents of
+	 * @param elements to set to
+	 */
+	public static <T> void setAll(Collection<T> collection, Collection<? extends T> elements) {
+		collection.clear();
+		collection.addAll(elements);
+	}
 
 	/**
 	 * A basic containsAll implementation. (does not call collection.containsAll)

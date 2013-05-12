@@ -14,6 +14,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
@@ -29,6 +30,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.entity.type.CommonItem;
+import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -523,6 +525,18 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 */
 	public static CommonPlayer get(Player player) {
 		return get(player, CommonPlayer.class);
+	}
+
+	/**
+	 * Obtains a (new) {@link CommonLivingEntity} instance providing additional methods for the Living Entity specified.
+	 * This method never returns null, unless the input Entity is null.
+	 * 
+	 * @param livingEntity to get a CommonLivingEntity for
+	 * @return a (new) CommonLivingEntity instance for the Living Entity
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends LivingEntity, C extends CommonLivingEntity<? extends T>> C get(T livingEntity) {
+		return (C) get(livingEntity, CommonLivingEntity.class);
 	}
 
 	/**

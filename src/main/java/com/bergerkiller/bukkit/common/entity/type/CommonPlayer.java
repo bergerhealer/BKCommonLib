@@ -11,14 +11,13 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-public class CommonPlayer extends CommonEntity<Player> {
+public class CommonPlayer extends CommonLivingEntity<Player> {
 
 	public CommonPlayer(Player entity) {
 		super(entity);
