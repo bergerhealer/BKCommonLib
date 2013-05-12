@@ -7,14 +7,15 @@ import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 
-import net.minecraft.server.Entity;
 import net.minecraft.server.EntityTrackerEntry;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
+import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -25,6 +26,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -116,6 +118,29 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		public int getPitch() {return protRot(entity.loc.getPitch());}
 		public IntLocationAbstract setYaw(int yaw) {entity.loc.setYaw((float) yaw / 256.0f * 360.0f); return this;}
 		public IntLocationAbstract setPitch(int pitch) {entity.loc.setPitch((float) pitch / 256.0f * 360.0f); return this;}
+	};
+	/**
+	 * Obtains the protocol head rotation as the clients know it, allowing it to be read from or written to
+	 */
+	public final IntegerAbstract headRotSynched = new IntegerAbstract() {
+		public int get() {return ((EntityTrackerEntry) handle).i;}
+		public IntegerAbstract set(int value) {((EntityTrackerEntry) handle).i = value; return this;}
+	};
+	/**
+	 * Obtains the protocol head rotation as it is live, on the server. Only reading is supported.
+	 */
+	public final IntegerAbstract headRotLive = new IntegerAbstract() {
+		public int get() {return protRot(entity.getHeadRotation());}
+		public IntegerAbstract set(int value) {throw new UnsupportedOperationException();}
+	};
+	/**
+	 * Obtains the tick time, this is for how long this network component/entry has been running on the server.
+	 * The tick time can be used to perform operations on an interval.
+	 * The tick time is automatically updated behind the hood.
+	 */
+	public final IntegerAbstract ticks = new IntegerAbstract() {
+		public int get() {return ((EntityTrackerEntry) handle).m;}
+		public IntegerAbstract set(int value) {((EntityTrackerEntry) handle).m = value; return this;}
 	};
 
 	/**
@@ -306,7 +331,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		if (entity.isDead()) {
 			return;
 		}
-		//TODO: Item frame support? Meh. Not for not. Later.
+		//TODO: Item frame support? Meh. Not for now.
 		this.syncVehicle();
 		if (this.isUpdateTick() || entity.isPositionChanged()) {
 			entity.setPositionChanged(false);
@@ -318,12 +343,27 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			}
 
 			// Update velocity when position changes
-			entity.setVelocityChanged(false);
 			this.syncVelocity();
-		} else if (entity.isVelocityChanged()) {
-			// Update velocity when velocity changes
+		}
+
+		// Refresh/resend velocity when requested (isVelocityChanged sets this)
+		if (entity.isVelocityChanged()) {
 			entity.setVelocityChanged(false);
-			this.syncVelocity();
+			Vector velocity = velLive.vector();
+			boolean cancelled = false;
+			if (entity.getEntity() instanceof Player) {
+				PlayerVelocityEvent event = new PlayerVelocityEvent((Player) entity.getEntity(), velocity);
+                if (CommonUtil.callEvent(event).isCancelled()) {
+                    cancelled = true;
+                } else if (!velocity.equals(event.getVelocity())) {
+                	velocity = event.getVelocity();
+                	velLive.set(velocity);
+                }
+			}
+			// Send update packet if not cancelled
+			if (!cancelled) {
+				this.broadcast(PacketFields.ENTITY_VELOCITY.newInstance(entity.getEntityId(), velocity));
+			}
 		}
 		this.syncMeta();
 		this.syncHeadRotation();
@@ -346,24 +386,25 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Based on the distances, relative or absolute movement is performed.
 	 */
 	public void syncLocation() {
-		// Position
-		final IntVector3 oldPos = this.getProtocolPositionSynched();
-		final IntVector3 newPos = this.getProtocolPosition();
-		final boolean moved = newPos.subtract(oldPos).abs().greaterEqualThan(MIN_RELATIVE_CHANGE);
-		// Rotation
-		final IntVector2 oldRot = this.getProtocolRotationSynched();
-		final IntVector2 newRot = this.getProtocolRotation();
-		final boolean rotated = newRot.subtract(oldRot).abs().greaterEqualThan(MIN_RELATIVE_CHANGE);
+		// Position check
+		final boolean moved = Math.abs(locLive.getX() - locSynched.getX()) >= MIN_RELATIVE_CHANGE
+				|| Math.abs(locLive.getY() - locSynched.getY()) >= MIN_RELATIVE_CHANGE
+				|| Math.abs(locLive.getZ() - locSynched.getZ()) >= MIN_RELATIVE_CHANGE;
+
+		// Rotation check
+		final boolean rotated = Math.abs(locLive.getYaw() - locSynched.getYaw()) >= MIN_RELATIVE_CHANGE
+				|| Math.abs(locLive.getPitch() - locSynched.getPitch()) >= MIN_RELATIVE_CHANGE;
+
 		// Synchronize
-		syncLocation(moved ? newPos : null, rotated ? newRot : null);
+		syncLocation(moved, rotated);
 	}
 
 	/**
 	 * Synchronizes the entity head yaw rotation to all Clients.
 	 */
 	public void syncHeadRotation() {
-		final int oldYaw = this.getProtocolHeadRotationSynched();
-		final int newYaw = this.getProtocolHeadRotation();
+		final int oldYaw = headRotSynched.get();
+		final int newYaw = headRotLive.get();
 		if (Math.abs(newYaw - oldYaw) >= MIN_RELATIVE_CHANGE) {
 			syncHeadRotation(newYaw);
 		}
@@ -388,12 +429,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		if (!this.isMobile()) {
 			return;
 		}
-		//TODO: For players, there should be an event here!
-		Vector oldVel = this.getProtocolVelocitySynched();
-		Vector newVel = this.getProtocolVelocity();
-		// Synchronize velocity when the entity stopped moving, or when the velocity change is large enough
-		if ((newVel.lengthSquared() == 0.0 && oldVel.lengthSquared() > 0.0) || oldVel.distanceSquared(newVel) > MIN_RELATIVE_VELOCITY_SQUARED) {
-			this.syncVelocity(newVel);
+		if ((velLive.lengthSquared() == 0.0 && velSynched.lengthSquared() > 0.0) || velLive.distanceSquared(velSynched) > MIN_RELATIVE_VELOCITY_SQUARED) {
+			this.syncVelocity(velLive.getX(), velLive.getY(), velLive.getZ());
 		}
 	}
 
@@ -436,14 +473,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			// This has some big issues when new players join...
 
 			// Position
-			final IntVector3 pos = this.getProtocolPositionSynched();
-			packet.write(PacketFields.VEHICLE_SPAWN.x, pos.x);
-			packet.write(PacketFields.VEHICLE_SPAWN.y, pos.y);
-			packet.write(PacketFields.VEHICLE_SPAWN.z, pos.z);
+			packet.write(PacketFields.VEHICLE_SPAWN.x, locSynched.getX());
+			packet.write(PacketFields.VEHICLE_SPAWN.y, locSynched.getY());
+			packet.write(PacketFields.VEHICLE_SPAWN.z, locSynched.getZ());
 			// Rotation
-			final IntVector2 rot = this.getProtocolRotationSynched();
-			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) rot.z);
-			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) rot.x);
+			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) locSynched.getYaw());
+			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) locSynched.getPitch());
 		}
 		return packet;
 	}
@@ -482,20 +517,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		}
 
 		// Update information
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		final Vector velocity = this.getProtocolVelocity();
-		handle.j = velocity.getX();
-		handle.k = velocity.getY();
-		handle.l = velocity.getZ();
-		final IntVector3 position = this.getProtocolPosition();
-		handle.xLoc = position.x;
-		handle.yLoc = position.y;
-		handle.zLoc = position.z;
-		final IntVector2 rotation = this.getProtocolRotation();
-		handle.yRot = rotation.x;
-		handle.xRot = rotation.z;
-		final int headYaw = this.getProtocolHeadRotation();
-		handle.i = headYaw;
+		velSynched.set(velLive);
+		locSynched.set(locLive);
+		headRotSynched.set(headRotLive.get());
 
 		// Spawn
 		for (Player viewer : getViewers()) {
@@ -521,7 +545,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * Synchronizes the entity position / rotation absolutely (Teleport packet)
 	 */
 	public void syncLocationAbsolute() {
-		syncLocationAbsolute(getProtocolPosition(), getProtocolRotation());
+		syncLocationAbsolute(locLive.getX(), locLive.getY(), locLive.getZ(), locLive.getYaw(), locLive.getPitch());
 	}
 
 	/**
@@ -537,20 +561,27 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		if (rotation == null) {
 			rotation = this.getProtocolRotationSynched();
 		}
+		syncLocationAbsolute(position.x, position.y, position.z, rotation.x, rotation.z);
+	}
+
+	/**
+	 * Synchronizes the entity position / rotation absolutely (Teleport packet)
+	 * 
+	 * @param posX - protocol position X
+	 * @param posY - protocol position Y
+	 * @param posZ - protocol position Z
+	 * @param yaw - protocol rotation yaw
+	 * @param pitch - protocol rotation pitch
+	 */
+	public void syncLocationAbsolute(int posX, int posY, int posZ, int yaw, int pitch) {
 		// Update protocol values
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		handle.xLoc = position.x;
-		handle.yLoc = position.y;
-		handle.zLoc = position.z;
-		handle.yRot = rotation.x;
-		handle.xRot = rotation.z;
+		locSynched.set(posX, posY, posZ, yaw, pitch);
 
 		// Update last synchronization time
 		EntityTrackerEntryRef.timeSinceLocationSync.set(handle, 0);
 
 		// Send synchronization messages
-		broadcast(PacketFields.ENTITY_TELEPORT.newInstance(entity.getEntityId(), position.x, position.y, position.z, 
-				(byte) rotation.x, (byte) rotation.z));
+		broadcast(PacketFields.ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch));
 	}
 
 	/**
@@ -560,8 +591,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param rotation - whether to sync rotation
 	 */
 	public void syncLocation(boolean position, boolean rotation) {
-		syncLocation(position ? getProtocolPosition() : null,
-				rotation ? getProtocolRotation() : null);
+		if (!position && !rotation) {
+			return;
+		}
+		syncLocation(position, rotation, locLive.getX(), locLive.getY(), locLive.getZ(), locLive.getYaw(), locLive.getPitch());
 	}
 
 	/**
@@ -573,42 +606,66 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param rotation (new, x = yaw, z = pitch)
 	 */
 	public void syncLocation(IntVector3 position, IntVector2 rotation) {
-		final boolean moved = position != null;
-		final boolean rotated = rotation != null;
-		final IntVector3 deltaPos = moved ? position.subtract(this.getProtocolPositionSynched()) : IntVector3.ZERO;
-		if (deltaPos.abs().greaterThan(MAX_RELATIVE_DISTANCE)) {
-			// Perform teleport instead
-			syncLocationAbsolute(position, rotation);
+		if (position == null && rotation == null) {
+			return;
+		}
+		if (position == null) {
+			syncLocation(false, true, 0, 0, 0, rotation.x, rotation.z);
+		} else if (rotation == null) {
+			syncLocation(true, false, position.x, position.y, position.z, 0, 0);
 		} else {
-			// Update protocol values
-			final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-			if (moved) {
-				handle.xLoc = position.x;
-				handle.yLoc = position.y;
-				handle.zLoc = position.z;
-			}
-			if (rotated) {
-				handle.yRot = rotation.x;
-				handle.xRot = rotation.z;
+			syncLocation(true, true, position.x, position.y, position.z, rotation.x, rotation.z);
+		}
+	}
+
+	/**
+	 * Synchronizes the entity position / rotation relatively.
+	 * If the relative change is too big, an absolute update is performed instead.
+	 * 
+	 * @param position - whether to update position (read pos on/off)
+	 * @param rotation - whether to update rotation (read yawpitch on/off)
+	 * @param posX - protocol position X
+	 * @param posY - protocol position Y
+	 * @param posZ - protocol position Z
+	 * @param yaw - protocol rotation yaw
+	 * @param pitch - protocol rotation pitch
+	 */
+	public void syncLocation(boolean position, boolean rotation, int posX, int posY, int posZ, int yaw, int pitch) {
+		// No position updates allowed for passengers (this is FORCED). Rotation is allowed.
+		if (position && !entity.isInsideVehicle()) {
+			final int deltaX = posX - locSynched.getX();
+			final int deltaY = posY - locSynched.getY();
+			final int deltaZ = posZ - locSynched.getZ();
+
+			// There is no use sending relative updates with zero change...
+			if (deltaX == 0 && deltaY == 0 && deltaZ == 0) {
+				return;
 			}
 
-			// Send synchronization messages
-			// If inside vehicle - there is no use to update the location!
-			if (entity.isInsideVehicle()) {
-				if (rotated) {
-					broadcast(PacketFields.ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) rotation.x, (byte) rotation.z));
+			// Absolute updates for too long distances
+			if (Math.abs(deltaX) > MAX_RELATIVE_DISTANCE || Math.abs(deltaY) > MAX_RELATIVE_DISTANCE || Math.abs(deltaZ) > MAX_RELATIVE_DISTANCE) {
+				// Distance too large, perform absolute update
+				// If no rotation is being updated, set the rotation to the synched rotation
+				if (!rotation) {
+					yaw = locSynched.getYaw();
+					pitch = locSynched.getPitch();
 				}
-			} else if (moved && rotated) {
+				syncLocationAbsolute(posX, posY, posZ, yaw, pitch);
+			} else if (rotation) {
+				// Update rotation and position relatively
+				locSynched.set(posX, posY, posZ, yaw, pitch);
 				broadcast(PacketFields.REL_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
-						(byte) deltaPos.x, (byte) deltaPos.y, (byte) deltaPos.z, (byte) rotation.x, (byte) rotation.z));
-
-			} else if (moved) {
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch));
+			} else {
+				// Only update position relatively
+				locSynched.set(posX, posY, posZ);
 				broadcast(PacketFields.REL_ENTITY_MOVE.newInstance(entity.getEntityId(), 
-						(byte) deltaPos.x, (byte) deltaPos.y, (byte) deltaPos.z));
-
-			} else if (rotated) {
-				broadcast(PacketFields.ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) rotation.x, (byte) rotation.z));
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ));
 			}
+		} else if (rotation) {
+			// Only update rotation
+			locSynched.setRotation(yaw, pitch);
+			broadcast(PacketFields.ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch));
 		}
 	}
 
@@ -618,7 +675,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param headRotation to set to
 	 */
 	public void syncHeadRotation(int headRotation) {
-		((EntityTrackerEntry) handle).i = headRotation;
+		headRotSynched.set(headRotation);
 		this.broadcast(PacketFields.ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation));
 	}
 
@@ -637,6 +694,22 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	}
 
 	/**
+	 * Synchronizes the entity velocity
+	 * 
+	 * @param velX
+	 * @param velY
+	 * @param velZ
+	 */
+	public void syncVelocity(double velX, double velY, double velZ) {
+		velSynched.set(velX, velY, velZ);
+		// If inside a vehicle, there is no use in updating
+		if (entity.isInsideVehicle()) {
+			return;
+		}
+		this.broadcast(PacketFields.ENTITY_VELOCITY.newInstance(entity.getEntityId(), velX, velY, velZ));
+	}
+
+	/**
 	 * Obtains the current Vehicle entity according to the viewers of this entity
 	 * 
 	 * @return Client-synchronized vehicle entity
@@ -652,10 +725,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param velocity to set to
 	 */
 	public void setProtocolVelocitySynched(Vector velocity) {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		handle.j = velocity.getX();
-		handle.k = velocity.getY();
-		handle.l = velocity.getZ();
+		velSynched.set(velocity);
 	}
 
 	/**
@@ -664,8 +734,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Client-synchronized entity velocity
 	 */
 	public Vector getProtocolVelocitySynched() {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		return new Vector(handle.j, handle.k, handle.l);
+		return velSynched.vector();
 	}
 
 	/**
@@ -674,8 +743,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Client-synchronized entity position
 	 */
 	public IntVector3 getProtocolPositionSynched() {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		return new IntVector3(handle.xLoc, handle.yLoc, handle.zLoc);
+		return locSynched.vector();
 	}
 
 	/**
@@ -684,8 +752,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Client-synchronized entity rotation (x = yaw, z = pitch)
 	 */
 	public IntVector2 getProtocolRotationSynched() {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		return new IntVector2(handle.yRot, handle.xRot);
+		return new IntVector2(locSynched.getYaw(), locSynched.getPitch());
 	}
 
 	/**
@@ -694,7 +761,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Entity velocity in protocol format
 	 */
 	public Vector getProtocolVelocity() {
-		return this.entity.getVelocity();
+		return velLive.vector();
 	}
 
 	/**
@@ -703,8 +770,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Entity position in protocol format
 	 */
 	public IntVector3 getProtocolPosition() {
-		final Entity entity = this.entity.getHandle(Entity.class);
-		return new IntVector3(protLoc(entity.locX), MathUtil.floor(entity.locY * 32.0), protLoc(entity.locZ));
+		return locLive.vector();
 	}
 
 	/**
@@ -713,8 +779,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Entity rotation in protocol format (x = yaw, z = pitch)
 	 */
 	public IntVector2 getProtocolRotation() {
-		final Entity entity = this.entity.getHandle(Entity.class);
-		return new IntVector2(protRot(entity.yaw), protRot(entity.pitch));
+		return new IntVector2(locLive.getYaw(), locLive.getPitch());
 	}
 
 	/**
@@ -723,7 +788,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Client-synched head-yaw rotation
 	 */
 	public int getProtocolHeadRotationSynched() {
-		return ((EntityTrackerEntry) handle).i;
+		return headRotSynched.get();
 	}
 
 	/**
@@ -742,8 +807,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return True if the update interval was reached, False if not
 	 */
 	public boolean isUpdateTick() {
-		final EntityTrackerEntry handle = (EntityTrackerEntry) this.handle;
-		return (handle.m % handle.c) == 0;
+		return ticks.isMod(((EntityTrackerEntry) handle).c);
 	}
 
 	/**
@@ -753,7 +817,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return True if the interval was reached, False if not
 	 */
 	public boolean isTick(int interval) {
-		return (((EntityTrackerEntry) handle).m % interval) == 0;
+		return ticks.isMod(interval);
 	}
 
 	/**
@@ -762,7 +826,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Tick time
 	 */
 	public int getTick() {
-		return ((EntityTrackerEntry) handle).m;
+		return ticks.get();
 	}
 
 	/**
@@ -771,7 +835,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return Entity head rotation in protocol format
 	 */
 	public int getProtocolHeadRotation() {
-		return protRot(this.entity.getHeadRotation());
+		return headRotLive.get();
 	}
 
 	private int protRot(float rot) {

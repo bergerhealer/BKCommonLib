@@ -137,6 +137,10 @@ public class CommonEntityType {
 		return byNMSEntity(Conversion.toEntityHandle.convert(entity));
 	}
 
+	public static CommonEntityType byNMSEntityClass(Class<?> entityClass) {
+		return LogicUtil.fixNull(byNMS.get(entityClass), UNKNOWN);
+	}
+
 	public static CommonEntityType byNMSEntity(Object entityHandle) {
 		return LogicUtil.fixNull(byNMS.get(entityHandle), UNKNOWN);
 	}

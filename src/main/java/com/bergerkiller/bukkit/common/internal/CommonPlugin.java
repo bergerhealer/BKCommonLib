@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,8 +19,10 @@ import net.minecraft.server.Entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
@@ -74,10 +77,11 @@ public class CommonPlugin extends PluginBase {
 	private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
-	private final List<NextTickListener> nextTickListeners = new ArrayList<NextTickListener>(1);
+	private final List<TimingsListener> timingsListeners = new ArrayList<TimingsListener>(1);
 	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
+	private final List<MobPreSpawnListener> mobPreSpawnListeners = new ArrayList<MobPreSpawnListener>();
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
@@ -85,6 +89,10 @@ public class CommonPlugin extends PluginBase {
 	private boolean isHyperConomyEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
+
+	public static List<TimingsListener> getTimings() {
+		return instance == null ? Collections.EMPTY_LIST : instance.timingsListeners;
+	}
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -138,12 +146,63 @@ public class CommonPlugin extends PluginBase {
 		return typed;
 	}
 
-	public void addNextTickListener(NextTickListener listener) {
-		nextTickListeners.add(listener);
+	public void addMobPreSpawnListener(MobPreSpawnListener listener) {
+		mobPreSpawnListeners.add(listener);
 	}
 
+	public void removeMobPreSpawnListener(MobPreSpawnListener listener) {
+		mobPreSpawnListeners.remove(listener);
+	}
+
+	public boolean canSpawnMob(World world, int x, int y, int z, EntityType entityType) {
+		for (MobPreSpawnListener listener : mobPreSpawnListeners) {
+			if (!listener.canSpawn(world, x, y, z, entityType)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Deprecated
+	public void addNextTickListener(NextTickListener listener) {
+		this.addTimingsListener(new NextTickListenerProxy(listener));
+	}
+
+	@Deprecated
 	public void removeNextTickListener(NextTickListener listener) {
-		nextTickListeners.remove(listener);
+		Iterator<TimingsListener> iter = this.timingsListeners.iterator();
+		while (iter.hasNext()) {
+			TimingsListener t = iter.next();
+			if (t instanceof NextTickListenerProxy && ((NextTickListenerProxy) t).listener == listener) {
+				iter.remove();
+			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static class NextTickListenerProxy implements TimingsListener {
+		private final NextTickListener listener;
+
+		public NextTickListenerProxy(NextTickListener listener) {
+			this.listener = listener;
+		}
+
+		@Override
+		public void onNextTicked(Runnable runnable, long executionTime) {
+			this.listener.onNextTicked(runnable, executionTime);
+		}
+
+		public void onChunkLoad(Chunk chunk, long executionTime) {}
+		public void onChunkGenerate(Chunk chunk, long executionTime) {}
+		public void onChunkUnloading(World world, long executionTime) {}
+	}
+
+	public void addTimingsListener(TimingsListener listener) {
+		this.timingsListeners.add(listener);
+	}
+
+	public void removeTimingsListener(TimingsListener listener) {
+		this.timingsListeners.remove(listener);
 	}
 
 	public void notifyAdded(org.bukkit.entity.Entity e) {
@@ -553,7 +612,7 @@ public class CommonPlugin extends PluginBase {
 		public void run() {
 			List<Runnable> nextTick = getInstance().nextTickTasks;
 			List<Runnable> nextSync = getInstance().nextTickSync;
-			List<NextTickListener> nextTickListeners = getInstance().nextTickListeners;
+			List<TimingsListener> timingsListeners = getTimings();
 			synchronized (nextTick) {
 				if (nextTick.isEmpty()) {
 					return;
@@ -561,7 +620,7 @@ public class CommonPlugin extends PluginBase {
 				nextSync.addAll(nextTick);
 				nextTick.clear();
 			}
-			if (nextTickListeners.isEmpty()) {
+			if (timingsListeners.isEmpty()) {
 				// No time measurement needed
 				for (Runnable task : nextSync) {
 					try {
@@ -574,7 +633,7 @@ public class CommonPlugin extends PluginBase {
 			} else {
 				// Perform time measurement and call next-tick listeners
 				int i;
-				final int listenerCount = nextTickListeners.size();
+				final int listenerCount = timingsListeners.size();
 				long startTime, delta, endTime = System.nanoTime();
 				for (Runnable task : nextSync) {
 					startTime = endTime;
@@ -587,7 +646,7 @@ public class CommonPlugin extends PluginBase {
 					endTime = System.nanoTime();
 					delta = endTime - startTime;
 					for (i = 0; i < listenerCount; i++) {
-						nextTickListeners.get(i).onNextTicked(task, delta);
+						timingsListeners.get(i).onNextTicked(task, delta);
 					}
 				}
 			}

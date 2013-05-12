@@ -75,6 +75,20 @@ public abstract class IntLocationAbstract extends IntVectorAbstract {
 		return setWorld(value.getWorld()).setYaw(value.getYaw()).setPitch(value.getPitch());
 	}
 
+	@Override
+	public IntLocationAbstract set(int x, int y, int z) {
+		super.set(x, y, z);
+		return this;
+	}
+
+	public IntLocationAbstract set(int x, int y, int z, int yaw, int pitch) {
+		return set(x, y, z).setRotation(yaw, pitch);
+	}
+
+	public IntLocationAbstract setRotation(int yaw, int pitch) {
+		return setYaw(yaw).setPitch(pitch);
+	}
+
 	public Location toLocation() {
 		return new Location(getWorld(), getX(), getY(), getZ(), getYaw(), getPitch());
 	}

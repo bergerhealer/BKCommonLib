@@ -2,8 +2,11 @@ package com.bergerkiller.bukkit.common.internal;
 
 /**
  * A listener to keep track of next-tick task execution.
- * It is mainly intended for performance measuring.
+ * It is mainly intended for performance measuring.<br><br>
+ * 
+ * @deprecated: Use TimingsListener instead
  */
+@Deprecated
 public interface NextTickListener {
 
 	/**

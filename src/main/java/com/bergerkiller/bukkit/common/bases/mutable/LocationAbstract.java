@@ -81,6 +81,20 @@ public abstract class LocationAbstract extends VectorAbstract {
 		return setWorld(value.getWorld()).setYaw(value.getYaw()).setPitch(value.getPitch());
 	}
 
+	@Override
+	public LocationAbstract set(double x, double y, double z) {
+		super.set(x, y, z);
+		return this;
+	}
+
+	public LocationAbstract set(double x, double y, double z, float yaw, float pitch) {
+		return set(x, y, z).setRotation(yaw, pitch);
+	}
+
+	public LocationAbstract setRotation(float yaw, float pitch) {
+		return setYaw(yaw).setPitch(pitch);
+	}
+
 	public Location toLocation() {
 		return new Location(getWorld(), getX(), getY(), getZ(), getYaw(), getPitch());
 	}

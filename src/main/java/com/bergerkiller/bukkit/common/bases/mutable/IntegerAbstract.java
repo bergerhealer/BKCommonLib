@@ -72,6 +72,24 @@ public abstract class IntegerAbstract {
 		return set(get() / value);
 	}
 
+	/**
+	 * Checks whether the modulus of the current value equals 0.
+	 * This is the case when the current value is dividable by the modulus specified,
+	 * and no remainder is left. For example:<br>
+	 * - {12}.isMod(6) == True<br>
+	 * - {11}.isMod(2) == False<br>
+	 * - {0}.isMod(6) == True<br><br>
+	 * 
+	 * This functionality can be used to perform something on an interval using a given time.
+	 * For example, {timesecond}.isMod(60) would trigger whenever a new minute is passed.
+	 * 
+	 * @param modulus to check
+	 * @return True if dividable without remainder, False if not
+	 */
+	public boolean isMod(int modulus) {
+		return (get() % modulus) == 0;
+	}
+
 	public boolean equals(int value) {
 		return get() == value;
 	}
