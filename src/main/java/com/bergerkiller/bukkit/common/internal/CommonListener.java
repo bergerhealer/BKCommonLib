@@ -66,6 +66,7 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	private void onWorldInit(final WorldInitEvent event) {
+		ChunkProviderServerHook.hook(event.getWorld());
 		CommonUtil.nextTick(new Runnable() {
 			public void run() {
 				CommonPlugin.getInstance().notifyWorldAdded(event.getWorld());
@@ -75,6 +76,7 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onWorldUnload(WorldUnloadEvent event) {
+		System.out.println("INIT: " + event.getWorld().getName());
 		CommonWorldListener listener = CommonPlugin.getInstance().worldListeners.remove(event.getWorld());
 		if (listener != null) {
 			listener.disable();

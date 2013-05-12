@@ -2,20 +2,25 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Server;
+import org.bukkit.event.world.ChunkPopulateEvent;
+import org.bukkit.generator.BlockPopulator;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 import net.minecraft.server.BiomeMeta;
+import net.minecraft.server.BlockSand;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkProviderServer;
 import net.minecraft.server.CrashReport;
@@ -76,6 +81,51 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 				CommonPlugin.TIMINGS.onChunkLoad(Conversion.toChunk.convert(nmsChunk), time);
 			}
 			return nmsChunk;
+		}
+	}
+
+	@Override
+	public void getChunkAt(IChunkProvider ichunkprovider, int i, int j) {
+		// Perform chunk population timings
+		if (!CommonPlugin.TIMINGS.isActive()) {
+			super.getChunkAt(ichunkprovider, i, j);
+			return;
+		}
+
+		Chunk chunk = this.getOrCreateChunk(i, j);
+
+		if (!chunk.done) {
+			chunk.done = true;
+			this.chunkProvider.getChunkAt(ichunkprovider, i, j);
+
+			// CraftBukkit start
+			BlockSand.instaFall = true;
+			final Random random = new Random();
+			random.setSeed(world.getSeed());
+			long xRand = random.nextLong() / 2L * 2L + 1L;
+			long zRand = random.nextLong() / 2L * 2L + 1L;
+			random.setSeed((long) i * xRand + (long) j * zRand ^ world.getSeed());
+
+			// Call populators
+			long time;
+			org.bukkit.World bWorld = getWorld();
+			org.bukkit.Chunk bChunk = CommonNMS.getChunk(chunk);
+			for (BlockPopulator populator : bWorld.getPopulators()) {
+				time = System.nanoTime();
+				try {
+					populator.populate(bWorld, random, bChunk);
+				} finally {
+					time = System.nanoTime() - time;
+					CommonPlugin.TIMINGS.onChunkPopulate(bChunk, populator, time);
+				}
+			}
+
+			// Done
+			BlockSand.instaFall = false;
+			super.world.getServer().getPluginManager().callEvent(new ChunkPopulateEvent(chunk.bukkitChunk));
+			// CraftBukkit end
+
+			chunk.e();
 		}
 	}
 
@@ -180,5 +230,32 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 				CommonPlugin.TIMINGS.onChunkUnloading(getWorld(), time);
 			}
 		}
+	}
+
+	private static <T> T getCPS(org.bukkit.World world, Class<T> type) {
+		return CommonUtil.tryCast(WorldServerRef.chunkProviderServer.get(Conversion.toWorldHandle.convert(world)), type);
+	}
+
+	private static IChunkLoader getLoader(Object cps) {
+		return (IChunkLoader) ChunkProviderServerRef.chunkLoader.get(cps);
+	}
+
+	public static void hook(org.bukkit.World world) {
+		ChunkProviderServer oldCPS = getCPS(world, ChunkProviderServer.class);
+		if (oldCPS instanceof ChunkProviderServerHook) {
+			return;
+		}
+		ChunkProviderServerHook newCPS = new ChunkProviderServerHook(oldCPS.world, getLoader(oldCPS), oldCPS.chunkProvider);
+		ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
+		WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
+	}
+
+	public static void unhook(org.bukkit.World world) {
+		ChunkProviderServerHook oldCPS = getCPS(world, ChunkProviderServerHook.class);
+		if (oldCPS == null) {
+			return;
+		}
+		ChunkProviderServer newCPS = new ChunkProviderServer(oldCPS.world, getLoader(oldCPS), oldCPS.chunkProvider);
+		WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
 	}
 }

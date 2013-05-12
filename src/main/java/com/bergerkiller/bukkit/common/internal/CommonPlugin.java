@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -462,6 +463,11 @@ public class CommonPlugin extends PluginBase {
 		}
 		worldListeners.clear();
 
+		// Unhook chunk providers
+		for (World world : WorldUtil.getWorlds()) {
+			ChunkProviderServerHook.unhook(world);
+		}
+
 		// Clear running tasks
 		for (Task task : startedTasks) {
 			task.stop();
@@ -533,8 +539,9 @@ public class CommonPlugin extends PluginBase {
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
 
-		// Register world listeners
+		// Register listeners and hooks
 		for (World world : WorldUtil.getWorlds()) {
+			ChunkProviderServerHook.hook(world);
 			notifyWorldAdded(world);
 		}
 
@@ -711,6 +718,7 @@ public class CommonPlugin extends PluginBase {
 		public void onChunkLoad(Chunk chunk, long executionTime) {}
 		public void onChunkGenerate(Chunk chunk, long executionTime) {}
 		public void onChunkUnloading(World world, long executionTime) {}
+		public void onChunkPopulate(Chunk chunk, BlockPopulator populator, long executionTime) {}
 	}
 
 	public static class TimingsRootListener implements TimingsListener {
@@ -769,6 +777,19 @@ public class CommonPlugin extends PluginBase {
 				try {
 					for (int i = 0; i < instance.timingsListeners.size(); i++) {
 						instance.timingsListeners.get(i).onChunkUnloading(world, executionTime);
+					}
+				} catch (Throwable t) {
+					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+				}
+			}
+		}
+
+		@Override
+		public void onChunkPopulate(Chunk chunk, BlockPopulator populator, long executionTime) {
+			if (isActive()) {
+				try {
+					for (int i = 0; i < instance.timingsListeners.size(); i++) {
+						instance.timingsListeners.get(i).onChunkPopulate(chunk, populator, executionTime);
 					}
 				} catch (Throwable t) {
 					LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);

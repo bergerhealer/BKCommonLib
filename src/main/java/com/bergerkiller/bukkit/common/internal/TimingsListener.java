@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
 
 /**
  * Timing information is reported back to instances of this interface type when registered.
@@ -38,4 +39,13 @@ public interface TimingsListener {
 	 * @param executionTime of the unloading operation (nanoseconds)
 	 */
 	void onChunkUnloading(World world, long executionTime);
+
+	/**
+	 * Called after a block populator finished operating on a chunk
+	 * 
+	 * @param chunk that was populated
+	 * @param populator that populated
+	 * @param executionTime of the population operation (nanoseconds)
+	 */
+	void onChunkPopulate(Chunk chunk, BlockPopulator populator, long executionTime);
 }
