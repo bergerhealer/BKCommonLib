@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class Common {
 	/**
@@ -20,6 +21,16 @@ public class Common {
 	 * Otherwise, the value is of the format: v1_2_R3
 	 */
 	public static final String MC_VERSION_PACKAGEPART;
+	/**
+	 * Defines the net.minecraft.server constant (which is not inlined or relocated).
+	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
+	 */
+	public static final String NMS_ROOT_NONVERSIONED = StringUtil.combine(".", "net", "minecraft", "server");
+	/**
+	 * Defines the org.bukkit.craftbukkit constant (which is not inlined or relocated).
+	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
+	 */
+	public static final String CB_ROOT_NONVERSIONED = StringUtil.combine(".", "org", "bukkit", "craftbukkit");
 	/**
 	 * Defines the net.minecraft.server root path
 	 */
@@ -39,18 +50,29 @@ public class Common {
 
 	static {
 		String version = "";
-		if (!checkVersion(version)) {
-			StringBuilder builder = new StringBuilder();
+
+		// Important: paths defined like this to avoid maven shading relocating it (DO NOT CHANGE!)
+		final String NMS_MAIN_CHECKCLASS = ".World";
+
+		// Obtain package version
+		StringBuilder builder = new StringBuilder();
+		builder.append(NMS_ROOT_NONVERSIONED).append(NMS_MAIN_CHECKCLASS);
+		if (CommonUtil.getClass(builder.toString()) == null) {
 			int a, b, c;
 			for (a = 0; a < 10; a++) {
 				for (b = 0; b < 10; b++) {
 					for (c = 0; c < 10; c++) {
+						// Trim builder back to package path length
+						builder.setLength(NMS_ROOT_NONVERSIONED.length() + 1);
+
 						// Format:
 						// [package].v1_4_R5.[trail]
-						builder.setLength(0);
 						builder.append('v').append(a).append('_').append(b).append('_').append('R').append(c);
-						version = builder.toString();
-						if (checkVersion(version)) {
+						builder.append(NMS_MAIN_CHECKCLASS);
+
+						// Class check and version obtaining
+						if (CommonUtil.getClass(builder.toString()) != null) {
+							version = builder.substring(NMS_ROOT_NONVERSIONED.length() + 1, builder.length() - NMS_MAIN_CHECKCLASS.length());
 							a = b = c = 10;
 						}
 					}
@@ -59,8 +81,8 @@ public class Common {
 		}
 		String part = version.isEmpty() ? "" : ("." + version);
 		MC_VERSION_PACKAGEPART = version;
-		NMS_ROOT = "net.minecraft.server" + part;
-		CB_ROOT = "org.bukkit.craftbukkit" + part;
+		NMS_ROOT = NMS_ROOT_NONVERSIONED + part;
+		CB_ROOT = CB_ROOT_NONVERSIONED + part;
 		COMMON_ROOT = "com.bergerkiller.bukkit.common";
 		IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
 		// Find out the MC_VERSION using the CraftServer
@@ -77,19 +99,6 @@ public class Common {
 		} catch (Throwable t) {
 		}
 		MC_VERSION = version;
-	}
-
-	private static boolean checkVersion(String version) {
-		try {
-			if (version.isEmpty()) {
-				Class.forName("net.minecraft.server.World");
-			} else {
-				Class.forName("net.minecraft.server." + version + ".World");
-			}
-			return true;
-		} catch (ClassNotFoundException ex) {
-			return false;
-		}
 	}
 
 	/**
@@ -155,7 +164,7 @@ public class Common {
 		String msg = type + " '" + name + "' does not exist in class file " + source.getSimpleName();
 		Exception ex = new Exception(msg);
 		for (StackTraceElement elem : ex.getStackTrace()) {
-			if (elem.getClassName().startsWith("com.bergerkiller.bukkit.common.reflection")) {
+			if (elem.getClassName().startsWith(COMMON_ROOT + ".reflection")) {
 				Bukkit.getServer().getLogger().log(Level.SEVERE, "[BKCommonLib] " + msg + " (Update BKCommonLib?)");
 				return;
 			}

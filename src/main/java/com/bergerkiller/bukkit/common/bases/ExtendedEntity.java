@@ -131,7 +131,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the Entity handle
 	 */
 	public Object getHandle() {
-		return CommonNMS.getNative(entity);
+		return Conversion.toEntityHandle.convert(entity);
 	}
 
 	/**

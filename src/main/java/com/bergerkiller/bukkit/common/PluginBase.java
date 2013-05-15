@@ -513,9 +513,9 @@ public abstract class PluginBase extends JavaPlugin {
 			if (CommonUtil.isInstance(reason, NoClassDefFoundError.class, NoSuchMethodError.class, NoSuchFieldError.class, IllegalAccessError.class)) {
 				String fixedReason = StringUtil.trimStart(reason.getMessage(), "tried to access ");
 				String path = StringUtil.trimStart(fixedReason, "method ", "field ", "class ");
-				if (path.startsWith("net.minecraft.server")) {
-					log(Level.SEVERE, "This version of the plugin is incompatible with this Minecraft version.");
-				} else if (path.startsWith("org.bukkit.craftbukkit")) {
+				if (path.startsWith(Common.NMS_ROOT_NONVERSIONED)) {
+					log(Level.SEVERE, "This version of the plugin is incompatible with this Minecraft version:");
+				} else if (path.startsWith(Common.CB_ROOT_NONVERSIONED)) {
 					log(Level.SEVERE, "This version of the plugin is incompatible with this CraftBukkit implementation:");
 				} else if (path.startsWith("org.bukkit")) {
 					log(Level.SEVERE, "This version of the plugin is incompatible with the current Bukkit API:");

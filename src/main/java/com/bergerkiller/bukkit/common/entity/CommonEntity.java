@@ -182,13 +182,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @return True if Entity Controllers are supported, False if not
 	 */
 	public boolean hasControllerSupport() {
+		// Check whether already hooked
 		if (isHooked()) {
 			return true;
-		} else if (getHandle() == null) {
-			return false;
-		} else {
-			return getHandle().getClass().getName().startsWith(Common.NMS_ROOT);
 		}
+		final Object handle = getHandle();
+		// Check whether the handle is not of an external-plugin type
+		if (handle == null || !handle.getClass().getName().startsWith(Common.NMS_ROOT)) {
+			return false;
+		}
+		// Check whether the CommonEntityType supports hooking
+		return CommonEntityType.byNMSEntity(handle).hasNMSEntity();
 	}
 
 	/**
