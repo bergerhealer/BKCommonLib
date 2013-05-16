@@ -108,7 +108,7 @@ public class ItemParser {
 		if (stack == null) {
 			return false;
 		}
-		return this.match(stack.getTypeId(), stack.getData().getData());
+		return this.match(stack.getTypeId(), stack.getDurability());
 	}
 
 	public boolean match(Material type, int data) {
@@ -201,7 +201,7 @@ public class ItemParser {
 	}
 
 	public ItemStack getItemStack(int amount) {
-		return new ItemStack(this.type, this.amount, (byte) this.data);
+		return new ItemStack(this.type, this.amount, (short) this.data);
 	}
 
 	public int getMaxStackSize() {
@@ -211,10 +211,10 @@ public class ItemParser {
 	/**
 	 * Creates a new ItemParser with the type and amount of this parser, but with a new data
 	 * 
-	 * @param data for the new parser
+	 * @param data for the new parser (-1 for no data)
 	 * @return new ItemParser with the new data
 	 */
-	public ItemParser setData(Byte data) {
+	public ItemParser setData(int data) {
 		return new ItemParser(this.type, this.amount, data);
 	}
 
