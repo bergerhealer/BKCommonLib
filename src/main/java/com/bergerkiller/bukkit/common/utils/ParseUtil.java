@@ -15,21 +15,22 @@ import org.bukkit.material.Wool;
 
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
+import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NumberConverter;
 
 public class ParseUtil {
-	private static final StringMap<Boolean> BOOL_NAME_MAP = new StringMap<Boolean>();
+	private static final StringMapCaseInsensitive<Boolean> BOOL_NAME_MAP = new StringMapCaseInsensitive<Boolean>();
 	private static final StringMap<Material> MAT_NAME_MAP = new StringMap<Material>();
 	private static final StringReplaceBundle MAT_ALIASES = new StringReplaceBundle();
 
 	static {
 		// Boolean representing text values
 		for (String trueValue : new String[] {"yes", "allow", "allowed", "true", "ye", "y", "t", "on", "enabled", "enable"}) {
-			BOOL_NAME_MAP.putUpper(trueValue, Boolean.TRUE);
+			BOOL_NAME_MAP.put(trueValue, Boolean.TRUE);
 		}
 		for (String falseValue : new String[] {"no", "none", "deny", "denied", "false", "n", "f", "off", "disabled", "disable"}) {
-			BOOL_NAME_MAP.putUpper(falseValue, Boolean.FALSE);
+			BOOL_NAME_MAP.put(falseValue, Boolean.FALSE);
 		}
 
 		// Material by name mapping
@@ -120,7 +121,7 @@ public class ParseUtil {
 	 * @return True if it is a boolean, False if it isn't
 	 */
 	public static boolean isBool(String text) {
-		return BOOL_NAME_MAP.containsKeyUpper(text);
+		return BOOL_NAME_MAP.containsKey(text);
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class ParseUtil {
 	 * @return Parsed value, or the default
 	 */
 	public static Boolean parseBool(String text, Boolean def) {
-		return LogicUtil.fixNull(BOOL_NAME_MAP.getUpper(text), def);
+		return LogicUtil.fixNull(BOOL_NAME_MAP.get(text), def);
 	}
 
 	/**

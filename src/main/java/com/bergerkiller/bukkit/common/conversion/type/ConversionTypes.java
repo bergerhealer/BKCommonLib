@@ -32,6 +32,9 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class ConversionTypes {
+	// Misc
+	@SuppressWarnings("rawtypes")
+	public static final EmptyConverterUnsafe NONE = EmptyConverterUnsafe.INSTANCE;
 	// Arrays
 	public static final ObjectArrayConverter<ItemStack[]> toItemStackArr = ObjectArrayConverter.toItemStackArr;
 	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = ObjectArrayConverter.toItemStackHandleArr;

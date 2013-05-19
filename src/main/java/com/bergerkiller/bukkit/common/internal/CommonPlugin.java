@@ -14,14 +14,12 @@ import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
 import net.milkbowl.vault.permission.Permission;
-import net.minecraft.server.Entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.BlockPopulator;
@@ -39,7 +37,7 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
-import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
+import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
@@ -86,7 +84,7 @@ public class CommonPlugin extends PluginBase {
 	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
-	private final List<MobPreSpawnListener> mobPreSpawnListeners = new ArrayList<MobPreSpawnListener>();
+	private final CommonEventFactory eventFactory = new CommonEventFactory();
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
@@ -145,23 +143,6 @@ public class CommonPlugin extends PluginBase {
 			debugVariables.put(name, typed);
 		}
 		return typed;
-	}
-
-	public void addMobPreSpawnListener(MobPreSpawnListener listener) {
-		mobPreSpawnListeners.add(listener);
-	}
-
-	public void removeMobPreSpawnListener(MobPreSpawnListener listener) {
-		mobPreSpawnListeners.remove(listener);
-	}
-
-	public boolean canSpawnMob(World world, int x, int y, int z, EntityType entityType) {
-		for (MobPreSpawnListener listener : mobPreSpawnListeners) {
-			if (!listener.canSpawn(world, x, y, z, entityType)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	@Deprecated
@@ -344,6 +325,15 @@ public class CommonPlugin extends PluginBase {
 				chunks.remove(chunkX, chunkZ);
 			}
 		}
+	}
+
+	/**
+	 * Obtains the event factory used to raise events for server happenings
+	 * 
+	 * @return event factory
+	 */
+	public CommonEventFactory getEventFactory() {
+		return eventFactory;
 	}
 
 	/**
@@ -676,29 +666,13 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private static class MoveEventHandler extends Task {
-		private final List<Entity> entityBuffer = new ArrayList<Entity>();
-
 		public MoveEventHandler(JavaPlugin plugin) {
 			super(plugin);
 		}
 
 		@Override
 		public void run() {
-			if (CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
-				EntityMoveEvent event = new EntityMoveEvent();
-				for (World world : WorldUtil.getWorlds()) {
-					entityBuffer.addAll(CommonNMS.getNative(world).entityList);
-					for (Entity entity : entityBuffer) {
-						if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ 
-								|| entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
-
-							event.setEntity(entity);
-							CommonUtil.callEvent(event);
-						}
-					}
-					entityBuffer.clear();
-				}
-			}
+			CommonPlugin.getInstance().getEventFactory().handleEntityMove();
 		}
 	}
 

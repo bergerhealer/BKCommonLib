@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.util.EnumMap;
 import java.util.Locale;
 
 import org.bukkit.Material;
@@ -13,23 +14,38 @@ import org.bukkit.entity.NPC;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Squid;
 
-import com.bergerkiller.bukkit.common.collections.StringMap;
+import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 
 /**
  * Contains entity naming and grouping functions to categorize entities
  */
 public class EntityGroupingUtil {
-	private static final StringMap<EntityCategory> entityCategories = new StringMap<EntityCategory>();
+	private static final StringMapCaseInsensitive<EntityCategory> entityCategories = new StringMapCaseInsensitive<EntityCategory>();
+	private static final EnumMap<EntityType, String> typeNames = new EnumMap<EntityType, String>(EntityType.class);
 
 	static {
 		// Note: These categories are ONLY used to map by name
 		for (EntityType type : EntityType.values()) {
-			entityCategories.putLower(getName(type), getCategory(type));
+			// Obtain type name
+			String name = type.getName();
+			if (name == null) {
+				Class<?> clazz = type.getEntityClass();
+				if (clazz == null) {
+					name = "unknown";
+				} else {
+					name = clazz.getSimpleName();
+				}
+			}
+			name = name.toLowerCase(Locale.ENGLISH);
+
+			// Store it
+			entityCategories.put(name, getCategory(type));
+			typeNames.put(type, name);
 		}
 	}
 
 	public static EntityCategory getCategory(String name) {
-		return LogicUtil.fixNull(entityCategories.getLower(name), EntityCategory.OTHER);
+		return LogicUtil.fixNull(entityCategories.get(name), EntityCategory.OTHER);
 	}
 
 	public static EntityCategory getCategory(EntityType type) {
@@ -138,7 +154,7 @@ public class EntityGroupingUtil {
 				return "falling" + mat.toString().toLowerCase(Locale.ENGLISH);
 			}
 		} else {
-			return getName(entity.getClass());
+			return getName(entity.getType());
 		}
 	}
 
@@ -158,7 +174,7 @@ public class EntityGroupingUtil {
 				return getName(type);
 			}
 		}
-		return entityClass.getSimpleName();
+		return entityClass.getSimpleName().toLowerCase(Locale.ENGLISH);
 	}
 
 	/**
@@ -168,20 +184,7 @@ public class EntityGroupingUtil {
 	 * @return Entity Type name
 	 */
 	public static String getName(EntityType type) {
-		// Bukkit, please fix your naming?
-		if (type == EntityType.OCELOT) {
-			return "ocelot";
-		}
-		String name = type.getName();
-		if (name == null) {
-			Class<?> clazz = type.getEntityClass();
-			if (clazz == null) {
-				return "unknown";
-			} else {
-				name = clazz.getSimpleName();
-			}
-		}
-		return name.toLowerCase(Locale.ENGLISH);
+		return typeNames.get(type);
 	}
 
 	/**

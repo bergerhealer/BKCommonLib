@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -31,6 +32,8 @@ import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
  * Stores all Converter pairs available
  */
 public class ConversionPairs {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static final ConverterPair NONE = ConversionTypes.NONE.formPair(ConversionTypes.NONE);
 	public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
 	public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
 	public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);

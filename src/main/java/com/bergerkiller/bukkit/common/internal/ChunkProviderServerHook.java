@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -9,13 +8,11 @@ import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
@@ -36,7 +33,6 @@ import net.minecraft.server.WorldServer;
  * This is here so that other plugins can safely control internal behavior (NoLagg mainly).
  */
 public class ChunkProviderServerHook extends ChunkProviderServer {
-	private final List<BiomeMeta> mobsBuffer = new ArrayList<BiomeMeta>();
 
 	public ChunkProviderServerHook(WorldServer worldserver, IChunkLoader ichunkloader, IChunkProvider ichunkprovider) {
 		super(worldserver, ichunkloader, ichunkprovider);
@@ -49,23 +45,13 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, int x, int y, int z) {
-		// Use a buffer for the entities, recreating a new List for every spawn operation kills the server
 		List<BiomeMeta> mobs = super.getMobsFor(enumcreaturetype, x, y, z);
-		if (LogicUtil.nullOrEmpty(mobs)) {
+		if (CommonPlugin.hasInstance()) {
+			org.bukkit.World world = this.world.getWorld();
+			return CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, x, y, z, mobs);
+		} else {
 			return mobs;
 		}
-
-		// Fire events for all mobs spawned
-		this.mobsBuffer.clear();
-		final CommonPlugin instance = CommonPlugin.getInstance();
-		for (BiomeMeta mob : mobs) {
-			if (instance.canSpawnMob(this.world.getWorld(), x, y, z, CommonEntityType.byNMSEntityClass(mob.b).entityType)) {
-				this.mobsBuffer.add(mob);
-			}
-		}
-
-		// Return the buffer (note that this does not allow 'permanent' storage in any way)
-		return this.mobsBuffer;
 	}
 
 	@Override
