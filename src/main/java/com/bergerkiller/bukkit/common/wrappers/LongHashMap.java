@@ -17,25 +17,25 @@ public class LongHashMap<T> extends BasicWrapper {
 	}
 
 	public int size() {
-		return LongHashMapRef.countField.get(handle);
+		return ((net.minecraft.server.LongHashMap) handle).count();
 	}
 
 	public boolean contains(long key) {
-		return LongHashMapRef.contains.invoke(handle, key);
+		return  ((net.minecraft.server.LongHashMap) handle).contains(key);
 	}
 
 	@SuppressWarnings("unchecked")
 	public T get(long key) {
-		return (T) LongHashMapRef.get.invoke(handle, key);
+		return (T) ((net.minecraft.server.LongHashMap) handle).getEntry(key);
 	}
 
 	@SuppressWarnings("unchecked")
 	public T remove(long key) {
-		return (T) LongHashMapRef.remove.invoke(handle, key);
+		return (T) ((net.minecraft.server.LongHashMap) handle).remove(key);
 	}
 
 	public void put(long key, T value) {
-		LongHashMapRef.put.invoke(handle, key, value);
+		((net.minecraft.server.LongHashMap) handle).put(key, value);
 	}
 
 	@SuppressWarnings("unchecked")
