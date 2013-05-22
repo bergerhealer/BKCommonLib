@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -37,7 +38,8 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 		try {
 			String className = StringUtil.getLastBefore(methodPath, ".");
 			String methodName = methodPath.substring(className.length() + 1);
-			load(Class.forName(className), methodName, parameterTypes);
+			Class<?> type = Class.forName(Common.SERVER.getClassName(className));
+			load(type, Common.SERVER.getMethodName(type, methodName, parameterTypes), parameterTypes);
 		} catch (Throwable t) {
 			System.out.println("Failed to load method '" + methodPath + "':");
 			t.printStackTrace();

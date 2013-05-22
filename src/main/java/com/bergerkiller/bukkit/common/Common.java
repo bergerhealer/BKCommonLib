@@ -1,119 +1,83 @@
 package com.bergerkiller.bukkit.common;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.server.CommonServer;
+import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
+import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
+import com.bergerkiller.bukkit.common.server.SpigotServer;
+import com.bergerkiller.bukkit.common.server.UnknownServer;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class Common {
 	/**
 	 * Defines the Minecraft version that runs on the server.
-	 * To get the package path used, use {@link MC_VERSION_PACKAGEPART} instead.
-	 * The package path version is more accurate to use for version checking.
 	 */
 	public static final String MC_VERSION;
-	/**
-	 * Defines the Minecraft version, parsed to the package addition, that runs on the server.
-	 * If none is specified, this value is an empty String.
-	 * Otherwise, the value is of the format: v1_2_R3
-	 */
-	public static final String MC_VERSION_PACKAGEPART;
 	/**
 	 * Defines the net.minecraft.server constant (which is not inlined or relocated).
 	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
 	 */
-	public static final String NMS_ROOT_NONVERSIONED = StringUtil.combine(".", "net", "minecraft", "server");
+	public static final String NMS_ROOT = StringUtil.combine(".", "net", "minecraft", "server");
 	/**
 	 * Defines the org.bukkit.craftbukkit constant (which is not inlined or relocated).
 	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
 	 */
-	public static final String CB_ROOT_NONVERSIONED = StringUtil.combine(".", "org", "bukkit", "craftbukkit");
-	/**
-	 * Defines the net.minecraft.server root path
-	 */
-	public static final String NMS_ROOT;
-	/**
-	 * Defines the org.bukkit.craftbukkit root path
-	 */
-	public static final String CB_ROOT;
+	public static final String CB_ROOT = StringUtil.combine(".", "org", "bukkit", "craftbukkit");
 	/**
 	 * Defines the com.bergerkiller.bukkit.common root path of this library
 	 */
-	public static final String COMMON_ROOT;
+	public static final String COMMON_ROOT = "com.bergerkiller.bukkit.common";
+	/**
+	 * Defines the type of server BKCommonLib is currently running on
+	 * and provides server-specific implementations.
+	 */
+	public static final CommonServer SERVER;
 	/**
 	 * Gets whether the current server software used is the Spigot implementation
 	 */
 	public static final boolean IS_SPIGOT_SERVER;
+	/**
+	 * The Minecraft package path version BKCommonLib is built against
+	 */
+	public static final String DEPENDENT_MC_VERSION = "v1_5_R3";
+	/**
+	 * Whether BKCommonLib is compatible with the server it is currently running on
+	 */
+	public static final boolean IS_COMPATIBLE;
 
 	static {
-		String version = "";
+		// Find out what server software we are running on
+		CommonServer runningServer = new UnknownServer();
+		try {
+			// Get all available server types
+			List<CommonServer> servers = new ArrayList<CommonServer>();
+			servers.add(new MCPCPlusServer());
+			servers.add(new SpigotServer());
+			servers.add(new CraftBukkitServer());
+			servers.add(new UnknownServer());
 
-		// Important: paths defined like this to avoid maven shading relocating it (DO NOT CHANGE!)
-		final String CB_MAIN_CHECKCLASS = ".CraftServer";
-
-		// Obtain package version
-		StringBuilder builder = new StringBuilder();
-		builder.append(CB_ROOT_NONVERSIONED).append(CB_MAIN_CHECKCLASS);
-		if (CommonUtil.getClass(builder.toString()) == null) {
-			int a, b, c;
-			for (a = 0; a < 10; a++) {
-				for (b = 0; b < 10; b++) {
-					for (c = 0; c < 10; c++) {
-						// Trim builder back to package path length
-						builder.setLength(NMS_ROOT_NONVERSIONED.length() + 1);
-
-						// Format:
-						// [package].v1_4_R5.[trail]
-						builder.append('v').append(a).append('_').append(b).append('_').append('R').append(c);
-						builder.append(CB_MAIN_CHECKCLASS);
-
-						// Class check and version obtaining
-						if (CommonUtil.getClass(builder.toString()) != null) {
-							version = builder.substring(NMS_ROOT_NONVERSIONED.length() + 1, builder.length() - CB_MAIN_CHECKCLASS.length());
-							a = b = c = 10;
-						}
-					}
+			// Use the first one that initializes correctly
+			for (CommonServer server : servers) {
+				if (server.init()) {
+					runningServer = server;
+					break;
 				}
 			}
-		}
-		String part = version.isEmpty() ? "" : ("." + version);
-		MC_VERSION_PACKAGEPART = version;
-		NMS_ROOT = NMS_ROOT_NONVERSIONED + part;
-		CB_ROOT = CB_ROOT_NONVERSIONED + part;
-		COMMON_ROOT = "com.bergerkiller.bukkit.common";
-
-		// Find out what server implementation we are running on
-		IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
-
-		// Find out the MC_VERSION using the CraftServer
-		try {
-			// Load required classes
-			Class<?> server = CommonUtil.getCBClass("CraftServer");
-			Class<?> minecraftServer = CommonUtil.getNMSClass("MinecraftServer");
-			// Get methods and instances
-			Method getServer = server.getDeclaredMethod("getServer");
-			Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
-			Method getVersion = minecraftServer.getDeclaredMethod("getVersion");
-			// Get the version
-			version = (String) getVersion.invoke(minecraftServerInstance);
 		} catch (Throwable t) {
+			CommonPlugin.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
 		}
-		MC_VERSION = version;
-	}
 
-	/**
-	 * Checks whether the version specified is compatible with the
-	 * Minecraft version used on this server
-	 * 
-	 * @param version to check, in the v1_4_5_R2 format where 1, 4 and 5
-	 * 			are the version numbers and 2 is the build revision
-	 * @return True if the version is compatible, False if not
-	 */
-	public static boolean isMCVersionCompatible(String version) {
-		return MC_VERSION_PACKAGEPART.isEmpty() || version.equals(MC_VERSION_PACKAGEPART);
+		// Set up the constants
+		SERVER = runningServer;
+		IS_COMPATIBLE = SERVER.isCompatible();
+		IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
+		MC_VERSION = SERVER.getMinecraftVersion();
 	}
 
 	/**

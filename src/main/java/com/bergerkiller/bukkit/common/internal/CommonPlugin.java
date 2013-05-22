@@ -53,11 +53,6 @@ import com.narrowtux.showcase.Showcase;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
-	/**
-	 * BKCommonLib Minecraft versioning
-	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_5_R3";
-	public static final boolean IS_COMPATIBLE = Common.isMCVersionCompatible(DEPENDENT_MC_VERSION);
 	/*
 	 * Loggers for internal BKCommonLib processes
 	 */
@@ -438,7 +433,7 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void onLoad() {
 		instance = this;
-		if (!IS_COMPATIBLE) {
+		if (!Common.IS_COMPATIBLE) {
 			return;
 		}
 		// Load the classes contained in this library
@@ -477,17 +472,13 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void enable() {
 		// Validate version
-		if (IS_COMPATIBLE) {
-			String version = "Minecraft " + Common.MC_VERSION;
-			if (Common.MC_VERSION_PACKAGEPART.isEmpty()) {
-				version += " (Non-versioned package)";
-			} else {
-				version += " (" + DEPENDENT_MC_VERSION + ")";
-			}
-			log(Level.INFO, "BKCommonLib is running on " + version);
+		final String serverDesc =  Common.SERVER.getServerName() + ": " + Common.SERVER.getServerVersion();
+		if (Common.IS_COMPATIBLE) {
+			log(Level.INFO, "BKCommonLib is running on " + serverDesc);
 		} else {
-			log(Level.SEVERE, "BKCommonLib can only run on a CraftBukkit build compatible with Minecraft " + DEPENDENT_MC_VERSION);
-			log(Level.SEVERE, "Please look for an available BKCommonLib update that is compatible with Minecraft " + Common.MC_VERSION + ":");
+			log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
+			log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is build for MC " + Common.DEPENDENT_MC_VERSION);
+			log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
 			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
 			this.onCriticalFailure();
 			return;

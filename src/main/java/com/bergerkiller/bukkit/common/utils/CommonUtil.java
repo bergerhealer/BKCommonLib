@@ -589,14 +589,19 @@ public class CommonUtil {
 	}
 
 	/**
-	 * Tries to get the class at the path specified
+	 * Tries to get the class at the path specified and
+	 * applies translations based on the server currently running.
 	 * 
 	 * @param path to the class
 	 * @return the class, or null if not found
 	 */
 	public static Class<?> getClass(String path) {
 		try {
-			return Class.forName(path);
+			if (Common.SERVER == null) {
+				return Class.forName(path);
+			} else {
+				return Class.forName(Common.SERVER.getClassName(path));
+			}
 		} catch (ClassNotFoundException e) {
 			return null;
 		}

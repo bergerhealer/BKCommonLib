@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -39,8 +40,9 @@ public class SafeField<T> implements FieldAccessor<T> {
 		}
 		try {
 			String className = StringUtil.getLastBefore(fieldPath, ".");
-			String methodName = fieldPath.substring(className.length() + 1);
-			load(Class.forName(className), methodName);
+			String fieldName = fieldPath.substring(className.length() + 1);
+			Class<?> type = Class.forName(Common.SERVER.getClassName(className));
+			load(type, Common.SERVER.getFieldName(type, fieldName));
 		} catch (Throwable t) {
 			System.out.println("Failed to load field '" + fieldPath + "':");
 			t.printStackTrace();

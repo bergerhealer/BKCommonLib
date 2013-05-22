@@ -513,9 +513,9 @@ public abstract class PluginBase extends JavaPlugin {
 			if (CommonUtil.isInstance(reason, NoClassDefFoundError.class, NoSuchMethodError.class, NoSuchFieldError.class, IllegalAccessError.class)) {
 				String fixedReason = StringUtil.trimStart(reason.getMessage(), "tried to access ");
 				String path = StringUtil.trimStart(fixedReason, "method ", "field ", "class ");
-				if (path.startsWith(Common.NMS_ROOT_NONVERSIONED)) {
+				if (path.startsWith(Common.NMS_ROOT)) {
 					log(Level.SEVERE, "This version of the plugin is incompatible with this Minecraft version:");
-				} else if (path.startsWith(Common.CB_ROOT_NONVERSIONED)) {
+				} else if (path.startsWith(Common.CB_ROOT)) {
 					log(Level.SEVERE, "This version of the plugin is incompatible with this CraftBukkit implementation:");
 				} else if (path.startsWith("org.bukkit")) {
 					log(Level.SEVERE, "This version of the plugin is incompatible with the current Bukkit API:");
@@ -610,7 +610,7 @@ public abstract class PluginBase extends JavaPlugin {
 	@SuppressWarnings("unchecked")
 	public final void onEnable() {
 		// Shortcut to avoid unneeded initialization: calling enable will result in BKCommonLib disabling
-		if (!CommonPlugin.IS_COMPATIBLE && this instanceof CommonPlugin) {
+		if (!Common.IS_COMPATIBLE && this instanceof CommonPlugin) {
 			this.enable();
 			return;
 		}
