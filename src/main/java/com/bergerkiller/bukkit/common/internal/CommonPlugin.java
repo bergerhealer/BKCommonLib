@@ -84,7 +84,7 @@ public class CommonPlugin extends PluginBase {
 	private final List<Task> startedTasks = new ArrayList<Task>();
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
-	private final CommonEventFactory eventFactory = new CommonEventFactory();
+	private CommonEventFactory eventFactory;
 	private boolean vaultEnabled = false;
 	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
@@ -518,6 +518,9 @@ public class CommonPlugin extends PluginBase {
 				"Our love is not permitted by the overlords. We must flee...",
 				"Now a plugin, a new server implementation tomorrow???");
 		log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+
+		// Initialize event factory
+		eventFactory = new CommonEventFactory();
 
 		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
 		playerVisibleChunks = new EntityMap<Player, LongHashSet>();

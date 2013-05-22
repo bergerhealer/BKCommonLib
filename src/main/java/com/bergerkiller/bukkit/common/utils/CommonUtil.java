@@ -48,7 +48,7 @@ public class CommonUtil {
 	private static final FieldAccessor<Collection<Plugin>> pluginsField = new SafeField<Collection<Plugin>>(SimplePluginManager.class, "plugins");
 
 	/**
-	 * Sends a message to a sender<br>
+	 * Sends a message to a sender<br> 
 	 * - Empty messages are ignored<br>
 	 * - Color is stripped from messages to consoles
 	 * 

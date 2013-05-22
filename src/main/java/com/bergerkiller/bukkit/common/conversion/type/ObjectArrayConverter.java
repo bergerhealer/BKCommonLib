@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
@@ -19,7 +19,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 public class ObjectArrayConverter<T> extends BasicConverter<T> {
 	public static final ObjectArrayConverter<Object[]> toObjectArr = new ObjectArrayConverter<Object[]>(Object.class);
 	public static final ObjectArrayConverter<ItemStack[]> toItemStackArr = new ObjectArrayConverter<ItemStack[]>(ItemStack.class);
-	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = new ObjectArrayConverter<Object[]>(CommonUtil.getNMSClass("ItemStack"));
+	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = new ObjectArrayConverter<Object[]>(ItemStackRef.TEMPLATE.getType());
 
 	@SuppressWarnings("unchecked")
 	public ObjectArrayConverter(Class<?> componentOutputType) {

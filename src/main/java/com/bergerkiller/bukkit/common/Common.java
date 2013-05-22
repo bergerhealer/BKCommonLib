@@ -52,11 +52,11 @@ public class Common {
 		String version = "";
 
 		// Important: paths defined like this to avoid maven shading relocating it (DO NOT CHANGE!)
-		final String NMS_MAIN_CHECKCLASS = ".World";
+		final String CB_MAIN_CHECKCLASS = ".CraftServer";
 
 		// Obtain package version
 		StringBuilder builder = new StringBuilder();
-		builder.append(NMS_ROOT_NONVERSIONED).append(NMS_MAIN_CHECKCLASS);
+		builder.append(CB_ROOT_NONVERSIONED).append(CB_MAIN_CHECKCLASS);
 		if (CommonUtil.getClass(builder.toString()) == null) {
 			int a, b, c;
 			for (a = 0; a < 10; a++) {
@@ -68,11 +68,11 @@ public class Common {
 						// Format:
 						// [package].v1_4_R5.[trail]
 						builder.append('v').append(a).append('_').append(b).append('_').append('R').append(c);
-						builder.append(NMS_MAIN_CHECKCLASS);
+						builder.append(CB_MAIN_CHECKCLASS);
 
 						// Class check and version obtaining
 						if (CommonUtil.getClass(builder.toString()) != null) {
-							version = builder.substring(NMS_ROOT_NONVERSIONED.length() + 1, builder.length() - NMS_MAIN_CHECKCLASS.length());
+							version = builder.substring(NMS_ROOT_NONVERSIONED.length() + 1, builder.length() - CB_MAIN_CHECKCLASS.length());
 							a = b = c = 10;
 						}
 					}
@@ -84,7 +84,10 @@ public class Common {
 		NMS_ROOT = NMS_ROOT_NONVERSIONED + part;
 		CB_ROOT = CB_ROOT_NONVERSIONED + part;
 		COMMON_ROOT = "com.bergerkiller.bukkit.common";
+
+		// Find out what server implementation we are running on
 		IS_SPIGOT_SERVER = CommonUtil.getCBClass("Spigot") != null;
+
 		// Find out the MC_VERSION using the CraftServer
 		try {
 			// Load required classes
