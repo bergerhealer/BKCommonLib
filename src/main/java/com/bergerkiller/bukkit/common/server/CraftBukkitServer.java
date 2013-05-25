@@ -46,14 +46,13 @@ public class CraftBukkitServer implements CommonServer {
 		// Figure out the MC version from the server
 		String version = PACKAGE_VERSION;
 		try {
-			// Load required classes
-			Class<?> server = Class.forName(getClassName(Common.CB_ROOT + ".CraftServer"));
-			Class<?> minecraftServer = Class.forName(getClassName(Common.NMS_ROOT + ".MinecraftServer"));
-			// Get methods and instances
+			// Obtain MinecraftServer instance from server
+			Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
 			Method getServer = server.getDeclaredMethod("getServer");
 			Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
-			Method getVersion = minecraftServer.getDeclaredMethod("getVersion");
-			// Get the version
+
+			// Use MinecraftServer instance to obtain the version
+			Method getVersion = minecraftServerInstance.getClass().getDeclaredMethod("getVersion");
 			version = (String) getVersion.invoke(minecraftServerInstance);
 		} catch (Throwable t) {
 		}
@@ -99,6 +98,6 @@ public class CraftBukkitServer implements CommonServer {
 
 	@Override
 	public String getServerName() {
-		return "CraftBukkit (" + Bukkit.getServer().getVersion() + ")";
+		return "CraftBukkit";
 	}
 }

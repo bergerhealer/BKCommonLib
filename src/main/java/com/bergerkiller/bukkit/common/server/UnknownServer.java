@@ -11,7 +11,7 @@ public class UnknownServer implements CommonServer {
 
 	@Override
 	public String getServerName() {
-		return "Unknown server (" + Bukkit.getServer().getName() + ")";
+		return "Unknown Server";
 	}
 
 	@Override

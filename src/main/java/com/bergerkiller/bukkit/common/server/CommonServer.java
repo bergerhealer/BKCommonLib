@@ -26,7 +26,7 @@ public interface CommonServer {
 	/**
 	 * Gets the real Class name for the given Path, allowing Class path translations to occur
 	 * 
-	 * @param path to the Class
+	 * @param path to the Class to fix
 	 * @return the real Class path
 	 */
 	public String getClassName(String path);
@@ -35,7 +35,7 @@ public interface CommonServer {
 	 * Obtains the real method name for a given method, allowing name translations to occur
 	 * 
 	 * @param type of Class the method is in
-	 * @param methodName of the method
+	 * @param methodName of the method to fix
 	 * @param params of the method
 	 * @return the (translated) method name
 	 */
@@ -45,7 +45,7 @@ public interface CommonServer {
 	 * Obtains the real field name for a given field, allowing name translations to occur
 	 * 
 	 * @param type of Class the field is in
-	 * @param fieldName of the field
+	 * @param fieldName of the field to fix
 	 * @return the (translated) field name
 	 */
 	public String getFieldName(Class<?> type, String fieldName);

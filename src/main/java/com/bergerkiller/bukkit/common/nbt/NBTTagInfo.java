@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -94,17 +95,17 @@ public class NBTTagInfo {
 	public NBTTagInfo(Class<?> nbtClass) throws Throwable {
 		this.nbtType = nbtClass;
 		if (NBTRef.NBTTagList.isType(nbtClass)) {
-			this.dataField = nbtClass.getDeclaredField("list");
+			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "list"));
 			this.dataType = List.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
 			this.dataName = "TagList";
 		} else if (NBTRef.NBTTagCompound.isType(nbtClass)) {
-			this.dataField = nbtClass.getDeclaredField("map");
+			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "map"));
 			this.dataType = Map.class;
 			this.constructor = nbtClass.getDeclaredConstructor(String.class);
 			this.dataName = "TagCompound";
 		} else {
-			this.dataField = nbtClass.getDeclaredField("data");
+			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "data"));
 			final Class<?> dataType = this.dataField.getType();
 			this.constructor = nbtClass.getDeclaredConstructor(String.class, dataType);
 			// Box it

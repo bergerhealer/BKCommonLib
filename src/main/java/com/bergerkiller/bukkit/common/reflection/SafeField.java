@@ -42,7 +42,7 @@ public class SafeField<T> implements FieldAccessor<T> {
 			String className = StringUtil.getLastBefore(fieldPath, ".");
 			String fieldName = fieldPath.substring(className.length() + 1);
 			Class<?> type = Class.forName(Common.SERVER.getClassName(className));
-			load(type, Common.SERVER.getFieldName(type, fieldName));
+			load(type, fieldName);
 		} catch (Throwable t) {
 			System.out.println("Failed to load field '" + fieldPath + "':");
 			t.printStackTrace();
@@ -64,19 +64,21 @@ public class SafeField<T> implements FieldAccessor<T> {
 		}
 		// try to find the field
 		Class<?> tmp = source;
+		String fixedName = Common.SERVER == null ? name : Common.SERVER.getFieldName(source, name);
+		String dispName = name.equals(fixedName) ? name : (name + "[" + fixedName + "]");
 		while (tmp != null) {
 			try {
-				this.field = tmp.getDeclaredField(name);
+				this.field = tmp.getDeclaredField(fixedName);
 				this.field.setAccessible(true);
 				return;
 			} catch (NoSuchFieldException ex) {
 				tmp = tmp.getSuperclass();
 			} catch (SecurityException ex) {
-				new Exception("No permission to access field '" + name + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
+				new Exception("No permission to access field '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
 				return;
 			}
 		}
-		CommonPlugin.getInstance().handleReflectionMissing("Field", name, source);
+		CommonPlugin.getInstance().handleReflectionMissing("Field", dispName, source);
 	}
 
 	@Override

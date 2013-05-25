@@ -39,7 +39,7 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 			String className = StringUtil.getLastBefore(methodPath, ".");
 			String methodName = methodPath.substring(className.length() + 1);
 			Class<?> type = Class.forName(Common.SERVER.getClassName(className));
-			load(type, Common.SERVER.getMethodName(type, methodName, parameterTypes), parameterTypes);
+			load(type, methodName, parameterTypes);
 		} catch (Throwable t) {
 			System.out.println("Failed to load method '" + methodPath + "':");
 			t.printStackTrace();
@@ -59,11 +59,23 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 			new Exception("Can not load method '" + name + "' because the class is null!").printStackTrace();
 			return;
 		}
+		// Find real name and display name
+		String fixedName = Common.SERVER == null ? name : Common.SERVER.getMethodName(source, name, parameterTypes);
+		String dispName = name.equals(fixedName) ? name : (name + "[" + fixedName + "]");
+		dispName += "(";
+		for (int i = 0; i < parameterTypes.length; i++) {
+			if (i > 0) {
+				dispName += ", ";
+			}
+			dispName += parameterTypes[i].getSimpleName();
+		}
+		dispName += ")";
+
 		// try to find the field
 		Class<?> tmp = source;
 		while (tmp != null) {
 			try {
-				this.method = tmp.getDeclaredMethod(name, parameterTypes);
+				this.method = tmp.getDeclaredMethod(fixedName, parameterTypes);
 				this.method.setAccessible(true);
 				this.isStatic = Modifier.isStatic(this.method.getModifiers());
 				this.parameterTypes = parameterTypes;
@@ -71,19 +83,11 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 			} catch (NoSuchMethodException ex) {
 				tmp = tmp.getSuperclass();
 			} catch (SecurityException ex) {
-				new Exception("No permission to access method '" + name + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
+				new Exception("No permission to access method '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
 				return;
 			}
 		}
-		name += "(";
-		for (int i = 0; i < parameterTypes.length; i++) {
-			if (i > 0) {
-				name += ", ";
-			}
-			name += parameterTypes[i].getSimpleName();
-		}
-		name += ")";
-		CommonPlugin.getInstance().handleReflectionMissing("Method", name, source);
+		CommonPlugin.getInstance().handleReflectionMissing("Method", dispName, source);
 	}
 
 	/**

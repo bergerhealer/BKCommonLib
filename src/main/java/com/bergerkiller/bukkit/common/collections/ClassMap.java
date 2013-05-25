@@ -76,8 +76,7 @@ public class ClassMap<T> {
 		if (instance == null) {
 			return null;
 		}
-		final Class<?> type = instance.getClass();
-		final T value = classes.get(type);
+		final T value = classes.get(instance.getClass());
 		if (value != null) {
 			return value;
 		}

@@ -1,9 +1,5 @@
 package com.bergerkiller.bukkit.common.server;
 
-import org.bukkit.Bukkit;
-
-import com.bergerkiller.bukkit.common.Common;
-
 public class SpigotServer extends CraftBukkitServer {
 
 	@Override
@@ -13,7 +9,7 @@ public class SpigotServer extends CraftBukkitServer {
 		}
 		// Check that the Spigot install is available
 		try {
-			Class.forName(getClassName(Common.CB_ROOT + ".Spigot"));
+			Class.forName(CB_ROOT_VERSIONED + ".Spigot");
 			return true;
 		} catch (ClassNotFoundException ex) {
 			return false;
@@ -22,6 +18,6 @@ public class SpigotServer extends CraftBukkitServer {
 
 	@Override
 	public String getServerName() {
-		return "Spigot (" + Bukkit.getServer().getVersion() + ")";
+		return "Spigot";
 	}
 }

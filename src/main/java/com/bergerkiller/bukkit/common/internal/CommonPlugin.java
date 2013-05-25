@@ -472,7 +472,7 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void enable() {
 		// Validate version
-		final String serverDesc =  Common.SERVER.getServerName() + ": " + Common.SERVER.getServerVersion();
+		final String serverDesc = Common.SERVER.getServerName() + " (" + Bukkit.getServer().getVersion() + ") : " + Common.SERVER.getServerVersion();
 		if (Common.IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on " + serverDesc);
 		} else {
