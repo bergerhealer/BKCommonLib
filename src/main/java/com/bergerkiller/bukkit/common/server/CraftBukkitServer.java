@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
-public class CraftBukkitServer implements CommonServer {
+public class CraftBukkitServer extends CommonServerBase {
 	/**
 	 * Defines the Package Version
 	 */

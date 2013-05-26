@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.server;
 
 import org.bukkit.Bukkit;
 
-public class UnknownServer implements CommonServer {
+public class UnknownServer extends CommonServerBase {
 
 	@Override
 	public String getServerVersion() {

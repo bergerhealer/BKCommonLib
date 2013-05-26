@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
@@ -14,6 +13,7 @@ import org.bukkit.craftbukkit.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -170,13 +170,42 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	/**
+	 * Checks whether a given world name can be loaded
+	 * 
+	 * @param worldName to check
+	 * @return True if the world at this world name is loadable, False if not
+	 */
+	public static boolean isLoadableWorld(String worldName) {
+		return Common.SERVER.isLoadableWorld(getWorldFolder(worldName));
+	}
+
+	/**
 	 * Gets the folder where world data for a certain world name is saved in
 	 * 
 	 * @param worldName (can not be null)
 	 * @return world folder
 	 */
 	public static File getWorldFolder(String worldName) {
-		return new File(Bukkit.getWorldContainer(), worldName);
+		return Common.SERVER.getWorldFolder(worldName);
+	}
+
+	/**
+	 * Gets the File Location where the regions of a world are contained
+	 * 
+	 * @param worldName to get the regions folder for
+	 * @return Region folder
+	 */
+	public static File getWorldRegionFolder(String worldName) {
+		return Common.SERVER.getWorldRegionFolder(worldName);
+	}
+
+	/**
+	 * Obtains a Collection of world names that can be loaded without creating it
+	 * 
+	 * @return Loadable worlds
+	 */
+	public static Collection<String> getLoadableWorlds() {
+		return Common.SERVER.getLoadableWorlds();
 	}
 
 	/**

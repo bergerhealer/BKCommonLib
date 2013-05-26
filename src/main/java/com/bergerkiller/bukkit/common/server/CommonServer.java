@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.io.File;
+import java.util.Collection;
+
 public interface CommonServer {
 
 	/**
@@ -76,4 +79,34 @@ public interface CommonServer {
 	 * @return Minecraft version
 	 */
 	public String getMinecraftVersion();
+
+	/**
+	 * Gets the File Location where the regions of a world are contained
+	 * 
+	 * @param worldName to get the regions folder for
+	 * @return Region folder
+	 */
+	public File getWorldRegionFolder(String worldName);
+
+	/**
+	 * Gets the File Location where a world is contained
+	 * 
+	 * @return World folder
+	 */
+	public File getWorldFolder(String worldName);
+
+	/**
+	 * Gets a Collection of all worlds that can be loaded without creating it
+	 * 
+	 * @return Loadable world names
+	 */
+	public Collection<String> getLoadableWorlds();
+
+	/**
+	 * Checks whether the World contained in the folder specified can be loaded
+	 * 
+	 * @param worldFolder to check
+	 * @return True if the world can be loaded, False if not
+	 */
+	public boolean isLoadableWorld(File worldFolder);
 }

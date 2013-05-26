@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -91,5 +94,43 @@ public class MCPCPlusServer extends SpigotServer {
 		}
 		// Failure to replace anything, perhaps it is correct?
 		return methodName;
+	}
+
+	@Override
+	public File getWorldFolder(String worldName) {
+		File container = Bukkit.getWorldContainer();
+		if (container.getName().equalsIgnoreCase(worldName)) {
+			return container;
+		} else {
+			return new File(container, worldName);
+		}
+	}
+
+	@Override
+	public Collection<String> getLoadableWorlds() {
+		File[] files = Bukkit.getWorldContainer().listFiles();
+		File container = Bukkit.getWorldContainer();
+		Collection<String> rval = new ArrayList<String>(files.length);
+		// Add the main world
+		rval.add(container.getName());
+		// Add all sub-worlds found in there
+		for (File worldFolder : Bukkit.getWorldContainer().listFiles()) {
+			if (isLoadableWorld(worldFolder)) {
+				rval.add(worldFolder.getName());
+			}
+		}
+		return rval;
+	}
+
+	@Override
+	public File getWorldRegionFolder(String worldName) {
+		File container = Bukkit.getWorldContainer();
+		File region;
+		if (container.getName().equalsIgnoreCase(worldName)) {
+			region = new File(container, "region");
+		} else {
+			region = new File(container, worldName + File.separator + "region");
+		}
+		return region.exists() ? region : null;
 	}
 }
