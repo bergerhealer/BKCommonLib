@@ -77,7 +77,6 @@ class CommonListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onWorldUnload(WorldUnloadEvent event) {
-		System.out.println("INIT: " + event.getWorld().getName());
 		CommonWorldListener listener = CommonPlugin.getInstance().worldListeners.remove(event.getWorld());
 		if (listener != null) {
 			listener.disable();

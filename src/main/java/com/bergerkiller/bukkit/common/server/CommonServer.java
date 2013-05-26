@@ -108,5 +108,5 @@ public interface CommonServer {
 	 * @param worldFolder to check
 	 * @return True if the world can be loaded, False if not
 	 */
-	public boolean isLoadableWorld(File worldFolder);
+	public boolean isLoadableWorld(String worldName);
 }

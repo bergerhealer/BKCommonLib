@@ -12,9 +12,9 @@ public abstract class CommonServerBase implements CommonServer {
 	public Collection<String> getLoadableWorlds() {
 		File[] files = Bukkit.getWorldContainer().listFiles();
 		Collection<String> rval = new ArrayList<String>(files.length);
-		for (File worldFolder : Bukkit.getWorldContainer().listFiles()) {
-			if (isLoadableWorld(worldFolder)) {
-				rval.add(worldFolder.getName());
+		for (String worldName : Bukkit.getWorldContainer().list()) {
+			if (isLoadableWorld(worldName)) {
+				rval.add(worldName);
 			}
 		}
 		return rval;
@@ -26,7 +26,11 @@ public abstract class CommonServerBase implements CommonServer {
 	}
 
 	@Override
-	public boolean isLoadableWorld(File worldFolder) {
+	public boolean isLoadableWorld(String worldName) {
+		if (Bukkit.getWorld(worldName) != null) {
+			return true;
+		}
+		File worldFolder = getWorldFolder(worldName);
 		return worldFolder.isDirectory() && new File(worldFolder, "level.dat").exists();
 	}
 

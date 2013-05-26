@@ -114,9 +114,9 @@ public class MCPCPlusServer extends SpigotServer {
 		// Add the main world
 		rval.add(container.getName());
 		// Add all sub-worlds found in there
-		for (File worldFolder : Bukkit.getWorldContainer().listFiles()) {
-			if (isLoadableWorld(worldFolder)) {
-				rval.add(worldFolder.getName());
+		for (String worldName : container.list()) {
+			if (isLoadableWorld(worldName)) {
+				rval.add(worldName);
 			}
 		}
 		return rval;

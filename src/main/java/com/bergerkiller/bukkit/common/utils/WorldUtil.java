@@ -176,7 +176,7 @@ public class WorldUtil extends ChunkUtil {
 	 * @return True if the world at this world name is loadable, False if not
 	 */
 	public static boolean isLoadableWorld(String worldName) {
-		return Common.SERVER.isLoadableWorld(getWorldFolder(worldName));
+		return Common.SERVER.isLoadableWorld(worldName);
 	}
 
 	/**
