@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 
@@ -39,6 +40,7 @@ public class NMSEntityClassBuilder {
 	private static final String SUPER_PREFIX = "super_";
 	private static final Class<?>[] DEFAULT_CONSTRUCTOR_TYPES = {WorldRef.TEMPLATE.getType()};
 	private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {null};
+	private final Class<?> superClass;
 	private final Enhancer enhancer = new Enhancer();
 	private final Map<Signature, CallbackBase> callbacks = new HashMap<Signature, CallbackBase>();
 	private final List<CallbackClass> callbackClasses = new ArrayList<CallbackClass>();
@@ -46,6 +48,8 @@ public class NMSEntityClassBuilder {
 
 	public NMSEntityClassBuilder(Class<?> superclass, Collection<Class<?>> callbackClasses) {
 		try {
+			this.superClass = superclass;
+
 			// Obtain all available interfaces and callbacks from the callback classes
 			Collection<Class<?>> interfaceClasses = new ArrayList<Class<?>>(callbackClasses.size());
 			for (Class<?> callbackClass : callbackClasses) {
@@ -53,14 +57,8 @@ public class NMSEntityClassBuilder {
 					interfaceClasses.add(interfaceClass);
 
 					// Set the initial Callbacks - this is important during the CallbackFilter accept phase
-					Signature sig;
 					for (Method method : interfaceClass.getDeclaredMethods()) {
-						sig = getSig(method);
-						callbacks.put(sig, null);
-						if (sig.getName().startsWith(SUPER_PREFIX)) {
-							sig = new Signature(sig.getName().substring(SUPER_PREFIX.length()), sig.getReturnType(), sig.getArgumentTypes());
-							callbacks.put(sig, null);
-						}
+						addCallback(method, null);
 					}
 				}
 				this.callbackClasses.add(new CallbackClass(callbackClass));
@@ -85,17 +83,19 @@ public class NMSEntityClassBuilder {
 			CallbackBase callback;
 			for (Class<?> interfaceClass : interfaceClasses) {
 				for (Method method : interfaceClass.getDeclaredMethods()) {
-					// Generate method signature
-					final Signature sig = getSig(method);
-					callback = null;
-
 					// Find the best suitable way of redirecting this Method
-					final String name = sig.getName();
+					callback = null;
+					final String name = method.getName();
 					if (name.startsWith(SUPER_PREFIX)) {
 						// Automatically redirect to the super method
-						final Signature superSig = new Signature(name.substring(SUPER_PREFIX.length()), sig.getReturnType(), sig.getArgumentTypes());
+						final String methodName = Common.SERVER.getMethodName(superclass, name.substring(SUPER_PREFIX.length()), method.getParameterTypes());
+						final Signature superSig = getSig(method, methodName);
 						try {
-							callback = new SuperCallback(MethodProxy.find(type, superSig));
+							MethodProxy proxy = MethodProxy.find(type, superSig);
+							if (proxy == null) {
+								throw new RuntimeException("Could not find super method: " + superSig);
+							}
+							callback = new SuperCallback(proxy);
 						} catch (IllegalArgumentException ex) {
 							throw new RuntimeException("Could not access super method: " + superSig, ex);
 						}
@@ -110,9 +110,9 @@ public class NMSEntityClassBuilder {
 					}
 					// Put the callback instance if available
 					if (callback == null) {
-						throw new RuntimeException("Interface method is not implemented: " + sig);
+						throw new RuntimeException("Interface method is not implemented: " + method.getName());
 					}
-					this.callbacks.put(sig, callback);
+					addCallback(method, callback);
 				}
 			}
 		} catch (Throwable t) {
@@ -120,8 +120,26 @@ public class NMSEntityClassBuilder {
 		}
 	}
 
+	private void addCallback(Method superMethod, CallbackBase callback) {
+		Signature sig = getSig(superMethod);
+		this.callbacks.put(sig, callback);
+		String sigName = sig.getName();
+		if (sigName.startsWith(SUPER_PREFIX)) {
+			return;
+		}
+		String fixedName = Common.SERVER.getMethodName(this.superClass, sigName, superMethod.getParameterTypes());
+		if (!fixedName.equals(sigName)) {
+			Signature fixedSig = getSig(superMethod, fixedName);
+			this.callbacks.put(fixedSig, callback);
+		}
+	}
+
 	private static Signature getSig(Method method) {
-		return new Signature(method.getName(), Type.getReturnType(method), Type.getArgumentTypes(method));
+		return getSig(method, method.getName());
+	}
+
+	private static Signature getSig(Method method, String name) {
+		return new Signature(name, Type.getReturnType(method), Type.getArgumentTypes(method));
 	}
 
 	/**
@@ -151,8 +169,12 @@ public class NMSEntityClassBuilder {
 			}
 
 			// Set up callback instances
-			for (Entry<Signature, CallbackBase> callback : callbacks.entrySet()) {
-				interceptor.callbacks.put(callback.getKey(), callback.getValue().newInstance(callbackInstancesBuffer));
+			for (Entry<Signature, CallbackBase> callbackEntry : callbacks.entrySet()) {
+				CallbackBase callback = callbackEntry.getValue();
+				if (callback == null) {
+					throw new RuntimeException("Class accepts a method that has no callback: " + callbackEntry.getKey());
+				}
+				interceptor.callbacks.put(callbackEntry.getKey(), callback.newInstance(callbackInstancesBuffer));
 			}
 			return entityHandle;
 		} finally {

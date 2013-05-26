@@ -20,7 +20,6 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController;
@@ -187,12 +186,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			return true;
 		}
 		final Object handle = getHandle();
+		final CommonEntityType type = CommonEntityType.byNMSEntity(handle);
 		// Check whether the handle is not of an external-plugin type
-		if (handle == null || !handle.getClass().getName().startsWith(Common.NMS_ROOT)) {
+		if (handle == null || !type.nmsType.isType(handle)) {
 			return false;
 		}
 		// Check whether the CommonEntityType supports hooking
-		return CommonEntityType.byNMSEntity(handle).hasNMSEntity();
+		return type.hasNMSEntity();
 	}
 
 	/**
@@ -216,10 +216,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 		// Check whether conversion is allowed
 		final String oldInstanceName = oldInstance.getClass().getName();
-		if (!oldInstanceName.startsWith(Common.NMS_ROOT)) {
+		final CommonEntityType type = CommonEntityType.byEntity(entity);
+		if (!type.nmsType.isType(oldInstance)) {
 			throw new RuntimeException("Can not assign controllers to a custom Entity Type (" + oldInstanceName + ")");
 		}
-		final CommonEntityType type = CommonEntityType.byEntity(entity);
 		if (!type.hasNMSEntity()) {
 			throw new RuntimeException("Entity of type '" + type.entityType + "' has no Controller support!");
 		}
