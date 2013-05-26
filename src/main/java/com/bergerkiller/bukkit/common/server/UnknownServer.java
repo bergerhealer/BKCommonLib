@@ -20,6 +20,11 @@ public class UnknownServer implements CommonServer {
 	}
 
 	@Override
+	public String getServerDescription() {
+		return Bukkit.getServer().getVersion();
+	}
+
+	@Override
 	public String getMinecraftVersion() {
 		return "UNKNOWN";
 	}
@@ -42,5 +47,9 @@ public class UnknownServer implements CommonServer {
 	@Override
 	public boolean init() {
 		return true;
+	}
+
+	@Override
+	public void postInit() {
 	}
 }

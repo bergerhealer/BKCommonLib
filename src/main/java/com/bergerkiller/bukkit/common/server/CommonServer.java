@@ -10,6 +10,12 @@ public interface CommonServer {
 	public boolean init();
 
 	/**
+	 * Called after the init() method successfully detected the server and initialized the server.
+	 * In here processing that depends on the CommonServer instance being fully initialized can be continued.
+	 */
+	public void postInit();
+
+	/**
 	 * Gets the versioning information of the server
 	 * 
 	 * @return server versioning description
@@ -22,6 +28,13 @@ public interface CommonServer {
 	 * @return server name
 	 */
 	public String getServerName();
+
+	/**
+	 * Gets a more detailed description of the server, excluding the server version
+	 * 
+	 * @return server description
+	 */
+	public String getServerDescription();
 
 	/**
 	 * Gets the real Class name for the given Path, allowing Class path translations to occur

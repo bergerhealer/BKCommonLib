@@ -75,6 +75,7 @@ public class Common {
 
 		// Set up the constants
 		SERVER = runningServer;
+		SERVER.postInit();
 		IS_COMPATIBLE = SERVER.isCompatible();
 		IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
 		MC_VERSION = SERVER.getMinecraftVersion();

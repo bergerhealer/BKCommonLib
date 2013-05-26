@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
-import java.lang.reflect.Method;
-
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class CraftBukkitServer implements CommonServer {
@@ -44,20 +44,25 @@ public class CraftBukkitServer implements CommonServer {
 		}
 
 		// Figure out the MC version from the server
-		String version = PACKAGE_VERSION;
+		MC_VERSION = PACKAGE_VERSION;
+		return true;
+	}
+
+	@Override
+	public void postInit() {
 		try {
 			// Obtain MinecraftServer instance from server
 			Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
-			Method getServer = server.getDeclaredMethod("getServer");
+			MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
 			Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
 
 			// Use MinecraftServer instance to obtain the version
-			Method getVersion = minecraftServerInstance.getClass().getDeclaredMethod("getVersion");
-			version = (String) getVersion.invoke(minecraftServerInstance);
+			Class<?> mcServer = minecraftServerInstance.getClass();
+			MethodAccessor<String> getVersion = new SafeMethod<String>(mcServer, "getVersion");
+			MC_VERSION = getVersion.invoke(minecraftServerInstance);
 		} catch (Throwable t) {
+			t.printStackTrace();
 		}
-		MC_VERSION = version;
-		return true;
 	}
 
 	@Override
@@ -94,6 +99,13 @@ public class CraftBukkitServer implements CommonServer {
 	@Override
 	public String getServerVersion() {
 		return (PACKAGE_VERSION.isEmpty() ? "(Unknown)" : PACKAGE_VERSION) + " (Minecraft " + MC_VERSION + ")";
+	}
+
+	@Override
+	public String getServerDescription() {
+		String desc = Bukkit.getServer().getVersion();
+		desc = desc.replace(" (MC: " + MC_VERSION + ")", "");
+		return desc;
 	}
 
 	@Override
