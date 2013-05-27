@@ -8,6 +8,8 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
@@ -22,6 +24,8 @@ import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 public class EntityGroupingUtil {
 	private static final StringMapCaseInsensitive<EntityCategory> entityCategories = new StringMapCaseInsensitive<EntityCategory>();
 	private static final EnumMap<EntityType, String> typeNames = new EnumMap<EntityType, String>(EntityType.class);
+	private static final Class<?>[] ANIMAL_CLASSES = {Animals.class, Squid.class};
+	private static final Class<?>[] MONSTER_CLASSES = {Monster.class, Slime.class, Ghast.class, Golem.class};
 
 	static {
 		// Note: These categories are ONLY used to map by name
@@ -113,7 +117,15 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isAnimal(Class<? extends Entity> entityClass) {
-		return entityClass != null && (Animals.class.isAssignableFrom(entityClass) || Squid.class.isAssignableFrom(entityClass));
+		if (entityClass == null) {
+			return false;
+		}
+		for (Class<?> animalClass : ANIMAL_CLASSES) {
+			if (animalClass.isAssignableFrom(entityClass)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isMonster(Entity entity) {
@@ -125,7 +137,15 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isMonster(Class<? extends Entity> entityClass) {
-		return entityClass != null && (Monster.class.isAssignableFrom(entityClass) || Slime.class.isAssignableFrom(entityClass));
+		if (entityClass == null) {
+			return false;
+		}
+		for (Class<?> monsterClass : MONSTER_CLASSES) {
+			if (monsterClass.isAssignableFrom(entityClass)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
