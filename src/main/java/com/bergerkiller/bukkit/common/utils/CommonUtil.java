@@ -524,7 +524,15 @@ public class CommonUtil {
 	 * @return the Plugin matching the Class, or null if not found
 	 */
 	public static Plugin getPluginByClass(Class<?> clazz) {
-		return getPluginByClass(clazz.getName());
+		ClassLoader loader = clazz.getClassLoader();
+		synchronized (Bukkit.getServer().getPluginManager()) {
+			for (Plugin plugin : getPluginsUnsafe()) {
+				if (plugin.getClass().getClassLoader() == loader) {
+					return plugin;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -534,20 +542,11 @@ public class CommonUtil {
 	 * @return the Plugin matching the Class, or null if not found
 	 */
 	public static Plugin getPluginByClass(String classPath) {
-		if (classPath.startsWith(Common.COMMON_ROOT)) {
-			return CommonPlugin.getInstance();
+		try {
+			return getPluginByClass(Class.forName(classPath));
+		} catch (ClassNotFoundException e) {
+			return null;
 		}
-		final String packagePath = getPackagePath(classPath);
-		synchronized (Bukkit.getServer().getPluginManager()) {
-			for (Plugin plugin : getPluginsUnsafe()) {
-				// Compare package paths to see if the main package is below the class package
-				// In the case of packagePath being empty: only if the main is in an empty package
-				if (packagePath.startsWith(getPackagePath(plugin.getDescription().getMain()))) {
-					return plugin;
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
