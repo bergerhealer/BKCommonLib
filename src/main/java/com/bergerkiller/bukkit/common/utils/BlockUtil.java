@@ -54,11 +54,16 @@ public class BlockUtil extends MaterialUtil {
 		if (type == null) {
 			return new MaterialData(typeId, data);
 		}
-		// Fix for signs that have no data value
-		if (type == Material.WALL_SIGN && !LogicUtil.containsByte(data, (byte) 0x2, (byte) 0x3, (byte) 0x4, (byte) 0x5)) {
-			data = 0x2;
+		final MaterialData mdata = type.getNewData(data);
+
+		// Fix attachable face returning NULL sometimes
+		if (mdata instanceof Attachable) {
+			Attachable att = (Attachable) mdata;
+			if (att.getAttachedFace() == null) {
+				att.setFacingDirection(BlockFace.NORTH);
+			}
 		}
-		return type.getNewData(data);
+		return mdata;
 	}
 
 	/**
