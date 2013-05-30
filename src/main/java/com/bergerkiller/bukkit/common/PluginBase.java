@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -503,6 +504,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * 
 	 * @param reason to throw
 	 */
+	@SuppressWarnings("unchecked")
 	public void handle(Throwable reason) {
 		if (reason instanceof Exception) {
 			StackTraceFilter.SERVER.print(reason);
@@ -528,7 +530,8 @@ public abstract class PluginBase extends JavaPlugin {
 						} else {
 							log(Level.SEVERE, "Encountered a compiler error");
 						}
-					} else if (plugin != null) {
+					} else {
+						// Obtain the type of happening
 						final String type;
 						if (reason instanceof IllegalAccessError) {
 							if (fixedReason.startsWith("class ")) {
@@ -549,8 +552,19 @@ public abstract class PluginBase extends JavaPlugin {
 						} else {
 							type = "Something is missing from";
 						}
-						pluginCause = getName() + " and " + plugin.getName();
-						log(Level.SEVERE, type + " dependency '" + plugin.getName() + "'");
+						// Log the message
+						if (plugin == null) {
+							log(Level.SEVERE, type + " a dependency of this plugin");
+							// Add all dependencies of this plugin to the cause
+							LinkedHashSet<String> dep = new LinkedHashSet<String>();
+							dep.add(this.getName());
+							dep.addAll(LogicUtil.fixNull(this.getDescription().getDepend(), Collections.EMPTY_LIST));
+							dep.addAll(LogicUtil.fixNull(this.getDescription().getSoftDepend(), Collections.EMPTY_LIST));
+							pluginCause = StringUtil.combineNames(dep);
+						} else {
+							pluginCause = getName() + " and " + plugin.getName();
+							log(Level.SEVERE, type + " dependency '" + plugin.getName() + "'");
+						}
 					}
 				}
 			} else {
@@ -731,9 +745,8 @@ public abstract class PluginBase extends JavaPlugin {
 			// Done, this plugin is enabled
 			this.enabled = true;
 		} catch (Throwable t) {
-			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled");
-			log(Level.SEVERE, "You may have to update " + this.getName() + " or look for a newer CraftBukkit build.");
-			StackTraceFilter.SERVER.print(t);
+			log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled:");
+			handle(t);
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
