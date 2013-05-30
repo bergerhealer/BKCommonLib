@@ -224,8 +224,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> x = getField("b");
 		public final FieldAccessor<Integer> y = getField("c");
 		public final FieldAccessor<Integer> z = getField("d");
-		public final FieldAccessor<Byte> yaw = getField("h");
-		public final FieldAccessor<Byte> pitch = getField("i");
+		public final FieldAccessor<Byte> pitch = getField("h");
+		public final FieldAccessor<Byte> yaw = getField("i");
 		public final FieldAccessor<Integer> extraData = getField("k");
 		public final FieldAccessor<Integer> motX = getField("e");
 		public final FieldAccessor<Integer> motY = getField("f");
