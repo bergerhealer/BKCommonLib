@@ -20,7 +20,7 @@ public class MCPCPlusServer extends SpigotServer {
 
 	@Override
 	public boolean init() {
-		if (!super.init() || !Bukkit.getServer().getVersion().contains("MCPC")) {
+		if (!super.init() || !Bukkit.getServer().getVersion().contains("MCPC-Plus")) {
 			return false;
 		}
 		// Obtain the Class remapper used by MCPC+
@@ -108,13 +108,13 @@ public class MCPCPlusServer extends SpigotServer {
 
 	@Override
 	public Collection<String> getLoadableWorlds() {
-		File[] files = Bukkit.getWorldContainer().listFiles();
 		File container = Bukkit.getWorldContainer();
+		String[] files = container.list();
 		Collection<String> rval = new ArrayList<String>(files.length);
 		// Add the main world
 		rval.add(container.getName());
 		// Add all sub-worlds found in there
-		for (String worldName : container.list()) {
+		for (String worldName : files) {
 			if (isLoadableWorld(worldName)) {
 				rval.add(worldName);
 			}
