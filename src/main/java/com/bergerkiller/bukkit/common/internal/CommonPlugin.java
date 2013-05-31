@@ -345,7 +345,7 @@ public class CommonPlugin extends PluginBase {
 			final Class<? extends PacketHandler> handlerClass;
 			if (CommonUtil.isPluginEnabled("ProtocolLib")) {
 				handlerClass = ProtocolLibPacketHandler.class;
-			} else if (Common.IS_SPIGOT_SERVER) {
+			} else if (CommonUtil.getClass("org.spigotmc.netty.NettyNetworkManager") != null) {
 				handlerClass = SpigotPacketHandler.class;
 			} else {
 				handlerClass = CommonPacketHandler.class;
