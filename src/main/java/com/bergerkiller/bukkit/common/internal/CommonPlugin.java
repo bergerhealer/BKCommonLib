@@ -235,12 +235,28 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	private boolean permCheck(CommandSender sender, String node) {
+		org.bukkit.permissions.Permission perm = Bukkit.getPluginManager().getPermission(node);
+
 		// This check avoids the *-permissions granting all OP-players permission for everything
-		if (Bukkit.getPluginManager().getPermission(node) == null) {
-			Bukkit.getPluginManager().addPermission(new org.bukkit.permissions.Permission(node, PermissionDefault.FALSE));
+		if (perm == null) {
+			perm = new org.bukkit.permissions.Permission(node, PermissionDefault.FALSE);
+			Bukkit.getPluginManager().addPermission(perm);
 		}
+
+		// Initial permission default check that always succeeds
+		// This is needed because some permission plugins do not support defaults at all
+		if (perm.getDefault().getValue(sender.isOp())) {
+			return true;
+		}
+
+		// Resort back to the default logic
 		if (this.vaultEnabled) {
-			return this.vaultPermission.has(sender, node);
+			if (sender instanceof Player) {
+				Player p = (Player) sender;
+				return this.vaultPermission.playerHas(p.getWorld(), p.getName(), node);
+			} else {
+				return this.vaultPermission.has(sender, node);
+			}
 		} else {
 			return sender.hasPermission(node);
 		}
