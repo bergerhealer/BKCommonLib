@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import me.snowleo.bleedingmobs.BleedingMobs;
-import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,9 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import regalowl.hyperconomy.HyperConomy;
@@ -61,6 +57,7 @@ public class CommonPlugin extends PluginBase {
 	public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
 	public static final ModuleLogger LOGGER_NETWORK = LOGGER.getModule("Network");
 	public static final ModuleLogger LOGGER_TIMINGS = LOGGER.getModule("Timings");
+	public static final ModuleLogger LOGGER_PERMISSIONS = LOGGER.getModule("Permissions");
 	/*
 	 * Timings class
 	 */
@@ -80,13 +77,12 @@ public class CommonPlugin extends PluginBase {
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
 	private CommonEventFactory eventFactory;
-	private boolean vaultEnabled = false;
-	private Permission vaultPermission = null;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private boolean isHyperConomyEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
+	private PermissionHandler permissionHandler = null;
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -234,69 +230,6 @@ public class CommonPlugin extends PluginBase {
 		return false;
 	}
 
-	private boolean permCheck(CommandSender sender, String node) {
-		org.bukkit.permissions.Permission perm = Bukkit.getPluginManager().getPermission(node);
-
-		// This check avoids the *-permissions granting all OP-players permission for everything
-		if (perm == null) {
-			perm = new org.bukkit.permissions.Permission(node, PermissionDefault.FALSE);
-			Bukkit.getPluginManager().addPermission(perm);
-		}
-
-		// Initial permission default check that always succeeds
-		// This is needed because some permission plugins do not support defaults at all
-		if (perm.getDefault().getValue(sender.isOp())) {
-			return true;
-		}
-
-		// Resort back to the default logic
-		if (this.vaultEnabled) {
-			if (sender instanceof Player) {
-				Player p = (Player) sender;
-				return this.vaultPermission.playerHas(p.getWorld(), p.getName(), node);
-			} else {
-				return this.vaultPermission.has(sender, node);
-			}
-		} else {
-			return sender.hasPermission(node);
-		}
-	}
-
-	private boolean permCheck(CommandSender sender, StringBuilder root, String[] args, int argIndex) {
-		// End of the sequence?
-		if (argIndex >= args.length) {
-			return permCheck(sender, root.toString());
-		}
-		int rootLength = root.length();
-		if (rootLength != 0) {
-			root.append('.');
-			rootLength++;
-		}
-		final int newArgIndex = argIndex + 1;
-		// Check permission with original name
-		root.append(args[argIndex].toLowerCase(Locale.ENGLISH));
-		if (permCheck(sender, root, args, newArgIndex)) {
-			return true;
-		}
-
-		// Try with *-signs
-		root.setLength(rootLength);
-		root.append('*');
-		return permCheck(sender, root, args, newArgIndex);
-	}
-
-	public boolean hasPermission(CommandSender sender, String[] permissionNode) {
-		int expectedLength = permissionNode.length;
-		for (String node : permissionNode) {
-			expectedLength += node.length();
-		}
-		return permCheck(sender, new StringBuilder(expectedLength), permissionNode, 0);
-	}
-
-	public boolean hasPermission(CommandSender sender, String permissionNode) {
-		return permCheck(sender, permissionNode.toLowerCase(Locale.ENGLISH)) || hasPermission(sender, permissionNode.split("\\."));
-	}
-
 	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
 		synchronized (playerVisibleChunks) {
 			LongHashSet chunks = playerVisibleChunks.get(player);
@@ -336,6 +269,15 @@ public class CommonPlugin extends PluginBase {
 				chunks.remove(chunkX, chunkZ);
 			}
 		}
+	}
+
+	/**
+	 * Obtains the Permission Handler used for handling player and console permissions
+	 * 
+	 * @return permission handler
+	 */
+	public PermissionHandler getPermissionHandler() {
+		return permissionHandler;
 	}
 
 	/**
@@ -424,18 +366,8 @@ public class CommonPlugin extends PluginBase {
 			if (enabled) {
 				log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
 			}
-		} else if (pluginName.equals("Vault")) {
-			if (enabled) {
-		        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(Permission.class);
-		        if (permissionProvider != null) {
-		            this.vaultPermission = permissionProvider.getProvider();
-		            this.vaultEnabled = this.vaultPermission != null;
-		        }
-			} else {
-				this.vaultPermission = null;
-				this.vaultEnabled = false;
-			}
 		}
+		this.permissionHandler.updateDependency(plugin, pluginName, enabled);
 		if (!this.updatePacketHandler()) {
 			this.onCriticalFailure();
 		}
@@ -510,7 +442,6 @@ public class CommonPlugin extends PluginBase {
 		}
 
 		// Welcome message
-		setDisableMessage(null);
 		final List<String> welcomeMessages = Arrays.asList(
 				"This library is written with stability in mind.", 
 				"No Bukkit moderators were harmed while compiling this piece of art.", 
@@ -527,7 +458,11 @@ public class CommonPlugin extends PluginBase {
 				"Reflection can open the way to everyone's heart, including CraftBukkit.",
 				"Our love is not permitted by the overlords. We must flee...",
 				"Now a plugin, a new server implementation tomorrow???");
-		log(Level.INFO, welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+		setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+		setDisableMessage(null);
+
+		// Initialize permissions
+		permissionHandler = new PermissionHandler();
 
 		// Initialize event factory
 		eventFactory = new CommonEventFactory();

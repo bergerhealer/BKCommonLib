@@ -49,7 +49,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * permissions and permission defaults, logging, error handling and localization.
  */
 public abstract class PluginBase extends JavaPlugin {
-	private String disableMessage = null;
+	private String disableMessage, enableMessage;
 	private FileConfiguration permissionconfig, localizationconfig;
 	private final BasicConfiguration pluginYaml = new BasicConfiguration();
 	private boolean enabled = false;
@@ -490,6 +490,24 @@ public abstract class PluginBase extends JavaPlugin {
 	}
 
 	/**
+	 * Gets the enable message shown after this Plugin enabled successfully
+	 * 
+	 * @return enable message
+	 */
+	public final String getEnableMessage() {
+		return this.enableMessage;
+	}
+
+	/**
+	 * Sets the enable message shown after this Plugin enabled successfully
+	 * 
+	 * @param msg to set to, null to disable the message
+	 */
+	public void setEnableMessage(String msg) {
+		this.enableMessage = msg;
+	}
+
+	/**
 	 * Gets the minimum BKCommonLib version required for this Plugin to function<br>
 	 * Override this and return Common.VERSION as result (compiler will automatically inline this)
 	 * 
@@ -759,6 +777,10 @@ public abstract class PluginBase extends JavaPlugin {
 			}
 		}
 
+		// Enable messages
+		if (this.enableMessage != null) {
+			log(Level.INFO, this.enableMessage);
+		}
 		Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
 	}
 
