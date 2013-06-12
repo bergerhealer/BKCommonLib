@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.localization;
 
 import org.bukkit.command.CommandSender;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
 /**
  * Basic implementation of ILocationDefault that supplies additional function routines<br>
  * The get routine has to be implemented to link to the localization source Plugin
@@ -32,7 +34,10 @@ public abstract class LocalizationEnum implements ILocalizationDefault {
 	 * @param arguments for the node
 	 */
 	public void message(CommandSender sender, String...arguments) {
-		sender.sendMessage(get(arguments));
+		String text = get(arguments);
+		if (!LogicUtil.nullOrEmpty(text)) {
+			sender.sendMessage(text);
+		}
 	}
 
 	/**
