@@ -64,7 +64,15 @@ public class FileConfiguration extends BasicConfiguration {
 		try {
 			boolean regen = !this.exists();
 			this.file.getAbsoluteFile().getParentFile().mkdirs();
-			this.saveToStream(new FileOutputStream(this.file));
+			if (!this.file.exists()) {
+				this.file.createNewFile();
+			}
+			FileOutputStream stream = new FileOutputStream(this.file);
+			try {
+				this.saveToStream(stream);
+			} finally {
+				stream.close();
+			}
 			if (regen) {
 				Bukkit.getLogger().log(Level.INFO, "[Configuration] File '" + this.file + "' has been generated");
 			}

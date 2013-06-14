@@ -59,6 +59,9 @@ public abstract class DataWriter {
 	 */
 	public boolean write() {
 		try {
+			if (!this.file.exists()) {
+				this.file.createNewFile();
+			}
 			DataOutputStream stream = this.getStream(new FileOutputStream(this.file));
 			try {
 				this.write(stream);
