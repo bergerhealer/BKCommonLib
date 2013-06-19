@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.entity;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
 
 import net.minecraft.server.Chunk;
 import net.minecraft.server.Entity;
@@ -32,6 +33,7 @@ import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -226,79 +228,84 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		// Respawn the entity and attach the controller
 		try {
 			// Create a new entity instance and perform data/property transfer
-			final Entity newInstance = (Entity) type.createNMSHookEntity(this);
+			Object newInstance = type.createNMSHookEntity(this);
 			type.nmsType.transfer(oldInstance, newInstance);
-			oldInstance.dead = true;
-			newInstance.dead = false;
-			oldInstance.valid = false;
-			newInstance.valid = true;
-
-			// *** Bukkit Entity ***
-			((CraftEntity) entity).setHandle(newInstance);
-			if (entity instanceof InventoryHolder) {
-				Inventory inv = ((InventoryHolder) entity).getInventory();
-				if (inv instanceof CraftInventory && newInstance instanceof IInventory) {
-					SafeField.set(inv, "inventory", newInstance);
-				}
-			}
-
-			// *** Give the old entity a new Bukkit Entity ***
-			EntityRef.bukkitEntity.set(oldInstance, EntityRef.createEntity(oldInstance));
-
-			// *** Passenger/Vehicle ***
-			if (newInstance.vehicle != null) {
-				newInstance.vehicle.passenger = newInstance;
-			}
-			if (newInstance.passenger != null) {
-				newInstance.passenger.vehicle = newInstance;
-			}
-
-			// Only do this replacement logic for Entities that are already spawned
-			if (this.isSpawned()) {
-				// Now proceed to replace this NMS Entity in all places imaginable.
-				// First load the chunk so we can at least work on something
-				Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
-
-				// *** Entities By ID Map ***
-				final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
-				if (entitiesById.remove(oldInstance.id) == null) {
-					CommonUtil.nextTick(new Runnable() {
-						public void run() {
-							entitiesById.put(newInstance.id, newInstance);
-						}
-					});
-				}
-				entitiesById.put(newInstance.id, newInstance);
-
-				// *** EntityTrackerEntry ***
-				final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-				Object entry = tracker.getEntry(entity);
-				if (entry != null) {
-					EntityTrackerEntryRef.tracker.set(entry, entity);
-				}
-				if (hasPassenger()) {
-					entry = tracker.getEntry(getPassenger());
-					if (entry != null) {
-						EntityTrackerEntryRef.vehicle.set(entry, entity);
-					}
-				}
-
-				// *** World ***
-				replaceInList(oldInstance.world.entityList, newInstance);
-				replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
-
-				// *** Chunk ***
-				final int chunkY = getChunkY();
-				if (!replaceInChunk(chunk, chunkY, newInstance)) {
-					for (int y = 0; y < chunk.entitySlices.length; y++) {
-						if (y != chunkY && replaceInChunk(chunk, y, newInstance)) {
-							break;
-						}
-					}
-				}
-			}
+			replaceEntity((Entity) newInstance);
 		} catch (Throwable t) {
 			throw new RuntimeException("Failed to set controller:", t);
+		}
+	}
+
+	private void replaceEntity(final Entity newInstance) {
+		final Entity oldInstance = getHandle(Entity.class);
+		oldInstance.dead = true;
+		newInstance.dead = false;
+		oldInstance.valid = false;
+		newInstance.valid = true;
+
+		// *** Bukkit Entity ***
+		((CraftEntity) entity).setHandle(newInstance);
+		if (entity instanceof InventoryHolder) {
+			Inventory inv = ((InventoryHolder) entity).getInventory();
+			if (inv instanceof CraftInventory && newInstance instanceof IInventory) {
+				SafeField.set(inv, "inventory", newInstance);
+			}
+		}
+
+		// *** Give the old entity a new Bukkit Entity ***
+		EntityRef.bukkitEntity.set(oldInstance, EntityRef.createEntity(oldInstance));
+
+		// *** Passenger/Vehicle ***
+		if (newInstance.vehicle != null) {
+			newInstance.vehicle.passenger = newInstance;
+		}
+		if (newInstance.passenger != null) {
+			newInstance.passenger.vehicle = newInstance;
+		}
+
+		// Only do this replacement logic for Entities that are already spawned
+		if (this.isSpawned()) {
+			// Now proceed to replace this NMS Entity in all places imaginable.
+			// First load the chunk so we can at least work on something
+			Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
+
+			// *** Entities By ID Map ***
+			final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
+			if (entitiesById.remove(oldInstance.id) == null) {
+				CommonUtil.nextTick(new Runnable() {
+					public void run() {
+						entitiesById.put(newInstance.id, newInstance);
+					}
+				});
+			}
+			entitiesById.put(newInstance.id, newInstance);
+
+			// *** EntityTrackerEntry ***
+			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
+			Object entry = tracker.getEntry(entity);
+			if (entry != null) {
+				EntityTrackerEntryRef.tracker.set(entry, entity);
+			}
+			if (hasPassenger()) {
+				entry = tracker.getEntry(getPassenger());
+				if (entry != null) {
+					EntityTrackerEntryRef.vehicle.set(entry, entity);
+				}
+			}
+
+			// *** World ***
+			replaceInList(oldInstance.world.entityList, newInstance);
+			replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
+
+			// *** Chunk ***
+			final int chunkY = getChunkY();
+			if (!replaceInChunk(chunk, chunkY, newInstance)) {
+				for (int y = 0; y < chunk.entitySlices.length; y++) {
+					if (y != chunkY && replaceInChunk(chunk, y, newInstance)) {
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -603,5 +610,45 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 		entity.entity = Conversion.toEntity.convert(handle);
 		// Create a new CommonEntity and done
 		return entity;
+	}
+
+	/**
+	 * Clears possible network or Entity controllers from the Entity.
+	 * This should be called when a specific Entity should default back to all default behaviours.
+	 * 
+	 * @param entity to clear the controllers of
+	 */
+	public static void clearControllers(org.bukkit.entity.Entity entity) {
+		CommonEntity<?> commonEntity = get(entity);
+		Object oldInstance = commonEntity.getHandle();
+
+		// Detach controller and undo hook Entity replacement
+		if (oldInstance instanceof NMSEntityHook) {
+			try {
+				CommonEntityController<?> controller = ((NMSEntityHook) oldInstance).getController();
+				if (controller != null) {
+					controller.onDetached();
+				}
+			} catch (Throwable t) {
+				CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to handle controller detachment:");
+				t.printStackTrace();
+			}
+			try {
+				CommonEntityType type = CommonEntityType.byNMSEntity(oldInstance);
+				System.out.println(type.entityType);
+				// Transfer data and replace
+				Object newInstance = type.createNMSEntity();
+				type.nmsType.transfer(oldInstance, newInstance);
+				commonEntity.replaceEntity((Entity) newInstance);
+			} catch (Throwable t) {
+				CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to unhook Common Entity Controller:");
+				t.printStackTrace();
+			}
+		}
+		// Unhook network controller
+		EntityNetworkController<?> controller = commonEntity.getNetworkController();
+		if (controller != null && !(controller instanceof DefaultEntityNetworkController)) {
+			commonEntity.setNetworkController(new DefaultEntityNetworkController());
+		}
 	}
 }

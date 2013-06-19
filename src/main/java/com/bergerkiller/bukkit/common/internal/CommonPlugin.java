@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,8 +19,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +36,7 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
@@ -69,6 +73,7 @@ public class CommonPlugin extends PluginBase {
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
 	private EntityMap<Player, LongHashSet> playerVisibleChunks;
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
+	private CommonListener listener;
 	private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
 	private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
 	private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
@@ -391,15 +396,12 @@ public class CommonPlugin extends PluginBase {
 	@Override
 	public void disable() {
 		instance = null;
+		// Disable listeners
 		for (CommonWorldListener listener : worldListeners.values()) {
 			listener.disable();
 		}
 		worldListeners.clear();
-
-		// Unhook chunk providers
-		for (World world : WorldUtil.getWorlds()) {
-			ChunkProviderServerHook.unhook(world);
-		}
+		HandlerList.unregisterAll(listener);
 
 		// Clear running tasks
 		for (Task task : startedTasks) {
@@ -415,6 +417,19 @@ public class CommonPlugin extends PluginBase {
 			t.printStackTrace();
 		}
 		packetHandler = null;
+
+		// Erase all traces of BKCommonLib from this server
+		Collection<Entity> entities = new ArrayList<Entity>();
+		for (World world : WorldUtil.getWorlds()) {
+			// Unhook chunk providers
+			ChunkProviderServerHook.unhook(world);
+			// Unhook entities
+			entities.addAll(WorldUtil.getEntities(world));
+			for (Entity entity : entities) {
+				CommonEntity.clearControllers(entity);
+			}
+			entities.clear();
+		}
 	}
 
 	@Override
@@ -471,7 +486,7 @@ public class CommonPlugin extends PluginBase {
 		playerVisibleChunks = new EntityMap<Player, LongHashSet>();
 
 		// Register events and tasks, initialize
-		register(new CommonListener());
+		register(listener = new CommonListener());
 		register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));

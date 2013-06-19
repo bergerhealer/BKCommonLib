@@ -21,6 +21,7 @@ class CommonClasses {
 		loadUtil("Recipe", "Stream", "World");
 		// Remaining classes
 		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityType", "collections.CollectionBasics");
+		loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
 	}
 
 	private static void loadRef(String... classNames) {

@@ -59,7 +59,7 @@ public class ClassMap<T> {
 			return value;
 		}
 		for (Entry<Class<?>, T> entry : classes.entrySet()) {
-			if (entry.getClass().isAssignableFrom(type)) {
+			if (entry.getKey().isAssignableFrom(type)) {
 				return entry.getValue();
 			}
 		}
@@ -81,7 +81,7 @@ public class ClassMap<T> {
 			return value;
 		}
 		for (Entry<Class<?>, T> entry : classes.entrySet()) {
-			if (entry.getClass().isInstance(instance)) {
+			if (entry.getKey().isInstance(instance)) {
 				return entry.getValue();
 			}
 		}
