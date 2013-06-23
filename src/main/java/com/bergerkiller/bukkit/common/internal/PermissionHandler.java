@@ -231,6 +231,7 @@ public class PermissionHandler implements PermissionChecker {
 				case TRUE : this.hasTRUE = true; break;
 				case OP : this.hasOP = true; break;
 				case NOT_OP : this.hasNOTOP = true; break;
+				default: break;
 			}
 			if (hasOP && hasNOTOP) {
 				hasTRUE = true;
