@@ -29,7 +29,7 @@ public class TabController implements PacketListener, Listener {
 	}
 	
 	/**
-	 * Get the custom tab form a player
+	 * Get the custom tab from a player
 	 * 
 	 * @param player Player to egt tab for
 	 * @return Tab for player (null if not exists)

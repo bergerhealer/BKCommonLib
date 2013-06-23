@@ -73,7 +73,7 @@ public class PlayerTab {
 	 * 
 	 * @param x Slot x
 	 * @param y Slot y
-	 * @return Slot name (null if nto found)
+	 * @return Slot name (null if not found)
 	 */
 	public String getSlotName(int x, int y) {
 		String slot = slots[y][x];
