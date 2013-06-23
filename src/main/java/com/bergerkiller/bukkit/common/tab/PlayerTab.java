@@ -12,17 +12,18 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 public class PlayerTab {
 	private String[][] slots = new String[3][20];
 	private Player player;
+	private boolean showPlayerList;
 	
 	protected PlayerTab(Player player) {
 		this.player = player;
 		for(Player p : Bukkit.getOnlinePlayers())
-			this.sendSlot(p.getName(), false, 0);
+			this.sendSlot(p.getPlayerListName(), false, 0);
 	}
 	
 	protected void restore() {
 		this.clearTab();
 		for(Player p : Bukkit.getOnlinePlayers())
-			this.sendSlot(p.getName(), true, PlayerUtil.getPing(p));
+			this.sendSlot(p.getPlayerListName(), true, PlayerUtil.getPing(p));
 	}
 	
 	private void resend(int row) {
@@ -36,6 +37,9 @@ public class PlayerTab {
 					this.sendSlot(slot, false, 0);
 				}
 			}
+		} if(this.showPlayerList) {
+			for(Player p : Bukkit.getOnlinePlayers())
+				this.sendSlot(p.getCustomName(), false, PlayerUtil.getPing(p));
 		}
 		
 		//Now send the updated slots back
@@ -49,7 +53,26 @@ public class PlayerTab {
 					this.sendSlot(name, true, ping);
 				}
 			}
+		} if(this.showPlayerList) {
+			//And the player list
+			for(Player p : Bukkit.getOnlinePlayers())
+				this.sendSlot(p.getCustomName(), true, PlayerUtil.getPing(p));
 		}
+	}
+	
+	protected void updatePlayerList(Player p, boolean register) {
+		this.sendSlot(p.getPlayerListName(), register, PlayerUtil.getPing(p));
+	}
+	
+	/**
+	 * Set if we should show the player list at the end of the tab
+	 * 
+	 * @param show Show player list?
+	 */
+	public void showPlayerList(boolean show) {
+		this.showPlayerList = show;
+		for(Player p : Bukkit.getOnlinePlayers())
+			this.sendSlot(p.getCustomName(), show, PlayerUtil.getPing(p));
 	}
 	
 	/**
@@ -65,6 +88,9 @@ public class PlayerTab {
 					slots[y][x] = null;
 				}
 			}
+		} if(this.showPlayerList) {
+			for(Player p : Bukkit.getOnlinePlayers())
+				this.sendSlot(p.getCustomName(), false, PlayerUtil.getPing(p));
 		}
 	}
 	
