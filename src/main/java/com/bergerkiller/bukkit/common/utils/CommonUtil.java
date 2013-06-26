@@ -282,7 +282,11 @@ public class CommonUtil {
 		InputStream stream = getPluginResource(pluginJarFile, configResourcePath);
 		try {
 			BasicConfiguration config = new BasicConfiguration();
-			config.loadFromStream(stream);
+			try {
+				config.loadFromStream(stream);
+			} catch (Throwable t) {
+				throw new IOException("Error in YAML format", t);
+			}
 			return config;
 		} finally {
 			stream.close();
