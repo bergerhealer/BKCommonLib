@@ -242,6 +242,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 			return;
 		}
 		ChunkProviderServer newCPS = new ChunkProviderServer(oldCPS.world, getLoader(oldCPS), oldCPS.chunkProvider);
+		ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
 		WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
 	}
 }
