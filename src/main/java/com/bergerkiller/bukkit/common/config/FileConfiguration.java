@@ -3,11 +3,12 @@ package com.bergerkiller.bukkit.common.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class FileConfiguration extends BasicConfiguration {
 	private final File file;
@@ -17,7 +18,7 @@ public class FileConfiguration extends BasicConfiguration {
 	}
 
 	public FileConfiguration(JavaPlugin plugin, String filepath) {
-		this(plugin.getDataFolder() + File.separator + filepath);
+		this(new File(CommonUtil.getPluginDataFolder(plugin), filepath));
 	}
 
 	public FileConfiguration(String filepath) {
@@ -25,6 +26,9 @@ public class FileConfiguration extends BasicConfiguration {
 	}
 
 	public FileConfiguration(final File file) {
+		if (file == null) {
+			throw new IllegalArgumentException("File is not allowed to be null!");
+		}
 		this.file = file;
 	}
 
@@ -36,24 +40,15 @@ public class FileConfiguration extends BasicConfiguration {
 	 * Loads this File Configuration from file
 	 */
 	public void load() {
-		/** We can't load a file that is null or does not exist */
-		if(this.file == null)
-			throw new IllegalArgumentException("File is null!");
-		
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while creating file '" + this.file + "':");
-				e.printStackTrace();
-			}
+		// Ignore loading if file doesn't exist
+		if (!file.exists()) {
+			return;
 		}
-		
 		try {
 			this.loadFromStream(new FileInputStream(this.file));
-		} catch (Exception ex) {
+		} catch (Throwable t) {
 			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
-			ex.printStackTrace();
+			t.printStackTrace();
 		}
 	}
 
@@ -67,12 +62,7 @@ public class FileConfiguration extends BasicConfiguration {
 			if (!this.file.exists()) {
 				this.file.createNewFile();
 			}
-			FileOutputStream stream = new FileOutputStream(this.file);
-			try {
-				this.saveToStream(stream);
-			} finally {
-				stream.close();
-			}
+			this.saveToStream(new FileOutputStream(this.file));
 			if (regen) {
 				Bukkit.getLogger().log(Level.INFO, "[Configuration] File '" + this.file + "' has been generated");
 			}

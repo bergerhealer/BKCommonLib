@@ -347,6 +347,26 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Obtains the folder in which plugin-specific information is contained.<br>
+	 * Usually this folder is <b>/plugins/[pluginname]</b>.<br>
+	 * This method can be used to properly obtain this folder if the plugin is not initialized yet.
+	 * 
+	 * @param plugin to get the data folder of
+	 * @return Plugin data folder (never null)
+	 */
+	public static File getPluginDataFolder(Plugin plugin) {
+		File folder = plugin.getDataFolder();
+		if (folder == null) {
+			File jarFile = getPluginJarFile(plugin);
+			if (jarFile == null) {
+				throw new RuntimeException("Plugin data folder can not be obtained: Not a valid JAR plugin");
+			}
+			folder = new File(jarFile.getAbsoluteFile().getParentFile(), plugin.getName());
+		}
+		return folder;
+	}
+
+	/**
 	 * Removes all stack trace elements after a given method from an error
 	 * 
 	 * @param error to filter
