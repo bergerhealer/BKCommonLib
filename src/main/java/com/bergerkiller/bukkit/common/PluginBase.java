@@ -435,7 +435,13 @@ public abstract class PluginBase extends JavaPlugin {
 				StringBuilder tmpPathBuilder = new StringBuilder(path);
 				String tmpPath = path;
 				for (int i = 0; i < arguments.length; i++) {
-					tmpPath = tmpPathBuilder.append('.').append(arguments[i].toLowerCase(Locale.ENGLISH)).toString();
+					tmpPathBuilder.append('.');
+					if (arguments[i] == null) {
+						tmpPathBuilder.append("null");
+					} else {
+						tmpPathBuilder.append(arguments[i].toLowerCase(Locale.ENGLISH));
+					}
+					tmpPath = tmpPathBuilder.toString();
 					// New argument appended path exists, update the path
 					if (this.localizationconfig.contains(tmpPath)) {
 						newPath = tmpPath;
@@ -451,7 +457,7 @@ public abstract class PluginBase extends JavaPlugin {
 		if (arguments.length > 0) {
 			StringBuilder locale = new StringBuilder(this.localizationconfig.get(path, ""));
 			for (int i = 0; i < arguments.length; i++) {
-				StringUtil.replaceAll(locale, "%" + i + "%", arguments[i]);
+				StringUtil.replaceAll(locale, "%" + i + "%", LogicUtil.fixNull(arguments[i], "null"));
 			}
 			return locale.toString();
 		} else {
