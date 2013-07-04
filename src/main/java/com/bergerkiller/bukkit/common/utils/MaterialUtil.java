@@ -220,7 +220,7 @@ public class MaterialUtil {
 	public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
 		@Override
 		public Boolean get(int typeId) {
-			return Block.s[typeId];
+			return Block.t[typeId];
 		}
 	};
 
@@ -242,7 +242,7 @@ public class MaterialUtil {
 		@Override
 		public Boolean get(int typeId) {
 			final Item item = LogicUtil.getArray(Item.byId, typeId, null);
-			return item == null ? false : item.m();
+			return item == null ? false : item.n();
 		}
 	};
 

@@ -197,6 +197,6 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
 		final EntityPlayer ep = CommonNMS.getNative(player);
-		return ep.o().getPlayerChunkMap().a(ep, chunkX, chunkZ);
+		return ep.p().getPlayerChunkMap().a(ep, chunkX, chunkZ);
 	}
 }

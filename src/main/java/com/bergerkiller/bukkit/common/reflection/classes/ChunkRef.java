@@ -30,7 +30,7 @@ public class ChunkRef {
 	public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
 	public static final FieldAccessor<List<Object>[]> entitySlices = TEMPLATE.getField("entitySlices");
 	public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
-	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "f");
+	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "g");
 
 	public static void loadNeighbours(Object chunkHandle, Object chunkProvider1, Object chunkProvider2, int x, int z) {
 		loadNeighbours.invoke(chunkHandle, chunkProvider1, chunkProvider2, x, z);

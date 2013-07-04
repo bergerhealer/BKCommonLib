@@ -45,7 +45,7 @@ public class Common {
 	/**
 	 * The Minecraft package path version BKCommonLib is built against
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_5_R3";
+	public static final String DEPENDENT_MC_VERSION = "v1_6_R1";
 	/**
 	 * Whether BKCommonLib is compatible with the server it is currently running on
 	 */
@@ -87,7 +87,7 @@ public class Common {
 	 * <b>Use getVersion() instead if you want the actual, current version!
 	 * Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 152;
+	public static final int VERSION = 153;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version

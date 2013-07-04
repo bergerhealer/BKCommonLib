@@ -2,4 +2,5 @@
 .classpath
 .project
 bin
+target
 

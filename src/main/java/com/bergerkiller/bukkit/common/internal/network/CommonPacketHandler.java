@@ -31,7 +31,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 	 * Known plugins that malfunction with the default packet handler
 	 */
 	private static final String[] incompatibilities = {"Spout"};
-	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ae(), "c");
+	private static final List<PlayerConnection> serverPlayerConnections = SafeField.get(CommonNMS.getMCServer().ag(), "c");
 
 	@Override
 	public String getName() {
@@ -217,7 +217,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 					} else {
 						msg.append("unregister");
 					}
-					msg.append(" PlayerConnection proxy for ").append(ep.name).append("...bad things may happen!");
+					msg.append(" PlayerConnection proxy for ").append(ep.getBukkitEntity().getName()).append("...bad things may happen!");
 					CommonPlugin.LOGGER.log(Level.SEVERE, msg.toString());
 					return;
 				}

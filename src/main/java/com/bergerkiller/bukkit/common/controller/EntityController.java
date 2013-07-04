@@ -209,7 +209,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dz = oldDz;
 
 				AxisAlignedBB axisalignedbb1 = handle.boundingBox.clone();
-				handle.boundingBox.c(axisalignedbb);
+				handle.boundingBox.d(axisalignedbb);
 
 				list = EntityControllerCollisionHelper.getCollisions(this, handle.boundingBox.a(oldDx, dy, oldDz));
 
@@ -253,7 +253,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					dx = moveDx;
 					dy = moveDy;
 					dz = moveDz;
-					handle.boundingBox.c(axisalignedbb1);
+					handle.boundingBox.d(axisalignedbb1);
 				} else {
 					double subY = handle.boundingBox.b - (int) handle.boundingBox.b;
 					if (subY > 0.0) {

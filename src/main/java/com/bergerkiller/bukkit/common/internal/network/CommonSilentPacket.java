@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
@@ -62,12 +62,12 @@ class CommonSilentPacket extends Packet {
 	}
 
 	@Override
-	public void a(DataInputStream in) throws IOException {
+	public void a(DataInput in) throws IOException {
 		throw new UnsupportedOperationException("Can not load a silent packet from a stream");
 	}
 
 	@Override
-	public void a(DataOutputStream out) throws IOException {
+	public void a(DataOutput out) throws IOException {
 		this.packet.a(out);
 	}
 

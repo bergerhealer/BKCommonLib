@@ -4,7 +4,11 @@
 
   <groupId>com.bergerkiller.bukkit</groupId>
   <artifactId>BKCommonLib</artifactId>
+<<<<<<< HEAD
   <version>1.52</version>
+=======
+  <version>1.53-SNAPSHOT</version>
+>>>>>>> Updated to 1.6.1 R0.1
   <packaging>jar</packaging>
 
   <name>BKCommonLib</name>
@@ -12,8 +16,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.mcversion>v1_5_R3</project.mcversion>
-    <project.libversion>1.5.2-R0.2-SNAPSHOT</project.libversion>
+    <project.mcversion>v1_6_R1</project.mcversion>
+    <project.libversion>1.6.1-R0.1-SNAPSHOT</project.libversion>
   </properties>
 
   <repositories>
@@ -36,7 +40,7 @@
     <repository>
       <id>comphenix-repo</id>
       <name>Comphenix Repository</name>
-      <url>http://assets.comphenix.net/plugin/repository/everything/</url>
+      <url>http://repo.comphenix.net/content/groups/public</url>
     </repository>
     <!-- Repo for access to Objenesis -->
     <repository>

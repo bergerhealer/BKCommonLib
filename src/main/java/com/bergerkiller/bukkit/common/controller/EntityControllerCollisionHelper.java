@@ -95,7 +95,7 @@ class EntityControllerCollisionHelper {
 
 			entityBounds = collider.boundingBox;
 			// Entity collision event after the null/inBounds check
-			if (entityBounds != null && entityBounds.a(bounds) && controller.onEntityCollision(Conversion.toEntity.convert(collider))) {
+			if (entityBounds != null && entityBounds.b(bounds) && controller.onEntityCollision(Conversion.toEntity.convert(collider))) {
 				collisionBuffer.add(entityBounds);
 			}
 		}

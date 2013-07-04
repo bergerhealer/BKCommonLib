@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.bukkit.craftbukkit.util.FlatMap;
+import org.spigotmc.FlatMap;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 

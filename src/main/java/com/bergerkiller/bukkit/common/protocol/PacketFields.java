@@ -34,6 +34,7 @@ public class PacketFields {
 	public static final NMSPacket24MobSpawn MOB_SPAWN = new NMSPacket24MobSpawn();
 	public static final NMSPacket25EntityPainting ENTITY_PAINTING = new NMSPacket25EntityPainting();
 	public static final NMSPacket26AddExpOrb ADD_EXP_ORB = new NMSPacket26AddExpOrb();
+	public static final NMSPacket27PlayerInput PLAYER_INPUT = new NMSPacket27PlayerInput();
 	public static final NMSPacket28EntityVelocity ENTITY_VELOCITY = new NMSPacket28EntityVelocity();
 	public static final NMSPacket29DestroyEntity DESTROY_ENTITY = new NMSPacket29DestroyEntity();
 	public static final NMSPacket31RelEntityMove REL_ENTITY_MOVE = new NMSPacket31RelEntityMove();

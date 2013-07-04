@@ -42,9 +42,9 @@ public class EntityRef {
 	private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class);
 	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("C");
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
-	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("f_");
+	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("e_");
 	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
-	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", int.class);
+	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 
 	private static final ClassTemplate<?> CRAFT_TEMPLATE = CBClassTemplate.create("entity.CraftEntity");

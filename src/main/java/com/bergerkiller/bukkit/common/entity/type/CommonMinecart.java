@@ -23,7 +23,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public int getDamage() {
-		return entity.getDamage();
+		return ((int) getHandle(EntityMinecartAbstract.class).getDamage()) * 10;
 	}
 
 	public Vector getDerailedVelocityMod() {
@@ -47,7 +47,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public void setDamage(int arg0) {
-		entity.setDamage(arg0);
+		entity.setDamage(((double) arg0) / 10);
 	}
 
 	public void setDerailedVelocityMod(Vector arg0) {
@@ -165,8 +165,8 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 */
 	public void setBlock(int blockId, int blockData) {
 		EntityMinecartAbstract handle = getHandle(EntityMinecartAbstract.class);
-		handle.k(blockId);
-		handle.l(blockData);
+		handle.i(blockId);
+		handle.j(blockData);
 	}
 
 	@Override

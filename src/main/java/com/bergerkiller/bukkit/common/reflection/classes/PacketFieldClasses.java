@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.crypto.SecretKey;
@@ -266,6 +267,12 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> z = getField("d");
 		public final FieldAccessor<Integer> experience = getField("e");
 	}
+	public static class NMSPacket27PlayerInput extends NMSPacket {
+		public final FieldAccessor<Float> sideways = getField("a");
+		public final FieldAccessor<Float> forward = getField("b");
+		public final FieldAccessor<Boolean> jump = getField("c");
+		public final FieldAccessor<Boolean> unmount = getField("d");
+	}
 	public static class NMSPacket28EntityVelocity extends NMSPacket30Entity {
 		public final FieldAccessor<Integer> motX = getField("b");
 		public final FieldAccessor<Integer> motY = getField("c");
@@ -365,7 +372,8 @@ public class PacketFieldClasses {
 	public static class NMSPacket39AttachEntity extends NMSPacket {
 		public final FieldAccessor<Integer> passengerId = getField("a");
 		public final FieldAccessor<Integer> vehicleId = getField("b");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
+		public final FieldAccessor<Boolean> lead = getField("c");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
 
 		public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
 			return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
@@ -400,6 +408,17 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket43SetExperience extends NMSPacket {
+		public final FieldAccessor<Float> bar = getField("a");
+		public final FieldAccessor<Integer> level = getField("b");
+		public final FieldAccessor<Integer> totalXp = getField("c");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(float.class, int.class, int.class);
+		
+		public CommonPacket newInstance(float bar, int level, int totalXp) {
+			return constructor1.newInstance(bar, level, totalXp);
+		}
+	}
+	public static class NMSPacket44UpdateAttributes extends NMSPacket30Entity {
+		public final FieldAccessor<Map<String, Double>> properties = getField("b");
 	}
 	public static class NMSPacket51MapChunk extends NMSPacket {
 		public final FieldAccessor<Integer> size = getField("size");

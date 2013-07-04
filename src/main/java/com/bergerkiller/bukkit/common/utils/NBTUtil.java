@@ -179,7 +179,7 @@ public class NBTUtil {
 	 * @return Tag list
 	 */
 	public static CommonTagList createList(DataInputStream in) {
-		return new CommonTagList(NBTBase.b(in));
+		return new CommonTagList(NBTBase.a(in));
 	}
 
 	/**
