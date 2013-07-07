@@ -99,18 +99,24 @@ class CommonListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
+	private void onPlayerQuit(PlayerQuitEvent event) {
+		CommonScoreboard.removePlayer(event.getPlayer());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
 	private void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		
-		//Scoreboard team initing
 		CommonPlugin.getInstance().getPacketHandler().onPlayerJoin(player);
+
+		// Scoreboard team init
 		CommonTeam team = CommonScoreboard.get(player).getTeam();
-		if(!team.shouldSendToAll())
-			team.send(player); //Send playe team to player
-		
-		for(CommonTeam ct : CommonScoreboard.getTeams()) {
-			if(ct.shouldSendToAll())
+		if (!team.shouldSendToAll()) {
+			team.send(player); //Send player team to player
+		}
+		for (CommonTeam ct : CommonScoreboard.getTeams()) {
+			if(ct.shouldSendToAll()) {
 				ct.send(player);
+			}
 		}
 	}
 

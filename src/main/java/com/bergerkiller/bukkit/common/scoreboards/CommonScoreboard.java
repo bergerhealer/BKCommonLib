@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -15,10 +16,14 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
+/**
+ * Represents a single Scoreboard as displayed to a single Player.
+ * Also keeps track of teams and their objectives.
+ */
 public class CommonScoreboard {
 	private static Map<Player, CommonScoreboard> boards = new WeakHashMap<Player, CommonScoreboard>();
 	private static Map<String, CommonTeam> teams = new HashMap<String, CommonTeam>();
-	public static CommonTeam dummyTeam = new CommonTeam("dummy") {
+	public static final CommonTeam dummyTeam = new CommonTeam("dummy") {
 		private static final long serialVersionUID = 2284488822613734842L;
 		public void addPlayer(OfflinePlayer player) {}
 		public void removePlayer(OfflinePlayer player) {}
@@ -31,39 +36,32 @@ public class CommonScoreboard {
 		public void send(Player player) {}
 		public void setSendToAll(boolean sendToAll) {}
 	};
-	
-	public static CommonScoreboard get(Player player) {
-		if(boards.containsKey(player))
-			return boards.get(player);
-		else {
-			CommonScoreboard board = new CommonScoreboard(player);
-			boards.put(player, board);
-			return board;
-		}
-	}
-	
 	private CommonTeam team;
 	private CommonObjective[] objectives = new CommonObjective[3];
-	private Player player;
-	
-	public CommonScoreboard(Player player) {
+	private final WeakReference<Player> player;
+
+	private CommonScoreboard(Player player) {
 		this.team = dummyTeam;
-		this.player = player;
+		this.player = new WeakReference<Player>(player);
 		for(int i = 0; i < 3; i++) {
 			Display display = Display.fromInt(i);
 			objectives[i] = new CommonObjective(this, display);
 		}
 	}
-	
+
 	/**
 	 * Get the player form the scoreboard
 	 * 
 	 * @return Player
 	 */
 	public Player getPlayer() {
-		return this.player;
+		Player player = this.player.get();
+		if (player == null) {
+			throw new RuntimeException("The Player referenced by this Scoreboard is no longer online/available");
+		}
+		return player;
 	}
-	
+
 	/**
 	 * Get the scoreboard form a certain display
 	 * 
@@ -73,7 +71,7 @@ public class CommonScoreboard {
 	public CommonObjective getObjective(Display display) {
 		return this.objectives[display.getId()];
 	}
-	
+
 	/**
 	 * Get the scoreboard team from the player
 	 * 
@@ -82,7 +80,7 @@ public class CommonScoreboard {
 	public CommonTeam getTeam() {
 		return this.team;
 	}
-	
+
 	/**
 	 * Set the team for the player
 	 * 
@@ -94,7 +92,7 @@ public class CommonScoreboard {
 		
 		this.team = team;
 	}
-	
+
 	/**
 	 * Create a new scoreboard team
 	 * 
@@ -106,7 +104,7 @@ public class CommonScoreboard {
 		teams.put(name, team);
 		return team;
 	}
-	
+
 	/**
 	 * Load a team form the disk
 	 * 
@@ -139,7 +137,7 @@ public class CommonScoreboard {
 		teams.put(name, team);
 		return team;
 	}
-	
+
 	/**
 	 * Save a team to the disk
 	 * 
@@ -160,7 +158,7 @@ public class CommonScoreboard {
 			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed ot save team to disk", e);
 		}
 	}
-	
+
 	/**
 	 * Get all registered teams by BKCommonLib
 	 * 
@@ -169,7 +167,7 @@ public class CommonScoreboard {
 	public static CommonTeam[] getTeams() {
 		return teams.values().toArray(new CommonTeam[0]);
 	}
-	
+
 	/**
 	 * Get a team by name
 	 * 
@@ -198,7 +196,34 @@ public class CommonScoreboard {
 		
 		return board;
 	}
-	
+
+	/**
+	 * Removes the Scoreboard instance of a Player, disposing of it's data
+	 * 
+	 * @param player to remove the Scoreboard instance of
+	 */
+	public static void removePlayer(Player player) {
+		CommonScoreboard board = boards.remove(player);
+		if (board != null) {
+			board.player.clear();
+		}
+	}
+
+	/**
+	 * Obtains the Scoreboard instance of a Player, creating a new one if needed
+	 * 
+	 * @param player to get the Scoreboard instance for
+	 * @return Scoreboard instance for this Player
+	 */
+	public static CommonScoreboard get(Player player) {
+		CommonScoreboard board = boards.get(player);
+		if (board == null) {
+			board = new CommonScoreboard(player);
+			boards.put(player, board);
+		}
+		return board;
+	}
+
 	public static enum Display {
 		LIST(0, "list", "List"),
 		SIDEBAR(1, "sidebar", "SideBar"),

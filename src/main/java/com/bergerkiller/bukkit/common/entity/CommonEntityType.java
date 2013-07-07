@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.entity;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import net.minecraft.server.IInventory;
 
@@ -18,6 +19,7 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHookImpl;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHookImpl;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
@@ -216,6 +218,7 @@ public class CommonEntityType {
 		add(EntityType.WITHER_SKULL, "WitherSkull", 80, 3, true);
 		add(EntityType.WOLF, "Wolf", 80, 3, true);
 		add(EntityType.ZOMBIE, "Zombie", 80, 3, true);
+		add(EntityType.HORSE, "Horse", 80, 3, true);
 
 		// Blocks/Tiles
 		add(EntityType.PRIMED_TNT, "TNTPrimed", 160, 10, true);
@@ -223,5 +226,15 @@ public class CommonEntityType {
 		add(EntityType.PAINTING, "Painting", 160, Integer.MAX_VALUE, false);
 		add(EntityType.ENDER_CRYSTAL, "EnderCrystal", 256, Integer.MAX_VALUE, false);
 		add(EntityType.ITEM_FRAME, "ItemFrame", 160, Integer.MAX_VALUE, false);
+
+		// Check that all entity types are registered properly
+		for (EntityType type : EntityType.values()) {
+			if (type == EntityType.UNKNOWN || type == EntityType.WEATHER) {
+				continue;
+			}
+			if (!byEntityType.containsKey(type)) {
+				CommonPlugin.LOGGER.log(Level.WARNING, "Entity Type '" + type + "' is not registered as CommonEntityType");
+			}
+		}
 	}
 }

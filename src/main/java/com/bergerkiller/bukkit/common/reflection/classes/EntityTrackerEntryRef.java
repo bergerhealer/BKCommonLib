@@ -28,7 +28,7 @@ public class EntityTrackerEntryRef {
 	public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("u");
 	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("isMoving");
 	public static final TranslatorFieldAccessor<Set<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerSet);
-	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("b");
+	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("c");
 	private static final MethodAccessor<Void> scanPlayers = TEMPLATE.getMethod("scanPlayers", List.class);
 	private static final MethodAccessor<Void> updatePlayer = TEMPLATE.getMethod("updatePlayer", EntityPlayerRef.TEMPLATE.getType());
 
