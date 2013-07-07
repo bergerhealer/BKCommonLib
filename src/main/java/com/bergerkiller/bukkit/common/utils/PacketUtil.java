@@ -91,6 +91,9 @@ public class PacketUtil {
 	}
 
 	public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
+		if (packet == null) {
+			return;
+		}
 		sendPacket(player, packet.getHandle(), throughListeners);
 	}
 

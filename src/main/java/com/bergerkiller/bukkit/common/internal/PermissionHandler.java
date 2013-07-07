@@ -184,9 +184,14 @@ public class PermissionHandler implements PermissionChecker {
 	 * @return True if permission is granted, False if not
 	 */
 	private static boolean permCheckWildcard(PermissionChecker checker, CommandSender sender, StringBuilder root, String[] args, int argIndex) {
+		// Check the permission
+		String rootText = root.toString();
+		if (!rootText.isEmpty() && checker.handlePermission(sender, rootText)) {
+			return true;
+		}
 		// End of the sequence?
 		if (argIndex >= args.length) {
-			return checker.handlePermission(sender, root.toString());
+			return false;
 		}
 		int rootLength = root.length();
 		if (rootLength != 0) {

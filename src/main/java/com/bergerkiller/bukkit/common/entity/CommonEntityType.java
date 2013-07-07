@@ -181,13 +181,13 @@ public class CommonEntityType {
 		add(EntityType.EXPERIENCE_ORB, "ExperienceOrb", 160, 20, true);
 
 		// Vehicles
-		add(EntityType.MINECART, "MinecartRideable", 80, 3, true);
-		add(EntityType.MINECART_CHEST, "MinecartChest", 80, 3, true);
-		add(EntityType.MINECART_FURNACE, "MinecartFurnace", 80, 3, true);
-		add(EntityType.MINECART_TNT, "MinecartTNT", 80, 3, true);
-		add(EntityType.MINECART_HOPPER, "MinecartHopper", 80, 3, true);
-		add(EntityType.MINECART_MOB_SPAWNER, "MinecartMobSpawner", 80, 3, true);
-		add(EntityType.BOAT, "Boat", 80, 3, true);
+		add(EntityType.MINECART, "MinecartRideable", 80, 2, true);
+		add(EntityType.MINECART_CHEST, "MinecartChest", 80, 2, true);
+		add(EntityType.MINECART_FURNACE, "MinecartFurnace", 80, 2, true);
+		add(EntityType.MINECART_TNT, "MinecartTNT", 80, 2, true);
+		add(EntityType.MINECART_HOPPER, "MinecartHopper", 80, 2, true);
+		add(EntityType.MINECART_MOB_SPAWNER, "MinecartMobSpawner", 80, 2, true);
+		add(EntityType.BOAT, "Boat", 80, 2, true);
 
 		// Mobs
 		add(EntityType.BAT, "Bat", 80, 3, false);
@@ -219,6 +219,7 @@ public class CommonEntityType {
 		add(EntityType.WOLF, "Wolf", 80, 3, true);
 		add(EntityType.ZOMBIE, "Zombie", 80, 3, true);
 		add(EntityType.HORSE, "Horse", 80, 3, true);
+		add(EntityType.VILLAGER, "Villager", 80, 3, true);
 
 		// Blocks/Tiles
 		add(EntityType.PRIMED_TNT, "TNTPrimed", 160, 10, true);
@@ -228,8 +229,9 @@ public class CommonEntityType {
 		add(EntityType.ITEM_FRAME, "ItemFrame", 160, Integer.MAX_VALUE, false);
 
 		// Check that all entity types are registered properly
+		EntityType[] invalidTypes = {EntityType.UNKNOWN, EntityType.WEATHER, EntityType.LIGHTNING, EntityType.COMPLEX_PART};
 		for (EntityType type : EntityType.values()) {
-			if (type == EntityType.UNKNOWN || type == EntityType.WEATHER) {
+			if (LogicUtil.contains(type, invalidTypes)) {
 				continue;
 			}
 			if (!byEntityType.containsKey(type)) {
