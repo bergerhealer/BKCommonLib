@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldClasses.NMSPacket42RemoveMobEffect;
 import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldClasses.*;
 
 /**
@@ -72,6 +71,7 @@ public class PacketFields {
 	public static final NMSPacket130UpdateSign UPDATE_SIGN = new NMSPacket130UpdateSign();
 	public static final NMSPacket131ItemData ITEM_DATA = new NMSPacket131ItemData();
 	public static final NMSPacket132TileEntityData TILE_ENTITY_DATA = new NMSPacket132TileEntityData();
+	public static final NMSPacket133OpenTileEntity TILE_ENTITY_OPEN = new NMSPacket133OpenTileEntity();
 	public static final NMSPacket200Statistic STATISTIC = new NMSPacket200Statistic();
 	public static final NMSPacket201PlayerInfo PLAYER_INFO = new NMSPacket201PlayerInfo();
 	public static final NMSPacket202Abilities ABILITIES = new NMSPacket202Abilities();

@@ -663,6 +663,12 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 				super.a(packet);
 		}
 
+		@Override
+		public void a(Packet133OpenTileEntity packet) {
+			if (this.canConfirm(packet))
+				super.a(packet);
+		}
+
 		private boolean canConfirm(Packet packet) {
 			return handler.handlePacketReceive(CommonNMS.getPlayer(this.player), packet, false);
 		}

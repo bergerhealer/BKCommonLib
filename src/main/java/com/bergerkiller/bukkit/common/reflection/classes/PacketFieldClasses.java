@@ -637,6 +637,12 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> action = getField("d");
 		public final FieldAccessor<Object> data = getField("e");
 	}
+	public static class NMSPacket133OpenTileEntity extends NMSPacket {
+		public final FieldAccessor<Integer> id = getField("a");
+		public final FieldAccessor<Integer> x = getField("b");
+		public final FieldAccessor<Integer> y = getField("c");
+		public final FieldAccessor<Integer> z = getField("d");
+	}
 	public static class NMSPacket200Statistic extends NMSPacket {
 		public final FieldAccessor<Integer> id = getField("a");
 		public final FieldAccessor<Integer> amount = getField("b");
