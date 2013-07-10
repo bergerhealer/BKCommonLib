@@ -635,7 +635,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			}
 			try {
 				CommonEntityType type = CommonEntityType.byNMSEntity(oldInstance);
-				System.out.println(type.entityType);
 				// Transfer data and replace
 				Object newInstance = type.createNMSEntity();
 				type.nmsType.transfer(oldInstance, newInstance);
