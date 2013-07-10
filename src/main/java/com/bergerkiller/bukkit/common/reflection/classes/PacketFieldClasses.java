@@ -369,13 +369,17 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> status = getField("b");
 	}
 	public static class NMSPacket39AttachEntity extends NMSPacket {
-		public final FieldAccessor<Integer> passengerId = getField("a");
-		public final FieldAccessor<Integer> vehicleId = getField("b");
-		public final FieldAccessor<Boolean> lead = getField("c");
+		public final FieldAccessor<Integer> lead = getField("a");
+		public final FieldAccessor<Integer> passengerId = getField("b");
+		public final FieldAccessor<Integer> vehicleId = getField("c");
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
 
 		public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
+			return newInstance(passenger, vehicle, 0);
+		}
+
+		public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle, int lead) {
+			return constructor1.newInstance(lead, Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
 		}
 	}
 	public static class NMSPacket40EntityMetadata extends NMSPacket30Entity {
