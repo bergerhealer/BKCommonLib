@@ -19,7 +19,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
-	private static final Material[] minecartTypes = {Material.MINECART, Material.STORAGE_MINECART, Material.POWERED_MINECART};
+	private static final Material[] minecartTypes = {Material.MINECART, Material.STORAGE_MINECART, Material.POWERED_MINECART, 
+		Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART};
 
 	/**
 	 * Gets all available types of Minecarts as item materials
@@ -131,13 +132,21 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	}
 
 	/**
+	 * @deprecated: Use double damage version instead
+	 */
+	@Deprecated
+	public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, int damage) {
+		damageBy(entity, damager, (double) damage);
+	}
+
+	/**
 	 * Damages an entity with as cause another entity
 	 * 
 	 * @param entity to be damaged
 	 * @param damager that damages
 	 * @param damage to deal
 	 */
-	public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, int damage) {
+	public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
 		DamageSource source;
 		if (damager instanceof Player) {
 			source = DamageSource.playerAttack(CommonNMS.getNative((Player) damager));
@@ -146,7 +155,15 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 		} else {
 			source = DamageSource.GENERIC;
 		}
-		CommonNMS.getNative(entity).damageEntity(source, damage);
+		CommonNMS.getNative(entity).damageEntity(source, (float) damage);
+	}
+
+	/**
+	 * @deprecated: Use double damage version instead
+	 */
+	@Deprecated
+	public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, int damage) {
+		damage(entity, cause, (double) damage);
 	}
 
 	/**
@@ -156,7 +173,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	 * @param cause of the damage
 	 * @param damage to deal
 	 */
-	public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, int damage) {
+	public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
 		DamageSource source;
 		if (cause == DamageCause.BLOCK_EXPLOSION) {
 			Location loc = entity.getLocation();
@@ -188,9 +205,17 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 		} else {
 			source = DamageSource.GENERIC;
 		}
-		CommonNMS.getNative(entity).damageEntity(source, damage);
+		CommonNMS.getNative(entity).damageEntity(source, (float) damage);
 	}
-	
+
+	/**
+	 * @deprecated: use the double damage version instead
+	 */
+	@Deprecated
+	public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {
+		damage_explode(entity, (double) damage, explosion);
+	}
+
 	/**
 	 * Damages an entity with the reason of an explosion
 	 * 
@@ -198,8 +223,8 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	 * @param damage of the damage
 	 * @param explosion wich has damaged the player
 	 */
-	public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {
-		CommonNMS.getNative(entity).damageEntity(DamageSource.explosion(explosion), damage);
+	public static void damage_explode(org.bukkit.entity.Entity entity, double damage, Explosion explosion) {
+		CommonNMS.getNative(entity).damageEntity(DamageSource.explosion(explosion), (float) damage);
 	}
 
 	/**

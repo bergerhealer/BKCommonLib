@@ -78,7 +78,7 @@ public class EntityRef {
 		setRotation.invoke(entityHandle, yaw, pitch);
 	}
 
-	public static void burn(Object entityHandle, int damage) {
+	public static void burn(Object entityHandle, float damage) {
 		burn.invoke(entityHandle, damage);
 	}
 

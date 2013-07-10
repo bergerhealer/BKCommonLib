@@ -22,8 +22,8 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 		super(base);
 	}
 
-	public int getDamage() {
-		return ((int) getHandle(EntityMinecartAbstract.class).getDamage()) * 10;
+	public double getDamage() {
+		return getHandle(EntityMinecartAbstract.class).getDamage();
 	}
 
 	public Vector getDerailedVelocityMod() {
@@ -46,8 +46,8 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 		entity.setSlowWhenEmpty(arg0);
 	}
 
-	public void setDamage(int arg0) {
-		entity.setDamage(((double) arg0) / 10);
+	public void setDamage(double damage) {
+		entity.setDamage(damage);
 	}
 
 	public void setDerailedVelocityMod(Vector arg0) {
@@ -63,7 +63,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public void setShakingDirection(int direction) {
-		getHandle(EntityMinecartAbstract.class).j(direction); 
+		getHandle(EntityMinecartAbstract.class).h(direction); 
 	}
 
 	public int getShakingDirection() {
@@ -71,7 +71,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public void setShakingFactor(int factor) {
-		getHandle(EntityMinecartAbstract.class).i(factor); 
+		getHandle(EntityMinecartAbstract.class).c(factor); 
 	}
 
 	public int getShakingFactor() {

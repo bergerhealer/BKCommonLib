@@ -78,8 +78,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * @param damager that dealt the damage
 	 * @param damage amount
 	 */
-	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, int damage) {
-		entity.getHandle(NMSEntityHook.class).super_damageEntity((DamageSource) damageSource.getHandle(), damage);
+	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, double damage) {
+		entity.getHandle(NMSEntityHook.class).super_damageEntity((DamageSource) damageSource.getHandle(), (float) damage);
 	}
 
 	/**
@@ -108,8 +108,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * 
 	 * @param damage dealt
 	 */
-	public void onBurnDamage(int damage) {
-		entity.getHandle(NMSEntityHook.class).super_burn(damage); 
+	public void onBurnDamage(double damage) {
+		entity.getHandle(NMSEntityHook.class).super_burn((float) damage); 
 	}
 
 	/**

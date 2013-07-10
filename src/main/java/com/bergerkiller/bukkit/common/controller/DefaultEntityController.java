@@ -51,20 +51,20 @@ public final class DefaultEntityController extends EntityController {
 	}
 
 	@Override
-	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, int damage) {
+	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, double damage) {
 		if (entity.getHandle() instanceof NMSEntityHook) {
 			super.onDamage(damageSource, damage);
 		}
-		((Entity) entity.getHandle()).damageEntity((DamageSource) damageSource.getHandle(), damage);
+		((Entity) entity.getHandle()).damageEntity((DamageSource) damageSource.getHandle(), (float) damage);
 	}
 
 	@Override
-	public void onBurnDamage(int damage) {
+	public void onBurnDamage(double damage) {
 		final Object handle = entity.getHandle();
 		if (handle instanceof NMSEntityHook) {
 			super.onBurnDamage(damage);
 		} else {
-			EntityRef.burn(handle, damage);
+			EntityRef.burn(handle, (float) damage);
 		}
 	}
 

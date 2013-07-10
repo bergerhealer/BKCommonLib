@@ -37,22 +37,22 @@ public interface NMSEntityHook {
 	/**
 	 * Damage Entity super
 	 */
-	public boolean super_damageEntity(DamageSource damagesource, int damage);
+	public boolean super_damageEntity(DamageSource damagesource, float damage);
 
 	/**
 	 * Damage Entity
 	 */
-	public boolean damageEntity(DamageSource damagesource, int damage);
+	public boolean damageEntity(DamageSource damagesource, float damage);
 
 	/**
 	 * onBurn super
 	 */
-	public void super_burn(int damage);
+	public void super_burn(float damage);
 
 	/**
 	 * onBurn
 	 */
-	public void burn(int damage);
+	public void burn(float damage);
 
 	/**
 	 * onMove super

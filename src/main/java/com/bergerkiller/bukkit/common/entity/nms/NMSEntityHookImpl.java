@@ -40,13 +40,13 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public boolean damageEntity(DamageSource damageSource, int damage) {
+	public boolean damageEntity(DamageSource damageSource, float damage) {
 		controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
 		return true;
 	}
 
 	@Override
-	public void burn(int damage) {
+	public void burn(float damage) {
 		controller.onBurnDamage(damage);
 	}
 
@@ -105,12 +105,12 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public boolean super_damageEntity(DamageSource damagesource, int damage) {
+	public boolean super_damageEntity(DamageSource damagesource, float damage) {
 		return controller.getEntity().getHandle(NMSEntityHook.class).super_damageEntity(damagesource, damage);
 	}
 
 	@Override
-	public void super_burn(int damage) {
+	public void super_burn(float damage) {
 		controller.getEntity().getHandle(NMSEntityHook.class).super_burn(damage);
 	}
 

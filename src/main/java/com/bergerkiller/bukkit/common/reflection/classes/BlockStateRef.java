@@ -81,13 +81,7 @@ public class BlockStateRef {
 		registerInst(new TileInstantiator("Dispenser"));
 		registerInst(new TileInstantiator("Chest"));
 		registerInst(new TileInstantiator("Dropper"));
-
-		// prior to R0.2 this class was missing
-		// For future CraftBukkit builds this if-check can be removed
-		if (CommonUtil.getCBClass("block.CraftBeacon") != null) {
-			registerInst(new TileInstantiator("Beacon"));
-		}
-
+		registerInst(new TileInstantiator("Beacon"));
 		registerInst(new TileInstantiator("Hopper"));
 		registerInst(new TileInstantiator("Chest"));
 		registerInst(new TileInstantiator("MobSpawner", "CreatureSpawner", "spawner"));

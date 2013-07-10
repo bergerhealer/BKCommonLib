@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import javax.crypto.SecretKey;
@@ -418,7 +417,11 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket44UpdateAttributes extends NMSPacket30Entity {
-		public final FieldAccessor<Map<String, Double>> properties = getField("b");
+		/**
+		 * A list of NMS.Attribute elements - may require further API to work with.
+		 * For now, use reflection.
+		 */
+		public final FieldAccessor<List<?>> attributes = getField("b");
 	}
 	public static class NMSPacket51MapChunk extends NMSPacket {
 		public final FieldAccessor<Integer> size = getField("size");
