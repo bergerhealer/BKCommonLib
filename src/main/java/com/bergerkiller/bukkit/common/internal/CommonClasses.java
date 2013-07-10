@@ -22,6 +22,7 @@ class CommonClasses {
 		// Remaining classes
 		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityType", "collections.CollectionBasics");
 		loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
+		loadCommon("protocol.PacketType", "protocol.PacketFields");
 	}
 
 	private static void loadRef(String... classNames) {

@@ -47,6 +47,7 @@ public class PacketFields {
 	public static final NMSPacket41MobEffect MOB_EFFECT = new NMSPacket41MobEffect();
 	public static final NMSPacket42RemoveMobEffect REMOVE_MOB_EFFECT = new NMSPacket42RemoveMobEffect();
 	public static final NMSPacket43SetExperience SET_EXPERIENCE = new NMSPacket43SetExperience();
+	public static final NMSPacket44UpdateAttributes UPDATE_ATTRIBUTES = new NMSPacket44UpdateAttributes();
 	public static final NMSPacket51MapChunk MAP_CHUNK = new NMSPacket51MapChunk();
 	public static final NMSPacket52MultiBlockChange MULTI_BLOCK_CHANGE = new NMSPacket52MultiBlockChange();
 	public static final NMSPacket53BlockChange BLOCK_CHANGE = new NMSPacket53BlockChange();

@@ -2,11 +2,15 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 public enum PacketType {
 	KEEP_ALIVE(0),
@@ -55,6 +59,7 @@ public enum PacketType {
 	DISCONNECT(255),
 	ENTITY_PAINTING(25),
 	ADD_EXP_ORB(26),
+	PLAYER_INPUT(27),
 	ENTITY_VELOCITY(28),
 	DESTROY_ENTITY(29),
 	HANDSHAKE(2),
@@ -71,6 +76,7 @@ public enum PacketType {
 	MOB_EFFECT(41),
 	REMOVE_MOB_EFFECT(42),
 	SET_EXP(43),
+	UPDATE_ATTRIBUTES(44),
 	UPDATE_TIME(4),
 	MAP_CHUNK(51),
 	MULTI_BLOCK_CHANGE(52),
@@ -177,6 +183,13 @@ public enum PacketType {
 		for (PacketType type : values()) {
 			if (type != UNKNOWN) {
 				byId[type.getId()] = type;
+			}
+		}
+		// Check whether all packet types are REALLY available
+		for (Class<?> packetType : PacketUtil.getPacketClasses()) {
+			int id = PacketUtil.getPacketId(packetType);
+			if (LogicUtil.isInBounds(byId, id) && byId[id] == UNKNOWN) {
+				CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet type for " + packetType.getSimpleName() + " (" + id + ") is not available");
 			}
 		}
 	}
