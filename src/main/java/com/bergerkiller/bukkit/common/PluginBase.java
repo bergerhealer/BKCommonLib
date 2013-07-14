@@ -147,12 +147,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * @return Permission
 	 */
 	public static Permission getPermission(String path) {
-		Permission perm = Bukkit.getServer().getPluginManager().getPermission(path);
-		if (perm == null) {
-			perm = new Permission(path, PermissionDefault.FALSE);
-			Bukkit.getServer().getPluginManager().addPermission(perm);
-		}
-		return perm;
+		return CommonPlugin.getInstance().getPermissionHandler().getPermission(path);
 	}
 
 	/**

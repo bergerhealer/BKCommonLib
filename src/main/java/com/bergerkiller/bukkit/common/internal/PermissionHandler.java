@@ -59,7 +59,7 @@ public class PermissionHandler implements PermissionChecker {
 			// Also pass in an invalid value to check that there are no inconsistencies
 
 			// Set up the test permission
-			org.bukkit.permissions.Permission perm = findPerm(PERMISSION_TEST_NODE);
+			org.bukkit.permissions.Permission perm = getPermission(PERMISSION_TEST_NODE);
 			perm.setDefault(PermissionDefault.FALSE);
 
 			// Find a player that does not have the test permission (this is kinda pointless, but hey, we are secure!)
@@ -92,8 +92,8 @@ public class PermissionHandler implements PermissionChecker {
 		}
 		return this.hasSuperWildcardSupport;
 	}
-	
-	private org.bukkit.permissions.Permission findPerm(String node) {
+
+	public org.bukkit.permissions.Permission getPermission(String node) {
 		org.bukkit.permissions.Permission perm = Bukkit.getPluginManager().getPermission(node);
 		if (perm == null) {
 			// Figure out what permission default to use
@@ -119,7 +119,7 @@ public class PermissionHandler implements PermissionChecker {
 	@Override
 	public boolean handlePermission(CommandSender sender, String permission) {
 		// Initialize the permission (and it's default) prior to check
-		org.bukkit.permissions.Permission perm = findPerm(permission);
+		org.bukkit.permissions.Permission perm = getPermission(permission);
 
 		// Resort back to the default logic
 		if (this.vaultEnabled) {
