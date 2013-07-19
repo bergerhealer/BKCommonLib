@@ -111,4 +111,14 @@ public class DataWatcher extends BasicWrapper {
 	public boolean isChanged() {
 		return DataWatcherRef.isChanged.invoke(handle);
 	}
+
+	/**
+	 * Gets whether this Data Watcher is empty or not.
+	 * An empty Data Watcher does not require any update messages to the players.
+	 * 
+	 * @return True if empty, False if not
+	 */
+	public boolean isEmpty() {
+		return DataWatcherRef.isEmpty.invoke(handle);
+	}
 }

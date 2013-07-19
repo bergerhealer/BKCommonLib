@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_6_R2</project.mcversion>
-    <project.libversion>1.6.2-R0.1-SNAPSHOT</project.libversion>
+    <project.spinotversion>1.6.2-R0.1-SNAPSHOT</project.spinotversion>
   </properties>
 
   <repositories>
@@ -22,15 +22,10 @@
       <id>vault-repo</id>
       <url>http://ci.herocraftonline.com/plugin/repository/everything/</url>
     </repository>
-    <!-- Repo for access to Libigot -->
+    <!-- Repo for access to Spinot -->
     <repository>
-      <id>libigot-repo</id>
-      <url>http://repo.libigot.org/</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>fail</checksumPolicy>
-      </snapshots>
+      <id>dj-tcraft-repo</id>
+      <url>http://ci.dj-tcraft.nl/plugin/repository/everything/</url>
     </repository>
     <!-- Repo for access to ProtocolLib -->
     <repository>
@@ -48,9 +43,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.libigot</groupId>
-      <artifactId>libigot</artifactId>
-      <version>${project.libversion}</version>
+      <groupId>org.spinotmc</groupId>
+      <artifactId>spinot</artifactId>
+      <version>${project.spinotversion}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>

@@ -199,4 +199,17 @@ public class PlayerUtil extends EntityUtil {
 		final EntityPlayer ep = CommonNMS.getNative(player);
 		return ep.p().getPlayerChunkMap().a(ep, chunkX, chunkZ);
 	}
+
+	/**
+	 * Checks whether a given chunk has been 'entered' by a player.
+	 * An entered chunk is liable for updates to the client.
+	 * Note that this does not check whether the chunk is actually sent.
+	 * 
+	 * @param player to check
+	 * @param chunk to check
+	 * @return True if the player entered the chunk, False if not
+	 */
+	public static boolean isChunkEntered(Player player, Chunk chunk) {
+		return isChunkEntered(player, chunk.getX(), chunk.getZ());
+	}
 }

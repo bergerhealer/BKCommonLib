@@ -123,6 +123,11 @@ public class PacketFieldClasses {
 	public static class NMSPacket5EntityEquipment extends NMSPacket30Entity {
 		public final FieldAccessor<Integer> slot = getField("b");
 		public final TranslatorFieldAccessor<ItemStack> item = getField("c").translate(ConversionPairs.itemStack);
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, int.class, ItemStackRef.TEMPLATE.getType());
+
+		public CommonPacket newInstance(int entityId, int slotId, ItemStack item) {
+			return constructor1.newInstance(entityId, slotId, Conversion.toItemStackHandle.convert(item));
+		}
 	}
 	public static class NMSPacket6SpawnPosition extends NMSPacket {
 		public final FieldAccessor<Integer> x = getField("x");
@@ -426,6 +431,11 @@ public class PacketFieldClasses {
 		 * For now, use reflection.
 		 */
 		public final FieldAccessor<List<?>> attributes = getField("b");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, Collection.class);
+
+		public CommonPacket newInstance(int entityId, Collection<?> attributes) {
+			return constructor1.newInstance(entityId, attributes);
+		}
 	}
 	public static class NMSPacket51MapChunk extends NMSPacket {
 		public final FieldAccessor<Integer> size = getField("size");
