@@ -103,6 +103,24 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	/**
+	 * Sets the vertical offset of the block in the Minecart, in pixels
+	 * 
+	 * @return offsetPixels to set to
+	 */
+	public void setBlockOffset(int offsetPixels) {
+		getHandle(EntityMinecartAbstract.class).k(offsetPixels);
+	}
+
+	/**
+	 * Gets the vertical offset of the block in the Minecart, in pixels
+	 * 
+	 * @return block offset in the Y-direction
+	 */
+	public int getBlockOffset() {
+		return getHandle(EntityMinecartAbstract.class).q();
+	}
+
+	/**
 	 * Gets the block type for this Minecart
 	 * 
 	 * @return block type
