@@ -42,11 +42,21 @@
   </repositories>
 
   <dependencies>
+    <!--
     <dependency>
       <groupId>org.spinotmc</groupId>
       <artifactId>spinot</artifactId>
       <version>${project.spinotversion}</version>
       <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.spinotmc</groupId>
+      <artifactId>spinot</artifactId>
+      <version>${project.spinotversion}</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/spinot-1.6.2-R0.1-SNAPSHOT.jar</systemPath>
       <optional>true</optional>
     </dependency>
     <dependency>
