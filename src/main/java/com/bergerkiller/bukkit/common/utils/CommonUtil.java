@@ -21,7 +21,9 @@ import net.minecraft.server.IPlayerFileData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -46,6 +48,15 @@ public class CommonUtil {
 	public static final int BLOCKVIEW = 32 + (VIEW << 4);
 	public static final Thread MAIN_THREAD = Thread.currentThread();
 	private static final FieldAccessor<Collection<Plugin>> pluginsField = new SafeField<Collection<Plugin>>(SimplePluginManager.class, "plugins");
+
+	/**
+	 * Gets a mapping of all commands available on the server, so they can be obtained and executed (dispatched)
+	 * 
+	 * @return Bukkit command map
+	 */
+	public static CommandMap getCommandMap() {
+		return ((CraftServer) Bukkit.getServer()).getCommandMap();
+	}
 
 	/**
 	 * Sends a message to a sender<br> 
