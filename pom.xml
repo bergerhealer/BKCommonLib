@@ -14,6 +14,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_6_R2</project.mcversion>
     <project.spinotversion>1.6.2-R0.1-SNAPSHOT</project.spinotversion>
+    <project.stableversion>1.53</project.stableversion>
+    <project.stableserver>1.6.1-R0.1</project.stableserver>
+    <project.stabledate>10 July 2013</project.stabledate>
   </properties>
 
   <repositories>
@@ -180,6 +183,57 @@
 		</executions>
 	  </plugin>
 
+      <!-- Version image generation -->
+      <plugin>
+        <groupId>com.bergerkiller</groupId>
+        <artifactId>imagegenerator-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>Version Image Generation</id>
+            <goals>
+              <goal>generate_image</goal>
+            </goals>
+            <configuration>
+              <name>BKCommonLibVersion.png</name>
+              <background>https://dl.dropbox.com/u/3681706/BKCommonLibVersionSource.png</background>
+              <labels>
+                <label>
+                  <text>v${project.stableversion}</text>
+                  <posX>264</posX>
+                  <posY>162</posY>
+                  <color>YELLOW</color>
+                  <font>
+                    <name>calibri</name>
+                    <size>20</size>
+                  </font>
+                </label>
+                <label>
+                  <text>${project.stableserver}</text>
+                  <posX>240</posX>
+                  <posY>191</posY>
+                  <color>YELLOW</color>
+                  <font>
+                    <name>calibri</name>
+                    <size>20</size>
+                  </font>
+                </label>
+                <label>
+                  <text>${project.stabledate}</text>
+                  <posX>249</posX>
+                  <posY>220</posY>
+                  <color>YELLOW</color>
+                  <font>
+                    <name>calibri</name>
+                    <size>20</size>
+                  </font>
+                </label>
+              </labels>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ 
 	  <!-- Clean up (this is to make testing easier) -->
 	  <plugin>
         <groupId>org.apache.maven.plugins</groupId>
