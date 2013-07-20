@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_6_R2</project.mcversion>
-    <project.spinotversion>1.6.2-R0.1-SNAPSHOT</project.spinotversion>
+    <project.cbversion>1.6.2-R0.1</project.cbversion>
     <project.stableversion>1.53</project.stableversion>
     <project.stableserver>1.6.1-R0.1</project.stableserver>
     <project.stabledate>10 July 2013</project.stabledate>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.spinotmc</groupId>
       <artifactId>spinot</artifactId>
-      <version>${project.spinotversion}</version>
+      <version>${project.cbversion}-SNAPSHOT</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
@@ -199,33 +199,75 @@
               <background>https://dl.dropbox.com/u/3681706/BKCommonLibVersionSource.png</background>
               <labels>
                 <label>
-                  <text>v${project.stableversion}</text>
-                  <posX>264</posX>
-                  <posY>162</posY>
-                  <color>YELLOW</color>
+                  <text>${project.stableversion}</text>
+                  <posX>182</posX>
+                  <posY>174</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
                   <font>
                     <name>calibri</name>
-                    <size>20</size>
+                    <size>18</size>
+                    <bold>true</bold>
                   </font>
                 </label>
                 <label>
                   <text>${project.stableserver}</text>
-                  <posX>240</posX>
-                  <posY>191</posY>
-                  <color>YELLOW</color>
+                  <posX>182</posX>
+                  <posY>196</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
                   <font>
                     <name>calibri</name>
-                    <size>20</size>
+                    <size>18</size>
+                    <bold>true</bold>
                   </font>
                 </label>
                 <label>
                   <text>${project.stabledate}</text>
-                  <posX>249</posX>
-                  <posY>220</posY>
-                  <color>YELLOW</color>
+                  <posX>182</posX>
+                  <posY>218</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
                   <font>
                     <name>calibri</name>
-                    <size>20</size>
+                    <size>18</size>
+                    <bold>true</bold>
+                  </font>
+                </label>
+                <label>
+                  <text>${project.version}</text>
+                  <posX>424</posX>
+                  <posY>174</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
+                  <font>
+                    <name>calibri</name>
+                    <size>18</size>
+                    <bold>true</bold>
+                  </font>
+                </label>
+                <label>
+                  <text>${project.cbversion}</text>
+                  <posX>424</posX>
+                  <posY>196</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
+                  <font>
+                    <name>calibri</name>
+                    <size>18</size>
+                    <bold>true</bold>
+                  </font>
+                </label>
+                <label>
+                  <text>$date{dd MMMM yyyy}</text>
+                  <posX>424</posX>
+                  <posY>218</posY>
+                  <color>CYAN</color>
+                  <align>CENTER</align>
+                  <font>
+                    <name>calibri</name>
+                    <size>18</size>
+                    <bold>true</bold>
                   </font>
                 </label>
               </labels>
