@@ -3,14 +3,18 @@ package com.bergerkiller.bukkit.common.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.ModuleLogger;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 public class FileConfiguration extends BasicConfiguration {
+	private static final ModuleLogger LOGGER = new ModuleLogger("Configuration");
 	private final File file;
 
 	public FileConfiguration(JavaPlugin plugin) {
@@ -47,8 +51,14 @@ public class FileConfiguration extends BasicConfiguration {
 		try {
 			this.loadFromStream(new FileInputStream(this.file));
 		} catch (Throwable t) {
-			Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
-			t.printStackTrace();
+			LOGGER.log(Level.SEVERE, "An error occured while loading file '" + this.file + "'");
+			try {
+				File backup = new File(this.file.getPath() + ".old");
+				StreamUtil.copyFile(this.file, backup);
+				LOGGER.log(Level.SEVERE, "A backup of this (corrupted?) file named '" + backup.getName() + "' can be found in case you wish to restore", t);
+			} catch (IOException ex) {
+				LOGGER.log(Level.SEVERE, "A backup of this (corrupted?) file could not be made and its contents may be lost (overwritten)", t);
+			}
 		}
 	}
 

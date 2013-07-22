@@ -71,7 +71,7 @@ public class BasicConfiguration extends ConfigurationNode {
 				StringBuilder mainHeader = new StringBuilder();
 				int indent;
 				while ((line = input.readLine()) != null) {
-					line = StringUtil.ampToColor(line);
+					line = fixLine(line);
 					indent = StringUtil.getSuccessiveCharCount(line, ' ');
 					trimmedLine = line.substring(indent);
 					// Prevent new name convention errors
@@ -112,6 +112,24 @@ public class BasicConfiguration extends ConfigurationNode {
 		} catch (FileNotFoundException ex) {
 			// Ignored
 		}
+	}
+
+	/**
+	 * Attempts to fix a single line of YAML text of easy to detect issues.
+	 * Quotation issues can not be fixed, as they can span multiple lines.
+	 * 
+	 * @param line to fix
+	 * @return fixed line
+	 */
+	private String fixLine(String line) {
+		// Replace chat style characters
+		String fixedLine = StringUtil.ampToColor(line);
+		// Replace tabs with spaces
+		int count = StringUtil.getSuccessiveCharCount(fixedLine, '\t');
+		if (count > 0) {
+			fixedLine = StringUtil.getFilledString(" ", count * getIndent()) + fixedLine.substring(count);
+		}
+		return fixedLine;
 	}
 
 	private void writeHeader(boolean main, BufferedWriter writer, String header, int indent) throws IOException {
