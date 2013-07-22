@@ -55,10 +55,10 @@ public class StreamUtil {
 	 * @param targetLocation
 	 * @throws IOException
 	 */
-    public static void copyFile(File sourceLocation, File targetLocation) throws IOException {
+	public static void copyFile(File sourceLocation, File targetLocation) throws IOException {
 		if (sourceLocation.isDirectory()) {
 			if (!targetLocation.exists()) {
-				targetLocation.mkdir();
+				targetLocation.mkdirs();
 			}
 			for (String subFileName : sourceLocation.list()) {
 				copyFile(new File(sourceLocation, subFileName), new File(targetLocation, subFileName));
@@ -75,17 +75,17 @@ public class StreamUtil {
 			FileChannel outputChannel = null;
 			try {
 				// Initialize file streams
-    			input = new FileInputStream(sourceLocation);
-    			inputChannel = input.getChannel();
-    			output = new FileOutputStream(targetLocation);
-    			outputChannel = output.getChannel();
-    			// Start transferring
-    			long transfered = 0;
-    			long bytes = inputChannel.size();
-    			while (transfered < bytes) {
-    				transfered += outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
-    				outputChannel.position(transfered);
-    			}
+				input = new FileInputStream(sourceLocation);
+				inputChannel = input.getChannel();
+				output = new FileOutputStream(targetLocation);
+				outputChannel = output.getChannel();
+				// Start transferring
+				long transfered = 0;
+				long bytes = inputChannel.size();
+				while (transfered < bytes) {
+					transfered += outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+					outputChannel.position(transfered);
+				}
 			} finally {
 				// Close input stream
 				if (inputChannel != null) {
@@ -101,5 +101,5 @@ public class StreamUtil {
 				}
 			}
 		}
-    }
+	}
 }
