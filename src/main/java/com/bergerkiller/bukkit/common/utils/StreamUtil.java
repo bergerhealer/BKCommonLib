@@ -8,6 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class StreamUtil {
@@ -24,6 +28,47 @@ public class StreamUtil {
 	public static void writeIndent(BufferedWriter writer, int indent) throws IOException {
 		for (int i = 0; i < indent; i++) {
 			writer.write(' ');
+		}
+	}
+
+	/**
+	 * Deletes a file or directory.
+	 * This method will attempt to delete all files in a directory
+	 * if a directory is specified.
+	 * All files it could not delete will be returned.
+	 * If the returned list is empty then deletion was successful.
+	 * The returned list is unmodifiable.
+	 * 
+	 * @param file to delete
+	 * @return a list of files it could not delete
+	 */
+	public static List<File> deleteFile(File file) {
+		if (file.isDirectory()) {
+			List<File> failFiles = new ArrayList<File>();
+			deleteFileList(file, failFiles);
+			return Collections.unmodifiableList(failFiles);
+		} else if (file.delete()) {
+			return Collections.emptyList();
+		} else {
+			return Collections.unmodifiableList(Arrays.asList(file));
+		}
+	}
+
+	private static boolean deleteFileList(File file, List<File> failFiles) {
+		if (file.isDirectory()) {
+			boolean success = true;
+			for (File subFile : file.listFiles()) {
+				success &= deleteFileList(subFile, failFiles);
+			}
+			if (success) {
+				file.delete();
+			}
+			return success;
+		} else if (file.delete()) {
+			return true;
+		} else {
+			failFiles.add(file);
+			return false;
 		}
 	}
 
