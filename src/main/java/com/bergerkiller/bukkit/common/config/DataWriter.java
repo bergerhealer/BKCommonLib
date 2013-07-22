@@ -3,13 +3,14 @@ package com.bergerkiller.bukkit.common.config;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * An abstract version of a Data writing class used to write to a destination File
@@ -59,10 +60,7 @@ public abstract class DataWriter {
 	 */
 	public boolean write() {
 		try {
-			if (!this.file.exists()) {
-				this.file.createNewFile();
-			}
-			DataOutputStream stream = this.getStream(new FileOutputStream(this.file));
+			DataOutputStream stream = this.getStream(StreamUtil.createOutputStream(this.file));
 			try {
 				this.write(stream);
 			} catch (IOException ex) {
