@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -68,11 +67,7 @@ public class FileConfiguration extends BasicConfiguration {
 	public void save() {
 		try {
 			boolean regen = !this.exists();
-			this.file.getAbsoluteFile().getParentFile().mkdirs();
-			if (!this.file.exists()) {
-				this.file.createNewFile();
-			}
-			this.saveToStream(new FileOutputStream(this.file));
+			this.saveToStream(StreamUtil.createOutputStream(this.file));
 			if (regen) {
 				Bukkit.getLogger().log(Level.INFO, "[Configuration] File '" + this.file + "' has been generated");
 			}

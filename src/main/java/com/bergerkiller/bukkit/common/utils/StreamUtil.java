@@ -28,6 +28,41 @@ public class StreamUtil {
 	}
 
 	/**
+	 * Creates a new FileOutputStream to a file.
+	 * If the file does not yet exist a new file is created.
+	 * The contents of existing files will be overwritten.
+	 * 
+	 * @param file to open
+	 * @return a new FileOutputStream for the (created) file
+	 * @throws IOException in case opening the file failed
+	 * @throws SecurityException in case the Security Manager (if assigned) denies access
+	 */
+	public static FileOutputStream createOutputStream(File file) throws IOException, SecurityException {
+		return createOutputStream(file, false);
+	}
+
+	/**
+	 * Creates a new FileOutputStream to a file.
+	 * If the file does not yet exist a new file is created.
+	 * 
+	 * @param file to open
+	 * @param append whether to append to existing files or not
+	 * @return a new FileOutputStream for the (created) file
+	 * @throws IOException in case opening the file failed
+	 * @throws SecurityException in case the Security Manager (if assigned) denies access
+	 */
+	public static FileOutputStream createOutputStream(File file, boolean append) throws IOException, SecurityException {
+		File directory = file.getAbsoluteFile().getParentFile();
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		return new FileOutputStream(file, append);
+	}
+
+	/**
 	 * Tries to copy a file or directory from one place to the other.
 	 * If copying fails along the way the error is printed and false is returned.
 	 * Note that when copying directories it may result in an incomplete copy.
@@ -64,10 +99,6 @@ public class StreamUtil {
 				copyFile(new File(sourceLocation, subFileName), new File(targetLocation, subFileName));
 			}
 		} else {
-			// Create file
-			if (!targetLocation.exists()) {
-				targetLocation.createNewFile();
-			}
 			// Start a new stream
 			FileInputStream input = null;
 			FileOutputStream output = null;
@@ -77,7 +108,7 @@ public class StreamUtil {
 				// Initialize file streams
 				input = new FileInputStream(sourceLocation);
 				inputChannel = input.getChannel();
-				output = new FileOutputStream(targetLocation);
+				output = createOutputStream(targetLocation);
 				outputChannel = output.getChannel();
 				// Start transferring
 				long transfered = 0;
