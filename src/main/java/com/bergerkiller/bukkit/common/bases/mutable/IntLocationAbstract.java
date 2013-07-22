@@ -98,7 +98,7 @@ public abstract class IntLocationAbstract extends IntVectorAbstract {
 	}
 
 	public IntLocationAbstract addPitch(int pitch) {
-		return setYaw(getPitch() + pitch);
+		return setPitch(getPitch() + pitch);
 	}
 
 	public float getYawDifference(int yawcomparer) {
