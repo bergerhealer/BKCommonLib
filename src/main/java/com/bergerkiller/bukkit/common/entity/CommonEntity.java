@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
+import com.bergerkiller.bukkit.common.controller.ExternalEntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
@@ -69,13 +70,16 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	public EntityNetworkController<CommonEntity<T>> getNetworkController() {
 		final EntityNetworkController result;
 		final Object entityTrackerEntry = WorldUtil.getTrackerEntry(entity);
-		if (entityTrackerEntry instanceof NMSEntityTrackerEntry) {
+		if (entityTrackerEntry == null) {
+			return null;
+		} else if (entityTrackerEntry instanceof NMSEntityTrackerEntry) {
 			result = ((NMSEntityTrackerEntry) entityTrackerEntry).getController();
-		} else if (entityTrackerEntry instanceof EntityTrackerEntry) {
+		} else if (EntityTrackerEntry.class.equals(entityTrackerEntry.getClass())) {
 			result = new DefaultEntityNetworkController();
 			result.bind(this, entityTrackerEntry);
 		} else {
-			return null;
+			result = new ExternalEntityNetworkController();
+			result.bind(this, entityTrackerEntry);
 		}
 		return result;
 	}
@@ -128,6 +132,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 				if (storedEntry != null) {
 					EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
 				}
+			}
+		} else if (controller instanceof ExternalEntityNetworkController) {
+			// Use the entry as stored by the external network controller
+			newEntry = controller.getHandle();
+			// Be sure to refresh stats using the old entry
+			if (storedEntry != null && newEntry != null) {
+				EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
 			}
 		} else {
 			// Assign a new Entity Tracker Entry with controller capabilities
