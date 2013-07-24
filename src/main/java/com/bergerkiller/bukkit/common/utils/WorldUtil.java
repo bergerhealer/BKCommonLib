@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
 import net.minecraft.server.Entity;
+import net.minecraft.server.FileIOThread;
 import net.minecraft.server.IDataManager;
 import net.minecraft.server.MovingObjectPosition;
 import net.minecraft.server.Vec3D;
@@ -353,7 +354,7 @@ public class WorldUtil extends ChunkUtil {
 	 * 
 	 * @param world to be saved
 	 */
-	public static void saveToDisk(org.bukkit.World world) {
+	public static synchronized void saveToDisk(org.bukkit.World world) {
 		CommonNMS.getNative(world).saveLevel();
 	}
 
