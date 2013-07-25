@@ -89,7 +89,7 @@ public class CommonScoreboard {
 	public void setTeam(CommonTeam team) {
 		if(team == null)
 			throw new IllegalArgumentException("Team cannot be null!");
-		
+
 		this.team = team;
 	}
 
@@ -113,7 +113,7 @@ public class CommonScoreboard {
 	 */
 	public static CommonTeam loadTeam(String name) {
 		CommonTeam team = null;
-		
+
 		try {
 			File dir = CommonPlugin.getInstance().getDataFolder();
 			dir.mkdir();
@@ -128,12 +128,12 @@ public class CommonScoreboard {
 		} catch(Exception e) {
 			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to load team from disk", e);
 		}
-		
+
 		if(team == null) {
 			//Failed to load team
 			team = new CommonTeam(name);
 		}
-		
+
 		teams.put(name, team);
 		return team;
 	}
@@ -177,7 +177,7 @@ public class CommonScoreboard {
 	public static CommonTeam getTeam(String name) {
 		return teams.get(name);
 	}
-	
+
 	/**
 	 * Copy the scoreboard
 	 * 
@@ -187,13 +187,13 @@ public class CommonScoreboard {
 	 */
 	public static CommonScoreboard copyFrom(Player player, CommonScoreboard from) {
 		CommonScoreboard board = new CommonScoreboard(player);
-		
+
 		//Copy all objectives
 		for(int i = 0; i < 3; i++) {
 			Display display = Display.fromInt(i);
 			board.objectives[i] = CommonObjective.copyFrom(board, from.getObjective(display));
 		}
-		
+
 		return board;
 	}
 
@@ -228,35 +228,35 @@ public class CommonScoreboard {
 		LIST(0, "list", "List"),
 		SIDEBAR(1, "sidebar", "SideBar"),
 		BELOWNAME(2, "belowname", "BelowName");
-		
+
 		private int id;
 		private String name;
 		private String displayName;
-		
+
 		Display(int id, String name, String displayName) {
 			this.id = id;
 			this.name = name;
 			this.displayName = displayName;
 		}
-		
+
 		public int getId() {
 			return this.id;
 		}
-		
+
 		public String getName() {
 			return this.name;
 		}
-		
+
 		public String getDisplayName() {
 			return this.displayName;
 		}
-		
+
 		public static Display fromInt(int from) {
 			for(Display display : values()) {
 				if(display.id == from)
 					return display;
 			}
-			
+
 			return null;
 		}
 	}

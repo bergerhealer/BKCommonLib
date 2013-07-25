@@ -113,14 +113,15 @@ public class CommonObjective {
 	/**
 	 * Create a score and add it to the list
 	 * 
-	 * @param name Score unique id
-	 * @param displayName Score diplay name
+	 * @param name for the Score
+	 * @param displayName (initial) of the Score to create
+	 * @param value (initial) of the Score to create
 	 * @return Score
 	 */
-	public CommonScore createScore(String id, String displayName, int value) {
+	public CommonScore createScore(String name, String displayName, int value) {
 		CommonScore score = new CommonScore(this.scoreboard, displayName, this.name);
 		score.setValue(value);
-		this.addScore(id, score);
+		this.addScore(name, score);
 		return score;
 	}
 

@@ -47,7 +47,7 @@ public class NibbleArrayBase extends NibbleArray {
 	}
 
 	/**
-	 * @deprecated use {@link #set(x, y, z, value)} instead
+	 * @deprecated use {@link #set(int, int, int, int) set(x, y, z, value)} instead
 	 */
 	@Override
 	@Deprecated
@@ -56,7 +56,7 @@ public class NibbleArrayBase extends NibbleArray {
 	}
 
 	/**
-	 * @deprecated use {@link #get(x, y, z)} instead
+	 * @deprecated use {@link #get(int, int, int) get(x, y, z)} instead
 	 */
 	@Override
 	@Deprecated

@@ -187,7 +187,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 	/**
 	 * Checks whether this particular Entity supports the use of Entity Controllers.
-	 * If this method returns True, {@link #setController(controller)} can be used.<br><br>
+	 * If this method returns True, {@link #setController(EntityController)} can be used.<br><br>
 	 * 
 	 * Note that Entity Network Controllers are always supported.
 	 * 
@@ -494,7 +494,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @param location to spawn at
 	 * @param networkController to assign to the Entity after spawning
 	 * @return True if spawning occurred, False if not
-	 * @see {@link #spawn(location)}
+	 * @see #spawn(Location)
 	 */
 	@SuppressWarnings("rawtypes")
 	public final boolean spawn(Location location, EntityNetworkController networkController) {

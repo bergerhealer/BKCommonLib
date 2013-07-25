@@ -64,7 +64,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	}
 
 	/**
-	 * @deprecated Use {@link #loadBukkitChunk(x, z)} instead
+	 * @deprecated Use {@link #loadBukkitChunk(int, int) loadBukkitChunk(x, z)} instead
 	 */
 	@Override
 	@Deprecated
@@ -84,7 +84,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	}
 
 	/**
-	 * @deprecated Use {@link #getBukkitChunkAt(x, z, taskWhenFinished)} instead
+	 * @deprecated Use {@link #getBukkitChunkAt(int, int, Runnable) getBukkitChunkAt(x, z, taskWhenFinished)} instead
 	 */
 	@Override
 	@Deprecated
@@ -134,7 +134,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
 	}
 
 	/**
-	 * @deprecated Use {@link #onPopulate(chunk, populator, random)} to handle populators instead
+	 * @deprecated Use {@link #onPopulate(Chunk, BlockPopulator, Random)} to handle populators instead
 	 */
 	@Override
 	@Deprecated

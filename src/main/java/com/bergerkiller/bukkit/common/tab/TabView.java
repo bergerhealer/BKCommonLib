@@ -12,10 +12,10 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * Changes in this view can be sent to multiple players or all players on the server.
  * Many methods are available to ease the setting of text and ping values in this view.<br><br>
  * 
- * To obtain a TabView instance, call the {@link #createTab(width, height)} method with the desired
+ * To obtain a TabView instance, call the {@link #createTab(int, int)} method with the desired
  * dimensions of the tab specified. It is only possible to create new tabs this way
  * when enabling your plugin. To create new Tab View instances at runtime, call {@link #clone()}
- * or {@link #cloneResize(newWidth, newHeight)}. Pay close attention to the Java Docs of these methods!
+ * or {@link #cloneResize(int, int)}. Pay close attention to the Java Docs of these methods!
  */
 public abstract class TabView {
 	/**
@@ -316,7 +316,9 @@ public abstract class TabView {
 	 * 
 	 * To set the values in reverse, simply use x2 for x1 and y2 for y1.<br><br>
 	 * 
-	 * This is an overload for {@link #setArea(x1, y1, x2, y2, ping, text)} to allow variable arguments instead of fixed arrays.
+	 * This is an overload for
+	 * {@link #setArea(int, int, int, int, String[], int[]) setArea(x1, y1, x2, y2, text, ping)}
+	 * to allow variable arguments instead of fixed arrays.
 	 * 
 	 * @param x1 - x-coordinate of point 1 (inclusive)
 	 * @param y1 - y-coordinate of point 2 (inclusive)
@@ -332,7 +334,7 @@ public abstract class TabView {
 	 * Sets all the text contents of this Tab View to the text array.
 	 * Elements outside of this array or if the array is null are not set.<br><br>
 	 * 
-	 * This is an overload of {@link #setAll(text, ping)} to allow variable arguments instead of fixed arrays.
+	 * This is an overload of {@link #setAll(String[], int[]) setAll(text, ping)} to allow variable arguments instead of fixed arrays.
 	 * 
 	 * @param text to set to, null or empty to ignore (nothing happens then)
 	 */

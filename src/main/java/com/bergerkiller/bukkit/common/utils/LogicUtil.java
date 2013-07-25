@@ -187,7 +187,7 @@ public class LogicUtil {
 
 	/**
 	 * Allocates a new array of the same length and writes the contents to this new array.
-	 * Unlike {@link #cloneAll(array)}, this method does not individually clone the elements
+	 * Unlike {@link #cloneAll(T[])}, this method does not individually clone the elements
 	 * 
 	 * @param array to re-allocate as a new array
 	 * @return new array with the contents of the input array

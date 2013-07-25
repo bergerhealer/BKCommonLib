@@ -27,7 +27,8 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 /**
  * Basic packet handler implementation for handling packets using a send/receive hook.
- * The {@link #handlePacketSend(player, packet, wasCancelled)} and {@link #handlePacketReceive(player, packet, wasCancelled)} methods should be called
+ * The {@link #handlePacketSend(Player, Object, boolean) handlePacketSend(player, packet, wasCancelled)}
+ * and {@link #handlePacketReceive(Player, Object, boolean) handlePacketReceive(player, packet, wasCancelled)} methods should be called
  * by an additional listener hook.
  */
 public abstract class PacketHandlerHooked implements PacketHandler {

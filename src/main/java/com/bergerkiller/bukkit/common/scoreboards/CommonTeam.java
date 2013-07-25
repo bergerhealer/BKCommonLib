@@ -22,7 +22,7 @@ public class CommonTeam implements Serializable {
 	private FriendlyFireType friendlyFire;
 	private List<String> players;
 	private boolean sendToAll;
-	
+
 	//Do NOT construct teams from outside
 	//Use CommonScoreboard.newTeam(String name)
 	protected CommonTeam(String name) {
@@ -33,7 +33,7 @@ public class CommonTeam implements Serializable {
 		this.friendlyFire = FriendlyFireType.ON;
 		this.players = new ArrayList<String>();
 	}
-	
+
 	/**
 	 * Gets the name of team
 	 * 
@@ -42,7 +42,7 @@ public class CommonTeam implements Serializable {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	/**
 	 * Gets the display name of the team
 	 * 
@@ -51,7 +51,7 @@ public class CommonTeam implements Serializable {
 	public String getDisplayName() {
 		return this.displayName;
 	}
-	
+
 	/**
 	 * Gets the prefix of the team
 	 * 
@@ -60,7 +60,7 @@ public class CommonTeam implements Serializable {
 	public String getPrefix() {
 		return this.prefix;
 	}
-	
+
 	/**
 	 * Gets the suffix of the team
 	 * 
@@ -69,7 +69,7 @@ public class CommonTeam implements Serializable {
 	public String getSuffix() {
 		return this.suffix;
 	}
-	
+
 	/**
 	 * Gets the friendly fire type for the team
 	 * - ON, pvp enabled
@@ -81,7 +81,7 @@ public class CommonTeam implements Serializable {
 	public FriendlyFireType getFriendlyFireType() {
 		return this.friendlyFire;
 	}
-	
+
 	/**
 	 * Gets all the players in the team
 	 * 
@@ -90,7 +90,7 @@ public class CommonTeam implements Serializable {
 	public List<String> getPlayers() {
 		return this.players;
 	}
-	
+
 	/**
 	 * Wether or not the team stats should be sent to all players
 	 * 
@@ -99,7 +99,7 @@ public class CommonTeam implements Serializable {
 	public boolean shouldSendToAll() {
 		return this.sendToAll;
 	}
-	
+
 	/**
 	 * Sets the display name for the team
 	 * 
@@ -109,7 +109,7 @@ public class CommonTeam implements Serializable {
 		this.displayName = displayName;
 		this.update();
 	}
-	
+
 	/**
 	 * Sets the prefix for the team
 	 * 
@@ -119,7 +119,7 @@ public class CommonTeam implements Serializable {
 		this.prefix = prefix;
 		this.update();
 	}
-	
+
 	/**
 	 * Sets the suffix for the team
 	 * 
@@ -129,7 +129,7 @@ public class CommonTeam implements Serializable {
 		this.suffix = suffix;
 		this.update();
 	}
-	
+
 	/**
 	 * Chanegs the freindly fire type for the team
 	 * - ON, pvp enabled
@@ -142,7 +142,7 @@ public class CommonTeam implements Serializable {
 		this.friendlyFire = friendlyFire;
 		this.update();
 	}
-	
+
 	/**
 	 * Set if we shall sedn the data to all players
 	 * 
@@ -151,7 +151,7 @@ public class CommonTeam implements Serializable {
 	public void setSendToAll(boolean sendToAll) {
 		this.sendToAll = sendToAll;
 	}
-	
+
 	/**
 	 * Add a player to the team
 	 * 
@@ -159,7 +159,7 @@ public class CommonTeam implements Serializable {
 	 */
 	public void addPlayer(OfflinePlayer player) {
 		players.add(player.getName());
-		
+
 		if(this.sendToAll) {
 			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(3));
@@ -167,7 +167,7 @@ public class CommonTeam implements Serializable {
 			if(player != null && player.isOnline()) {
 				PacketUtil.sendPacket((Player) player, this.getPacket(0));
 			}
-			
+
 			for(String user : players) {
 				Player p = Bukkit.getPlayer(user);
 				if(p != null && p.isOnline()) {
@@ -176,7 +176,7 @@ public class CommonTeam implements Serializable {
 			}
 		}
 	}
-	 
+
 	/**
 	 * Remove a player from the team
 	 * 
@@ -184,7 +184,7 @@ public class CommonTeam implements Serializable {
 	 */
 	public void removePlayer(OfflinePlayer player) {
 		players.remove(player.getName());
-		
+
 		if(this.sendToAll) {
 			for(Player p : Bukkit.getServer().getOnlinePlayers())
 				PacketUtil.sendPacket(p, this.getPacket(4));
@@ -192,7 +192,7 @@ public class CommonTeam implements Serializable {
 			if(player != null && player.isOnline()) {
 				PacketUtil.sendPacket((Player) player, this.getPacket(1));
 			}
-			
+
 			for(String user : players) {
 				Player p = Bukkit.getPlayer(user);
 				if(p != null && p.isOnline()) {
@@ -201,7 +201,7 @@ public class CommonTeam implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Dispaly (create) the team
 	 */
@@ -218,7 +218,7 @@ public class CommonTeam implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Hide (remove) the team
 	 */
@@ -235,7 +235,7 @@ public class CommonTeam implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Send chanegs to the team
 	 */
@@ -252,7 +252,7 @@ public class CommonTeam implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Send all team data to a speciafic player
 	 * 
@@ -261,7 +261,7 @@ public class CommonTeam implements Serializable {
 	public void send(Player player) {
 		PacketUtil.sendPacket(player, this.getPacket(0));
 	}
-	
+
 	/**
 	 * Get the team packet with a cusotm action
 	 * 
@@ -275,24 +275,27 @@ public class CommonTeam implements Serializable {
 		packet.write(PacketFields.SET_SCOREBOARD_TEAM.prefix, this.prefix);
 		packet.write(PacketFields.SET_SCOREBOARD_TEAM.suffix, this.suffix);
 		packet.write(PacketFields.SET_SCOREBOARD_TEAM.players, this.players);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.friendlyFire, this.friendlyFire.rawInt);
+		packet.write(PacketFields.SET_SCOREBOARD_TEAM.friendlyFire, this.friendlyFire.getRawInt());
 		packet.write(PacketFields.SET_SCOREBOARD_TEAM.mode, action);
 		return packet;
 	}
-	
+
 	public static enum FriendlyFireType {
-		OFF(0),
-		ON(1),
-		INVICIBLE(2);
-		
-		private int rawInt;
-		
-		FriendlyFireType(int rawInt) {
-			this.rawInt = rawInt;
-		}
-		
+		/**
+		 * PVP disabled
+		 */
+		OFF(),
+		/**
+		 * PVP enabled
+		 */
+		ON(),
+		/**
+		 * Players are invisible
+		 */
+		INVICIBLE();
+
 		public int getRawInt() {
-			return this.rawInt;
+			return this.ordinal();
 		}
 	}
 }

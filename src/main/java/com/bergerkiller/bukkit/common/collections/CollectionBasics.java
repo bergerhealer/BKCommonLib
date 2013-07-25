@@ -35,7 +35,7 @@ public class CollectionBasics {
 
 	/**
 	 * A basic containsAll implementation. (does not call collection.containsAll)
-	 * Calls {@link Collection#contains()} for all elements in the elements collection specified
+	 * Calls {@link Collection#contains(Object)} for all elements in the elements collection specified
 	 * 
 	 * @param collection to look in
 	 * @param elements to look for
@@ -52,7 +52,7 @@ public class CollectionBasics {
 
 	/**
 	 * A basic removeAll implementation. (does not call collection.removeAll)
-	 * Calls {@link Collection#remove(o)} for all elements in the elements collection specified
+	 * Calls {@link Collection#remove(Object)} for all elements in the elements collection specified
 	 * 
 	 * @param collection to remove from
 	 * @param elements to remove
@@ -68,7 +68,7 @@ public class CollectionBasics {
 
 	/**
 	 * A basic addAll implementation. (does not call collection.addAll)
-	 * Calls {@link Collection#add(e)} for all elements in the elements collection specified
+	 * Calls {@link Collection#add(E)} for all elements in the elements collection specified
 	 * 
 	 * @param collection to add to
 	 * @param elements to add

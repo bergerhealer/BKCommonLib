@@ -91,9 +91,9 @@ public class ChunkUtil {
 	 * Gets the block type Id
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return block type Id
 	 */
 	public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {

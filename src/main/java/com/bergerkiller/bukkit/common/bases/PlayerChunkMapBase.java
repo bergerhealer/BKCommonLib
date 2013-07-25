@@ -26,7 +26,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	}
 
 	/**
-	 * @deprecated use {@link #containsPlayer(Player, x, z)} instead
+	 * @deprecated use {@link #containsPlayer(Player, int, int) containsPlayer(player, x, z)} instead
 	 */
 	@Deprecated
 	@Override
