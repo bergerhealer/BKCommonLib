@@ -747,4 +747,13 @@ public class CommonUtil {
 		}
 		return false;
 	}
+
+	/**
+	 * Checks whether the server has officially started running and accepting new players to join.
+	 * 
+	 * @return True if the server started, False if not and the server is still enabling
+	 */
+	public static boolean isServerStarted() {
+		return CommonPlugin.hasInstance() && CommonPlugin.getInstance().isServerStarted();
+	}
 }

@@ -234,6 +234,26 @@ public class MathUtil {
 	}
 
 	/**
+	 * Gets the ceiling integer value from a double value
+	 * 
+	 * @param value to get the ceiling of
+	 * @return ceiling value
+	 */
+	public static int ceil(double value) {
+		return -floor(-value);
+	}
+
+	/**
+	 * Gets the ceiling integer value from a float value
+	 * 
+	 * @param value to get the ceiling of
+	 * @return ceiling value
+	 */
+	public static int ceil(float value) {
+		return -floor(-value);
+	}
+
+	/**
 	 * Moves a Location into the yaw and pitch of the Location in the offset specified
 	 * 
 	 * @param loc to move

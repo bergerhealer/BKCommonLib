@@ -668,6 +668,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<String> playerName = getField("a");
 		public final FieldAccessor<Boolean> online = getField("b");
 		public final FieldAccessor<Integer> ping = getField("c");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(String.class, boolean.class, int.class);
+
+		public CommonPacket newInstance(String playerName, boolean online, int ping) {
+			return constructor1.newInstance(playerName, online, ping);
+		}
 	}
 	public static class NMSPacket202Abilities extends NMSPacket {
 		public final FieldAccessor<Boolean> isInvulnerable = getField("a");

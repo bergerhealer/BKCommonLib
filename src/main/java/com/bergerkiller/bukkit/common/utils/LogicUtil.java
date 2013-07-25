@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -460,5 +461,21 @@ public class LogicUtil {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Skips elements from an iterator by calling 'next' a given amount of times (if possible).
+	 * If the count exceeds the amount of elements the iterator provides, further elements are ignored.
+	 * In that case, calling {@link Iterator.hasNext()} would yield false.
+	 * 
+	 * @param iterator to skip
+	 * @param count to skip
+	 * @return the iterator
+	 */
+	public static <T extends Iterator<?>> T skipIterator(T iterator, int count) {
+		for (int i = 0; i < count && iterator.hasNext(); i++) {
+			iterator.next();
+		}
+		return iterator;
 	}
 }

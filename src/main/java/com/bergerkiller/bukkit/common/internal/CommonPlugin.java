@@ -45,7 +45,6 @@ import com.bergerkiller.bukkit.common.internal.network.SpigotPacketHandler;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.tab.TabController;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -85,13 +84,14 @@ public class CommonPlugin extends PluginBase {
 	private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
 	private CommonEventFactory eventFactory;
+	private boolean isServerStarted = false;
 	private boolean isShowcaseEnabled = false;
 	private boolean isSCSEnabled = false;
 	private boolean isHyperConomyEnabled = false;
 	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
 	private PermissionHandler permissionHandler = null;
-	private TabController tabController = null;
+	private CommonTabController tabController;
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -128,6 +128,10 @@ public class CommonPlugin extends PluginBase {
 
 	public void registerMap(EntityMap map) {
 		this.maps.add(new SoftReference(map));
+	}
+
+	public boolean isServerStarted() {
+		return isServerStarted;
 	}
 
 	public void nextTick(Runnable runnable) {
@@ -278,6 +282,15 @@ public class CommonPlugin extends PluginBase {
 				chunks.remove(chunkX, chunkZ);
 			}
 		}
+	}
+
+	/**
+	 * Gets the Tab Controller that is responsible for the creation and updating of tabs
+	 * 
+	 * @return tab controller
+	 */
+	public CommonTabController getTabController() {
+		return tabController;
 	}
 
 	/**
@@ -492,11 +505,22 @@ public class CommonPlugin extends PluginBase {
 		// Register events and tasks, initialize
 		register(listener = new CommonListener());
 		register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
-		register(tabController = new TabController());
+		register(tabController = new CommonTabController());
 		PacketUtil.addPacketListener(this, tabController, PacketType.PLAYER_INFO);
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
+		startedTasks.add(new TabUpdater(this).start(1, 1));
+
+		// Operations to execute the next tick (when the server has started)
+		CommonUtil.nextTick(new Runnable() {
+			public void run() {
+				// Set server started state
+				isServerStarted = true;
+				// Tell the tabs to initialize the initial dimensions
+				getTabController().setDefaultSize();
+			}
+		});
 
 		// Register listeners and hooks
 		for (World world : WorldUtil.getWorlds()) {
@@ -555,6 +579,17 @@ public class CommonPlugin extends PluginBase {
 			return true;
 		}
 		return false;
+	}
+
+	private static class TabUpdater extends Task {
+		public TabUpdater(JavaPlugin plugin) {
+			super(plugin);
+		}
+
+		@Override
+		public void run() {
+			getInstance().getTabController().refreshAllTabs();
+		}
 	}
 
 	private static class EntityRemovalHandler extends Task {
