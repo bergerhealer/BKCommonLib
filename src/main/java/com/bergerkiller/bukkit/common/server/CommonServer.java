@@ -13,7 +13,7 @@ public interface CommonServer {
 	public boolean init();
 
 	/**
-	 * Called after the init() method successfully detected the server and initialized the server.
+	 * Called after the {@link #init()} method successfully detected the server and initialized the server.
 	 * In here processing that depends on the CommonServer instance being fully initialized can be continued.
 	 */
 	public void postInit();
@@ -103,9 +103,9 @@ public interface CommonServer {
 	public Collection<String> getLoadableWorlds();
 
 	/**
-	 * Checks whether the World contained in the folder specified can be loaded
+	 * Checks whether the World name specified contains a folder and can be loaded
 	 * 
-	 * @param worldFolder to check
+	 * @param worldName to check
 	 * @return True if the world can be loaded, False if not
 	 */
 	public boolean isLoadableWorld(String worldName);

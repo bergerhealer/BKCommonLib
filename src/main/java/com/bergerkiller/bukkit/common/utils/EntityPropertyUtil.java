@@ -132,7 +132,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	}
 
 	/**
-	 * @deprecated: Use double damage version instead
+	 * @deprecated Use double damage version instead
 	 */
 	@Deprecated
 	public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, int damage) {
@@ -159,7 +159,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	}
 
 	/**
-	 * @deprecated: Use double damage version instead
+	 * @deprecated Use double damage version instead
 	 */
 	@Deprecated
 	public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, int damage) {
@@ -209,7 +209,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 	}
 
 	/**
-	 * @deprecated: use the double damage version instead
+	 * @deprecated use the double damage version instead
 	 */
 	@Deprecated
 	public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {

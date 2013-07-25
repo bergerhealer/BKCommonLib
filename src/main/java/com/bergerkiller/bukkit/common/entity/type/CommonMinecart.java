@@ -16,6 +16,11 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
+/**
+ * An abstract implementation for all Minecarts
+ * 
+ * @param <T> - type of Minecart Entity
+ */
 public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
 	public CommonMinecart(T base) {
@@ -105,7 +110,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	/**
 	 * Sets the vertical offset of the block in the Minecart, in pixels
 	 * 
-	 * @return offsetPixels to set to
+	 * @param offsetPixels to set to
 	 */
 	public void setBlockOffset(int offsetPixels) {
 		getHandle(EntityMinecartAbstract.class).k(offsetPixels);

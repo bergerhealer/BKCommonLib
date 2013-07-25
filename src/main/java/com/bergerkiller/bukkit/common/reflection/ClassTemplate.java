@@ -230,7 +230,7 @@ public class ClassTemplate<T> {
 	 * Attempts to find the method by name
 	 * 
 	 * @param name of the method
-	 * @param arguments of the method
+	 * @param parameterTypes of the method
 	 * @return method
 	 */
 	public <K> SafeMethod<K> getMethod(String name, Class<?>... parameterTypes) {

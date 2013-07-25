@@ -228,7 +228,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * Registers a packet monitor for the packet types specified.
 	 * Monitors can only monitor packets, they can not alter them.
 	 * 
-	 * @param packetListener to register
+	 * @param packetMonitor to register
 	 * @param packetTypes to register the listener for
 	 */
 	public final void register(PacketMonitor packetMonitor, PacketType... packetTypes) {
@@ -617,7 +617,7 @@ public abstract class PluginBase extends JavaPlugin {
 	 * To make use of this functionality, first add the following line to the <b>plugin.yml</b>:<br>
 	 * <pre>metrics: true</pre>
 	 * 
-	 * To avoid issues, call {@link hasMetrics()} before using this method to check whether Metrics is available.
+	 * To avoid issues, call {@link #hasMetrics()} before using this method to check whether Metrics is available.
 	 * 
 	 * @return the Metrics instance used
 	 * @throws RuntimeException if no metrics is available
@@ -631,7 +631,7 @@ public abstract class PluginBase extends JavaPlugin {
 
 	/**
 	 * Checks whether Metrics is available for this Plugin. Always call this method
-	 * before using {@link getMetrics()} - initialization of Metrics could have failed!
+	 * before using {@link #getMetrics()} - initialization of Metrics could have failed!
 	 * 
 	 * @return True if Metrics is available, False if not
 	 */

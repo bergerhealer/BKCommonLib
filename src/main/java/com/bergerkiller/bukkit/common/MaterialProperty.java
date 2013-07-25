@@ -46,10 +46,10 @@ public abstract class MaterialProperty<T> {
 	/**
 	 * Gets this property for the block specified
 	 * 
-	 * @param world the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param chunk the block is in
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return The property of the material
 	 */
 	public T get(Chunk chunk, int x, int y, int z) {
@@ -60,9 +60,9 @@ public abstract class MaterialProperty<T> {
 	 * Gets this property for the block specified
 	 * 
 	 * @param world the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return The property of the material
 	 */
 	public T get(org.bukkit.World world, int x, int y, int z) {

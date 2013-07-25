@@ -7,6 +7,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * A Common Entity implementation for Minecarts with a Chest
+ */
 public class CommonMinecartChest extends CommonMinecartInventory<StorageMinecart> {
 
 	public CommonMinecartChest(StorageMinecart base) {

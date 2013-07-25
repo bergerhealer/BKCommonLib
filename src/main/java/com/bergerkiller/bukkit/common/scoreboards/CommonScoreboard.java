@@ -50,7 +50,7 @@ public class CommonScoreboard {
 	}
 
 	/**
-	 * Get the player form the scoreboard
+	 * Get the player from the scoreboard
 	 * 
 	 * @return Player
 	 */
@@ -63,7 +63,7 @@ public class CommonScoreboard {
 	}
 
 	/**
-	 * Get the scoreboard form a certain display
+	 * Get the scoreboard from a certain display
 	 * 
 	 * @param display Display
 	 * @return Objective
@@ -106,10 +106,10 @@ public class CommonScoreboard {
 	}
 
 	/**
-	 * Load a team form the disk
+	 * Load a team from the disk
 	 * 
-	 * @param team Team name
-	 * @return Team form disk (new team if failed)
+	 * @param name of the Team
+	 * @return Team from disk (new team if failed)
 	 */
 	public static CommonTeam loadTeam(String name) {
 		CommonTeam team = null;
@@ -126,7 +126,7 @@ public class CommonScoreboard {
 				ois.close();
 			}
 		} catch(Exception e) {
-			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to load team form disk", e);
+			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to load team from disk", e);
 		}
 		
 		if(team == null) {
@@ -155,7 +155,7 @@ public class CommonScoreboard {
 			oos.flush();
 			oos.close();
 		} catch(Exception e) {
-			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed ot save team to disk", e);
+			CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to save team to disk", e);
 		}
 	}
 

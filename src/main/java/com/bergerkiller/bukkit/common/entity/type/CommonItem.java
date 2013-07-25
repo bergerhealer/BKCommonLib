@@ -5,6 +5,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 
+/**
+ * A Common Entity implementation for Items
+ */
 public class CommonItem extends CommonEntity<Item> {
 
 	public CommonItem(Item base) {

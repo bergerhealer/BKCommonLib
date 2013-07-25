@@ -60,7 +60,7 @@ public class ChunkRef {
 	/**
 	 * Gets the y-coordinate of the highest chunk section
 	 * 
-	 * @param chunk to get it from
+	 * @param chunkHandle to get it from
 	 * @return chunk section highest y-position
 	 */
 	public static int getTopSectionY(Object chunkHandle) {

@@ -12,6 +12,9 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
+/**
+ * A Common Entity implementation for Minecarts with a TNT Block (explosive)
+ */
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
 	private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("fuse");

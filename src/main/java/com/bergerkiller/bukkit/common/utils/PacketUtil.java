@@ -146,7 +146,7 @@ public class PacketUtil {
 	 * Adds a single packet monitor. Packet monitors only monitor (not change) packets.
 	 * 
 	 * @param plugin to register for
-	 * @param listener to register
+	 * @param monitor to register
 	 * @param packets to register for
 	 */
 	public static void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType... packets) {
@@ -212,7 +212,7 @@ public class PacketUtil {
 	 * Obtains a collection of all plugins currently listening for the Packet type specified.
 	 * Packets of this type can be expected to be handled by these plugins when sending it.
 	 * 
-	 * @param packetId to check
+	 * @param packetType to get the listening plugins for
 	 * @return collection of listening plugins
 	 */
 	public static Collection<Plugin> getListenerPlugins(PacketType packetType) {
@@ -223,7 +223,7 @@ public class PacketUtil {
 	 * Obtains a collection of all plugins currently listening for the Packet id specified.
 	 * Packets of this type can be expected to be handled by these plugins when sending it.
 	 * 
-	 * @param packetId to check
+	 * @param packetId to get the listening plugins for
 	 * @return collection of listening plugins
 	 */
 	public static Collection<Plugin> getListenerPlugins(int packetId) {

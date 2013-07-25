@@ -24,7 +24,6 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
 import net.minecraft.server.Entity;
-import net.minecraft.server.FileIOThread;
 import net.minecraft.server.IDataManager;
 import net.minecraft.server.MovingObjectPosition;
 import net.minecraft.server.Vec3D;
@@ -60,9 +59,9 @@ public class WorldUtil extends ChunkUtil {
 	 * Gets the block data
 	 * 
 	 * @param world the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return block data
 	 */
 	public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
@@ -73,9 +72,9 @@ public class WorldUtil extends ChunkUtil {
 	 * Gets the block type Id
 	 * 
 	 * @param world the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return block type Id
 	 */
 	public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
@@ -278,7 +277,7 @@ public class WorldUtil extends ChunkUtil {
 	 * Sets a new entity tracker entry for the entity specified
 	 * 
 	 * @param entity to set it for
-	 * @param entityTrackerEntrytracker to set to (can be null to remove only)
+	 * @param entityTrackerEntry to set to (can be null to remove only)
 	 * @return the previous tracker entry for the entity, or null if there was none
 	 */
 	public static Object setTrackerEntry(org.bukkit.entity.Entity entity, Object entityTrackerEntry) {

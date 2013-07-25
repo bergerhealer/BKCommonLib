@@ -75,7 +75,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	/**
 	 * Called when the entity is damaged by something
 	 * 
-	 * @param damager that dealt the damage
+	 * @param damageSource of the damage
 	 * @param damage amount
 	 */
 	public void onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, double damage) {

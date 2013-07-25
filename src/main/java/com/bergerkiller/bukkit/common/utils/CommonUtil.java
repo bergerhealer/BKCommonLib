@@ -502,7 +502,7 @@ public class CommonUtil {
 
 	/**
 	 * Gets all Plugins running on the server WITHOUT allocating a new array if possible.
-	 * If there is no performance requirement to avoid array allocation, use {@link getPlugins()} instead.
+	 * If there is no performance requirement to avoid array allocation, use {@link #getPlugins()} instead.
 	 * Only use this method inside a <b>synchronized</b> body around the Plugin Manager, for example:
 	 * <pre>
 	 * synchronized (Bukkit.getPluginManager()) {

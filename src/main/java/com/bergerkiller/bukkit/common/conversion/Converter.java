@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion;
 /**
  * Represents a data type converter
  * 
- * @param <O> output type
+ * @param <T> output type
  */
 public interface Converter<T> {
 

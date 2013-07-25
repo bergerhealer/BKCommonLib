@@ -27,7 +27,7 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 /**
  * Basic packet handler implementation for handling packets using a send/receive hook.
- * The {@link handlePacketSend} and {@link handlePacketReceive} methods should be called
+ * The {@link #handlePacketSend(player, packet, wasCancelled)} and {@link #handlePacketReceive(player, packet, wasCancelled)} methods should be called
  * by an additional listener hook.
  */
 public abstract class PacketHandlerHooked implements PacketHandler {
@@ -249,6 +249,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		return Conversion.toIntArr.convert(list);
 	}
 
+	/**
+	 * Handles a packet before it is being sent to a player
+	 * 
+	 * @param player for which the packet was meant
+	 * @param packet that is handled
+	 * @param wasCancelled - True if it was originally cancelled, False if not
+	 * @return True if the packet is allowed to be sent, False if not
+	 */
 	public boolean handlePacketSend(Player player, Object packet, boolean wasCancelled) {
 		if(player == null || packet == null) {
 			return true;
@@ -280,6 +288,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 	}
 
+	/**
+	 * Handles a packet before it is being handled by the server
+	 * 
+	 * @param player from which the packet came
+	 * @param packet that is handled
+	 * @param wasCancelled - True if the packet is allowed to be received, False if not
+	 * @return True if the packet is allowed to be received, False if not
+	 */
 	public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
 		if(player == null || packet == null) {
 			return true;

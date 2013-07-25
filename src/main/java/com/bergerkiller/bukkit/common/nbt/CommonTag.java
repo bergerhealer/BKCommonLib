@@ -51,8 +51,7 @@ public class CommonTag extends BasicWrapper {
 	/**
 	 * Gets the data stored by this tag
 	 * 
-	 * @param type to convert the data to
-	 * @param def value to return when no data is available
+	 * @param def value to return when no data is available (can not be null)
 	 * @return Tag data
 	 */
 	public <T> T getData(T def) {

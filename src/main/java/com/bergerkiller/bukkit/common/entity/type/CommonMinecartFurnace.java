@@ -12,6 +12,9 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
+/**
+ * A Common Entity implementation for Minecarts with a Furnace
+ */
 public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
 	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartFurnace");
 	private static final FieldAccessor<Double> pushForceX = TEMPLATE.getField("a");

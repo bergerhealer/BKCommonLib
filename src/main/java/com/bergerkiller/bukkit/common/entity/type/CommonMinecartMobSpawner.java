@@ -12,6 +12,9 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 
+/**
+ * A Common Entity implementation for Minecarts with a Mob Spawner
+ */
 public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
 	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartMobSpawner");
 	private static final FieldAccessor<Object> mobSpawnerHandle = TEMPLATE.getField("a");

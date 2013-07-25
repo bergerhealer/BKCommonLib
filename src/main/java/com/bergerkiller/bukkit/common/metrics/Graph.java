@@ -107,7 +107,7 @@ public class Graph {
 
 	/**
 	 * Add a plotter to the graph, which will be used to plot entries.
-	 * The {@link toString()} method of the value should produce a valid numeric number.
+	 * The {@link #toString()} method of the value should produce a valid numeric number.
 	 * It is allowed to dynamically produce values this way, but keep in mind that
 	 * the method is called from another thread.
 	 *

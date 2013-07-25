@@ -53,7 +53,7 @@ public class FromToCounter {
 	}
 
 	/**
-	 * Gets the last element returned by {@link next()}
+	 * Gets the last element returned by {@link #next()}
 	 * 
 	 * @return last element
 	 * @throws NoSuchElementException if next was not called prior
@@ -66,8 +66,8 @@ public class FromToCounter {
 	}
 
 	/**
-	 * Disables this counter, causing {@link hasNext()} to always return false.
-	 * Any subsequent calls to {@link next()} or {@link get()} will fail.
+	 * Disables this counter, causing {@link #hasNext()} to always return false.
+	 * Any subsequent calls to {@link #next()} or {@link #get()} will fail.
 	 */
 	public void disable() {
 		this.incr = this.i = this.start = this.end = 0;

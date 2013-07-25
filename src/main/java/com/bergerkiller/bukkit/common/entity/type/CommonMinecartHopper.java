@@ -12,6 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 
+/**
+ * A Common Entity implementation for Minecarts with a Hopper
+ */
 public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart> {
 	private static final FieldAccessor<Integer> suckingCooldown = new SafeField<Integer>(EntityMinecartHopper.class, "b");
 

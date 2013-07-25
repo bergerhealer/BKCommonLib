@@ -62,7 +62,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * Gets the Entity Network Controller currently assigned to this Entity.
 	 * If none is available, this method returns Null.
 	 * If no custom network controller is set, this method returns a new
-	 * {@link com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController DefaultEntityNetworkController} instance.
+	 * {@link DefaultEntityNetworkController} instance.
 	 * 
 	 * @return Entity Network Controller, or null if not available
 	 */
@@ -88,7 +88,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * Sets an Entity Network Controller for this Entity.
 	 * To stop tracking this minecart, pass in Null.
 	 * To default back to the net.minecraft.server implementation, pass in a new
-	 * {@link com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController DefaultEntityNetworkController} instance.<br>
+	 * {@link DefaultEntityNetworkController} instance.<br>
 	 * <br>
 	 * This method only works if the Entity world has previously been set.
 	 * 
@@ -171,7 +171,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	/**
 	 * Gets the Entity Controller currently assigned to this Entity.
 	 * If no custom controller is set, this method returns a new 
-	 * {@link com.bergerkiller.bukkit.common.controller.DefaultEntityController DefaultEntityController} instance.
+	 * {@link DefaultEntityController} instance.
 	 * 
 	 * @return Entity Controller
 	 */
@@ -187,7 +187,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 	/**
 	 * Checks whether this particular Entity supports the use of Entity Controllers.
-	 * If this method returns True, {@link setController(controller)} can be used.<br><br>
+	 * If this method returns True, {@link #setController(controller)} can be used.<br><br>
 	 * 
 	 * Note that Entity Network Controllers are always supported.
 	 * 
@@ -494,7 +494,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 * @param location to spawn at
 	 * @param networkController to assign to the Entity after spawning
 	 * @return True if spawning occurred, False if not
-	 * @see {@link spawn(Location location)}
+	 * @see {@link #spawn(location)}
 	 */
 	@SuppressWarnings("rawtypes")
 	public final boolean spawn(Location location, EntityNetworkController networkController) {

@@ -49,7 +49,7 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
 	/**
 	 * Sets the minimum amount of times the Entity is spawned
 	 * 
-	 * @param spawnCount to set to
+	 * @param minSpawnCount to set to
 	 */
 	public void setMinSpawnCount(int minSpawnCount) {
 		this.minSpawnCount = minSpawnCount;
@@ -67,7 +67,7 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
 	/**
 	 * Sets the maximum amount of times the Entity is spawned
 	 * 
-	 * @param spawnCount to set to
+	 * @param maxSpawnCount to set to
 	 */
 	public void setMaxSpawnCount(int maxSpawnCount) {
 		this.maxSpawnCount = maxSpawnCount;

@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion;
 /**
  * A basic implementation which stores the output type
  * 
- * @param <O> - output type
+ * @param <T> - output type
  */
 public abstract class BasicConverter<T> implements Converter<T> {
 	private final Class<T> outputType;

@@ -348,19 +348,19 @@ public class ItemUtil {
 	 * @param item to respawn
 	 * @return Respawned item
 	 */
-	public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item bitem) {
-		bitem.remove();
-		EntityItem item = CommonNMS.getNative(bitem);
-		EntityItem newItem = new EntityItem(item.world, item.locX, item.locY, item.locZ, item.getItemStack());
-		newItem.fallDistance = item.fallDistance;
-		newItem.fireTicks = item.fireTicks;
-		newItem.pickupDelay = item.pickupDelay;
-		newItem.motX = item.motX;
-		newItem.motY = item.motY;
-		newItem.motZ = item.motZ;
-		newItem.age = item.age;
-		newItem.world.addEntity(newItem);
-		return CommonNMS.getItem(newItem);
+	public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item item) {
+		item.remove();
+		EntityItem oldItemHandle = CommonNMS.getNative(item);
+		EntityItem newItemHandle = new EntityItem(oldItemHandle.world, oldItemHandle.locX, oldItemHandle.locY, oldItemHandle.locZ, oldItemHandle.getItemStack());
+		newItemHandle.fallDistance = oldItemHandle.fallDistance;
+		newItemHandle.fireTicks = oldItemHandle.fireTicks;
+		newItemHandle.pickupDelay = oldItemHandle.pickupDelay;
+		newItemHandle.motX = oldItemHandle.motX;
+		newItemHandle.motY = oldItemHandle.motY;
+		newItemHandle.motZ = oldItemHandle.motZ;
+		newItemHandle.age = oldItemHandle.age;
+		newItemHandle.world.addEntity(newItemHandle);
+		return CommonNMS.getItem(newItemHandle);
 	}
 
 	/**

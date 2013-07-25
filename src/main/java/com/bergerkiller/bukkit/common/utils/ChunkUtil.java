@@ -40,8 +40,8 @@ public class ChunkUtil {
 	 * Gets the height of a given column in a chunk
 	 * 
 	 * @param chunk the column is in
-	 * @param x-coordinate of the block column
-	 * @param z-coordinate of the block column
+	 * @param x - coordinate of the block column
+	 * @param z - coordinate of the block column
 	 * @return column height
 	 */
 	public static int getHeight(org.bukkit.Chunk chunk, int x, int z) {
@@ -52,9 +52,9 @@ public class ChunkUtil {
 	 * Gets the block light level
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return Block light level
 	 */
 	public static int getBlockLight(org.bukkit.Chunk chunk, int x, int y, int z) {
@@ -65,9 +65,9 @@ public class ChunkUtil {
 	 * Gets the sky light level
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return Sky light level
 	 */
 	public static int getSkyLight(org.bukkit.Chunk chunk, int x, int y, int z) {
@@ -78,9 +78,9 @@ public class ChunkUtil {
 	 * Gets the block data
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @return block data
 	 */
 	public static int getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
@@ -104,9 +104,9 @@ public class ChunkUtil {
 	 * Sets a block type id and data without causing physics or lighting updates
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @param typeId to set to
 	 * @param data to set to
 	 */
@@ -128,9 +128,9 @@ public class ChunkUtil {
 	 * Sets a block type id and data, causing physics and lighting updates
 	 * 
 	 * @param chunk the block is in
-	 * @param x-coordinate of the block
-	 * @param y-coordinate of the block
-	 * @param z-coordinate of the block
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
 	 * @param typeId to set to
 	 * @param data to set to
 	 * @return True if a block got changed, False if not
@@ -210,7 +210,7 @@ public class ChunkUtil {
 	/**
 	 * Gets all the chunks loaded on a given world
 	 * 
-	 * @param chunkprovider to get the loaded chunks from
+	 * @param world to get the loaded chunks from
 	 * @return Loaded chunks
 	 */
 	@SuppressWarnings("rawtypes")
@@ -237,8 +237,8 @@ public class ChunkUtil {
 	 * Gets a chunk from a world without loading or generating it
 	 * 
 	 * @param world to obtain the chunk from
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
+	 * @param x - coordinate of the chunk
+	 * @param z - coordinate of the chunk
 	 * @return The chunk, or null if it is not loaded
 	 */
 	@SuppressWarnings("rawtypes")
@@ -269,8 +269,8 @@ public class ChunkUtil {
 	 * Allows the lazy-loading of chunks without locking the server.
 	 * 
 	 * @param world to obtain the chunk from
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
+	 * @param x - coordinate of the chunk
+	 * @param z - coordinate of the chunk
 	 * @param runnable to execute once the chunk is loaded or obtained
 	 */
 	public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
@@ -281,8 +281,8 @@ public class ChunkUtil {
 	 * Sets a given chunk coordinate to contain the chunk specified
 	 * 
 	 * @param world to set the chunk in
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
+	 * @param x - coordinate of the chunk
+	 * @param z - coordinate of the chunk
 	 * @param chunk to set to (use null to remove)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -337,8 +337,8 @@ public class ChunkUtil {
 	 * Sets whether a given chunk coordinate has to be unloaded
 	 * 
 	 * @param world to set the unload request for
-	 * @param x coordinate of the chunk
-	 * @param z coordinate of the chunk
+	 * @param x - coordinate of the chunk
+	 * @param z - coordinate of the chunk
 	 * @param unload state to set to
 	 */
 	public static void setChunkUnloading(World world, final int x, final int z, boolean unload) {

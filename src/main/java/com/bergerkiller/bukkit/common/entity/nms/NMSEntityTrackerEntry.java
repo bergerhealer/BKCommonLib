@@ -20,8 +20,7 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 	/**
 	 * Initializes a new Entity Tracker Entry hook
 	 * 
-	 * @param controller for the tracker entry
-	 * @param previous entity tracker entry that was set to load state from, use Null to ignore
+	 * @param entity that this tracker entry belongs to
 	 */
 	public NMSEntityTrackerEntry(final Entity entity) {
 		super(CommonNMS.getNative(entity), 80, 3, true);

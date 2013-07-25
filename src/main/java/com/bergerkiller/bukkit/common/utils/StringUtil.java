@@ -35,20 +35,21 @@ public class StringUtil {
 	}
 
 	/**
-	 * Converts a Location to a destination name.
+	 * Converts a Block to a {@link com.bergerkiller.bukkit.common.BlockLocation} formatted text
 	 * 
-	 * @param loc The Location to convert
-	 * @return A string representing the destination name.
+	 * @param block to convert
+	 * @return A string representing the Block Location
 	 */
 	public static String blockToString(Block block) {
 		return block.getWorld().getName() + "_" + block.getX() + "_" + block.getY() + "_" + block.getZ();
 	}
 
 	/**
-	 * Converts a destination name to a String.
+	 * Converts {@link com.bergerkiller.bukkit.common.BlockLocation} formatted text to a Block.
+	 * If the World or Block is inaccessible, null is returned.
 	 * 
 	 * @param str The String to convert
-	 * @return A Location representing the String.
+	 * @return Block denoted by the String
 	 */
 	public static Block stringToBlock(String str) {
 		try {
@@ -255,7 +256,7 @@ public class StringUtil {
 	}
 
 	/**
-	 * Equivalent of {@link String.trim()}, but only trims away the whitespace at the beginning.
+	 * Equivalent of {@link String#trim()}, but only trims away the whitespace at the beginning.
 	 * 
 	 * @param text to trim the start of
 	 * @return text trimmed at the start
@@ -270,7 +271,7 @@ public class StringUtil {
 	}
 
 	/**
-	 * Equivalent of {@link String.trim()}, but only trims away the whitespace at the end.
+	 * Equivalent of {@link String#trim()}, but only trims away the whitespace at the end.
 	 * 
 	 * @param text to trim the end of
 	 * @return text trimmed at the end

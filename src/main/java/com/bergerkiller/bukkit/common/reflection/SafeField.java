@@ -181,7 +181,6 @@ public class SafeField<T> implements FieldAccessor<T> {
 	 * @param source to set a Field for
 	 * @param fieldname to set
 	 * @param value to set to
-	 * @return True if successful, False if not
 	 */
 	public static <T> void set(Object source, String fieldname, T value) {
 		new SafeField<T>(source, fieldname).set(source, value);
@@ -193,7 +192,6 @@ public class SafeField<T> implements FieldAccessor<T> {
 	 * @param clazz to set the static field in
 	 * @param fieldname of the static field
 	 * @param value to set to
-	 * @return True if successful, False if not
 	 */
 	public static <T> void setStatic(Class<?> clazz, String fieldname, T value) {
 		new SafeField<T>(clazz, fieldname).set(null, value);

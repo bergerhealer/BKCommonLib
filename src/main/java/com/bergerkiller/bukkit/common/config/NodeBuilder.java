@@ -24,7 +24,7 @@ public class NodeBuilder {
 	 * Handles the reading input of a new line
 	 * 
 	 * @param line to handle
-	 * @param index of the node according to the indentation of the line
+	 * @param preceedingSpaces in front of the line (indentation spaces)
 	 * @return True if a node was handled, False if not
 	 */
 	public boolean handle(String line, int preceedingSpaces) {

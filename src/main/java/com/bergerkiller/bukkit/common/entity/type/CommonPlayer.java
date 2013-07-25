@@ -17,6 +17,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
+/**
+ * A Common Entity implementation for Players
+ */
 public class CommonPlayer extends CommonLivingEntity<Player> {
 
 	public CommonPlayer(Player entity) {

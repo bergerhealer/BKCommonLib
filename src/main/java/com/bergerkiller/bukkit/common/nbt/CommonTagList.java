@@ -286,7 +286,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 	 * 
 	 * The individual elements can be collections or arrays as well, which allows adding multiple arrays at once.
 	 * 
-	 * @param data to set to
+	 * @param values to set to
 	 */
 	public <T> void setAllValues(T... values) {
 		clear();
@@ -300,7 +300,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 	 * 
 	 * The individual elements can be collections or arrays as well, which allows adding multiple arrays at once.
 	 * 
-	 * @param data to set to
+	 * @param values to set to
 	 */
 	public <T> void addAllValues(T... values) {
 		for (Object data : values) {

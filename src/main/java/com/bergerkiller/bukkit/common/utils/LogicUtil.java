@@ -187,7 +187,7 @@ public class LogicUtil {
 
 	/**
 	 * Allocates a new array of the same length and writes the contents to this new array.
-	 * Unlike {@link cloneAll}, this method does not individually clone the elements
+	 * Unlike {@link #cloneAll(array)}, this method does not individually clone the elements
 	 * 
 	 * @param array to re-allocate as a new array
 	 * @return new array with the contents of the input array
@@ -400,10 +400,10 @@ public class LogicUtil {
 	}
 
 	/**
-	 * Checks if a list of characters contains the character specified
+	 * Checks if a sequence of characters contains the character specified
 	 * 
 	 * @param value to find
-	 * @param values to search in
+	 * @param sequence of char values to search in
 	 * @return True if it is contained, False if not
 	 */
 	public static boolean containsChar(char value, CharSequence sequence) {
@@ -466,7 +466,7 @@ public class LogicUtil {
 	/**
 	 * Skips elements from an iterator by calling 'next' a given amount of times (if possible).
 	 * If the count exceeds the amount of elements the iterator provides, further elements are ignored.
-	 * In that case, calling {@link Iterator.hasNext()} would yield false.
+	 * In that case, calling {@link Iterator#hasNext()} would yield false.
 	 * 
 	 * @param iterator to skip
 	 * @param count to skip

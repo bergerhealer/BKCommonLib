@@ -10,9 +10,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 
 /**
- * Does nothing but redirect to the default entity behaviour
- * 
- * @param <T> - type of Common Entity
+ * Does nothing but redirect to the default entity behavior
  */
 @SuppressWarnings("rawtypes")
 public final class DefaultEntityController extends EntityController {

@@ -8,6 +8,11 @@ import org.bukkit.inventory.EntityEquipment;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
+/**
+ * A Common Entity implementation for Living Entities
+ * 
+ * @param <T> - type of Living Entity
+ */
 public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> {
 
 	public CommonLivingEntity(T entity) {

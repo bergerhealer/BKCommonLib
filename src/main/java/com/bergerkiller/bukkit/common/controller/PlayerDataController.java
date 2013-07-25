@@ -14,7 +14,7 @@ import net.minecraft.server.NBTTagCompound;
 
 /**
  * A controller for dealing with player data loading and saving.
- * To hook it up to the server, call {@link assign()}.
+ * To hook it up to the server, call {@link #assign()}.
  */
 public class PlayerDataController {
 	private IPlayerFileData base;

@@ -12,10 +12,10 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * Changes in this view can be sent to multiple players or all players on the server.
  * Many methods are available to ease the setting of text and ping values in this view.<br><br>
  * 
- * To obtain a TabView instance, call the {@link createTab} method with the desired
+ * To obtain a TabView instance, call the {@link #createTab(width, height)} method with the desired
  * dimensions of the tab specified. It is only possible to create new tabs this way
- * when enabling your plugin. To create new Tab View instances at runtime, call {@link clone()}
- * or {@link cloneResize}. Pay close attention to the Java Docs of these methods!
+ * when enabling your plugin. To create new Tab View instances at runtime, call {@link #clone()}
+ * or {@link #cloneResize(newWidth, newHeight)}. Pay close attention to the Java Docs of these methods!
  */
 public abstract class TabView {
 	/**
@@ -55,7 +55,7 @@ public abstract class TabView {
 	 */
 	public static final int PING_FULL = PING_5;
 	/**
-	 * A ping value constant that represents the default ping value, which is equal to PING_1
+	 * A ping value constant that represents the default ping value, which is equal to {@link #PING_1}
 	 */
 	public static final int PING_DEFAULT = PING_1;
 	/**
@@ -70,6 +70,7 @@ public abstract class TabView {
 	 * A TabView constant that denotes an empty view, where all available slots are cleared
 	 */
 	public static final TabView EMPTY = new TabViewEmpty();
+
 	/**
 	 * Gets the width of this Tab View
 	 * 
@@ -86,7 +87,7 @@ public abstract class TabView {
 
 	/**
 	 * Gets the total amount of slots of this Tab View.
-	 * This is equal to [width x height[
+	 * This is equal to [width x height]
 	 * 
 	 * @return total slot count
 	 */
@@ -242,13 +243,13 @@ public abstract class TabView {
 	 * Ordering of xy1 and xy2 is not important.
 	 * 
 	 * @param x1 - x-coordinate of point 1 (inclusive)
-	 * @param x2 - y-coordinate of point 1 (inclusive)
-	 * @param y1 - x-coordinate of point 2 (inclusive)
+	 * @param y1 - y-coordinate of point 1 (inclusive)
+	 * @param x2 - x-coordinate of point 2 (inclusive)
 	 * @param y2 - y-coordinate of point 2 (inclusive)
 	 * @param text to use
 	 * @param ping to use
 	 */
-	public void fillArea(int x1, int x2, int y1, int y2, String text, int ping) {
+	public void fillArea(int x1, int y1, int x2, int y2, String text, int ping) {
 		boundsCheck(x1, y1);
 		boundsCheck(x2, y2);
 		// Initialize all counters
@@ -315,7 +316,7 @@ public abstract class TabView {
 	 * 
 	 * To set the values in reverse, simply use x2 for x1 and y2 for y1.<br><br>
 	 * 
-	 * This is an overload for {@link setArea()} to allow variable arguments instead of fixed arrays.
+	 * This is an overload for {@link #setArea(x1, y1, x2, y2, ping, text)} to allow variable arguments instead of fixed arrays.
 	 * 
 	 * @param x1 - x-coordinate of point 1 (inclusive)
 	 * @param y1 - y-coordinate of point 2 (inclusive)
@@ -331,7 +332,7 @@ public abstract class TabView {
 	 * Sets all the text contents of this Tab View to the text array.
 	 * Elements outside of this array or if the array is null are not set.<br><br>
 	 * 
-	 * This is an overload of {@link setAll()} to allow variable arguments instead of fixed arrays.
+	 * This is an overload of {@link #setAll(text, ping)} to allow variable arguments instead of fixed arrays.
 	 * 
 	 * @param text to set to, null or empty to ignore (nothing happens then)
 	 */
@@ -360,7 +361,7 @@ public abstract class TabView {
 	/**
 	 * Displays this Tab View to the player specified.
 	 * The player is added to the viewers, previous viewers are not removed.
-	 * If you wish to hide this Tab View again, use displayTo on the {@link DEFAULT} or {@link EMPTY} constants.
+	 * If you wish to hide this Tab View again, use displayTo on the {@link #DEFAULT} or {@link #EMPTY} constants.
 	 * 
 	 * @param player
 	 */

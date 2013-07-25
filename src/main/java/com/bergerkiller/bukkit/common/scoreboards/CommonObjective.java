@@ -18,14 +18,14 @@ public class CommonObjective {
 	private String displayName;
 	private boolean displayed;
 	private Map<String, CommonScore> scores = new HashMap<String, CommonScore>();
-	
+
 	protected CommonObjective(CommonScoreboard scoreboard, Display display) {
 		this.display = display;
 		this.scoreboard = scoreboard;
 		this.name = display.getName();
 		this.displayName = display.getDisplayName();
 	}
-	
+
 	/**
 	 * Get the objective unique id
 	 * 
@@ -34,7 +34,7 @@ public class CommonObjective {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	/**
 	 * Get the objective display name
 	 * 
@@ -43,7 +43,7 @@ public class CommonObjective {
 	public String getDisplayName() {
 		return this.displayName;
 	}
-	
+
 	/**
 	 * Get the display from the objective
 	 * 
@@ -52,7 +52,7 @@ public class CommonObjective {
 	public Display getDisplay() {
 		return this.display;
 	}
-	
+
 	/**
 	 * Change the display name from the objective
 	 * 
@@ -62,7 +62,7 @@ public class CommonObjective {
 		this.displayName = value;
 		this.update();
 	}
-	
+
 	/**
 	 * Get the scores
 	 * 
@@ -71,7 +71,7 @@ public class CommonObjective {
 	public Collection<CommonScore> getScores() {
 		return scores.values();
 	}
-	
+
 	/**
 	 * Get a score by name
 	 * 
@@ -81,33 +81,35 @@ public class CommonObjective {
 	public CommonScore getScore(String name) {
 		return scores.get(name);
 	}
-	
+
 	/**
 	 * Add a score to the list
 	 * 
+	 * @param name of the Score
 	 * @param score Score
 	 */
-	public void addScore(String id, CommonScore score) {
-		CommonScore old = this.getScore(id);
-		if(old != null)
+	public void addScore(String name, CommonScore score) {
+		CommonScore old = this.getScore(name);
+		if (old != null) {
 			old.remove();
-		
+		}
 		score.create();
-		scores.put(id, score);
+		scores.put(name, score);
 	}
-	
+
 	/**
 	 * Remove a score form the list
 	 * 
-	 * @param score Score
+	 * @param name of the Score
 	 */
-	public void removeScore(String id) {
-		CommonScore score = this.getScore(id);
-		if(score!= null)
+	public void removeScore(String name) {
+		CommonScore score = this.getScore(name);
+		if (score!= null) {
 			score.remove();
-		scores.remove(id);
+		}
+		scores.remove(name);
 	}
-	
+
 	/**
 	 * Create a score and add it to the list
 	 * 
@@ -121,7 +123,7 @@ public class CommonObjective {
 		this.addScore(id, score);
 		return score;
 	}
-	
+
 	/**
 	 * Clear all scores
 	 */
@@ -133,41 +135,39 @@ public class CommonObjective {
 			it.remove();
 		}
 	}
-	
+
 	/**
 	 * Update the display text
 	 */
 	public void update() {
 		if(!this.displayed)
 			return;
-		
+
 		this.handle(2);
 	}
-	
+
 	/**
-	 * Show the objective
-	 * 
-	 * @param display Display location
+	 * Show this objective
 	 */
 	public void show() {
-		if(!this.displayed)
+		if (!this.displayed) {
 			this.handle(0);
-		
+		}
 		this.display();
 		this.displayed = true;
 	}
-	
+
 	/**
-	 * Hide the objective
+	 * Hide this objective
 	 */
 	public void hide() {
-		if(!this.displayed)
+		if (!this.displayed) {
 			return;
-		
+		}
 		this.handle(1);
 		this.displayed = false;
 	}
-	
+
 	private void handle(int type) {
 		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_OBJECTIVE);
 		packet.write(PacketFields.SET_SCOREBOARD_OBJECTIVE.name, this.name);
@@ -175,17 +175,17 @@ public class CommonObjective {
 		packet.write(PacketFields.SET_SCOREBOARD_OBJECTIVE.action, type);
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
-	
+
 	private void display() {
 		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_DISPLAY_OBJECTIVE);
 		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.name, this.name);
 		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display.getId());
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
-	
+
 	protected static CommonObjective copyFrom(CommonScoreboard board, CommonObjective objective) {
 		CommonObjective obj = new CommonObjective(board, objective.display);
-		
+
 		//Copy all scores
 		for(Map.Entry<String, CommonScore> entry : objective.scores.entrySet()) {
 			String id = entry.getKey();
@@ -193,7 +193,7 @@ public class CommonObjective {
 			CommonScore newScore = CommonScore.copyFrom(board, score);
 			obj.addScore(id, newScore);
 		}
-		
+
 		return obj;
 	}
 }
