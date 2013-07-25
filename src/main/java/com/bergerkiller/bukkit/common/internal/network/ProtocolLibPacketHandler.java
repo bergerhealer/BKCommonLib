@@ -66,12 +66,23 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		}
 		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
 		try {
-			ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, throughListeners);
+			if (throughListeners) {
+				// Send it through the listeners
+				ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend);
+			} else {
+				// Silent - do not send it through listeners, only through monitors
+				sendSilentPacket(player, toSend);
+			}
 		} catch (PlayerLoggedOutException ex) {
 			// Ignore
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException("Error while sending packet!", e);
 		}
+	}
+
+	private void sendSilentPacket(Player player, PacketContainer packet) throws InvocationTargetException {
+		// Note: Added in a separate method so we can better look at possible errors
+		ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
 	}
 
 	@Override
