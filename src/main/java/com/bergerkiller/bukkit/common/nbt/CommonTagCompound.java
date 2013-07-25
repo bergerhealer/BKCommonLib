@@ -367,7 +367,19 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
-	 * Writes this CommonTagCompound to the OutputStream specified
+	 * Writes this CommonTagCompound to the OutputStream specified.
+	 * This method writes the compound as raw, uncompressed data.
+	 * 
+	 * @param stream to write to
+	 * @throws IOException
+	 */
+	public void writeToUncompressed(OutputStream stream) throws IOException {
+		NBTUtil.writeCompoundUncompressed(getHandle(), stream);
+	}
+
+	/**
+	 * Writes this CommonTagCompound to the OutputStream specified.
+	 * This method writes the compound as GZIP-compressed data.
 	 * 
 	 * @param stream to write to
 	 * @throws IOException
@@ -377,8 +389,9 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
-	 * Writes this CommonTagCompound to the file specified<br>
-	 * First writes to a temporary file to avoid corrupted files
+	 * Writes this CommonTagCompound to the file specified.
+	 * First writes to a temporary file to avoid corrupted files.
+	 * This method writes the compound as GZIP-compressed data to the file.
 	 * 
 	 * @param file to write to
 	 * @throws IOException on failure
@@ -397,7 +410,20 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
-	 * Reads a CommonTagCompound from the InputStream specified
+	 * Reads a CommonTagCompound from the InputStream specified.
+	 * This method expects an Input Stream containing raw, uncompressed data.
+	 * 
+	 * @param stream to read from
+	 * @return read compound
+	 * @throws IOException on failure
+	 */
+	public static CommonTagCompound readFromUncompressed(InputStream stream) throws IOException {
+		return (CommonTagCompound) create(NBTUtil.readCompoundUncompressed(stream));
+	}
+
+	/**
+	 * Reads a CommonTagCompound from the InputStream specified.
+	 * This method expects an Input Stream containing GZIP-compressed data.
 	 * 
 	 * @param stream to read from
 	 * @return read compound
@@ -408,7 +434,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	}
 
 	/**
-	 * Reads a CommonTagCompound from the file specified
+	 * Reads a CommonTagCompound from the file specified.
+	 * This method expects a file containing GZIP-compressed data.
 	 * 
 	 * @param file to read from
 	 * @return read compound

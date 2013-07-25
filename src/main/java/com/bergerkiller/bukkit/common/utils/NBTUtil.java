@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -75,7 +77,8 @@ public class NBTUtil {
 	}
 
 	/**
-	 * Reads an NBTTagCompound handle from an input stream
+	 * Reads an NBTTagCompound handle from an input stream.
+	 * This method expects an Input Stream containing GZIP-compressed data.
 	 * 
 	 * @param stream to read from
 	 * @return NBTTagCompound
@@ -86,7 +89,20 @@ public class NBTUtil {
 	}
 
 	/**
-	 * Writes an NBTTagCompound to an output stream
+	 * Reads an NBTTagCompound handle from an input stream.
+	 * This method expects an Input Stream containing raw, uncompressed data.
+	 * 
+	 * @param stream to read from
+	 * @return NBTTagCompound
+	 * @throws IOException
+	 */
+	public static Object readCompoundUncompressed(InputStream stream) throws IOException {
+		return NBTCompressedStreamTools.a((DataInput) new DataInputStream(stream));
+	}
+
+	/**
+	 * Writes an NBTTagCompound to an output stream.
+	 * This method writes the compound as GZIP-compressed data.
 	 * 
 	 * @param compound to write
 	 * @param stream to write to
@@ -94,6 +110,18 @@ public class NBTUtil {
 	 */
 	public static void writeCompound(Object compound, OutputStream stream) throws IOException {
 		NBTCompressedStreamTools.a((NBTTagCompound) compound, stream);
+	}
+
+	/**
+	 * Writes an NBTTagCompound to an output stream.
+	 * This method writes the compound as raw, uncompressed data.
+	 * 
+	 * @param compound to write
+	 * @param stream to write to
+	 * @throws IOException
+	 */
+	public static void writeCompoundUncompressed(Object compound, OutputStream stream) throws IOException {
+		NBTCompressedStreamTools.a((NBTTagCompound) compound, (DataOutput) new DataOutputStream(stream));
 	}
 
 	/**

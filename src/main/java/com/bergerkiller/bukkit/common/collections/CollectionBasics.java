@@ -68,7 +68,7 @@ public class CollectionBasics {
 
 	/**
 	 * A basic addAll implementation. (does not call collection.addAll)
-	 * Calls {@link Collection#add(E)} for all elements in the elements collection specified
+	 * Calls {@link Collection#add(Object)} for all elements in the elements collection specified
 	 * 
 	 * @param collection to add to
 	 * @param elements to add
