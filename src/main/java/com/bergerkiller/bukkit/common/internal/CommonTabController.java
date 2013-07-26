@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 import com.bergerkiller.bukkit.common.collections.EntityMap;
-import com.bergerkiller.bukkit.common.collections.FilteringCollection;
+import com.bergerkiller.bukkit.common.collections.FilteredCollectionSelf;
 import com.bergerkiller.bukkit.common.collections.UniqueList;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
@@ -262,10 +262,10 @@ public class CommonTabController implements PacketListener, Listener {
 	}
 
 	private Collection<PlayerTabInfo> getViewers(final TabView currentTab) {
-		return new FilteringCollection<PlayerTabInfo>(players.values()) {
+		return new FilteredCollectionSelf<PlayerTabInfo>(players.values()) {
 			@Override
-			public boolean isFiltered(Object value) {
-				return !(value instanceof PlayerTabInfo) || ((PlayerTabInfo) value).getCurrentTab() != currentTab;
+			public boolean isFiltered(PlayerTabInfo element) {
+				return element.getCurrentTab() != currentTab;
 			}
 		};
 	}

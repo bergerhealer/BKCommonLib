@@ -419,6 +419,20 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Performs an unsafe cast to a generic type. Be sure to check that
+	 * the object being cast is actually an instance of the type to cast to.
+	 * Casting errors will occur while working with the resulting value,
+	 * not while performing the casting in this method.
+	 * 
+	 * @param value to cast
+	 * @return value cast in an unsafe way
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T unsafeCast(Object value) {
+		return (T) value;
+	}
+
+	/**
 	 * Tries to cast the object to the type specified, returning null upon failure
 	 * 
 	 * @param object to cast
