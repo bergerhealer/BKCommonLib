@@ -63,20 +63,17 @@ public class SafeField<T> implements FieldAccessor<T> {
 			return;
 		}
 		// try to find the field
-		Class<?> tmp = source;
 		String fixedName = Common.SERVER == null ? name : Common.SERVER.getFieldName(source, name);
 		String dispName = name.equals(fixedName) ? name : (name + "[" + fixedName + "]");
-		while (tmp != null) {
-			try {
-				this.field = tmp.getDeclaredField(fixedName);
+		try {
+			this.field = findRaw(source, fixedName);
+			if (this.field != null) {
 				this.field.setAccessible(true);
 				return;
-			} catch (NoSuchFieldException ex) {
-				tmp = tmp.getSuperclass();
-			} catch (SecurityException ex) {
-				new Exception("No permission to access field '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
-				return;
 			}
+		} catch (SecurityException ex) {
+			new Exception("No permission to access field '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
+			return;
 		}
 		CommonPlugin.getInstance().handleReflectionMissing("Field", dispName, source);
 	}
@@ -175,6 +172,11 @@ public class SafeField<T> implements FieldAccessor<T> {
 		return field.getType();
 	}
 
+	@Override
+	public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
+		return new TranslatorFieldAccessor<K>(this, converterPair);
+	}
+
 	/**
 	 * Tries to set a Field for a certain Object
 	 * 
@@ -243,8 +245,35 @@ public class SafeField<T> implements FieldAccessor<T> {
 		return create(type, name).translate(converterPair);
 	}
 
-	@Override
-	public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
-		return new TranslatorFieldAccessor<K>(this, converterPair);
+	/**
+	 * Checks whether a certain field is available in a Class
+	 * 
+	 * @param type of Class
+	 * @param name of the field
+	 * @return True if available, False if not
+	 */
+	public static boolean contains(Class<?> type, String name) {
+		return findRaw(type, Common.SERVER.getFieldName(type, name)) != null;
 	}
+
+	/**
+	 * Tries to recursively find a field in a Class
+	 * 
+	 * @param type of Class
+	 * @param name of the field
+	 * @return the Field, or null if not found
+	 */
+	private static Field findRaw(Class<?> type, String name) {
+		Class<?> tmp = type;
+		// Try to find the field in the current and all Super Classes
+		while (tmp != null) {
+			try {
+				return tmp.getDeclaredField(name);
+			} catch (NoSuchFieldException ex) {
+				tmp = tmp.getSuperclass();
+			}
+		}
+		// Interfaces don't contain fields, so nothing found at this point
+		return null;
+	}	
 }

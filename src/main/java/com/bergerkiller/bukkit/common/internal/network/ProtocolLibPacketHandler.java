@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.comphenix.protocol.Packets;
@@ -33,8 +34,45 @@ import com.comphenix.protocol.injector.PlayerLoggedOutException;
  * A packet handler implementation that uses ProtocolLib packet listeners
  */
 public class ProtocolLibPacketHandler implements PacketHandler {
+	public static final String LIB_ROOT = "com.comphenix.protocol.";
 	private final List<CommonPacketMonitor> monitors = new ArrayList<CommonPacketMonitor>();
 	private final List<CommonPacketListener> listeners = new ArrayList<CommonPacketListener>();
+	private boolean useOldSilentSending;
+
+	@Override
+	public void onPlayerJoin(Player player) {
+	}
+
+	@Override
+	public boolean onEnable() {
+		// Check whether all required classes are available
+		Class<?> manager = CommonUtil.getClass(LIB_ROOT + "ProtocolManager");
+		Class<?> packetContainer = CommonUtil.getClass(LIB_ROOT + "events.PacketContainer");
+		if (manager == null || packetContainer == null) {
+			return false;
+		}
+		// Check whether the new method sendServerPacket(player, packet, marker, filtered) exists
+		Class<?> networkMarker = CommonUtil.getClass(LIB_ROOT + "events.NetworkMarker");
+		if (networkMarker == null) {
+			// Network Marker does not exist - use the old method
+			this.useOldSilentSending = true;
+		} else {
+			// Only use the old method if the new method does not exist
+			Class<?>[] newArgs = {Player.class, packetContainer, networkMarker, boolean.class};
+			this.useOldSilentSending = !SafeMethod.contains(manager, "sendServerPacket", newArgs);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onDisable() {
+		return true;
+	}
+
+	@Override
+	public String getName() {
+		return "the ProtocolLib library";
+	}
 
 	@Override
 	public Collection<Plugin> getListening(int packetId) {
@@ -82,7 +120,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
 	private void sendSilentPacket(Player player, PacketContainer packet) throws InvocationTargetException {
 		// Note: Added in a separate method so we can better look at possible errors
-		ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
+		if (useOldSilentSending) {
+			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
+		} else {
+			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, null, false);
+		}
 	}
 
 	@Override
@@ -132,25 +174,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		for (CommonPacketMonitor monitor : monitors) {
 			to.addPacketMonitor(monitor.getPlugin(), monitor.monitor, monitor.ids);
 		}
-	}
-
-	@Override
-	public boolean onEnable() {
-		return true;
-	}
-
-	@Override
-	public boolean onDisable() {
-		return true;
-	}
-
-	@Override
-	public void onPlayerJoin(Player player) {
-	}
-
-	@Override
-	public String getName() {
-		return "the ProtocolLib library";
 	}
 
 	@Override

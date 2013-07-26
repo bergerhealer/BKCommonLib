@@ -71,21 +71,18 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 		}
 		dispName += ")";
 
-		// try to find the field
-		Class<?> tmp = source;
-		while (tmp != null) {
-			try {
-				this.method = tmp.getDeclaredMethod(fixedName, parameterTypes);
+		// try to find the method
+		try {
+			this.method = findRaw(source, fixedName, parameterTypes);
+			if (this.method != null) {
 				this.method.setAccessible(true);
 				this.isStatic = Modifier.isStatic(this.method.getModifiers());
 				this.parameterTypes = parameterTypes;
 				return;
-			} catch (NoSuchMethodException ex) {
-				tmp = tmp.getSuperclass();
-			} catch (SecurityException ex) {
-				new Exception("No permission to access method '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
-				return;
 			}
+		} catch (SecurityException ex) {
+			new Exception("No permission to access method '" + dispName + "' in class file '" + source.getSimpleName() + "'").printStackTrace();
+			return;
 		}
 		CommonPlugin.getInstance().handleReflectionMissing("Method", dispName, source);
 	}
@@ -151,6 +148,47 @@ public class SafeMethod<T> implements MethodAccessor<T> {
 				throw e;
 			}
 		}
+		return null;
+	}
+
+	/**
+	 * Checks whether a certain method is available in a Class
+	 * 
+	 * @param type of Class
+	 * @param name of the method
+	 * @param parameterTypes of the method
+	 * @return True if available, False if not
+	 */
+	public static boolean contains(Class<?> type, String name, Class<?>... parameterTypes) {
+		return findRaw(type, Common.SERVER.getMethodName(type, name, parameterTypes), parameterTypes) != null;
+	}
+
+	/**
+	 * Tries to recursively find a method in a Class
+	 * 
+	 * @param type of Class
+	 * @param name of the method
+	 * @param parameterTypes of the method
+	 * @return the Method, or null if not found
+	 */
+	private static Method findRaw(Class<?> type, String name, Class<?>... parameterTypes) {
+		Class<?> tmp = type;
+		// Try to find the method in the current and all Super Classes
+		while (tmp != null) {
+			try {
+				return tmp.getDeclaredMethod(name, parameterTypes);
+			} catch (NoSuchMethodException ex) {
+				tmp = tmp.getSuperclass();
+			}
+		}
+		// Try to find the method in all implemented Interfaces
+		for (Class<?> interfaceClass : type.getInterfaces()) {
+			try {
+				return interfaceClass.getDeclaredMethod(name, parameterTypes);
+			} catch (NoSuchMethodException ex) {
+			}
+		}
+		// Nothing found
 		return null;
 	}
 }
