@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
+import org.bukkit.Location;
+
 import net.minecraft.server.DamageSource;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.NBTTagCompound;
@@ -93,4 +95,14 @@ public interface NMSEntityHook {
 	 * onSave for takeables
 	 */
     public boolean d(NBTTagCompound nbttagcompound);
+
+    /**
+     * Teleport super
+     */
+    public void super_teleportTo(Location exit, boolean portal);
+
+    /**
+     * Teleport
+     */
+    public void teleportTo(Location exit, boolean portal);
 }

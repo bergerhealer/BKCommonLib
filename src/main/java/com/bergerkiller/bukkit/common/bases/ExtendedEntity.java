@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -543,6 +544,52 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public boolean isInWater(boolean update) {
 		return update ? h().H() : h().G();
+	}
+
+	/**
+	 * Sets whether an Entity is allowed to teleport upon entering a portal right now.
+	 * This state is live-updated based on whether the Entity moved into/away from a portal.
+	 * 
+	 * @param allow whether to allow portal entering
+	 */
+	public void setAllowTeleportation(boolean allow) {
+		EntityUtil.setAllowTeleportation(entity, allow);
+	}
+
+	/**
+	 * Gets whether an Entity is allowed to teleport upon entering a portal right now.
+	 * This state is live-updated based on whether the Entity moved into/away from a portal.
+	 */
+	public boolean getAllowTeleportation() {
+		return EntityUtil.getAllowTeleportation(entity);
+	}
+
+	/**
+	 * Gets the entity portal enter cooldown ticks
+	 * 
+	 * @return entity cooldown ticks
+	 */
+	public int getPortalCooldown() {
+		return EntityUtil.getPortalCooldown(entity);
+	}
+
+	/**
+	 * Sets the entity portal enter cooldown ticks
+	 * 
+	 * @param cooldownTicks to set to
+	 */
+	public void setPortalCooldown(int cooldownTicks) {
+		EntityUtil.setPortalCooldown(entity, cooldownTicks);
+	}
+
+	/**
+	 * Gets the maximum portal cooldown ticks.
+	 * This is the value applied right after entering a portal.
+	 * 
+	 * @return entity maximum portal cooldown ticks
+	 */
+	public int getPortalCooldownMaximum() {
+		return EntityUtil.getPortalCooldownMaximum(entity);
 	}
 
 	public boolean leaveVehicle() {

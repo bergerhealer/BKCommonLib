@@ -261,4 +261,56 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 		}
 		return false;
 	}
+
+	/**
+	 * Sets whether an Entity is allowed to teleport upon entering a portal right now.
+	 * This state is live-updated based on whether the Entity moved into/away from a portal.
+	 * 
+	 * @param entity to set it for
+	 * @param state to set to
+	 */
+	public static void setAllowTeleportation(Entity entity, boolean state) {
+		EntityRef.allowTeleportation.set(Conversion.toEntityHandle.convert(entity), state);
+	}
+
+	/**
+	 * Gets whether an Entity is allowed to teleport upon entering a portal right now.
+	 * This state is live-updated based on whether the Entity moved into/away from a portal.
+	 * 
+	 * @param entity to get it for
+	 */
+	public static boolean getAllowTeleportation(Entity entity) {
+		return EntityRef.allowTeleportation.get(Conversion.toEntityHandle.convert(entity));
+	}
+
+	/**
+	 * Sets the entity portal enter cooldown ticks
+	 * 
+	 * @param entity to set it for
+	 * @param cooldownTicks to set to
+	 */
+	public static void setPortalCooldown(Entity entity, int cooldownTicks) {
+		CommonNMS.getNative(entity).portalCooldown = cooldownTicks;
+	}
+
+	/**
+	 * Gets the entity portal enter cooldown ticks
+	 * 
+	 * @param entity to get it for
+	 * @return entity cooldown ticks
+	 */
+	public static int getPortalCooldown(Entity entity) {
+		return CommonNMS.getNative(entity).portalCooldown;
+	}
+
+	/**
+	 * Gets the maximum portal cooldown ticks.
+	 * This is the value applied right after entering a portal.
+	 * 
+	 * @param entity to get it for
+	 * @return entity maximum portal cooldown ticks
+	 */
+	public static int getPortalCooldownMaximum(Entity entity) {
+		return CommonNMS.getNative(entity).ab();
+	}
 }

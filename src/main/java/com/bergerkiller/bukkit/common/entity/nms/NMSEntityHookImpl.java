@@ -1,5 +1,9 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
+import org.bukkit.Location;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
+
 import net.minecraft.server.DamageSource;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityHuman;
@@ -91,6 +95,24 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 		}
 	}
 
+	@Override
+	public void teleportTo(Location exit, boolean portal) {
+		// Instead of using the default internal logic, we are better than that!
+		// Let's bring forth our very own teleport logic!
+
+		// Adjust the exit if the portal travel agent is being used
+		CommonEntity<?> entity = this.controller.getEntity();
+		if (portal) {
+			Vector velocity = entity.getVelocity();
+			CommonNMS.getNative(exit.getWorld()).t().adjustExit(entity.getHandle(Entity.class), exit, velocity);
+			if (entity.vel.getX() != velocity.getX() || entity.vel.getY() != velocity.getY() || entity.vel.getZ() != velocity.getZ()) {
+				entity.setVelocity(velocity);
+			}
+		}
+		// Finally, teleport it
+		this.controller.getEntity().teleport(exit, portal ? TeleportCause.NETHER_PORTAL : TeleportCause.UNKNOWN);
+	}
+
 	/*
 	 * The super methods are unused
 	 */
@@ -127,5 +149,10 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	@Override
 	public String super_getLocalizedName() {
 		return controller.getEntity().getHandle(NMSEntityHook.class).super_getLocalizedName();
+	}
+
+	@Override
+	public void super_teleportTo(Location exit, boolean portal) {
+		controller.getEntity().getHandle(NMSEntityHook.class).super_teleportTo(exit, portal) ;
 	}
 }
