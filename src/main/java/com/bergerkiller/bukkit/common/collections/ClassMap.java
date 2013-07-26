@@ -11,10 +11,10 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
  * A map that obtains the value bound to a given Class.
  * Only if the key specified is an instance of a mapped Class, is the value returned.
  * 
- * @param <T> - type of Value
+ * @param <V> - Value type to map to Class keys
  */
-public class ClassMap<T> {
-	private final LinkedHashMap<Class<?>, T> classes = new LinkedHashMap<Class<?>, T>();
+public class ClassMap<V> {
+	private final LinkedHashMap<Class<?>, V> classes = new LinkedHashMap<Class<?>, V>();
 
 	/**
 	 * Puts a Class : Value pair into this map.
@@ -23,7 +23,7 @@ public class ClassMap<T> {
 	 * @param typeTemplate to put the type of
 	 * @param value to put
 	 */
-	public void put(ClassTemplate<?> typeTemplate, T value) {
+	public void put(ClassTemplate<?> typeTemplate, V value) {
 		if (typeTemplate == null) {
 			return;
 		}
@@ -37,7 +37,7 @@ public class ClassMap<T> {
 	 * @param type to put
 	 * @param value to put
 	 */
-	public void put(Class<?> type, T value) {
+	public void put(Class<?> type, V value) {
 		if (type == null) {
 			return;
 		}
@@ -50,15 +50,15 @@ public class ClassMap<T> {
 	 * @param type of instance
 	 * @return the value bound to the instance type
 	 */
-	public T get(Class<?> type) {
+	public V get(Class<?> type) {
 		if (type == null) {
 			return null;
 		}
-		final T value = classes.get(type);
+		final V value = classes.get(type);
 		if (value != null) {
 			return value;
 		}
-		for (Entry<Class<?>, T> entry : classes.entrySet()) {
+		for (Entry<Class<?>, V> entry : classes.entrySet()) {
 			if (entry.getKey().isAssignableFrom(type)) {
 				return entry.getValue();
 			}
@@ -72,15 +72,15 @@ public class ClassMap<T> {
 	 * @param instance to get the value of
 	 * @return the value bound to the instance type
 	 */
-	public T get(Object instance) {
+	public V get(Object instance) {
 		if (instance == null) {
 			return null;
 		}
-		final T value = classes.get(instance.getClass());
+		final V value = classes.get(instance.getClass());
 		if (value != null) {
 			return value;
 		}
-		for (Entry<Class<?>, T> entry : classes.entrySet()) {
+		for (Entry<Class<?>, V> entry : classes.entrySet()) {
 			if (entry.getKey().isInstance(instance)) {
 				return entry.getValue();
 			}
@@ -93,7 +93,7 @@ public class ClassMap<T> {
 	 * 
 	 * @return Class Instance Map data
 	 */
-	public Map<Class<?>, T> getData() {
+	public Map<Class<?>, V> getData() {
 		return Collections.unmodifiableMap(classes);
 	}
 }

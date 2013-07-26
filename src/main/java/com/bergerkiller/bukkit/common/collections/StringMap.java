@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * A String HashMap providing a few extra useful methods
  * 
- * @param <V> - Value type
+ * @param <V> - Value type to map to String keys
  */
 public class StringMap<V> extends HashMap<String, V> {
 	private static final long serialVersionUID = -245022676771481540L;

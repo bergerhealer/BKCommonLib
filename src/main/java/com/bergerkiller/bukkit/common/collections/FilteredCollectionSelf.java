@@ -9,16 +9,16 @@ import com.bergerkiller.bukkit.common.filtering.Filter;
  * This implementation allows for quick-and-dirty Filtered Collections
  * that don't require the creation of new Filter instances.
  * 
- * @param <T> - type of Collection elements
+ * @param <E> - Collection element type
  */
-public abstract class FilteredCollectionSelf<T> extends FilteredCollection<T> implements Filter<T> {
+public abstract class FilteredCollectionSelf<E> extends FilteredCollection<E> implements Filter<E> {
 
 	/**
 	 * Constructs a new Self-Filtered Collection using the base Collection specified
 	 * 
 	 * @param base Collection
 	 */
-	protected FilteredCollectionSelf(Collection<T> base) {
+	protected FilteredCollectionSelf(Collection<E> base) {
 		super(base, null);
 		filter = this;
 	}

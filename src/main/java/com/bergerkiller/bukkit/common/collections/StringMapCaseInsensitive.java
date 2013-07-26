@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
  * A high-performance HashMap implementation that ignores the case of keys. The keys are stored in the original case.
  * This map violates it general contract for that reason, as keys no longer have to equal one another.
  * 
- * @param <V> - value type
+ * @param <V> - Value type to map to String keys
  */
 public class StringMapCaseInsensitive<V> implements Map<String, V> {
 	private static final Converter<StringWrap> toStringWrap = new BasicConverter<StringWrap>(StringWrap.class) {

@@ -8,6 +8,9 @@ import org.bukkit.block.Block;
 import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+/**
+ * A Set implementation for storing Block Locations (offline Blocks)
+ */
 public class BlockSet extends HashSet<BlockLocation> {
 	private static final long serialVersionUID = 1L;
 

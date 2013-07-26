@@ -7,13 +7,15 @@ import java.util.NoSuchElementException;
 
 /**
  * An iterator that can iterate over a collection of lists
+ * 
+ * @param <E> - List element type
  */
-public class List2DIterator<T> implements Iterator<T> {
-	private final Iterator<List<T>> collectionIter;
-	private Iterator<T> elemIter;
-	private Iterator<T> oldIter; // Used for remove() functionality
+public class List2DIterator<E> implements Iterator<E> {
+	private final Iterator<List<E>> collectionIter;
+	private Iterator<E> elemIter;
+	private Iterator<E> oldIter; // Used for remove() functionality
 
-	public List2DIterator(Collection<List<T>> collection2D) {
+	public List2DIterator(Collection<List<E>> collection2D) {
 		collectionIter = collection2D.iterator();
 		nextElemIter();
 	}
@@ -43,11 +45,11 @@ public class List2DIterator<T> implements Iterator<T> {
 	}
 
 	@Override
-	public T next() {
+	public E next() {
 		if (elemIter == null) {
 			throw new NoSuchElementException("Ran out of elements to return (forgot a hasNext check?)");
 		}
-		final T elem = elemIter.next();
+		final E elem = elemIter.next();
 		oldIter = elemIter;
 		nextElemIter();
 		return elem;

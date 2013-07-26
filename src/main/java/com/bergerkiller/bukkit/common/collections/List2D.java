@@ -9,15 +9,17 @@ import java.util.ListIterator;
 /**
  * A list implementation that uses a backing array of lists.
  * The amount of stored lists is NEVER changed.
+ * 
+ * @param <E> - List element type
  */
-public class List2D<T> implements List<T> {
-	private final Collection<List<T>> lists;
+public class List2D<E> implements List<E> {
+	private final Collection<List<E>> lists;
 
-	public List2D(List<T>[] lists) {
+	public List2D(List<E>[] lists) {
 		this(Arrays.asList(lists));
 	}
 
-	public List2D(Collection<List<T>> lists) {
+	public List2D(Collection<List<E>> lists) {
 		if (lists.isEmpty()) {
 			throw new IllegalArgumentException("Can not use an empty collection of lists");
 		}
@@ -25,9 +27,9 @@ public class List2D<T> implements List<T> {
 	}
 
 	@Override
-	public boolean add(T e) {
-		Iterator<List<T>> iter = lists.iterator();
-		List<T> rval = null;
+	public boolean add(E e) {
+		Iterator<List<E>> iter = lists.iterator();
+		List<E> rval = null;
 		while (iter.hasNext()) {
 			rval = iter.next();
 		}
@@ -37,7 +39,7 @@ public class List2D<T> implements List<T> {
 	@Override
 	public int size() {
 		int size = 0;
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			size += list.size();
 		}
 		return size;
@@ -45,7 +47,7 @@ public class List2D<T> implements List<T> {
 
 	@Override
 	public boolean isEmpty() {
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			if (!list.isEmpty()) {
 				return false;
 			}
@@ -55,7 +57,7 @@ public class List2D<T> implements List<T> {
 
 	@Override
 	public boolean contains(Object o) {
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			if (list.contains(o)) {
 				return true;
 			}
@@ -64,8 +66,8 @@ public class List2D<T> implements List<T> {
 	}
 
 	@Override
-	public Iterator<T> iterator() {
-		return new List2DIterator<T>(lists);
+	public Iterator<E> iterator() {
+		return new List2DIterator<E>(lists);
 	}
 
 	@Override
@@ -74,13 +76,13 @@ public class List2D<T> implements List<T> {
 	}
 
 	@Override
-	public <K> K[] toArray(K[] array) {
+	public <T> T[] toArray(T[] array) {
 		return CollectionBasics.toArray(this, array);
 	}
 
 	@Override
 	public boolean remove(Object o) {
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			if (list.remove(o)) {
 				return true;
 			}
@@ -99,14 +101,14 @@ public class List2D<T> implements List<T> {
 	}
 
 	@Override
-	public boolean addAll(int index, Collection<? extends T> c) {
+	public boolean addAll(int index, Collection<? extends E> c) {
 		return CollectionBasics.getEntry(lists, index).addAll(c);
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		boolean changed = false;
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			changed |= list.removeAll(c);
 		}
 		return changed;
@@ -119,35 +121,35 @@ public class List2D<T> implements List<T> {
 
 	@Override
 	public void clear() {
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			list.clear();
 		}
 	}
 
 	@Override
-	public T get(int index) {
+	public E get(int index) {
 		return CollectionBasics.getEntry(lists, index).get();
 	}
 
 	@Override
-	public T set(int index, T element) {
+	public E set(int index, E element) {
 		return CollectionBasics.getEntry(lists, index).set(element);
 	}
 
 	@Override
-	public void add(int index, T element) {
+	public void add(int index, E element) {
 		CollectionBasics.getEntry(lists, index).add(element);
 	}
 
 	@Override
-	public T remove(int index) {
+	public E remove(int index) {
 		return CollectionBasics.getEntry(lists, index).remove();
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends T> c) {
+	public boolean addAll(Collection<? extends E> c) {
 		boolean changed = false;
-		for (T element : c) {
+		for (E element : c) {
 			changed |= add(element);
 		}
 		return changed;
@@ -157,7 +159,7 @@ public class List2D<T> implements List<T> {
 	public int indexOf(Object o) {
 		int index = 0;
 		int subIndex;
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			subIndex = list.indexOf(o);
 			if (subIndex == -1) {
 				index += list.size();
@@ -173,7 +175,7 @@ public class List2D<T> implements List<T> {
 		int rval = -1;
 		int index = 0;
 		int subIndex;
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			subIndex = list.lastIndexOf(o);
 			if (subIndex == -1) {
 				index += list.size();
@@ -185,17 +187,17 @@ public class List2D<T> implements List<T> {
 	}
 
 	@Override
-	public ListIterator<T> listIterator() {
-		return new List2DListIterator<T>(lists);
+	public ListIterator<E> listIterator() {
+		return new List2DListIterator<E>(lists);
 	}
 
 	@Override
-	public ListIterator<T> listIterator(int index) {
-		return new List2DListIterator<T>(lists, index);
+	public ListIterator<E> listIterator(int index) {
+		return new List2DListIterator<E>(lists, index);
 	}
 
 	@Override
-	public List<T> subList(int fromIndex, int toIndex) {
+	public List<E> subList(int fromIndex, int toIndex) {
 		throw new UnsupportedOperationException("Unimplemented feature");
 	}
 }

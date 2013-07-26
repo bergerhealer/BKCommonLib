@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -319,6 +320,44 @@ public class LogicUtil {
 	 */
 	public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
 		return collection.toArray(createArray(type, collection.size()));
+	}
+
+	/**
+	 * Adds all the elements of an array to a Collection
+	 * 
+	 * @param collection to add elements to
+	 * @param array to add to the Collection
+	 * @return True if the collection changed as a result of the call, False if not.
+	 */
+	public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
+		if (array.length > 20) {
+			return collection.addAll(Arrays.asList(array));
+		} else {
+			boolean changed = false;
+			for (T element : array) {
+				changed |= collection.add(element);
+			}
+			return changed;
+		}
+	}
+
+	/**
+	 * Removes all the elements of an array from a Collection
+	 * 
+	 * @param collection to remove elements from
+	 * @param array to remove from the Collection
+	 * @return True if the collection changed as a result of the call, False if not.
+	 */
+	public static boolean removeArray(Collection<?> collection, Object... array) {
+		if (array.length > 100) {
+			return collection.removeAll(Arrays.asList(array));
+		} else {
+			boolean changed = false;
+			for (Object element : array) {
+				changed |= collection.remove(element);
+			}
+			return changed;
+		}
 	}
 
 	/**

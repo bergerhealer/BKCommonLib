@@ -7,8 +7,8 @@ import java.util.AbstractMap.SimpleEntry;
 /**
  * A basic ArrayList implementation for storing entries
  * 
- * @param <K> - key type
- * @param <V> - value type
+ * @param <K> - Key type
+ * @param <V> - Value type
  */
 public class EntryList<K, V> extends ArrayList<Entry<K, V>> {
 	private static final long serialVersionUID = 1L;

@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * A List implementation that only stores unique values, like a Set does
  * 
- * @param <E> - type of elements
+ * @param <E> - Element type
  */
 public class UniqueList<E> extends ArrayList<E> {
 	private static final long serialVersionUID = 1L;

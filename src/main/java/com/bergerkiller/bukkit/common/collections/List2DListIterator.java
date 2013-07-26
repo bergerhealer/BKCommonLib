@@ -9,27 +9,29 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics.ListEntry;
 /**
  * A List Iterator that can iterate over a collection of collections.
  * For example, to iterate over an array of lists
+ * 
+ * @param <E> - List element type
  */
-public class List2DListIterator<T> implements ListIterator<T> {
-	private final Collection<List<T>> lists;
+public class List2DListIterator<E> implements ListIterator<E> {
+	private final Collection<List<E>> lists;
 	private int index;
 
-	public List2DListIterator(Collection<List<T>> lists) {
+	public List2DListIterator(Collection<List<E>> lists) {
 		this(lists, 0);
 	}
 
-	public List2DListIterator(Collection<List<T>> lists, int index) {
+	public List2DListIterator(Collection<List<E>> lists, int index) {
 		this.lists = lists;
 		this.index = index;
 	}
 
-	private ListEntry<T> get() {
+	private ListEntry<E> get() {
 		return CollectionBasics.getEntry(lists, index);
 	}
 
 	private int size() {
 		int size = 0;
-		for (List<T> list : lists) {
+		for (List<E> list : lists) {
 			size += list.size();
 		}
 		return size;
@@ -46,7 +48,7 @@ public class List2DListIterator<T> implements ListIterator<T> {
 	}
 
 	@Override
-	public T next() {
+	public E next() {
 		try {
 			return get().get();
 		} finally {
@@ -60,7 +62,7 @@ public class List2DListIterator<T> implements ListIterator<T> {
 	}
 
 	@Override
-	public T previous() {
+	public E previous() {
 		index--;
 		return get().get();
 	}
@@ -76,12 +78,12 @@ public class List2DListIterator<T> implements ListIterator<T> {
 	}
 
 	@Override
-	public void set(T e) {
+	public void set(E e) {
 		get().set(e);
 	}
 
 	@Override
-	public void add(T e) {
+	public void add(E e) {
 		get().add(e);
 	}
 }

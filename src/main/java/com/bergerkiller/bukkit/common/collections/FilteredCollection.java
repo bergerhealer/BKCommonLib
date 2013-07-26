@@ -14,11 +14,11 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * A basic implementation of a Collection that filters some elements from a base Collection.
  * To define the elements to a filter, a {@link Filter} is used.
  * 
- * @param <T> - type of Collection elements
+ * @param <E> - Collection element type
  */
-public class FilteredCollection<T> implements Collection<T> {
-	private final Collection<T> base;
-	protected Filter<T> filter;
+public class FilteredCollection<E> implements Collection<E> {
+	private final Collection<E> base;
+	protected Filter<E> filter;
 
 	/**
 	 * Constructs a new Filtered Collection using the base Collection and
@@ -27,14 +27,14 @@ public class FilteredCollection<T> implements Collection<T> {
 	 * @param base Collection
 	 * @param filter to use to filter elements from the base Collection
 	 */
-	public FilteredCollection(Collection<T> base, Filter<T> filter) {
+	public FilteredCollection(Collection<E> base, Filter<E> filter) {
 		this.base = base;
 		this.filter = filter;
 	}
 
 	@Override
-	public Iterator<T> iterator() {
-		return new FilteredIterator<T>(this);
+	public Iterator<E> iterator() {
+		return new FilteredIterator<E>(this);
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class FilteredCollection<T> implements Collection<T> {
 	 * 
 	 * @return Filtered Collection Filter
 	 */
-	public Filter<T> getFilter() {
+	public Filter<E> getFilter() {
 		return this.filter;
 	}
 
@@ -51,7 +51,7 @@ public class FilteredCollection<T> implements Collection<T> {
 	 * 
 	 * @param filter to set to
 	 */
-	public void setFilter(Filter<T> filter) {
+	public void setFilter(Filter<E> filter) {
 		this.filter = filter;
 	}
 
@@ -102,7 +102,7 @@ public class FilteredCollection<T> implements Collection<T> {
 	@Override
 	public int size() {
 		int size = 0;
-		for (T value : base) {
+		for (E value : base) {
 			if (!filter.isFiltered(value)) {
 				size++;
 			}
@@ -113,7 +113,7 @@ public class FilteredCollection<T> implements Collection<T> {
 	@Override
 	public boolean isEmpty() {
 		if (!base.isEmpty()) {
-			for (T value : base) {
+			for (E value : base) {
 				if (!filter.isFiltered(value)) {
 					return false;
 				}
@@ -133,12 +133,12 @@ public class FilteredCollection<T> implements Collection<T> {
 	}
 
 	@Override
-	public <E> E[] toArray(E[] a) {
+	public <T> T[] toArray(T[] a) {
 		return CollectionBasics.toArray(this, a);
 	}
 
 	@Override
-	public boolean add(T e) {
+	public boolean add(E e) {
 		if (filter.isFiltered(e)) {
 			return false;
 		} else {
@@ -150,9 +150,9 @@ public class FilteredCollection<T> implements Collection<T> {
 	@Override
 	public boolean remove(Object o) {
 		// Remove the first element that equals o and is not filtered
-		Iterator<T> iter = base.iterator();
+		Iterator<E> iter = base.iterator();
 		while (iter.hasNext()) {
-			final T value = iter.next();
+			final E value = iter.next();
 			if (LogicUtil.bothNullOrEqual(value, o) && !filter.isFiltered(value)) {
 				iter.remove();
 				return true;
@@ -167,7 +167,7 @@ public class FilteredCollection<T> implements Collection<T> {
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends T> c) {
+	public boolean addAll(Collection<? extends E> c) {
 		return CollectionBasics.addAll(this, c);
 	}
 
@@ -180,10 +180,10 @@ public class FilteredCollection<T> implements Collection<T> {
 		} else {
 			// Go by all elements in this Collection
 			// If contained in c, remove them
-			Iterator<T> iter = base.iterator();
+			Iterator<E> iter = base.iterator();
 			boolean removed = false;
 			while (iter.hasNext()) {
-				T value = iter.next();
+				E value = iter.next();
 				if (c.contains(value) && !filter.isFiltered(value)) {
 					iter.remove();
 					removed = true;
@@ -200,7 +200,7 @@ public class FilteredCollection<T> implements Collection<T> {
 
 	@Override
 	public void clear() {
-		Iterator<T> iter = this.base.iterator();
+		Iterator<E> iter = this.base.iterator();
 		if (!filter.isFiltered(iter.next())) {
 			iter.remove();
 		}

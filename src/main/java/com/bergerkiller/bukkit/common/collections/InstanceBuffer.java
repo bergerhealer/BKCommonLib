@@ -10,6 +10,8 @@ import java.util.List;
  * allow operating outside the size of the buffer, and dynamically allocate the new capacity needed.<br><br>
  * 
  * The {@link #createElement()} method needs to be implemented to use this buffer.
+ * 
+ * @param <E> - Instance element type
  */
 public abstract class InstanceBuffer<E> extends AbstractList<E> {
 	private final ArrayList<E> buffer = new ArrayList<E>();
