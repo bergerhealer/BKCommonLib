@@ -12,22 +12,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import me.snowleo.bleedingmobs.BleedingMobs;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import regalowl.hyperconomy.HyperConomy;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.MessageBuilder;
@@ -50,8 +45,6 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
-import com.kellerkindt.scs.ShowCaseStandalone;
-import com.narrowtux.showcase.Showcase;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
@@ -85,13 +78,10 @@ public class CommonPlugin extends PluginBase {
 	private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
 	private CommonEventFactory eventFactory;
 	private boolean isServerStarted = false;
-	private boolean isShowcaseEnabled = false;
-	private boolean isSCSEnabled = false;
-	private boolean isHyperConomyEnabled = false;
-	private Plugin bleedingMobsInstance = null;
 	private PacketHandler packetHandler = null;
 	private PermissionHandler permissionHandler = null;
-	private CommonTabController tabController;
+	private CommonTabController tabController = null;
+	private CommonEntityBlacklist entityBlacklist = null;
 
 	public static boolean hasInstance() {
 		return instance != null;
@@ -190,59 +180,6 @@ public class CommonPlugin extends PluginBase {
 		worldListeners.put(world, listener);
 	}
 
-	@SuppressWarnings("deprecation")
-	public boolean isEntityIgnored(org.bukkit.entity.Entity entity) {
-		if (entity instanceof Item) {
-			Item item = (Item) entity;
-			if (this.isShowcaseEnabled) {
-				try {
-					if (Showcase.instance.getItemByDrop(item) != null) {
-						return true;
-					}
-				} catch (Throwable t) {
-					log(Level.SEVERE, "Showcase item verification failed (update needed?), contact the authors!");
-					handle(t);
-					this.isShowcaseEnabled = false;
-				}
-			}
-			if (this.isSCSEnabled) {
-				try {
-					if (ShowCaseStandalone.get().getShopHandler().isShopItem(item)) {
-						return true;
-					}
-				} catch (Throwable t) {
-					log(Level.SEVERE, "ShowcaseStandalone item verification failed (update needed?), contact the authors!");
-					handle(t);
-					this.isSCSEnabled = false;
-				}
-			}
-			if (this.isHyperConomyEnabled) {
-				try {
-					if (HyperConomy.hyperAPI.isItemDisplay(item)) {
-						return true;
-					}
-				} catch (Throwable t) {
-					log(Level.SEVERE, "HyperConomy item verification failed (update needed?), contact the authors!");
-					handle(t);
-					this.isHyperConomyEnabled = false;
-				}
-			}
-			if (this.bleedingMobsInstance != null) {
-				try {
-					BleedingMobs bm = (BleedingMobs) this.bleedingMobsInstance;
-					if (bm.isSpawning() || (bm.isWorldEnabled(item.getWorld()) && bm.isParticleItem(item.getUniqueId()))) {
-						return true;
-					}
-				} catch (Throwable t) {
-					Bukkit.getLogger().log(Level.SEVERE, "Bleeding Mobs item verification failed (update needed?), contact the authors!");
-					t.printStackTrace();
-					this.bleedingMobsInstance = null;
-				}
-			}
-		}
-		return false;
-	}
-
 	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
 		synchronized (playerVisibleChunks) {
 			LongHashSet chunks = playerVisibleChunks.get(player);
@@ -285,7 +222,17 @@ public class CommonPlugin extends PluginBase {
 	}
 
 	/**
-	 * Gets the Tab Controller that is responsible for the creation and updating of tabs
+	 * Obtains the Entity Blacklist that filters out Entities that are part of other plugin's logic.
+	 * This includes entities that represent particles or virtual items.
+	 * 
+	 * @return entity blacklist
+	 */
+	public CommonEntityBlacklist getEntityBlacklist() {
+		return entityBlacklist;
+	}
+
+	/**
+	 * Obtains the Tab Controller that is responsible for the creation and updating of tabs
 	 * 
 	 * @return tab controller
 	 */
@@ -371,24 +318,7 @@ public class CommonPlugin extends PluginBase {
 		if (!enabled) {
 			packetHandler.removePacketListeners(plugin);
 		}
-		if (pluginName.equals("Showcase")) {
-			if (this.isShowcaseEnabled = enabled) {
-				log(Level.INFO, "Showcase detected: Showcased items will be ignored");
-			}
-		} else if (pluginName.equals("ShowCaseStandalone")) {
-			if (this.isSCSEnabled = enabled) {
-				log(Level.INFO, "Showcase Standalone detected: Showcased items will be ignored");
-			}
-		} else if (pluginName.equals("HyperConomy")) {
-			if (this.isHyperConomyEnabled = enabled) {
-				log(Level.INFO, "HyperConomy detected: Showcased items will be ignored");
-			}
-		} else if (pluginName.equals("BleedingMobs")) {
-			this.bleedingMobsInstance = enabled ? plugin : null;
-			if (enabled) {
-				log(Level.INFO, "Bleeding Mobs detected: Particle items will be ignored");
-			}
-		}
+		this.entityBlacklist.updateDependency(plugin, pluginName, enabled);
 		this.permissionHandler.updateDependency(plugin, pluginName, enabled);
 		if (!this.updatePacketHandler()) {
 			this.onCriticalFailure();
@@ -501,6 +431,9 @@ public class CommonPlugin extends PluginBase {
 
 		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
 		playerVisibleChunks = new EntityMap<Player, LongHashSet>();
+
+		// Initialize Entity Blacklist
+		entityBlacklist = new CommonEntityBlacklist();
 
 		// Register events and tasks, initialize
 		register(listener = new CommonListener());

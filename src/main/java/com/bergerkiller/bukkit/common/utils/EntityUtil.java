@@ -61,7 +61,7 @@ public class EntityUtil extends EntityPropertyUtil {
 	 * @return True if the entity should be ignored, False if not
 	 */
 	public static boolean isIgnored(org.bukkit.entity.Entity entity) {
-		return CommonPlugin.getInstance().isEntityIgnored(entity);
+		return CommonPlugin.getInstance().getEntityBlacklist().isFiltered(entity);
 	}
 
 	/*
