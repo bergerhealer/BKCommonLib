@@ -5,6 +5,11 @@ import java.util.NoSuchElementException;
 
 import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 
+/**
+ * A wrapper around the internal LongHashSet implementation.
+ * This type of HashSet allows storing long keys.
+ * Ideally, two int values are merged into one long to store 2D-coordinates.
+ */
 public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 
 	public LongHashSet() {
