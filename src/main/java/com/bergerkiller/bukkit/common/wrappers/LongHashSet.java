@@ -23,16 +23,16 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 		return LongHashSetRef.iterator.invoke(handle);
 	}
 
-	public boolean add(int lsw, int msw) {
-		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).add(lsw, msw);
+	public boolean add(int msw, int lsw) {
+		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).add(msw, lsw);
 	}
 
 	public boolean add(long value) {
 		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).add(value);
 	}
 
-	public boolean contains(int lsw, int msw) {
-		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).contains(lsw, msw);
+	public boolean contains(int msw, int lsw) {
+		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).contains(msw, lsw);
 	}
 
 	public boolean contains(long value) {

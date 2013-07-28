@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.server;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.bukkit.Bukkit;
 
@@ -31,7 +32,22 @@ public abstract class CommonServerBase implements CommonServer {
 			return true;
 		}
 		File worldFolder = getWorldFolder(worldName);
-		return worldFolder.isDirectory() && new File(worldFolder, "level.dat").exists();
+		if (!worldFolder.isDirectory()) {
+			return false;
+		}
+		if (new File(worldFolder, "level.dat").exists()) {
+			return true;
+		}
+		// Check whether there are any valid region files in the folder
+		File regionFolder = getWorldRegionFolder(worldName);
+		if (regionFolder != null) {
+			for (String fileName : regionFolder.list()) {
+				if (fileName.toLowerCase(Locale.ENGLISH).endsWith(".mca")) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
