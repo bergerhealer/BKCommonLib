@@ -435,10 +435,14 @@ public class CommonTabController implements PacketListener, Listener {
 				// Allow the default message to go through, but do keep track of the updates names
 				if (register) {
 					// Add the new names, and ping if needed
+					final int index;
 					if (this.names.add(name)) {
-						this.ping[this.names.size() - 1] = ping;
+						index = this.names.size() - 1;
 					} else {
-						this.ping[this.names.indexOf(name)] = ping;
+						index = this.names.indexOf(name);
+					}
+					if (index >= 0 && index < count) {
+						this.ping[index] = ping;
 					}
 				} else {
 					int index = this.names.indexOf(name);
@@ -446,12 +450,14 @@ public class CommonTabController implements PacketListener, Listener {
 						// Remove name (at that index)
 						this.names.remove(index);
 						// Shift ping and text one to the left starting at the index
-						for (int i = index; i < (count - 1); i++) {
-							this.text[i] = this.text[i + 1];
-							this.ping[i] = this.ping[i + 1];
+						if (index >= 0 && index < count) {
+							for (int i = index; i < (count - 1); i++) {
+								this.text[i] = this.text[i + 1];
+								this.ping[i] = this.ping[i + 1];
+							}
+							this.text[count - 1] = TabView.TEXT_DEFAULT;
+							this.ping[count - 1] = TabView.PING_DEFAULT;
 						}
-						this.text[count - 1] = TabView.TEXT_DEFAULT;
-						this.ping[count - 1] = TabView.PING_DEFAULT;
 					}
 				}
 				return true;
