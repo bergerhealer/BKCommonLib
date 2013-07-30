@@ -215,17 +215,31 @@ public class WorldUtil extends ChunkUtil {
 	 * Note that portals are created if no position can be found.
 	 * 
 	 * @param startLocation to find a spawn from
-	 * @return spawn location, or null if this failed
+	 * @return suitable spawn location, or the input startLocation if this failed
 	 */
 	public static Location findSpawnLocation(Location startLocation) {
+		return findSpawnLocation(startLocation, true);
+	}
+
+	/**
+	 * Attempts to find a suitable spawn location, searching from the startLocation specified.
+	 * If specified, portals will be created if none are found.
+	 * 
+	 * @param startLocation to find a spawn from
+	 * @param createPortals - True to create a portal if not found, False not to
+	 * @return suitable spawn location, or the input startLocation if this failed
+	 */
+	public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
 		WorldServer ws = CommonNMS.getNative(startLocation.getWorld());
 		// Use a new travel agent to designate a proper position
-		Location exit = new CraftTravelAgent(ws).findOrCreate(startLocation);
+		CraftTravelAgent travelAgent = new CraftTravelAgent(ws);
+		travelAgent.setCanCreatePortal(createPortals);
+		Location exit = travelAgent.findOrCreate(startLocation);
 		// Adjust the exit to make it suitable for players
 		// Note: this will raise an NPE while trying to fire the PortalExit event
 		// This is expected behavior
 		try {
-			ws.t().adjustExit((Entity) findSpawnDummyEntity, exit, new Vector(0, 0, 0));
+			travelAgent.adjustExit((Entity) findSpawnDummyEntity, exit, new Vector(0, 0, 0));
 		} catch (NullPointerException ex) {
 		}
 		// Done!
