@@ -361,6 +361,16 @@ public abstract class TabView {
 	public abstract int getPing(int x, int y);
 
 	/**
+	 * Gets whether the current Tab View is displayed to a player
+	 * 
+	 * @param player to check
+	 * @return True if this Tab View is displayed to the Player, False if not
+	 */
+	public boolean isDisplayedTo(Player player) {
+		return getController().getCurrentTab(player) == this;
+	}
+
+	/**
 	 * Displays this Tab View to the player specified.
 	 * The player is added to the viewers, previous viewers are not removed.
 	 * If you wish to hide this Tab View again, use displayTo on the {@link #DEFAULT} or {@link #EMPTY} constants.
