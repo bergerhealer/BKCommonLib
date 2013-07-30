@@ -158,12 +158,16 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
 	@Override
 	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
-		ProtocolLibrary.getProtocolManager().addPacketListener(new CommonPacketListener(plugin, listener, ids));
+		CommonPacketListener commonListener = new CommonPacketListener(plugin, listener, ids);
+		ProtocolLibrary.getProtocolManager().addPacketListener(commonListener);
+		this.listeners.add(commonListener);
 	}
 
 	@Override
 	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, int[] ids) {
-		ProtocolLibrary.getProtocolManager().addPacketListener(new CommonPacketMonitor(plugin, monitor, ids));
+		CommonPacketMonitor commonMonitor = new CommonPacketMonitor(plugin, monitor, ids);
+		ProtocolLibrary.getProtocolManager().addPacketListener(commonMonitor);
+		this.monitors.add(commonMonitor);
 	}
 
 	@Override

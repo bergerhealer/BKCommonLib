@@ -36,9 +36,10 @@ public class PacketFields {
 	public static final NMSPacket27PlayerInput PLAYER_INPUT = new NMSPacket27PlayerInput();
 	public static final NMSPacket28EntityVelocity ENTITY_VELOCITY = new NMSPacket28EntityVelocity();
 	public static final NMSPacket29DestroyEntity DESTROY_ENTITY = new NMSPacket29DestroyEntity();
-	public static final NMSPacket31RelEntityMove REL_ENTITY_MOVE = new NMSPacket31RelEntityMove();
+	public static final NMSPacket30Entity ENTITY = new NMSPacket30Entity();
+	public static final NMSPacket31RelEntityMove ENTITY_MOVE = new NMSPacket31RelEntityMove();
 	public static final NMSPacket32EntityLook ENTITY_LOOK = new NMSPacket32EntityLook();
-	public static final NMSPacket33RelEntityMoveLook REL_ENTITY_MOVE_LOOK = new NMSPacket33RelEntityMoveLook();
+	public static final NMSPacket33RelEntityMoveLook ENTITY_MOVE_LOOK = new NMSPacket33RelEntityMoveLook();
 	public static final NMSPacket34EntityTeleport ENTITY_TELEPORT = new NMSPacket34EntityTeleport();
 	public static final NMSPacket35EntityHeadRotation ENTITY_HEAD_ROTATION = new NMSPacket35EntityHeadRotation();
 	public static final NMSPacket38EntityStatus ENTITY_STATUS = new NMSPacket38EntityStatus();
@@ -51,7 +52,7 @@ public class PacketFields {
 	public static final NMSPacket51MapChunk MAP_CHUNK = new NMSPacket51MapChunk();
 	public static final NMSPacket52MultiBlockChange MULTI_BLOCK_CHANGE = new NMSPacket52MultiBlockChange();
 	public static final NMSPacket53BlockChange BLOCK_CHANGE = new NMSPacket53BlockChange();
-	public static final NMSPacket54PlayNoteBlock PLAY_NOTE_BLOCK = new NMSPacket54PlayNoteBlock();
+	public static final NMSPacket54PlayNoteBlock PLAY_NOTEBLOCK = new NMSPacket54PlayNoteBlock();
 	public static final NMSPacket55BlockBreakAnimation BLOCK_BREAK_ANIMATION = new NMSPacket55BlockBreakAnimation();
 	public static final NMSPacket56MapChunkBulk MAP_CHUNK_BULK = new NMSPacket56MapChunkBulk();
 	public static final NMSPacket60Explosion EXPLOSION = new NMSPacket60Explosion();
@@ -65,7 +66,7 @@ public class PacketFields {
 	public static final NMSPacket102WindowClick WINDOW_CLICK = new NMSPacket102WindowClick();
 	public static final NMSPacket103SetSlot SET_SLOT = new NMSPacket103SetSlot();
 	public static final NMSPacket104WindowItems WINDOW_ITEMS = new NMSPacket104WindowItems();
-	public static final NMSPacket105CraftProgressBar CRAFT_PROGRESS_BAR = new NMSPacket105CraftProgressBar();
+	public static final NMSPacket105CraftProgressBar PROGRESS_BAR = new NMSPacket105CraftProgressBar();
 	public static final NMSPacket106Transaction TRANSACTION = new NMSPacket106Transaction();
 	public static final NMSPacket107SetCreativeSlot SET_CREATIVE_SLOT = new NMSPacket107SetCreativeSlot();
 	public static final NMSPacket108ButtonClick BUTTON_CLICK = new NMSPacket108ButtonClick();
@@ -77,7 +78,7 @@ public class PacketFields {
 	public static final NMSPacket201PlayerInfo PLAYER_INFO = new NMSPacket201PlayerInfo();
 	public static final NMSPacket202Abilities ABILITIES = new NMSPacket202Abilities();
 	public static final NMSPacket203TabComplete TAB_COMPLETE = new NMSPacket203TabComplete();
-	public static final NMSPacket204LocaleAndViewDistance LOCALE_AND_VIEW_DISTANCE = new NMSPacket204LocaleAndViewDistance();
+	public static final NMSPacket204LocaleAndViewDistance CLIENT_INFO = new NMSPacket204LocaleAndViewDistance();
 	public static final NMSPacket205ClientCommand CLIENT_COMMAND = new NMSPacket205ClientCommand();
 	public static final NMSPacket206SetScoreboardObjective SET_SCOREBOARD_OBJECTIVE = new NMSPacket206SetScoreboardObjective();
 	public static final NMSPacket207SetScoreboardScore SET_SCOREBOARD_SCORE = new NMSPacket207SetScoreboardScore();
@@ -87,5 +88,5 @@ public class PacketFields {
 	public static final NMSPacket252KeyResponse KEY_RESPONSE = new NMSPacket252KeyResponse();
 	public static final NMSPacket253KeyRequest KEY_REQUEST = new NMSPacket253KeyRequest();
 	public static final NMSPacket254GetInfo GET_INFO = new NMSPacket254GetInfo();
-	public static final NMSPacket255KickDisconnect KICK_DISCONNECT = new NMSPacket255KickDisconnect();
+	public static final NMSPacket255KickDisconnect DISCONNECT = new NMSPacket255KickDisconnect();
 }

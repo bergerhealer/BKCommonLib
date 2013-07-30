@@ -17,7 +17,6 @@ import net.minecraft.server.World;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
 
 import org.bukkit.craftbukkit.inventory.CraftInventory;
@@ -255,7 +254,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 		@Override
 		public org.bukkit.WorldType convertSpecial(Object value, Class<?> valueType, org.bukkit.WorldType def) {
 			if (WorldTypeRef.TEMPLATE.isInstance(value)) {
-				return WorldType.getByName(WorldTypeRef.name.get(value));
+				return org.bukkit.WorldType.getByName(WorldTypeRef.name.get(value));
 			} else if (value != null) {
 				return ParseUtil.parseEnum(org.bukkit.WorldType.class, value.toString(), def);
 			} else {

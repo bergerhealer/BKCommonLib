@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.lang.reflect.Array;
 import java.util.Collection;
 
+import net.minecraft.server.WorldType;
+
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
@@ -43,11 +45,19 @@ public abstract class PrimitiveConverter<T> extends BasicConverter<T> {
 	public static final PrimitiveConverter<String> toString = new PrimitiveConverter<String>(String.class, "") {
 		@Override
 		public String convertSpecial(Object value, Class<?> valueType, String def) {
+			// String-types
 			if (value instanceof CharSequence) {
 				return value.toString();
 			} else if (value instanceof char[]) {
 				return String.copyValueOf((char[]) value);
 			}
+
+			// Unique toString cases
+			if (value instanceof WorldType) {
+				return ((WorldType) value).name();
+			}
+
+			// Arrays, Collections and Maps
 			if (value.getClass().isArray()) {
 				if (value.getClass().getComponentType().isPrimitive()) {
 					// Primitive type array - simply append elements with a space

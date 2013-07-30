@@ -148,8 +148,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> x = getField("a");
 		public final FieldAccessor<Integer> y = getField("b");
 		public final FieldAccessor<Integer> z = getField("c");
-		public final FieldAccessor<Object> gamemode = getField("d");
-		public final FieldAccessor<Object> worldType = getField("e");
+		public final TranslatorFieldAccessor<GameMode> gamemode = getField("d").translate(ConversionPairs.gameMode);
+		public final TranslatorFieldAccessor<WorldType> worldType = getField("e").translate(ConversionPairs.worldType);
 	}
 	public static class NMSPacket10Flying extends NMSPacket {
 		public final FieldAccessor<Double> x = getField("x");

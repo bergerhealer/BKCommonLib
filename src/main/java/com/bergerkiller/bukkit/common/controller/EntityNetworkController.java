@@ -757,12 +757,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			} else if (rotation) {
 				// Update rotation and position relatively
 				locSynched.set(posX, posY, posZ, yaw, pitch);
-				broadcast(PacketFields.REL_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
+				broadcast(PacketFields.ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
 						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch));
 			} else {
 				// Only update position relatively
 				locSynched.set(posX, posY, posZ);
-				broadcast(PacketFields.REL_ENTITY_MOVE.newInstance(entity.getEntityId(), 
+				broadcast(PacketFields.ENTITY_MOVE.newInstance(entity.getEntityId(), 
 						(byte) deltaX, (byte) deltaY, (byte) deltaZ));
 			}
 		} else if (rotation) {
