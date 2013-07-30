@@ -3,7 +3,8 @@ package com.bergerkiller.bukkit.common.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
+import java.util.LinkedHashSet;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.FilteredCollectionSelf;
 import com.bergerkiller.bukkit.common.collections.UniqueList;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -34,13 +36,35 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class CommonTabController implements PacketListener, Listener {
-	private static final char[] RANDOM_STYLE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+	public static final int MAX_TEXT_LENGTH = 16;	
+	private static final char[] RANDOM_STYLE_CHARS;
 	private final FieldAccessor<Integer> maxPlayersField;
 	private int serverMaxPlayers;
 	private int serverListWidth, serverListHeight, serverListCount;
 	private int customListWidth, customListHeight, customListCount;
 	private final EntityMap<Player, PlayerTabInfo> players = new EntityMap<Player, PlayerTabInfo>();
 	private TabView defaultTab;
+
+	static {
+		LinkedHashSet<Character> chars = new LinkedHashSet<Character>();
+		// Add all chars available that do not conflict with rendering
+		// ===========================================================================
+		LogicUtil.addArray(chars, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+		LogicUtil.addArray(chars, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
+		LogicUtil.addArray(chars, 'p', 'q', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+		LogicUtil.addArray(chars, '+', '-', '=', '|', '(', ')', '{', '}', '[', ']');
+		// ===========================================================================
+
+		// Also add all upper-case versions
+		for (Character c : chars.toArray(new Character[0])) {
+			chars.add(Character.toUpperCase(c));
+		}
+		// To char array and check length
+		RANDOM_STYLE_CHARS = Conversion.toCharArr.convert(chars);
+		if (RANDOM_STYLE_CHARS.length < 60) {
+			CommonPlugin.LOGGER.log(Level.WARNING, "Not enough unique characters to use: " + RANDOM_STYLE_CHARS.length);
+		}
+	}
 
 	protected CommonTabController() {
 		// Read server max players
@@ -479,25 +503,35 @@ public class CommonTabController implements PacketListener, Listener {
 		}
 
 		private String getName(String text) {
+			if (text.length() > MAX_TEXT_LENGTH) {
+				text = text.substring(0, MAX_TEXT_LENGTH);
+			}
 			if (names.add(text)) {
 				return text;
 			}
-			// There are 16*16*16 = 4096 possibilities to randomly pick from
-			// This will be efficient enough (we think)
-			int textLength = text.length();
-			StringBuilder uniqueNameBuilder = new StringBuilder(textLength + 6).append(text);
+
+			// Get rid of 2 chars before the maximum length, since we need to append style chars...
+			int textLength = Math.min(text.length(), MAX_TEXT_LENGTH - 2);
+			StringBuilder uniqueNameBuilder = new StringBuilder(textLength + 2);
+
+			// Initial name + chat style char
+			// Increment text length since we don't want to trim off the chat style char
+			uniqueNameBuilder.append(text);
+			uniqueNameBuilder.setLength(textLength);
+			uniqueNameBuilder.append(StringUtil.CHAT_STYLE_CHAR);
+			textLength++;
+
+			// Let's start building!
 			String uniqueName;
-			int i, index;
-			Random random = new Random();
-			do {
+			for (char styleChar : RANDOM_STYLE_CHARS) {
 				uniqueNameBuilder.setLength(textLength);
-				for (i = 0; i < 3; i++) {
-					index = random.nextInt(RANDOM_STYLE_CHARS.length);
-					uniqueNameBuilder.append(StringUtil.CHAT_STYLE_CHAR).append(RANDOM_STYLE_CHARS[index]);
-				}
+				uniqueNameBuilder.append(styleChar);
 				uniqueName = uniqueNameBuilder.toString();
-			} while (!names.add(uniqueName));
-			return uniqueName;
+				if (names.add(uniqueName)) {
+					return uniqueName;
+				}
+			}
+			throw new RuntimeException("Ran out of names to generate... :(");
 		}
 
 		private int getIndex(int x, int y) {

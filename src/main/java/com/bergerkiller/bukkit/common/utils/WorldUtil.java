@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
@@ -32,6 +33,7 @@ import net.minecraft.server.WorldNBTStorage;
 import net.minecraft.server.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
+	private static final Object findSpawnDummyEntity = EntityPlayerRef.TEMPLATE.newInstanceNull();
 
 	/**
 	 * Gets the block type Id
@@ -209,14 +211,25 @@ public class WorldUtil extends ChunkUtil {
 	}
 
 	/**
-	 * Attempts to find a suitable spawn location, searching from the startLocation specified
+	 * Attempts to find a suitable spawn location, searching from the startLocation specified.
+	 * Note that portals are created if no position can be found.
 	 * 
 	 * @param startLocation to find a spawn from
 	 * @return spawn location, or null if this failed
 	 */
 	public static Location findSpawnLocation(Location startLocation) {
-		WorldServer ws = (WorldServer) Conversion.toWorldHandle.convert(startLocation.getWorld());
-		return new CraftTravelAgent(ws).findOrCreate(startLocation);
+		WorldServer ws = CommonNMS.getNative(startLocation.getWorld());
+		// Use a new travel agent to designate a proper position
+		Location exit = new CraftTravelAgent(ws).findOrCreate(startLocation);
+		// Adjust the exit to make it suitable for players
+		// Note: this will raise an NPE while trying to fire the PortalExit event
+		// This is expected behavior
+		try {
+			ws.t().adjustExit((Entity) findSpawnDummyEntity, exit, new Vector(0, 0, 0));
+		} catch (NullPointerException ex) {
+		}
+		// Done!
+		return exit;
 	}
 
 	/**
