@@ -126,7 +126,7 @@ public abstract class TabView {
 	/**
 	 * Sets all the text and ping values of a single column. Points outside of the text or ping array
 	 * bounds are ignored. If the text or ping arrays are null, the values are ignored.
-	 * The text is set from left to right
+	 * The text is set from top to bottom
 	 * 
 	 * @param column - x-coordinate of the column
 	 * @param text values, null or empty to ignore
@@ -139,7 +139,7 @@ public abstract class TabView {
 	/**
 	 * Sets all the text and ping values of a single row. Points outside of the text or ping array
 	 * bounds are ignored. If the text or ping arrays are null, the values are ignored.
-	 * The text is set from left to right<br><br>
+	 * The text is set from top to bottom<br><br>
 	 * 
 	 * To set the values in reverse, simply use y2 for y1.
 	 * 
@@ -267,6 +267,54 @@ public abstract class TabView {
 	}
 
 	/**
+	 * Fills an entire row with the text and ping specified.
+	 * 
+	 * @param row to fill
+	 * @param x1 - x-coordinate of point 1 of the row (inclusive)
+	 * @param x2 - x-coordinate of point 2 of the row (inclusive)
+	 * @param text to use
+	 * @param ping to use
+	 */
+	public void fillRow(int row, int x1, int x2, String text, int ping) {
+		fillArea(x1, row, x2, row, text, ping);
+	}
+
+	/**
+	 * Fills an entire row with the text and ping specified.
+	 * 
+	 * @param row to fill
+	 * @param text to use
+	 * @param ping to use
+	 */
+	public void fillRow(int row, String text, int ping) {
+		fillRow(row, 0, getWidth() - 1, text, ping);
+	}
+
+	/**
+	 * Fills an entire column with the text and ping specified.
+	 * 
+	 * @param column to fill
+	 * @param y1 - y-coordinate of point 1 of the row (inclusive)
+	 * @param y2 - y-coordinate of point 2 of the row (inclusive)
+	 * @param text to use
+	 * @param ping to use
+	 */
+	public void fillColumn(int column, int y1, int y2, String text, int ping) {
+		fillArea(column, y1, column, y2, text, ping);
+	}
+
+	/**
+	 * Fills an entire column with the text and ping specified.
+	 * 
+	 * @param column to fill
+	 * @param text to use
+	 * @param ping to use
+	 */
+	public void fillColumn(int column, String text, int ping) {
+		fillColumn(column, 0, getHeight() - 1, text, ping);
+	}
+
+	/**
 	 * Sets all slots of this Tab View to the text and ping values
 	 * 
 	 * @param text value to set to
@@ -328,6 +376,77 @@ public abstract class TabView {
 	 */
 	public void setAreaText(int x1, int y1, int x2, int y2, String... text) {
 		setArea(x1, y1, x2, y2, text, null);
+	}
+
+	/**
+	 * Sets all the text and ping values of a single row.
+	 * Points outside of the text array bounds are ignored.
+	 * The text is set from left to right.<br><br>
+	 * 
+	 * To set the values in reverse, simply use x2 for x1.<br><br>
+	 * 
+	 * This is an overload for
+	 * {@link #setRow(int, int, int, String[], int[]) setRow(row, x1, x2, text, ping)}
+	 * to allow variable arguments instead of fixed arrays.
+	 * 
+	 * @param row - y-coordinate of the row
+	 * @param x1 - x-coordinate of point 1 (start) of the row (inclusive)
+	 * @param x2 - x-coordinate of point 2 (end) of the row (inclusive)
+	 * @param text
+	 */
+	public void setRowText(int row, int x1, int x2, String... text) {
+		this.setRow(row, x1, x2, text, null);
+	}
+
+	/**
+	 * Sets all the text and ping values of a single row.
+	 * Points outside of the text array bounds are ignored.
+	 * The text is set from left to right.<br><br>
+	 * 
+	 * This is an overload for
+	 * {@link #setRow(int, String[], int[]) setRow(row, text, ping)}
+	 * to allow variable arguments instead of fixed arrays.
+	 * 
+	 * @param row to set
+	 * @param text to set to
+	 */
+	public void setRowText(int row, String... text) {
+		this.setRow(row, text, null);
+	}
+
+	/**
+	 * Sets all the text and ping values of a single row.
+	 * Points outside of the text array bounds are ignored.
+	 * The text is set from top to bottom.<br><br>
+	 * 
+	 * To set the values in reverse, simply use y2 for y1.<br><br>
+	 * 
+	 * This is an overload for
+	 * {@link #setColumn(int, int, int, String[], int[]) setColumn(column, y1, y2, text, ping)}
+	 * to allow variable arguments instead of fixed arrays.
+	 * 
+	 * @param column - x-coordinate of the column
+	 * @param y1 - y-coordinate of point 1 (start) of the column (inclusive)
+	 * @param y2 - y-coordinate of point 2 (end) of the column (inclusive)
+	 * @param text
+	 */
+	public void setColumnText(int column, int y1, int y2, String... text) {
+		this.setColumn(column, y1, y2, text, null);
+	}
+
+	/**
+	 * Sets all the text values of a single column. Points outside of the text or ping array
+	 * bounds are ignored. The text is set from top to bottom.<br><br>
+	 * 
+	 * This is an overload for
+	 * {@link #setColumn(int, String[], int[]) setColumn(column, text, ping)}
+	 * to allow variable arguments instead of fixed arrays.
+	 * 
+	 * @param column - x-coordinate of the column
+	 * @param text
+	 */
+	public void setColumnText(int column, String... text) {
+		setColumn(column, text, null);
 	}
 
 	/**
