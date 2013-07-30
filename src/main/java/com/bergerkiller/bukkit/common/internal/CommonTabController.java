@@ -3,7 +3,10 @@ package com.bergerkiller.bukkit.common.internal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -28,11 +31,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.tab.TabView;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class CommonTabController implements PacketListener, Listener {
@@ -320,6 +321,7 @@ public class CommonTabController implements PacketListener, Listener {
 	 */
 	private static class PlayerTabInfo {
 		private final Player player;
+		private final Map<String, Integer> defaultView = new LinkedHashMap<String, Integer>();
 		private final UniqueList<String> names = new UniqueList<String>();
 		private final String[] text;
 		private final int[] ping;
@@ -349,6 +351,11 @@ public class CommonTabController implements PacketListener, Listener {
 			// No need to do anything if it's no valid tab change
 			if (this.currentTab == currentTab) {
 				return;
+			}
+			// If the current tab was DEFAULT, update the names
+			if (this.currentTab == TabView.DEFAULT) {
+				this.names.clear();
+				this.names.addAll(this.defaultView.keySet());
 			}
 			this.currentTab = currentTab;
 			// Only need to clear (and not send or add names) if EMPTY
@@ -431,39 +438,15 @@ public class CommonTabController implements PacketListener, Listener {
 		}
 
 		public boolean handlePlayerInfoPacket(String name, int ping, boolean register) {
-			if (this.currentTab == TabView.DEFAULT) {
-				// Allow the default message to go through, but do keep track of the updates names
-				if (register) {
-					// Add the new names, and ping if needed
-					final int index;
-					if (this.names.add(name)) {
-						index = this.names.size() - 1;
-					} else {
-						index = this.names.indexOf(name);
-					}
-					if (index >= 0 && index < count) {
-						this.ping[index] = ping;
-					}
-				} else {
-					int index = this.names.indexOf(name);
-					if (index != -1) {
-						// Remove name (at that index)
-						this.names.remove(index);
-						// Shift ping and text one to the left starting at the index
-						if (index >= 0 && index < count) {
-							for (int i = index; i < (count - 1); i++) {
-								this.text[i] = this.text[i + 1];
-								this.ping[i] = this.ping[i + 1];
-							}
-							this.text[count - 1] = TabView.TEXT_DEFAULT;
-							this.ping[count - 1] = TabView.PING_DEFAULT;
-						}
-					}
-				}
-				return true;
+			// Update the default view
+			if (register) {
+				defaultView.put(name, ping);
 			} else {
-				return false;
+				defaultView.remove(name);
 			}
+
+			// If the default tab is shown, allow it to go through
+			return this.currentTab == TabView.DEFAULT;
 		}
 
 		public void refresh() {
@@ -489,10 +472,10 @@ public class CommonTabController implements PacketListener, Listener {
 			}
 			// Show the new contents
 			if (currentTab == TabView.DEFAULT) {
-				Iterator<Player> iter = LogicUtil.skipIterator(CommonUtil.getOnlinePlayers().iterator(), startIndex);
+				Iterator<Entry<String, Integer>> iter = LogicUtil.skipIterator(this.defaultView.entrySet().iterator(), startIndex);
 				while (iter.hasNext()) {
-					Player player = iter.next();
-					showSlot(getName(player.getPlayerListName()), PlayerUtil.getPing(player));
+					Entry<String, Integer> entry = iter.next();
+					showSlot(entry.getKey(), entry.getValue());
 				}
 			} else if (currentTab != TabView.EMPTY) {
 				// Find out the end-index to stop showing information at
