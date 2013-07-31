@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 
@@ -75,7 +76,44 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 	 * 
 	 * @return the living entity's inventory
 	 */
-    public EntityEquipment getEquipment() {
-    	return entity.getEquipment();
-    }
+	public EntityEquipment getEquipment() {
+		return entity.getEquipment();
+	}
+
+	/**
+	 * Gets the current health level of this Living Entity
+	 * 
+	 * @return health
+	 */
+	public double getHealth() {
+		return entity.getHealth();
+	}
+
+	/**
+	 * Sets the current health level of this Living Entity
+	 * 
+	 * @param health to set to
+	 */
+	public void setHealth(double health) {
+		entity.setHealth(health);
+	}
+
+	/**
+	 * Damages this Entity, damage caused by an unknown source
+	 * 
+	 * @param damage dealt
+	 */
+	public void damage(double damage) {
+		entity.damage(damage);
+	}
+
+	/**
+	 * Damages this Entity, damage caused by another Entity
+	 * 
+	 * @param damage dealt
+	 * @param damager that caused the damage
+	 */
+	public void damage(double damage, Entity damager) {
+		entity.damage(damage, damager);
+	}
 }

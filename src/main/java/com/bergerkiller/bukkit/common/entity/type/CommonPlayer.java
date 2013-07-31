@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -48,12 +47,16 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
 
 	@Override
 	public boolean teleport(Location location, TeleportCause cause) {
+		// First, perform the default teleport logic
 		if (!super.teleport(location, cause)) {
 			return false;
 		}
 
 		// Properly move the player to the new location (changed chunks?)
-		CommonNMS.getNative(getWorld()).getPlayerChunkMap().movePlayer(getHandle(EntityPlayer.class)); 
+		// This was causing strange in-between world bugs
+		// And since without it it works fine too...it is going to be disabled for a while
+		// I added this for some reason, if this reason is found, please look into a way of fixing the bugs
+		//CommonNMS.getNative(getWorld()).getPlayerChunkMap().movePlayer(getHandle(EntityPlayer.class)); 
 
 		// Instantly send the chunk the vehicle is currently in
 		// This avoid the player losing track of the vehicle because the chunk is missing
