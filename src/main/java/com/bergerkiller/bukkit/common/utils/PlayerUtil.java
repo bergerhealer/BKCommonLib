@@ -7,6 +7,7 @@ import net.minecraft.server.EntityPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -182,7 +183,7 @@ public class PlayerUtil extends EntityUtil {
 	 * @return True if the chunk is visible to the player, False if not
 	 */
 	public static boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
-		return CommonPlugin.getInstance().isChunkVisible(player, chunkX, chunkZ);
+		return CommonPlugin.getInstance().getPlayerMeta(player).isChunkVisible(chunkX, chunkZ);
 	}
 
 	/**
@@ -211,5 +212,15 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static boolean isChunkEntered(Player player, Chunk chunk) {
 		return isChunkEntered(player, chunk.getX(), chunk.getZ());
+	}
+
+	/**
+	 * Gets a modifiable List of Entity IDs that are queuing for Player Chunk Packets to be sent
+	 * 
+	 * @param player to get it for
+	 * @return Entity Remove Queue
+	 */
+	public static List<Integer> getEntityRemoveQueue(Player player) {
+		return Common.SERVER.getEntityRemoveQueue(player);
 	}
 }

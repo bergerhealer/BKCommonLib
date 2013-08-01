@@ -44,7 +44,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
@@ -66,7 +65,7 @@ public class CommonPlugin extends PluginBase {
 	 */
 	private static CommonPlugin instance;
 	public final List<PluginBase> plugins = new ArrayList<PluginBase>();
-	private EntityMap<Player, LongHashSet> playerVisibleChunks;
+	private EntityMap<Player, CommonPlayerMeta> playerVisibleChunks;
 	protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
 	private CommonListener listener;
 	private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
@@ -180,44 +179,19 @@ public class CommonPlugin extends PluginBase {
 		worldListeners.put(world, listener);
 	}
 
-	public boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
+	/**
+	 * Gets the Player Meta Data associated to a Player
+	 * 
+	 * @param player to get the meta data of
+	 * @return Player meta data
+	 */
+	public CommonPlayerMeta getPlayerMeta(Player player) {
 		synchronized (playerVisibleChunks) {
-			LongHashSet chunks = playerVisibleChunks.get(player);
-			return chunks == null ? false : chunks.contains(chunkX, chunkZ);
-		}
-	}
-
-	public void setChunksAsVisible(Player player, int[] chunkX, int[] chunkZ) {
-		if (chunkX.length != chunkZ.length) {
-			throw new IllegalArgumentException("Chunk X and Z coordinate count is not the same");
-		}
-		synchronized (playerVisibleChunks) {
-			LongHashSet chunks = playerVisibleChunks.get(player);
-			if (chunks == null) {
-				chunks = new LongHashSet();
-				playerVisibleChunks.put(player, chunks);
+			CommonPlayerMeta meta = playerVisibleChunks.get(player);
+			if (meta == null) {
+				playerVisibleChunks.put(player, meta = new CommonPlayerMeta(player));
 			}
-			for (int i = 0; i < chunkX.length; i++) {
-				chunks.add(chunkX[i], chunkZ[i]);
-			}
-		}
-	}
-
-	public void setChunkVisible(Player player, int chunkX, int chunkZ, boolean visible) {
-		synchronized (playerVisibleChunks) {
-			LongHashSet chunks = playerVisibleChunks.get(player);
-			if (chunks == null) {
-				if (!visible) {
-					return;
-				}
-				chunks = new LongHashSet();
-				playerVisibleChunks.put(player, chunks);
-			}
-			if (visible) {
-				chunks.add(chunkX, chunkZ);
-			} else {
-				chunks.remove(chunkX, chunkZ);
-			}
+			return meta;
 		}
 	}
 
@@ -342,7 +316,6 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public void disable() {
-		instance = null;
 		// Disable listeners
 		for (CommonWorldListener listener : worldListeners.values()) {
 			listener.disable();
@@ -377,6 +350,12 @@ public class CommonPlugin extends PluginBase {
 			}
 			entities.clear();
 		}
+
+		// Server-specific disabling occurs
+		Common.SERVER.disable(this);
+
+		// Dereference
+		instance = null;
 	}
 
 	@Override
@@ -430,7 +409,7 @@ public class CommonPlugin extends PluginBase {
 		eventFactory = new CommonEventFactory();
 
 		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
-		playerVisibleChunks = new EntityMap<Player, LongHashSet>();
+		playerVisibleChunks = new EntityMap<Player, CommonPlayerMeta>();
 
 		// Initialize Entity Blacklist
 		entityBlacklist = new CommonEntityBlacklist();
@@ -469,6 +448,9 @@ public class CommonPlugin extends PluginBase {
 			// Depending
 			getMetrics().addGraph(new MyDependingPluginsGraph());
 		}
+
+		// Server-specific enabling occurs
+		Common.SERVER.enable(this);
 
 		// Parse BKCommonLib version to int
 		int version = this.getVersionNumber();

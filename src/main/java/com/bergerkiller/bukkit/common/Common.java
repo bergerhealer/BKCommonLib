@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
 import com.bergerkiller.bukkit.common.server.SpigotServer;
+import com.bergerkiller.bukkit.common.server.SportBukkitServer;
 import com.bergerkiller.bukkit.common.server.UnknownServer;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -59,6 +60,7 @@ public class Common {
 			List<CommonServer> servers = new ArrayList<CommonServer>();
 			servers.add(new MCPCPlusServer());
 			servers.add(new SpigotServer());
+			servers.add(new SportBukkitServer());
 			servers.add(new CraftBukkitServer());
 			servers.add(new UnknownServer());
 

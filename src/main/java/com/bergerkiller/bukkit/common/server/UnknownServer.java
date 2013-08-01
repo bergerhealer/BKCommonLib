@@ -1,6 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class UnknownServer extends CommonServerBase {
 
@@ -30,6 +34,11 @@ public class UnknownServer extends CommonServerBase {
 	}
 
 	@Override
+	public List<Integer> getEntityRemoveQueue(Player player) {
+		return Collections.emptyList();
+	}
+
+	@Override
 	public String getClassName(String path) {
 		return path;
 	}
@@ -52,4 +61,6 @@ public class UnknownServer extends CommonServerBase {
 	@Override
 	public void postInit() {
 	}
+
+
 }

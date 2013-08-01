@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
@@ -116,9 +117,8 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
 	 * 
 	 * @return list of entity ids to send destroy packets for
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Integer> getEntityRemoveQueue() {
-		return getHandle(EntityPlayer.class).removeQueue; 
+		return Common.SERVER.getEntityRemoveQueue(entity);
 	}
 
 	/**

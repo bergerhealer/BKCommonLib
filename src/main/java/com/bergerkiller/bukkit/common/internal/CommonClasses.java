@@ -16,6 +16,8 @@ class CommonClasses {
 		loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashMap", "NetworkManager");
 		loadRef("PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader", "Recipe");
 		loadRef("NBT", "RegionFile", "TileEntity", "WorldServer", "Chunk", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
+		// Internal
+		loadCommon("internal.CommonWorldListener", "internal.CommonTabController");
 		// Utility classes (only those that interact with nms)
 		loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
 		loadUtil("Recipe", "Stream", "World");

@@ -2,6 +2,11 @@ package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
+
+import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public interface CommonServer {
 
@@ -17,6 +22,20 @@ public interface CommonServer {
 	 * In here processing that depends on the CommonServer instance being fully initialized can be continued.
 	 */
 	public void postInit();
+
+	/**
+	 * Prepares this server for enabling of BKCommonLIb
+	 * 
+	 * @param plugin instance
+	 */
+	public void enable(CommonPlugin plugin);
+
+	/**
+	 * Prepares this server for disabling of BKCommonLib
+	 * 
+	 * @param plugin instance
+	 */
+	public void disable(CommonPlugin plugin);
 
 	/**
 	 * Gets the versioning information of the server
@@ -109,4 +128,12 @@ public interface CommonServer {
 	 * @return True if the world can be loaded, False if not
 	 */
 	public boolean isLoadableWorld(String worldName);
+
+	/**
+	 * Obtains the Entity remove queue used for queuing removal packets for a Player
+	 * 
+	 * @param player to get it for
+	 * @return Entity remove queue
+	 */
+	public List<Integer> getEntityRemoveQueue(Player player);
 }

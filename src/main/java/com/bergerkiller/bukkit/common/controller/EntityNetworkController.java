@@ -16,6 +16,7 @@ import net.minecraft.server.EntityTrackerEntry;
 import net.minecraft.server.MathHelper;
 import net.minecraft.server.MobEffect;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.ObjectAbstract;
@@ -24,7 +25,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -315,9 +315,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @param player to set it for
 	 * @param remove - True to remove, False NOT to remove
 	 */
-	@SuppressWarnings("unchecked")
 	public void setRemoveNextTick(Player player, boolean remove) {
-		LogicUtil.addOrRemove(CommonNMS.getNative(player).removeQueue, entity.getEntityId(), remove);
+		LogicUtil.addOrRemove(Common.SERVER.getEntityRemoveQueue(player), entity.getEntityId(), remove);
 	}
 
 	/**

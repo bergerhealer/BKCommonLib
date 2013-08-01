@@ -126,6 +126,12 @@ class CommonWorldListener extends WorldManager {
 	public void a(EntityHuman human, String name, double x, double y, double z, float yaw, float pitch) {
 	}
 
+	/*
+	 * Method is part of SportBukkit only!
+	 */
+	public void a(String text, double d0, double d1, double d2, float f0, float f1, Entity entity) {
+	}
+
 	static {
 		// Validate that ALL methods in WorldManager are properly overrided
 		for (Method method : WorldManager.class.getDeclaredMethods()) {
@@ -136,6 +142,7 @@ class CommonWorldListener extends WorldManager {
 			if (!commonMethod.isOverridedIn(CommonWorldListener.class)) {
 				StringBuilder msg = new StringBuilder();
 				msg.append("Method ");
+				msg.append(method.getReturnType().getSimpleName()).append(' ');
 				msg.append(method.getName()).append('(');
 				boolean first = true;
 				for (Class<?> param : method.getParameterTypes()) {

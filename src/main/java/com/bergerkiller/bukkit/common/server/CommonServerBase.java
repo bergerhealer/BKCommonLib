@@ -7,6 +7,8 @@ import java.util.Locale;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 public abstract class CommonServerBase implements CommonServer {
 
 	@Override
@@ -70,5 +72,13 @@ public abstract class CommonServerBase implements CommonServer {
 		}
 		// Unknown???
 		return null;
+	}
+
+	@Override
+	public void enable(CommonPlugin plugin) {
+	}
+
+	@Override
+	public void disable(CommonPlugin plugin) {
 	}
 }
