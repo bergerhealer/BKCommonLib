@@ -34,6 +34,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -42,9 +43,13 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class PacketFieldClasses {
 	public static class NMSPacket extends NMSClassTemplate {
-		public final FieldAccessor<Integer> packetID = getField("packetID");
-		public final FieldAccessor<Boolean> lowPriority = getField("lowPriority");
-		public final FieldAccessor<Long> timestamp = getField("timestamp");
+		private static final Class<?> packetType = CommonUtil.getNMSClass("Packet");
+		private static final FieldAccessor<Integer> packetIDGlobal = new SafeField<Integer>(packetType, "packetID");
+		private static final FieldAccessor<Boolean> lowPriorityGlobal = new SafeField<Boolean>(packetType, "lowPriority");
+		private static final FieldAccessor<Long> timestampGlobal = new SafeField<Long>(packetType, "timestamp");
+		public final FieldAccessor<Integer> packetID = packetIDGlobal;
+		public final FieldAccessor<Boolean> lowPriority = lowPriorityGlobal;
+		public final FieldAccessor<Long> timestamp = timestampGlobal;
 		private final MethodAccessor<Integer> packetSize = getMethod("a");
 		private final MethodAccessor<Void> register = getMethod("a", int.class, boolean.class, boolean.class, Class.class);
 		private final SafeConstructor<CommonPacket> constructor0 = getPacketConstructor();
