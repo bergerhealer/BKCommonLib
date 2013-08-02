@@ -85,7 +85,7 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isMob(Entity entity) {
-		return isMob(entity.getClass());
+		return entity != null && isMob(entity.getClass());
 	}
 
 	public static boolean isMob(EntityType entityType) {
@@ -97,7 +97,7 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isNPC(Entity entity) {
-		return isNPC(entity.getClass());
+		return entity != null && isNPC(entity.getClass());
 	}
 
 	public static boolean isNPC(EntityType entityType) {
@@ -109,7 +109,7 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isAnimal(Entity entity) {
-		return isAnimal(entity.getClass());
+		return entity != null && isAnimal(entity.getClass());
 	}
 
 	public static boolean isAnimal(EntityType entityType) {
@@ -129,7 +129,7 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isMonster(Entity entity) {
-		return isMonster(entity.getClass());
+		return entity != null && isMonster(entity.getClass());
 	}
 
 	public static boolean isMonster(EntityType entityType) {
