@@ -37,6 +37,8 @@ public class LongHashSetRef {
 	public static final long REMOVED = TEMPLATE.<Long>getStaticFieldValue("REMOVED").longValue();
 	static {
 		if (Common.IS_SPIGOT_SERVER) {
+			// Load the Spigot dummy flatmap in advance
+			SpigotDummyFlatMap.getInstance();
 			// Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases
 			constructor1 = constructor2 = new SafeConstructor<Object>(null) {
 				private final FieldAccessor<Object> flat = TEMPLATE.getField("flat");
@@ -55,7 +57,7 @@ public class LongHashSetRef {
 					elements.set(instance, 0);
 					freeEntries.set(instance, size);
 					modCount.set(instance, 0);
-					flat.set(instance, SpigotDummyFlatMap.newInstance());
+					flat.set(instance, SpigotDummyFlatMap.getInstance());
 					// All done!
 					return instance;
 				}

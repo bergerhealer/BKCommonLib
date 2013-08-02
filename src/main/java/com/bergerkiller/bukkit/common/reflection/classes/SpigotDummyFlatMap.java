@@ -1,34 +1,46 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.spigotmc.FlatMap;
+import java.util.Arrays;
+import java.util.logging.Level;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.ClassBuilder;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
-class SpigotDummyFlatMap extends FlatMap<Object> {
-	private static final ClassTemplate<SpigotDummyFlatMap> TEMPLATE = ClassTemplate.create(SpigotDummyFlatMap.class);
-
-	private SpigotDummyFlatMap() {
+public class SpigotDummyFlatMap {
+	private static final Object INSTANCE;
+	static {
+		Class<?> flatMapClass = CommonUtil.getClass("org.spigotmc.FlatMap");
+		Object flatInstance = null;
+		if (flatMapClass == null) {
+			CommonPlugin.LOGGER.log(Level.SEVERE, "The Spigot FlatMap class could not be located!");
+		} else {
+			try {
+				// Initialize a new dummy flatmap (that does nothing)
+				ClassBuilder builder = new ClassBuilder(flatMapClass, FlatMapImpl.class);
+				flatInstance = builder.create(new Class<?>[0], new Object[0], Arrays.asList((Object) new FlatMapImpl()));
+			} catch (Throwable t) {
+				CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to initialize the Spigot Dummy FlatMap:", t);
+			}
+		}
+		INSTANCE = flatInstance;
 	}
 
-	@Override
-	public Object get(long msw, long lsw) {
-		return null;
+	public static Object getInstance() {
+		return INSTANCE;
 	}
 
-	@Override
-	public Object get(long key) {
-		return null;
+	public static class FlatMapImpl implements FlatMapMethods {
+		public Object get(long msw, long lsw) {return null;}
+		public Object get(long key) {return null;}
+		public void put(long msw, long lsw, Object value) {}
+		public void put(long key, Object value) {}
 	}
 
-	@Override
-	public void put(long msw, long lsw, Object value) {
-	}
-
-	@Override
-	public void put(long key, Object value) {
-	}
-
-	public static FlatMap<Object> newInstance() {
-		return TEMPLATE.newInstanceNull();
+	public static interface FlatMapMethods {
+		public Object get(long msw, long lsw);
+		public Object get(long key);
+		public void put(long msw, long lsw, Object value);
+		public void put(long key, Object value);
 	}
 }

@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.reflection;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +44,11 @@ public class ClassBuilder {
 	private final Map<Class<?>, Object> callbackInstancesBuffer = new HashMap<Class<?>, Object>();
 	private final Map<Signature, CallbackSignature> callbackSignatures = new HashMap<Signature, CallbackSignature>();
 	private final List<Class<?>> callbackClasses;
+
+	@SuppressWarnings("rawtypes")
+	public ClassBuilder(Class<?> superclass, Class... callbackClasses) {
+		this(superclass, Arrays.asList((Class<?>[]) callbackClasses));
+	}
 
 	public ClassBuilder(Class<?> superclass, Collection<Class<?>> callbackClasses) {
 		if (LogicUtil.nullOrEmpty(callbackClasses)) {

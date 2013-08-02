@@ -17,6 +17,7 @@ public class MCPCPlusServer extends SpigotServer {
 	private MethodAccessor<String> mapField;
 	private Map<String, String> classesMap;
 	private Map<String, String> methodsMap;
+	private boolean isRelocatedSpigotUtils;
 
 	@Override
 	public boolean init() {
@@ -35,6 +36,13 @@ public class MCPCPlusServer extends SpigotServer {
 		Object jarMapping = SafeField.get(classRemapper, "jarMapping");
 		this.classesMap = SafeField.get(jarMapping, "classes");
 		this.methodsMap = SafeField.get(jarMapping, "methods");
+		// Check whether the Spigot utilities are relocated
+		try {
+			Class.forName("org.spigotmc.FlatMap");
+			isRelocatedSpigotUtils = true;
+		} catch (ClassNotFoundException ex) {
+			isRelocatedSpigotUtils = false;
+		}
 		return true;
 	}
 
@@ -45,6 +53,9 @@ public class MCPCPlusServer extends SpigotServer {
 
 	@Override
 	public String getClassName(String path) {
+		if (!isRelocatedSpigotUtils && path.equals("org.spigotmc.FlatMap")) {
+			return CB_ROOT_VERSIONED + ".util.FlatMap";
+		}
 		return mapType.invoke(classRemapper, super.getClassName(path).replace('.', '/')).replace('/', '.');
 	}
 
