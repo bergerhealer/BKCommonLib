@@ -47,19 +47,21 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 				return false;
 			}
 		}
-		CommonPlayerConnection.bindAll();
+		CommonPlayerConnection.bindAll(true);
 		return true;
 	}
 
 	@Override
 	public boolean onDisable() {
-		CommonPlayerConnection.unbindAll();
+		// Unbind all hooks - but don't do a check since we are disabling
+		// Can not create new tasks at that point
+		CommonPlayerConnection.unbindAll(false);
 		return true;
 	}
 
 	@Override
 	public void onPlayerJoin(Player player) {
-		CommonPlayerConnection.bind(player);
+		CommonPlayerConnection.bind(player, true);
 	}
 
 	@Override
@@ -159,15 +161,15 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			PlayerConnectionRef.TEMPLATE.transfer(previous, this);
 		}
 
-		public static void bindAll() {
+		public static void bindAll(boolean doSafetyCheck) {
 			for (Player player : CommonUtil.getOnlinePlayers()) {
-				bind(player);
+				bind(player, doSafetyCheck);
 			}
 		}
 
-		public static void unbindAll() {
+		public static void unbindAll(boolean doSafetyCheck) {
 			for (Player player : CommonUtil.getOnlinePlayers()) {
-				unbind(player);
+				unbind(player, doSafetyCheck);
 			}
 		}
 
@@ -175,14 +177,14 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			return playerConnection instanceof CommonPlayerConnection || playerConnection.getClass() == PlayerConnection.class;
 		}
 
-		private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection) {
+		private static void setPlayerConnection(final EntityPlayer ep, final PlayerConnection connection, boolean doSafetyCheck) {
 			if (isReplaceable(ep.playerConnection)) {
 				// Set it
 				ep.playerConnection = connection;
 				// Register
 				registerPlayerConnection(ep, connection, true);
 				// Perform a little check-up in 10 ticks
-				if (CommonPlugin.hasInstance()) {
+				if (doSafetyCheck && CommonPlugin.hasInstance()) {
 					new Task(CommonPlugin.getInstance()) {
 						@Override
 						public void run() {
@@ -231,21 +233,21 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			}
 		}
 
-		public static void bind(Player player) {
+		public static void bind(Player player, boolean doSafetyCheck) {
 			final EntityPlayer ep = CommonNMS.getNative(player);
 			if (ep.playerConnection instanceof CommonPlayerConnection) {
 				return;
 			}
-			setPlayerConnection(ep, new CommonPlayerConnection(CommonNMS.getMCServer(), ep));
+			setPlayerConnection(ep, new CommonPlayerConnection(CommonNMS.getMCServer(), ep), doSafetyCheck);
 		}
 
-		public static void unbind(Player player) {
+		public static void unbind(Player player, boolean doSafetyCheck) {
 			final EntityPlayer ep = CommonNMS.getNative(player);
 			final PlayerConnection previous = ep.playerConnection;
 			if (previous instanceof CommonPlayerConnection) {
 				PlayerConnection replacement = ((CommonPlayerConnection) previous).previous;
 				PlayerConnectionRef.TEMPLATE.transfer(previous, replacement);
-				setPlayerConnection(ep, replacement);
+				setPlayerConnection(ep, replacement, doSafetyCheck);
 			}
 		}
 
