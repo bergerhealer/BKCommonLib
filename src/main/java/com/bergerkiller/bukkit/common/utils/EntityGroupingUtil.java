@@ -93,7 +93,7 @@ public class EntityGroupingUtil {
 	}
 
 	public static boolean isMob(Class<? extends Entity> entityClass) {
-		return isAnimal(entityClass) || isMonster(entityClass);
+		return isAnimal(entityClass) || isMonster(entityClass) || isNPC(entityClass);
 	}
 
 	public static boolean isNPC(Entity entity) {
