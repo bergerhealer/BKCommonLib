@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
  * An abstract implementation for all Minecarts
@@ -188,8 +189,8 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 */
 	public void setBlock(int blockId, int blockData) {
 		EntityMinecartAbstract handle = getHandle(EntityMinecartAbstract.class);
-		handle.i(blockId);
-		handle.j(blockData);
+		handle.i(MathUtil.clamp(blockId, 0, Short.MAX_VALUE));
+		handle.j(MathUtil.clamp(blockData, 0, Short.MAX_VALUE));
 	}
 
 	@Override
