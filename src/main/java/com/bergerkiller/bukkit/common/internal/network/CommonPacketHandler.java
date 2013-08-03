@@ -40,6 +40,9 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
 	@Override
 	public boolean onEnable() {
+		if (!super.onEnable()) {
+			return false;
+		}
 		for (String incompatibility : incompatibilities) {
 			if (CommonUtil.isPluginInDirectory(incompatibility)) {
 				// Fail!
