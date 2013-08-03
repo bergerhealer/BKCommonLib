@@ -48,6 +48,9 @@ public class SpigotPacketHandler extends PacketHandlerHooked {
 
 	@Override
 	public boolean onEnable() {
+		if (!super.onEnable()) {
+			return false;
+		}
 		if (listener == null) {
 			listener = new SpigotPacketListener();
 			listener.enable(this);

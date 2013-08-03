@@ -30,6 +30,8 @@ public interface PacketHandler {
 
 	public void sendPacket(Player player, Object packet, boolean throughListeners);
 
+	public void receivePacket(Player player, Object packet);
+
 	public Collection<Plugin> getListening(int id);
 
 	public void transfer(PacketHandler to);

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,18 +9,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -38,6 +44,25 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	private final List<PacketMonitor>[] monitors = new ArrayList[256];
 	private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
 	private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
+	private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
+
+	@Override
+	public boolean onEnable() {
+		// Initialize all receiver methods
+		Class<?> packetType = PacketFields.DEFAULT.getType();
+		for (Method method : PlayerConnectionRef.TEMPLATE.getType().getDeclaredMethods()) {
+			if (method.getReturnType() != void.class || method.getParameterTypes().length != 1 
+					|| !Modifier.isPublic(method.getModifiers())) {
+				continue;
+			}
+			Class<?> arg = method.getParameterTypes()[0];
+			if (!packetType.isAssignableFrom(arg) || arg == packetType) {
+				continue;
+			}
+			receiverMethods.put(arg, new SafeMethod<Void>(method));
+		}
+		return true;
+	}
 
 	@Override
 	public void removePacketListeners(Plugin plugin) {
@@ -169,16 +194,20 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 	}
 
+	@Override
+	public void receivePacket(Player player, Object packet) {
+		SafeMethod<?> method = this.receiverMethods.get(packet);
+		if (method == null) {
+			CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
+		} else {
+			method.invoke(getPlayerConnection(player), packet);
+		}
+	}
+
 	public abstract void sendSilentPacket(Player player, Object packet);
 
 	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
-		if (packet instanceof CommonPacket) {
-			packet = ((CommonPacket) packet).getHandle();
-		}
-		if (packet == null) {
-			return;
-		}
 		Object handle = Conversion.toEntityHandle.convert(player);
 		if (!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
 			return;
@@ -228,6 +257,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 				to.addPacketMonitor(entry.getKey(), listener, getMonitorIds(listener));
 			}
 		}
+	}
+
+	protected Object getPlayerConnection(Player player) {
+		return EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
 	}
 
 	private int[] getListenerIds(PacketListener listener) {

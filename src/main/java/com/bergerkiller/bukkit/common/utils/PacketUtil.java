@@ -78,26 +78,76 @@ public class PacketUtil {
 		});
 	}
 
-	public static void sendPacket(Player player, Object packet) {
-		sendPacket(player, packet, true);
+	/**
+	 * Fakes a packet sent from the Client to the Server for a certain Player.
+	 * 
+	 * @param player to receive a packet for
+	 * @param packet to receive
+	 */
+	public static void receivePacket(Player player, CommonPacket packet) {
+		receivePacket(player, (Object) packet);
 	}
 
-	public static void sendPacket(Player player, Object packet, boolean throughListeners) {
-		CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
+	/**
+	 * Fakes a packet sent from the Client to the Server for a certain Player.
+	 * 
+	 * @param player to receive a packet for
+	 * @param packet to receive
+	 */
+	public static void receivePacket(Player player, Object packet) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
+		if (packet == null) {
+			return;
+		}
+		CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet);
 	}
 
 	public static void sendPacket(Player player, CommonPacket packet) {
 		sendPacket(player, packet, true);
 	}
 
+	public static void sendPacket(Player player, Object packet) {
+		sendPacket(player, packet, true);
+	}
+
 	public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
+		sendPacket(player, (Object) packet, throughListeners);
+	}
+
+	public static void sendPacket(Player player, Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		if (packet == null) {
 			return;
 		}
-		sendPacket(player, packet.getHandle(), throughListeners);
+		CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
+	}
+
+	public static void broadcastBlockPacket(Block block, Object packet, boolean throughListeners) {
+		broadcastBlockPacket(block.getWorld(), block.getX(), block.getZ(), packet, throughListeners);
+	}
+
+	public static void broadcastBlockPacket(org.bukkit.World world, final int x, final int z, Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
+		if (world == null || packet == null) {
+			return;
+		}
+		for (Player player : WorldUtil.getPlayers(world)) {
+			if (EntityUtil.isNearBlock(player, x, z, CommonUtil.BLOCKVIEW)) {
+				sendPacket(player, packet, throughListeners);
+			}
+		}
 	}
 
 	public static void broadcastChunkPacket(org.bukkit.Chunk chunk, Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		if (chunk == null || packet == null) {
 			return;
 		}
@@ -109,22 +159,10 @@ public class PacketUtil {
 		}
 	}
 
-	public static void broadcastBlockPacket(Block block, Object packet, boolean throughListeners) {
-		broadcastBlockPacket(block.getWorld(), block.getX(), block.getZ(), packet, throughListeners);
-	}
-
-	public static void broadcastBlockPacket(org.bukkit.World world, final int x, final int z, Object packet, boolean throughListeners) {
-		if (world == null || packet == null) {
-			return;
-		}
-		for (Player player : WorldUtil.getPlayers(world)) {
-			if (EntityUtil.isNearBlock(player, x, z, CommonUtil.BLOCKVIEW)) {
-				sendPacket(player, packet, throughListeners);
-			}
-		}
-	}
-
 	public static void broadcastPacket(Object packet, boolean throughListeners) {
+		if (packet instanceof CommonPacket) {
+			packet = ((CommonPacket) packet).getHandle();
+		}
 		for (Player player : CommonUtil.getOnlinePlayers()) {
 			sendPacket(player, packet, throughListeners);
 		}

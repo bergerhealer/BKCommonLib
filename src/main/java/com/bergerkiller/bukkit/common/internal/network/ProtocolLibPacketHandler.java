@@ -88,18 +88,23 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 	}
 
 	@Override
+	public void receivePacket(Player player, Object packet) {
+		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
+			return;
+		}
+		PacketContainer toReceive = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
+		try{
+			ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
+		} catch (PlayerLoggedOutException ex) {
+			// Ignore
+		} catch (Exception e) {
+			throw new RuntimeException("Error while receiving packet:", e);
+		}
+	}
+
+	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
-		if (packet instanceof CommonPacket) {
-			packet = ((CommonPacket) packet).getHandle();
-		}
-		if (packet == null) {
-			return;
-		}
-		Object handle = Conversion.toEntityHandle.convert(player);
-		if(!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
-			return;
-		}
-		if (PlayerUtil.isDisconnected(player)) {
+		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
 		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
@@ -113,9 +118,15 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 			}
 		} catch (PlayerLoggedOutException ex) {
 			// Ignore
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException("Error while sending packet!", e);
+		} catch (Exception e) {
+			throw new RuntimeException("Error while sending packet:", e);
 		}
+	}
+
+	private boolean isNPCPlayer(Player player) {
+		// Is this check still needed?
+		Object handle = Conversion.toEntityHandle.convert(player);
+		return !handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"));
 	}
 
 	private void sendSilentPacket(Player player, PacketContainer packet) throws InvocationTargetException {

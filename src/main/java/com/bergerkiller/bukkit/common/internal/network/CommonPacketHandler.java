@@ -66,8 +66,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
 	@Override
 	public void sendSilentPacket(Player player, Object packet) {
-		final Object connection = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
-		PlayerConnectionRef.sendPacket(connection, new CommonSilentPacket(packet));
+		PlayerConnectionRef.sendPacket(getPlayerConnection(player), new CommonSilentPacket(packet));
 	}
 
 	@Override
