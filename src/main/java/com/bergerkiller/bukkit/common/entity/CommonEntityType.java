@@ -228,6 +228,13 @@ public class CommonEntityType {
 		add(EntityType.ENDER_CRYSTAL, "EnderCrystal", 256, Integer.MAX_VALUE, false);
 		add(EntityType.ITEM_FRAME, "ItemFrame", 160, Integer.MAX_VALUE, false);
 
+		// Leash EntityType (note: was added mid-way and may not exist on a dev-build of CB)
+		// Can be changed to a fixed call for 1.6.3+
+		EntityType leash = EntityType.fromName("LeashKnot");
+		if (leash != null) {
+			add(leash, "Leash", 160, Integer.MAX_VALUE, false);
+		}
+
 		// Check that all entity types are registered properly
 		EntityType[] invalidTypes = {EntityType.UNKNOWN, EntityType.WEATHER, EntityType.LIGHTNING, EntityType.COMPLEX_PART};
 		for (EntityType type : EntityType.values()) {
