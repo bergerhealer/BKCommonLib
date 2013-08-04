@@ -47,6 +47,11 @@ public class ParseUtil {
 		MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
 		MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
 		MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
+		MAT_NAME_MAP.put("COBBLEFENCE", Material.COBBLE_WALL);
+		MAT_NAME_MAP.put("STONEFENCE", Material.COBBLE_WALL);
+		MAT_NAME_MAP.put("COBBLEFENCE", Material.COBBLE_WALL);
+		MAT_NAME_MAP.put("STONEFENCE", Material.COBBLE_WALL);
+		MAT_NAME_MAP.put("STONEWALL", Material.COBBLE_WALL);
 
 		// Material by name aliases
 		MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
