@@ -39,8 +39,13 @@ public class LongHashMap<V> extends BasicWrapper {
 		this.setHandle(handle);
 	}
 
+	/**
+	 * Gets the amount of Long:Value pairs stored in this LongHashMap
+	 * 
+	 * @return size
+	 */
 	public int size() {
-		return ((net.minecraft.server.LongHashMap) handle).count();
+		return Math.max(((net.minecraft.server.LongHashMap) handle).count(), 0);
 	}
 
 	/**
@@ -127,6 +132,12 @@ public class LongHashMap<V> extends BasicWrapper {
 		int keyIndex = 0;
 		for (int i = 0; i < entries.length; i++) {
 			if (entries[i] != null) {
+				if (keyIndex >= keys.length) {
+					// This should never happen, but hey, servers make (size) mistakes!
+					long[] newKeys = new long[keys.length + 1];
+					System.arraycopy(keys, 0, newKeys, 0, keys.length);
+					keys = newKeys;
+				}
 				keys[keyIndex++] = LongHashMapEntryRef.entryKey.get(entries[i]);
 			}
 		}

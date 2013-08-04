@@ -84,8 +84,13 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 		return LongHashSetRef.isEmpty.invoke(handle);
 	}
 
+	/**
+	 * Gets the amount of Long values stored in this LongHashSet
+	 * 
+	 * @return size
+	 */
 	public int size() {
-		return ((org.bukkit.craftbukkit.util.LongHashSet) handle).size();
+		return Math.max(((org.bukkit.craftbukkit.util.LongHashSet) handle).size(), 0);
 	}
 
 	/**
