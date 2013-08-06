@@ -215,4 +215,8 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
 	public boolean isOnGround() {
 		return base.isOnGround();
 	}
+
+	public org.bukkit.entity.Entity.Spigot spigot() {
+		return base.spigot();
+	}
 }

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import net.minecraft.server.EntityLiving;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -7,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 /**
@@ -81,12 +84,22 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 	}
 
 	/**
+	 * Gets the maximum possible health level of this Living Entity
+	 * 
+	 * @return max health
+	 */
+	public double getMaxHealth() {
+		return getHandle(EntityLiving.class).getMaxHealth();
+	}
+
+	/**
 	 * Gets the current health level of this Living Entity
 	 * 
 	 * @return health
 	 */
 	public double getHealth() {
-		return entity.getHealth();
+		EntityLiving handle = getHandle(EntityLiving.class);
+		return MathUtil.clamp(handle.getHealth(), 0, handle.getMaxHealth());
 	}
 
 	/**
