@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -224,5 +225,9 @@ public class CommonNMS {
 	 */
 	public static DedicatedPlayerList getPlayerList() {
 		return (DedicatedPlayerList) CraftServerRef.getPlayerList.invoke(Bukkit.getServer());
+	}
+
+	public static AttributeMapServer getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
+		return (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(Conversion.toEntityHandle.convert(entity));
 	}
 }

@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
-public class EntityHumanRef {
+public class EntityHumanRef extends EntityLivingRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityHuman");
 	public static final TranslatorFieldAccessor<IntVector3> spawnCoord = TEMPLATE.getField("c").translate(ConversionPairs.chunkCoordinates);
 	public static final FieldAccessor<Boolean> spawnForced = TEMPLATE.getField("d");

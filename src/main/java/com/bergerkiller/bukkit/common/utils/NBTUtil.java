@@ -11,18 +11,23 @@ import java.util.List;
 
 import org.bukkit.craftbukkit.inventory.CraftInventoryCustom;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 
+import net.minecraft.server.AttributeMapServer;
 import net.minecraft.server.Entity;
 import net.minecraft.server.FoodMetaData;
+import net.minecraft.server.GenericAttributes;
 import net.minecraft.server.InventoryEnderChest;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.MobEffect;
@@ -287,5 +292,42 @@ public class NBTUtil {
 		} else {
 			throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
 		}
+	}
+
+	/**
+	 * Resets all attributes set for an Entity to the defaults.
+	 * This should be called prior to loading in new attributes using
+	 * {@link #loadAttributes(LivingEntity, CommonTagList)}
+	 * 
+	 * @param livingEntity to reset
+	 */
+	public static void resetAttributes(LivingEntity livingEntity) {
+		Object livingHandle = Conversion.toEntityHandle.convert(livingEntity);
+
+		// Clear old attributes and force a re-create
+		EntityLivingRef.attributeMap.set(livingHandle, null);
+		EntityLivingRef.resetAttributes.invoke(livingHandle);
+	}
+
+	/**
+	 * Loads the attributes for an Entity, applying the new attributes to the entity
+	 * 
+	 * @param livingEntity to load
+	 * @param data to load from
+	 */
+	public static void loadAttributes(LivingEntity livingEntity, CommonTagList data) {
+		AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
+		GenericAttributes.a(map, (NBTTagList) data.getHandle(), null);
+	}
+
+	/**
+	 * Saves the current attributes of an Entity to a new CommonTagList
+	 * 
+	 * @param livingEntity to save
+	 * @return CommonTagList containing the saved data
+	 */
+	public static CommonTagList saveAttributes(LivingEntity livingEntity) {
+		AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
+		return (CommonTagList) CommonTag.create(GenericAttributes.a(map));
 	}
 }

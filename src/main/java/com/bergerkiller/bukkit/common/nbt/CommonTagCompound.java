@@ -16,7 +16,6 @@ import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
-import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * An NBTTagCompound wrapper which is used to map values to keys<br>
@@ -398,7 +397,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	 * @throws IOException on failure
 	 */
 	public void writeTo(File file) throws IOException {
-		TempFileOutputStream stream = StreamUtil.createTempOutputStream(file);
+		TempFileOutputStream stream = new TempFileOutputStream(file);
 		boolean successful = false;
 		try {
 			writeTo(stream);

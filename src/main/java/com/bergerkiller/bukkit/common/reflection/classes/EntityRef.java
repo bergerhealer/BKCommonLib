@@ -46,6 +46,8 @@ public class EntityRef {
 	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("e_");
 	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
 	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
+	private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("I");
+	private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("H");
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 
 	private static final ClassTemplate<?> CRAFT_TEMPLATE = CBClassTemplate.create("entity.CraftEntity");
@@ -57,6 +59,10 @@ public class EntityRef {
 
 	public static Item createEntityItem(World world, double x, double y, double z) {
 		return (Item) Conversion.toEntity.convert(entityItemConstr.newInstance(Conversion.toWorldHandle.convert(world), x, y, z));
+	}
+
+	public static boolean isInWater(Object entityHandle, boolean update) {
+		return update ? isInWaterUpdate.invoke(entityHandle) : isInWaterNoUpdate.invoke(entityHandle);
 	}
 
 	public static void updateFalling(Object entityHandle, double deltaY, boolean hitGround) {

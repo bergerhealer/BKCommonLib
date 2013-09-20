@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -393,6 +394,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			PacketUtil.sendPacket(viewer, getPassengerPacket(entity.getPassenger()));
 		}
 
+		// Potential leash
+		Entity leashHolder = entity.getLeashHolder();
+		if (leashHolder != null) {
+			PacketUtil.sendPacket(viewer, PacketFields.ATTACH_ENTITY.newInstance(entity.getEntity(), leashHolder, 1));
+		}
+
 		// Human entity sleeping action
 		if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
 			PacketUtil.sendPacket(viewer, PacketFields.ENTITY_LOCATION_ACTION.newInstance(entity.getEntity(), 
@@ -423,21 +430,22 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		}
 		// Living Entity - only data
 		if (handle instanceof EntityLiving) {
-			EntityLiving living = (EntityLiving) handle;
-
 			// Entity Attributes
-			AttributeMapServer attributeMap = (AttributeMapServer) living.aW();
+			AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
 			Collection<?> attributes = attributeMap.c();
 			if (!attributes.isEmpty()) {
 				PacketUtil.sendPacket(viewer, PacketFields.UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
 			}
+
 			// Entity Equipment
+			EntityLiving living = (EntityLiving) handle;
 			for (int i = 0; i < 5; ++i) {
 	            org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(i));
 	            if (itemstack != null) {
 	            	PacketUtil.sendPacket(viewer, PacketFields.ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i, itemstack));
 	            }
 			}
+
 			// Entity Mob Effects
 			for (MobEffect effect : (Collection<MobEffect>) living.getEffects()) {
 				PacketUtil.sendPacket(viewer, PacketFields.MOB_EFFECT.newInstance(entity.getEntityId(), effect));
@@ -583,10 +591,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		}
 		// Living Entity - only data
 		if (handle instanceof EntityLiving) {
-			EntityLiving living = (EntityLiving) handle;
-
 			// Entity Attributes
-			AttributeMapServer attributeMap = (AttributeMapServer) living.aW();
+			AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
 			Collection<?> attributes = attributeMap.b();
 			if (!attributes.isEmpty()) {
 				this.broadcast(PacketFields.UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
@@ -602,7 +608,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	public void syncVehicle() {
 		syncVehicle(entity.getVehicle());
 	}
-
+	
 	/**
 	 * Synchronizes the entity Vehicle
 	 * 

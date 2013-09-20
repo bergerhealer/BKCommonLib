@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import net.minecraft.server.Entity;
+import net.minecraft.server.EntityInsentient;
 import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.EntityEffect;
@@ -522,6 +523,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 		return entity.isInsideVehicle();
 	}
 
+	/**
+	 * Gets the Entity that is holding this Entity by a leash.
+	 * If this Entity does not support leashing, or the Entity is
+	 * not on a leash, null is returned instead.
+	 * 
+	 * @return Leash holder
+	 */
+	public org.bukkit.entity.Entity getLeashHolder() {
+		EntityInsentient handle = getHandle(EntityInsentient.class);
+		return handle == null ? null : Conversion.toEntity.convert(handle.getLeashHolder());
+	}
+
 	public boolean isValid() {
 		return entity.isValid();
 	}
@@ -533,7 +546,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return True if this Entity is in water, False if not
 	 */
 	public boolean isInWater() {
-		return h().G();
+		return isInWater(false);
 	}
 
 	/**
@@ -543,7 +556,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return True if this Entity is in water, False if not
 	 */
 	public boolean isInWater(boolean update) {
-		return update ? h().H() : h().G();
+		return EntityRef.isInWater(getHandle(), update);
 	}
 
 	/**

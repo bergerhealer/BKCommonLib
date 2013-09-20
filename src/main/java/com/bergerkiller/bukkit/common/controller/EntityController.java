@@ -144,7 +144,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 		if(dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
 			return;
 		}
-		
+
 		final Entity handle = entity.getHandle(Entity.class);
 		if (handle.Z) {
 			handle.boundingBox.d(dx, dy, dz);
