@@ -485,7 +485,7 @@ public class CommonPlugin extends PluginBase {
 						message.green("= ");
 					} else {
 						message.green("set to ");
-						value.parseSet(StringUtil.combine(" ", StringUtil.remove(args, 0)));
+						value.parseSet(StringUtil.join(" ", StringUtil.remove(args, 0)));
 					}
 					message.white(value.toString());
 				}

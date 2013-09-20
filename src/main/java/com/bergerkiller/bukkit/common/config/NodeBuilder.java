@@ -68,6 +68,6 @@ public class NodeBuilder {
 	 * @return current path
 	 */
 	public String getPath() {
-		return StringUtil.combine(".", this.nodes);
+		return StringUtil.join(".", this.nodes);
 	}
 }

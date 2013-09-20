@@ -146,7 +146,7 @@ public class PermissionHandler implements PermissionChecker {
 
 	public boolean hasPermission(CommandSender sender, String[] permissionNode) {
 		if (hasSuperWildcardSupport()) {
-			return handlePermission(sender, StringUtil.combine(".", permissionNode).toLowerCase(Locale.ENGLISH));
+			return handlePermission(sender, StringUtil.join(".", permissionNode).toLowerCase(Locale.ENGLISH));
 		}
 		return permCheckWildcard(this, sender, permissionNode);
 	}

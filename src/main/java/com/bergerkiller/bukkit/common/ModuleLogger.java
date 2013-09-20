@@ -26,7 +26,7 @@ public class ModuleLogger extends Logger {
 	}
 
 	public ModuleLogger(Logger parent, String... modulePath) {
-		super(StringUtil.combine(".", modulePath), null);
+		super(StringUtil.join(".", modulePath), null);
 		this.setParent(parent);
 		this.setLevel(Level.ALL);
 		this.modulePath = modulePath;

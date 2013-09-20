@@ -360,14 +360,21 @@ public class StringUtil {
 	}
 
 	/**
-	 * Combines all the separate parts together with a separator in between
-	 * 
-	 * @param separator to put in between the parts
-	 * @param parts to combine
-	 * @return combined parts separated using the separator
+	 * Use {@link #join(String, String...)} instead (is more properly named).
+	 * Method is not likely to be removed, however.
 	 */
+	@Deprecated
 	public static String combine(String separator, String... parts) {
-		return combine(separator, Arrays.asList(parts));
+		return join(separator, parts);
+	}
+
+	/**
+	 * Use {@link #join(String, Collection)} instead (is more properly named)
+	 * Method is not likely to be removed, however.
+	 */
+	@Deprecated
+	public static String combine(String separator, Collection<String> parts) {
+		return join(separator, parts);
 	}
 
 	/**
@@ -377,8 +384,19 @@ public class StringUtil {
 	 * @param parts to combine
 	 * @return combined parts separated using the separator
 	 */
-	public static String combine(String separator, Collection<String> parts) {
-		StringBuilder builder = new StringBuilder();
+	public static String join(String separator, String... parts) {
+		return join(separator, Arrays.asList(parts));
+	}
+
+	/**
+	 * Combines all the separate parts together with a separator in between
+	 * 
+	 * @param separator to put in between the parts
+	 * @param parts to combine
+	 * @return combined parts separated using the separator
+	 */
+	public static String join(String separator, Collection<String> parts) {
+		StringBuilder builder = new StringBuilder(parts.size() * 16);
 		boolean first = true;
 		for (String line : parts) {
 			if (!first) {

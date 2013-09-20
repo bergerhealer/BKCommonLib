@@ -24,12 +24,12 @@ public class Common {
 	 * Defines the net.minecraft.server constant (which is not inlined or relocated).
 	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
 	 */
-	public static final String NMS_ROOT = StringUtil.combine(".", "net", "minecraft", "server");
+	public static final String NMS_ROOT = StringUtil.join(".", "net", "minecraft", "server");
 	/**
 	 * Defines the org.bukkit.craftbukkit constant (which is not inlined or relocated).
 	 * Implementer note: do NOT change this to a constant or maven shading will rename it.
 	 */
-	public static final String CB_ROOT = StringUtil.combine(".", "org", "bukkit", "craftbukkit");
+	public static final String CB_ROOT = StringUtil.join(".", "org", "bukkit", "craftbukkit");
 	/**
 	 * Defines the com.bergerkiller.bukkit.common root path of this library
 	 */

@@ -137,7 +137,7 @@ public abstract class PluginBase extends JavaPlugin {
 		if (path == null || path.length == 0) {
 			return this.getDataFolder();
 		}
-		return new File(this.getDataFolder(), StringUtil.combine(File.separator, path));
+		return new File(this.getDataFolder(), StringUtil.join(File.separator, path));
 	}
 
 	/**

@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ConfigurationNode implements Cloneable {
@@ -515,6 +516,12 @@ public class ConfigurationNode implements Cloneable {
 	 * @return the converted value, or the default value if not found or invalid
 	 */
 	public <T> T get(String path, Class<T> type, T def) {
+		Object rawValue = this.get(path);
+		if (type == String.class && rawValue instanceof String[]) {
+			// Special conversion to line-by-line String
+			// This is needed, as it saves line-split Strings as such
+			return (T) StringUtil.join("\n", (String[]) rawValue);
+		}
 		T rval = ParseUtil.convert(this.get(path), type, def);
 		this.set(path, rval);
 		return rval;
