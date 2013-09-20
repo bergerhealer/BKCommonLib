@@ -1,14 +1,15 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.Map;
-
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 
 import net.minecraft.server.EntityItem;
@@ -280,19 +281,22 @@ public class ItemUtil {
 		if (item1.getTypeId() != item2.getTypeId() || item1.getDurability() != item2.getDurability()) {
 			return false;
 		}
-		// Enchantment checks
-		Map<Enchantment, Integer> ench1 = item1.getEnchantments();
-		Map<Enchantment, Integer> ench2 = item2.getEnchantments();
-		boolean hasEnchantments = !LogicUtil.nullOrEmpty(ench1);
-		// One has enchantments and the other doesn't? Don't stack in that case.
-		if (hasEnchantments != !LogicUtil.nullOrEmpty(ench2)) {
+		// Metadata checks
+		boolean hasMeta = hasMetaTag(item1);
+		if (hasMeta != hasMetaTag(item2)) {
+			return false;
+		} else if (!hasMeta) {
+			// No further data to test
+			return true;
+		}
+		if (!item1.getItemMeta().equals(item2.getItemMeta())) {
 			return false;
 		}
-		// Check if the enchantments are the same
-		if (hasEnchantments && (ench1.size() != ench2.size() || !LogicUtil.containsAll(ench1, ench2))) {
-			return false;
-		}
-		return true;
+
+		// Not included in metadata checks: Item attributes (Bukkit needs to update)
+		CommonTagList item1Attr = getMetaTag(item1).get("AttributeModifiers", CommonTagList.class);
+		CommonTagList item2Attr = getMetaTag(item2).get("AttributeModifiers", CommonTagList.class);
+		return LogicUtil.bothNullOrEqual(item1Attr, item2Attr);
 	}
 
 	/**
@@ -503,6 +507,47 @@ public class ItemUtil {
 		} else {
 			return getMaxSize(stack.getTypeId(), 0);
 		}
+	}
+
+	/**
+	 * Checks whether an Item stores a metadata tag
+	 * 
+	 * @param stack to check
+	 * @return True if a metadata tag is stored, False if not
+	 */
+	public static boolean hasMetaTag(org.bukkit.inventory.ItemStack stack) {
+		return CommonNMS.getNative(stack).hasTag();
+	}
+
+	/**
+	 * Obtains the Metadata tag stored in an item.
+	 * If no metadata is stored, null is returned instead.
+	 * 
+	 * @param stack to get the metadata tag of
+	 * @return metadata tag
+	 */
+	public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
+		return ItemStackRef.tag.get(Conversion.toItemStackHandle.convert(stack));
+	}
+
+	/**
+	 * Sets the cost of repairing this item
+	 * 
+	 * @param stack to set the repair cost of
+	 * @param repairCost to set to
+	 */
+	public static void setRepairCost(org.bukkit.inventory.ItemStack stack, int repairCost) {
+		CommonNMS.getNative(stack).setRepairCost(repairCost);
+	}
+
+	/**
+	 * Gets the cost of repairing this item
+	 * 
+	 * @param stack to get the repair cost of
+	 * @return repair cost
+	 */
+	public static int getRepairCost(org.bukkit.inventory.ItemStack stack) {
+		return CommonNMS.getNative(stack).getRepairCost();
 	}
 
 	/**
