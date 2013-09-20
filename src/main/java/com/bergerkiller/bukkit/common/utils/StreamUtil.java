@@ -32,6 +32,43 @@ public class StreamUtil {
 	}
 
 	/**
+	 * Returns an iterable that can be used to navigate all the files in a directory.
+	 * The listed files include sub-directories.<br>
+	 * <br>
+	 * <b>Implementers note:</b><br>
+	 * Might be used to optimize file listing for Java 1.7.
+	 * Alternatively, perhaps some native calls will do the job.
+	 * The goal is providing faster directory listing than the default
+	 * {@link File#listFiles()} method can offer.
+	 * 
+	 * @param directory to list the file contents of
+	 * @return Iterable of Files available in the directory
+	 */
+	public static Iterable<File> listFiles(File directory) {
+		return Arrays.asList(directory.listFiles());
+	}
+
+	/**
+	 * Gets the amount of bytes of data stored on disk by a specific file or in a specific folder
+	 * 
+	 * @param file to get the size of
+	 * @return File/folder size in bytes
+	 */
+	public static long getFileSize(File file) {
+		if (!file.exists()) {
+			return 0L;
+		} else if (file.isDirectory()) {
+			long size = 0L;
+			for (File subfile : listFiles(file)) {
+				size += getFileSize(subfile);
+			}
+			return size;
+		} else {
+			return file.length();
+		}
+	}
+
+	/**
 	 * Deletes a file or directory.
 	 * This method will attempt to delete all files in a directory
 	 * if a directory is specified.
@@ -57,7 +94,7 @@ public class StreamUtil {
 	private static boolean deleteFileList(File file, List<File> failFiles) {
 		if (file.isDirectory()) {
 			boolean success = true;
-			for (File subFile : file.listFiles()) {
+			for (File subFile : listFiles(file)) {
 				success &= deleteFileList(subFile, failFiles);
 			}
 			if (success) {
@@ -98,11 +135,11 @@ public class StreamUtil {
 	 */
 	public static FileOutputStream createOutputStream(File file, boolean append) throws IOException, SecurityException {
 		File directory = file.getAbsoluteFile().getParentFile();
-		if (!directory.exists()) {
-			directory.mkdirs();
+		if (!directory.exists() && !directory.mkdirs()) {
+			throw new IOException("Failed to create the parent directory of the file");
 		}
-		if (!file.exists()) {
-			file.createNewFile();
+		if (!file.exists() && !file.createNewFile()) {
+			throw new IOException("Failed to create the new file to write to");
 		}
 		return new FileOutputStream(file, append);
 	}
@@ -140,7 +177,8 @@ public class StreamUtil {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdirs();
 			}
-			for (String subFileName : sourceLocation.list()) {
+			for (File subFile : listFiles(sourceLocation)) {
+				String subFileName = subFile.getName();
 				copyFile(new File(sourceLocation, subFileName), new File(targetLocation, subFileName));
 			}
 		} else {

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,9 +12,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * An NBTTagCompound wrapper which is used to map values to keys<br>
@@ -397,15 +398,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	 * @throws IOException on failure
 	 */
 	public void writeTo(File file) throws IOException {
-		File tmp = new File(file.toString() + ".tmp");
-		FileOutputStream stream = new FileOutputStream(tmp);
+		TempFileOutputStream stream = StreamUtil.createTempOutputStream(file);
+		boolean successful = false;
 		try {
 			writeTo(stream);
-			if ((file.exists() && !file.delete()) || !tmp.renameTo(file)) {
-				throw new IOException("No write access for file '" + file.toString() + "'");
-			}
+			successful = true;
 		} finally {
-			stream.close();
+			stream.close(successful);
 		}
 	}
 
