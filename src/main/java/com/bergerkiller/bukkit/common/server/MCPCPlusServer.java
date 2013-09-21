@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 public class MCPCPlusServer extends SpigotServer {
 	private Object classRemapper;
@@ -113,7 +114,7 @@ public class MCPCPlusServer extends SpigotServer {
 		if (container.getName().equalsIgnoreCase(worldName)) {
 			return container;
 		} else {
-			return new File(container, worldName);
+			return StreamUtil.getFileIgnoreCase(container, worldName);
 		}
 	}
 
@@ -135,13 +136,7 @@ public class MCPCPlusServer extends SpigotServer {
 
 	@Override
 	public File getWorldRegionFolder(String worldName) {
-		File container = Bukkit.getWorldContainer();
-		File region;
-		if (container.getName().equalsIgnoreCase(worldName)) {
-			region = new File(container, "region");
-		} else {
-			region = new File(container, worldName + File.separator + "region");
-		}
+		File region = new File(getWorldFolder(worldName), "region");
 		return region.exists() ? region : null;
 	}
 }

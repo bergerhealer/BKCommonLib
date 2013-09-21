@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Stream and File-related utility methods
+ */
 public class StreamUtil {
 
 	public static UUID readUUID(DataInputStream stream) throws IOException {
@@ -215,5 +218,45 @@ public class StreamUtil {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Obtains a file found in a parent directory.
+	 * Child name casing is ignored. If the child file is found
+	 * in the parent directory with the same casing, this is returned.
+	 * If this is not the case, but a file with the same name but different
+	 * casing is available, then this is returned instead. If none could be found,
+	 * a file with the casing of the child is returned alternatively.<br>
+	 * <br>
+	 * The returned File will point to an existing file <b>on the current OS</b>, if
+	 * system-independent file paths are needed or paths with accurate File System casing,
+	 * {@link File#getCanonicalFile()} should be used on the resulting File.
+	 * 
+	 * @param parent directory
+	 * @param child file name
+	 * @return File pointing to the child file found in the parent directory
+	 */
+	public static File getFileIgnoreCase(File parent, String child) {
+		if (LogicUtil.nullOrEmpty(child)) {
+			return parent;
+		}
+		File childFile = new File(parent, child);
+		if (!childFile.exists() && parent.exists()) {
+			int firstFolderIdx = child.indexOf(File.separator);
+			if (firstFolderIdx != -1) {
+				// Process folder structure recursively
+				File newParent = getFileIgnoreCase(parent, child.substring(0, firstFolderIdx));
+				String newChild = child.substring(firstFolderIdx + 1);
+				return getFileIgnoreCase(newParent, newChild);
+			} else {
+				// No folder specified in child - find the accurate file name
+				for (String childName : parent.list()) {
+					if (childName.equalsIgnoreCase(child)) {
+						return new File(parent, childName);
+					}
+				}
+			}
+		}
+		return childFile;
 	}
 }

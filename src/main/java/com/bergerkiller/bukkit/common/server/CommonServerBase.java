@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 public abstract class CommonServerBase implements CommonServer {
 
@@ -25,7 +26,7 @@ public abstract class CommonServerBase implements CommonServer {
 
 	@Override
 	public File getWorldFolder(String worldName) {
-		return new File(Bukkit.getWorldContainer(), worldName);
+		return StreamUtil.getFileIgnoreCase(Bukkit.getWorldContainer(), worldName);
 	}
 
 	@Override
