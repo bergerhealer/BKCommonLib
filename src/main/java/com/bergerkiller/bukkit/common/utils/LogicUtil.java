@@ -13,11 +13,14 @@ import java.util.Map.Entry;
 import org.bukkit.block.Block;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeDirectMethod;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
+	private static final MethodAccessor<Object> objectCloneMethod;
 	private static final Map<Class<?>, Class<?>> unboxedToBoxed = new HashMap<Class<?>, Class<?>>();
 	private static final Map<Class<?>, Class<?>> boxedToUnboxed = new HashMap<Class<?>, Class<?>>();
 	static {
@@ -32,6 +35,34 @@ public class LogicUtil {
 		for (Entry<Class<?>, Class<?>> entry : unboxedToBoxed.entrySet()) {
 			boxedToUnboxed.put(entry.getValue(), entry.getKey());
 		}
+		// Get the cloning method
+		MethodAccessor<Object> objectCloneMethodAccessor;
+		try {
+			final Method cloneMethod = Object.class.getDeclaredMethod("clone");
+			cloneMethod.setAccessible(true);
+			objectCloneMethodAccessor = new SafeDirectMethod<Object>() {
+				@Override
+				public Object invoke(Object instance, Object... args) {
+					try {
+						return cloneMethod.invoke(instance, args);
+					} catch (Throwable t) {
+						throw new RuntimeException("Failed to clone:", t);
+					}
+				}
+			};
+		} catch (Throwable t) {
+			objectCloneMethodAccessor = new SafeDirectMethod<Object>() {
+				@Override
+				public Object invoke(Object instance, Object... args) {
+					try {
+						return instance.getClass().getDeclaredMethod("clone").invoke(instance, args);
+					} catch (Throwable t) {
+						throw new RuntimeException("Failed to clone:", t);
+					}
+				}
+			};
+		}
+		objectCloneMethod = objectCloneMethodAccessor;
 	}
 
 	/**
@@ -216,12 +247,7 @@ public class LogicUtil {
 		if (value == null) {
 			return null;
 		}
-		// Use reflection to call clone() (it's protected...)
-		try {
-		    return (T) value.getClass().getDeclaredMethod("clone").invoke(value);
-		} catch (Exception ex) {
-			throw new RuntimeException("Cloning was not possible:", ex);
-		}
+		return (T) objectCloneMethod.invoke(value);
 	}
 
 	/**

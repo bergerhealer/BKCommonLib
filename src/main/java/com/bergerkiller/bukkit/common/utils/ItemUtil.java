@@ -262,7 +262,7 @@ public class ItemUtil {
 		// Transfer type, durability and any other remaining metadata information
 		to.setTypeId(from.getTypeId());
 		to.setDurability(from.getDurability());
-		setMetaTag(to, getMetaTag(from).clone());
+		setMetaTag(to, LogicUtil.clone(getMetaTag(from)));
 	}
 
 	/**
