@@ -9,8 +9,12 @@ class CommonClasses {
 	 * Then the main server thread class loader is used, which is unable to find (our) net.minecraft.server references
 	 */
 	public static void init() {
+		// Converter types
+		loadConverter("Collection", "CollectionType", "Empty", "Entry", "Enum", "Handle", "Number", "ObjectArray");
+		loadConverter("PrimitiveArray", "Primitive", "Property", "Wrapper", "WrapperHandle");
+		loadCommon("conversion.type.EmptyConverterUnsafe");
 		// Conversion
-		Common.loadClasses(Common.COMMON_ROOT + ".conversion.Conversion");
+		loadCommon("conversion.Conversion");
 		// Reflection classes
 		loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
 		loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashSet", "LongHashMap");
@@ -25,6 +29,13 @@ class CommonClasses {
 		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityType", "collections.CollectionBasics");
 		loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
 		loadCommon("protocol.PacketType", "protocol.PacketFields");
+	}
+
+	private static void loadConverter(String... classNames) {
+		for (int i = 0; i < classNames.length; i++) {
+			classNames[i] = "conversion.type." + classNames[i] + "Converter";
+		}
+		loadCommon(classNames);
 	}
 
 	private static void loadRef(String... classNames) {

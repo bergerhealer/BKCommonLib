@@ -110,6 +110,8 @@ public class Common {
 		for (String className : classNames) {
 			try {
 				loadInner(Class.forName(className));
+			} catch (ExceptionInInitializerError error) {
+				throw new RuntimeException("An error occurred trying to initialize class '" + className + "':", error);
 			} catch (ClassNotFoundException ex) {
 				throw new RuntimeException("Could not load class '" + className + "' - Update needed?");
 			}
