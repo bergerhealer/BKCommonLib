@@ -129,7 +129,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
 	}
 
-	private static class CommonPlayerConnection extends PlayerConnection {
+	public static class CommonPlayerConnection extends PlayerConnection {
 		private final PlayerConnection previous;
 		private final PacketHandlerHooked handler;
 
