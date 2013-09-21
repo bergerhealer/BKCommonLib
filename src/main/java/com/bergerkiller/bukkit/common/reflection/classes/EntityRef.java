@@ -41,7 +41,7 @@ public class EntityRef {
 	public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ai");
 	public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("ap");
 	private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class);
-	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("C");
+	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("D");
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("e_");
 	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
