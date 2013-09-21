@@ -24,6 +24,7 @@ import net.minecraft.server.*;
 public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	private static final BlockFace[] paintingFaces = {BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST};
 
+	@SuppressWarnings("deprecation")
 	public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
 		@Override
 		public Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
@@ -56,6 +57,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final PropertyConverter<Material> toItemMaterial = new PropertyConverter<Material>(Material.class) {
 		@Override
 		public Material convertSpecial(Object value, Class<?> valueType, Material def) {
@@ -69,6 +71,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 			return def;
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final PropertyConverter<Byte> toDifficultyId = new PropertyConverter<Byte>(Byte.class) {
 		@Override
 		public Byte convertSpecial(Object value, Class<?> valueType, Byte def) {

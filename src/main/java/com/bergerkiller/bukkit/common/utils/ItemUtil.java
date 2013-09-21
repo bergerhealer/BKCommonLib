@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -258,16 +257,12 @@ public class ItemUtil {
 	 * @param from which Item Stack to read the info
 	 * @param to which Item Stack to transfer the info to
 	 */
+	@SuppressWarnings("deprecation")
 	public static void transferInfo(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
-		// Transfer type and durability
+		// Transfer type, durability and any other remaining metadata information
 		to.setTypeId(from.getTypeId());
 		to.setDurability(from.getDurability());
-		// Remove previous enchantments
-		for (Enchantment ench : to.getEnchantments().keySet()) {
-			to.removeEnchantment(ench);
-		}
-		// Add new enchantments
-		to.addEnchantments(from.getEnchantments());
+		setMetaTag(to, getMetaTag(from).clone());
 	}
 
 	/**
@@ -278,7 +273,7 @@ public class ItemUtil {
 	 * @return True if the items have the same type, data and enchantments, False if not
 	 */
 	public static boolean equalsIgnoreAmount(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
-		if (item1.getTypeId() != item2.getTypeId() || item1.getDurability() != item2.getDurability()) {
+		if (MaterialUtil.getTypeId(item1) != MaterialUtil.getTypeId(item2) || MaterialUtil.getRawData(item1) != MaterialUtil.getRawData(item2)) {
 			return false;
 		}
 		// Metadata checks
@@ -306,7 +301,7 @@ public class ItemUtil {
 	 * @param item signature of the items to remove
 	 */
 	public static void removeItems(Inventory inventory, org.bukkit.inventory.ItemStack item) {
-		removeItems(inventory, item.getTypeId(), (int) item.getDurability(), item.getAmount());
+		removeItems(inventory, MaterialUtil.getTypeId(item), MaterialUtil.getRawData(item), item.getAmount());
 	}
 
 	/**
@@ -321,7 +316,7 @@ public class ItemUtil {
 		int countToRemove = amount < 0 ? Integer.MAX_VALUE : amount;
 		for (int i = 0; i < inventory.getSize(); i++) {
 			org.bukkit.inventory.ItemStack item = inventory.getItem(i);
-			if (LogicUtil.nullOrEmpty(item) || item.getTypeId() != itemid || (data != -1 && item.getDurability() != data)) {
+			if (LogicUtil.nullOrEmpty(item) || MaterialUtil.getTypeId(item) != itemid || (data != -1 && MaterialUtil.getRawData(item) != data)) {
 				continue;
 			}
 			if (item.getAmount() <= countToRemove) {
@@ -440,14 +435,14 @@ public class ItemUtil {
 			}
 			// Compare type Id
 			if (itemTypeId == -1) {
-				itemTypeId = item.getTypeId();
-			} else if (itemTypeId != item.getTypeId()) {
+				itemTypeId = MaterialUtil.getTypeId(item);
+			} else if (itemTypeId != MaterialUtil.getTypeId(item)) {
 				continue;
 			}
 			// Compare data
 			if (itemData == -1) {
-				itemData = item.getDurability();
-			} else if (item.getDurability() != itemData) {
+				itemData = MaterialUtil.getRawData(item);
+			} else if (MaterialUtil.getRawData(item) != itemData) {
 				continue;
 			}
 			// addition
@@ -505,7 +500,7 @@ public class ItemUtil {
 		if (LogicUtil.nullOrEmpty(stack)) {
 			return 0;
 		} else {
-			return getMaxSize(stack.getTypeId(), 0);
+			return getMaxSize(MaterialUtil.getTypeId(stack), 0);
 		}
 	}
 
@@ -528,6 +523,17 @@ public class ItemUtil {
 	 */
 	public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
 		return ItemStackRef.tag.get(Conversion.toItemStackHandle.convert(stack));
+	}
+
+	/**
+	 * Sets the Metadata tag stored in an item.
+	 * If tag is null, all metadata is cleared.
+	 * 
+	 * @param stack to set the metadata tag of
+	 * @param tag to set to
+	 */
+	public static void setMetaTag(org.bukkit.inventory.ItemStack stack, CommonTagCompound tag) {
+		ItemStackRef.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
 	}
 
 	/**

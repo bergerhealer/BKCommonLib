@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -108,14 +109,14 @@ public class ItemParser {
 		if (stack == null) {
 			return false;
 		}
-		return this.match(stack.getTypeId(), stack.getDurability());
+		return this.match(MaterialUtil.getTypeId(stack), MaterialUtil.getRawData(stack));
 	}
 
 	public boolean match(Material type, int data) {
 		if (type == null) {
 			return false;
 		}
-		return this.match(type.getId(), data);
+		return this.match(MaterialUtil.getTypeId(type), data);
 	}
 
 	public boolean match(int typeid, int data) {
@@ -193,7 +194,7 @@ public class ItemParser {
 	 * @return Matched type Id
 	 */
 	public int getTypeId() {
-		return this.type == null ? -1 : this.type.getId();
+		return this.type == null ? -1 : MaterialUtil.getTypeId(this.type);
 	}
 
 	public ItemStack getItemStack() {

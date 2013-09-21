@@ -31,7 +31,7 @@ public class DebugUtil {
 	public static void randomizeBlock(Block block, Material... materials) {
 		while (true) {
 			Material mat = materials[(int) (Math.random() * materials.length)];
-			if (block.getTypeId() != mat.getId()) {
+			if (!MaterialUtil.isType(block, mat)) {
 				block.setType(mat);
 				break;
 			}
@@ -68,7 +68,7 @@ public class DebugUtil {
 		StringUtil.replaceAll(buffer, "#y", Integer.toString(block.getY()));
 		StringUtil.replaceAll(buffer, "#z", Integer.toString(block.getZ()));
 		StringUtil.replaceAll(buffer, "#world", block.getWorld().getName());
-		StringUtil.replaceAll(buffer, "#typeid", Integer.toString(block.getTypeId()));
+		StringUtil.replaceAll(buffer, "#typeid", Integer.toString(MaterialUtil.getTypeId(block)));
 		StringUtil.replaceAll(buffer, "#type", block.getType().toString());
 		return buffer.toString();
 	}

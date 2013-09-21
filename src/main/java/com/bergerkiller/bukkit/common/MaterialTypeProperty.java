@@ -39,7 +39,7 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	public MaterialTypeProperty(int... allowedTypes) {
 		this.allowedTypes = new Material[allowedTypes.length];
 		for (int i = 0; i < allowedTypes.length; i++) {
-			this.allowedTypes[i] = Material.getMaterial(allowedTypes[i]);
+			this.allowedTypes[i] = MaterialUtil.getType(allowedTypes[i]);
 		}
 	}
 

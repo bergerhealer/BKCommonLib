@@ -6,6 +6,8 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 /**
  * Represents a property for a given material<br>
@@ -20,7 +22,7 @@ public abstract class MaterialProperty<T> {
 	 * @return The property of the material
 	 */
 	public T get(ItemStack item) {
-		return item == null ? get(0) : get(item.getTypeId());
+		return item == null ? get(0) : get(MaterialUtil.getTypeId(item));
 	}
 
 	/**
@@ -30,7 +32,7 @@ public abstract class MaterialProperty<T> {
 	 * @return The property of the material
 	 */
 	public T get(Material material) {
-		return material == null ? get(0) : get(material.getId());
+		return material == null ? get(0) : get(MaterialUtil.getTypeId(material));
 	}
 
 	/**
@@ -40,7 +42,7 @@ public abstract class MaterialProperty<T> {
 	 * @return The property of the material
 	 */
 	public T get(Block block) {
-		return block == null ? get(0) : get(block.getTypeId());
+		return block == null ? get(0) : get(MaterialUtil.getTypeId(block));
 	}
 
 	/**
@@ -66,7 +68,7 @@ public abstract class MaterialProperty<T> {
 	 * @return The property of the material
 	 */
 	public T get(org.bukkit.World world, int x, int y, int z) {
-		return get(world.getBlockTypeIdAt(x, y, z));
+		return get(WorldUtil.getBlockTypeId(world, x, y, z));
 	}
 
 	/**

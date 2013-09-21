@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
@@ -309,10 +310,10 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				int typeId = handle.world.getTypeId(bX, bY, bZ);
 
 				// Some special type cases (this is sooooooo hacked in...)
-				if (typeId == 0 && handle.world.getTypeId(bX, bY - 1, bZ) == Material.FENCE.getId()) {
-					typeId = Material.FENCE.getId();
+				if (typeId == 0 && handle.world.getTypeId(bX, bY - 1, bZ) == MaterialUtil.getTypeId(Material.FENCE)) {
+					typeId = MaterialUtil.getTypeId(Material.FENCE);
 				}
-				if (typeId != Material.LADDER.getId()) {
+				if (typeId != MaterialUtil.getTypeId(Material.LADDER)) {
 					moveDy = 0.0;
 				}
 

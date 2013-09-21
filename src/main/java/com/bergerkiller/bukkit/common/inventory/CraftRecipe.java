@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class CraftRecipe {
@@ -32,7 +33,7 @@ public class CraftRecipe {
 
 			create = true;
 			for (ItemStack newitem : newinput) {
-				if (newitem.getTypeId() == item.getTypeId() && newitem.getDurability() == item.getDurability()) {
+				if (ItemUtil.equalsIgnoreAmount(item, newitem)) {
 					ItemUtil.addAmount(newitem, 1);
 					create = false;
 					break;
@@ -50,7 +51,7 @@ public class CraftRecipe {
 		newoutput.add(output.clone());
 		// Deal with special cases that demand an additional item (added elsewhere)
 		for (ItemStack stack : newinput) {
-			if (BlockUtil.isType(stack.getTypeId(), Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.MILK_BUCKET)) {
+			if (BlockUtil.isType(stack, Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.MILK_BUCKET)) {
 				newoutput.add(new ItemStack(Material.BUCKET, stack.getAmount()));
 			}
 		}
@@ -121,7 +122,7 @@ public class CraftRecipe {
 	 */
 	public boolean containsInput(Inventory inventory) {
 		for (ItemStack item : this.input) {
-			if (ItemUtil.getItemCount(inventory, item.getTypeId(), item.getDurability()) < item.getAmount()) {
+			if (ItemUtil.getItemCount(inventory, MaterialUtil.getTypeId(item), MaterialUtil.getRawData(item)) < item.getAmount()) {
 				return false;
 			}
 		}
@@ -240,7 +241,7 @@ public class CraftRecipe {
 			// Check that input and output are not causing a loop
 			// For example Sandstone has an infinite crafting loop going on
 			// (You can craft 4 Sandstone using 4 Sandstone...yeah)
-			if (rval.input.length == 1 && rval.output.length == 1 && rval.input[0].getTypeId() == rval.output[0].getTypeId()) {
+			if (rval.input.length == 1 && rval.output.length == 1 && MaterialUtil.getTypeId(rval.input[0]) == MaterialUtil.getTypeId(rval.output[0])) {
 				return null;
 			}
 			return rval;

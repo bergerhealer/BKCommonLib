@@ -30,7 +30,7 @@ public class RecipeUtil {
 			}
 			int fuel = TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
 			if (fuel > 0) {
-				fuelTimes.put(material.getId(), fuel);
+				fuelTimes.put(MaterialUtil.getTypeId(material), fuel);
 			}
 		}
 	}
@@ -52,12 +52,12 @@ public class RecipeUtil {
 		if (item == null) {
 			return 0;
 		} else {
-			return getFuelTime(item.getTypeId()) * item.getAmount();
+			return getFuelTime(MaterialUtil.getTypeId(item)) * item.getAmount();
 		}
 	}
 
 	public static int getFuelTime(Material material) {
-		return getFuelTime(material.getId());
+		return getFuelTime(MaterialUtil.getTypeId(material));
 	}
 
 	public static boolean isFuelItem(int itemid) {
@@ -65,11 +65,11 @@ public class RecipeUtil {
 	}
 
 	public static boolean isFuelItem(Material material) {
-		return isFuelItem(material.getId());
+		return isFuelItem(MaterialUtil.getTypeId(material));
 	}
 
 	public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
-		return isFuelItem(item.getTypeId());
+		return isFuelItem(MaterialUtil.getTypeId(item));
 	}
 
 	public static boolean isHeatableItem(int itemid) {
@@ -77,11 +77,11 @@ public class RecipeUtil {
 	}
 
 	public static boolean isHeatableItem(Material material) {
-		return isFuelItem(material.getId());
+		return isFuelItem(MaterialUtil.getTypeId(material));
 	}
 
 	public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
-		return isHeatableItem(item.getTypeId());
+		return isHeatableItem(MaterialUtil.getTypeId(item));
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
@@ -89,7 +89,7 @@ public class RecipeUtil {
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-		return getFurnaceResult(cooked.getTypeId());
+		return getFurnaceResult(MaterialUtil.getTypeId(cooked));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,7 +108,7 @@ public class RecipeUtil {
 		List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
 		for (Object rec : getCraftRecipes()) {
 			ItemStack item = RecipeRef.getOutput(rec);
-			if (item != null && item.getTypeId() == itemid && (data == -1 || data == item.getDurability())) {
+			if (item != null && MaterialUtil.getTypeId(item) == itemid && (data == -1 || MaterialUtil.getRawData(item) == data)) {
 				CraftRecipe crec = CraftRecipe.create(rec);
 				if (crec != null) {
 					poss.add(crec);

@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 
 /**
@@ -90,7 +91,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 				org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
 				Object rval = CraftItemStack.asNMSCopy(stack);
 				if (rval == null) {
-					rval = ItemStackRef.newInstance(stack.getTypeId(), stack.getDurability(), stack.getAmount());
+					rval = ItemStackRef.newInstance(MaterialUtil.getTypeId(stack), MaterialUtil.getRawData(stack), stack.getAmount());
 				}
 				return rval;
 			} else {
@@ -198,6 +199,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			return true;
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final HandleConverter toGameModeHandle = new HandleConverter("EnumGamemode") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {

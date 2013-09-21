@@ -12,6 +12,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
+@SuppressWarnings("deprecation")
 public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState {
 	static {
 		validate(BlockStateProxy.class);

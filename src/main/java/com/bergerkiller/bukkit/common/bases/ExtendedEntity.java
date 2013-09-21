@@ -34,6 +34,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -357,7 +358,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public void makeStepSound(org.bukkit.block.Block block) {
-		makeStepSound(block.getX(), block.getY(), block.getZ(), block.getTypeId());
+		makeStepSound(block.getX(), block.getY(), block.getZ(), MaterialUtil.getTypeId(block));
 	}
 
 	public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
@@ -725,7 +726,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the dropped Item
 	 */
 	public Item spawnItemDrop(Material material, int amount, float force) {
-		return CommonNMS.getItem(getHandle(Entity.class).a(material.getId(), amount, force));
+		return CommonNMS.getItem(getHandle(Entity.class).a(MaterialUtil.getTypeId(material), amount, force));
 	}
 
 	/**

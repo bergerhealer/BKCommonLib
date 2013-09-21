@@ -196,6 +196,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final WrapperConverter<org.bukkit.Material> toMaterial = new WrapperConverter<org.bukkit.Material>(org.bukkit.Material.class) {
 		@Override
 		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
@@ -240,6 +241,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final WrapperConverter<Difficulty> toDifficulty = new WrapperConverter<Difficulty>(Difficulty.class) {
 		@Override
 		public Difficulty convertSpecial(Object value, Class<?> valueType, Difficulty def) {
@@ -262,6 +264,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
+	@SuppressWarnings("deprecation")
 	public static final WrapperConverter<org.bukkit.GameMode> toGameMode = new WrapperConverter<org.bukkit.GameMode>(org.bukkit.GameMode.class) {
 		@Override
 		public org.bukkit.GameMode convertSpecial(Object value, Class<?> valueType, org.bukkit.GameMode def) {

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
  * To call methods in the base class, call the regular methods.
  * To call methods from the current implementation, call the super_ methods.
  */
+@SuppressWarnings("deprecation")
 public class CraftInventoryProxy extends CraftInventory implements Proxy<Inventory> {
 	private Inventory base;
 

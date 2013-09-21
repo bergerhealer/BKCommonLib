@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
@@ -132,7 +133,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 * @return block type
 	 */
 	public Material getBlockType() {
-		return Material.getMaterial(getBlockId());
+		return MaterialUtil.getType(getBlockId());
 	}
 
 	/**
@@ -178,7 +179,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 * @param blockData of the Block
 	 */
 	public void setBlock(Material blockType, int blockData) {
-		setBlock(blockType == null ? 0 : blockType.getId(), blockData);
+		setBlock(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), blockData);
 	}
 
 	/**

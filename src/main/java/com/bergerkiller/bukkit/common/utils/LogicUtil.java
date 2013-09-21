@@ -104,7 +104,7 @@ public class LogicUtil {
 	 * @return True if the item is null or empty
 	 */
 	public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
-		return item == null || item.getTypeId() == 0 || item.getAmount() < 1;
+		return item == null || MaterialUtil.getTypeId(item) == 0 || item.getAmount() < 1;
 	}
 
 	/**

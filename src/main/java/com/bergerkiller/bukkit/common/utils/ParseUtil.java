@@ -405,8 +405,7 @@ public class ParseUtil {
 		}
 		// From ID
 		try {
-			Material m = Material.getMaterial(Integer.parseInt(text));
-			return m == null ? def : m;
+			return LogicUtil.fixNull(MaterialUtil.getType(Integer.parseInt(text)), def);
 		} catch (Exception ex) {
 		}
 		// Replace aliases and find the corresponding Material
@@ -460,11 +459,11 @@ public class ParseUtil {
 			if (material == Material.WOOD) {
 				TreeSpecies ts = parseTreeSpecies(text, null);
 				if (ts != null) {
-					return ts.getData();
+					return MaterialUtil.getRawData(ts);
 				}
 				return def;
 			} else {
-				MaterialData dat = material.getNewData((byte) 0);
+				MaterialData dat = MaterialUtil.getData(material, 0);
 				if (dat instanceof TexturedMaterial) {
 					TexturedMaterial tdat = (TexturedMaterial) dat;
 					Material mat = parseMaterial(text, null);
@@ -498,7 +497,7 @@ public class ParseUtil {
 				} else {
 					return def;
 				}
-				return dat.getData();
+				return MaterialUtil.getRawData(dat);
 			}
 		}
 	}

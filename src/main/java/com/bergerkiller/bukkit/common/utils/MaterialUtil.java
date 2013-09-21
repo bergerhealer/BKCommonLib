@@ -4,7 +4,12 @@ import net.minecraft.server.Block;
 import net.minecraft.server.Item;
 
 import org.bukkit.Material;
+import org.bukkit.TreeSpecies;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Attachable;
+import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
@@ -16,6 +21,109 @@ import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
  * Contains material properties and helper functions
  */
 public class MaterialUtil {
+
+	/*
+	 * The below methods may have to be manually re-designed when
+	 * material IDs/Data officially become 'erased'.
+	 * But we know how Minecraft is addicted to them, so I bet they
+	 * still end up somewhere. Since they are valuable for fast equality
+	 * checks and thus mapping values to item materials/data, these methods
+	 * will stay, unless the default implementation has an equivalent such as
+	 * a UUID. Name mapping is NOT an option!
+	 * 
+	 * That said, for future compatibility, redirect all method calls to these
+	 * methods.
+	 */
+
+	@SuppressWarnings("deprecation")
+	public static Material getType(int typeId) {
+		return Material.getMaterial(typeId);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getTypeId(ItemStack item) {
+		return item.getTypeId();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getTypeId(org.bukkit.block.Block block) {
+		return block.getTypeId();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getTypeId(Material material) {
+		return material.getId();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getRawData(TreeSpecies treeSpecies) {
+		return treeSpecies.getData();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getRawData(org.bukkit.block.Block block) {
+		return block.getData();
+	}
+
+	public static int getRawData(ItemStack item) {
+		return item.getDurability();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getRawData(MaterialData materialData) {
+		return materialData.getData();
+	}
+
+	/**
+	 * Obtains the Material Data using the material type Id and data value specified.
+	 * <b>Please use the int data version instead, as Block data is expected to become
+	 * more than a byte!</b>
+	 * 
+	 * @param typeId of the material
+	 * @param data for the material
+	 * @return new MaterialData instance for this type of material and data
+	 */
+	public static MaterialData getData(int typeId, byte data) {
+		return getData(typeId, (int) data);
+	}
+
+	/**
+	 * Obtains the Material Data using the material type Id and data value specified
+	 * 
+	 * @param typeId of the material
+	 * @param rawData for the material
+	 * @return new MaterialData instance for this type of material and data
+	 */
+	@SuppressWarnings("deprecation")
+	public static MaterialData getData(int typeId, int rawData) {
+		Material type = Material.getMaterial(typeId);
+		return type == null ? new MaterialData(typeId, (byte) rawData) : getData(type, rawData);
+	}
+
+	/**
+	 * Obtains the Material Data using the material type Id and data value specified
+	 * 
+	 * @param type of the material
+	 * @param rawData for the material
+	 * @return new MaterialData instance for this type of material and data
+	 */
+	@SuppressWarnings("deprecation")
+	public static MaterialData getData(Material type, int rawData) {
+		if (type == null) {
+			return new MaterialData(0, (byte) rawData);
+		}
+		final MaterialData mdata = type.getNewData((byte) rawData);
+
+		// Fix attachable face returning NULL sometimes
+		if (mdata instanceof Attachable) {
+			Attachable att = (Attachable) mdata;
+			if (att.getAttachedFace() == null) {
+				att.setFacingDirection(BlockFace.NORTH);
+			}
+		}
+		return mdata;
+	}
+
 	/**
 	 * Checks whether the material Id is contained in the types
 	 * 
@@ -25,6 +133,17 @@ public class MaterialUtil {
 	 */
 	public static boolean isType(int material, int... types) {
 		return LogicUtil.containsInt(material, types);
+	}
+
+	/**
+	 * Checks whether the material of the item is contained in the types
+	 * 
+	 * @param itemStack containing the material type to check
+	 * @param types to look in
+	 * @return True if the material is contained
+	 */
+	public static boolean isType(ItemStack itemStack, Material... types) {
+		return isType(getTypeId(itemStack), types);
 	}
 
 	/**
@@ -47,7 +166,7 @@ public class MaterialUtil {
 	 */
 	public static boolean isType(int material, Material... types) {
 		for (Material type : types) {
-			if (type.getId() == material) {
+			if (getTypeId(type) == material) {
 				return true;
 			}
 		}
@@ -62,7 +181,7 @@ public class MaterialUtil {
 	 * @return True if the material is contained
 	 */
 	public static boolean isType(org.bukkit.block.Block block, Material... types) {
-		return isType(block.getTypeId(), types);
+		return isType(getTypeId(block), types);
 	}
 
 	/**
@@ -73,7 +192,7 @@ public class MaterialUtil {
 	 * @return True if the material is contained
 	 */
 	public static boolean isType(org.bukkit.block.Block block, int... types) {
-		return isType(block.getTypeId(), types);
+		return isType(getTypeId(block), types);
 	}
 
 	/**

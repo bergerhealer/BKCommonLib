@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 /**
  * Stores Block material information and method calls
@@ -36,7 +37,7 @@ public class BlockInfo extends BasicWrapper {
 	 * @return Block information (never null)
 	 */
 	public static BlockInfo get(Block block) {
-		return get(block.getTypeId());
+		return get(MaterialUtil.getTypeId(block));
 	}
 
 	/**
@@ -46,7 +47,7 @@ public class BlockInfo extends BasicWrapper {
 	 * @return Block information (never null)
 	 */
 	public static BlockInfo get(Material material) {
-		return get(material.getId());
+		return get(MaterialUtil.getTypeId(material));
 	}
 
 	/**
@@ -113,7 +114,7 @@ public class BlockInfo extends BasicWrapper {
 	 * @param chance
 	 */
 	public final void dropNaturally(Block block, float yield, int chance) {
-		dropNaturally(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getData(), yield, 0);
+		dropNaturally(block.getWorld(), block.getX(), block.getY(), block.getZ(), MaterialUtil.getRawData(block), yield, 0);
 	}
 
 	/**
@@ -169,7 +170,7 @@ public class BlockInfo extends BasicWrapper {
 	 * @param yield (e.g. 20.0f)
 	 */
 	public final void destroy(Block block, float yield) {
-		destroy(block.getWorld(), block.getX(), block.getY(), block.getZ(), block.getData(), yield);
+		destroy(block.getWorld(), block.getX(), block.getY(), block.getZ(), MaterialUtil.getRawData(block), yield);
 	}
 
 	/**

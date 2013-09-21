@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 public class BlockStateRef {
 	public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
@@ -153,7 +154,7 @@ public class BlockStateRef {
 
 		public BlockState newInstance(Block block, Object tileEntity) {
 			final BlockState state = (BlockState) STATE.newInstanceNull();
-			final int typeId = block.getTypeId();
+			final int typeId = MaterialUtil.getTypeId(block);
 			tileField.set(state, tileEntity);
 			world.set(state, block.getWorld());
 			secondWorld.set(state, block.getWorld());
@@ -163,7 +164,7 @@ public class BlockStateRef {
 			x.set(state, block.getX());
 			y.set(state, block.getY());
 			z.set(state, block.getZ());
-			data.set(state, BlockUtil.getData(typeId, block.getData()));
+			data.set(state, BlockUtil.getData(typeId, MaterialUtil.getRawData(block)));
 			this.apply(state, tileEntity);
 			return state;
 		}

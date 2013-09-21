@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
+@SuppressWarnings("deprecation")
 public class BlockProxy extends ProxyBase<Block> implements Block {
 	static {
 		validate(BlockProxy.class);

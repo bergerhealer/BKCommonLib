@@ -31,6 +31,7 @@ public class EntityGroupingUtil {
 		// Note: These categories are ONLY used to map by name
 		for (EntityType type : EntityType.values()) {
 			// Obtain type name
+			@SuppressWarnings("deprecation")
 			String name = type.getName();
 			if (name == null) {
 				Class<?> clazz = type.getEntityClass();
