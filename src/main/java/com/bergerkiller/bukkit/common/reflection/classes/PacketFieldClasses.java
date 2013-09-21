@@ -762,6 +762,10 @@ public class PacketFieldClasses {
 			if (!packetClass.getName().startsWith(Common.NMS_ROOT)) {
 				continue;
 			}
+			// Ignore CGLib enhanced classes
+			if (packetClass.getSimpleName().contains("$$EnhancerByCGLIB$$")) {
+				continue;
+			}
 			// Get name of packet according to the classes in this Class
 			if (!implemented.contains("NMS" + packetClass.getSimpleName())) {
 				CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet not implemented: " + packetClass.getSimpleName());
