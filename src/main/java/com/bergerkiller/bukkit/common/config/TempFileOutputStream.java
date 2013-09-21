@@ -21,6 +21,7 @@ public class TempFileOutputStream extends OutputStream {
 	private final FileOutputStream baseStream;
 	private final File outputFile;
 	private final File tempFile;
+	private boolean closed;
 
 	/**
 	 * Constructs a new TempFileOutputStream with the output file specified.
@@ -69,6 +70,7 @@ public class TempFileOutputStream extends OutputStream {
 		this.baseStream = tempBaseStream;
 		this.tempFile = tempFile;
 		this.outputFile = outputFile;
+		this.closed = false;
 	}
 
 	@Override
@@ -100,6 +102,11 @@ public class TempFileOutputStream extends OutputStream {
 	 * @throws IOException - if an I/O error occurs.
 	 */
 	public void close(boolean completeTransfer) throws IOException {
+		if (this.closed) {
+			return;
+		}
+		this.closed = true;
+
 		// Close the base streams
 		try {
 			super.close();
