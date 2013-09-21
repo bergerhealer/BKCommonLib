@@ -21,6 +21,8 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
@@ -429,6 +431,41 @@ public class WorldUtil extends ChunkUtil {
 
 	public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
 		return CommonNMS.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
+	}
+
+	public static void queueChunkSend(org.bukkit.Chunk chunk) {
+		queueChunkSend(chunk.getWorld(), chunk.getX(), chunk.getZ());
+	}
+
+	/**
+	 * Queues a chunk for sending to all players in view
+	 * 
+	 * @param world the chunk is in
+	 * @param chunkX of the chunk
+	 * @param chunkZ of the chunk
+	 */
+	public static void queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
+		Object playerChunkMap = WorldServerRef.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
+		Object playerChunk = PlayerChunkMapRef.getPlayerChunk(playerChunkMap, chunkX, chunkZ);
+		if (playerChunk == null) {
+			return;
+		}
+		for (Player player : PlayerChunkRef.players.get(playerChunk)) {
+			PlayerUtil.queueChunkSend(player, chunkX, chunkZ);
+		}
+	}
+
+	/**
+	 * Queues a block for sending to all players in view
+	 * 
+	 * @param world the block is in
+	 * @param blockX of the block
+	 * @param blockY of the block
+	 * @param blockZ of the block
+	 */
+	public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
+		Object playerChunkMap = WorldServerRef.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
+		PlayerChunkMapRef.flagBlockDirty(playerChunkMap, blockX, blockY, blockZ);
 	}
 
 	/**
