@@ -73,18 +73,34 @@ public class PermissionHandler implements PermissionChecker {
 				testPlayerNameBldr.setLength(testPlayerNameBase.length());
 				testPlayerNameBldr.append(i);
 				testPlayerName = testPlayerNameBldr.toString();
-				if (!this.vaultPermission.playerHas(world, testPlayerName, PERMISSION_TEST_NODE)) {
-					break;
+				try {
+					if (!this.vaultPermission.playerHas(world, testPlayerName, PERMISSION_TEST_NODE)) {
+						break;
+					}
+				} catch (Throwable t) {
+					// Failure
+					i = maxTries;
 				}
 			}
 			// Check for permission failure (perhaps there is a consistent permission thing)
 			if (i < (maxTries - 1)) {
-				// Grant permission with the *-node
-				this.vaultPermission.playerAdd(world, testPlayerName, PERMISSION_TEST_NODE_ALL);
-				// See if it has the desired effect
-				this.hasSuperWildcardSupport = this.vaultPermission.playerHas(world, testPlayerName, PERMISSION_TEST_NODE);
-				// Undo permission change
-				this.vaultPermission.playerRemove(world, testPlayerName, PERMISSION_TEST_NODE_ALL);
+				try {
+					// Grant permission with the *-node
+					this.vaultPermission.playerAdd(world, testPlayerName, PERMISSION_TEST_NODE_ALL);
+
+					// Adding was successful, ALWAYS do the removal phase
+					// See if it had the desired effect
+					try {
+						this.hasSuperWildcardSupport = this.vaultPermission.playerHas(world, testPlayerName, PERMISSION_TEST_NODE);
+					} catch (Throwable t) {
+					}
+					// Undo permission change
+					try {
+						this.vaultPermission.playerRemove(world, testPlayerName, PERMISSION_TEST_NODE_ALL);
+					} catch (Throwable t) {
+					}
+				} catch (Throwable t) {
+				}
 			}
 
 			// Undo the previously added Bukkit Permission
