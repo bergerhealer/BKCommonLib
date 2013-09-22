@@ -369,7 +369,7 @@ public class CommonPlugin extends PluginBase {
 			log(Level.INFO, "BKCommonLib is running on " + serverDesc);
 		} else {
 			log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
-			log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is build for MC " + Common.DEPENDENT_MC_VERSION);
+			log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);
 			log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
 			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
 			this.onCriticalFailure();
@@ -398,7 +398,12 @@ public class CommonPlugin extends PluginBase {
 				"Not enough wrappers. Needs more wrappers. Moooreee...",
 				"Reflection can open the way to everyone's heart, including CraftBukkit.",
 				"Our love is not permitted by the overlords. We must flee...",
-				"Now a plugin, a new server implementation tomorrow???");
+				"Now a plugin, a new server implementation tomorrow???",
+				"Providing support for supporting the unsupportable.",
+				"NullPointerException: the seasonal influenza of Java.",
+				"Every feature break in Bukkit makes my feature list longer.",
+				"I...I forgot an exclamation mark...*rages internally*", 
+				"I am still winning the game. Are you?");
 		setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
 		setDisableMessage(null);
 
