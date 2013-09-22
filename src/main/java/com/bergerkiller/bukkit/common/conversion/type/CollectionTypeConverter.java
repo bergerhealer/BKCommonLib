@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +14,7 @@ import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public abstract class CollectionTypeConverter<T extends Collection<?>, B extends Collection<?>> implements Converter<T> {
 	public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = new CollectionTypeConverter<List<Player>, List<?>>(CollectionConverter.toList) {
@@ -56,6 +58,9 @@ public abstract class CollectionTypeConverter<T extends Collection<?>, B extends
 
 	public CollectionTypeConverter(CollectionConverter<B> converter) {
 		this.converter = converter;
+		if (converter == null) {
+			CommonPlugin.LOGGER_CONVERSION.log(Level.SEVERE, "Collection type converter is lacking a base converter!", new IllegalArgumentException());
+		}
 	}
 
 	protected abstract T convertSpecial(B value, T def);

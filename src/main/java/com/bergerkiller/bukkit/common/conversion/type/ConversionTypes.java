@@ -35,6 +35,16 @@ public class ConversionTypes {
 	// Misc
 	@SuppressWarnings("rawtypes")
 	public static final EmptyConverterUnsafe NONE = EmptyConverterUnsafe.INSTANCE;
+	// Primitives
+	public static final PrimitiveConverter<String> toString = PrimitiveConverter.toString;
+	public static final PrimitiveConverter<Byte> toByte = PrimitiveConverter.toByte;
+	public static final PrimitiveConverter<Short> toShort = PrimitiveConverter.toShort;
+	public static final PrimitiveConverter<Integer> toInt = PrimitiveConverter.toInt;
+	public static final PrimitiveConverter<Long> toLong = PrimitiveConverter.toLong;
+	public static final PrimitiveConverter<Float> toFloat = PrimitiveConverter.toFloat;
+	public static final PrimitiveConverter<Double> toDouble = PrimitiveConverter.toDouble;
+	public static final PrimitiveConverter<Boolean> toBool = PrimitiveConverter.toBool;
+	public static final PrimitiveConverter<Character> toChar = PrimitiveConverter.toChar;
 	// Arrays
 	public static final ObjectArrayConverter<ItemStack[]> toItemStackArr = ObjectArrayConverter.toItemStackArr;
 	public static final ObjectArrayConverter<Object[]> toItemStackHandleArr = ObjectArrayConverter.toItemStackHandleArr;
@@ -56,16 +66,6 @@ public class ConversionTypes {
 	public static final CollectionTypeConverter<List<ItemStack>, List<?>> toItemStackList = CollectionTypeConverter.toItemStackList;
 	public static final CollectionTypeConverter<List<Object>, List<?>> toItemStackHandleList = CollectionTypeConverter.toItemStackHandleList;
 	public static final CollectionConverter<Set<?>> toSet = CollectionConverter.toSet;
-	// Primitives
-	public static final PrimitiveConverter<String> toString = PrimitiveConverter.toString;
-	public static final PrimitiveConverter<Byte> toByte = PrimitiveConverter.toByte;
-	public static final PrimitiveConverter<Short> toShort = PrimitiveConverter.toShort;
-	public static final PrimitiveConverter<Integer> toInt = PrimitiveConverter.toInt;
-	public static final PrimitiveConverter<Long> toLong = PrimitiveConverter.toLong;
-	public static final PrimitiveConverter<Float> toFloat = PrimitiveConverter.toFloat;
-	public static final PrimitiveConverter<Double> toDouble = PrimitiveConverter.toDouble;
-	public static final PrimitiveConverter<Boolean> toBool = PrimitiveConverter.toBool;
-	public static final PrimitiveConverter<Character> toChar = PrimitiveConverter.toChar;
 	// Handles
 	public static final HandleConverter toEntityHandle = HandleConverter.toEntityHandle;
 	public static final HandleConverter toWorldHandle = HandleConverter.toWorldHandle;

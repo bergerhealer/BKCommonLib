@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
  * Converts values to a primitive array
@@ -23,11 +25,15 @@ public class PrimitiveArrayConverter<T> extends BasicConverter<T> {
 	public static final PrimitiveArrayConverter<float[]> toFloatArr = new PrimitiveArrayConverter<float[]>(float[].class, PrimitiveConverter.toFloat);
 	public static final PrimitiveArrayConverter<double[]> toDoubleArr = new PrimitiveArrayConverter<double[]>(double[].class, PrimitiveConverter.toDouble);
 
-	private final PrimitiveConverter<?> elementConvertor;
+	private final PrimitiveConverter<?> elementConverter;
 
-	public PrimitiveArrayConverter(Class<T> outputType, PrimitiveConverter<?> elementConvertor) {
+	public PrimitiveArrayConverter(Class<T> outputType, PrimitiveConverter<?> elementConverter) {
 		super(outputType);
-		this.elementConvertor = elementConvertor;
+		this.elementConverter = elementConverter;
+		if (elementConverter == null) {
+			CommonPlugin.LOGGER_CONVERSION.log(Level.SEVERE, "Converter to " + outputType.getComponentType().getSimpleName() +
+					"[] lacks a primitive element converter!");
+		}
 	}
 
 	/**
@@ -41,7 +47,7 @@ public class PrimitiveArrayConverter<T> extends BasicConverter<T> {
 		final Iterator<?> iter = collection.iterator();
 		final T array = newInstance(length);
 		for (int i = 0; i < length; i++) {
-			Array.set(array, i, elementConvertor.convertZero(iter.next()));
+			Array.set(array, i, elementConverter.convertZero(iter.next()));
 		}
 		return array;
 	}
@@ -60,7 +66,7 @@ public class PrimitiveArrayConverter<T> extends BasicConverter<T> {
 		final int length = Array.getLength(primitiveArray);
 		final T array = newInstance(length);
 		for (int i = 0; i < length; i++) {
-			Array.set(array, i, elementConvertor.convertZero(Array.get(primitiveArray, i)));
+			Array.set(array, i, elementConverter.convertZero(Array.get(primitiveArray, i)));
 		}
 		return array;
 	}
