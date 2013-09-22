@@ -400,7 +400,6 @@ public class CommonPlugin extends PluginBase {
 				"Our love is not permitted by the overlords. We must flee...",
 				"Now a plugin, a new server implementation tomorrow???",
 				"Providing support for supporting the unsupportable.",
-				"NullPointerException: the seasonal influenza of Java.",
 				"Every feature break in Bukkit makes my feature list longer.",
 				"I...I forgot an exclamation mark...*rages internally*", 
 				"I am still winning the game. Are you?");
