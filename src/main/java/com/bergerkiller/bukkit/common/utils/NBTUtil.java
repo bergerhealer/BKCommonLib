@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.inventory.CraftInventoryCustom;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
@@ -329,5 +330,40 @@ public class NBTUtil {
 	public static CommonTagList saveAttributes(LivingEntity livingEntity) {
 		AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
 		return (CommonTagList) CommonTag.create(GenericAttributes.a(map));
+	}
+
+	/**
+	 * Loads the Block State information from a data compound
+	 * 
+	 * @param blockState to load
+	 * @param data to load into the blockState
+	 */
+	public static void loadBlockState(BlockState blockState, CommonTagCompound data) {
+		CommonNMS.getNative(blockState).a((NBTTagCompound) data.getHandle());
+	}
+
+	/**
+	 * Saves the Block State information to a data compound
+	 * 
+	 * @param blockState to save
+	 * @return compound with saved data
+	 */
+	public static CommonTagCompound saveBlockState(BlockState blockState) {
+		return saveBlockState(blockState, null);
+	}
+
+	/**
+	 * Saves the Block State information to a data compound
+	 * 
+	 * @param blockState to save
+	 * @param data to save the blockState to, null to create a new compound
+	 * @return compound with saved data
+	 */
+	public static CommonTagCompound saveBlockState(BlockState blockState, CommonTagCompound data) {
+		if (data == null) {
+			data = new CommonTagCompound();
+		}
+		CommonNMS.getNative(blockState).b((NBTTagCompound) data.getHandle());
+		return data;
 	}
 }

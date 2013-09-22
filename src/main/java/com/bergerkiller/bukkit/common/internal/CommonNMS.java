@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -121,6 +122,10 @@ public class CommonNMS {
 
 	public static Chunk getNative(org.bukkit.Chunk chunk) {
 		return (Chunk) Conversion.toChunkHandle.convert(chunk);
+	}
+
+	public static TileEntity getNative(org.bukkit.block.BlockState blockState) {
+		return (TileEntity) BlockStateRef.toTileEntity(blockState);
 	}
 
 	public static Inventory getInventory(IInventory inventory) {
