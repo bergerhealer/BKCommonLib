@@ -334,7 +334,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					}
 
 					entity.makeStepSound(bX, bY, bZ, typeId);
-					Block.byId[bZ].b(handle.world, bX, bY, bZ, handle);
+					Block.byId[typeId].b(handle.world, bX, bY, bZ, handle);
 				}
 			}
 
