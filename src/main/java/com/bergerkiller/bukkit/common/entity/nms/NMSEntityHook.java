@@ -55,6 +55,16 @@ public interface NMSEntityHook {
 	 * onBurn
 	 */
 	public void burn(float damage);
+	
+	/**
+	 * onPush super
+	 */
+	public void super_g(double dx, double dy, double dz);
+	
+	/**
+	 * onPush
+	 */
+	public void g(double dx, double dy, double dz);
 
 	/**
 	 * onMove super

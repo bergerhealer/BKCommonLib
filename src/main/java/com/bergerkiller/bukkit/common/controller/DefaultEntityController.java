@@ -75,6 +75,16 @@ public final class DefaultEntityController extends EntityController {
 			return ((Entity) handle).getLocalizedName();
 		}
 	}
+	
+	@Override
+	public void onPush(double dx, double dy, double dz) {
+		final Object handle = entity.getHandle();
+		if (handle instanceof NMSEntityHook) {
+			((NMSEntityHook) handle).super_g(dx, dy, dz);
+		} else {
+			((Entity) handle).g(dx, dy, dz);
+		}
+	}
 
 	@Override
 	public void onMove(double dx, double dy, double dz) {

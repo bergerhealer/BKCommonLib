@@ -136,8 +136,8 @@ public class ClassBuilder {
 	public synchronized Object create(Class<?>[] argumentTypes, Object[] arguments, Collection<Object> callbacks) {
 		try {
 			// Prepare the instances buffer: add all callback instances
-			for (Object çallbackInstance : callbacks) {
-				callbackInstancesBuffer.put(çallbackInstance.getClass(), çallbackInstance);
+			for (Object callbackInstance : callbacks) {
+				callbackInstancesBuffer.put(callbackInstance.getClass(), callbackInstance);
 			}
 
 			// Create a method interceptor, assign it and then create a new instance

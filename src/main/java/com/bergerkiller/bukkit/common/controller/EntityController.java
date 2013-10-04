@@ -132,6 +132,10 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	public String getLocalizedName() {
 		return entity.getHandle(NMSEntityHook.class).super_getLocalizedName();
 	}
+	
+	public void onPush(double dx, double dy, double dz) {
+		entity.getHandle(NMSEntityHook.class).super_g(dx, dy, dz);
+	}
 
 	/**
 	 * Performs Entity movement logic, to move the Entity and handle collisions
