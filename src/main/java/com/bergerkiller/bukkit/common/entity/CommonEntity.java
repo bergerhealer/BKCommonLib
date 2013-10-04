@@ -519,6 +519,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 			teleport(location);
 			return false;
 		}
+		
+		EntityNetworkController<?> controller = getNetworkController();
+		if (controller != null) {
+		    controller.onAttached();
+		}
+		
 		last.set(loc.set(location));
 		EntityUtil.addEntity(entity);
 		// Perform controller attaching
