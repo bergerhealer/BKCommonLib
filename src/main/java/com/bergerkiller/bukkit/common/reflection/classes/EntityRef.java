@@ -74,7 +74,7 @@ public class EntityRef {
 	}
 
 	public static void playStepSound(Object entityHandle, int x, int y, int z, int typeId) {
-		playStepSound.invoke(entityHandle, x, y, z);
+		playStepSound.invoke(entityHandle, x, y, z, typeId);
 	}
 
 	public static boolean hasMovementSound(Object entityHandle) {
