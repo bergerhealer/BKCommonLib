@@ -31,6 +31,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.tab.TabView;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -249,6 +250,17 @@ public class CommonTabController implements PacketListener, Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLoginFirst(PlayerLoginEvent event) {
+		if (event.getResult() == Result.ALLOWED) {
+			// Register a PlayerTabInfo instance
+			getInfo(event.getPlayer());		
+			// Ensure the listeners are registered in the right order
+			CommonUtil.queueListenerLast(this, PlayerLoginEvent.class);
+			CommonUtil.queueListenerFirst(this, PlayerJoinEvent.class);
+		}
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		if (event.getResult() == Result.ALLOWED) {
@@ -256,12 +268,10 @@ public class CommonTabController implements PacketListener, Listener {
 			if (hasChangedMaxPlayers()) {
 				maxPlayersField.set(CommonNMS.getPlayerList(), customListCount);
 			}
-			// Register a PlayerTabInfo instance
-			getInfo(event.getPlayer());
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (hasChangedMaxPlayers()) {
 			// Restore server max players (required, otherwise new people can join a full server all of a sudden!)

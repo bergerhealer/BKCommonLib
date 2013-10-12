@@ -17,6 +17,17 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class Common {
 	/**
+	 * BKCommonLib version number, use this to set your dependency version 
+	 * for BKCommonLib-using plugins<br>
+	 * <b>Use getVersion() instead if you want the actual, current version!
+	 * Constants get inlined when compiling!</b>
+	 */
+	public static final int VERSION = 156;
+	/**
+	 * The Minecraft package path version BKCommonLib is built against
+	 */
+	public static final String DEPENDENT_MC_VERSION = "v1_6_R3";
+	/**
 	 * Defines the Minecraft version that runs on the server.
 	 */
 	public static final String MC_VERSION;
@@ -43,10 +54,6 @@ public class Common {
 	 * Gets whether the current server software used is the Spigot implementation
 	 */
 	public static final boolean IS_SPIGOT_SERVER;
-	/**
-	 * The Minecraft package path version BKCommonLib is built against
-	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_6_R3";
 	/**
 	 * Whether BKCommonLib is compatible with the server it is currently running on
 	 */
@@ -82,14 +89,6 @@ public class Common {
 		IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
 		MC_VERSION = SERVER.getMinecraftVersion();
 	}
-
-	/**
-	 * BKCommonLib version number, use this to set your dependency version 
-	 * for BKCommonLib-using plugins<br>
-	 * <b>Use getVersion() instead if you want the actual, current version!
-	 * Constants get inlined when compiling!</b>
-	 */
-	public static final int VERSION = 155;
 
 	/**
 	 * Gets the BKCommonLib version number, use this function to compare your own version with the currently installed version

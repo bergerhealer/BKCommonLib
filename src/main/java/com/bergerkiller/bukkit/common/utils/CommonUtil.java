@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,9 +28,12 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.SimplePluginManager;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -769,5 +773,100 @@ public class CommonUtil {
 	 */
 	public static boolean isServerStarted() {
 		return CommonPlugin.hasInstance() && CommonPlugin.getInstance().isServerStarted();
+	}
+
+	/**
+	 * Obtains the Handler List of an event, throwing an exception if this is not possible
+	 * 
+	 * @param eventClass to get the HandlerList of
+	 * @return the HandlerList
+	 * @throws RuntimeException: Event class has no handler list
+	 */
+	public static HandlerList getEventHandlerList(Class<?> eventClass) {
+		try {
+			return (HandlerList) eventClass.getDeclaredMethod("getHandlerList").invoke(null);
+		} catch (Throwable t) {
+		}
+		throw new RuntimeException("Class '" + eventClass.getName() + "' does not have a handler list");
+	}
+
+	/**
+	 * Re-orders the event registration to ensure that the listener MONITOR handler is called last, after
+	 * all other listener handlers have executed. This should only be used if information is changed
+	 * that could cause other listeners after this handler to malfunction.<br>
+	 * <br>
+	 * This method may fail if more than one Monitor handler per Event class is present in a
+	 * single Listener.
+	 * 
+	 * @param listener of the event handler
+	 * @param eventClass that is handled
+	 */
+	public static void queueListenerLast(Listener listener, Class<?> eventClass) {
+		setListenerOrder(listener, eventClass, false);
+	}
+
+	/**
+	 * Re-orders the event registration to ensure that the listener LOWEST handler is called first, before
+	 * all other listener handlers have executed. This should only be used if information is changed
+	 * that could cause other listeners before this handler to malfunction.<br>
+	 * This method may fail if more than one Lowest handler per Event class is present in a
+	 * single Listener.
+	 * 
+	 * @param listener of the event handler
+	 * @param eventClass that is handled
+	 */
+	public static void queueListenerFirst(Listener listener, Class<?> eventClass) {
+		setListenerOrder(listener, eventClass, true);
+	}
+
+	private static void setListenerOrder(Listener listener, Class<?> eventClass, boolean first) {
+		HandlerList list = getEventHandlerList(eventClass);
+		final EventPriority prio = first ? EventPriority.LOWEST : EventPriority.MONITOR;
+		synchronized (list) {
+			EnumMap<EventPriority, ArrayList<RegisteredListener>> handlerSlots = SafeField.get(list, "handlerslots");
+			ArrayList<RegisteredListener> registeredListenerList = handlerSlots.get(prio);
+			int requestedIndex = first ? 0 : (registeredListenerList.size() - 1);
+
+			// Try to find the registered listener
+			for (int i = 0; i < registeredListenerList.size(); i++) {
+				RegisteredListener registeredListener = registeredListenerList.get(i);
+				// Check that the Listener matches
+				if (registeredListener.getListener() != listener) {
+					continue;
+				} else if (i == requestedIndex) {
+					// Already in order, do not do anything
+					return;
+				}
+				RegisteredListener[] allListeners = list.getRegisteredListeners();
+
+				// Change order in list
+				registeredListenerList.remove(i);
+				registeredListenerList.add(requestedIndex, registeredListener);
+
+				// Get the index of the listener in the baked array
+				ArrayList<RegisteredListener> newListeners = new ArrayList<RegisteredListener>(allListeners.length);
+				if (first) {
+					newListeners.add(registeredListener);
+					for (RegisteredListener otherListener : allListeners) {
+						if (otherListener != registeredListener) {
+							newListeners.add(otherListener);
+						}
+					}
+				} else {
+					for (RegisteredListener otherListener : allListeners) {
+						if (otherListener != registeredListener) {
+							newListeners.add(otherListener);
+						}
+					}
+					newListeners.add(registeredListener);
+				}
+				// Transfer the listeners over
+				if (newListeners.toArray(allListeners) != allListeners) {
+					// Strange failure, ensure a bake
+					list.bake();
+				}
+				return;
+			}
+		}
 	}
 }
