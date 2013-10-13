@@ -68,6 +68,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public EntityNetworkController<CommonEntity<T>> getNetworkController() {
+		if (EntityRef.world.getInternal(getHandle()) == null) {
+			return null;
+		}
 		final EntityNetworkController result;
 		final Object entityTrackerEntry = WorldUtil.getTrackerEntry(entity);
 		if (entityTrackerEntry == null) {
