@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -136,7 +137,28 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 	public void damage(double damage, Entity damager) {
 		entity.damage(damage, damager);
 	}
-	
+
+	/**
+	 * Gets the movement this Living Entity is performing.
+	 * It points to the direction the Entity is trying to 'go' to.
+	 * In the case of Players, this is the WASD movement direction.
+	 * 
+	 * @return Movement direction
+	 */
+	public Vector getMovement() {
+		return MathUtil.getDirection(loc.getYaw(), loc.getPitch()).multiply(getForwardMovement());
+	}
+
+	/**
+	 * Gets the forward movement this Living Entity is performing.
+	 * This value is negative when moving backwards.
+	 * 
+	 * @return Forward movement
+	 */
+	public double getForwardMovement() {
+		return getHandle(EntityLiving.class).bf; 
+	}
+
 	/**
 	 * Sets the path finding radius.
 	 * 
@@ -146,17 +168,17 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 		EntityLiving nmsEntity = CommonNMS.getNative(entity);
 		nmsEntity.getAttributeInstance(GenericAttributes.b).setValue(range);
 	}
-	
+
 	/**
 	 * Gets the path finding range
 	 * 
 	 * @return range of path finding
 	 */
-	public double getPathfidningRange() {
+	public double getPathfindingRange() {
 		EntityLiving nmsEntity = CommonNMS.getNative(entity);
 		return nmsEntity.getAttributeInstance(GenericAttributes.b).getValue();
 	}
-	
+
 	/**
 	 * Move to a location with pathfinding
 	 * 
@@ -193,7 +215,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 				int dx = MathUtil.floor(x);
 				int dy = (int) y;
 				int dz = MathUtil.floor(z);
-				PathEntity path = nmsEntity.world.a(nmsEntity, dx, dy, dz, (float) this.getPathfidningRange(), true, false, false, true);
+				PathEntity path = nmsEntity.world.a(nmsEntity, dx, dy, dz, (float) this.getPathfindingRange(), true, false, false, true);
 				this.moveWithPath(path, speed);
 			}
 		}
@@ -211,7 +233,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 		if(nmsEntity instanceof EntityInsentient) {
 			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
 			if(!navigation.a(nmsTargetEntity, speed)) {
-				PathEntity path = nmsEntity.world.findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfidningRange(), true, false, false, true);
+				PathEntity path = nmsEntity.world.findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfindingRange(), true, false, false, true);
 				this.moveWithPath(path, speed);
 			}
 		}
