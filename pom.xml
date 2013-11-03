@@ -4,7 +4,7 @@
 
   <groupId>com.bergerkiller.bukkit</groupId>
   <artifactId>BKCommonLib</artifactId>
-  <version>1.56-SNAPSHOT</version>
+  <version>1.7.2-SPIGOT-HACK</version>
   <packaging>jar</packaging>
 
   <name>BKCommonLib</name>

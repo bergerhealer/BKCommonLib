@@ -112,10 +112,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> maxPlayers = getField("h");
 	}
 	public static class NMSPacket2Handshake extends NMSPacket {
-		public final FieldAccessor<Integer> protocolVersion = getField("a");
-		public final FieldAccessor<String> playerName = getField("b");
-		public final FieldAccessor<String> serverName = getField("c");
-		public final FieldAccessor<Integer> serverPort = getField("d");
+		public final FieldAccessor<Integer> protocolVersion = getField("protocolVersion");
+//		public final FieldAccessor<String> playerName = getField("b");
+		public final FieldAccessor<String> serverName = getField("serverAddress");
+		public final FieldAccessor<Integer> serverPort = getField("serverPort");
+		public final FieldAccessor<Integer> state = getField("state");
 	}
 	public static class NMSPacket3Chat extends NMSPacket {
 		public final FieldAccessor<Boolean> isFromServer = getField("c");
@@ -202,11 +203,11 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> blockX = getField("b");
 		public final FieldAccessor<Integer> blockY = getField("c");
 		public final FieldAccessor<Integer> blockZ = getField("d");
-		public final FieldAccessor<Integer> action = getField("e");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class, int.class);
+//		public final FieldAccessor<Integer> action = getField("e");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class);
 
 		public CommonPacket newInstance(Entity entity, int action, int blockX, int blockY, int blockZ) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), action, blockX, blockY, blockZ);
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), blockX, blockY, blockZ);
 		}
 	}
 	public static class NMSPacket18ArmAnimation extends NMSPacket30Entity {
