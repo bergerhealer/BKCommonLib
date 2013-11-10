@@ -22,7 +22,7 @@ public class Common {
 	 * <b>Use getVersion() instead if you want the actual, current version!
 	 * Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 156;
+	public static final int VERSION = 170; //156 stable
 	/**
 	 * The Minecraft package path version BKCommonLib is built against
 	 */
