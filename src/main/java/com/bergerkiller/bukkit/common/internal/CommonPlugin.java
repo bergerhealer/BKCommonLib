@@ -367,6 +367,13 @@ public class CommonPlugin extends PluginBase {
 		serverDesc.append(") : ").append(Common.SERVER.getServerVersion());
 		if (Common.IS_COMPATIBLE) {
 			log(Level.INFO, "BKCommonLib is running on " + serverDesc);
+		} else if (!Common.IS_SPIGOT_SERVER || CommonUtil.getNMSClass("Stat") == null) {
+			log(Level.SEVERE, "This version of BKCommonLib is built for the SPIGOT 1.7-hack server software");
+			log(Level.SEVERE, "It does NOT work on any other server software");
+			log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
+			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
+			this.onCriticalFailure();
+			return;
 		} else {
 			log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
 			log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);

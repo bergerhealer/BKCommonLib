@@ -58,7 +58,7 @@ public class Common {
 	 * Whether BKCommonLib is compatible with the server it is currently running on
 	 */
 	public static final boolean IS_COMPATIBLE;
-
+	
 	static {
 		// Find out what server software we are running on
 		CommonServer runningServer = new UnknownServer();

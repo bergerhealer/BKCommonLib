@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import javax.crypto.SecretKey;
@@ -34,6 +36,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -44,7 +47,26 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 public class PacketFieldClasses {
 	public static class NMSPacket extends NMSClassTemplate {
 		private static final Class<?> packetType = CommonUtil.getNMSClass("Packet");
-		private static final FieldAccessor<Integer> packetIDGlobal = new SafeField<Integer>(packetType, "packetID");
+		private static final FieldAccessor<Integer> packetIDGlobalField = new SafeField<Integer>(packetType, "packetID");
+		private static final FieldAccessor<Integer> packetIDGlobal = new SafeDirectField<Integer>() {
+			@Override
+			public Integer get(Object instance) {
+				Integer id = packetIDGlobalField.get(instance);
+				if (id.equals(0)) {
+					// Get from class instead, it's not set yet!
+					id = PacketUtil.getPacketId(instance.getClass());
+					if (id == null) {
+						return 0;
+					}
+				}
+				return id;
+			}
+
+			@Override
+			public boolean set(Object instance, Integer value) {
+				return packetIDGlobalField.set(instance, value);
+			}
+		};
 		private static final FieldAccessor<Boolean> lowPriorityGlobal = new SafeField<Boolean>(packetType, "lowPriority");
 		private static final FieldAccessor<Long> timestampGlobal = new SafeField<Long>(packetType, "timestamp");
 		public final FieldAccessor<Integer> packetID = packetIDGlobal;
@@ -108,7 +130,7 @@ public class PacketFieldClasses {
 		public final TranslatorFieldAccessor<GameMode> gameMode = getField("d").translate(ConversionPairs.gameMode);
 		public final FieldAccessor<Integer> dimension = getField("e");
 		public final TranslatorFieldAccessor<Difficulty> difficulty = getField("f").translate(ConversionPairs.difficulty);
-		//public final FieldAccessor<Byte> unused = getField("g");
+//		public final FieldAccessor<Byte> unused = getField("g");
 		public final FieldAccessor<Byte> maxPlayers = getField("h");
 	}
 	public static class NMSPacket2Handshake extends NMSPacket {
@@ -141,7 +163,6 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> z = getField("z");
 	}
 	public static class NMSPacket7UseEntity extends NMSPacket {
-		public final FieldAccessor<Integer> playerId = getField("a");
 		public final FieldAccessor<Integer> targetEntityId = getField("target");
 		public final FieldAccessor<Integer> action = getField("action");
 	}
@@ -151,9 +172,8 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Short> foodSaturation = getField("c");
 	}
 	public static class NMSPacket9Respawn extends NMSPacket {
-		public final FieldAccessor<Integer> x = getField("a");
-		public final FieldAccessor<Integer> y = getField("b");
-		public final FieldAccessor<Integer> z = getField("c");
+		public final FieldAccessor<Integer> dimension = getField("a");
+		public final FieldAccessor<Difficulty> difficulty = getField("b").translate(ConversionPairs.difficulty);
 		public final TranslatorFieldAccessor<GameMode> gamemode = getField("d").translate(ConversionPairs.gameMode);
 		public final TranslatorFieldAccessor<WorldType> worldType = getField("e").translate(ConversionPairs.worldType);
 	}
@@ -206,8 +226,13 @@ public class PacketFieldClasses {
 //		public final FieldAccessor<Integer> action = getField("e");
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class);
 
-		public CommonPacket newInstance(Entity entity, int action, int blockX, int blockY, int blockZ) {
+		public CommonPacket newInstance(Entity entity, int blockX, int blockY, int blockZ) {
 			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), blockX, blockY, blockZ);
+		}
+
+		@Deprecated
+		public CommonPacket newInstance(Entity entity, int action, int blockX, int blockY, int blockZ) {
+			return newInstance(entity, blockX, blockY, blockZ);
 		}
 	}
 	public static class NMSPacket18ArmAnimation extends NMSPacket30Entity {
@@ -222,6 +247,7 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> y = getField("d");
 		public final FieldAccessor<Integer> z = getField("e");
 		public final FieldAccessor<Byte> yaw = getField("f");
+		public final FieldAccessor<String> playerUUID = getField("playerUUID");
 		public final FieldAccessor<Byte> pitch = getField("g");
 		public final FieldAccessor<Integer> heldItemId = getField("h");
 		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("i").translate(ConversionPairs.dataWatcher);
@@ -667,8 +693,54 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> z = getField("d");
 	}
 	public static class NMSPacket200Statistic extends NMSPacket {
-		public final FieldAccessor<Integer> id = getField("a");
-		public final FieldAccessor<Integer> amount = getField("b");
+		public final FieldAccessor<Integer> id = new SafeDirectField<Integer>() {
+			private final Map<Integer, String> statNameToId = SafeField.get(CommonUtil.getNMSClass("StatisticList"), "a");
+
+			@Override
+			public Integer get(Object instance) {
+				String n = name.get(instance);
+				for (Entry<Integer, String> statEntry : statNameToId.entrySet()) {
+					if (statEntry.getValue().equals(n)) {
+						return statEntry.getKey();
+					}
+				}
+				return -1;
+			}
+
+			@Override
+			public boolean set(Object instance, Integer value) {
+				name.set(instance, statNameToId.get(value));
+				return true;
+			}
+		};
+		private final FieldAccessor<String> name = new SafeDirectField<String>() {
+			@Override
+			public String get(Object instance) {
+				return SafeField.get(stats.get(instance)[0], "name");
+			}
+
+			@Override
+			public boolean set(Object instance, String value) {
+				SafeField.set(stats.get(instance)[0], "name", value);
+				return true;
+			}
+		};
+		public final FieldAccessor<Integer> amount = new SafeDirectField<Integer>() {
+			@Override
+			public Integer get(Object instance) {
+				return SafeField.get(stats.get(instance)[0], "value");
+			}
+
+			@Override
+			public boolean set(Object instance, Integer value) {
+				SafeField.set(stats.get(instance)[0], "value", value);
+				return true;
+			}
+		};
+
+//		public final FieldAccessor<Integer> id = getField("a");
+//		public final FieldAccessor<Integer> amount = getField("b");
+		public final FieldAccessor<Object[]> stats = getField("stats");
 	}
 	public static class NMSPacket201PlayerInfo extends NMSPacket {
 		public final FieldAccessor<String> playerName = getField("a");
@@ -694,6 +766,8 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket203TabComplete extends NMSPacket {
+		public final FieldAccessor<String> read = getField("read");
+		public final FieldAccessor<String[]> response = getField("response");
 	}
 	public static class NMSPacket204LocaleAndViewDistance extends NMSPacket {
 		public final FieldAccessor<String> locale = getField("a");
