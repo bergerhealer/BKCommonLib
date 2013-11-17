@@ -134,11 +134,27 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Byte> maxPlayers = getField("h");
 	}
 	public static class NMSPacket2Handshake extends NMSPacket {
-		public final FieldAccessor<Integer> protocolVersion = getField("protocolVersion");
-//		public final FieldAccessor<String> playerName = getField("b");
-		public final FieldAccessor<String> serverName = getField("serverAddress");
-		public final FieldAccessor<Integer> serverPort = getField("serverPort");
-		public final FieldAccessor<Integer> state = getField("state");
+		public final FieldAccessor<Integer> protocolVersion;
+		public final FieldAccessor<String> playerName;
+		public final FieldAccessor<String> serverName;
+		public final FieldAccessor<Integer> serverPort;
+		public final FieldAccessor<Integer> state;
+
+		public NMSPacket2Handshake() {
+			if (Common.IS_1_7_PROTOCOL) {
+				protocolVersion = getField("protocolVersion");
+				playerName = null;
+				serverName = getField("serverAddress");
+				serverPort = getField("serverPort");
+				state = getField("state");
+			} else {
+				protocolVersion = getField("a");
+				playerName = getField("b");
+				serverName = getField("c");
+				serverPort = getField("d");
+				state = null;
+			}
+		}
 	}
 	public static class NMSPacket3Chat extends NMSPacket {
 		public final FieldAccessor<Boolean> isFromServer = getField("c");
@@ -224,15 +240,27 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> blockY = getField("c");
 		public final FieldAccessor<Integer> blockZ = getField("d");
 //		public final FieldAccessor<Integer> action = getField("e");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class);
+		private final SafeConstructor<CommonPacket> constructor1;
+
+		public NMSPacket17EntityLocationAction() {
+			if (Common.IS_1_7_PROTOCOL) {
+				constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class);
+			} else {
+				constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), int.class, int.class, int.class, int.class);
+			}
+		}
 
 		public CommonPacket newInstance(Entity entity, int blockX, int blockY, int blockZ) {
-			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), blockX, blockY, blockZ);
+			return newInstance(entity, 0, blockX, blockY, blockZ);
 		}
 
 		@Deprecated
 		public CommonPacket newInstance(Entity entity, int action, int blockX, int blockY, int blockZ) {
-			return newInstance(entity, blockX, blockY, blockZ);
+			if (Common.IS_1_7_PROTOCOL) {
+				return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), blockX, blockY, blockZ);
+			} else {
+				return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), action, blockX, blockY, blockZ);
+			}
 		}
 	}
 	public static class NMSPacket18ArmAnimation extends NMSPacket30Entity {
@@ -247,10 +275,18 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> y = getField("d");
 		public final FieldAccessor<Integer> z = getField("e");
 		public final FieldAccessor<Byte> yaw = getField("f");
-		public final FieldAccessor<String> playerUUID = getField("playerUUID");
+		public final FieldAccessor<String> playerUUID;
 		public final FieldAccessor<Byte> pitch = getField("g");
 		public final FieldAccessor<Integer> heldItemId = getField("h");
 		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("i").translate(ConversionPairs.dataWatcher);
+
+		public NMSPacket20NamedEntitySpawn() {
+			if (Common.IS_1_7_PROTOCOL) {
+				playerUUID = getField("playerUUID");
+			} else {
+				playerUUID = null;
+			}
+		}
 	}
 	public static class NMSPacket22Collect extends NMSPacket {
 		public final FieldAccessor<Integer> collectedItemId = getField("a");
@@ -693,54 +729,68 @@ public class PacketFieldClasses {
 		public final FieldAccessor<Integer> z = getField("d");
 	}
 	public static class NMSPacket200Statistic extends NMSPacket {
-		public final FieldAccessor<Integer> id = new SafeDirectField<Integer>() {
-			private final Map<Integer, String> statNameToId = SafeField.get(CommonUtil.getNMSClass("StatisticList"), "a");
+		public final FieldAccessor<Integer> id;
+		public final FieldAccessor<Integer> amount;
+		public final FieldAccessor<Object[]> stats;
 
-			@Override
-			public Integer get(Object instance) {
-				String n = name.get(instance);
-				for (Entry<Integer, String> statEntry : statNameToId.entrySet()) {
-					if (statEntry.getValue().equals(n)) {
-						return statEntry.getKey();
+		public NMSPacket200Statistic() {
+			if (Common.IS_1_7_PROTOCOL) {
+				// Name accessor from stat element array
+				final FieldAccessor<String> name = new SafeDirectField<String>() {
+					@Override
+					public String get(Object instance) {
+						return SafeField.get(stats.get(instance)[0], "name");
 					}
-				}
-				return -1;
-			}
 
-			@Override
-			public boolean set(Object instance, Integer value) {
-				name.set(instance, statNameToId.get(value));
-				return true;
-			}
-		};
-		private final FieldAccessor<String> name = new SafeDirectField<String>() {
-			@Override
-			public String get(Object instance) {
-				return SafeField.get(stats.get(instance)[0], "name");
-			}
+					@Override
+					public boolean set(Object instance, String value) {
+						SafeField.set(stats.get(instance)[0], "name", value);
+						return true;
+					}
+				};
+				// ID accessor by accessing the first stat element
+				id = new SafeDirectField<Integer>() {
+					private final Map<Integer, String> statNameToId = SafeField.get(CommonUtil.getNMSClass("StatisticList"), "a");
 
-			@Override
-			public boolean set(Object instance, String value) {
-				SafeField.set(stats.get(instance)[0], "name", value);
-				return true;
-			}
-		};
-		public final FieldAccessor<Integer> amount = new SafeDirectField<Integer>() {
-			@Override
-			public Integer get(Object instance) {
-				return SafeField.get(stats.get(instance)[0], "value");
-			}
+					@Override
+					public Integer get(Object instance) {
+						String n = name.get(instance);
+						for (Entry<Integer, String> statEntry : statNameToId.entrySet()) {
+							if (statEntry.getValue().equals(n)) {
+								return statEntry.getKey();
+							}
+						}
+						return -1;
+					}
 
-			@Override
-			public boolean set(Object instance, Integer value) {
-				SafeField.set(stats.get(instance)[0], "value", value);
-				return true;
-			}
-		};
+					@Override
+					public boolean set(Object instance, Integer value) {
+						name.set(instance, statNameToId.get(value));
+						return true;
+					}
+				};
+				// Amount accessor by accessing the first stat element
+				amount = new SafeDirectField<Integer>() {
+					@Override
+					public Integer get(Object instance) {
+						return SafeField.get(stats.get(instance)[0], "value");
+					}
 
-//		public final FieldAccessor<Integer> id = getField("a");
-//		public final FieldAccessor<Integer> amount = getField("b");
-		public final FieldAccessor<Object[]> stats = getField("stats");
+					@Override
+					public boolean set(Object instance, Integer value) {
+						SafeField.set(stats.get(instance)[0], "value", value);
+						return true;
+					}
+				};
+
+				// Stats accessors, only available in 1.7
+				stats = getField("stats");
+			} else {
+				id = getField("a");
+				amount = getField("b");
+				stats = null;
+			}
+		}
 	}
 	public static class NMSPacket201PlayerInfo extends NMSPacket {
 		public final FieldAccessor<String> playerName = getField("a");
@@ -766,8 +816,18 @@ public class PacketFieldClasses {
 		}
 	}
 	public static class NMSPacket203TabComplete extends NMSPacket {
-		public final FieldAccessor<String> read = getField("read");
-		public final FieldAccessor<String[]> response = getField("response");
+		public final FieldAccessor<String> read;
+		public final FieldAccessor<String[]> response;
+
+		public NMSPacket203TabComplete() {
+			if (Common.IS_1_7_PROTOCOL) {
+				read = getField("read");
+				response = getField("response");
+			} else {
+				read = getField("a");
+				response = null;
+			}
+		}
 	}
 	public static class NMSPacket204LocaleAndViewDistance extends NMSPacket {
 		public final FieldAccessor<String> locale = getField("a");

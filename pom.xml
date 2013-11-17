@@ -4,7 +4,7 @@
 
   <groupId>com.bergerkiller.bukkit</groupId>
   <artifactId>BKCommonLib</artifactId>
-  <version>1.7.2-SPIGOT-HACK</version>
+  <version>1.56</version>
   <packaging>jar</packaging>
 
   <name>BKCommonLib</name>
@@ -14,9 +14,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_6_R3</project.mcversion>
     <project.cbversion>1.6.4-R2.1</project.cbversion>
-    <project.stableversion>1.55</project.stableversion>
-    <project.stableserver>1.6.4-R0.1</project.stableserver>
-    <project.stabledate>30 September 2013</project.stabledate>
+    <project.stableversion>1.56</project.stableversion>
+    <project.stableserver>1.6.4-R2.1</project.stableserver>
+    <project.stabledate>17 November 2013</project.stabledate>
   </properties>
 
   <repositories>
