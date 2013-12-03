@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.minecraft.util.com.google.common.collect.BiMap;
+
 import org.bukkit.block.Block;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
@@ -542,5 +544,26 @@ public class LogicUtil {
 			iterator.next();
 		}
 		return iterator;
+	}
+
+	/**
+	 * Obtains the key at which a specific value is mapped to in a Map.
+	 * This is essentially the reverse key lookup in a map, and is thus slow.
+	 * For 'BiMap' maps, the inverse is used to obtain the key faster.
+	 * 
+	 * @param map to check
+	 * @param value to look for
+	 * @return key the value is mapped to, or null if not found
+	 */
+	public static <K, V> K getKeyAtValue(Map<K, V> map, V value) {
+		if (map instanceof BiMap) {
+			return ((BiMap<K, V>) map).inverse().get(value);
+		}
+		for (Entry<K, V> entry : map.entrySet()) {
+			if (bothNullOrEqual(entry.getValue(), value)) {
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 }

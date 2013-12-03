@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
@@ -59,4 +60,6 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, LongHashMap<Object>> longHashMap = toLongHashMapHandle.formPair(toLongHashMap);
 	public static final ConverterPair<Object, IntHashMap<Object>> intHashMap = toIntHashMapHandle.formPair(toIntHashMap);
 	public static final ConverterPair<Object, BlockState> blockState = toTileEntityHandle.formPair(toBlockState);
+	public static final ConverterPair<Object, Material> block = toBlockHandle.formPair(toMaterial);
+	public static final ConverterPair<Object, Material> item = toItemHandle.formPair(toMaterial);
 }

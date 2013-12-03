@@ -39,7 +39,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
@@ -289,7 +289,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	public static final WrapperConverter<CommonPacket> toCommonPacket = new WrapperConverter<CommonPacket>(CommonPacket.class) {
 		@Override
 		public CommonPacket convertSpecial(Object value, Class<?> valueType, CommonPacket def) {
-			if (PacketFields.DEFAULT.isInstance(value)) {
+			if (PacketType.DEFAULT.isInstance(value)) {
 				return new CommonPacket(value);
 			} else {
 				return def;

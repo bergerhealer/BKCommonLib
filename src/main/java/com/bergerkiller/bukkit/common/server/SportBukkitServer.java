@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -67,7 +67,7 @@ public class SportBukkitServer extends CraftBukkitServer {
 			for (Player player : CommonUtil.getOnlinePlayers()) {
 				List<Integer> idList = getEntityRemoveQueue(player);
 				if (!idList.isEmpty()) {
-					PacketUtil.sendPacket(player, PacketFields.DESTROY_ENTITY.newInstance(idList));
+					PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(idList));
 					idList.clear();
 				}
 			}

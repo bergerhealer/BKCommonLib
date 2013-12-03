@@ -21,9 +21,9 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
@@ -50,7 +50,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	@Override
 	public boolean onEnable() {
 		// Initialize all receiver methods
-		Class<?> packetType = PacketFields.DEFAULT.getType();
+		Class<?> packetType = PacketType.DEFAULT.getType();
 		for (Method method : PlayerConnectionRef.TEMPLATE.getType().getDeclaredMethods()) {
 			if (method.getReturnType() != void.class || method.getParameterTypes().length != 1 
 					|| !Modifier.isPublic(method.getModifiers())) {
@@ -213,14 +213,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		if (!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
 			return;
 		}
-		if (!PacketFields.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
+		if (!PacketType.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
 		if (throughListeners) {
 			final Object connection = EntityPlayerRef.playerConnection.get(handle);
 			PlayerConnectionRef.sendPacket(connection, packet);
 		} else {
-			handlePacketSendMonitor(player, PacketFields.DEFAULT.packetID.get(packet), packet);
+			handlePacketSendMonitor(player, PacketType.getType(packet), packet);
 			sendSilentPacket(player, packet);
 		}
 	}
@@ -297,9 +297,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 			return true;
 		}
 		// Handle listeners
-		final int id = PacketFields.DEFAULT.packetID.get(packet);
+		PacketType type = PacketType.getType(packet);
+		final int id = type.getId();
 		if (!LogicUtil.nullOrEmpty(listeners[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
+			CommonPacket cp = new CommonPacket(packet, type);
 			PacketSendEvent ev = new PacketSendEvent(player, cp);
 			ev.setCancelled(wasCancelled);
 			for (PacketListener listener : listeners[id]) {
@@ -310,14 +311,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 			}
 		}
 		// Handle monitors
-		handlePacketSendMonitor(player, id, packet);
+		handlePacketSendMonitor(player, type, packet);
 		return true;
 	}
 
-	private void handlePacketSendMonitor(Player player, int packetId, Object packet) {
-		if (!LogicUtil.nullOrEmpty(monitors[packetId])) {
-			CommonPacket cp = new CommonPacket(packet, packetId);
-			for (PacketMonitor monitor : monitors[packetId]) {
+	private void handlePacketSendMonitor(Player player, PacketType packetType, Object packet) {
+		if (!LogicUtil.nullOrEmpty(monitors[packetType.getId()])) {
+			CommonPacket cp = new CommonPacket(packet, packetType);
+			for (PacketMonitor monitor : monitors[packetType.getId()]) {
 				monitor.onMonitorPacketSend(cp, player);
 			}
 		}
@@ -336,9 +337,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 			return true;
 		}
 		// Handle listeners
-		final int id = PacketFields.DEFAULT.packetID.get(packet);
+		PacketType type = PacketType.getType(packet);
+		final int id = type.getId();
 		if (!LogicUtil.nullOrEmpty(listeners[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
+			CommonPacket cp = new CommonPacket(packet, type);
 			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
 			ev.setCancelled(wasCancelled);
 			for (PacketListener listener : listeners[id]) {
@@ -350,7 +352,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 		// Handle monitors
 		if (!LogicUtil.nullOrEmpty(monitors[id])) {
-			CommonPacket cp = new CommonPacket(packet, id);
+			CommonPacket cp = new CommonPacket(packet, type);
 			for (PacketMonitor monitor : monitors[id]) {
 				monitor.onMonitorPacketReceive(cp, player);
 			}
@@ -378,10 +380,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		long queuedsize = 0;
 		synchronized (lockObject) {
 			for (Object p : low) {
-				queuedsize += PacketFields.DEFAULT.getPacketSize(p) + 1;
+				queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
 			}
 			for (Object p : high) {
-				queuedsize += PacketFields.DEFAULT.getPacketSize(p) + 1;
+				queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
 			}
 		}
 		return queuedsize;

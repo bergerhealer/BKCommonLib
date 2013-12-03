@@ -69,13 +69,29 @@ public class ClassTemplate<T> {
 	 * @return Declared fields
 	 */
 	public List<SafeField<?>> getFields() {
-		if (type == null) {
-			return Collections.emptyList();
-		}
 		if (fields == null) {
-			fields = fillFields(new ArrayList<SafeField<?>>(), type);
+			if (type == null) {
+				fields = Collections.emptyList();
+			} else {
+				fields = Collections.unmodifiableList(fillFields(new ArrayList<SafeField<?>>(), type));
+			}
 		}
-		return Collections.unmodifiableList(fields);
+		return fields;
+	}
+
+	/**
+	 * Gets the field set at a specific index
+	 * 
+	 * @param index to get the field at
+	 * @return field at the index
+	 * @throws IllegalArgumentException - If no field is at the index
+	 */
+	public SafeField<?> getFieldAt(int index) {
+		List<SafeField<?>> fields = getFields();
+		if (index < 0 || index >= fields.size()) {
+			throw new IllegalArgumentException("No field exists at index " + index);
+		}
+		return fields.get(index);
 	}
 
 	private static List<SafeField<?>> fillFields(List<SafeField<?>> fields, Class<?> clazz) {

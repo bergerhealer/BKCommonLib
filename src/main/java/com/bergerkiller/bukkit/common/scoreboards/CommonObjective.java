@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard.Display;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -170,17 +169,17 @@ public class CommonObjective {
 	}
 
 	private void handle(int type) {
-		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_OBJECTIVE);
-		packet.write(PacketFields.SET_SCOREBOARD_OBJECTIVE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_OBJECTIVE.displayName, this.displayName);
-		packet.write(PacketFields.SET_SCOREBOARD_OBJECTIVE.action, type);
+		CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_OBJECTIVE);
+		packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.name, this.name);
+		packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.displayName, this.displayName);
+		packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.action, type);
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
 
 	private void display() {
-		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_DISPLAY_OBJECTIVE);
-		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display.getId());
+		CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE);
+		packet.write(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE.name, this.name);
+		packet.write(PacketType.OUT_SCOREBOARD_DISPLAY_OBJECTIVE.display, this.display.getId());
 		PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
 	}
 

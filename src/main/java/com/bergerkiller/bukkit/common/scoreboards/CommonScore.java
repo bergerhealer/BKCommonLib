@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
@@ -52,11 +51,11 @@ public class CommonScore {
 		if (!this.created) {
 			return;
 		}
-		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_SCORE);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.objName, this.objName);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.value, this.value);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.action, 0);
+		CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_SCORE);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.objName, this.objName);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.value, this.value);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, 0);
 		PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
 	}
 
@@ -78,9 +77,9 @@ public class CommonScore {
 		if (!this.created) {
 			return;
 		}
-		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_SCORE);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.name, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_SCORE.action, 1);
+		CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_SCORE);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
+		packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, 1);
 		PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
 		this.created = false;
 	}

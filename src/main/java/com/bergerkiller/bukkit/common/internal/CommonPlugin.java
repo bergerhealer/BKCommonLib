@@ -423,7 +423,7 @@ public class CommonPlugin extends PluginBase {
 		register(listener = new CommonListener());
 		register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 		register(tabController = new CommonTabController());
-		PacketUtil.addPacketListener(this, tabController, PacketType.PLAYER_INFO);
+		PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
 		startedTasks.add(new NextTickHandler(this).start(1, 1));
 		startedTasks.add(new MoveEventHandler(this).start(1, 1));
 		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));

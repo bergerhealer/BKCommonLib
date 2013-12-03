@@ -339,7 +339,7 @@ public class ItemUtil {
 	 * @return Empty item stack
 	 */
 	public static org.bukkit.inventory.ItemStack emptyItem() {
-		return CraftItemStack.asCraftMirror((ItemStack) ItemStackRef.newInstance(0, 0, 0));
+		return CraftItemStack.asCraftMirror((ItemStack) ItemStackRef.newInstance(Material.AIR, 0, 0));
 	}
 
 	/**

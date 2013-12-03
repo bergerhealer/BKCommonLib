@@ -11,27 +11,24 @@ public class CommonPacket {
 	private Object packet;
 	private PacketType type;
 
-	public CommonPacket(int id) {
-		this.type = PacketType.fromId(id);
-		this.packet = type.getPacket();
+	public CommonPacket(int id, boolean outGoing) {
+		this(PacketType.getType(id, outGoing));
 	}
 
-	public CommonPacket(PacketType packet) {
-		this.type = packet;
-		this.packet = type.getPacket();
+	public CommonPacket(PacketType packetType) {
+		this.type = packetType;
+		this.packet = this.type.createPacketHandle();
 	}
-	
-	public CommonPacket(Object packet) {
-		int id = PacketFields.DEFAULT.packetID.get(packet);
-		this.type = PacketType.fromId(id);
-		this.packet = packet;
+
+	public CommonPacket(Object packetHandle) {
+		this(packetHandle, PacketType.getType(packetHandle));
 	}
-	
-	public CommonPacket(Object packet, int id) {
-		this.type = PacketType.fromId(id);
-		this.packet = packet;
+
+	public CommonPacket(Object packetHandle, PacketType packetType) {
+		this.type = packetType;
+		this.packet = packetHandle;
 	}
-	
+
 	/**
 	 * Get the packet type
 	 * 
@@ -82,13 +79,9 @@ public class CommonPacket {
 	 * @param value Value
 	 * @throws IllegalArgumentException Invalid field index
 	 */
+	@SuppressWarnings("unchecked")
 	public void write(int index, Object value) throws IllegalArgumentException {
-		String field = type.getField(index);
-		if(field != null) {
-			this.write(field, value);
-		} else {
-			throw new IllegalArgumentException("Invalid field index: "+index);
-		}
+		this.write((FieldAccessor<Object>) this.type.getFieldAt(index), value);
 	}
 
 	/**
@@ -124,12 +117,7 @@ public class CommonPacket {
 	 * @throws IllegalArgumentException Ivalid field index
 	 */
 	public Object read(int index) throws IllegalArgumentException {
-		String field = type.getField(index);
-		if(field != null) {
-			return this.read(field);
-		} else {
-			throw new IllegalArgumentException("Invalid field index: "+index);
-		}
+		return this.read(this.type.getFieldAt(index));
 	}
 
 	/**
@@ -139,9 +127,9 @@ public class CommonPacket {
 	 * @throws IllegalArgumentException no datawatcher field found
 	 */
 	public void setDatawatcher(DataWatcher datawatcher) throws IllegalArgumentException {
-		write(type.getMetaDataField(), datawatcher.getHandle());
+		write(type.getMetaDataField(), datawatcher);
 	}
-	
+
 	/**
 	 * Get the data watcher from a packet
 	 * 
@@ -215,25 +203,23 @@ public class CommonPacket {
 		}
 		PacketType type = this.getType();
 		try {
-			if (type != PacketType.UNKNOWN) {
-				StringBuilder builder = new StringBuilder();
-				builder.append(type).append(" {\n");
-				// Find out the right PacketFields class
-				Object fieldsInstance = PacketFields.class.getDeclaredField(type.toString()).get(null);
-				for (SafeField<?> field : ClassTemplate.create(fieldsInstance).getFields()) {
-					if (field.isStatic()) {
-						continue;
-					}
-					Object fieldValue = field.get(fieldsInstance);
-					if (fieldValue instanceof FieldAccessor) {
-						final String name = field.getName();
-						final Object value = ((FieldAccessor<?>) fieldValue).get(handle);
-						builder.append("  ").append(name).append(" = ").append(Conversion.toString.convert(value)).append('\n');
-					}
+			StringBuilder builder = new StringBuilder();
+			builder.append(type).append(" {\n");
+			// Get all field accessor constants defined in the Packet Type
+			for (SafeField<?> field : ClassTemplate.create(type).getFields()) {
+				if (field.isStatic()) {
+					continue;
 				}
-				builder.append("}");
-				return builder.toString();
+				Object fieldValue = field.get(type);
+				if (fieldValue instanceof FieldAccessor) {
+					// Obtain the name and value for each field
+					final String name = field.getName();
+					final Object value = ((FieldAccessor<?>) fieldValue).get(handle);
+					builder.append("  ").append(name).append(" = ").append(Conversion.toString.convert(value)).append('\n');
+				}
 			}
+			builder.append("}");
+			return builder.toString();
 		} catch (Throwable t) {
 		}
 		// Print the fields (error/unknown packet...)

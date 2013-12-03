@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -22,7 +22,7 @@ public class EntityTrackerRef {
 	private static final MethodAccessor<Void> spawnEntities = TEMPLATE.getMethod("a", EntityPlayerRef.TEMPLATE.getType(), ChunkRef.TEMPLATE.getType());
 	private static final MethodAccessor<Void> track = TEMPLATE.getMethod("track", EntityRef.TEMPLATE.getType());
 	private static final MethodAccessor<Void> untrack = TEMPLATE.getMethod("untrackEntity", EntityRef.TEMPLATE.getType());
-	private static final MethodAccessor<Void> sendPacket = TEMPLATE.getMethod("sendPacketToEntity", EntityRef.TEMPLATE.getType(), PacketFields.DEFAULT.getType());
+	private static final MethodAccessor<Void> sendPacket = TEMPLATE.getMethod("sendPacketToEntity", EntityRef.TEMPLATE.getType(), PacketType.DEFAULT.getType());
 	private static final MethodAccessor<Void> untrackPlayer = TEMPLATE.getMethod("untrackPlayer", EntityPlayerRef.TEMPLATE.getType());
 
 	public static void sendPacket(Object entityTrackerInstance, Entity entity, Object packet) {

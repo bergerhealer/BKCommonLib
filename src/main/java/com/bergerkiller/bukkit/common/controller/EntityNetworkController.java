@@ -26,7 +26,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
@@ -330,7 +330,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// If instant, do not send other destroy messages, if not, send one
 		this.setRemoveNextTick(viewer, !instant);
 		if (instant) {
-			PacketUtil.sendPacket(viewer, PacketFields.DESTROY_ENTITY.newInstance(entity.getEntityId()));
+			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_DESTROY.newInstance(entity.getEntityId()));
 		}
 	}
 
@@ -383,7 +383,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
 		// Velocity
 		if (this.isMobile()) {
-			PacketUtil.sendPacket(viewer, PacketFields.ENTITY_VELOCITY.newInstance(entity.getEntityId(), this.velSynched.vector()));
+			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_VELOCITY.newInstance(entity.getEntityId(), this.velSynched.vector()));
 		}
 
 		// Passenger/Vehicle information
@@ -397,12 +397,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Potential leash
 		Entity leashHolder = entity.getLeashHolder();
 		if (leashHolder != null) {
-			PacketUtil.sendPacket(viewer, PacketFields.ATTACH_ENTITY.newInstance(entity.getEntity(), leashHolder, 1));
+			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), leashHolder, 1));
 		}
 
 		// Human entity sleeping action
 		if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
-			PacketUtil.sendPacket(viewer, PacketFields.ENTITY_LOCATION_ACTION.newInstance(entity.getEntity(), 
+			PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(), 
 					entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
 		}
 
@@ -426,7 +426,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Meta Data
 		DataWatcher metaData = entity.getMetaData();
 		if (!metaData.isEmpty()) {
-			PacketUtil.sendPacket(viewer, PacketFields.ENTITY_METADATA.newInstance(entity.getEntityId(), metaData, true));
+			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_METADATA.newInstance(entity.getEntityId(), metaData, true));
 		}
 		// Living Entity - only data
 		if (handle instanceof EntityLiving) {
@@ -434,7 +434,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
 			Collection<?> attributes = attributeMap.c();
 			if (!attributes.isEmpty()) {
-				PacketUtil.sendPacket(viewer, PacketFields.UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
+				PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
 			}
 
 			// Entity Equipment
@@ -442,13 +442,13 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			for (int i = 0; i < 5; ++i) {
 	            org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(i));
 	            if (itemstack != null) {
-	            	PacketUtil.sendPacket(viewer, PacketFields.ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i, itemstack));
+	            	PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i, itemstack));
 	            }
 			}
 
 			// Entity Mob Effects
 			for (MobEffect effect : (Collection<MobEffect>) living.getEffects()) {
-				PacketUtil.sendPacket(viewer, PacketFields.MOB_EFFECT.newInstance(entity.getEntityId(), effect));
+				PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect));
 			}
 		}
 	}
@@ -587,7 +587,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Meta Data
 		DataWatcher meta = entity.getMetaData();
 		if (meta.isChanged()) {
-			broadcast(PacketFields.ENTITY_METADATA.newInstance(entity.getEntityId(), meta, false), true);
+			broadcast(PacketType.OUT_ENTITY_METADATA.newInstance(entity.getEntityId(), meta, false), true);
 		}
 		// Living Entity - only data
 		if (handle instanceof EntityLiving) {
@@ -595,7 +595,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
 			Collection<?> attributes = attributeMap.b();
 			if (!attributes.isEmpty()) {
-				this.broadcast(PacketFields.UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
+				this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
 			}
 			attributes.clear();
 		}
@@ -762,18 +762,18 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			} else if (rotation) {
 				// Update rotation and position relatively
 				locSynched.set(posX, posY, posZ, yaw, pitch);
-				broadcast(PacketFields.ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
+				broadcast(PacketType.OUT_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
 						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch));
 			} else {
 				// Only update position relatively
 				locSynched.set(posX, posY, posZ);
-				broadcast(PacketFields.ENTITY_MOVE.newInstance(entity.getEntityId(), 
+				broadcast(PacketType.OUT_ENTITY_MOVE.newInstance(entity.getEntityId(), 
 						(byte) deltaX, (byte) deltaY, (byte) deltaZ));
 			}
 		} else if (rotation) {
 			// Only update rotation
 			locSynched.setRotation(yaw, pitch);
-			broadcast(PacketFields.ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch));
+			broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch));
 		}
 	}
 
@@ -819,7 +819,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with absolute position information
 	 */
 	public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-		return PacketFields.ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch);
+		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch);
 	}
 
 	/**
@@ -831,7 +831,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with velocity information
 	 */
 	public CommonPacket getVelocityPacket(double velX, double velY, double velZ) {
-		return PacketFields.ENTITY_VELOCITY.newInstance(entity.getEntityId(), velX, velY, velZ);
+		return PacketType.OUT_ENTITY_VELOCITY.newInstance(entity.getEntityId(), velX, velY, velZ);
 	}
 
 	/**
@@ -843,17 +843,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 */
 	public CommonPacket getSpawnPacket() {
 		final CommonPacket packet = EntityTrackerEntryRef.getSpawnPacket(handle);
-		if (PacketFields.VEHICLE_SPAWN.isInstance(packet)) {
+		if (PacketType.OUT_ENTITY_SPAWN.isInstance(packet)) {
 			// NMS error: They are not using the position, but the live position
 			// This has some big issues when new players join...
 
 			// Position
-			packet.write(PacketFields.VEHICLE_SPAWN.x, locSynched.getX());
-			packet.write(PacketFields.VEHICLE_SPAWN.y, locSynched.getY());
-			packet.write(PacketFields.VEHICLE_SPAWN.z, locSynched.getZ());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
 			// Rotation
-			packet.write(PacketFields.VEHICLE_SPAWN.yaw, (byte) locSynched.getYaw());
-			packet.write(PacketFields.VEHICLE_SPAWN.pitch, (byte) locSynched.getPitch());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (byte) locSynched.getYaw());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (byte) locSynched.getPitch());
 		}
 		return packet;
 	}
@@ -865,7 +865,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return packet with passenger information
 	 */
 	public CommonPacket getPassengerPacket(Entity passenger) {
-		return PacketFields.ATTACH_ENTITY.newInstance(passenger, entity.getEntity());
+		return PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, entity.getEntity());
 	}
 
 	/**
@@ -875,7 +875,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return packet with vehicle information
 	 */
 	public CommonPacket getVehiclePacket(Entity vehicle) {
-		return PacketFields.ATTACH_ENTITY.newInstance(entity.getEntity(), vehicle);
+		return PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle);
 	}
 
 	/**
@@ -885,7 +885,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return packet with head rotation information
 	 */
 	public CommonPacket getHeadRotationPacket(int headRotation) {
-		return PacketFields.ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation);
+		return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation);
 	}
 
 	private int protRot(float rot) {

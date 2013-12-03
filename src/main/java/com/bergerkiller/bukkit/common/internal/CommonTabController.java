@@ -25,7 +25,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
@@ -287,11 +286,11 @@ public class CommonTabController implements PacketListener, Listener {
 
 	@Override
 	public void onPacketSend(PacketSendEvent event) {
-		if (event.getType() == PacketType.PLAYER_INFO && !event.isCancelled()) {
+		if (event.getType() == PacketType.OUT_PLAYER_INFO && !event.isCancelled()) {
 			CommonPacket packet = event.getPacket();
-			String name = packet.read(PacketFields.PLAYER_INFO.playerName);
-			int ping = packet.read(PacketFields.PLAYER_INFO.ping);
-			boolean register = packet.read(PacketFields.PLAYER_INFO.online);
+			String name = packet.read(PacketType.OUT_PLAYER_INFO.playerName);
+			int ping = packet.read(PacketType.OUT_PLAYER_INFO.ping);
+			boolean register = packet.read(PacketType.OUT_PLAYER_INFO.online);
 			event.setCancelled(!getInfo(event.getPlayer()).handlePlayerInfoPacket(name, ping, register));
 		}
 	}
@@ -538,11 +537,11 @@ public class CommonTabController implements PacketListener, Listener {
 		}
 	
 		private void hideSlot(String text) {
-			PacketUtil.sendPacket(player, PacketFields.PLAYER_INFO.newInstance(text, false, 0), false);
+			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, false, 0), false);
 		}
 
 		private void showSlot(String text, int ping) {
-			PacketUtil.sendPacket(player, PacketFields.PLAYER_INFO.newInstance(text, true, ping), false);
+			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, true, ping), false);
 		}
 	}
 }

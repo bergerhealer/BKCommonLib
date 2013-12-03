@@ -16,10 +16,10 @@ import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+import com.bergerkiller.bukkit.common.reflection.classes.EnumProtocolRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.comphenix.protocol.Packets;
@@ -92,7 +92,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toReceive = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
+		PacketContainer toReceive = new PacketContainer(EnumProtocolRef.getPacketId(packet.getClass()), packet);
 		try{
 			ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
 		} catch (PlayerLoggedOutException ex) {
@@ -107,7 +107,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toSend = new PacketContainer(PacketFields.DEFAULT.packetID.get(packet), packet);
+		PacketContainer toSend = new PacketContainer(EnumProtocolRef.getPacketId(packet.getClass()), packet);
 		try {
 			if (throughListeners) {
 				// Send it through the listeners

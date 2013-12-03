@@ -90,7 +90,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 				org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
 				Object rval = CraftItemStack.asNMSCopy(stack);
 				if (rval == null) {
-					rval = ItemStackRef.newInstance(MaterialUtil.getTypeId(stack), MaterialUtil.getRawData(stack), stack.getAmount());
+					rval = ItemStackRef.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
 				}
 				return rval;
 			} else {

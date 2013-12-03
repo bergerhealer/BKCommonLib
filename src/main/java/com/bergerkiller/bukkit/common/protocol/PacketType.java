@@ -1,226 +1,204 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PacketFieldClasses.NMSPacket;
+import com.bergerkiller.bukkit.common.reflection.classes.EnumProtocolRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.collections.ClassMap;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.protocol.PacketTypeClasses.*;
 
-public enum PacketType {
-	UNKNOWN(-1),
-	KEEP_ALIVE(0),
-	LOGIN(1),
-	HANDSHAKE(2),
-	CHAT(3),
-	UPDATE_TIME(4),
-	ENTITY_EQUIPMENT(5),
-	SPAWN_POSITION(6),
-	USE_ENTITY(7),
-	UPDATE_HEALTH(8),
-	RESPAWN(9),
-	FLYING(10),
-	PLAYER_POSITION(11),
-	PLAYER_LOOK(12),
-	PLAYER_LOOK_MOVE(13),
-	BLOCK_DIG(14),
-	PLACE(15),
-	BLOCK_ITEM_SWITCH(16),
-	ENTITY_LOCATION_ACTION(17),
-	ARM_ANIMATION(18),
-	ENTITY_ACTION(19),
-	NAMED_ENTITY_SPAWN(20),
-	COLLECT(22),
-	VEHICLE_SPAWN(23),
-	MOB_SPAWN(24),
-	ENTITY_PAINTING(25),
-	ADD_EXP_ORB(26),
-	PLAYER_INPUT(27),
-	ENTITY_VELOCITY(28),
-	DESTROY_ENTITY(29),
-	ENTITY(30),
-	ENTITY_MOVE(31),
-	ENTITY_LOOK(32),
-	ENTITY_MOVE_LOOK(33),
-	ENTITY_TELEPORT(34),
-	ENTITY_HEAD_ROTATION(35),
-	ENTITY_STATUS(38),
-	ATTACH_ENTITY(39),
-	ENTITY_METADATA(40),
-	MOB_EFFECT(41),
-	REMOVE_MOB_EFFECT(42),
-	SET_EXPERIENCE(43),
-	UPDATE_ATTRIBUTES(44),
-	MAP_CHUNK(51),
-	MULTI_BLOCK_CHANGE(52),
-	BLOCK_CHANGE(53),
-	PLAY_NOTEBLOCK(54),
-	BLOCK_BREAK_ANIMATION(55),
-	MAP_CHUNK_BULK(56),
-	EXPLOSION(60),
-	WORLD_EVENT(61),
-	NAMED_SOUND_EFFECT(62),
-	WORLD_PARTICLES(63),
-	BED(70),
-	WEATHER(71),
-	OPEN_WINDOW(100),
-	CLOSE_WINDOW(101),
-	WINDOW_CLICK(102),
-	SET_SLOT(103),
-	WINDOW_ITEMS(104),
-	PROGRESS_BAR(105),
-	TRANSACTION(106),
-	SET_CREATIVE_SLOT(107),
-	BUTTON_CLICK(108),
-	UPDATE_SIGN(130),
-	ITEM_DATA(131),
-	TILE_ENTITY_DATA(132),
-	TILE_ENTITY_OPEN(133),
-	STATISTIC(200),
-	PLAYER_INFO(201),
-	ABILITIES(202),
-	TAB_COMPLETE(203),
-	CLIENT_INFO(204),
-	CLIENT_COMMAND(205),
-	SET_SCOREBOARD_OBJECTIVE(206),
-	SET_SCOREBOARD_SCORE(207),
-	SET_SCOREBOARD_DISPLAY_OBJECTIVE(208),
-	SET_SCOREBOARD_TEAM(209),
-	CUSTOM_PAYLOAD(250),
-	KEY_RESPONSE(252),
-	KEY_REQUEST(253),
-	GET_INFO(254),
-	DISCONNECT(255);
+public class PacketType extends ClassTemplate<Object> {
+	private static final ClassMap<PacketType> typesByPacketClass = new ClassMap<PacketType>();
 
+	/* All available 'Play' packets */
+	public static final NMSPacket DEFAULT = new NMSPacket();
+	public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
+	public static final NMSPacketPlayOutAnimation OUT_ANIMATION = new NMSPacketPlayOutAnimation();
+	public static final NMSPacketPlayOutBed OUT_BED = new NMSPacketPlayOutBed();
+	public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
+	public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
+	public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();
+	public static final NMSPacketPlayOutCustomPayload OUT_CUSTOM_PAYLOAD = new NMSPacketPlayOutCustomPayload();
+	public static final NMSPacketPlayOutExperience OUT_EXPERIENCE = new NMSPacketPlayOutExperience();
+	public static final NMSPacketPlayOutExplosion OUT_EXPLOSION = new NMSPacketPlayOutExplosion();
+	public static final NMSPacketPlayOutGameStateChange OUT_GAME_STATE_CHANGE = new NMSPacketPlayOutGameStateChange();
+	public static final NMSPacketPlayOutHeldItemSlot OUT_HELD_ITEM_SLOT = new NMSPacketPlayOutHeldItemSlot();
+	public static final NMSPacketPlayOutKeepAlive OUT_KEEP_ALIVE = new NMSPacketPlayOutKeepAlive();
+	public static final NMSPacketPlayOutKickDisconnect OUT_KICK_DISCONNECT = new NMSPacketPlayOutKickDisconnect();
+	public static final NMSPacketPlayOutLogin OUT_LOGIN = new NMSPacketPlayOutLogin();
+	public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
+	public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
+	public static final NMSPacketPlayOutMapChunkBulk OUT_MAP_CHUNK_BULK = new NMSPacketPlayOutMapChunkBulk();
+	public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
+	public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();
+	public static final NMSPacketPlayOutOpenSignEditor OUT_OPEN_SIGN_EDITOR = new NMSPacketPlayOutOpenSignEditor();
+	public static final NMSPacketPlayOutPlayerInfo OUT_PLAYER_INFO = new NMSPacketPlayOutPlayerInfo();
+	public static final NMSPacketPlayOutPosition OUT_POSITION = new NMSPacketPlayOutPosition();
+	public static final NMSPacketPlayOutRespawn OUT_RESPAWN = new NMSPacketPlayOutRespawn();
+	public static final NMSPacketPlayOutSpawnPosition OUT_SPAWN_POSITION = new NMSPacketPlayOutSpawnPosition();
+	public static final NMSPacketPlayOutStatistic OUT_STATISTIC = new NMSPacketPlayOutStatistic();
+	public static final NMSPacketPlayOutTabComplete OUT_TAB_COMPLETE = new NMSPacketPlayOutTabComplete();
+	public static final NMSPacketPlayOutTileEntityData OUT_TILE_ENTITY_DATA = new NMSPacketPlayOutTileEntityData();
+	public static final NMSPacketPlayOutUpdateHealth OUT_UPDATE_HEALTH = new NMSPacketPlayOutUpdateHealth();
+	public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
+	public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
+	public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
+	public static final NMSPacketPlayOutWorldParticles OUT_WORLD_PARTICLES = new NMSPacketPlayOutWorldParticles();
+
+	/* Scoreboard-related packets */
+	public static final NMSPacketPlayOutScoreboardDisplayObjective OUT_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSPacketPlayOutScoreboardDisplayObjective();
+	public static final NMSPacketPlayOutScoreboardObjective OUT_SCOREBOARD_OBJECTIVE = new NMSPacketPlayOutScoreboardObjective();
+	public static final NMSPacketPlayOutScoreboardScore OUT_SCOREBOARD_SCORE = new NMSPacketPlayOutScoreboardScore();
+	public static final NMSPacketPlayOutScoreboardTeam OUT_SCOREBOARD_TEAM = new NMSPacketPlayOutScoreboardTeam();
+
+	/* Window-related packets */
+	public static final NMSPacketPlayOutCloseWindow OUT_WINDOW_CLOSE = new NMSPacketPlayOutCloseWindow();
+	public static final NMSPacketPlayOutCraftProgressBar OUT_WINDOW_PROGRESS = new NMSPacketPlayOutCraftProgressBar();
+	public static final NMSPacketPlayOutOpenWindow OUT_WINDOW_OPEN = new NMSPacketPlayOutOpenWindow();
+	public static final NMSPacketPlayOutSetSlot OUT_WINDOW_SET_SLOT = new NMSPacketPlayOutSetSlot();
+	public static final NMSPacketPlayOutTransaction OUT_WINDOW_TRANSACTION = new NMSPacketPlayOutTransaction();
+	public static final NMSPacketPlayOutWindowItems OUT_WINDOW_ITEMS = new NMSPacketPlayOutWindowItems();
+
+	/* Entity-related packets */
+	public static final NMSPacketPlayOutEntity OUT_ENTITY = new NMSPacketPlayOutEntity();
+	public static final NMSPacketPlayOutSpawnEntity OUT_ENTITY_SPAWN = new NMSPacketPlayOutSpawnEntity();
+	public static final NMSPacketPlayOutNamedEntitySpawn OUT_ENTITY_SPAWN_NAMED = new NMSPacketPlayOutNamedEntitySpawn();
+	public static final NMSPacketPlayOutSpawnEntityExperienceOrb OUT_ENTITY_SPAWN_EXPORB = new NMSPacketPlayOutSpawnEntityExperienceOrb();
+	public static final NMSPacketPlayOutSpawnEntityLiving OUT_ENTITY_SPAWN_LIVING = new NMSPacketPlayOutSpawnEntityLiving();
+	public static final NMSPacketPlayOutSpawnEntityPainting OUT_ENTITY_SPAWN_PAINTING = new NMSPacketPlayOutSpawnEntityPainting();
+	public static final NMSPacketPlayOutSpawnEntityWeather OUT_ENTITY_SPAWN_WITHER = new NMSPacketPlayOutSpawnEntityWeather();
+	public static final NMSPacketPlayOutEntityDestroy OUT_ENTITY_DESTROY = new NMSPacketPlayOutEntityDestroy();
+	public static final NMSPacketPlayOutAttachEntity OUT_ENTITY_ATTACH = new NMSPacketPlayOutAttachEntity();
+	public static final NMSPacketPlayOutEntityEffect OUT_ENTITY_EFFECT_ADD = new NMSPacketPlayOutEntityEffect();
+	public static final NMSPacketPlayOutRemoveEntityEffect OUT_ENTITY_EFFECT_REMOVE = new NMSPacketPlayOutRemoveEntityEffect();
+	public static final NMSPacketPlayOutEntityEquipment OUT_ENTITY_EQUIPMENT = new NMSPacketPlayOutEntityEquipment();
+	public static final NMSPacketPlayOutEntityHeadRotation OUT_ENTITY_HEAD_ROTATION = new NMSPacketPlayOutEntityHeadRotation();
+	public static final NMSPacketPlayOutEntityLook OUT_ENTITY_LOOK = new NMSPacketPlayOutEntityLook();
+	public static final NMSPacketPlayOutEntityMetadata OUT_ENTITY_METADATA = new NMSPacketPlayOutEntityMetadata();
+	public static final NMSPacketPlayOutEntityStatus OUT_ENTITY_STATUS = new NMSPacketPlayOutEntityStatus();
+	public static final NMSPacketPlayOutEntityTeleport OUT_ENTITY_TELEPORT = new NMSPacketPlayOutEntityTeleport();
+	public static final NMSPacketPlayOutEntityVelocity OUT_ENTITY_VELOCITY = new NMSPacketPlayOutEntityVelocity();
+	public static final NMSPacketPlayOutRelEntityMove OUT_ENTITY_MOVE = new NMSPacketPlayOutRelEntityMove();
+	public static final NMSPacketPlayOutRelEntityMoveLook OUT_ENTITY_MOVE_LOOK = new NMSPacketPlayOutRelEntityMoveLook();
+	public static final NMSPacketPlayOutUpdateAttributes OUT_ENTITY_UPDATE_ATTRIBUTES = new NMSPacketPlayOutUpdateAttributes();
+	
+	
+	
+	
 	private final int id;
-	private final ClassTemplate<?> template;
-	private final String[] fieldNames;
-	private final String dataWatcherField;
-	private final NMSPacket packetFields;
-	private static final PacketType[] byId = new PacketType[256];
+	private final boolean outgoing;
+	private final FieldAccessor<DataWatcher> dataWatcherField;
 
-	private PacketType(int id) {
-		this.id = id;
-		if (true) {
-			this.template = null;
-			this.fieldNames = new String[0];
-			this.dataWatcherField = null;
-			this.packetFields = null;
-			return;
+	static {
+		//TODO: Check that all NMS packets are actually registered here
+	}
+
+	/**
+	 * Constructor used in PacketTypeClasses to construct by name
+	 */
+	protected PacketType() {
+		this(null);
+	}
+
+	@SuppressWarnings("unchecked")
+	private PacketType(Class<?> packetClass) {
+		// If not specified, resort to using the PacketType class name to obtain the Class
+		if (packetClass == null) {
+			packetClass = CommonUtil.getNMSClass(getType().getSimpleName().substring(3));
 		}
-		
-		final Class<?> type = (Class<?>) PacketFields.DEFAULT.getStaticFieldValue("l", Conversion.toIntHashMap).get(id);
-		// Check for null types (we call those unknown)
-		if (type == null) {
-			this.template = null;
-			this.dataWatcherField = null;
-			this.fieldNames = new String[0];
-			this.packetFields = PacketFields.DEFAULT;
-			return;
+		typesByPacketClass.put(packetClass, this);
+
+		// Apply the packet class
+		this.setClass((Class<Object>) packetClass);
+
+		// Obtain ID and determine in/outgoing
+		Integer tmpId;
+		if ((tmpId = EnumProtocolRef.getPacketIdIn(getType())) != null) {
+			this.outgoing = false;
+			this.id = tmpId.intValue();
+		} else if ((tmpId = EnumProtocolRef.getPacketIdOut(getType())) != null) {
+			this.outgoing = true;
+			this.id = tmpId.intValue();
+		} else {
+			this.outgoing = false;
+			this.id = -1;
+			CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getType().getSimpleName() + " is not registered!");
 		}
-		this.template = ClassTemplate.create(type);
-		List<SafeField<?>> fields = this.template.getFields();
-		this.fieldNames = new String[fields.size()];
-		String dataWatcherField = null;
-		for (int i = 0; i < fields.size(); i++) {
-			SafeField<?> field = fields.get(i);
+
+		// Obtain the datawatcher Field
+		FieldAccessor<DataWatcher> dataWatcherField = null;
+		for (SafeField<?> field : this.getFields()) {
 			if (DataWatcherRef.TEMPLATE.isType(field.getType())) {
-				dataWatcherField = field.getName();
+				dataWatcherField = field.translate(ConversionPairs.dataWatcher);
+				break;
 			}
-			fieldNames[i] = field.getName();
 		}
 		this.dataWatcherField = dataWatcherField;
-
-		// Obtain packet fields information
-		NMSPacket packetFields = null;
-		try {
-			Field typeField = PacketFields.class.getDeclaredField(toString());
-			if ((typeField.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
-				packetFields = CommonUtil.tryCast(typeField.get(null), NMSPacket.class);
-			}
-		} catch (Throwable t) {
-		}
-		if (packetFields == null) {
-			CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet type " + toString() + "(" + id + ") lacks a PacketFields constant!");
-		}
-		this.packetFields = packetFields;
 	}
 
-	/**
-	 * Constructs a new Packet instance from this Type
-	 * 
-	 * @return Packet
-	 */
-	public Object getPacket() {
-		return template == null ? null : template.newInstance();
+	public boolean isOutGoing() {
+		return this.outgoing;
 	}
 
-	/**
-	 * Gets the Packet Id of this Packet type
-	 * 
-	 * @return Packet type id
-	 */
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
-	/**
-	 * Gets the packet field table accessed using PacketFields.TYPE_NAME.
-	 * This can be used in combination with generics to translate packet fields.
-	 * 
-	 * @return NMSPacket information
-	 */
-	public NMSPacket getPacketFields() {
-		return this.packetFields;
+	protected Object createPacketHandle() {
+		return super.newInstance();
 	}
 
-	public String getMetaDataField() {
+	public FieldAccessor<DataWatcher> getMetaDataField() {
 		if (dataWatcherField == null) {
 			throw new IllegalArgumentException("MetaData field does not exist");
 		}
 		return dataWatcherField;
 	}
 
-	public String getField(int index) {
-		return (index >= 0 && index < fieldNames.length) ? fieldNames[index] : null;
+	public int getPacketSize(Object packetHandle) {
+		return 1;
 	}
 
-	/**
-	 * Gets the Packet Type from a Packet Id
-	 * 
-	 * @param id of the Packet
-	 * @return Packet Type, or UNKNOWN if unknown
-	 */
-	public static PacketType fromId(int id) {
-		if (id >= 0 && id < 256) {
-			return byId[id];
+	protected static PacketType getType(Class<?> packetHandleClass) {
+		if (packetHandleClass == null) {
+			throw new IllegalArgumentException("Null packets can not be used");
+		}
+		PacketType type = typesByPacketClass.get(packetHandleClass);
+		if (type == null) {
+			type = new PacketType(packetHandleClass);
+		}
+		return type;
+	}
+
+	public static PacketType getType(Object packetHandle) {
+		if (packetHandle == null) {
+			throw new IllegalArgumentException("Null packets can not be used");
+		}
+		PacketType type = typesByPacketClass.get(packetHandle);
+		if (type == null) {
+			type = new PacketType(packetHandle.getClass());
+		}
+		return type;
+	}
+
+	public static PacketType getType(int packetId, boolean outGoing) {
+		final Class<?> type;
+		if (outGoing) {
+			type = EnumProtocolRef.getPacketClassOut(packetId);
 		} else {
-			return UNKNOWN;
+			type = EnumProtocolRef.getPacketClassIn(packetId);
 		}
-	}
-
-	static {
-		Arrays.fill(byId, UNKNOWN);
-		for (PacketType type : values()) {
-			if (type != UNKNOWN) {
-				byId[type.getId()] = type;
-			}
-		}
-		// Check whether all packet types are REALLY available
-		for (Class<?> packetType : PacketUtil.getPacketClasses()) {
-			int id = PacketUtil.getPacketId(packetType);
-			if (LogicUtil.isInBounds(byId, id) && byId[id] == UNKNOWN) {
-				CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet type for " + packetType.getSimpleName() + " (" + id + ") is not available");
-			}
+		if (type == null) {
+			return null;
+		} else {
+			return getType(type);
 		}
 	}
 }

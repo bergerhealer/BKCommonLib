@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
@@ -105,10 +105,10 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
 			for (int i = 0; i < rawIds.length; i++) {
 				rawIds[i] = ids.remove(0).intValue();
 			}
-			sendPacket(PacketFields.DESTROY_ENTITY.newInstance(rawIds));
+			sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstance(rawIds));
 		}
 		// Remove any remaining entities
-		sendPacket(PacketFields.DESTROY_ENTITY.newInstance(ids));
+		sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstance(ids));
 		ids.clear();
 	}
 

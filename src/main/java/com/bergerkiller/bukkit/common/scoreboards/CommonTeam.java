@@ -9,7 +9,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
@@ -269,14 +268,14 @@ public class CommonTeam implements Serializable {
 	 * @return Packet
 	 */
 	private CommonPacket getPacket(int action) {
-		CommonPacket packet = new CommonPacket(PacketType.SET_SCOREBOARD_TEAM);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.team, this.name);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.display, this.displayName);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.prefix, this.prefix);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.suffix, this.suffix);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.players, this.players);
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.friendlyFire, this.friendlyFire.getRawInt());
-		packet.write(PacketFields.SET_SCOREBOARD_TEAM.mode, action);
+		CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_TEAM);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.team, this.name);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.display, this.displayName);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.prefix, this.prefix);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.suffix, this.suffix);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.players, this.players);
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.friendlyFire, this.friendlyFire.getRawInt());
+		packet.write(PacketType.OUT_SCOREBOARD_TEAM.mode, action);
 		return packet;
 	}
 

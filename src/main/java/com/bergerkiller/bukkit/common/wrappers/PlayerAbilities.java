@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
@@ -83,6 +83,6 @@ public class PlayerAbilities extends BasicWrapper {
 	 * @param player to update
 	 */
 	public void update(Player player) {
-		PacketUtil.sendPacket(player, PacketFields.ABILITIES.newInstance(this));
+		PacketUtil.sendPacket(player, PacketType.OUT_ABILITIES.newInstance(this));
 	}
 }

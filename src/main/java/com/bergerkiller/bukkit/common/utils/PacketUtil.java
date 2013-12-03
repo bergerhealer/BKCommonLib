@@ -2,8 +2,6 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 import net.minecraft.server.Packet;
 
@@ -16,26 +14,12 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 
 public class PacketUtil {
-	private static final Map<Class<?>, Integer> packetsToIds = Collections.emptyMap(); //PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
-
-	public static Collection<Class<?>> getPacketClasses() {
-		return packetsToIds.keySet();
-	}
-
-	public static int getPacketId(Class<?> packetClass) {
-		return packetsToIds.get(packetClass);
-	}
-
-	public static void registerPacketToId(Class<?> packetClass, int id) {
-		packetsToIds.put(packetClass, id);
-	}
 
 	/**
 	 * Sends all the packets required to properly display a chunk to a player
@@ -61,7 +45,7 @@ public class PacketUtil {
 
 		// Send payload
 		if (sendPayload) {
-			sendPacket(player, PacketFields.MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
+			sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
 		}
 		// Tile entities
 		CommonPacket packet;
