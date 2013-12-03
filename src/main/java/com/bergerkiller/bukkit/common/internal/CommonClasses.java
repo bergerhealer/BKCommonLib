@@ -26,9 +26,9 @@ class CommonClasses {
 		loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
 		loadUtil("Recipe", "Stream", "World");
 		// Remaining classes
-		loadCommon("nbt.NBTTagInfo", "reflection.classes.PacketFieldClasses", "entity.CommonEntityType", "collections.CollectionBasics");
+		loadCommon("nbt.NBTTagInfo", "entity.CommonEntityType", "collections.CollectionBasics");
 		loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
-		loadCommon("protocol.PacketType", "protocol.PacketFields");
+		loadCommon("protocol.PacketType");
 	}
 
 	private static void loadConverter(String... classNames) {

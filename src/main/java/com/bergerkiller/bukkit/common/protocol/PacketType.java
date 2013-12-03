@@ -111,7 +111,7 @@ public class PacketType extends ClassTemplate<Object> {
 	private PacketType(Class<?> packetClass) {
 		// If not specified, resort to using the PacketType class name to obtain the Class
 		if (packetClass == null) {
-			packetClass = CommonUtil.getNMSClass(getType().getSimpleName().substring(3));
+			packetClass = CommonUtil.getNMSClass(getClass().getSimpleName().substring(3));
 		}
 		typesByPacketClass.put(packetClass, this);
 

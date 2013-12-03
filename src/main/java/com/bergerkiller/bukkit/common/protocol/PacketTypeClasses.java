@@ -20,6 +20,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -176,10 +177,10 @@ public class PacketTypeClasses {
 
 	public static class NMSPacketPlayOutEntityHeadRotation extends NMSPacketPlayOutEntity {
 		public final FieldAccessor<Byte> headYaw = getField("b");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class);
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), byte.class);
 
-		public CommonPacket newInstance(int entityId, byte headRotation) {
-			return constructor1.newInstance(entityId, headRotation);
+		public CommonPacket newInstance(org.bukkit.entity.Entity entity, byte headRotation) {
+			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), headRotation);
 		}
 	}
 
@@ -352,19 +353,17 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
-		public final FieldAccessor<Integer> chunkX = getField("a");
-		public final FieldAccessor<Integer> chunkZ = getField("b");
+		public final FieldAccessor<IntVector2> chunk = getField("b").translate(ConversionPairs.chunkIntPair);
+		public final FieldAccessor<byte[]> blockData = getField("c");
 		public final FieldAccessor<Integer> blockCount = getField("d");
-		public final FieldAccessor<byte[]> blockData = getField("e");
 	}
 
 	public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacketPlayOutEntity {
-		public final FieldAccessor<String> entityName = getField("b");
+		public final FieldAccessor<Object> profile = getField("b");
 		public final FieldAccessor<Integer> x = getField("c");
 		public final FieldAccessor<Integer> y = getField("d");
 		public final FieldAccessor<Integer> z = getField("e");
 		public final FieldAccessor<Byte> yaw = getField("f");
-		public final FieldAccessor<String> playerUUID = getField("playerUUID");
 		public final FieldAccessor<Byte> pitch = getField("g");
 		public final FieldAccessor<Integer> heldItemId = getField("h");
 		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("i").translate(ConversionPairs.dataWatcher);
@@ -447,8 +446,8 @@ public class PacketTypeClasses {
 	public static class NMSPacketPlayOutRespawn extends NMSPacket {
 		public final FieldAccessor<Integer> dimension = getField("a");
 		public final FieldAccessor<Difficulty> difficulty = getField("b").translate(ConversionPairs.difficulty);
-		public final TranslatorFieldAccessor<GameMode> gamemode = getField("d").translate(ConversionPairs.gameMode);
-		public final TranslatorFieldAccessor<WorldType> worldType = getField("e").translate(ConversionPairs.worldType);
+		public final TranslatorFieldAccessor<GameMode> gamemode = getField("c").translate(ConversionPairs.gameMode);
+		public final TranslatorFieldAccessor<WorldType> worldType = getField("d").translate(ConversionPairs.worldType);
 	}
 
 	public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {
@@ -515,7 +514,7 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> yaw = getField("i");
 		public final FieldAccessor<Byte> pitch = getField("j");
 		public final FieldAccessor<Byte> headYaw = getField("k");
-		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("t").translate(ConversionPairs.dataWatcher);
+		public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("l").translate(ConversionPairs.dataWatcher);
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("EntityLiving"));
 
 		public CommonPacket newInstance(Object entityLiving) {

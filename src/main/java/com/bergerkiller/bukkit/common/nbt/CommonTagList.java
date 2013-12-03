@@ -44,8 +44,8 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 		this((Object) data);
 	}
 
-	protected CommonTagList(Object data) {
-		super(data);
+	public CommonTagList(Object value) {
+		super(value);
 	}
 
 	private void updateListType(Object elementHandle) {

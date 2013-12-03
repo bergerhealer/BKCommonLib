@@ -368,23 +368,17 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		if (!NetworkManagerRef.TEMPLATE.isInstance(nm)) {
 			return 0L;
 		}
-		Object lockObject = NetworkManagerRef.lockObject.get(nm);
-		if (lockObject == null) {
-			return 0L;
-		}
-		List<Object> low = NetworkManagerRef.lowPriorityQueue.get(nm);
-		List<Object> high = NetworkManagerRef.highPriorityQueue.get(nm);
+		Collection<Object> low = NetworkManagerRef.lowPriorityQueue.get(nm);
+		Collection<Object> high = NetworkManagerRef.highPriorityQueue.get(nm);
 		if (low == null || high == null) {
 			return 0L;
 		}
 		long queuedsize = 0;
-		synchronized (lockObject) {
-			for (Object p : low) {
-				queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
-			}
-			for (Object p : high) {
-				queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
-			}
+		for (Object p : low) {
+			queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
+		}
+		for (Object p : high) {
+			queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
 		}
 		return queuedsize;
 	}

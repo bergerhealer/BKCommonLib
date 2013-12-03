@@ -885,7 +885,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return packet with head rotation information
 	 */
 	public CommonPacket getHeadRotationPacket(int headRotation) {
-		return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntityId(), (byte) headRotation);
+		return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntity(), (byte) headRotation);
 	}
 
 	private int protRot(float rot) {
