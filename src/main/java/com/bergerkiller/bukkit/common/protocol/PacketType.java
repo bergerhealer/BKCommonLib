@@ -129,7 +129,9 @@ public class PacketType extends ClassTemplate<Object> {
 		} else {
 			this.outgoing = false;
 			this.id = -1;
-			CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getType().getSimpleName() + " is not registered!");
+			if (!packetClass.equals(CommonUtil.getNMSClass("Packet"))) {
+				CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getType().getSimpleName() + " is not registered!");
+			}
 		}
 
 		// Obtain the datawatcher Field

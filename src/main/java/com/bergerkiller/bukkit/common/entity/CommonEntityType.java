@@ -187,6 +187,7 @@ public class CommonEntityType {
 		add(EntityType.MINECART_TNT, "MinecartTNT", 80, 2, true);
 		add(EntityType.MINECART_HOPPER, "MinecartHopper", 80, 2, true);
 		add(EntityType.MINECART_MOB_SPAWNER, "MinecartMobSpawner", 80, 2, true);
+		add(EntityType.MINECART_COMMAND, "MinecartCommandBlock", 80, 2, true);
 		add(EntityType.BOAT, "Boat", 80, 2, true);
 
 		// Mobs
