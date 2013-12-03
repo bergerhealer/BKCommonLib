@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -10,6 +12,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
+import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.EnumSkyBlock;
 
@@ -18,11 +21,11 @@ public class ChunkRef {
 	public static final int XZ_MASK = 0xf;
 	public static final int Y_MASK = 0xff;
 	public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("Chunk");
-	public static final FieldAccessor<Integer> x = TEMPLATE.getField("x");
-	public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
+	public static final FieldAccessor<Integer> x = TEMPLATE.getField("locX");
+	public static final FieldAccessor<Integer> z = TEMPLATE.getField("locZ");
 	public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("m");
 	public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("i");
-	public static final FieldAccessor<Boolean> seenByPlayer = TEMPLATE.getField("seenByPlayer");
+	public static final FieldAccessor<Boolean> seenByPlayer = TEMPLATE.getField("q");
 	private static final MethodAccessor<Void> addEntities = TEMPLATE.getMethod("addEntities");
 	private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("a", icp, icp, int.class, int.class);
 	private static final MethodAccessor<Boolean> needsSaving = TEMPLATE.getMethod("a", boolean.class);
@@ -88,15 +91,25 @@ public class ChunkRef {
 		return ((Chunk) chunkHandle).getBrightness(mode, x & XZ_MASK, y, z & XZ_MASK);
 	}
 
+	public static boolean setBlock(Object chunkHandle, int x, int y, int z, Object type, int data) {
+		return ((Chunk) chunkHandle).a(x & XZ_MASK, y, z & XZ_MASK, (Block) type, data);
+	}
+
+	@Deprecated
 	public static boolean setBlock(Object chunkHandle, int x, int y, int z, int typeId, int data) {
-		return ((Chunk) chunkHandle).a(x & XZ_MASK, y, z & XZ_MASK, typeId, data);
+		return setBlock(chunkHandle, x, y, z, CraftMagicNumbers.getBlock(typeId), data);
 	}
 
 	public static int getData(Object chunkHandle, int x, int y, int z) {
 		return ((Chunk) chunkHandle).getData(x & XZ_MASK, y, z & XZ_MASK);
 	}
 
+	public static Object getType(Object chunkHandle, int x, int y, int z) {
+		return ((Chunk) chunkHandle).getType(x & XZ_MASK, y, z & XZ_MASK);
+	}
+
+	@Deprecated
 	public static int getTypeId(Object chunkHandle, int x, int y, int z) {
-		return ((Chunk) chunkHandle).getTypeId(x & XZ_MASK, y, z & XZ_MASK);
+		return CraftMagicNumbers.getId((Block) getType(chunkHandle, x, y, z));
 	}
 }

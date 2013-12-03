@@ -38,7 +38,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
 	 * @return True if Items were sucked in, False if not
 	 */
 	public boolean suckItems() {
-		return getHandle(EntityMinecartHopper.class).aD();
+		return getHandle(EntityMinecartHopper.class).aF();
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
 	 * @return True if sucking items, False if not
 	 */
 	public boolean isSuckingItems() {
-		return getHandle(EntityMinecartHopper.class).u();
+		return getHandle(EntityMinecartHopper.class).v();
 	}
 
 	/**

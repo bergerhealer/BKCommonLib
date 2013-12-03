@@ -36,6 +36,7 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	 * 
 	 * @param allowedTypes to set
 	 */
+	@Deprecated
 	public MaterialTypeProperty(int... allowedTypes) {
 		this.allowedTypes = new Material[allowedTypes.length];
 		for (int i = 0; i < allowedTypes.length; i++) {
@@ -54,8 +55,8 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	}
 
 	@Override
-	public Boolean get(int typeId) {
-		return MaterialUtil.isType(typeId, this.allowedTypes);
+	public Boolean get(Material type) {
+		return MaterialUtil.isType(type, this.allowedTypes);
 	}
 
 	@Override

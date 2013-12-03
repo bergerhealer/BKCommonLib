@@ -114,6 +114,7 @@ public class ConversionTypes {
 	public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = WrapperConverter.toLongHashMap;
 	public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = WrapperConverter.toIntHashMap;
 	// Properties
+	@Deprecated
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
 	public static final PropertyConverter<Byte> toDifficultyId = PropertyConverter.toDifficultyId;

@@ -32,7 +32,6 @@ import net.minecraft.server.GenericAttributes;
 import net.minecraft.server.InventoryEnderChest;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.MobEffect;
-import net.minecraft.server.NBTBase;
 import net.minecraft.server.NBTCompressedStreamTools;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
@@ -175,17 +174,17 @@ public class NBTUtil {
 		ItemStack stack = (ItemStack) HandleConverter.toItemStackHandle.convert(item);
 		stack.save((NBTTagCompound) compound.getHandle());
 	}
-	
+
 	/**
-	 * Sades a tag list to an output
+	 * Saves a tag list to an output
 	 * 
 	 * @param list Tag list
 	 * @param out Output
 	 */
 	public static void saveList(CommonTagList list, DataOutput out) {
-		NBTBase.a((NBTBase) list.getHandle(), out);
+		NBTRef.writeTag(list.getHandle(), out);
 	}
-	
+
 	/**
 	 * Creates an inventory from a tag list
 	 * 
@@ -213,7 +212,7 @@ public class NBTUtil {
 	 * @return Tag list
 	 */
 	public static CommonTagList createList(DataInputStream in) {
-		return new CommonTagList(NBTBase.a(in));
+		return new CommonTagList(NBTRef.readTag(in));
 	}
 
 	/**
@@ -318,7 +317,7 @@ public class NBTUtil {
 	 */
 	public static void loadAttributes(LivingEntity livingEntity, CommonTagList data) {
 		AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
-		GenericAttributes.a(map, (NBTTagList) data.getHandle(), null);
+		GenericAttributes.a(map, (NBTTagList) data.getHandle());
 	}
 
 	/**

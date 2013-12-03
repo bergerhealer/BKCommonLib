@@ -81,8 +81,22 @@ public class WorldUtil extends ChunkUtil {
 	 * @param z - coordinate of the block
 	 * @return block type Id
 	 */
+	@Deprecated
 	public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
 		return CommonNMS.getNative(world).getTypeId(x, y, z);
+	}
+
+	/**
+	 * Gets the block type
+	 * 
+	 * @param world the block is in
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
+	 * @return block type
+	 */
+	public static org.bukkit.Material getBlockType(org.bukkit.World world, int x, int y, int z) {
+		return MaterialUtil.getType(CommonNMS.getNative(world).getTypeId(x, y, z));
 	}
 
 	/**

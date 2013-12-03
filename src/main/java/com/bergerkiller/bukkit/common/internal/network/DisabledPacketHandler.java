@@ -1,0 +1,78 @@
+package com.bergerkiller.bukkit.common.internal.network;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
+
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.PacketHandler;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+
+public class DisabledPacketHandler implements PacketHandler {
+
+	@Override
+	public void removePacketListeners(Plugin plugin) {
+	}
+
+	@Override
+	public void removePacketListener(PacketListener listener) {
+	}
+
+	@Override
+	public void removePacketMonitor(PacketMonitor monitor) {
+	}
+
+	@Override
+	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
+	}
+
+	@Override
+	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, int[] ids) {
+	}
+
+	@Override
+	public void sendPacket(Player player, Object packet, boolean throughListeners) {
+	}
+
+	@Override
+	public void receivePacket(Player player, Object packet) {
+	}
+
+	@Override
+	public Collection<Plugin> getListening(int id) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public void transfer(PacketHandler to) {
+	}
+
+	@Override
+	public String getName() {
+		return "absolutely 'wow it is' NOTHING";
+	}
+
+	@Override
+	public boolean onEnable() {
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Network handler is DISABLED: All packet handling routines are broken!");
+		return true;
+	}
+
+	@Override
+	public boolean onDisable() {
+		return true;
+	}
+
+	@Override
+	public void onPlayerJoin(Player player) {
+	}
+
+	@Override
+	public long getPendingBytes(Player player) {
+		return 0;
+	}
+}

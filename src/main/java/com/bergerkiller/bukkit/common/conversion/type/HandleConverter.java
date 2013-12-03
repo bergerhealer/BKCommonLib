@@ -1,8 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.Block;
 import net.minecraft.server.Entity;
-import net.minecraft.server.Item;
 
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
@@ -11,6 +9,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.inventory.CraftInventory;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -166,12 +165,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toItemHandle = new HandleConverter("Item") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			Integer id = PropertyConverter.toItemId.convert(value);
-			if (id != null) {
-				int idInt = id.intValue();
-				if (LogicUtil.isInBounds(Item.byId, idInt)) {
-					return LogicUtil.fixNull(Item.byId[idInt], def);
-				}
+			org.bukkit.Material material = ConversionTypes.toMaterial.convert(value);
+			if (material != null) {
+				return CraftMagicNumbers.getItem(material);
 			}
 			return def;
 		}
@@ -184,12 +180,9 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toBlockHandle = new HandleConverter("Block") {
 		@Override
 		public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-			Integer id = PropertyConverter.toItemId.convert(value);
-			if (id != null) {
-				int idInt = id.intValue();
-				if (LogicUtil.isInBounds(Block.byId, idInt)) {
-					return LogicUtil.fixNull(Block.byId[idInt], def);
-				}
+			org.bukkit.Material material = ConversionTypes.toMaterial.convert(value);
+			if (material != null) {
+				return CraftMagicNumbers.getBlock(material);
 			}
 			return def;
 		}

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
@@ -35,29 +38,31 @@ public class RecipeUtil {
 		}
 	}
 
+	@Deprecated
 	public static Set<Integer> getFuelItems() {
 		return fuelTimes.keySet();
 	}
 
+	@Deprecated
 	public static Map<Integer, Integer> getFuelTimes() {
 		return fuelTimes;
 	}
 
+	@Deprecated
 	public static int getFuelTime(int itemid) {
-		Integer rval = fuelTimes.get(itemid);
-		return rval == null ? 0 : rval;
+		return getFuelTime(new ItemStack(itemid, 1));
+	}
+
+	public static int getFuelTime(Material material) {
+		return getFuelTime(new ItemStack(material, 1));
 	}
 
 	public static int getFuelTime(org.bukkit.inventory.ItemStack item) {
 		if (item == null) {
 			return 0;
 		} else {
-			return getFuelTime(MaterialUtil.getTypeId(item)) * item.getAmount();
+			return item.getAmount() * TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
 		}
-	}
-
-	public static int getFuelTime(Material material) {
-		return getFuelTime(MaterialUtil.getTypeId(material));
 	}
 
 	public static boolean isFuelItem(int itemid) {
@@ -72,29 +77,40 @@ public class RecipeUtil {
 		return isFuelItem(MaterialUtil.getTypeId(item));
 	}
 
+	@Deprecated
 	public static boolean isHeatableItem(int itemid) {
-		return RecipesFurnace.getInstance().recipes.containsKey(itemid);
+		return getFurnaceResult(itemid) != null;
 	}
 
 	public static boolean isHeatableItem(Material material) {
-		return isFuelItem(MaterialUtil.getTypeId(material));
+		return getFurnaceResult(material) != null;
 	}
 
 	public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
-		return isHeatableItem(MaterialUtil.getTypeId(item));
+		return getFurnaceResult(item) != null;
 	}
 
+	@Deprecated
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
-		return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(itemid));
+		return getFurnaceResult(new ItemStack(itemid, 1));
+	}
+
+	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.Material cookedType) {
+		return getFurnaceResult(new ItemStack(cookedType, 1));
 	}
 
 	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-		return getFurnaceResult(MaterialUtil.getTypeId(cooked));
+		return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(CommonNMS.getNative(cooked)));
 	}
 
-	@SuppressWarnings("unchecked")
+	public static Collection<ItemStack> getHeatableItemStacks() {
+		return ConversionPairs.itemStack.convertAll(RecipesFurnace.getInstance().recipes.keySet());
+	}
+
+	@Deprecated
 	public static Set<Integer> getHeatableItems() {
-		return RecipesFurnace.getInstance().recipes.keySet();
+		return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(),
+				Conversion.toItemStackHandle, Conversion.toItemId);
 	}
 
 	/**

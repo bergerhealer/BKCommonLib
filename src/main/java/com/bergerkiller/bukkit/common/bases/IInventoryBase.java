@@ -66,7 +66,7 @@ public class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public void g() {
+	public void l_() {
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public String getName() {
+	public String getInventoryName() {
 		return getClass().getSimpleName();
 	}
 
@@ -140,7 +140,7 @@ public class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public boolean c() {
+	public boolean k_() {
 		return false;
 	}
 }

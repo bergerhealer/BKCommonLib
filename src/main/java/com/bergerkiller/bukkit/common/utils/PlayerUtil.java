@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.List;
 
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.WorldServer;
 
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -36,13 +37,14 @@ public class PlayerUtil extends EntityUtil {
 	 * @param player to check
 	 * @return True if the player is disconnected, False if not
 	 */
+	@Deprecated //TODO: FIX THIS!
 	public static boolean isDisconnected(Player player) {
 		final Object handle = Conversion.toEntityHandle.convert(player);
 		if (handle == null) {
 			return true;
 		}
 		final Object connection = EntityPlayerRef.playerConnection.get(handle);
-		return connection == null || PlayerConnectionRef.disconnected.get(connection);
+		return connection == null; // || PlayerConnectionRef.disconnected.get(connection);
 	}
 
 	/**
@@ -198,7 +200,7 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
 		final EntityPlayer ep = CommonNMS.getNative(player);
-		return ep.p().getPlayerChunkMap().a(ep, chunkX, chunkZ);
+		return ((WorldServer) ep.world).getPlayerChunkMap().a(ep, chunkX, chunkZ);
 	}
 
 	/**

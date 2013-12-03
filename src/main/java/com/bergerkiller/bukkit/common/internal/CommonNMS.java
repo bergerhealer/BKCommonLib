@@ -10,8 +10,8 @@ import net.minecraft.server.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.inventory.*;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -88,7 +88,7 @@ public class CommonNMS {
 		return inv instanceof CraftInventory ? ((CraftInventory) inv).getInventory() : null;
 	}
 
-	public static EntityItem getNative(Item item) {
+	public static EntityItem getNative(org.bukkit.entity.Item item) {
 		return getNative(item, EntityItem.class);
 	}
 
@@ -144,8 +144,8 @@ public class CommonNMS {
 		return getEntity(entity, Player.class);
 	}
 
-	public static Item getItem(EntityItem entity) {
-		return getEntity(entity, Item.class);
+	public static org.bukkit.entity.Item getItem(EntityItem entity) {
+		return getEntity(entity, org.bukkit.entity.Item.class);
 	}
 
 	public static <T extends org.bukkit.entity.Entity> T getEntity(Entity entity, Class<T> type) {
@@ -193,7 +193,7 @@ public class CommonNMS {
 	}
 
 	public static boolean isValidBlockId(int blockId) {
-		return LogicUtil.isInBounds(Block.byId, blockId) && Block.byId[blockId] != null;
+		return Item.d(blockId) != null || Block.e(blockId) != null;
 	}
 
 	public static List<Entity> getEntities(World world, Entity ignore, 
@@ -214,6 +214,24 @@ public class CommonNMS {
 		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
 	}
 
+	public static Block getBlock(org.bukkit.Material material) {
+		return CraftMagicNumbers.getBlock(material);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static Block getBlock(int id) {
+		return CraftMagicNumbers.getBlock(id);
+	}
+
+	public static Item getItem(org.bukkit.Material material) {
+		return CraftMagicNumbers.getItem(material);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static Item getItem(int id) {
+		return CraftMagicNumbers.getItem(id);
+	}
+	
 	/**
 	 * Gets the native Minecraft Server which contains the main logic
 	 * 

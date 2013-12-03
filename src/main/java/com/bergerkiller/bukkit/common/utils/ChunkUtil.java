@@ -1,13 +1,16 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+
+import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkCoordIntPair;
 import net.minecraft.server.ChunkSection;
 import net.minecraft.server.WorldServer;
+
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.util.LongHash;
@@ -96,8 +99,23 @@ public class ChunkUtil {
 	 * @param z - coordinate of the block
 	 * @return block type Id
 	 */
+	@Deprecated
 	public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {
 		return ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z);
+	}
+
+	/**
+	 * Gets the block type Id
+	 * 
+	 * @param chunk the block is in
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
+	 * @return block type
+	 */
+	@SuppressWarnings("deprecation")
+	public static Material getBlockType(org.bukkit.Chunk chunk, int x, int y, int z) {
+		return MaterialUtil.getType(ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z));
 	}
 
 	/**
@@ -135,17 +153,34 @@ public class ChunkUtil {
 	 * @param data to set to
 	 * @return True if a block got changed, False if not
 	 */
+	@Deprecated
 	public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
+		return setBlock(chunk, x, y, z, MaterialUtil.getType(typeId), data);
+	}
+
+	/**
+	 * Sets a block type id and data, causing physics and lighting updates
+	 * 
+	 * @param chunk the block is in
+	 * @param x - coordinate of the block
+	 * @param y - coordinate of the block
+	 * @param z - coordinate of the block
+	 * @param type to set to
+	 * @param data to set to
+	 * @return True if a block got changed, False if not
+	 */
+	public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, Material type, int data) {
 		boolean result = y >= 0 && y <= chunk.getWorld().getMaxHeight();
 		WorldServer world = CommonNMS.getNative(chunk.getWorld());
+		Block typeBlock = CommonNMS.getBlock(type);
 		if (result) {
-			result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, typeId, data);
+			result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, typeBlock, data);
             world.methodProfiler.a("checkLight");
             world.z(x, y, z);
             world.methodProfiler.b();
 		}
 		if (result) {
-			world.applyPhysics(x, y, z, typeId);
+			world.applyPhysics(x, y, z, typeBlock);
 		}
 		return result;
 	}
@@ -213,8 +248,14 @@ public class ChunkUtil {
 	 * @param world to get the loaded chunks from
 	 * @return Loaded chunks
 	 */
-	@SuppressWarnings("rawtypes")
 	public static Collection<org.bukkit.Chunk> getChunks(World world) {
+		Object cps = CommonNMS.getNative(world).chunkProviderServer;
+		List<Object> rawChunkList = ChunkProviderServerRef.chunkList.get(cps);
+		Collection<org.bukkit.Chunk> chunkList = CommonNMS.getChunks(rawChunkList);
+		return FilteredCollection.createNullFilter(chunkList);
+
+		/* Old implementation that hooked into the hashmap raw entries
+
 		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
 			if (chunks != null) {
@@ -231,6 +272,8 @@ public class ChunkUtil {
 		}
 		// Bukkit alternative
 		return FilteredCollection.createNullFilter(Arrays.asList(world.getLoadedChunks()));
+		
+		*/
 	}
 
 	/**
@@ -292,15 +335,26 @@ public class ChunkUtil {
 			throw new RuntimeException("Can not put a chunk that has no BukkitChunk");
 		}
 		if (canUseLongObjectHashMap) {
-			Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
-			if (chunks != null) {
+			Object cps = CommonNMS.getNative(world).chunkProviderServer;
+			Object chunks = ChunkProviderServerRef.chunks.get(cps);
+			List<Object> chunkList = ChunkProviderServerRef.chunkList.get(cps);
+			if (chunks != null && chunkList != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
 					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
 						if (handle == null) {
-							((LongObjectHashMap) chunks).remove(key);
+							// Remove the chunk
+							Object removed = ((LongObjectHashMap) chunks).remove(key);
+							if (removed != null) {
+								chunkList.remove(removed);
+							}
 						} else {
-							((LongObjectHashMap) chunks).put(key, handle);
+							// Add the chunk
+							Object oldChunk = ((LongObjectHashMap) chunks).put(key, handle);
+							if (oldChunk != null) {
+								chunkList.remove(oldChunk);
+							}
+							chunkList.add(handle);
 						}
 						return;
 					}

@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 public class EntityTrackerRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityTracker");
-	public static final FieldAccessor<Set<Object>> trackerSet = TEMPLATE.getField("b");
+	public static final FieldAccessor<Set<Object>> trackerSet = TEMPLATE.getField("c");
 	public static final FieldAccessor<IntHashMap<Object>> trackedEntities = TEMPLATE.getField("trackedEntities").translate(ConversionPairs.intHashMap);
 	private static final MethodAccessor<Void> spawnEntities = TEMPLATE.getMethod("a", EntityPlayerRef.TEMPLATE.getType(), ChunkRef.TEMPLATE.getType());
 	private static final MethodAccessor<Void> track = TEMPLATE.getMethod("track", EntityRef.TEMPLATE.getType());

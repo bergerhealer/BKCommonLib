@@ -22,7 +22,7 @@ public class DummyWorldServer extends WorldServer {
 	 */
 	@Deprecated
 	protected DummyWorldServer() {
-		super(constrFail(), null, null, 12, null, null, null, null, null);
+		super(constrFail(), null, null, 12, null, null, null, null);
 	}
 
 	private static final MinecraftServer constrFail() {

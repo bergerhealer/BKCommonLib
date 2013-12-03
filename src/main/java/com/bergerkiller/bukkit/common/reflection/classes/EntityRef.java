@@ -9,6 +9,7 @@ import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
@@ -20,13 +21,15 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class EntityRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("Entity");
+	
+	/* Fields */
 	public static final FieldAccessor<org.bukkit.entity.Entity> bukkitEntity = TEMPLATE.getField("bukkitEntity");
-	public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("aj");
-	public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("ak");
-	public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("al");
-	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("an");
+	public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("ai");
+	public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("aj");
+	public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("ak");
+	public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("al");
 	public static final FieldAccessor<Boolean> velocityChanged = TEMPLATE.getField("velocityChanged");
-	public static final FieldAccessor<Boolean> justLanded = TEMPLATE.getField("K");
+	public static final FieldAccessor<Boolean> justLanded = TEMPLATE.getField("J");
 	public static final FieldAccessor<Double> locX = TEMPLATE.getField("locX");
 	public static final FieldAccessor<Double> locY = TEMPLATE.getField("locY");
 	public static final FieldAccessor<Double> locZ = TEMPLATE.getField("locZ");
@@ -36,20 +39,24 @@ public class EntityRef {
 	public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
 	public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
 	public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
-	public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("c");
-	public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("p"); //Note: Not sure if the name is correct!
-	public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ai");
-	public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("ap");
+	public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("d");
+	public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("o"); //Note: Not sure if the name is correct!
+	public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ah");
+	public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("ao");
+
+	/* Methods */
 	private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class);
-	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("D");
-	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
-	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("e_");
+	private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("I");
+	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, BlockRef.TEMPLATE.getType());
+	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("g_");
 	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
 	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
-	private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("I");
-	private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("H");
-	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
+	private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("N");
+	private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("M");
+	public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("H");
 
+	/* External */
+	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
 	private static final ClassTemplate<?> CRAFT_TEMPLATE = CBClassTemplate.create("entity.CraftEntity");
 	private static final MethodAccessor<Entity> getCraftEntity = CRAFT_TEMPLATE.getMethod("getEntity", CraftServerRef.TEMPLATE.getType(), TEMPLATE.getType());
 
@@ -73,8 +80,13 @@ public class EntityRef {
 		updateBlockCollision.invoke(entityHandle);
 	}
 
+	@Deprecated
 	public static void playStepSound(Object entityHandle, int x, int y, int z, int typeId) {
-		playStepSound.invoke(entityHandle, x, y, z, typeId);
+		playStepSound(entityHandle, x, y, z, CommonNMS.getBlock(typeId));
+	}
+
+	public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {
+		playStepSound.invoke(entityHandle, x, y, z, blockStepped);
 	}
 
 	public static boolean hasMovementSound(Object entityHandle) {

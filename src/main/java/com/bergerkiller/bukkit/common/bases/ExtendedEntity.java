@@ -15,6 +15,7 @@ import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftSound;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -34,7 +35,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketFields;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -358,9 +358,14 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	}
 
 	public void makeStepSound(org.bukkit.block.Block block) {
-		makeStepSound(block.getX(), block.getY(), block.getZ(), MaterialUtil.getTypeId(block));
+		makeStepSound(block.getX(), block.getY(), block.getZ(), block.getType());
 	}
 
+	public void makeStepSound(int blockX, int blockY, int blockZ, Material type) {
+		EntityRef.playStepSound(getHandle(), blockX, blockY, blockZ, CommonNMS.getBlock(type));
+	}
+
+	@Deprecated
 	public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
 		if (CommonNMS.isValidBlockId(typeId)) {
 			EntityRef.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
@@ -726,7 +731,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return the dropped Item
 	 */
 	public Item spawnItemDrop(Material material, int amount, float force) {
-		return CommonNMS.getItem(getHandle(Entity.class).a(MaterialUtil.getTypeId(material), amount, force));
+		return CommonNMS.getItem(getHandle(Entity.class).a(CraftMagicNumbers.getItem(material), amount, force));
 	}
 
 	/**

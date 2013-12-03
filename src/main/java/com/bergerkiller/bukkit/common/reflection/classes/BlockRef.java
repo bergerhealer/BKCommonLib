@@ -1,24 +1,43 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+
+import net.minecraft.server.Block;
 import net.minecraft.server.Explosion;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
 
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 public class BlockRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("Block");
-	public static final Object[] byId = TEMPLATE.getStaticFieldValue("byId");
-	public static final FieldAccessor<Integer> id = TEMPLATE.getField("id");
+	public static final FieldAccessor<String> name = TEMPLATE.getField("d");
 	public static final MethodAccessor<Void> dropNaturally = TEMPLATE.getMethod("dropNaturally", WorldRef.TEMPLATE.getType(), int.class, int.class, int.class, int.class, float.class, int.class);
 	public static final MethodAccessor<Void> ignite = TEMPLATE.getMethod("wasExploded", WorldRef.TEMPLATE.getType(), int.class, int.class, int.class, Explosion.class);
-	public static final MethodAccessor<Boolean> isSolid = TEMPLATE.getMethod("c");
-	public static final MethodAccessor<Boolean> isPowerSource = TEMPLATE.getMethod("isPowerSource");
 
+	@Deprecated
+	public static final FieldAccessor<Integer> id = new SafeDirectField<Integer>() {
+		@Override
+		public Integer get(Object instance) {
+			return getBlockId(instance);
+		}
+
+		@Override
+		public boolean set(Object instance, Integer value) {
+			return false;
+		}
+	};
+
+	@Deprecated
+	public static int getBlockId(Object instance) {
+		return CraftMagicNumbers.getId((Block) instance);
+	}
+
+	@Deprecated
 	public static Object getBlock(int id) {
-		return LogicUtil.getArray(byId, id, null);
+		return CraftMagicNumbers.getBlock(id);
 	}
 }

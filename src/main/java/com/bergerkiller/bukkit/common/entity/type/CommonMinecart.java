@@ -70,11 +70,11 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public void setShakingDirection(int direction) {
-		getHandle(EntityMinecartAbstract.class).h(direction); 
+		getHandle(EntityMinecartAbstract.class).j(direction); 
 	}
 
 	public int getShakingDirection() {
-		return getHandle(EntityMinecartAbstract.class).k();
+		return getHandle(EntityMinecartAbstract.class).l();
 	}
 
 	public void setShakingFactor(int factor) {
@@ -82,7 +82,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public int getShakingFactor() {
-		return getHandle(EntityMinecartAbstract.class).j();
+		return getHandle(EntityMinecartAbstract.class).getType();
 	}
 
 	/**
@@ -128,21 +128,24 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	/**
+	 * Gets the block type id for this Minecart
+	 * 
+	 * @return block type id
+	 */
+	@Deprecated
+	public int getBlockId() {
+		Material mat = getBlockType();
+		return mat == null ? 0 : mat.getId();
+	}
+
+	/**
 	 * Gets the block type for this Minecart
 	 * 
 	 * @return block type
 	 */
 	public Material getBlockType() {
-		return MaterialUtil.getType(getBlockId());
-	}
-
-	/**
-	 * Gets the block type id for this Minecart
-	 * 
-	 * @return block type id
-	 */
-	public int getBlockId() {
-		return getHandle(EntityMinecartAbstract.class).getDataWatcher().getInt(20) & '\uffff';
+		int value = getHandle(EntityMinecartAbstract.class).getDataWatcher().getInt(20) & '\uffff';
+		return MaterialUtil.getType(value);
 	}
 
 	/**
@@ -151,7 +154,28 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 * @return block data
 	 */
 	public int getBlockData() {
-		return getHandle(EntityMinecartAbstract.class).o();
+		return getHandle(EntityMinecartAbstract.class).p();
+	}
+
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockId of the Block
+	 */
+	@Deprecated
+	public void setBlock(int blockId) {
+		setBlock(blockId, 0);
+	}
+
+	/**
+	 * Sets the Block displayed in this Minecart
+	 * 
+	 * @param blockId of the Block
+	 * @param blockData of the Block
+	 */
+	@Deprecated
+	public void setBlock(int blockId, int blockData) {
+		setBlock(Material.getMaterial(blockId), blockData);
 	}
 
 	/**
@@ -166,31 +190,12 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	/**
 	 * Sets the Block displayed in this Minecart
 	 * 
-	 * @param blockId of the Block
-	 */
-	public void setBlock(int blockId) {
-		setBlock(blockId, 0);
-	}
-
-	/**
-	 * Sets the Block displayed in this Minecart
-	 * 
 	 * @param blockType of the Block
 	 * @param blockData of the Block
 	 */
 	public void setBlock(Material blockType, int blockData) {
-		setBlock(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), blockData);
-	}
-
-	/**
-	 * Sets the Block displayed in this Minecart
-	 * 
-	 * @param blockId of the Block
-	 * @param blockData of the Block
-	 */
-	public void setBlock(int blockId, int blockData) {
 		EntityMinecartAbstract handle = getHandle(EntityMinecartAbstract.class);
-		handle.i(MathUtil.clamp(blockId, 0, Short.MAX_VALUE));
+		handle.i(MathUtil.clamp(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), 0, Short.MAX_VALUE));
 		handle.j(MathUtil.clamp(blockData, 0, Short.MAX_VALUE));
 	}
 

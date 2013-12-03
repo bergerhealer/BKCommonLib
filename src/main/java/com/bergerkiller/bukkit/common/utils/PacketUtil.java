@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import net.minecraft.server.Packet;
@@ -22,7 +23,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 
 public class PacketUtil {
-	private static final Map<Class<?>, Integer> packetsToIds = PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
+	private static final Map<Class<?>, Integer> packetsToIds = Collections.emptyMap(); //PacketFields.DEFAULT.<Map<Class<?>, Integer>>getField("a").get(null);
 
 	public static Collection<Class<?>> getPacketClasses() {
 		return packetsToIds.keySet();

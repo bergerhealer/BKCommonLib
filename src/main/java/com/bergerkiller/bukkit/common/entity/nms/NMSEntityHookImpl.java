@@ -39,7 +39,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public void l_() {
+	public void h() {
 		controller.onTick();
 	}
 
@@ -70,7 +70,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public String getLocalizedName() {
+	public String getName() {
 		return controller.getLocalizedName();
 	}
 
@@ -127,8 +127,8 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public void super_l_() {
-		controller.getEntity().getHandle(NMSEntityHook.class).super_l_();
+	public void super_h() {
+		controller.getEntity().getHandle(NMSEntityHook.class).super_h();
 	}
 
 	@Override
@@ -157,8 +157,8 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public String super_getLocalizedName() {
-		return controller.getEntity().getHandle(NMSEntityHook.class).super_getLocalizedName();
+	public String super_getName() {
+		return controller.getEntity().getHandle(NMSEntityHook.class).super_getName();
 	}
 
 	@Override

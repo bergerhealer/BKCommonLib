@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Locale;
 
+import net.minecraft.server.CommandBlockListenerAbstract;
 import net.minecraft.server.TileEntitySkull;
 
 import org.bukkit.Chunk;
@@ -67,15 +68,15 @@ public class BlockStateRef {
 			}
 		});
 		registerInst(new TileInstantiator("Command", "CommandBlock", "commandBlock") {
+			private final FieldAccessor<CommandBlockListenerAbstract> listener = TILE.getField("a");
 			private final FieldAccessor<String> state_command = STATE.getField("command");
-			private final FieldAccessor<String> tile_command = TILE.getField("b");
 			private final FieldAccessor<String> state_name = STATE.getField("name");
-			private final MethodAccessor<String> tile_getName = TILE.getMethod("getName");
 
 			@Override
 			protected void apply(BlockState state, Object tile) {
-				state_command.set(state, tile_command.get(tile));
-				state_name.set(state, tile_getName.invoke(tile));
+				CommandBlockListenerAbstract list = listener.get(tile);
+				state_command.set(state, list.e);
+				state_name.set(state, list.getName());
 			}
 		});
 		registerInst(new TileInstantiator("Furnace"));

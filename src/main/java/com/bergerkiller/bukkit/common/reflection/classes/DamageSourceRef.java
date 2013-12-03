@@ -73,6 +73,6 @@ public class DamageSourceRef {
 	}
 
 	public static boolean isFireDamage(Object damageSource) {
-		return ((DamageSource) damageSource).m();
+		return ((DamageSource) damageSource).o();
 	}
 }

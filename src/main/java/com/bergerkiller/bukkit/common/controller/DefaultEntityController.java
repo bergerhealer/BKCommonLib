@@ -34,7 +34,7 @@ public final class DefaultEntityController extends EntityController {
 		if (handle instanceof NMSEntityHook) {
 			super.onTick();
 		} else {
-			((Entity) handle).l_();
+			((Entity) handle).h();
 		}
 	}
 
@@ -72,7 +72,7 @@ public final class DefaultEntityController extends EntityController {
 		if (handle instanceof NMSEntityHook) {
 			return super.getLocalizedName();
 		} else {
-			return ((Entity) handle).getLocalizedName();
+			return ((Entity) handle).getName();
 		}
 	}
 	

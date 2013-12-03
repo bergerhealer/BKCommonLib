@@ -18,19 +18,23 @@ import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 public class EntityTrackerEntryRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityTrackerEntry");
 	public static final TranslatorFieldAccessor<Entity> tracker = TEMPLATE.getField("tracker").translate(ConversionPairs.entity);
-	public static final TranslatorFieldAccessor<Entity> vehicle = TEMPLATE.getField("v").translate(ConversionPairs.entity);
-	public static final FieldAccessor<Boolean> synched = TEMPLATE.getField("s");
+	public static final TranslatorFieldAccessor<Entity> vehicle = TEMPLATE.getField("w").translate(ConversionPairs.entity);
+	public static final FieldAccessor<Boolean> synched = TEMPLATE.getField("isMoving");
 	public static final FieldAccessor<Double> prevX = TEMPLATE.getField("p");
 	public static final FieldAccessor<Double> prevY = TEMPLATE.getField("q");
 	public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("r");
 	public static final FieldAccessor<Integer> viewDistance = TEMPLATE.getField("b");
 	public static final FieldAccessor<Integer> updateInterval = TEMPLATE.getField("c");
-	public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("u");
-	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("isMoving");
+	public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("v");
+	public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("u");
 	public static final TranslatorFieldAccessor<Set<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerSet);
 	private static final MethodAccessor<Object> getSpawnPacket = TEMPLATE.getMethod("c");
 	private static final MethodAccessor<Void> scanPlayers = TEMPLATE.getMethod("scanPlayers", List.class);
 	private static final MethodAccessor<Void> updatePlayer = TEMPLATE.getMethod("updatePlayer", EntityPlayerRef.TEMPLATE.getType());
+
+	/*
+	 * Note: isMoving is wrongly deobfuscated by CraftBukkit team!
+	 */
 
 	public static CommonPacket getSpawnPacket(Object instance) {
 		return Conversion.toCommonPacket.convert(getSpawnPacket.invoke(instance));

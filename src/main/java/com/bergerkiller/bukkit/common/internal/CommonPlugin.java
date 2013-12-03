@@ -34,9 +34,8 @@ import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
+import com.bergerkiller.bukkit.common.internal.network.DisabledPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
-import com.bergerkiller.bukkit.common.internal.network.SpigotPacketHandler;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -246,10 +245,12 @@ public class CommonPlugin extends PluginBase {
 			final Class<? extends PacketHandler> handlerClass;
 			if (CommonUtil.isPluginEnabled("ProtocolLib")) {
 				handlerClass = ProtocolLibPacketHandler.class;
-			} else if (CommonUtil.getClass("org.spigotmc.netty.NettyServerConnection") != null) {
-				handlerClass = SpigotPacketHandler.class;
+//			} else if (CommonUtil.getClass("org.spigotmc.netty.NettyServerConnection") != null) {
+//				handlerClass = SpigotPacketHandler.class;
+//			} else {
+//				handlerClass = CommonPacketHandler.class;
 			} else {
-				handlerClass = CommonPacketHandler.class;
+				handlerClass = DisabledPacketHandler.class;
 			}
 			// Register the packet handler
 			if (this.packetHandler != null && this.packetHandler.getClass() == handlerClass) {

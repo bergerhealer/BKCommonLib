@@ -22,11 +22,11 @@ public class Common {
 	 * <b>Use getVersion() instead if you want the actual, current version!
 	 * Constants get inlined when compiling!</b>
 	 */
-	public static final int VERSION = 156;
+	public static final int VERSION = 157;
 	/**
 	 * The Minecraft package path version BKCommonLib is built against
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_6_R3";
+	public static final String DEPENDENT_MC_VERSION = "v1_7_R1";
 	/**
 	 * Defines the Minecraft version that runs on the server.
 	 */
@@ -58,10 +58,6 @@ public class Common {
 	 * Whether BKCommonLib is compatible with the server it is currently running on
 	 */
 	public static final boolean IS_COMPATIBLE;
-	/**
-	 * Whether the server is running a 1.7 protocol on this 1.6.4 server
-	 */
-	public static final boolean IS_1_7_PROTOCOL;
 
 	static {
 		// Find out what server software we are running on
@@ -92,7 +88,6 @@ public class Common {
 		IS_COMPATIBLE = SERVER.isCompatible();
 		IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
 		MC_VERSION = SERVER.getMinecraftVersion();
-		IS_1_7_PROTOCOL = MC_VERSION.startsWith("1.7");
 	}
 
 	/**

@@ -268,20 +268,21 @@ public class BlockUtil extends MaterialUtil {
 	 * Performs Physics at the block specified
 	 * 
 	 * @param block to apply physics to
-	 * @param callertype Material, the source of these physics (use Air if there is no caller)
+	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
 	 */
-	public static void applyPhysics(org.bukkit.block.Block block, Material callertype) {
-		applyPhysics(block, getTypeId(callertype));
+	@Deprecated
+	public static void applyPhysics(org.bukkit.block.Block block, int callertypeid) {
+		applyPhysics(block, getType(callertypeid));
 	}
 
 	/**
 	 * Performs Physics at the block specified
 	 * 
 	 * @param block to apply physics to
-	 * @param callertypeid of the Material, the source of these physics (use 0 if there is no caller)
+	 * @param callerType Material, the source of these physics (use Air if there is no caller)
 	 */
-	public static void applyPhysics(org.bukkit.block.Block block, int callertypeid) {
-		CommonNMS.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), callertypeid);
+	public static void applyPhysics(org.bukkit.block.Block block, Material callerType) {
+		CommonNMS.getNative(block.getWorld()).applyPhysics(block.getX(), block.getY(), block.getZ(), CommonNMS.getBlock(callerType));
 	}
 
 	/**

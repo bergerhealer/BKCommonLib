@@ -47,7 +47,7 @@ class EntityControllerCollisionHelper {
 			for (z = zmin; z < zmax; ++z) {
 				if (handle.world.isLoaded(x, 64, z)) {
 					for (y = ymin - 1; y < ymax; ++y) {
-						Block block = Block.byId[handle.world.getTypeId(x, y, z)];
+						Block block = handle.world.getType(x, y, z);
 						if (block != null) {
 							block.a(handle.world, x, y, z, bounds, collisionBuffer, handle);
 						}

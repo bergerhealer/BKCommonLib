@@ -11,7 +11,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 import net.minecraft.server.*;
 
@@ -24,51 +23,43 @@ import net.minecraft.server.*;
 public abstract class PropertyConverter<T> extends BasicConverter<T> {
 	private static final BlockFace[] paintingFaces = {BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST};
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
 		@Override
 		public Integer convertSpecial(Object value, Class<?> valueType, Integer def) {
-			if (value instanceof Material) {
-				return ((Material) value).getId();
-			} else if (value instanceof Block) {
-				return ((Block) value).id;
-			} else if (value instanceof org.bukkit.block.Block) {
-				return ((org.bukkit.block.Block) value).getTypeId();
-			} else if (value instanceof Item) {
-				return ((Item) value).id;
-			} else if (value instanceof ItemStack) {
-				return ((ItemStack) value).id;
-			} else if (value instanceof EntityItem) {
-				return ((EntityItem) value).getItemStack().id;
-			} else if (value instanceof org.bukkit.entity.Item) {
-				return ((org.bukkit.entity.Item) value).getItemStack().getTypeId();
-			} else if (value instanceof org.bukkit.inventory.ItemStack) {
-				return ((org.bukkit.inventory.ItemStack) value).getTypeId();
-			} else if (value instanceof Number) {
-				return NumberConverter.toInt.convert((Number) value);
+			Material mat = toItemMaterial.convert(value);
+			if (mat == null) {
+				return def;
 			} else {
-				// Get id by name
-				Material mat = ParseUtil.parseMaterial(value.toString(), null);
-				if (mat != null) {
-					return mat.getId();
-				} else {
-					return def;
-				}
+				return mat.getId();
 			}
 		}
 	};
+
 	@SuppressWarnings("deprecation")
 	public static final PropertyConverter<Material> toItemMaterial = new PropertyConverter<Material>(Material.class) {
 		@Override
 		public Material convertSpecial(Object value, Class<?> valueType, Material def) {
-			Integer id = toItemId.convert(value);
-			if (id != null) {
-				Material mat = Material.getMaterial(id.intValue());
-				if (mat != null) {
-					return mat;
-				}
+			// First convert to a material directly
+			Material mat = ConversionTypes.toMaterial.convert(value);
+			if (mat != null) {
+				return mat;
 			}
-			return def;
+
+			// Ask additional getters
+			if (value instanceof org.bukkit.block.Block) {
+				return ((org.bukkit.block.Block) value).getType();
+			} else if (value instanceof ItemStack) {
+				return Material.getMaterial(((ItemStack) value).c);
+			} else if (value instanceof EntityItem) {
+				return Material.getMaterial(((EntityItem) value).getItemStack().c);
+			} else if (value instanceof org.bukkit.entity.Item) {
+				return ((org.bukkit.entity.Item) value).getItemStack().getType();
+			} else if (value instanceof org.bukkit.inventory.ItemStack) {
+				return ((org.bukkit.inventory.ItemStack) value).getType();
+			} else {
+				return def;
+			}
 		}
 	};
 	@SuppressWarnings("deprecation")

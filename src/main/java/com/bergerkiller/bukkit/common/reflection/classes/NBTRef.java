@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.Collection;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
@@ -26,4 +28,21 @@ public class NBTRef {
 	public static final MethodAccessor<Object> nbtCompoundGet = NBTTagCompound.getMethod("get", String.class);
 	public static final MethodAccessor<Boolean> nbtCompoundContains = NBTTagCompound.getMethod("hasKey", String.class);
 	public static final MethodAccessor<Boolean> nbtCompoundIsEmpty = NBTTagCompound.getMethod("isEmpty");
+
+	/* External */
+	private static final ClassTemplate<?> COMPR_TEMP = new NMSClassTemplate("NBTCompressedStreamTools");
+	private static final MethodAccessor<Void> writeTag = COMPR_TEMP.getMethod("a", NBTBase.getType(), DataOutput.class);
+	private static final MethodAccessor<Object> readTag = COMPR_TEMP.getMethod("a", DataInput.class, int.class);
+
+	public static void writeTag(Object nbtBaseInstance, DataOutput outputStream) {
+		writeTag.invoke(null, nbtBaseInstance, outputStream);
+	}
+
+	public static Object readTag(DataInput inputStream) {
+		return readTag(inputStream, 0);
+	}
+
+	public static Object readTag(DataInput inputStream, int param) {
+		return readTag.invoke(null, inputStream, param);
+	}
 }

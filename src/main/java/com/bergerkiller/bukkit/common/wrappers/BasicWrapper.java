@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
 /**
  * A basic implementation for a wrapper class
  */
@@ -26,6 +28,17 @@ public class BasicWrapper {
 	 */
 	public Object getHandle() {
 		return handle;
+	}
+
+	/**
+	 * Gets the internal handle from this wrapper and casts it to the type specified.
+	 * If no handle is contained or the conversion failed, NULL is returned instead.
+	 * 
+	 * @param type to cast to
+	 * @return the handle cast to the type, or NULL if no handle or casting fails
+	 */
+	public <T> T getHandle(Class<T> type) {
+		return CommonUtil.tryCast(handle, type);
 	}
 
 	@Override

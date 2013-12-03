@@ -29,12 +29,12 @@ public interface NMSEntityHook {
 	/**
 	 * onTick super
 	 */
-	public void super_l_();
+	public void super_h();
 
 	/**
 	 * onTick
 	 */
-	public void l_();
+	public void h();
 
 	/**
 	 * Damage Entity super
@@ -89,12 +89,12 @@ public interface NMSEntityHook {
 	/**
 	 * getLocalizedName super
 	 */
-	public String super_getLocalizedName();
+	public String super_getName();
 
 	/**
 	 * getLocalizedName
 	 */
-	public String getLocalizedName();
+	public String getName();
 
 	/**
 	 * onSave

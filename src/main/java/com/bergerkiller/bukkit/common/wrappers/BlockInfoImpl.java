@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import org.bukkit.entity.Entity;
+
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
@@ -13,36 +15,39 @@ import net.minecraft.server.World;
  * Override all methods here and perform block-specific logic instead.
  */
 class BlockInfoImpl extends BlockInfo {
-	private int id;
-	
+
 	public BlockInfoImpl(Object handle) {
 		setHandle(handle);
 	}
 
 	@Override
-	protected void setHandle(Object handle) {
-		super.setHandle(handle);
-		id = BlockRef.id.get(handle);
-	}
-	
-	@Override
 	public int getOpacity() {
-		return Block.lightBlock[id];
+		return getHandle(Block.class).k();
 	}
 
 	@Override
 	public int getLightEmission() {
-		return Block.lightEmission[id];
+		return getHandle(Block.class).m();
 	}
 
 	@Override
 	public boolean isSolid() {
-		return BlockRef.isSolid.invoke(handle);
+		return getHandle(Block.class).d();
 	}
 
 	@Override
 	public boolean isPowerSource() {
-		return BlockRef.isPowerSource.invoke(handle);
+		return getHandle(Block.class).isPowerSource();
+	}
+
+	@Override
+	public boolean isSuffocating() {
+		return getHandle(Block.class).r();
+	}
+
+	@Override
+	public float getDamageResilience(Entity source)  {
+		return getHandle(Block.class).a(CommonNMS.getNative(source));
 	}
 
 	@Override

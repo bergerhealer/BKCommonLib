@@ -2,20 +2,19 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.HashMap;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
-
-import net.minecraft.server.EntityTypes;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 @SuppressWarnings("rawtypes")
 public class EntityTypesRef {
-	private static final MethodAccessor<Void> register = new SafeMethod<Void>(EntityTypes.class, "a", Class.class, String.class, int.class);
-	public static final HashMap<String, Class> namesToClass = SafeField.get(EntityTypes.class, "b");
-	public static final HashMap<Class, String> classToNames = SafeField.get(EntityTypes.class, "c");
-	public static final HashMap<Integer, Class> idToClass = SafeField.get(EntityTypes.class, "d");
-	public static final HashMap<Class, Integer> classToId = SafeField.get(EntityTypes.class, "e");
-	public static final HashMap<String, Integer> namesToId = SafeField.get(EntityTypes.class, "f");
+	private static final ClassTemplate<?> TEMPLATE = new NMSClassTemplate("EntityTypes");
+	private static final MethodAccessor<Void> register =TEMPLATE.getMethod("a", Class.class, String.class, int.class);
+	public static final HashMap<String, Class> namesToClass = TEMPLATE.getStaticFieldValue("c");
+	public static final HashMap<Class, String> classToNames = TEMPLATE.getStaticFieldValue("d");
+	public static final HashMap<Integer, Class> idToClass = TEMPLATE.getStaticFieldValue("e");
+	public static final HashMap<Class, Integer> classToId = TEMPLATE.getStaticFieldValue("f");
+	public static final HashMap<String, Integer> namesToId = TEMPLATE.getStaticFieldValue("g");
 
 	/**
 	 * Registers a new entity

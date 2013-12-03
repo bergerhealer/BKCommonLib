@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
@@ -486,7 +487,18 @@ public class ItemUtil {
 	 * @return max stacking size
 	 */
 	public static int getMaxSize(int itemId, int def) {
-		Item item = LogicUtil.getArray(Item.byId, itemId, null);
+		return getMaxSize(MaterialUtil.getType(itemId), def);
+	}
+
+	/**
+	 * Gets the max stacking size for a given item
+	 * 
+	 * @param itemType of the item
+	 * @param def to return for invalid items
+	 * @return max stacking size
+	 */
+	public static int getMaxSize(Material itemType, int def) {
+		Item item = CommonNMS.getItem(itemType);
 		return item == null ? def : item.getMaxStackSize();
 	}
 

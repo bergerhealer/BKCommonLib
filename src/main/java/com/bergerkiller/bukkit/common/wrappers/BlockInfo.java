@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
@@ -19,8 +20,12 @@ public class BlockInfo extends BasicWrapper {
 	private static final BlockInfo[] blocks = new BlockInfo[4096];
 	static {
 		Arrays.fill(blocks, NONE);
+		//TODO: Better way of finding all Block constants in the registry
 		for (int i = 0; i < blocks.length; i++) {
+
+			@SuppressWarnings("deprecation")
 			Object handle = BlockRef.getBlock(i);
+
 			if (handle != null) {
 				blocks[i] = new BlockInfoImpl(handle);
 			}
@@ -61,6 +66,15 @@ public class BlockInfo extends BasicWrapper {
 	}
 
 	/**
+	 * Gets whether this Block material causes suffocation to entities entering it
+	 * 
+	 * @return True if suffocating, False if not
+	 */
+	public boolean isSuffocating() {
+		return false;
+	}
+
+	/**
 	 * Gets whether the block is a Redstone power source
 	 * 
 	 * @return True if it is a power source, False if not
@@ -94,6 +108,16 @@ public class BlockInfo extends BasicWrapper {
 	 */
 	public int getLightEmission() {
 		return 0;
+	}
+
+	/**
+	 * Gets the damage resilience of a block to damage dealt by a certain entity
+	 * 
+	 * @param source of the damage
+	 * @return resilience
+	 */
+	public float getDamageResilience(Entity source) {
+		return 0.0f;
 	}
 
 	/**

@@ -110,6 +110,14 @@ public enum PacketType {
 
 	private PacketType(int id) {
 		this.id = id;
+		if (true) {
+			this.template = null;
+			this.fieldNames = new String[0];
+			this.dataWatcherField = null;
+			this.packetFields = null;
+			return;
+		}
+		
 		final Class<?> type = (Class<?>) PacketFields.DEFAULT.getStaticFieldValue("l", Conversion.toIntHashMap).get(id);
 		// Check for null types (we call those unknown)
 		if (type == null) {

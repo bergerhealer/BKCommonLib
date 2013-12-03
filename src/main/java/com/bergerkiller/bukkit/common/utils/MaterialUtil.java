@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.Block;
 import net.minecraft.server.Item;
 
 import org.bukkit.Material;
@@ -15,7 +14,7 @@ import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
+import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
 
 /**
  * Contains material properties and helper functions
@@ -202,9 +201,9 @@ public class MaterialUtil {
 	 * @param source of the damage
 	 * @return resilience
 	 */
+	@Deprecated
 	public static float getDamageResilience(int blockId, Entity source) {
-		Block block = (Block) BlockRef.getBlock(blockId);
-		return block == null ? 0.0f : block.a(CommonNMS.getNative(source));
+		return BlockInfo.get(blockId).getDamageResilience(source);
 	}
 
 	/**
@@ -308,8 +307,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			return Block.l(typeId);
+		public Boolean get(Material type) {
+			return BlockInfo.get(type).isSuffocating();
 		}
 	};
 
@@ -318,8 +317,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> ISHEATABLE = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			return RecipeUtil.isHeatableItem(typeId);
+		public Boolean get(Material type) {
+			return RecipeUtil.isHeatableItem(type);
 		}
 	};
 
@@ -328,8 +327,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> ISFUEL = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			return RecipeUtil.isFuelItem(typeId);
+		public Boolean get(Material type) {
+			return RecipeUtil.isFuelItem(type);
 		}
 	};
 
@@ -338,8 +337,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			return Block.t[typeId];
+		public Boolean get(Material type) {
+			return BlockInfo.get(type).isSolid();
 		}
 	};
 
@@ -348,9 +347,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			final Block block = Block.byId[typeId];
-			return block == null ? false : block.isPowerSource();
+		public Boolean get(Material type) {
+			return BlockInfo.get(type).isPowerSource();
 		}
 	};
 
@@ -359,8 +357,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Boolean> HASDATA = new MaterialBooleanProperty() {
 		@Override
-		public Boolean get(int typeId) {
-			final Item item = LogicUtil.getArray(Item.byId, typeId, null);
+		public Boolean get(Material type) {
+			final Item item = CommonNMS.getItem(type);
 			return item == null ? false : item.n();
 		}
 	};
@@ -370,8 +368,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Integer> EMISSION = new MaterialProperty<Integer>() {
 		@Override
-		public Integer get(int typeId) {
-			return Block.lightEmission[typeId];
+		public Integer get(Material type) {
+			return BlockInfo.get(type).getLightEmission();
 		}
 	};
 
@@ -380,8 +378,8 @@ public class MaterialUtil {
 	 */
 	public static final MaterialProperty<Integer> OPACITY = new MaterialProperty<Integer>() {
 		@Override
-		public Integer get(int typeId) {
-			return Block.lightBlock[typeId];
+		public Integer get(Material type) {
+			return BlockInfo.get(type).getOpacity();
 		}
 	};
 }

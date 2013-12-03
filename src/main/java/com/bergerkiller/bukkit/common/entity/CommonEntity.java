@@ -285,14 +285,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
 			// *** Entities By ID Map ***
 			final IntHashMap<Object> entitiesById = WorldServerRef.entitiesById.get(oldInstance.world);
-			if (entitiesById.remove(oldInstance.id) == null) {
+			if (entitiesById.remove(oldInstance.getId()) == null) {
 				CommonUtil.nextTick(new Runnable() {
 					public void run() {
-						entitiesById.put(newInstance.id, newInstance);
+						entitiesById.put(newInstance.getId(), newInstance);
 					}
 				});
 			}
-			entitiesById.put(newInstance.id, newInstance);
+			entitiesById.put(newInstance.getId(), newInstance);
 
 			// *** EntityTrackerEntry ***
 			final EntityTracker tracker = WorldUtil.getTracker(getWorld());
@@ -336,7 +336,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 	private static boolean replaceInList(List list, Entity entity) {
 		ListIterator<Entity> iter = list.listIterator();
 		while (iter.hasNext()) {
-			if (iter.next().id == entity.id)  {
+			if (iter.next().getId() == entity.getId())  {
 				iter.set(entity);
 				return true;
 			}

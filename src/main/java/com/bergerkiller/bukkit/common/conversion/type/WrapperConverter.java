@@ -1,11 +1,13 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.Container;
 import net.minecraft.server.Entity;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryCrafting;
 import net.minecraft.server.InventoryMerchant;
+import net.minecraft.server.Item;
 import net.minecraft.server.ItemStack;
 import net.minecraft.server.PlayerInventory;
 import net.minecraft.server.TileEntity;
@@ -27,6 +29,7 @@ import org.bukkit.craftbukkit.inventory.CraftInventoryFurnace;
 import org.bukkit.craftbukkit.inventory.CraftInventoryMerchant;
 import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
@@ -202,6 +205,12 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 		protected Material convertSpecial(Object value, Class<?> valueType, Material def) {
 			if (value instanceof Number) {
 				return LogicUtil.fixNull(Material.getMaterial(((Number) value).intValue()), def);
+			} else if (value instanceof Item) {
+				return CraftMagicNumbers.getMaterial((Item) value);
+			} else if (value instanceof Block) {
+				return CraftMagicNumbers.getMaterial((Block) value);
+			} else if (value instanceof Number) {
+				return Material.getMaterial(((Number) value).intValue());
 			} else {
 				return ParseUtil.parseMaterial(value.toString(), def);
 			}

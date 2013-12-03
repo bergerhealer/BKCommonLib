@@ -193,7 +193,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
 	@Override
 	public long getPendingBytes(Player player) {
-		return CommonPacketHandler.calculatePendingBytes(player);
+		return PacketHandlerHooked.calculatePendingBytes(player);
 	}
 
 	private static class CommonPacketMonitor extends CommonPacketAdapter {
