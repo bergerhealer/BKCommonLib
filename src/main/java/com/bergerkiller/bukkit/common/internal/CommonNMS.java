@@ -214,24 +214,24 @@ public class CommonNMS {
 		return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
 	}
 
-	public static Block getBlock(org.bukkit.Material material) {
-		return CraftMagicNumbers.getBlock(material);
-	}
-
 	@SuppressWarnings("deprecation")
 	public static Block getBlock(int id) {
-		return CraftMagicNumbers.getBlock(id);
-	}
-
-	public static Item getItem(org.bukkit.Material material) {
-		return CraftMagicNumbers.getItem(material);
+		return getBlock(org.bukkit.Material.getMaterial(id));
 	}
 
 	@SuppressWarnings("deprecation")
 	public static Item getItem(int id) {
 		return CraftMagicNumbers.getItem(id);
 	}
-	
+
+	public static Block getBlock(org.bukkit.Material material) {
+		return material == null ? null : CraftMagicNumbers.getBlock(material);
+	}
+
+	public static Item getItem(org.bukkit.Material material) {
+		return material == null ? null : CraftMagicNumbers.getItem(material);
+	}
+
 	/**
 	 * Gets the native Minecraft Server which contains the main logic
 	 * 

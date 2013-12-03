@@ -49,8 +49,8 @@ public class NBTUtil {
 	 * @param data to store in this handle initially
 	 * @return new handle
 	 */
-	public static Object createHandle(String name, Object data) {
-		return NBTTagInfo.findInfo(data).createHandle(name, data);
+	public static Object createHandle(Object data) {
+		return NBTTagInfo.findInfo(data).createHandle(data);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -8,7 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
@@ -20,15 +21,17 @@ public class BlockInfo extends BasicWrapper {
 	private static final BlockInfo[] blocks = new BlockInfo[4096];
 	static {
 		Arrays.fill(blocks, NONE);
-		//TODO: Better way of finding all Block constants in the registry
-		for (int i = 0; i < blocks.length; i++) {
+		try {
+			//TODO: Better way of finding all Block constants in the registry
+			for (int i = 0; i < blocks.length; i++) {
+				Object handle = CommonNMS.getBlock(i);
 
-			@SuppressWarnings("deprecation")
-			Object handle = BlockRef.getBlock(i);
-
-			if (handle != null) {
-				blocks[i] = new BlockInfoImpl(handle);
+				if (handle != null) {
+					blocks[i] = new BlockInfoImpl(handle);
+				}
 			}
+		} catch (Throwable t) {
+			CommonPlugin.LOGGER.log(Level.SEVERE, "Unable to initialize BlockInfo API:", t);
 		}
 	}
 

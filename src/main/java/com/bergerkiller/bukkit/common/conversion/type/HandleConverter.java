@@ -150,7 +150,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 				return ((CommonTag) value).getHandle();
 			} else {
 				try {
-					return NBTUtil.createHandle(null, value);
+					return NBTUtil.createHandle(value);
 				} catch (Exception ex) {
 					return def;
 				}

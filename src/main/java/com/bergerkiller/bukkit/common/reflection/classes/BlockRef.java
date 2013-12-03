@@ -35,9 +35,4 @@ public class BlockRef {
 	public static int getBlockId(Object instance) {
 		return CraftMagicNumbers.getId((Block) instance);
 	}
-
-	@Deprecated
-	public static Object getBlock(int id) {
-		return CraftMagicNumbers.getBlock(id);
-	}
 }

@@ -27,12 +27,8 @@ public class CommonTag extends BasicWrapper {
 	protected final NBTTagInfo info;
 
 	public CommonTag(Object data) {
-		this(null, data);
-	}
-
-	public CommonTag(String name, Object data) {
 		info = NBTTagInfo.findInfo(data);
-		setHandle(info.createHandle(name, commonToNbt(data)));
+		setHandle(info.createHandle(commonToNbt(data)));
 	}
 
 	protected Object getRawData() {
@@ -87,24 +83,6 @@ public class CommonTag extends BasicWrapper {
 		info.setData(handle, commonToNbt(data));
 	}
 
-	/**
-	 * Gets the name of this tag
-	 * 
-	 * @return tag name
-	 */
-	public String getName() {
-		return NBTRef.getName.invoke(handle);
-	}
-
-	/**
-	 * Sets a new name for this tag
-	 * 
-	 * @param newName to set to
-	 */
-	public void setName(String newName) {
-		NBTRef.setName.invoke(handle, newName);
-	}
-
 	@Override
 	public String toString() {
 		return info.toString(handle, 0);
@@ -146,9 +124,6 @@ public class CommonTag extends BasicWrapper {
 			// Replace
 			for (Entry<String, Object> entry : elems.entrySet()) {
 				Object value = commonToNbt(entry.getValue());
-				if (NBTRef.NBTBase.isInstance(value)) {
-					NBTRef.setName.invoke(value, entry.getKey());
-				}
 				tags.put(entry.getKey(), value);
 			}
 			return tags;
@@ -161,7 +136,7 @@ public class CommonTag extends BasicWrapper {
 			}
 			return tags;
 		} else {
-			return NBTUtil.createHandle(null, data);
+			return NBTUtil.createHandle(data);
 		}
 	}
 
@@ -207,7 +182,7 @@ public class CommonTag extends BasicWrapper {
 			}
 			return tags;
 		} else if (wrapData) {
-			return create(null, data);
+			return createForData(data);
 		} else {
 			return data;
 		}
@@ -221,8 +196,8 @@ public class CommonTag extends BasicWrapper {
 	 * @param data to store
 	 * @return a new CommonTag instance
 	 */
-	public static CommonTag create(String name, Object data) {
-		return create(NBTUtil.createHandle(name, data));
+	public static CommonTag createForData(Object data) {
+		return create(NBTUtil.createHandle(data));
 	}
 
 	/**
@@ -237,13 +212,12 @@ public class CommonTag extends BasicWrapper {
 			return null;
 		}
 		CommonTag tag;
-		final String name = NBTRef.getName.invoke(handle);
 		if (NBTRef.NBTTagCompound.isInstance(handle)) {
-			tag = new CommonTagCompound(name, handle);
+			tag = new CommonTagCompound(handle);
 		} else if (NBTRef.NBTTagList.isInstance(handle)) {
-			tag = new CommonTagList(name, handle);
+			tag = new CommonTagList(handle);
 		} else {
-			tag = new CommonTag(name, handle);
+			tag = new CommonTag(handle);
 		}
 		return tag;
 	}

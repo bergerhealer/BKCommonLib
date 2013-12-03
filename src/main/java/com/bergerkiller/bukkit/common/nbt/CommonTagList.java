@@ -33,31 +33,19 @@ import com.bergerkiller.bukkit.common.utils.NBTUtil;
 public class CommonTagList extends CommonTag implements List<CommonTag> {
 
 	public CommonTagList() {
-		this(null, new ArrayList<CommonTag>());
+		this(new ArrayList<CommonTag>());
 	}
 
 	public CommonTagList(Object... values) {
-		this(null, values);
+		this(CollectionConverter.toList.convert(values));
 	}
 
 	public CommonTagList(List<?> data) {
-		this(null, data);
+		this((Object) data);
 	}
 
-	public CommonTagList(String name) {
-		this(name, new ArrayList<CommonTag>());
-	}
-
-	public CommonTagList(String name, Object... values) {
-		this(name, CollectionConverter.toList.convert(values));
-	}
-
-	public CommonTagList(String name, List<?> data) {
-		this(name, (Object) data);
-	}
-
-	protected CommonTagList(String name, Object data) {
-		super(name, data);
+	protected CommonTagList(Object data) {
+		super(data);
 	}
 
 	private void updateListType(Object elementHandle) {
@@ -95,12 +83,6 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 		updateListType(null);
 	}
 
-	private Object prepElement(Object element, String name) {
-		final Object elementHandle = prepElement(element);
-		NBTRef.setName.invoke(elementHandle, name);
-		return elementHandle;
-	}
-
 	private Object prepElement(Object element) {
 		if (element == null) {
 			throw new IllegalArgumentException("Can not store null elements");
@@ -108,7 +90,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 			try {
 				Object handle = commonToNbt(element);
 				if (!NBTRef.NBTBase.isInstance(handle)) {
-					handle = NBTUtil.createHandle(null, handle);
+					handle = NBTUtil.createHandle(handle);
 				}
 				if (handle != null) {
 					updateListType(handle);
@@ -180,18 +162,6 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 	}
 
 	/**
-	 * Sets a single tag. Supported element types:<br>
-	 * <u>NBTBase, CommonTag, byte, short, int, long, float, double, byte[], int[], String</u>
-	 * 
-	 * @param index to set at
-	 * @param name to give to the (new) tag
-	 * @param element to set to
-	 */
-	public void setValue(int index, String name, Object element) {
-		getRawData().set(index, prepElement(element, name));
-	}
-
-	/**
 	 * Adds a single tag. Supported element types:<br>
 	 * <u>NBTBase, CommonTag, byte, short, int, long, float, double, byte[], int[], String</u>
 	 * 
@@ -206,33 +176,10 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 	 * Adds a single tag. Supported element types:<br>
 	 * <u>NBTBase, CommonTag, byte, short, int, long, float, double, byte[], int[], String</u>
 	 * 
-	 * @param index to set at
-	 * @param name to give to the (new) tag
-	 * @param element to set to
-	 */
-	public void addValue(int index, String name, Object element) {
-		getRawData().add(index, prepElement(element, name));
-	}
-
-	/**
-	 * Adds a single tag. Supported element types:<br>
-	 * <u>NBTBase, CommonTag, byte, short, int, long, float, double, byte[], int[], String</u>
-	 * 
 	 * @param element to add
 	 */
 	public void addValue(Object element) {
 		getRawData().add(prepElement(element));
-	}
-
-	/**
-	 * Adds a single tag. Supported element types:<br>
-	 * <u>NBTBase, CommonTag, byte, short, int, long, float, double, byte[], int[], String</u>
-	 * 
-	 * @param name to give to the (new) tag
-	 * @param element to add
-	 */
-	public void addValue(String name, Object element) {
-		getRawData().add(prepElement(element, name));
 	}
 
 	@Override
@@ -314,7 +261,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 				}
 			} else if (data instanceof Map) {
 				for (Entry<Object, Object> entry : ((Map<Object, Object>) data).entrySet()) {
-					addValue(entry.getKey().toString(), entry.getValue());
+					addValue(entry.getValue());
 				}
 			} else if (dataType.isArray()) {
 				if (dataType.isPrimitive()) {

@@ -16,8 +16,6 @@ public class NBTRef {
 	public static final ClassTemplate<?> NBTTagCompound = NMSClassTemplate.create("NBTTagCompound");
 	public static final SafeMethod<Byte> getTypeId = NBTBase.getMethod("getTypeId");
 	public static final FieldAccessor<Byte> nbtListType = NBTTagList.getField("type");
-	public static final MethodAccessor<Void> setName = NBTBase.getMethod("setName", String.class);
-	public static final MethodAccessor<String> getName = NBTBase.getMethod("getName");
 	public static final MethodAccessor<Object> clone = NBTBase.getMethod("clone");
 	public static final MethodAccessor<Void> nbtListAdd = NBTTagList.getMethod("add", NBTBase.getType());
 	public static final MethodAccessor<Integer> nbtListSize = NBTTagList.getMethod("size");

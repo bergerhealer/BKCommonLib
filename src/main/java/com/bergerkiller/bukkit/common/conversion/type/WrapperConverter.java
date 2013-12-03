@@ -177,7 +177,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 				return CommonTag.create(value);
 			} else {
 				try {
-					return CommonTag.create(null, value);
+					return CommonTag.createForData(value);
 				} catch (Exception ex) {
 				}
 			}

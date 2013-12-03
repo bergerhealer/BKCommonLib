@@ -51,7 +51,7 @@ public class MaterialUtil {
 
 	@SuppressWarnings("deprecation")
 	public static int getTypeId(Material material) {
-		return material.getId();
+		return material == null ? 0 : material.getId();
 	}
 
 	@SuppressWarnings("deprecation")

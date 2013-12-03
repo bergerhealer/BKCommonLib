@@ -25,23 +25,15 @@ import com.bergerkiller.bukkit.common.utils.NBTUtil;
 public class CommonTagCompound extends CommonTag implements Map<String, CommonTag> {
 
 	public CommonTagCompound() {
-		this((String) null);
+		this(new HashMap<String, CommonTag>());
 	}
 
 	public CommonTagCompound(Map<String, ?> data) {
-		this(null, data);
+		this((Object) data);
 	}
 
-	public CommonTagCompound(String name) {
-		this(name, new HashMap<String, CommonTag>());
-	}
-
-	public CommonTagCompound(String name, Map<String, ?> data) {
-		this(name, (Object) data);
-	}
-
-	protected CommonTagCompound(String name, Object data) {
-		super(name, data);
+	protected CommonTagCompound(Object data) {
+		super(data);
 	}
 
 	@Override
@@ -106,7 +98,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 		} else {
 			Object elementHandle = commonToNbt(value);
 			if (!NBTRef.NBTBase.isInstance(elementHandle)) {
-				elementHandle = NBTUtil.createHandle(key, value);
+				elementHandle = NBTUtil.createHandle(value);
 			}
 			NBTRef.nbtCompoundSet.invoke(handle, key, elementHandle);
 		}

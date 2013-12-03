@@ -97,17 +97,17 @@ public class NBTTagInfo {
 		if (NBTRef.NBTTagList.isType(nbtClass)) {
 			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "list"));
 			this.dataType = List.class;
-			this.constructor = nbtClass.getDeclaredConstructor(String.class);
+			this.constructor = nbtClass.getDeclaredConstructor();
 			this.dataName = "TagList";
 		} else if (NBTRef.NBTTagCompound.isType(nbtClass)) {
 			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "map"));
 			this.dataType = Map.class;
-			this.constructor = nbtClass.getDeclaredConstructor(String.class);
+			this.constructor = nbtClass.getDeclaredConstructor();
 			this.dataName = "TagCompound";
 		} else {
 			this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "data"));
 			final Class<?> dataType = this.dataField.getType();
-			this.constructor = nbtClass.getDeclaredConstructor(String.class, dataType);
+			this.constructor = nbtClass.getDeclaredConstructor(dataType);
 			// Box it
 			final Class<?> boxed = LogicUtil.getBoxedType(dataType);
 			if (boxed == null) {
@@ -143,8 +143,7 @@ public class NBTTagInfo {
 		StringBuilder text = new StringBuilder(100);
 
 		// Data type and name header
-		final String name = NBTRef.getName.invoke(handle);
-		text.append(indentTxt).append(dataName).append("(\"").append(name).append("\"): ");
+		text.append(indentTxt).append(dataName).append(": ");
 
 		// Tag data information
 		Collection<Object> elements;
@@ -182,12 +181,11 @@ public class NBTTagInfo {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object createHandle(String name, Object data) {
+	public Object createHandle(Object data) {
 		if (data == null) {
 			throw new RuntimeException("Can not create a tag for null data");
 		}
 		if (nbtType.isAssignableFrom(data.getClass())) {
-			NBTRef.setName.invoke(data, name);
 			return data;
 		}
 		if (!dataType.isAssignableFrom(data.getClass())) {
@@ -208,13 +206,13 @@ public class NBTTagInfo {
 					} else if (element instanceof CommonTag) {
 						base = ((CommonTag) element).getHandle();
 					} else {
-						base = NBTUtil.createHandle(null, element);
+						base = NBTUtil.createHandle(element);
 					}
 					type = NBTUtil.getTypeId(base);
 					newData.add(base);
 				}
 				// Assign this data to a new valid NBT Tag List
-				handle = constructor.newInstance(name);
+				handle = constructor.newInstance();
 				NBTRef.nbtListType.set(handle, type);
 				dataField.set(handle, newData);
 			} else if (NBTRef.NBTTagCompound.isType(nbtType)) {
@@ -229,15 +227,15 @@ public class NBTTagInfo {
 					} else if (entry.getValue() instanceof CommonTag) {
 						base = ((CommonTag) entry.getValue()).getHandle();
 					} else {
-						base = NBTUtil.createHandle(key, entry.getValue());
+						base = NBTUtil.createHandle(entry.getValue());
 					}
 					newData.put(key, base);
 				}
 				// Assign this data to a new valid NBT Tag Compound
-				handle = constructor.newInstance(name);
+				handle = constructor.newInstance();
 				dataField.set(handle, newData);
 			} else {
-				handle = constructor.newInstance(name, data);
+				handle = constructor.newInstance(data);
 			}
 			return handle;
 		} catch (Throwable t) {

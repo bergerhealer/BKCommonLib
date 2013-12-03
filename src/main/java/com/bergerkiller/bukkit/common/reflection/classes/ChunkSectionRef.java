@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -16,7 +17,7 @@ public class ChunkSectionRef {
 	public static final MethodAccessor<Object> getBlockLightNibble = TEMPLATE.getMethod("getEmittedLightArray");
 	public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("getSkyLightArray");
 	private static final MethodAccessor<Integer> blocks = TEMPLATE.getMethod("getTypeId", int.class, int.class, int.class);
-	private static final MethodAccessor<Void> blocksWithType = TEMPLATE.getMethod("setTypeId", int.class, int.class, int.class, int.class);
+	private static final MethodAccessor<Void> setTypeBlock = TEMPLATE.getMethod("setTypeId", int.class, int.class, int.class, BlockRef.TEMPLATE.getType());
 	private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("getData", int.class, int.class, int.class);
 	private static final MethodAccessor<Void> setData = TEMPLATE.getMethod("setData", int.class, int.class, int.class, int.class);
 	private static final MethodAccessor<Integer> getSkyLight = TEMPLATE.getMethod("getSkyLight", int.class, int.class, int.class);
@@ -29,7 +30,7 @@ public class ChunkSectionRef {
 	}
 
 	public static void setTypeId(Object section, int x, int y, int z, int typeId) {
-		blocksWithType.invoke(section, x & 0xf, y & 0xf, z & 0xf, typeId);
+		setTypeBlock.invoke(section, x & 0xf, y & 0xf, z & 0xf, CommonNMS.getBlock(typeId));
 	}
 
 	public static int getData(Object section, int x, int y, int z) {

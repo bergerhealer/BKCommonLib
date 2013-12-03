@@ -60,6 +60,12 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
 	}
 
 	@Override
+	@Deprecated
+	public Boolean get(int typeId) {
+		return super.get(typeId);
+	}
+	
+	@Override
 	public Collection<Material> getMaterials() {
 		return Collections.unmodifiableList(Arrays.asList(this.allowedTypes));
 	}
