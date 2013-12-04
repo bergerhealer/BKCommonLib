@@ -17,10 +17,14 @@ import com.bergerkiller.bukkit.common.protocol.PacketTypeClasses.*;
 public class PacketType extends ClassTemplate<Object> {
 	private static final ClassMap<PacketType> typesByPacketClass = new ClassMap<PacketType>();
 
-	/* All available 'Play' packets */
+	/* 
+	 * ========================
+	 * === Outgoing packets ===
+	 * ========================
+	 */
+	/* Misc. packets */
 	public static final NMSPacket DEFAULT = new NMSPacket();
 	public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
-	public static final NMSPacketPlayOutAnimation OUT_ANIMATION = new NMSPacketPlayOutAnimation();
 	public static final NMSPacketPlayOutBed OUT_BED = new NMSPacketPlayOutBed();
 	public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
 	public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
@@ -51,13 +55,11 @@ public class PacketType extends ClassTemplate<Object> {
 	public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
 	public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
 	public static final NMSPacketPlayOutWorldParticles OUT_WORLD_PARTICLES = new NMSPacketPlayOutWorldParticles();
-
 	/* Scoreboard-related packets */
 	public static final NMSPacketPlayOutScoreboardDisplayObjective OUT_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSPacketPlayOutScoreboardDisplayObjective();
 	public static final NMSPacketPlayOutScoreboardObjective OUT_SCOREBOARD_OBJECTIVE = new NMSPacketPlayOutScoreboardObjective();
 	public static final NMSPacketPlayOutScoreboardScore OUT_SCOREBOARD_SCORE = new NMSPacketPlayOutScoreboardScore();
 	public static final NMSPacketPlayOutScoreboardTeam OUT_SCOREBOARD_TEAM = new NMSPacketPlayOutScoreboardTeam();
-
 	/* Window-related packets */
 	public static final NMSPacketPlayOutCloseWindow OUT_WINDOW_CLOSE = new NMSPacketPlayOutCloseWindow();
 	public static final NMSPacketPlayOutCraftProgressBar OUT_WINDOW_PROGRESS = new NMSPacketPlayOutCraftProgressBar();
@@ -65,7 +67,6 @@ public class PacketType extends ClassTemplate<Object> {
 	public static final NMSPacketPlayOutSetSlot OUT_WINDOW_SET_SLOT = new NMSPacketPlayOutSetSlot();
 	public static final NMSPacketPlayOutTransaction OUT_WINDOW_TRANSACTION = new NMSPacketPlayOutTransaction();
 	public static final NMSPacketPlayOutWindowItems OUT_WINDOW_ITEMS = new NMSPacketPlayOutWindowItems();
-
 	/* Entity-related packets */
 	public static final NMSPacketPlayOutEntity OUT_ENTITY = new NMSPacketPlayOutEntity();
 	public static final NMSPacketPlayOutSpawnEntity OUT_ENTITY_SPAWN = new NMSPacketPlayOutSpawnEntity();
@@ -81,6 +82,7 @@ public class PacketType extends ClassTemplate<Object> {
 	public static final NMSPacketPlayOutEntityEquipment OUT_ENTITY_EQUIPMENT = new NMSPacketPlayOutEntityEquipment();
 	public static final NMSPacketPlayOutEntityHeadRotation OUT_ENTITY_HEAD_ROTATION = new NMSPacketPlayOutEntityHeadRotation();
 	public static final NMSPacketPlayOutEntityLook OUT_ENTITY_LOOK = new NMSPacketPlayOutEntityLook();
+	public static final NMSPacketPlayOutAnimation OUT_ENTITY_ANIMATION = new NMSPacketPlayOutAnimation();
 	public static final NMSPacketPlayOutEntityMetadata OUT_ENTITY_METADATA = new NMSPacketPlayOutEntityMetadata();
 	public static final NMSPacketPlayOutEntityStatus OUT_ENTITY_STATUS = new NMSPacketPlayOutEntityStatus();
 	public static final NMSPacketPlayOutEntityTeleport OUT_ENTITY_TELEPORT = new NMSPacketPlayOutEntityTeleport();
@@ -88,10 +90,39 @@ public class PacketType extends ClassTemplate<Object> {
 	public static final NMSPacketPlayOutRelEntityMove OUT_ENTITY_MOVE = new NMSPacketPlayOutRelEntityMove();
 	public static final NMSPacketPlayOutRelEntityMoveLook OUT_ENTITY_MOVE_LOOK = new NMSPacketPlayOutRelEntityMoveLook();
 	public static final NMSPacketPlayOutUpdateAttributes OUT_ENTITY_UPDATE_ATTRIBUTES = new NMSPacketPlayOutUpdateAttributes();
-	
-	
-	
-	
+
+	/* 
+	 * ========================
+	 * === Incoming packets ===
+	 * ========================
+	 */
+	public static final NMSPacketPlayInAbilities IN_ABILITIES = new NMSPacketPlayInAbilities();
+	public static final NMSPacketPlayInArmAnimation IN_ENTITY_ANIMATION = new NMSPacketPlayInArmAnimation();
+	public static final NMSPacketPlayInBlockDig IN_BLOCK_DIG = new NMSPacketPlayInBlockDig();
+	public static final NMSPacketPlayInBlockPlace IN_BLOCK_PLACE = new NMSPacketPlayInBlockPlace();
+	public static final NMSPacketPlayInChat IN_CHAT = new NMSPacketPlayInChat();
+	public static final NMSPacketPlayInClientCommand IN_CLIENT_COMMAND = new NMSPacketPlayInClientCommand();
+	public static final NMSPacketPlayInCustomPayload IN_CUSTOM_PAYLOAD = new NMSPacketPlayInCustomPayload();
+	public static final NMSPacketPlayInEntityAction IN_ENTITY_ACTION = new NMSPacketPlayInEntityAction();
+	public static final NMSPacketPlayInFlying IN_FLYING = new NMSPacketPlayInFlying();
+	public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
+	public static final NMSPacketPlayInKeepAlive IN_KEEP_ALIVE = new NMSPacketPlayInKeepAlive();
+	public static final NMSPacketPlayInLook IN_LOOK = new NMSPacketPlayInLook();
+	public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
+	public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
+	public static final NMSPacketPlayInSetCreativeSlot IN_SET_CREATIVE_SLOT = new NMSPacketPlayInSetCreativeSlot();
+	public static final NMSPacketPlayInSettings IN_SETTINGS = new NMSPacketPlayInSettings();
+	public static final NMSPacketPlayInSteerVehicle IN_STEER_VEHICLE = new NMSPacketPlayInSteerVehicle();
+	public static final NMSPacketPlayInTabComplete IN_TAB_COMPLETE = new NMSPacketPlayInTabComplete();
+	public static final NMSPacketPlayInUpdateSign IN_UPDATE_SIGN = new NMSPacketPlayInUpdateSign();
+	public static final NMSPacketPlayInUseEntity IN_USE_ENTITY = new NMSPacketPlayInUseEntity();
+
+	/* Window-related packets */
+	public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
+	public static final NMSPacketPlayInEnchantItem IN_WINDOW_ENCHANT_ITEM = new NMSPacketPlayInEnchantItem();
+	public static final NMSPacketPlayInTransaction IN_WINDOW_TRANSACTION = new NMSPacketPlayInTransaction();
+	public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
+
 	private final int id;
 	private final boolean outgoing;
 	private final FieldAccessor<DataWatcher> dataWatcherField;
