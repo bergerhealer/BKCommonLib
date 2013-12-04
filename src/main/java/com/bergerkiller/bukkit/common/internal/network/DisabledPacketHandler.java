@@ -7,10 +7,16 @@ import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 public class DisabledPacketHandler implements PacketHandler {
 
@@ -36,6 +42,18 @@ public class DisabledPacketHandler implements PacketHandler {
 
 	@Override
 	public void sendPacket(Player player, Object packet, boolean throughListeners) {
+		if (!throughListeners) {
+			throw new RuntimeException("Non-listened packet sending is non-functional right now (Update needed in BKCommonLib!)");
+		}
+		Object handle = Conversion.toEntityHandle.convert(player);
+		if (!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
+			return;
+		}
+		if (!PacketType.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
+			return;
+		}
+		final Object connection = EntityPlayerRef.playerConnection.get(handle);
+		PlayerConnectionRef.sendPacket(connection, packet);
 	}
 
 	@Override

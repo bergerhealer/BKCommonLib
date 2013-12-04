@@ -111,7 +111,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 	 * @param values to set the elements of the list to
 	 */
 	public <T> void putListValues(String key, T... values) {
-		final CommonTagList list = new CommonTagList(key);
+		final CommonTagList list = new CommonTagList();
 		list.setAllValues(values);
 		this.put(key, list);
 	}

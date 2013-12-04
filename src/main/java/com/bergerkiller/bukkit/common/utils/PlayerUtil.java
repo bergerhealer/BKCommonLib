@@ -20,6 +20,8 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
 
 /**
@@ -36,14 +38,17 @@ public class PlayerUtil extends EntityUtil {
 	 * @param player to check
 	 * @return True if the player is disconnected, False if not
 	 */
-	@Deprecated //TODO: FIX THIS!
 	public static boolean isDisconnected(Player player) {
 		final Object handle = Conversion.toEntityHandle.convert(player);
 		if (handle == null) {
 			return true;
 		}
 		final Object connection = EntityPlayerRef.playerConnection.get(handle);
-		return connection == null; // || PlayerConnectionRef.disconnected.get(connection);
+		if (connection == null) {
+			return true;
+		}
+		final Object network = PlayerConnectionRef.networkManager.get(connection);
+		return network == null || !NetworkManagerRef.getIsOpen.invoke(network);
 	}
 
 	/**
