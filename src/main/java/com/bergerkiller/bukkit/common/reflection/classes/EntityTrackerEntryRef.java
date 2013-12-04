@@ -20,9 +20,9 @@ public class EntityTrackerEntryRef {
 	public static final TranslatorFieldAccessor<Entity> tracker = TEMPLATE.getField("tracker").translate(ConversionPairs.entity);
 	public static final TranslatorFieldAccessor<Entity> vehicle = TEMPLATE.getField("w").translate(ConversionPairs.entity);
 	public static final FieldAccessor<Boolean> synched = TEMPLATE.getField("isMoving");
-	public static final FieldAccessor<Double> prevX = TEMPLATE.getField("p");
-	public static final FieldAccessor<Double> prevY = TEMPLATE.getField("q");
-	public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("r");
+	public static final FieldAccessor<Double> prevX = TEMPLATE.getField("q");
+	public static final FieldAccessor<Double> prevY = TEMPLATE.getField("r");
+	public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("s");
 	public static final FieldAccessor<Integer> viewDistance = TEMPLATE.getField("b");
 	public static final FieldAccessor<Integer> updateInterval = TEMPLATE.getField("c");
 	public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("v");
