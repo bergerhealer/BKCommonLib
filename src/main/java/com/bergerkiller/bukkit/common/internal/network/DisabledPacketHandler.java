@@ -33,11 +33,11 @@ public class DisabledPacketHandler implements PacketHandler {
 	}
 
 	@Override
-	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
+	public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
 	}
 
 	@Override
-	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, int[] ids) {
+	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types) {
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class DisabledPacketHandler implements PacketHandler {
 	}
 
 	@Override
-	public Collection<Plugin> getListening(int id) {
+	public Collection<Plugin> getListening(PacketType packetType) {
 		return Collections.emptyList();
 	}
 

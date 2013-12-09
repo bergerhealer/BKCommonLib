@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 
 /**
  * All the methods needed for internally handling the packet sending and receiving
@@ -24,15 +25,15 @@ public interface PacketHandler {
 
 	public void removePacketMonitor(PacketMonitor monitor);
 	
-	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids);
+	public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types);
 
-	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, int[] ids);
+	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types);
 
 	public void sendPacket(Player player, Object packet, boolean throughListeners);
 
 	public void receivePacket(Player player, Object packet);
 
-	public Collection<Plugin> getListening(int id);
+	public Collection<Plugin> getListening(PacketType packetType);
 
 	public void transfer(PacketHandler to);
 

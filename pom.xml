@@ -105,9 +105,7 @@
     <dependency>
       <groupId>com.comphenix.protocol</groupId>
       <artifactId>ProtocolLib</artifactId>
-      <scope>provided</scope>
-      <version>2.5.0</version>
-      <optional>true</optional>
+      <version>2.7.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

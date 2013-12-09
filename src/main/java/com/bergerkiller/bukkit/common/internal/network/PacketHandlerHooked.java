@@ -29,7 +29,6 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 /**
@@ -38,11 +37,9 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
  * and {@link #handlePacketReceive(Player, Object, boolean) handlePacketReceive(player, packet, wasCancelled)} methods should be called
  * by an additional listener hook.
  */
-public abstract class PacketHandlerHooked implements PacketHandler {
-	@SuppressWarnings("unchecked")
-	private final List<PacketListener>[] listeners = new ArrayList[256];
-	@SuppressWarnings("unchecked")
-	private final List<PacketMonitor>[] monitors = new ArrayList[256];
+public abstract class PacketHandlerHooked implements PacketHandler {	
+	private final Map<PacketType, List<PacketListener>> listeners = new HashMap<PacketType, List<PacketListener>>();
+	private final Map<PacketType, List<PacketMonitor>> monitors = new HashMap<PacketType, List<PacketMonitor>>();
 	private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
 	private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
 	private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
@@ -92,10 +89,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		if (monitor == null) {
 			return;
 		}
-		for(int i = 0; i < monitors.length; i++) {
-			if (!LogicUtil.nullOrEmpty(monitors[i])) {
-				monitors[i].remove(monitor);
-			}
+		for (List<PacketMonitor> monitorList : monitors.values()) {
+			monitorList.remove(monitor);
 		}
 		if (fromPlugins) {
 			// Remove from plugin list
@@ -118,10 +113,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		if (listener == null) {
 			return;
 		}
-		for(int i = 0; i < listeners.length; i++) {
-			if (!LogicUtil.nullOrEmpty(listeners[i])) {
-				listeners[i].remove(listener);
-			}
+		for (List<PacketListener> listenerList : listeners.values()) {
+			listenerList.remove(listener);
 		}
 		if (fromPlugins) {
 			// Remove from plugin list
@@ -136,25 +129,21 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	}
 
 	@Override
-	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, int[] ids) {
+	public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types) {
 		if (monitor == null) {
 			throw new IllegalArgumentException("Monitor is not allowed to be null");
 		} else if (plugin == null) {
 			throw new IllegalArgumentException("Plugin is not allowed to be null");
 		}
 		// Register the listener
-		for (int id : ids) {
-			if (id == -1) {
-				continue;
-			}
-			if (id < 0 || id >= monitors.length) {
-				throw new IllegalArgumentException("Unknown packet type Id: " + id);
-			}
+		for (PacketType type : types) {
 			// Map to listener array
-			if (monitors[id] == null) {
-				monitors[id] = new ArrayList<PacketMonitor>();
+			List<PacketMonitor> monitorList = monitors.get(type);
+			if (monitorList == null) {
+				monitorList = new ArrayList<PacketMonitor>();
+				monitors.put(type, monitorList);
 			}
-			monitors[id].add(monitor);
+			monitorList.add(monitor);
 			// Map to plugin list
 			List<PacketMonitor> list = monitorPlugins.get(plugin);
 			if (list == null) {
@@ -166,25 +155,21 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	}
 
 	@Override
-	public void addPacketListener(Plugin plugin, PacketListener listener, int[] ids) {
+	public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
 		if (listener == null) {
 			throw new IllegalArgumentException("Listener is not allowed to be null");
 		} else if (plugin == null) {
 			throw new IllegalArgumentException("Plugin is not allowed to be null");
 		}
 		// Register the listener
-		for (int id : ids) {
-			if (id == -1) {
-				continue;
-			}
-			if (id < 0 || id >= listeners.length) {
-				throw new IllegalArgumentException("Unknown packet type Id: " + id);
-			}
+		for (PacketType type : types) {
 			// Map to listener array
-			if (listeners[id] == null) {
-				listeners[id] = new ArrayList<PacketListener>();
+			List<PacketListener> listenerList = listeners.get(type);
+			if (listenerList == null) {
+				listenerList = new ArrayList<PacketListener>();
+				listeners.put(type, listenerList);
 			}
-			listeners[id].add(listener);
+			listenerList.add(listener);
 			// Map to plugin list
 			List<PacketListener> list = listenerPlugins.get(plugin);
 			if (list == null) {
@@ -226,17 +211,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	}
 
 	@Override
-	public Collection<Plugin> getListening(int id) {
-		if (!LogicUtil.isInBounds(listeners, id)) {
-			return Collections.emptySet();
-		}
-		List<PacketListener> list = listeners[id];
-		if (LogicUtil.nullOrEmpty(list)) {
+	public Collection<Plugin> getListening(PacketType type) {
+		List<PacketListener> listenerList = listeners.get(type);
+		if (listenerList == null) {
 			return Collections.emptySet();
 		}
 		List<Plugin> plugins = new ArrayList<Plugin>();
 		for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
-			for (PacketListener listener : list) {
+			for (PacketListener listener : listenerList) {
 				if (entry.getValue().contains(listener)) {
 					plugins.add(entry.getKey());
 					break;
@@ -250,12 +232,12 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	public void transfer(PacketHandler to) {
 		for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
 			for (PacketListener listener : entry.getValue()) {
-				to.addPacketListener(entry.getKey(), listener, getListenerIds(listener));
+				to.addPacketListener(entry.getKey(), listener, getListenerTypes(listener));
 			}
 		}
 		for (Entry<Plugin, List<PacketMonitor>> entry : monitorPlugins.entrySet()) {
 			for (PacketMonitor listener : entry.getValue()) {
-				to.addPacketMonitor(entry.getKey(), listener, getMonitorIds(listener));
+				to.addPacketMonitor(entry.getKey(), listener, getMonitorTypes(listener));
 			}
 		}
 	}
@@ -264,24 +246,24 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		return EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
 	}
 
-	private int[] getListenerIds(PacketListener listener) {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (int i = 0; i < listeners.length; i++) {
-			if (listeners[i] != null && listeners[i].contains(listener)) {
-				list.add(i);
+	private PacketType[] getListenerTypes(PacketListener listener) {
+		ArrayList<PacketType> list = new ArrayList<PacketType>();
+		for (Map.Entry<PacketType, List<PacketListener>> entry : listeners.entrySet()) {
+			if (entry.getValue().contains(listener)) {
+				list.add(entry.getKey());
 			}
 		}
-		return Conversion.toIntArr.convert(list);
+		return Conversion.toObjectArr.convert(list, PacketType.class);
 	}
 
-	private int[] getMonitorIds(PacketMonitor listener) {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (int i = 0; i < monitors.length; i++) {
-			if (monitors[i] != null && monitors[i].contains(listener)) {
-				list.add(i);
+	private PacketType[] getMonitorTypes(PacketMonitor listener) {
+		ArrayList<PacketType> list = new ArrayList<PacketType>();
+		for (Map.Entry<PacketType, List<PacketMonitor>> entry : monitors.entrySet()) {
+			if (entry.getValue().contains(listener)) {
+				list.add(entry.getKey());
 			}
 		}
-		return Conversion.toIntArr.convert(list);
+		return Conversion.toObjectArr.convert(list, PacketType.class);
 	}
 
 	/**
@@ -298,12 +280,12 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 		// Handle listeners
 		PacketType type = PacketType.getType(packet);
-		final int id = type.getId();
-		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+		List<PacketListener> listenerList = listeners.get(type);
+		if (listenerList != null) {
 			CommonPacket cp = new CommonPacket(packet, type);
 			PacketSendEvent ev = new PacketSendEvent(player, cp);
 			ev.setCancelled(wasCancelled);
-			for (PacketListener listener : listeners[id]) {
+			for (PacketListener listener : listenerList) {
 				listener.onPacketSend(ev);
 			}
 			if (ev.isCancelled()) {
@@ -316,9 +298,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 	}
 
 	private void handlePacketSendMonitor(Player player, PacketType packetType, Object packet) {
-		if (!LogicUtil.nullOrEmpty(monitors[packetType.getId()])) {
+		List<PacketMonitor> monitorList = monitors.get(packetType);
+		if (monitorList != null) {
 			CommonPacket cp = new CommonPacket(packet, packetType);
-			for (PacketMonitor monitor : monitors[packetType.getId()]) {
+			for (PacketMonitor monitor : monitorList) {
 				monitor.onMonitorPacketSend(cp, player);
 			}
 		}
@@ -338,12 +321,12 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 		}
 		// Handle listeners
 		PacketType type = PacketType.getType(packet);
-		final int id = type.getId();
-		if (!LogicUtil.nullOrEmpty(listeners[id])) {
+		List<PacketListener> listenerList = listeners.get(type);
+		if (listenerList != null) {
 			CommonPacket cp = new CommonPacket(packet, type);
 			PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
 			ev.setCancelled(wasCancelled);
-			for (PacketListener listener : listeners[id]) {
+			for (PacketListener listener : listenerList) {
 				listener.onPacketReceive(ev);
 			}
 			if (ev.isCancelled()) {
@@ -351,9 +334,10 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 			}
 		}
 		// Handle monitors
-		if (!LogicUtil.nullOrEmpty(monitors[id])) {
+		List<PacketMonitor> monitorList = monitors.get(type);
+		if (monitorList != null) {
 			CommonPacket cp = new CommonPacket(packet, type);
-			for (PacketMonitor monitor : monitors[id]) {
+			for (PacketMonitor monitor : monitorList) {
 				monitor.onMonitorPacketReceive(cp, player);
 			}
 		}

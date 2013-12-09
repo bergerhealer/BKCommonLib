@@ -153,18 +153,6 @@ public class PacketUtil {
 		}
 	}
 
-	private static int[] getIds(PacketType[] packets) {
-		int[] ids = new int[packets.length];
-		for (int i = 0; i < packets.length; i++) {
-			if (packets[i] == null) {
-				throw new IllegalArgumentException("Can not register a null packet type");
-			} else {
-				ids[i] = packets[i].getId();
-			}
-		}
-		return ids;
-	}
-
 	/**
 	 * Adds a single packet monitor. Packet monitors only monitor (not change) packets.
 	 * 
@@ -176,7 +164,7 @@ public class PacketUtil {
 		if (monitor == null || LogicUtil.nullOrEmpty(packets)) {
 			return;
 		}
-		CommonPlugin.getInstance().getPacketHandler().addPacketMonitor(plugin, monitor, getIds(packets));
+		CommonPlugin.getInstance().getPacketHandler().addPacketMonitor(plugin, monitor, packets);
 	}
 
 	/**
@@ -190,7 +178,7 @@ public class PacketUtil {
 		if (listener == null || LogicUtil.nullOrEmpty(packets)) {
 			return;
 		}
-		CommonPlugin.getInstance().getPacketHandler().addPacketListener(plugin, listener, getIds(packets));
+		CommonPlugin.getInstance().getPacketHandler().addPacketListener(plugin, listener, packets);
 	}
 
 	/**
@@ -239,18 +227,7 @@ public class PacketUtil {
 	 * @return collection of listening plugins
 	 */
 	public static Collection<Plugin> getListenerPlugins(PacketType packetType) {
-		return getListenerPlugins(packetType.getId());
-	}
-
-	/**
-	 * Obtains a collection of all plugins currently listening for the Packet id specified.
-	 * Packets of this type can be expected to be handled by these plugins when sending it.
-	 * 
-	 * @param packetId to get the listening plugins for
-	 * @return collection of listening plugins
-	 */
-	public static Collection<Plugin> getListenerPlugins(int packetId) {
-		return CommonPlugin.getInstance().getPacketHandler().getListening(packetId);
+		return CommonPlugin.getInstance().getPacketHandler().getListening(packetType);
 	}
 
 	/**
