@@ -188,6 +188,11 @@ public class PacketType extends ClassTemplate<Object> {
 		return super.newInstance();
 	}
 
+	@Override
+	public String toString() {
+		return super.getType().getSimpleName();
+	}
+
 	public FieldAccessor<DataWatcher> getMetaDataField() {
 		if (dataWatcherField == null) {
 			throw new IllegalArgumentException("MetaData field does not exist");

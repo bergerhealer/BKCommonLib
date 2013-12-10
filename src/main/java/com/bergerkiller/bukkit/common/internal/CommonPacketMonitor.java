@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.logging.Level;
+
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -12,6 +14,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
  */
 class CommonPacketMonitor implements PacketMonitor {
 	public static final PacketType[] TYPES = {PacketType.OUT_MAP_CHUNK, PacketType.OUT_MAP_CHUNK_BULK, PacketType.OUT_RESPAWN};
+	private boolean listenError = false;
 
 	@Override
 	public void onMonitorPacketReceive(CommonPacket packet, Player player) {
@@ -36,9 +39,9 @@ class CommonPacketMonitor implements PacketMonitor {
 		} else if (packet.getType() == PacketType.OUT_RESPAWN) {
 			// Clear all known chunks
 			meta.clearVisibleChunks();
-		} else {
-			System.out.println(packet);
-			Thread.dumpStack();
+		} else if (!listenError) {
+			listenError = true;
+			CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet entered listener that the listener was not registered for: type=" + packet.getType());
 		}
 	}
 }
