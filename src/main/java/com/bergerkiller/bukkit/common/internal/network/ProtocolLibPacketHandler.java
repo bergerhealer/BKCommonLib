@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerOptions;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketContainer;
@@ -269,7 +270,9 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 				com.comphenix.protocol.PacketType comType = getPacketType(type);
 				comTypes.add(comType);
 			}
-			return ListeningWhitelist.newBuilder().priority(priority).types(comTypes).gamePhase(GamePhase.PLAYING).build();
+			
+			return ListeningWhitelist.newBuilder().priority(priority).types(comTypes)
+					.gamePhase(GamePhase.PLAYING).options(new ListenerOptions[0]).build();
 		}
 	
 		@Override
