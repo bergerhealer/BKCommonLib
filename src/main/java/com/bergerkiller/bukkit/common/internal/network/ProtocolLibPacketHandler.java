@@ -19,15 +19,14 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.EnumProtocolRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
-import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.PlayerLoggedOutException;
 
 /**
@@ -65,10 +64,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
 	@Override
 	public Collection<Plugin> getListening(PacketType packetType) {
-		Integer id = Integer.valueOf(packetType.getId());
 		Set<Plugin> plugins = new HashSet<Plugin>();
 		// Obtain all plugins that have a listener (ignore monitors)
 		boolean outGoing = packetType.isOutGoing();
+		com.comphenix.protocol.PacketType comType = getPacketType(packetType);
 		for (com.comphenix.protocol.events.PacketListener listener : ProtocolLibrary.getProtocolManager().getPacketListeners()) {
 			final ListeningWhitelist whitelist;
 			if (outGoing) {
@@ -76,7 +75,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 			} else {
 				whitelist = listener.getReceivingWhitelist();
 			}
-			if (whitelist.getPriority() != ListenerPriority.MONITOR && whitelist.getWhitelist().contains(id)) {
+			if (whitelist.getPriority() != ListenerPriority.MONITOR && whitelist.getTypes().contains(comType)) {
 				plugins.add(listener.getPlugin());
 			}
 		}
@@ -88,7 +87,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toReceive = new PacketContainer(EnumProtocolRef.getPacketId(packet.getClass()), packet);
+		PacketContainer toReceive = new PacketContainer(getPacketType(PacketType.getType(packet)), packet);
 		try{
 			ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
 		} catch (PlayerLoggedOutException ex) {
@@ -103,7 +102,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toSend = new PacketContainer(EnumProtocolRef.getPacketId(packet.getClass()), packet);
+		PacketContainer toSend = new PacketContainer(getPacketType(PacketType.getType(packet)), packet);
 		try {
 			if (throughListeners) {
 				// Send it through the listeners
@@ -187,6 +186,21 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		return PacketHandlerHooked.calculatePendingBytes(player);
 	}
 
+	private static com.comphenix.protocol.PacketType getPacketType(PacketType commonType) {
+		final Class<?> srcClass;
+		if (commonType.isOutGoing()) {
+			srcClass = com.comphenix.protocol.PacketType.Play.Server.class;
+		} else {
+			srcClass = com.comphenix.protocol.PacketType.Play.Client.class;
+		}
+		for (com.comphenix.protocol.PacketType type : CommonUtil.getClassConstants(srcClass, com.comphenix.protocol.PacketType.class)) {
+			if (type.getCurrentId() == commonType.getId()) {
+				return type;
+			}
+		}
+		throw new RuntimeException("Unknown packet type: " + commonType.toString());
+	}
+
 	private static class CommonPacketMonitor extends CommonPacketAdapter {
 		public final PacketMonitor monitor;
 
@@ -247,16 +261,15 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		}
 
 		private static ListeningWhitelist getWhiteList(ListenerPriority priority, PacketType[] types, boolean receiving) {
-			List<Integer> supportedPackets = new ArrayList<Integer>();
+			List<com.comphenix.protocol.PacketType> comTypes = new ArrayList<com.comphenix.protocol.PacketType>();
 			for (PacketType type : types) {
 				if ((!type.isOutGoing()) != receiving) {
 					continue;
 				}
-				if ((receiving && Packets.Client.isSupported(type.getId())) || (!receiving && Packets.Server.isSupported(type.getId()))) {
-					supportedPackets.add(type.getId());
-				}
+				com.comphenix.protocol.PacketType comType = getPacketType(type);
+				comTypes.add(comType);
 			}
-			return new ListeningWhitelist(priority, supportedPackets.toArray(new Integer[0]));
+			return ListeningWhitelist.newBuilder().priority(priority).types(comTypes).gamePhase(GamePhase.PLAYING).build();
 		}
 	
 		@Override
