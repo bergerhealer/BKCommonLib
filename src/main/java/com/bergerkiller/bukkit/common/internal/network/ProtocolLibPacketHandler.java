@@ -29,6 +29,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.PlayerLoggedOutException;
+import com.comphenix.protocol.injector.packet.PacketRegistry;
 
 /**
  * A packet handler implementation that uses ProtocolLib packet listeners
@@ -88,7 +89,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toReceive = new PacketContainer(getPacketType(PacketType.getType(packet)), packet);
+		PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
 		try{
 			ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
 		} catch (PlayerLoggedOutException ex) {
@@ -103,7 +104,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 		if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
 			return;
 		}
-		PacketContainer toSend = new PacketContainer(getPacketType(PacketType.getType(packet)), packet);
+		PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
 		try {
 			if (throughListeners) {
 				// Send it through the listeners
@@ -188,18 +189,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 	}
 
 	private static com.comphenix.protocol.PacketType getPacketType(PacketType commonType) {
-		final Class<?> srcClass;
-		if (commonType.isOutGoing()) {
-			srcClass = com.comphenix.protocol.PacketType.Play.Server.class;
-		} else {
-			srcClass = com.comphenix.protocol.PacketType.Play.Client.class;
-		}
-		for (com.comphenix.protocol.PacketType type : CommonUtil.getClassConstants(srcClass, com.comphenix.protocol.PacketType.class)) {
-			if (type.getCurrentId() == commonType.getId()) {
-				return type;
-			}
-		}
-		throw new RuntimeException("Unknown packet type: " + commonType.toString());
+		return getPacketType(commonType.getType());
+	}
+
+	private static com.comphenix.protocol.PacketType getPacketType(Class<?> packetClass) {
+		return PacketRegistry.getPacketType(packetClass);
 	}
 
 	private static class CommonPacketMonitor extends CommonPacketAdapter {

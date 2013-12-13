@@ -342,10 +342,10 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
-		public final FieldAccessor<int[]> bulk_x = getField("c");
-		public final FieldAccessor<int[]> bulk_z = getField("d");
-		public final FieldAccessor<int[]> bulk_chunkDataBitMap = getField("a");
-		public final FieldAccessor<int[]> bulk_chunkBiomeBitMap = getField("b");
+		public final FieldAccessor<int[]> bulk_x = getField("a");
+		public final FieldAccessor<int[]> bulk_z = getField("b");
+		public final FieldAccessor<int[]> bulk_chunkDataBitMap = getField("c");
+		public final FieldAccessor<int[]> bulk_chunkBiomeBitMap = getField("d");
 		public final FieldAccessor<byte[][]> inflatedBuffers = getField("inflatedBuffers");
 		public final FieldAccessor<byte[]> buildBuffer = getField("buildBuffer");
 		public final FieldAccessor<byte[]> deflatedData = getField("buffer");

@@ -77,6 +77,9 @@ public class DisabledPacketHandler implements PacketHandler {
 	@Override
 	public boolean onEnable() {
 		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Network handler is DISABLED: All packet handling routines are broken!");
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Some plugins will malfunction or some features in plugins might fail entirely");
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Until this is fixed, please install ProtocolLib for 1.7.2 to restore support");
+		CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "http://dev.bukkit.org/bukkit-plugins/protocollib/");
 		return true;
 	}
 
