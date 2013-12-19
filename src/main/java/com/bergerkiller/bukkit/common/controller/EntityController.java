@@ -145,11 +145,6 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 */
 	public void onMove(double dx, double dy, double dz) {
 		final Entity handle = entity.getHandle(Entity.class);
-		// Don't perform any movement updates when not moving
-		if (dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
-			onPostMove(handle, 0.0, 0.0, 0.0);
-			return;
-		}
 		if (handle.Y) {
 			handle.boundingBox.d(dx, dy, dz);
 			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
@@ -167,6 +162,14 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dz *= 0.25;
 				entity.vel.setZero();
 			}
+
+			// Don't perform any movement updates when not moving
+			if (dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
+				onPostMove(0.0, 0.0, 0.0);
+				return;
+			}
+
+			// Perform movement updates
 			final double oldDx = dx;
 			final double oldDy = dy;
 			final double oldDz = dz;
@@ -304,11 +307,12 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				CommonUtil.callEvent(new VehicleBlockCollisionEvent(vehicle, block));
 			}
 			// Perform post movement logic
-			onPostMove(handle, moveDx, moveDy, moveDz);
+			onPostMove(moveDx, moveDy, moveDz);
 		}
 	}
 
-	private void onPostMove(Entity handle, double moveDx, double moveDy, double moveDz) {
+	private void onPostMove(double moveDx, double moveDy, double moveDz) {
+		Entity handle = this.entity.getHandle(Entity.class);
 		// Update entity movement sounds
 		if (EntityRef.hasMovementSound(handle) && handle.vehicle == null) {
 			int bX = entity.loc.x.block();
