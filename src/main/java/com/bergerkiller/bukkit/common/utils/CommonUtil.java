@@ -44,6 +44,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 
 public class CommonUtil {
 	public static final int VIEW = Bukkit.getServer().getViewDistance();
@@ -868,5 +869,31 @@ public class CommonUtil {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * Checks whether a certain method is overrided in a class
+	 * 
+	 * @param baseClass the method is defined in
+	 * @param typeInstance to check whether it overrides in the base class
+	 * @param methodName of the method
+	 * @param parameterTypes of the method
+	 * @return True if overrided, False if not
+	 */
+	public static boolean isMethodOverrided(Class<?> baseClass, Object typeInstance, String methodName, Class<?>... parameterTypes) {
+		return isMethodOverrided(baseClass, typeInstance.getClass(), methodName, parameterTypes);
+	}
+
+	/**
+	 * Checks whether a certain method is overrided in a class
+	 * 
+	 * @param baseClass the method is defined in
+	 * @param type to check whether it overrides in the base class
+	 * @param methodName of the method
+	 * @param parameterTypes of the method
+	 * @return True if overrided, False if not
+	 */
+	public static boolean isMethodOverrided(Class<?> baseClass, Class<?> type, String methodName, Class<?>... parameterTypes) {
+		return new SafeMethod<Void>(baseClass, methodName, parameterTypes).isOverridedIn(type);
 	}
 }

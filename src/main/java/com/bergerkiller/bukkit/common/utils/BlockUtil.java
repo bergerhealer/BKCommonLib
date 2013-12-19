@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.Lever;
@@ -41,6 +42,78 @@ public class BlockUtil extends MaterialUtil {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+
+	/**
+	 * Performs an event asking other plugins whether a block can change to a different Material
+	 * 
+	 * @param block to check
+	 * @param type that the block is about to be set to (built)
+	 * @return True if permitted, False if not
+	 */
+	public static boolean canBuildBlock(org.bukkit.block.Block block, Material type) {
+		return canBuildBlock(block, type, true);
+	}
+
+	/**
+	 * Performs an event asking other plugins whether a block can change to a different Material
+	 * 
+	 * @param block to check
+	 * @param type that the block is about to be set to (built)
+	 * @param isBuildable - Initial allow state
+	 * @return True if permitted, False if not
+	 */
+	@SuppressWarnings("deprecation")
+	public static boolean canBuildBlock(org.bukkit.block.Block block, Material type, boolean isBuildable) {
+		return CommonUtil.callEvent(new BlockCanBuildEvent(block, type.getId(), true)).isBuildable();
+	}
+
+	/**
+	 * Sets the Block type and data at once, then performs physics
+	 * 
+	 * @param block to set the type and data of
+	 * @param type to set to
+	 * @param data to set to
+	 */
+	public static void setTypeAndData(org.bukkit.block.Block block, Material type, MaterialData data) {
+		setTypeAndData(block, type, data, true);
+	}
+
+	/**
+	 * Sets the Block type and data at once
+	 * 
+	 * @param block to set the type and data of
+	 * @param type to set to
+	 * @param data to set to
+	 * @param update - whether to perform physics afterwards
+	 */
+	@SuppressWarnings("deprecation")
+	public static void setTypeAndData(org.bukkit.block.Block block, Material type, MaterialData data, boolean update) {
+		block.setTypeIdAndData(type.getId(), data.getData(), update);
+	}
+
+	/**
+	 * Sets the Block type and data at once, then performs physics
+	 * 
+	 * @param block to set the type and data of
+	 * @param type to set to
+	 * @param data to set to
+	 */
+	public static void setTypeAndRawData(org.bukkit.block.Block block, Material type, int data) {
+		setTypeAndRawData(block, type, data, true);
+	}
+
+	/**
+	 * Sets the Block type and data at once
+	 * 
+	 * @param block to set the type and data of
+	 * @param type to set to
+	 * @param data to set to
+	 * @param update - whether to perform physics afterwards
+	 */
+	@SuppressWarnings("deprecation")
+	public static void setTypeAndRawData(org.bukkit.block.Block block, Material type, int data, boolean update) {
+		block.setTypeIdAndData(type.getId(), (byte) data, update);
 	}
 
 	/**
