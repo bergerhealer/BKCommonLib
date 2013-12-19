@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,6 +27,8 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
@@ -38,6 +42,16 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 public class ChunkUtil {
 	private static boolean canUseLongObjectHashMap = CommonUtil.getCBClass("util.LongObjectHashMap") != null;
 	private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
+	public static final FieldAccessor<List<Object>> chunkListField;
+	static {
+		Field f;
+		try {
+			f = ChunkProviderServerRef.TEMPLATE.getType().getField("chunkList");
+		} catch (Throwable t) {
+			f = null;
+		}
+		chunkListField = f == null ? null : new SafeField<List<Object>>(f);
+	}
 
 	/**
 	 * Gets the height of a given column in a chunk
@@ -248,14 +262,16 @@ public class ChunkUtil {
 	 * @param world to get the loaded chunks from
 	 * @return Loaded chunks
 	 */
+	@SuppressWarnings("rawtypes")
 	public static Collection<org.bukkit.Chunk> getChunks(World world) {
-		Object cps = CommonNMS.getNative(world).chunkProviderServer;
-		List<Object> rawChunkList = ChunkProviderServerRef.chunkList.get(cps);
-		Collection<org.bukkit.Chunk> chunkList = CommonNMS.getChunks(rawChunkList);
-		return FilteredCollection.createNullFilter(chunkList);
-
-		/* Old implementation that hooked into the hashmap raw entries
-
+		// ChunkList field (if available)
+		if (chunkListField != null) {
+			Object cps = CommonNMS.getNative(world).chunkProviderServer;
+			List<Object> rawChunkList = chunkListField.get(cps);
+			Collection<org.bukkit.Chunk> chunkList = CommonNMS.getChunks(rawChunkList);
+			return FilteredCollection.createNullFilter(chunkList);
+		}
+		// LongObjectHashMap mirror
 		if (canUseLongObjectHashMap) {
 			Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
 			if (chunks != null) {
@@ -272,8 +288,6 @@ public class ChunkUtil {
 		}
 		// Bukkit alternative
 		return FilteredCollection.createNullFilter(Arrays.asList(world.getLoadedChunks()));
-		
-		*/
 	}
 
 	/**
@@ -337,24 +351,26 @@ public class ChunkUtil {
 		if (canUseLongObjectHashMap) {
 			Object cps = CommonNMS.getNative(world).chunkProviderServer;
 			Object chunks = ChunkProviderServerRef.chunks.get(cps);
-			List<Object> chunkList = ChunkProviderServerRef.chunkList.get(cps);
-			if (chunks != null && chunkList != null) {
+			if (chunks != null) {
 				final long key = LongHash.toLong(x, z);
 				try {
 					if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
 						if (handle == null) {
 							// Remove the chunk
 							Object removed = ((LongObjectHashMap) chunks).remove(key);
-							if (removed != null) {
-								chunkList.remove(removed);
+							if (removed != null && chunkListField != null) {
+								chunkListField.get(cps).remove(removed);
 							}
 						} else {
 							// Add the chunk
 							Object oldChunk = ((LongObjectHashMap) chunks).put(key, handle);
-							if (oldChunk != null) {
-								chunkList.remove(oldChunk);
+							if (chunkListField != null) {
+								List<Object> chunkList = chunkListField.get(cps);
+								if (oldChunk != null) {
+									chunkList.remove(oldChunk);
+								}
+								chunkList.add(handle);
 							}
-							chunkList.add(handle);
 						}
 						return;
 					}
