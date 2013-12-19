@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -144,14 +143,13 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 * @param dy offset to move
 	 * @param dz offset to move
 	 */
-	@SuppressWarnings("deprecation")
 	public void onMove(double dx, double dy, double dz) {
-		//Don't do anything if we aren't moving 
-		if(dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
+		final Entity handle = entity.getHandle(Entity.class);
+		// Don't perform any movement updates when not moving
+		if (dx == 0 && dy == 0 && dz == 0 && !entity.hasPassenger() && !entity.isInsideVehicle()) {
+			onPostMove(handle, 0.0, 0.0, 0.0);
 			return;
 		}
-
-		final Entity handle = entity.getHandle(Entity.class);
 		if (handle.Y) {
 			handle.boundingBox.d(dx, dy, dz);
 			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
@@ -267,7 +265,6 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					}
 				}
 			}
-
 			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
 			handle.locY = handle.boundingBox.b + (double) handle.height - (double) handle.X;
 			handle.locZ = CommonNMS.getMiddleZ(handle.boundingBox);
@@ -306,63 +303,67 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				}
 				CommonUtil.callEvent(new VehicleBlockCollisionEvent(vehicle, block));
 			}
+			// Perform post movement logic
+			onPostMove(handle, moveDx, moveDy, moveDz);
+		}
+	}
 
-			// Update entity movement sounds
-			if (EntityRef.hasMovementSound(handle) && handle.vehicle == null) {
-				int bX = entity.loc.x.block();
-				int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.height);
-				int bZ = entity.loc.z.block();
-				Object block = handle.world.getType(bX, bY, bZ);
-				int j1 = handle.world.getType(bX, bY - 1, bZ).b();
+	private void onPostMove(Entity handle, double moveDx, double moveDy, double moveDz) {
+		// Update entity movement sounds
+		if (EntityRef.hasMovementSound(handle) && handle.vehicle == null) {
+			int bX = entity.loc.x.block();
+			int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.height);
+			int bZ = entity.loc.z.block();
+			Block block = handle.world.getType(bX, bY, bZ);
+			int j1 = handle.world.getType(bX, bY - 1, bZ).b();
 
-				// Magic values! *gasp* Bad, BAD Minecraft! Go sit in a corner!
-				if (j1 == 11 || j1 == 32 || j1 == 21) {
-					block = handle.world.getType(bX, bY - 1, bZ);
-				}
-				if (block != Blocks.LADDER) {
-					moveDy = 0.0;
-				}
+			// Magic values! *gasp* Bad, BAD Minecraft! Go sit in a corner!
+			if (j1 == 11 || j1 == 32 || j1 == 21) {
+				block = handle.world.getType(bX, bY - 1, bZ);
+			}
+			if (block != Blocks.LADDER) {
+				moveDy = 0.0;
+			}
 
-				handle.Q += MathUtil.length(moveDx, moveDz) * 0.6;
-				handle.R += MathUtil.length(moveDx, moveDy, moveDz) * 0.6;
-				if (handle.R > EntityRef.stepCounter.get(entity.getHandle()) && block != Blocks.AIR) {
-					EntityRef.stepCounter.set(entity.getHandle(), (int) handle.R + 1);
-					if (entity.isInWater(true)) {
-						float f = (float) Math.sqrt(entity.vel.y.squared() + 0.2 * entity.vel.xz.lengthSquared()) * 0.35f;
-						if (f > 1.0f) {
-							f = 1.0f;
-						}
-						entity.makeRandomSound(EntityRef.getSwimSound.invoke(handle), f, 1.0f);
+			handle.Q += MathUtil.length(moveDx, moveDz) * 0.6;
+			handle.R += MathUtil.length(moveDx, moveDy, moveDz) * 0.6;
+			if (handle.R > EntityRef.stepCounter.get(entity.getHandle()) && block != Blocks.AIR) {
+				EntityRef.stepCounter.set(entity.getHandle(), (int) handle.R + 1);
+				if (entity.isInWater(true)) {
+					float f = (float) Math.sqrt(entity.vel.y.squared() + 0.2 * entity.vel.xz.lengthSquared()) * 0.35f;
+					if (f > 1.0f) {
+						f = 1.0f;
 					}
-					entity.makeStepSound(bX, bY, bZ, BlockRef.getBlockId(block));
-					((Block) block).b(handle.world, bX, bY, bZ, handle);
+					entity.makeRandomSound(EntityRef.getSwimSound.invoke(handle), f, 1.0f);
 				}
+				entity.makeStepSound(bX, bY, bZ, CommonNMS.getMaterial(block));
+				block.b(handle.world, bX, bY, bZ, handle);
 			}
+		}
 
-			EntityRef.updateBlockCollision(handle);
+		EntityRef.updateBlockCollision(handle);
 
-			// Fire tick calculation (check using block collision)
-			final boolean isInWater = handle.L(); // In water or raining
-			if (handle.world.e(handle.boundingBox.shrink(0.001, 0.001, 0.001))) {
-				onBurnDamage(1);
-				if (!isInWater) {
-					handle.fireTicks++;
-					if (handle.fireTicks <= 0) {
-						EntityCombustEvent event = new EntityCombustEvent(entity.getEntity(), 8);
-						if (!CommonUtil.callEvent(event).isCancelled()) {
-							handle.setOnFire(event.getDuration());
-						}
-					} else {
-						handle.setOnFire(8);
+		// Fire tick calculation (check using block collision)
+		final boolean isInWater = handle.L(); // In water or raining
+		if (handle.world.e(handle.boundingBox.shrink(0.001, 0.001, 0.001))) {
+			onBurnDamage(1);
+			if (!isInWater) {
+				handle.fireTicks++;
+				if (handle.fireTicks <= 0) {
+					EntityCombustEvent event = new EntityCombustEvent(entity.getEntity(), 8);
+					if (!CommonUtil.callEvent(event).isCancelled()) {
+						handle.setOnFire(event.getDuration());
 					}
+				} else {
+					handle.setOnFire(8);
 				}
-			} else if (handle.fireTicks <= 0) {
-				handle.fireTicks = -handle.maxFireTicks;
 			}
-			if (isInWater && handle.fireTicks > 0) {
-				entity.makeRandomSound(Sound.FIZZ, 0.7f, 1.6f);
-				handle.fireTicks = -handle.maxFireTicks;
-			}
+		} else if (handle.fireTicks <= 0) {
+			handle.fireTicks = -handle.maxFireTicks;
+		}
+		if (isInWater && handle.fireTicks > 0) {
+			entity.makeRandomSound(Sound.FIZZ, 0.7f, 1.6f);
+			handle.fireTicks = -handle.maxFireTicks;
 		}
 	}
 }

@@ -232,6 +232,14 @@ public class CommonNMS {
 		return material == null ? null : CraftMagicNumbers.getItem(material);
 	}
 
+	public static org.bukkit.Material getMaterial(Block block) {
+		return CraftMagicNumbers.getMaterial(block);
+	}
+
+	public static org.bukkit.Material getMaterial(Item item) {
+		return CraftMagicNumbers.getMaterial(item);
+	}
+
 	/**
 	 * Gets the native Minecraft Server which contains the main logic
 	 * 
