@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+
 import net.minecraft.server.EnumProtocol;
 import net.minecraft.server.IChatBaseComponent;
 import net.minecraft.server.Packet;
@@ -90,617 +92,635 @@ import net.minecraft.server.PacketPlayOutWindowItems;
 import net.minecraft.server.PacketPlayOutWorldEvent;
 import net.minecraft.server.PacketPlayOutWorldParticles;
 
+/**
+ * This class is unused since there is no proper listening AT ALL provided by this
+ */
 public class CommonPacketPlayListener implements PacketPlayInListener, PacketPlayOutListener {
-	private final PacketListener baseListener;
+	private final PacketPlayInListener baseInListener;
+	private final PacketPlayOutListener baseOutListener;
 
 	public CommonPacketPlayListener(PacketListener baseListener) {
-		if (!(baseListener instanceof PacketPlayInListener) || !(baseListener instanceof PacketPlayOutListener)) {
-			throw new RuntimeException("Expected a base listener that implements both in and outgoing listening!");
+		if (baseListener instanceof PacketPlayInListener) {
+			this.baseInListener = (PacketPlayInListener) baseListener;
+		} else {
+			this.baseInListener = null;
 		}
-		this.baseListener = baseListener;
+		if (baseListener instanceof PacketPlayOutListener) {
+			this.baseOutListener = (PacketPlayOutListener) baseListener;
+		} else {
+			this.baseOutListener = null;
+		}
 	}
 
 	private boolean onReceive(Packet packet) {
-		return true;
+		System.out.println("RECEIVE: " + PacketType.getType(packet).toString());
+		return this.baseInListener != null;
 	}
 
 	private boolean onSend(Packet packet) {
-		return true;
+		System.out.println("SEND: " + PacketType.getType(packet).toString());
+		return this.baseOutListener != null;
 	}
 
 	@Override
 	public void a() {
-		baseListener.a();
+		if (baseOutListener != null) {
+			baseOutListener.a();
+		}
 	}
 
 	@Override
 	public void a(IChatBaseComponent arg0) {
-		baseListener.a(arg0);
+		if (baseOutListener != null) {
+			baseOutListener.a(arg0);
+		}
 	}
 
 	@Override
 	public void a(EnumProtocol arg0, EnumProtocol arg1) {
-		baseListener.a(arg0, arg1);
+		if (baseOutListener != null) {
+			baseOutListener.a(arg0, arg1);
+		}
 	}
 
 	@Override
 	public void a(PacketPlayInArmAnimation arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInChat arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInTabComplete arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInClientCommand arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInSettings arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInTransaction arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInEnchantItem arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInWindowClick arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInCloseWindow arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInCustomPayload arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInUseEntity arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInKeepAlive arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInFlying arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInAbilities arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInBlockDig arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInEntityAction arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInSteerVehicle arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInHeldItemSlot arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInSetCreativeSlot arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInUpdateSign arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayInBlockPlace arg0) {
 		if (onReceive(arg0)) {
-			((PacketPlayInListener) baseListener).a(arg0);
+			baseInListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnEntity arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnEntityExperienceOrb arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnEntityWeather arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnEntityLiving arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutScoreboardObjective arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnEntityPainting arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutNamedEntitySpawn arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutAnimation arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutStatistic arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutBlockBreakAnimation arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutOpenSignEditor arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutTileEntityData arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutBlockAction arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutBlockChange arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutChat arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutTabComplete arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutMultiBlockChange arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutMap arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutTransaction arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutCloseWindow arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutWindowItems arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutOpenWindow arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutCraftProgressBar arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSetSlot arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutCustomPayload arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutKickDisconnect arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutBed arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityStatus arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutAttachEntity arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutExplosion arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutGameStateChange arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutKeepAlive arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutMapChunk arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutMapChunkBulk arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutWorldEvent arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutLogin arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntity arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutPosition arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutWorldParticles arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutAbilities arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutPlayerInfo arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityDestroy arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutRemoveEntityEffect arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutRespawn arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityHeadRotation arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutHeldItemSlot arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutScoreboardDisplayObjective arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityMetadata arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityVelocity arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityEquipment arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutExperience arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutUpdateHealth arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutScoreboardTeam arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutScoreboardScore arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutSpawnPosition arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutUpdateTime arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutUpdateSign arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutNamedSoundEffect arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutCollect arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityTeleport arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutUpdateAttributes arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 
 	@Override
 	public void a(PacketPlayOutEntityEffect arg0) {
 		if (onSend(arg0)) {
-			((PacketPlayOutListener) baseListener).a(arg0);
+			baseOutListener.a(arg0);
 		}
 	}
 }

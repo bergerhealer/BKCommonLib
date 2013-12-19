@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 
+import net.minecraft.server.NetworkManager;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -90,6 +92,11 @@ public class DisabledPacketHandler implements PacketHandler {
 
 	@Override
 	public void onPlayerJoin(Player player) {
+		Object conn = EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+		NetworkManager nett = (NetworkManager) PlayerConnectionRef.networkManager.get(conn);
+		net.minecraft.server.PacketListener old = nett.getPacketListener();
+		CommonPacketPlayListener listener = new CommonPacketPlayListener(old);
+		nett.a(listener);
 	}
 
 	@Override
