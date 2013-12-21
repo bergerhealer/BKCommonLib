@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 /**
  * Converter for converting to internal handles (from wrapper classes)<br>
@@ -274,6 +275,16 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 	public static final HandleConverter toLongHashMapHandle = new WrapperHandleConverter("LongHashMap");
 	public static final HandleConverter toLongHashSetHandle = new WrapperHandleConverter(CommonUtil.getCBClass("util.LongHashSet"));
 	public static final HandleConverter toIntHashMapHandle = new WrapperHandleConverter("IntHashMap");
+	public static final HandleConverter toUseActionHandle = new HandleConverter("EnumEntityUseAction") {
+		@Override
+		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof UseAction) {
+				return ((UseAction) value).getHandle();
+			} else {
+				return def;
+			}
+		}
+	};
 
 	public HandleConverter(String outputTypeName) {
 		this(CommonUtil.getNMSClass(outputTypeName));

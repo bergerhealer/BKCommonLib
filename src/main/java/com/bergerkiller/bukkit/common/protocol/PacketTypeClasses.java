@@ -36,6 +36,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 public class PacketTypeClasses {
 	public static class NMSPacket extends PacketType {
@@ -823,7 +824,7 @@ public class PacketTypeClasses {
 
 	public static class NMSPacketPlayInUseEntity extends NMSPacket {
 		public final FieldAccessor<Integer> clickedEntityId = getField("a");
-		public final FieldAccessor<Object> useAction = getField("action");
+		public final TranslatorFieldAccessor<UseAction> useAction = getField("action").translate(ConversionPairs.useAction);
 	}
 
 	public static class NMSPacketPlayInWindowClick extends NMSPacketPlayInWindow {

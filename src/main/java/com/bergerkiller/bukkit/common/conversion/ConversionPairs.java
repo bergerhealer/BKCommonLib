@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
 
@@ -62,4 +63,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, BlockState> blockState = toTileEntityHandle.formPair(toBlockState);
 	public static final ConverterPair<Object, Material> block = toBlockHandle.formPair(toMaterial);
 	public static final ConverterPair<Object, Material> item = toItemHandle.formPair(toMaterial);
+	public static final ConverterPair<Object, UseAction> useAction = toUseActionHandle.formPair(toUseAction);
 }

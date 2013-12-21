@@ -4,6 +4,7 @@ import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.Container;
 import net.minecraft.server.Entity;
+import net.minecraft.server.EnumEntityUseAction;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryCrafting;
 import net.minecraft.server.InventoryMerchant;
@@ -61,6 +62,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 /**
  * Converter for converting to wrapper classes (from handles and other types)
@@ -384,6 +386,15 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 			} else {
 				return def;
 			}
+		}
+	};
+	public static final WrapperConverter<UseAction> toUseAction = new WrapperConverter<UseAction>(UseAction.class) {
+		@Override
+		protected UseAction convertSpecial(Object value, Class<?> valueType, UseAction def) {
+			if (value instanceof EnumEntityUseAction) {
+				return UseAction.fromHandle(value);
+			}
+			return def;
 		}
 	};
 

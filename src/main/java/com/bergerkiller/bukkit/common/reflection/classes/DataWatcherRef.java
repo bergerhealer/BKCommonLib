@@ -5,6 +5,7 @@ import java.util.List;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 
 public class DataWatcherRef {
 	public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("DataWatcher");
@@ -15,6 +16,7 @@ public class DataWatcherRef {
 	public static final MethodAccessor<Object> read = TEMPLATE.getMethod("i", int.class);
 	public static final MethodAccessor<Boolean> isChanged = TEMPLATE.getMethod("a");
 	public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("d");
+	public static final SafeConstructor<Object> constructor1 = TEMPLATE.getConstructor(EntityRef.TEMPLATE.getType());
 
 	/**
 	 * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher instead

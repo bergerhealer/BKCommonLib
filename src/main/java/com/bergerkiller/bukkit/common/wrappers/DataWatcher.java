@@ -12,8 +12,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
  */
 public class DataWatcher extends BasicWrapper {
 
-	public DataWatcher() {
-		this(DataWatcherRef.TEMPLATE.newInstance());
+	public DataWatcher(org.bukkit.entity.Entity entityOwner) {
+		this(DataWatcherRef.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
 	}
 
 	public DataWatcher(Object handle) {
