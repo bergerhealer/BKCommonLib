@@ -778,7 +778,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 * @return data, or def if not found
 	 */
 	public <K> K getWatchedData(int index, Class<K> type, K def) {
-		WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher());
+		WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
 		if (object == null) {
 			return def;
 		}
