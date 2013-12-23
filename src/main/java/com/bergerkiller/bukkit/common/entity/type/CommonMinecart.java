@@ -70,19 +70,19 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	public void setShakingDirection(int direction) {
-		getHandle(EntityMinecartAbstract.class).j(direction); 
+		this.setWatchedData(18, direction);
 	}
 
 	public int getShakingDirection() {
-		return getHandle(EntityMinecartAbstract.class).l();
+		return this.getWatchedData(18, 0);
 	}
 
 	public void setShakingFactor(int factor) {
-		getHandle(EntityMinecartAbstract.class).c(factor); 
+		this.setWatchedData(17, factor);
 	}
 
 	public int getShakingFactor() {
-		return getHandle(EntityMinecartAbstract.class).getType();
+		return this.getWatchedData(17, 0);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 * @param offsetPixels to set to
 	 */
 	public void setBlockOffset(int offsetPixels) {
-		getHandle(EntityMinecartAbstract.class).k(offsetPixels);
+		this.setWatchedData(21, offsetPixels);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	 * @return block offset in the Y-direction
 	 */
 	public int getBlockOffset() {
-		return getHandle(EntityMinecartAbstract.class).q();
+		return this.getWatchedData(21, 0);
 	}
 
 	/**
@@ -136,25 +136,6 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	public int getBlockId() {
 		Material mat = getBlockType();
 		return mat == null ? 0 : mat.getId();
-	}
-
-	/**
-	 * Gets the block type for this Minecart
-	 * 
-	 * @return block type
-	 */
-	public Material getBlockType() {
-		int value = getHandle(EntityMinecartAbstract.class).getDataWatcher().getInt(20) & '\uffff';
-		return MaterialUtil.getType(value);
-	}
-
-	/**
-	 * Gets the block data for this Minecart
-	 * 
-	 * @return block data
-	 */
-	public int getBlockData() {
-		return getHandle(EntityMinecartAbstract.class).p();
 	}
 
 	/**
@@ -188,15 +169,38 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
 	}
 
 	/**
+	 * Gets the block type for this Minecart
+	 * 
+	 * @return block type
+	 */
+	public Material getBlockType() {
+		int value = this.getWatchedData(20, 0) & 0xFFFF;
+		return MaterialUtil.getType(value);
+	}
+
+	/**
+	 * Gets the block data for this Minecart
+	 * 
+	 * @return block data
+	 */
+	public int getBlockData() {
+		return this.getWatchedData(20, 0) >> 16;
+	}
+
+	/**
 	 * Sets the Block displayed in this Minecart
 	 * 
 	 * @param blockType of the Block
 	 * @param blockData of the Block
 	 */
 	public void setBlock(Material blockType, int blockData) {
-		EntityMinecartAbstract handle = getHandle(EntityMinecartAbstract.class);
-		handle.i(MathUtil.clamp(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), 0, Short.MAX_VALUE));
-		handle.j(MathUtil.clamp(blockData, 0, Short.MAX_VALUE));
+		// Compile the new Block ID and Block Data into a single Integer entry (combining two short values)
+		int entryId = MathUtil.clamp(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), 0, Short.MAX_VALUE);
+		int entryData = MathUtil.clamp(blockData, 0, Short.MAX_VALUE);
+		int entryTotal = (entryId & 0xFFFF) | (entryData << 16);
+		// Set the entry in the Entity data watcher, plus set INDEX=22 to 1 indicating there's a Block
+		this.setWatchedData(20, entryTotal);
+		this.setWatchedData(22, (byte) 1);
 	}
 
 	@Override

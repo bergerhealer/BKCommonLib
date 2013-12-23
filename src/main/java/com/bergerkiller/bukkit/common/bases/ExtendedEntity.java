@@ -7,6 +7,7 @@ import java.util.UUID;
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityInsentient;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.WatchableObject;
 
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -32,6 +33,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -743,6 +745,44 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	 */
 	public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
 		return CommonNMS.getItem(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
+	}
+
+	/**
+	 * Sets a DataWatcher value at the specified index
+	 * 
+	 * @param index to set at
+	 * @param value to set to
+	 */
+	public void setWatchedData(int index, Object value) {
+		h().getDataWatcher().watch(index, value);
+	}
+
+	/**
+	 * Gets a DataWatcher value at the specified index
+	 * 
+	 * @param index to get at
+	 * @param def to return on failure and type to get (can not be null)
+	 * @return data, or def if not found
+	 */
+	@SuppressWarnings("unchecked")
+	public <K> K getWatchedData(int index, K def) {
+		return getWatchedData(index, (Class<K>) def.getClass(), def);
+	}
+
+	/**
+	 * Gets a DataWatcher value at the specified index
+	 * 
+	 * @param index to get at
+	 * @param type of data to get
+	 * @param def to return on failure
+	 * @return data, or def if not found
+	 */
+	public <K> K getWatchedData(int index, Class<K> type, K def) {
+		WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher());
+		if (object == null) {
+			return def;
+		}
+		return Conversion.convert(object.b(), type, def);
 	}
 
 	@Override
