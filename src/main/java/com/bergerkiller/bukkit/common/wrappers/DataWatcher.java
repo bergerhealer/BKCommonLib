@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
 
@@ -14,6 +15,15 @@ public class DataWatcher extends BasicWrapper {
 
 	public DataWatcher(org.bukkit.entity.Entity entityOwner) {
 		this(DataWatcherRef.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
+	}
+
+	/**
+	 * Initializes a new Empty DataWatcher.
+	 * Please avoid binding this constructed DataWatcher to live entities.
+	 * When doing so, instead use the Entity-accepting constructor.
+	 */
+	public DataWatcher() {
+		this(DataWatcherRef.constructor1.newInstance(CommonDisabledEntity.INSTANCE));
 	}
 
 	public DataWatcher(Object handle) {
