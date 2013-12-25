@@ -366,7 +366,7 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacketPlayOutEntity {
-		public final FieldAccessor<Object> profile = getField("b");
+		public final TranslatorFieldAccessor<String> profile = getField("b").translate(ConversionPairs.gameProfileId);
 		public final FieldAccessor<Integer> x = getField("c");
 		public final FieldAccessor<Integer> y = getField("d");
 		public final FieldAccessor<Integer> z = getField("e");
@@ -785,7 +785,7 @@ public class PacketTypeClasses {
 		public final FieldAccessor<String> locale = getField("a");
 		public final FieldAccessor<Integer> viewDistanceId = getField("b");
 		public final FieldAccessor<Object> chatVisibility = getField("c");
-		public final FieldAccessor<Object> difficulty = getField("e");
+		public final TranslatorFieldAccessor<Difficulty> difficulty = getField("e").translate(ConversionPairs.difficulty);
 		public final FieldAccessor<Boolean> showCape = getField("f");
 	}
 

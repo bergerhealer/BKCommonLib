@@ -80,6 +80,7 @@ public class ConversionTypes {
 	public static final HandleConverter toBlockHandle = HandleConverter.toBlockHandle;
 	public static final HandleConverter toGameModeHandle = HandleConverter.toGameModeHandle;
 	public static final HandleConverter toWorldTypeHandle = HandleConverter.toWorldHandle;
+	public static final HandleConverter toDifficultyHandle = HandleConverter.toDifficultyHandle;
 	public static final HandleConverter toPacketHandle = HandleConverter.toPacketHandle;
 	public static final HandleConverter toVec3DHandle = HandleConverter.toVec3DHandle;
 	public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.toChunkCoordIntPairHandle;
@@ -120,8 +121,9 @@ public class ConversionTypes {
 	@Deprecated
 	public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
 	public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
-	public static final PropertyConverter<Byte> toDifficultyId = PropertyConverter.toDifficultyId;
 	public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
 	public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
 	public static final PropertyConverter<EntityType> toMinecartType = PropertyConverter.toMinecartType;
+	public static final PropertyConverter<Object> toGameProfileFromId = PropertyConverter.toGameProfileFromId;
+	public static final PropertyConverter<String> toGameProfileId = PropertyConverter.toGameProfileId;
 }

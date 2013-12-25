@@ -4,6 +4,7 @@ import net.minecraft.server.Block;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.Container;
 import net.minecraft.server.Entity;
+import net.minecraft.server.EnumDifficulty;
 import net.minecraft.server.EnumEntityUseAction;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryCrafting;
@@ -256,7 +257,9 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
 	public static final WrapperConverter<Difficulty> toDifficulty = new WrapperConverter<Difficulty>(Difficulty.class) {
 		@Override
 		public Difficulty convertSpecial(Object value, Class<?> valueType, Difficulty def) {
-			if (value instanceof Number) {
+			if (value instanceof EnumDifficulty) {
+				return LogicUtil.fixNull(Difficulty.getByValue(((EnumDifficulty) value).a()), def);
+			} else if (value instanceof Number) {
 				return LogicUtil.fixNull(Difficulty.getByValue(((Number) value).intValue()), def);
 			} else {
 				return ParseUtil.parseEnum(Difficulty.class, value.toString(), def);

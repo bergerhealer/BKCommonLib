@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.Entity;
+import net.minecraft.server.EnumDifficulty;
 
+import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -283,6 +285,21 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			} else {
 				return def;
 			}
+		}
+	};
+	public static final HandleConverter toDifficultyHandle = new HandleConverter("EnumDifficulty") {
+		@Override
+		@SuppressWarnings("deprecation")
+		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			int id;
+			if (value instanceof Number) {
+				id = ((Number) value).intValue();
+			} else if (value instanceof Difficulty) {
+				id = ((Difficulty) value).getValue();
+			} else {
+				return def;
+			}
+			return EnumDifficulty.a(id);
 		}
 	};
 

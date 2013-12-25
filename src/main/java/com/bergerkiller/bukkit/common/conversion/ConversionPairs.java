@@ -46,7 +46,7 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, Chunk> chunk = toChunkHandle.formPair(toChunk);
 	public static final ConverterPair<Object, ItemStack> itemStack = toItemStackHandle.formPair(toItemStack);
 	public static final ConverterPair<Object, Inventory> inventory = toInventoryHandle.formPair(toInventory);
-	public static final ConverterPair<Byte, Difficulty> difficulty = toDifficultyId.formPair(toDifficulty);
+	public static final ConverterPair<Object, Difficulty> difficulty = toDifficultyHandle.formPair(toDifficulty);
 	public static final ConverterPair<Object, GameMode> gameMode = toGameModeHandle.formPair(toGameMode);
 	public static final ConverterPair<Object, WorldType> worldType = toWorldTypeHandle.formPair(toWorldType);
 	public static final ConverterPair<Object, DataWatcher> dataWatcher = toDataWatcherHandle.formPair(toDataWatcher);
@@ -64,4 +64,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, Material> block = toBlockHandle.formPair(toMaterial);
 	public static final ConverterPair<Object, Material> item = toItemHandle.formPair(toMaterial);
 	public static final ConverterPair<Object, UseAction> useAction = toUseActionHandle.formPair(toUseAction);
+	public static final ConverterPair<Object, String> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
 }

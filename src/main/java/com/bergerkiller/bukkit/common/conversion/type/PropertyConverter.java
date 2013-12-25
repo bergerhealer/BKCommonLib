@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -13,6 +12,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 import net.minecraft.server.*;
+import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 /**
  * Converter to convert to a certain property obtained from various kinds of objects<br>
@@ -57,18 +57,6 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 				return ((org.bukkit.entity.Item) value).getItemStack().getType();
 			} else if (value instanceof org.bukkit.inventory.ItemStack) {
 				return ((org.bukkit.inventory.ItemStack) value).getType();
-			} else {
-				return def;
-			}
-		}
-	};
-	@SuppressWarnings("deprecation")
-	public static final PropertyConverter<Byte> toDifficultyId = new PropertyConverter<Byte>(Byte.class) {
-		@Override
-		public Byte convertSpecial(Object value, Class<?> valueType, Byte def) {
-			value = WrapperConverter.toDifficulty.convert(value);
-			if (value instanceof Difficulty) {
-				return Byte.valueOf((byte) ((Difficulty) value).getValue());
 			} else {
 				return def;
 			}
@@ -137,9 +125,31 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
+	public static final PropertyConverter<String> toGameProfileId = new PropertyConverter<String>(String.class) {
+		@Override
+		protected String convertSpecial(Object value, Class<?> valueType, String def) {
+			if (value instanceof GameProfile) {
+				return ((GameProfile) value).getId();
+			} else {
+				return def;
+			}
+		}
+	};
+	public static final PropertyConverter<Object> toGameProfileFromId = new PropertyConverter<Object>(GameProfile.class) {
+		@Override
+		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof String) {
+				String name = (String) value;
+				return new GameProfile(name, name);
+			} else {
+				return def;
+			}
+		}
+	};
 
-	public PropertyConverter(Class<T> outputType) {
-		super(outputType);
+	@SuppressWarnings("unchecked")
+	public PropertyConverter(Class<?> outputType) {
+		super((Class<T>) outputType);
 	}
 
 	@Override
