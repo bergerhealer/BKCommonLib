@@ -194,7 +194,7 @@
             </goals>
             <configuration>
               <name>BKCommonLibVersion.png</name>
-              <background>https://dl.dropbox.com/u/3681706/BKCommonLibVersionSource.png</background>
+              <background>http://dev.dj-tcraft.nl/BKCommonLibVersionSource.png</background>
               <labels>
                 <label>
                   <text>${project.stableversion}</text>
