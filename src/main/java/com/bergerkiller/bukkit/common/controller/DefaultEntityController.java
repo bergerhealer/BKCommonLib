@@ -24,6 +24,7 @@ public final class DefaultEntityController extends EntityController {
 		if (handle instanceof NMSEntityHook) {
 			super.onDie();
 		} else {
+//			((Entity) handle).isI
 			((Entity) handle).die();
 		}
 	}

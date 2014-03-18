@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.bases.DummyWorldServer;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.reflection.ClassBuilder;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
@@ -24,7 +25,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
  */
 public class NMSEntityClassBuilder extends ClassBuilder {
 	private static final Class<?>[] DEFAULT_CONSTRUCTOR_TYPES = {WorldRef.TEMPLATE.getType()};
-	private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {null};
+	private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {DummyWorldServer.newInstance()};
 	private final List<Constructor<?>> callbackConstructors = new ArrayList<Constructor<?>>();
 
 	public NMSEntityClassBuilder(Class<?> superClass, Collection<Class<?>> callbackClasses) {
