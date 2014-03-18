@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.bergerkiller.bukkit.common.bases.DummyWorldServer;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.reflection.ClassBuilder;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
@@ -25,7 +24,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
  */
 public class NMSEntityClassBuilder extends ClassBuilder {
 	private static final Class<?>[] DEFAULT_CONSTRUCTOR_TYPES = {WorldRef.TEMPLATE.getType()};
-	private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {DummyWorldServer.newInstance()};
+	private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {null};
 	private final List<Constructor<?>> callbackConstructors = new ArrayList<Constructor<?>>();
 
 	public NMSEntityClassBuilder(Class<?> superClass, Collection<Class<?>> callbackClasses) {
@@ -44,7 +43,7 @@ public class NMSEntityClassBuilder extends ClassBuilder {
 	 * 
 	 * @return new Entiy instance
 	 */
-	public synchronized Object create(CommonEntity<?> entity) {
+	public synchronized Object create(CommonEntity<?> entity, Object... args) {
 		// Prepare new Callback instances
 		List<Object> instances = new ArrayList<Object>(callbackConstructors.size());
 		for (Constructor<?> callbackConstructor : callbackConstructors) {
@@ -54,6 +53,11 @@ public class NMSEntityClassBuilder extends ClassBuilder {
 				throw new RuntimeException("Unable to construct Callback Class:", t);
 			}
 		}
+		
+		if(args.length <= 0) {
+			args = DEFAULT_CONSTRUCTOR_ARGS;
+		}
+		
 		// Create and return
 		return create(DEFAULT_CONSTRUCTOR_TYPES, DEFAULT_CONSTRUCTOR_ARGS, instances);
 	}
