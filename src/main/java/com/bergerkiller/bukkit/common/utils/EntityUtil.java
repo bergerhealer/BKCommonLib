@@ -2,7 +2,11 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.UUID;
 import net.minecraft.server.Entity;
+import net.minecraft.server.EntityLiving;
+import net.minecraft.server.GenericAttributes;
+
 import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -51,6 +55,28 @@ public class EntityUtil extends EntityPropertyUtil {
 		WorldUtil.getTracker(entity.getWorld()).stopTracking(entity);
 		// Add the entity to the world
 		nmsentity.world.addEntity(nmsentity);
+	}
+	
+	/**
+	 * Changes the speed of a living entity
+	 * 
+	 * @param entity Entity
+	 * @param speed New entity speed
+	 */
+	public static void setSpeed(LivingEntity entity, double speed) {
+		EntityLiving nmsEntity = CommonNMS.getNative(entity);
+		nmsEntity.getAttributeInstance(GenericAttributes.d).setValue(speed);
+	}
+	
+	/**
+	 * Gets the speed of a living entity
+	 * 
+	 * @param entity to check speed
+	 * @return entity speed
+	 */
+	public static double getSpeed(LivingEntity entity) {
+		EntityLiving nmsEntity = CommonNMS.getNative(entity);
+		return nmsEntity.getAttributeInstance(GenericAttributes.d).getValue();
 	}
 
 	/**
