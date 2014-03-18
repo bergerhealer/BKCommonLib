@@ -125,7 +125,7 @@ public class CommonEntityType {
 			this.hookBuilder = new NMSEntityClassBuilder(this.nmsType.getType(), callbacks);
 		}
 		// Create a new instance
-		return (NMSEntityHook) this.hookBuilder.create(commonEntity, commonEntity.getWorld());
+		return (NMSEntityHook) this.hookBuilder.create(commonEntity);
 	}
 
 	/*
