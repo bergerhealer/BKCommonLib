@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class NetworkManagerRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("NetworkManager");
-	public static final FieldAccessor<Queue<Object>> lowPriorityQueue = TEMPLATE.getField("i");
-	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("j");
+	public static final FieldAccessor<Queue<Object>> lowPriorityQueue = TEMPLATE.getField("k");
+	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("l");
 	public static final MethodAccessor<Boolean> getIsOpen = TEMPLATE.getMethod("isConnected");
 }
