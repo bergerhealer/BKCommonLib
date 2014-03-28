@@ -12,8 +12,8 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 
 public class PlayerChunkMapRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerChunkMap");
-	public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = TEMPLATE.getField("f").translate(ConversionPairs.longHashMap);
-	public static final FieldAccessor<Queue<?>> dirtyBlockChunks = TEMPLATE.getField("d");
+	public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = TEMPLATE.getField("d").translate(ConversionPairs.longHashMap);
+	public static final FieldAccessor<Queue<?>> dirtyBlockChunks = TEMPLATE.getField("f");
 	private static final MethodAccessor<Void> flagDirty = TEMPLATE.getMethod("flagDirty", int.class, int.class, int.class);
 
 	public static void flagBlockDirty(Object playerChunkMap, int x, int y, int z) {
