@@ -23,19 +23,19 @@ public class VectorRef {
 
 	public static Vector getVec(Object vec3D) {
 		Vec3D vec = (Vec3D) vec3D;
-		return new Vector(vec.c, vec.d, vec.e);
+		return new Vector(vec.a, vec.b, vec.c);
 	}
 
 	public static double getVecX(Object vec3D) {
-		return ((Vec3D) vec3D).c;
+		return ((Vec3D) vec3D).a;
 	}
 
 	public static double getVecY(Object vec3D) {
-		return ((Vec3D) vec3D).d;
+		return ((Vec3D) vec3D).b;
 	}
 
 	public static double getVecZ(Object vec3D) {
-		return ((Vec3D) vec3D).e;
+		return ((Vec3D) vec3D).c;
 	}
 
 	public static boolean isVec(Object vec3D) {

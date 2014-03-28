@@ -25,8 +25,8 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 	public NMSEntityTrackerEntry(final Entity entity) {
 		super(CommonNMS.getNative(entity), 80, 3, true);
 		// Fix these two: Wrongly set in Constructor
-		this.xLoc = tracker.at.a(tracker.locX);
-		this.zLoc = tracker.at.a(tracker.locZ);
+		this.xLoc = tracker.as.a(tracker.locX);
+		this.zLoc = tracker.as.a(tracker.locZ);
 		// Set proper update interval/viewdistance/mobile
 		final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
 		EntityTrackerEntryRef.isMobile.set(this, type.networkIsMobile);

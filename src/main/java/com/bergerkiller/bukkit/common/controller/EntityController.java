@@ -145,7 +145,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	 */
 	public void onMove(double dx, double dy, double dz) {
 		final Entity handle = entity.getHandle(Entity.class);
-		if (handle.Y) {
+		if (handle.X) {
 			handle.boundingBox.d(dx, dy, dz);
 			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
 			handle.locY = (handle.boundingBox.b + (double) handle.height) - (double) handle.W;
@@ -181,7 +181,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dy = aabb.b(handle.boundingBox, dy);
 			}
 			handle.boundingBox.d(0.0, dy, 0.0);
-			if (!handle.K && oldDy != dy) {
+			if (!handle.J && oldDy != dy) {
 				dx = dy = dz = 0.0;
 			}
 			boolean isOnGround = handle.onGround || oldDy != dy && oldDy < 0.0;
@@ -191,7 +191,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dx = aabb.a(handle.boundingBox, dx);
 			}
 			handle.boundingBox.d(dx, 0.0, 0.0);
-			if (!handle.K && oldDx != dx) {
+			if (!handle.J && oldDx != dx) {
 				dx = dy = dz = 0.0;
 			}
 
@@ -200,19 +200,19 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				dz = aabb.c(handle.boundingBox, dz);
 			}
 			handle.boundingBox.d(0.0, 0.0, dz);
-			if (!handle.K && oldDz != dz) {
+			if (!handle.J && oldDz != dz) {
 				dx = dy = dz = 0.0;
 			}
 
 			double moveDx;
 			double moveDy;
 			double moveDz;
-			if (handle.X > 0.0f && handle.X < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
+			if (handle.Y > 0.0f && handle.Y < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
 				moveDx = dx;
 				moveDy = dy;
 				moveDz = dz;
 				dx = oldDx;
-				dy = (double) handle.X;
+				dy = (double) handle.Y;
 				dz = oldDz;
 
 				AxisAlignedBB axisalignedbb1 = handle.boundingBox.clone();
@@ -225,7 +225,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					dy = aabb.b(handle.boundingBox, dy);
 				}
 				handle.boundingBox.d(0.0, dy, 0.0);
-				if (!handle.K && oldDy != dy) {
+				if (!handle.J && oldDy != dy) {
 					dx = dy = dz = 0.0;
 				}
 
@@ -234,7 +234,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					dx = aabb.a(handle.boundingBox, dx);
 				}
 				handle.boundingBox.d(dx, 0.0, 0.0);
-				if (!handle.K && oldDx != dx) {
+				if (!handle.J && oldDx != dx) {
 					dx = dy = dz = 0.0;
 				}
 
@@ -243,14 +243,14 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 					dz = aabb.c(handle.boundingBox, dz);
 				}
 				handle.boundingBox.d(0.0, 0.0, dz);
-				if (!handle.K && oldDz != dz) {
+				if (!handle.J && oldDz != dz) {
 					dx = dy = dz = 0.0;
 				}
 
-				if (!handle.K && oldDy != dy) {
+				if (!handle.J && oldDy != dy) {
 					dx = dy = dz = 0.0;
 				} else {
-					dy = (double) -handle.X;
+					dy = (double) -handle.Y;
 					for (int k = 0; k < list.size(); k++) {
 						dy = list.get(k).b(handle.boundingBox, dy);
 					}
@@ -264,17 +264,17 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 				} else {
 					double subY = handle.boundingBox.b - (int) handle.boundingBox.b;
 					if (subY > 0.0) {
-						handle.X += subY + 0.01;
+						handle.Y += subY + 0.01;
 					}
 				}
 			}
 			handle.locX = CommonNMS.getMiddleX(handle.boundingBox);
-			handle.locY = handle.boundingBox.b + (double) handle.height - (double) handle.X;
+			handle.locY = handle.boundingBox.b + (double) handle.height - (double) handle.Y;
 			handle.locZ = CommonNMS.getMiddleZ(handle.boundingBox);
 			entity.setMovementImpaired(oldDx != dx || oldDz != dz);
 			handle.onGround = oldDy != dy && oldDy < 0.0;
 			handle.G = oldDy != dy;
-			handle.H = entity.isMovementImpaired() || handle.G;
+			handle.F = entity.isMovementImpaired() || handle.G;
 			EntityRef.updateFalling(handle, dy, handle.onGround);
 
 			// ================ Collision slowdown caused by ==============
@@ -330,9 +330,9 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 			}
 
 			handle.Q += MathUtil.length(moveDx, moveDz) * 0.6;
-			handle.R += MathUtil.length(moveDx, moveDy, moveDz) * 0.6;
-			if (handle.R > EntityRef.stepCounter.get(entity.getHandle()) && block != Blocks.AIR) {
-				EntityRef.stepCounter.set(entity.getHandle(), (int) handle.R + 1);
+			handle.O += MathUtil.length(moveDx, moveDy, moveDz) * 0.6;
+			if (handle.O > EntityRef.stepCounter.get(entity.getHandle()) && block != Blocks.AIR) {
+				EntityRef.stepCounter.set(entity.getHandle(), (int) handle.O + 1);
 				if (entity.isInWater(true)) {
 					float f = (float) Math.sqrt(entity.vel.y.squared() + 0.2 * entity.vel.xz.lengthSquared()) * 0.35f;
 					if (f > 1.0f) {

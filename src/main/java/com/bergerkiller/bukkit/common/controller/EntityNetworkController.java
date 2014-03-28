@@ -893,6 +893,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	}
 
 	private int protLoc(double loc) {
-		return ((EntityTrackerEntry) handle).tracker.at.a(loc);
+		return ((EntityTrackerEntry) handle).tracker.as.a(loc);
 	}
 }

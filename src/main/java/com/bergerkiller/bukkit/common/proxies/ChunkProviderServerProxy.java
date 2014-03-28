@@ -40,12 +40,12 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
 	}
 
 	@Override
-	public void a() {
-		base.a();
+	public void b() {
+		base.b();
 	}
 
-	public void super_a() {
-		super.a();
+	public void super_b() {
+		super.b();
 	}
 
 	@Override

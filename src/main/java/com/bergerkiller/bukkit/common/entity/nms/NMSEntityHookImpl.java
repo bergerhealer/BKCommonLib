@@ -109,7 +109,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 		CommonEntity<?> entity = this.controller.getEntity();
 		if (portal) {
 			Vector velocity = entity.getVelocity();
-			CommonNMS.getNative(exit.getWorld()).t().adjustExit(entity.getHandle(Entity.class), exit, velocity);
+			CommonNMS.getNative(exit.getWorld()).getTravelAgent().adjustExit(entity.getHandle(Entity.class), exit, velocity);
 			if (entity.vel.getX() != velocity.getX() || entity.vel.getY() != velocity.getY() || entity.vel.getZ() != velocity.getZ()) {
 				entity.setVelocity(velocity);
 			}
