@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.WorldServer;
+import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
@@ -165,6 +167,16 @@ public class PlayerUtil extends EntityUtil {
 	 */
 	public static void setPing(Player player, int ping) {
 		CommonNMS.getNative(player).ping = ping;
+	}
+	
+	/**
+	 * Gets the players game profile
+	 * 
+	 * @param player to get game profile from
+	 * @return The player's GameProfile
+	 */
+	public static GameProfile getGameProfile(Player player) {
+		return EntityHumanRef.gameProfile.get(Conversion.toEntityHandle.convert(player));
 	}
 
 	/**

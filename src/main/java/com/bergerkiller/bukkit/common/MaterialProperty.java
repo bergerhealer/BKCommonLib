@@ -81,7 +81,6 @@ public abstract class MaterialProperty<T> {
 	 * @param material to get this property of
 	 * @return The property of the material
 	 */
-	@SuppressWarnings("deprecation")
 	public T get(Material material) {
 		return material == null ? get(0) : get(MaterialUtil.getTypeId(material));
 	}

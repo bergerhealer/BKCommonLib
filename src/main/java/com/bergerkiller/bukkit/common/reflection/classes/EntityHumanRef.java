@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.HashMap;
 
+import net.minecraft.util.com.mojang.authlib.GameProfile;
+
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -27,6 +29,7 @@ public class EntityHumanRef extends EntityLivingRef {
 	public static final FieldAccessor<HashMap<Integer, Object>> mobEffects = TEMPLATE.getField("effects");
 	public static final FieldAccessor<Boolean> updateEffects = TEMPLATE.getField("updateEffects");
 	public static final TranslatorFieldAccessor<PlayerAbilities> abilities = TEMPLATE.getField("abilities").translate(ConversionPairs.playerAbilities);
+	public static final FieldAccessor<GameProfile> gameProfile = TEMPLATE.getField("i");
 
 	public static boolean canInstaBuild(HumanEntity human) {
 		return abilities.get(HandleConverter.toEntityHandle.convert(human)).canInstantlyBuild();

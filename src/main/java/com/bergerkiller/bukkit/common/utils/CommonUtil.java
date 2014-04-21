@@ -14,11 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
 import net.minecraft.server.IPlayerFileData;
+import net.minecraft.util.com.google.common.base.Charsets;
+import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -209,6 +212,23 @@ public class CommonUtil {
 	 */
 	public static boolean hasPermission(CommandSender sender, String[] permissionNode) {
 		return CommonPlugin.getInstance().getPermissionHandler().hasPermission(sender, permissionNode);
+	}
+	
+	/**
+	 * Get the game profile from a name.
+	 * 
+	 * @param name to get game profile from.
+	 * @return Player's GameProfile, OfflinePlayer profile used if player not found.
+	 */
+	public static GameProfile getGameProfile(String name) {
+		Player player = Bukkit.getPlayer(name);
+		if(player != null) {
+			//The right way
+			return PlayerUtil.getGameProfile(player);
+		}
+		
+		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+		return new GameProfile(uuid, name);
 	}
 
 	/**

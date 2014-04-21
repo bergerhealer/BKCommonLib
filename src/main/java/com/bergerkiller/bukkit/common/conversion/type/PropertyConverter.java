@@ -2,19 +2,22 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 import net.minecraft.server.*;
-import net.minecraft.util.com.google.common.base.Charsets;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 /**
@@ -143,8 +146,16 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			if (value instanceof String) {
 				String name = (String) value;
-				UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
-				return new GameProfile(uuid, name);
+				return CommonUtil.getGameProfile(name);
+			} else if(value instanceof UUID) {
+				UUID uuid = (UUID) value;
+				for(Player player : Bukkit.getOnlinePlayers()) {
+					if(player.getUniqueId().equals(uuid)) {
+						return PlayerUtil.getGameProfile(player);
+					}
+				}
+				
+				return def;
 			} else {
 				return def;
 			}
