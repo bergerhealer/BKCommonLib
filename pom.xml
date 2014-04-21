@@ -49,7 +49,9 @@
       <groupId>org.spinotmc</groupId>
       <artifactId>spinot</artifactId>
       <version>${project.cbversion}-SNAPSHOT</version>
-      <scope>provided</scope>
+      <!-- <scope>provided</scope> -->
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/spinot.jar</systemPath>
       <optional>true</optional>
     </dependency>
     <dependency>
