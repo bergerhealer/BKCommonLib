@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
@@ -64,5 +65,5 @@ public class ConversionPairs {
 	public static final ConverterPair<Object, Material> block = toBlockHandle.formPair(toMaterial);
 	public static final ConverterPair<Object, Material> item = toItemHandle.formPair(toMaterial);
 	public static final ConverterPair<Object, UseAction> useAction = toUseActionHandle.formPair(toUseAction);
-	public static final ConverterPair<Object, String> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
+	public static final ConverterPair<Object, UUID> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
 }

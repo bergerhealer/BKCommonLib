@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.minecraft.server.Vec3D;
 
@@ -366,7 +367,7 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacketPlayOutEntity {
-		public final TranslatorFieldAccessor<String> profile = getField("b").translate(ConversionPairs.gameProfileId);
+		public final TranslatorFieldAccessor<UUID> profile = getField("b").translate(ConversionPairs.gameProfileId);
 		public final FieldAccessor<Integer> x = getField("c");
 		public final FieldAccessor<Integer> y = getField("d");
 		public final FieldAccessor<Integer> z = getField("e");

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.util.UUID;
+
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -12,6 +14,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 import net.minecraft.server.*;
+import net.minecraft.util.com.google.common.base.Charsets;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 /**
@@ -125,9 +128,9 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 			}
 		}
 	};
-	public static final PropertyConverter<String> toGameProfileId = new PropertyConverter<String>(String.class) {
+	public static final PropertyConverter<UUID> toGameProfileId = new PropertyConverter<UUID>(UUID.class) {
 		@Override
-		protected String convertSpecial(Object value, Class<?> valueType, String def) {
+		protected UUID convertSpecial(Object value, Class<?> valueType, UUID def) {
 			if (value instanceof GameProfile) {
 				return ((GameProfile) value).getId();
 			} else {
@@ -140,7 +143,8 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
 		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
 			if (value instanceof String) {
 				String name = (String) value;
-				return new GameProfile(name, name);
+				UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+				return new GameProfile(uuid, name);
 			} else {
 				return def;
 			}

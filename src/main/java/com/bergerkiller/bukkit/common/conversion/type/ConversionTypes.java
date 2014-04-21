@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
@@ -125,5 +126,5 @@ public class ConversionTypes {
 	public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
 	public static final PropertyConverter<EntityType> toMinecartType = PropertyConverter.toMinecartType;
 	public static final PropertyConverter<Object> toGameProfileFromId = PropertyConverter.toGameProfileFromId;
-	public static final PropertyConverter<String> toGameProfileId = PropertyConverter.toGameProfileId;
+	public static final PropertyConverter<UUID> toGameProfileId = PropertyConverter.toGameProfileId;
 }

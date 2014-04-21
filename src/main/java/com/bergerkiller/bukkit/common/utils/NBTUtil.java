@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -102,7 +100,7 @@ public class NBTUtil {
 	 * @throws IOException
 	 */
 	public static Object readCompoundUncompressed(InputStream stream) throws IOException {
-		return NBTCompressedStreamTools.a((DataInput) new DataInputStream(stream));
+		return NBTCompressedStreamTools.a(stream);
 	}
 
 	/**
@@ -126,7 +124,7 @@ public class NBTUtil {
 	 * @throws IOException
 	 */
 	public static void writeCompoundUncompressed(Object compound, OutputStream stream) throws IOException {
-		NBTCompressedStreamTools.a((NBTTagCompound) compound, (DataOutput) new DataOutputStream(stream));
+		NBTCompressedStreamTools.a((NBTTagCompound) compound, stream);
 	}
 
 	/**

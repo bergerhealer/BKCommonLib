@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import net.minecraft.server.CommandBlockListenerAbstract;
 import net.minecraft.server.TileEntitySkull;
+import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.Chunk;
 import org.bukkit.SkullType;
@@ -54,7 +55,7 @@ public class BlockStateRef {
 			}
 		});
 		registerInst(new TileInstantiator("Skull") {
-			private final FieldAccessor<String> state_player = STATE.getField("player");
+			private final FieldAccessor<GameProfile> state_profile = STATE.getField("profile");
 			private final FieldAccessor<SkullType> state_type = STATE.getField("skullType");
 			private final FieldAccessor<Byte> state_rotation = STATE.getField("rotation");
 			private final MethodAccessor<SkullType> state_getSkullType = STATE.getMethod("getSkullType", int.class);
@@ -62,7 +63,7 @@ public class BlockStateRef {
 			@Override
 			protected void apply(BlockState state, Object tile) {
 				TileEntitySkull t = (TileEntitySkull) tile;
-				state_player.set(state, t.getExtraType());
+				state_profile.set(state, t.getGameProfile());
 				state_type.set(state, state_getSkullType.invoke(null, t.getSkullType()));
 				state_rotation.set(state, (byte) t.getRotation());
 			}
