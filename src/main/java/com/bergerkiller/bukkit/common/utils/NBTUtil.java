@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -178,7 +179,7 @@ public class NBTUtil {
 	 * @param list Tag list
 	 * @param out Output
 	 */
-	public static void saveList(CommonTagList list, OutputStream out) {
+	public static void saveList(CommonTagList list, DataOutput out) {
 		NBTRef.writeTag(list.getHandle(), out);
 	}
 
