@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.Collection;
 
 import net.minecraft.server.NBTReadLimiter;
@@ -32,22 +32,22 @@ public class NBTRef {
 
 	/* External */
 	private static final ClassTemplate<?> COMPR_TEMP = new NMSClassTemplate("NBTCompressedStreamTools");
-	private static final MethodAccessor<Void> writeTag = COMPR_TEMP.getMethod("a", NBTBase.getType(), OutputStream.class);
-	private static final MethodAccessor<Object> readTag = COMPR_TEMP.getMethod("a", InputStream.class, int.class, NBTReadLimiter.class);
+	private static final MethodAccessor<Void> writeTag = COMPR_TEMP.getMethod("a", NBTBase.getType(), DataOutput.class);
+	private static final MethodAccessor<Object> readTag = COMPR_TEMP.getMethod("a", DataInput.class, int.class, NBTReadLimiter.class);
 
-	public static void writeTag(Object nbtBaseInstance, OutputStream outputStream) {
+	public static void writeTag(Object nbtBaseInstance, DataOutput outputStream) {
 		writeTag.invoke(null, nbtBaseInstance, outputStream);
 	}
 
-	public static Object readTag(InputStream inputStream) {
+	public static Object readTag(DataInput inputStream) {
 		return readTag.invoke(inputStream, 0, new NBTReadLimiterUnlimited(0L));
 	}
 
-	public static Object readTag(InputStream inputStream, int param) {
+	public static Object readTag(DataInput inputStream, int param) {
 		return readTag.invoke(null, inputStream, param, new NBTReadLimiterUnlimited(0L));
 	}
 	
-	public static Object readTag(InputStream inputStream, int param, long maxLength) {
+	public static Object readTag(DataInput inputStream, int param, long maxLength) {
 		return readTag.invoke(null, inputStream, param, new NBTReadLimiter(maxLength));
 	}
 }
