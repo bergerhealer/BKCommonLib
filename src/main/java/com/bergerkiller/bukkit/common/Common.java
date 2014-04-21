@@ -26,7 +26,7 @@ public class Common {
 	/**
 	 * The Minecraft package path version BKCommonLib is built against
 	 */
-	public static final String DEPENDENT_MC_VERSION = "v1_7_R2";
+	public static final String DEPENDENT_MC_VERSION = "v1_7_R3";
 	/**
 	 * Defines the Minecraft version that runs on the server.
 	 */
