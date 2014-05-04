@@ -273,7 +273,7 @@ public class WorldUtil extends ChunkUtil {
 		if (man instanceof WorldNBTStorage) {
 			return ((WorldNBTStorage) man).getPlayerDir();
 		}
-		return new File(getWorldFolder(world), "players");
+		return new File(getWorldFolder(world), "playerdata");
 	}
 
 	/**
