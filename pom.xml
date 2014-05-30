@@ -14,9 +14,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.mcversion>v1_7_R3</project.mcversion>
     <project.cbversion>1.7.9-R0.1</project.cbversion>
-    <project.stableversion>1.57</project.stableversion>
-    <project.stableserver>1.7.2-R0.1</project.stableserver>
-    <project.stabledate>1 January 2014</project.stabledate>
+    <project.stableversion>1.58</project.stableversion>
+    <project.stableserver>1.7.9-R0.1</project.stableserver>
+    <project.stabledate>21 May 2014</project.stabledate>
   </properties>
 
   <repositories>
