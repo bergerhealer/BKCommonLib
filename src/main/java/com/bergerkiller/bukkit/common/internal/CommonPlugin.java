@@ -403,7 +403,12 @@ public class CommonPlugin extends PluginBase {
 				"Providing support for supporting the unsupportable.",
 				"Every feature break in Bukkit makes my feature list longer.",
 				"I...I forgot an exclamation mark...*rages internally*", 
-				"I am still winning the game. Are you?");
+				"I am still winning the game. Are you?",
+				"We did what our big brother couldn't",
+				"If you need syntax help visit javadocs.a.b.v1_2_3.net",
+				"v1_1_R1 1+1+1 = 3, Half life 3 confirmed?",
+				"BKCommonLib > Minecraft.a.b().q.f * Achievement.OBFUSCATED.value",
+				"BKCommonLib isn't a plugin, its a language based on english.");
 		setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
 		setDisableMessage(null);
 
