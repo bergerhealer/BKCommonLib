@@ -223,8 +223,14 @@ public class BlockInfo extends BasicWrapper {
 	 * @param data of the block
 	 * @param yield (e.g. 20.0f)
 	 */
+	@SuppressWarnings("deprecation")
 	public final void destroy(World world, int x, int y, int z, int data, float yield) {
 		dropNaturally(world, x, y, z, data, yield);
-		CommonNMS.getNative(world).setTypeId(x, y, z, 0);
+//		net.minecraft.server.World nativeWorld = CommonNMS.getNative(world);
+//		net.minecraft.server.Block nativeBlock = nativeWorld.getType(x, y, z);
+//		nativeWorld.setTypeId(x, y, z, nativeBlock, 0);
+		//DAT NMS IS WUT SUX
+		
+		world.getBlockAt(x, y, z).setTypeId(0);
 	}
 }

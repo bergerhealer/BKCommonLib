@@ -66,7 +66,7 @@ public class IInventoryBase implements IInventory {
 	}
 
 	@Override
-	public void l_() {
+	public void closeContainer() {
 	}
 
 	@Override

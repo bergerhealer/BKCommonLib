@@ -299,7 +299,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
 			} else {
 				return def;
 			}
-			return EnumDifficulty.a(id);
+			return EnumDifficulty.getById(id);
 		}
 	};
 

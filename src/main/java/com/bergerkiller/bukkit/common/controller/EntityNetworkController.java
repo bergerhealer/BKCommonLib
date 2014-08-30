@@ -593,7 +593,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		if (handle instanceof EntityLiving) {
 			// Entity Attributes
 			AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
-			Collection<?> attributes = attributeMap.b();
+			Collection<?> attributes = attributeMap.c();
 			if (!attributes.isEmpty()) {
 				this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
 			}
