@@ -20,14 +20,11 @@ public class ProtocolTest {
 	private final Logger logger = LoggerFactory.getLogger("TEST");
 	private final List<Class<?>> packetClasses = new ArrayList<Class<?>>();
 	
-	@Test
-	public void testPacketsFound() {
+	public ProtocolTest() {
+		//Scan for API packets
 		for(PojoClass pojoClass : PojoClassFactory.enumerateClassesByExtendingType("com.bergerkiller.bukkit.common.protocol", NMSPacket.class, null)) {
 			packetClasses.add(pojoClass.getClazz());
 		}
-		
-		Assert.assertNotEquals("No packets were found while scanning in protocol package!", packetClasses.size(), 0);
-		logger.info("Found %d packets.", packetClasses.size());
 	}
 	
 	@Test
@@ -58,7 +55,8 @@ public class ProtocolTest {
 	
 	@Test
 	public void testMissingPackets() {
-		int packetsFound = 0;
+		Assert.assertFalse("No API packets were found!", packetClasses.isEmpty());
+		int expected = 0;
 		//Scan for NMS packets
 		List<PojoClass> scanned = PojoClassFactory.enumerateClassesByExtendingType("net.minecraft.server", Packet.class, new PojoClassFilter() {
 
@@ -67,9 +65,9 @@ public class ProtocolTest {
 				return pojoClass.getName().contains("PacketPlay");
 			}
 		});
-		packetsFound = scanned.size();
-		
-		Assert.assertEquals("Packets missing, expected " + packetsFound + " but found " + packetClasses.size(), packetsFound, packetClasses.size());
+		expected = scanned.size();
+		int actual = packetClasses.size();
+		Assert.assertEquals("Packets missing, expected " + expected + " but found " + actual, expected, actual);
 	}
 	
 	public void testMissingMethods() {
