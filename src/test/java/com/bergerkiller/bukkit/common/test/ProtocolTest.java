@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.server.Packet;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -68,6 +69,7 @@ public class ProtocolTest {
 		Assert.assertEquals("Packets missing, expected " + expected + " but found " + actual, expected, actual);
 	}
 	
+	@Ignore
 	@Test
 	public void testMissingMethods() {
 		for(PojoClass nmsPacket : nmsPacketClasses) {
