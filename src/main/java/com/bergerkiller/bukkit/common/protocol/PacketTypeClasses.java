@@ -322,10 +322,10 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutMapChunk extends NMSPacket {
-		public final FieldAccessor<Integer> size = getField("size");
+		public final FieldAccessor<Integer> size = getField("h");
 		public final FieldAccessor<byte[]> buffer = getField("e");
-		public final FieldAccessor<byte[]> inflatedBuffer = getField("buffer");
-		public final FieldAccessor<Boolean> hasBiomeData = getField("inflatedBuffer");
+		public final FieldAccessor<byte[]> inflatedBuffer = getField("f");
+		public final FieldAccessor<Boolean> hasBiomeData = getField("g");
 		public final FieldAccessor<Integer> x = getField("a");
 		public final FieldAccessor<Integer> z = getField("b");
 		public final FieldAccessor<Integer> chunkDataBitMap = getField("c");

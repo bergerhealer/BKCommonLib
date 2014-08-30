@@ -40,7 +40,7 @@ public class EntityRef {
 	public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
 	public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
 	public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("d");
-	public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("n"); //Note: Not sure if the name is correct!
+	public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("k"); //Note: Not sure if the name is correct!
 	public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ag");
 	public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("an");
 

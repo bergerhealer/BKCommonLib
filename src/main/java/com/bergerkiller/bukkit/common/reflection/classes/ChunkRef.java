@@ -24,10 +24,10 @@ public class ChunkRef {
 	public static final FieldAccessor<Integer> x = TEMPLATE.getField("locX");
 	public static final FieldAccessor<Integer> z = TEMPLATE.getField("locZ");
 	public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("m");
-	public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("i");
+	public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("getSections");
 	public static final FieldAccessor<Boolean> seenByPlayer = TEMPLATE.getField("q");
 	private static final MethodAccessor<Void> addEntities = TEMPLATE.getMethod("addEntities");
-	private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("a", icp, icp, int.class, int.class);
+	private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("loadNearby", icp, icp, int.class, int.class);
 	private static final MethodAccessor<Boolean> needsSaving = TEMPLATE.getMethod("a", boolean.class);
 	public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
 	public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
