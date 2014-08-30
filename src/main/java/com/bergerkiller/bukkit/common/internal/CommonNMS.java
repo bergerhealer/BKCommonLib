@@ -193,7 +193,7 @@ public class CommonNMS {
 	}
 
 	public static boolean isValidBlockId(int blockId) {
-		return Item.d(blockId) != null || Block.e(blockId) != null;
+		return Item.getById(blockId) != null;
 	}
 
 	public static List<Entity> getEntities(World world, Entity ignore, 
