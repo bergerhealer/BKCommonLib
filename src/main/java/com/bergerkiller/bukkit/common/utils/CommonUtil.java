@@ -361,7 +361,6 @@ public class CommonUtil {
 			throw new IOException("Resource not found: " + resourcePath);
 		}
 		
-		jarFile.close();
 		return jarFile.getInputStream(entry);
 	}
 
