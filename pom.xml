@@ -17,6 +17,7 @@
     <project.stableversion>1.58</project.stableversion>
     <project.stableserver>1.7.9-R0.1</project.stableserver>
     <project.stabledate>21 May 2014</project.stabledate>
+    <junit.version>4.11</junit.version>
   </properties>
 
   <repositories>
@@ -115,6 +116,12 @@
 	  <version>0.3.2</version>
 	  <scope>test</scope>
 	</dependency>
+	<dependency>
+	  <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <!-- Build -->
