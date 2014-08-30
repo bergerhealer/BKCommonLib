@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import net.minecraft.server.*;
@@ -119,15 +120,22 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
 			Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
 			Channel channel = NetworkManagerRef.channel.get(networkManager);
-			channel.pipeline().addBefore("packet_handler", "BKCommonLib", new CommonChannelListener(player));
+			channel.pipeline().addBefore("packet_handler", "bkcommonlib", new CommonChannelListener(player));
 		}
 		
 		public static void unbind(Player player) {
 			Object entityPlayer = Conversion.toEntityHandle.convert(player);
 			Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
 			Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
-			Channel channel = NetworkManagerRef.channel.get(networkManager);
-			channel.pipeline().remove("BKCommonLib");
+			final Channel channel = NetworkManagerRef.channel.get(networkManager);
+			channel.eventLoop().submit(new Callable<Object>() {
+
+				@Override
+				public Object call() throws Exception {
+					channel.pipeline().remove("bkcommonlib");
+					return null;
+				}
+			});
 		}
 		
 		private final PacketHandlerHooked handler;
