@@ -26,7 +26,7 @@ public class ProtocolTest {
 			packetClasses.add(pojoClass.getClazz());
 		}
 		
-		Assert.assertTrue("No packets were found while scanning in protocol package!", packetClasses.size() > 0);
+		Assert.assertNotEquals("No packets were found while scanning in protocol package!", packetClasses.size(), 0);
 		logger.info("Found %d packets.", packetClasses.size());
 	}
 	
