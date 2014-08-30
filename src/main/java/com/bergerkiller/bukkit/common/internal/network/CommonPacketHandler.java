@@ -119,7 +119,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
 			Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
 			Channel channel = NetworkManagerRef.channel.get(networkManager);
-			channel.pipeline().addBefore("bkc_handler", "packets", new CommonChannelListener(player));
+			channel.pipeline().addBefore("packet_handler", "BKCommonLib", new CommonChannelListener(player));
 		}
 		
 		public static void unbind(Player player) {
@@ -127,7 +127,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 			Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
 			Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
 			Channel channel = NetworkManagerRef.channel.get(networkManager);
-			channel.pipeline().remove("bkc_handler");
+			channel.pipeline().remove("BKCommonLib");
 		}
 		
 		private final PacketHandlerHooked handler;

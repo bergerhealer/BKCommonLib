@@ -357,8 +357,11 @@ public class CommonUtil {
 		final JarFile jarFile = new JarFile(pluginJarFile);
 		final ZipEntry entry = jarFile.getEntry(resourcePath);
 		if (entry == null) {
+			jarFile.close();
 			throw new IOException("Resource not found: " + resourcePath);
 		}
+		
+		jarFile.close();
 		return jarFile.getInputStream(entry);
 	}
 
