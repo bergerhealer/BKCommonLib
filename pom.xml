@@ -119,7 +119,7 @@
 
   <!-- Build -->
   <build>
-  	<defaultGoal>clean install</defaultGoal>
+  	<defaultGoal>package</defaultGoal>
 
 	<!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
 	<resources>
