@@ -23,12 +23,9 @@ import net.minecraft.server.PlayerChunkMap;
 import net.minecraft.server.WorldServer;
 
 public class PlayerChunkMapBase extends PlayerChunkMap {
-	private final SafeConstructor<?> playerChunkComparatorConst;
 	
 	public PlayerChunkMapBase(World world, int viewDistace) {
 		super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistace);
-		NMSClassTemplate chunkCoordComparatorClassTemplate = new NMSClassTemplate("PlayerChunkMap$ChunkCoordComparator");
-		this.playerChunkComparatorConst = chunkCoordComparatorClassTemplate.getConstructor(EntityPlayer.class);
 	}
 
 	/**
@@ -131,16 +128,15 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 				entityplayer.d = entityplayer.locX;
 				entityplayer.e = entityplayer.locZ;
 
-				Comparator<? super ChunkCoordIntPair> chunkCoordComparator = (Comparator<? super ChunkCoordIntPair>) playerChunkComparatorConst.newInstance(entityplayer);
-				Collections.sort(chunksToLoad, chunkCoordComparator);
+				
+				Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
 				for (ChunkCoordIntPair pair : chunksToLoad) {
 					Object playerchunk = PlayerChunkMapRef.getChunk.invoke(pair.x, pair.z, true);
 					PlayerChunkRef.load.invoke(playerchunk, entityplayer);
 				}
 
-				chunkCoordComparator = (Comparator<? super ChunkCoordIntPair>) playerChunkComparatorConst.newInstance(entityplayer);
 				if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1))
-					Collections.sort(entityplayer.chunkCoordIntPairQueue, chunkCoordComparator);
+					Collections.sort(entityplayer.chunkCoordIntPairQueue, new ChunkCoordComparator(entityplayer));
 			}
 		}
 	}
@@ -194,5 +190,47 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	 */
 	public World getWorld() {
 		return Conversion.toWorld.convert(super.a());
+	}
+	
+	/**
+	 * This is nuts bro o,o
+	 */
+	private static class ChunkCoordComparator implements
+			Comparator<ChunkCoordIntPair> {
+		private int x;
+		private int z;
+
+		public ChunkCoordComparator(EntityPlayer entityplayer) {
+			this.x = ((int) entityplayer.locX >> 4);
+			this.z = ((int) entityplayer.locZ >> 4);
+		}
+
+		public int compare(ChunkCoordIntPair a, ChunkCoordIntPair b) {
+			if (a.equals(b)) {
+				return 0;
+			}
+
+			int ax = a.x - this.x;
+			int az = a.z - this.z;
+			int bx = b.x - this.x;
+			int bz = b.z - this.z;
+
+			int result = (ax - bx) * (ax + bx) + (az - bz) * (az + bz);
+			if (result != 0) {
+				return result;
+			}
+
+			if (ax < 0) {
+				if (bx < 0) {
+					return bz - az;
+				}
+				return -1;
+			}
+
+			if (bx < 0) {
+				return 1;
+			}
+			return az - bz;
+		}
 	}
 }
