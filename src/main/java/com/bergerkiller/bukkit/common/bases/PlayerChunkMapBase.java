@@ -1,19 +1,34 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 
+import net.minecraft.server.ChunkCoordIntPair;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.PlayerChunkMap;
 import net.minecraft.server.WorldServer;
 
 public class PlayerChunkMapBase extends PlayerChunkMap {
-
+	private final SafeConstructor<?> playerChunkComparatorConst;
+	
 	public PlayerChunkMapBase(World world, int viewDistace) {
 		super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistace);
+		NMSClassTemplate chunkCoordComparatorClassTemplate = new NMSClassTemplate("PlayerChunkMap$ChunkCoordComparator");
+		this.playerChunkComparatorConst = chunkCoordComparatorClassTemplate.getConstructor(EntityPlayer.class);
 	}
 
 	/**
@@ -69,6 +84,10 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	public void removePlayer(EntityPlayer arg0) {
 		removePlayer(CommonNMS.getPlayer(arg0));
 	}
+	
+	public Object getPlayerChunk(Object playerChunk) {
+		return playerChunk;
+	}
 
 	/**
 	 * Updates player movement
@@ -76,7 +95,54 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	 * @param player to update
 	 */
 	public void movePlayer(Player player) {
-		super.movePlayer(CommonNMS.getNative(player));
+		EntityPlayer entityplayer = CommonNMS.getNative(player);
+		int i = (int) entityplayer.locX >> 4;
+		int j = (int) entityplayer.locZ >> 4;
+		double d0 = entityplayer.d - entityplayer.locX;
+		double d1 = entityplayer.e - entityplayer.locZ;
+		double d2 = d0 * d0 + d1 * d1;
+
+		if (d2 >= 64.0D) {
+			int k = (int) entityplayer.d >> 4;
+			int l = (int) entityplayer.e >> 4;
+			int i1 = PlayerChunkMapRef.radius.get(this);
+			int j1 = i - k;
+			int k1 = j - l;
+			List<ChunkCoordIntPair> chunksToLoad = new LinkedList<ChunkCoordIntPair>();
+
+			if ((j1 != 0) || (k1 != 0)) {
+				for (int l1 = i - i1; l1 <= i + i1; l1++) {
+					for (int i2 = j - i1; i2 <= j + i1; i2++) {
+						if(!PlayerChunkMapRef.shouldUnload.invoke(this, l1, i2, k, l, i1)) {
+							chunksToLoad.add(new ChunkCoordIntPair(l1, i2));
+						}
+
+						if(!PlayerChunkMapRef.shouldUnload.invoke(this, l1 - j1, i2 - k1, i, j, i1)) {
+							Object playerchunk = getPlayerChunk(PlayerChunkMapRef.getChunk.invoke(this, l1 - j1, i2 - k1, false));
+
+							if (playerchunk != null) {
+								PlayerChunkRef.unload.invoke(playerchunk, entityplayer);
+							}
+						}
+					}
+				}
+
+				b(entityplayer);
+				entityplayer.d = entityplayer.locX;
+				entityplayer.e = entityplayer.locZ;
+
+				Comparator<? super ChunkCoordIntPair> chunkCoordComparator = (Comparator<? super ChunkCoordIntPair>) playerChunkComparatorConst.newInstance(entityplayer);
+				Collections.sort(chunksToLoad, chunkCoordComparator);
+				for (ChunkCoordIntPair pair : chunksToLoad) {
+					Object playerchunk = PlayerChunkMapRef.getChunk.invoke(pair.x, pair.z, true);
+					PlayerChunkRef.load.invoke(playerchunk, entityplayer);
+				}
+
+				chunkCoordComparator = (Comparator<? super ChunkCoordIntPair>) playerChunkComparatorConst.newInstance(entityplayer);
+				if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1))
+					Collections.sort(entityplayer.chunkCoordIntPairQueue, chunkCoordComparator);
+			}
+		}
 	}
 
 	/**
