@@ -15,7 +15,7 @@ public class ProtocolTest {
 	
 	@Test
 	public void testPacketsFound() {
-		for(PojoClass pojoClass : PojoClassFactory.enumerateClassesByExtendingType("com.bergerkiller.bukkit.common.protocol.PacketTypeClasses", NMSPacket.class, null)) {
+		for(PojoClass pojoClass : PojoClassFactory.enumerateClassesByExtendingType("com.bergerkiller.bukkit.common.protocol", NMSPacket.class, null)) {
 			packetClasses.add(pojoClass.getClazz());
 		}
 		
