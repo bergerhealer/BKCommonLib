@@ -62,7 +62,7 @@ public class PacketType extends ClassTemplate<Object> {
 	public static final NMSPacketPlayOutScoreboardTeam OUT_SCOREBOARD_TEAM = new NMSPacketPlayOutScoreboardTeam();
 	/* Window-related packets */
 	public static final NMSPacketPlayOutCloseWindow OUT_WINDOW_CLOSE = new NMSPacketPlayOutCloseWindow();
-	public static final NMSPacketPlayOutCraftProgressBar OUT_WINDOW_PROGRESS = new NMSPacketPlayOutCraftProgressBar();
+	public static final NMSPacketPlayOutWindowData OUT_WINDOW_DATA = new NMSPacketPlayOutWindowData();
 	public static final NMSPacketPlayOutOpenWindow OUT_WINDOW_OPEN = new NMSPacketPlayOutOpenWindow();
 	public static final NMSPacketPlayOutSetSlot OUT_WINDOW_SET_SLOT = new NMSPacketPlayOutSetSlot();
 	public static final NMSPacketPlayOutTransaction OUT_WINDOW_TRANSACTION = new NMSPacketPlayOutTransaction();

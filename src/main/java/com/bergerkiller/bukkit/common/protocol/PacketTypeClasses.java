@@ -133,7 +133,7 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Integer> collectorEntityId = getField("b");
 	}
 
-	public static class NMSPacketPlayOutCraftProgressBar extends NMSPacketPlayOutWindow {
+	public static class NMSPacketPlayOutWindowData extends NMSPacketPlayOutWindow {
 		public final FieldAccessor<Integer> count = getField("b");
 		public final FieldAccessor<Integer> data = getField("c");
 	}
