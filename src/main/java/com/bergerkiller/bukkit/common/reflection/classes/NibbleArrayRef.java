@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
@@ -15,34 +14,34 @@ public class NibbleArrayRef {
 	private static final MethodAccessor<Integer> copyToByteArray;
 	private static final MethodAccessor<byte[]> getValueArray;
 	static {
-		if (Common.IS_SPIGOT_SERVER) {
-			copyToByteArray = TEMPLATE.getMethod("copyToByteArray", byte[].class, int.class);
-			getValueArray = TEMPLATE.getMethod("getValueArray");
-			getByteLength = TEMPLATE.getMethod("getByteLength");
-		} else {
-			copyToByteArray = new SafeDirectMethod<Integer>() {
-				@Override
-				public Integer invoke(Object instance, Object... args) {
-					byte[] data = array.get(instance);
-					byte[] rawBuffer = (byte[]) args[0];
-					int rawLength = ((Integer) args[1]).intValue();
-					System.arraycopy(data, 0, rawBuffer, rawLength, data.length);
-					return Integer.valueOf(data.length + rawLength);
-				}
-			};
-			getValueArray = new SafeDirectMethod<byte[]>() {
-				@Override
-				public byte[] invoke(Object instance, Object... args) {
-					return array.get(instance);
-				}
-			};
-			getByteLength = new SafeDirectMethod<Integer>() {
-				@Override
-				public Integer invoke(Object instance, Object... args) {
-					return array.get(instance).length;
-				}
-			};
-		}
+//		if (Common.IS_SPIGOT_SERVER) {
+//			copyToByteArray = TEMPLATE.getMethod("copyToByteArray", byte[].class, int.class);
+//			getValueArray = TEMPLATE.getMethod("getValueArray");
+//			getByteLength = TEMPLATE.getMethod("getByteLength");
+//		} else {
+		copyToByteArray = new SafeDirectMethod<Integer>() {
+			@Override
+			public Integer invoke(Object instance, Object... args) {
+				byte[] data = array.get(instance);
+				byte[] rawBuffer = (byte[]) args[0];
+				int rawLength = ((Integer) args[1]).intValue();
+				System.arraycopy(data, 0, rawBuffer, rawLength, data.length);
+				return Integer.valueOf(data.length + rawLength);
+			}
+		};
+		getValueArray = new SafeDirectMethod<byte[]>() {
+			@Override
+			public byte[] invoke(Object instance, Object... args) {
+				return array.get(instance);
+			}
+		};
+		getByteLength = new SafeDirectMethod<Integer>() {
+			@Override
+			public Integer invoke(Object instance, Object... args) {
+				return array.get(instance).length;
+			}
+		};
+//		}
 	}
 
 	/**
