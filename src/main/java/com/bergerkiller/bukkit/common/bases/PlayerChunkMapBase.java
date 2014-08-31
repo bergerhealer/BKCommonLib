@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -12,8 +10,6 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 
@@ -91,6 +87,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	 * 
 	 * @param player to update
 	 */
+	@SuppressWarnings("unchecked")
 	public void movePlayer(Player player) {
 		EntityPlayer entityplayer = CommonNMS.getNative(player);
 		int i = (int) entityplayer.locX >> 4;
@@ -156,7 +153,22 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 	 * @param player to remove
 	 */
 	public void removePlayer(Player player) {
-		super.removePlayer(CommonNMS.getNative(player));
+		EntityPlayer entityplayer = CommonNMS.getNative(player);
+		int i = (int) entityplayer.d >> 4;
+		int j = (int) entityplayer.e >> 4;
+		int radius = PlayerChunkMapRef.radius.get(this);
+
+		for (int k = i - radius; k <= i + radius; k++) {
+			for (int l = j - radius; l <= j + radius; l++) {
+				Object playerchunk = getPlayerChunk(PlayerChunkMapRef.getChunk.invoke(this, k, l, false));
+
+				if (playerchunk != null) {
+					PlayerChunkRef.unload.invoke(playerchunk, entityplayer);
+				}
+			}
+		}
+
+		PlayerChunkMapRef.managedPlayers.get(this).remove(entityplayer);
 	}
 
 	/**

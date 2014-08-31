@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.List;
 import java.util.Queue;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -12,6 +13,7 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 
 public class PlayerChunkMapRef {
 	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerChunkMap");
+	public static final FieldAccessor<List<?>> managedPlayers = TEMPLATE.getField("managedPlayers");
 	public static final FieldAccessor<Integer> radius = TEMPLATE.getField("g");
 	public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = TEMPLATE.getField("d").translate(ConversionPairs.longHashMap);
 	public static final FieldAccessor<Queue<?>> dirtyBlockChunks = TEMPLATE.getField("f");
