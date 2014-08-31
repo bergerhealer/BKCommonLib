@@ -19,4 +19,5 @@ public class PlayerChunkRef {
 	public static final FieldAccessor<List<Player>> players = TEMPLATE.getField("b").translate(ConversionPairs.playerList);
 	public static final MethodAccessor<Void> unload = TEMPLATE.getMethod("b", EntityPlayer.class);
 	public static final MethodAccessor<Void> load = TEMPLATE.getMethod("a", EntityPlayer.class);
+	public static final FieldAccessor<Boolean> loaded = TEMPLATE.getField("loaded");
 }
