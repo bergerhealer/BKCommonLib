@@ -131,7 +131,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 				
 				Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
 				for (ChunkCoordIntPair pair : chunksToLoad) {
-					Object playerchunk = PlayerChunkMapRef.getChunk.invoke(pair.x, pair.z, true);
+					Object playerchunk = PlayerChunkMapRef.getChunk.invoke(this, pair.x, pair.z, true);
 					PlayerChunkRef.load.invoke(playerchunk, entityplayer);
 				}
 
