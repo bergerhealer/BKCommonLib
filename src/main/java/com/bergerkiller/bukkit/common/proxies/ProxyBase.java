@@ -82,7 +82,7 @@ public class ProxyBase<T> implements Proxy<T> {
                 }
             }
             return succ;
-        } catch (Throwable t) {
+        } catch (SecurityException t) {
             t.printStackTrace();
             return false;
         }

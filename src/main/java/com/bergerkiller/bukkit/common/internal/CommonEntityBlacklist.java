@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import me.snowleo.bleedingmobs.BleedingMobs;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
@@ -14,27 +12,16 @@ import regalowl.hyperconomy.HyperConomy;
 
 import com.bergerkiller.bukkit.common.filtering.Filter;
 import com.kellerkindt.scs.ShowCaseStandalone;
-import com.narrowtux.showcase.Showcase;
 
 public class CommonEntityBlacklist implements Filter<Entity> {
 
-    private final List<BlacklistFilter> availableFilters = new ArrayList<BlacklistFilter>();
+    private final List<BlacklistFilter> availableFilters = new ArrayList<>();
 
     public CommonEntityBlacklist() {
-		// ===============================================
+        // ===============================================
         // ==== Initialize all available filters here ====
         // ===============================================
 
-        // Showcase
-        availableFilters.add(new BlacklistFilter("Showcase") {
-            @Override
-            public boolean isFiltered(Entity element) {
-                if (element instanceof Item) {
-                    return Showcase.instance.getItemByDrop((Item) element) != null;
-                }
-                return false;
-            }
-        });
         // Showcase Standalone
         availableFilters.add(new BlacklistFilter("ShowCaseStandalone") {
             @Override
@@ -52,20 +39,6 @@ public class CommonEntityBlacklist implements Filter<Entity> {
             public boolean isFiltered(Entity element) {
                 if (element instanceof Item) {
                     return HyperConomy.hyperAPI.isItemDisplay((Item) element);
-                }
-                return false;
-            }
-        });
-        // Bleeding Mobs
-        availableFilters.add(new BlacklistFilter("BleedingMobs") {
-            @Override
-            @SuppressWarnings("deprecation")
-            public boolean isFiltered(Entity element) {
-                if (element instanceof Item) {
-                    BleedingMobs bm = (BleedingMobs) this.getPlugin();
-                    if (bm.isSpawning() || (bm.isWorldEnabled(element.getWorld()) && bm.isParticleItem(element.getUniqueId()))) {
-                        return true;
-                    }
                 }
                 return false;
             }

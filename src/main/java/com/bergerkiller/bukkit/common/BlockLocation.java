@@ -99,7 +99,7 @@ public class BlockLocation {
                 }
             }
             return new BlockLocation(world.toString(), x, y, z);
-        } catch (Throwable t) {
+        } catch (NumberFormatException t) {
             return null;
         }
     }

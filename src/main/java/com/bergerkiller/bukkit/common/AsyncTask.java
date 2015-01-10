@@ -39,6 +39,7 @@ public abstract class AsyncTask implements Runnable {
     public AsyncTask(final String name, final int priority) {
         final AsyncTask task = this;
         this.thread = new Thread() {
+            @Override
             public void run() {
                 task.running = true;
                 try {

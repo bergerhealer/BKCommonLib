@@ -28,7 +28,7 @@ public class DummyWorldServer extends WorldServer {
         super(constrFail(), null, null, 12, null, null, null);
     }
 
-    private static final MinecraftServer constrFail() {
+    private static MinecraftServer constrFail() {
         throw new UnsupportedOperationException("DummyWorld constructor can not be used - use ClassTemplate.newInstanceNull");
     }
 

@@ -200,7 +200,7 @@ public class ConfigurationNode implements Cloneable {
      */
     public Map<String, String> getHeaders() {
         String root = this.getPath();
-        Map<String, String> rval = new HashMap<String, String>(this.headers.size());
+        Map<String, String> rval = new HashMap<>(this.headers.size());
         if (LogicUtil.nullOrEmpty(root)) {
             rval.putAll(this.headers);
         } else {
@@ -276,7 +276,7 @@ public class ConfigurationNode implements Cloneable {
      * @return Set of configuration nodes
      */
     public Set<ConfigurationNode> getNodes() {
-        Set<ConfigurationNode> rval = new HashSet<ConfigurationNode>();
+        Set<ConfigurationNode> rval = new HashSet<>();
         for (String path : this.getKeys()) {
             if (this.isNode(path)) {
                 rval.add(this.getNode(path));
@@ -327,6 +327,8 @@ public class ConfigurationNode implements Cloneable {
     /**
      * Clones this ConfigurationNode in a way that it no longer references the
      * backing file configuration
+     * 
+     * @return ConfigurationNode
      */
     @Override
     public ConfigurationNode clone() {
@@ -421,12 +423,16 @@ public class ConfigurationNode implements Cloneable {
             this.setRead(path);
             if (value.getClass().isEnum()) {
                 String text = value.toString();
-                if (text.equals("true")) {
-                    value = true;
-                } else if (text.equals("false")) {
-                    value = false;
-                } else {
-                    value = text;
+                switch (text) {
+                    case "true":
+                        value = true;
+                        break;
+                    case "false":
+                        value = false;
+                        break;
+                    default:
+                        value = text;
+                        break;
                 }
             }
         }
@@ -466,7 +472,7 @@ public class ConfigurationNode implements Cloneable {
     public <T> List<T> getList(String path, Class<T> type, List<T> def) {
         List list = this.getList(path);
         if (list != null) {
-            def = new ArrayList<T>();
+            def = new ArrayList<>();
             T val;
             for (Object o : list) {
                 val = ParseUtil.convert(o, type);

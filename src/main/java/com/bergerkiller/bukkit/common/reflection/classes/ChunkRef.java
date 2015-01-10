@@ -34,8 +34,8 @@ public class ChunkRef {
     public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
     public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
     public static final FieldAccessor<List<Object>[]> entitySlices = TEMPLATE.getField("entitySlices");
-    public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
-    public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "g");
+    public static final FieldAccessor<Object> worldProvider = new SafeField<>(CommonUtil.getNMSClass("World"), "worldProvider");
+    public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<>(CommonUtil.getNMSClass("WorldProvider"), "g");
 
     public static void loadNeighbours(Object chunkHandle, Object chunkProvider1, Object chunkProvider2, int x, int z) {
         loadNeighbours.invoke(chunkHandle, chunkProvider1, chunkProvider2, x, z);
@@ -57,6 +57,7 @@ public class ChunkRef {
 
     /**
      * Gets all chunk sections contained in a chunk
+     * @param chunkHandle
      */
     public static Object[] getSections(Object chunkHandle) {
         return sections.invoke(chunkHandle);
@@ -69,7 +70,7 @@ public class ChunkRef {
      * @return chunk section highest y-position
      */
     public static int getTopSectionY(Object chunkHandle) {
-        return ((Chunk) chunkHandle).h();
+        return ((Chunk) chunkHandle).f(new BlockPosition(((Chunk) chunkHandle).locX, 0, ((Chunk) chunkHandle).locZ));
     }
 
     public static int getHeight(Object chunkHandle, int x, int z) {
@@ -96,7 +97,7 @@ public class ChunkRef {
     }
 
     public static boolean setBlock(Object chunkHandle, BlockPosition blockposition, Object type, int data) {
-        return ((Chunk) chunkHandle).a(blockposition, (Block) type, data);
+        return ((Chunk) chunkHandle).a(blockposition, (Block) type);
     }
 
     @Deprecated
@@ -105,7 +106,7 @@ public class ChunkRef {
     }
 
     public static int getData(Object chunkHandle, BlockPosition blockposition) {
-        return ((Chunk) chunkHandle).getData(blockposition);
+        return ((Chunk) chunkHandle).b(blockposition);
     }
 
     public static Object getType(Object chunkHandle, BlockPosition blockposition) {

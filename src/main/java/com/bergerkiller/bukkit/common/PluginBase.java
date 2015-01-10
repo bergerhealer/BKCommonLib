@@ -223,7 +223,7 @@ public abstract class PluginBase extends JavaPlugin {
         }
         try {
             this.register(listener.newInstance());
-        } catch (Exception e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -585,7 +585,7 @@ public abstract class PluginBase extends JavaPlugin {
                         if (plugin == null) {
                             log(Level.SEVERE, type + " a dependency of this plugin");
                             // Add all dependencies of this plugin to the cause
-                            LinkedHashSet<String> dep = new LinkedHashSet<String>();
+                            LinkedHashSet<String> dep = new LinkedHashSet<>();
                             dep.add(this.getName());
                             dep.addAll(LogicUtil.fixNull(this.getDescription().getDepend(), Collections.EMPTY_LIST));
                             dep.addAll(LogicUtil.fixNull(this.getDescription().getSoftDepend(), Collections.EMPTY_LIST));
@@ -710,7 +710,7 @@ public abstract class PluginBase extends JavaPlugin {
         // Load plugin.yml configuration
         try {
             this.pluginYaml.loadFromStream(getResource("plugin.yml"));
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
         }
 
@@ -721,12 +721,12 @@ public abstract class PluginBase extends JavaPlugin {
             ConfigurationNode commandsNode = getLocalizationNode("commands");
 
             // Create a new modifiable commands map to replace with
-            commands = new HashMap<String, Map<String, Object>>(commands);
+            commands = new HashMap<>(commands);
             for (Entry<String, Map<String, Object>> commandEntry : commands.entrySet()) {
                 ConfigurationNode node = commandsNode.getNode(commandEntry.getKey());
 
                 // Transfer description and usage
-                Map<String, Object> data = new HashMap<String, Object>(commandEntry.getValue());
+                Map<String, Object> data = new HashMap<>(commandEntry.getValue());
                 node.shareWith(data, "description", "No description specified");
                 node.shareWith(data, "usage", "/" + commandEntry.getKey());
                 commandEntry.setValue(Collections.unmodifiableMap(data));

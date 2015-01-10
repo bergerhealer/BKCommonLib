@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class ActiveState<T> {
 
     private T state;
-    private LinkedList<T> oldStates = new LinkedList<T>();
+    private LinkedList<T> oldStates = new LinkedList<>();
 
     /**
      * Initialized a new Active State

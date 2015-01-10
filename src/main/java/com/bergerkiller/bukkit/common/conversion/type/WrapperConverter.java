@@ -314,10 +314,10 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<IntVector3> toIntVector3 = new WrapperConverter<IntVector3>(IntVector3.class) {
         @Override
         public IntVector3 convertSpecial(Object value, Class<?> valueType, IntVector3 def) {
-            if (VectorRef.isPosition(value)) {
-                return VectorRef.getPosition(value);
-            } else if (VectorRef.isCoord(value)) {
-                return VectorRef.getCoord(value);
+            if (VectorRef.isPair(value)) {
+                return VectorRef.getPair(value).toIntVector3(0);
+            } else if (VectorRef.isVec(value)) {
+                return VectorRef.getPair(value).toIntVector3(0);
             } else {
                 return def;
             }
@@ -365,7 +365,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
         @Override
         protected LongHashMap<Object> convertSpecial(Object value, Class<?> valueType, LongHashMap<Object> def) {
             if (LongHashMapRef.TEMPLATE.isInstance(value)) {
-                return new LongHashMap<Object>(value);
+                return new LongHashMap<>(value);
             } else {
                 return def;
             }
@@ -385,7 +385,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
         @Override
         protected IntHashMap<Object> convertSpecial(Object value, Class<?> valueType, IntHashMap<Object> def) {
             if (IntHashMapRef.TEMPLATE.isInstance(value)) {
-                return new IntHashMap<Object>(value);
+                return new IntHashMap<>(value);
             } else {
                 return def;
             }

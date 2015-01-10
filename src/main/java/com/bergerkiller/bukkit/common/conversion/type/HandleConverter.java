@@ -234,14 +234,13 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isPosition(value)) {
-                final int x = VectorRef.getPositionX(value);
-                final int y = VectorRef.getPositionY(value);
-                final int z = VectorRef.getPositionZ(value);
-                return VectorRef.newCoord(x, y, z);
+            if (VectorRef.isPair(value)) {
+                final int x = VectorRef.getPairX(value);
+                final int z = VectorRef.getPairZ(value);
+                return VectorRef.newPair(x, z);
             } else if (value instanceof IntVector3) {
                 IntVector3 iv3 = (IntVector3) value;
-                return VectorRef.newCoord(iv3.x, iv3.y, iv3.z);
+                return VectorRef.newPair(iv3.x, iv3.z);
             } else {
                 return def;
             }
@@ -250,14 +249,13 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toChunkPositionHandle = new HandleConverter("ChunkPosition") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isCoord(value)) {
-                final int x = VectorRef.getCoordX(value);
-                final int y = VectorRef.getCoordX(value);
-                final int z = VectorRef.getCoordX(value);
-                return VectorRef.newPosition(x, y, z);
+            if (VectorRef.isPair(value)) {
+                final int x = VectorRef.getPairX(value);
+                final int z = VectorRef.getPairZ(value);
+                return VectorRef.newPair(x, z);
             } else if (value instanceof IntVector3) {
                 IntVector3 iv3 = (IntVector3) value;
-                return VectorRef.newPosition(iv3.x, iv3.y, iv3.z);
+                return new IntVector3(iv3.x, iv3.y, iv3.z);
             } else {
                 return def;
             }

@@ -8,9 +8,7 @@ import net.minecraft.server.v1_8_R1.IChatBaseComponent;
 import net.minecraft.server.v1_8_R1.IInventory;
 import net.minecraft.server.v1_8_R1.ItemStack;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 /**

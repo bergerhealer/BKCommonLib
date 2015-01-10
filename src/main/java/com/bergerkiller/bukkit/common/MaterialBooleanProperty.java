@@ -21,7 +21,7 @@ public abstract class MaterialBooleanProperty extends MaterialProperty<Boolean> 
      * @return True material collection
      */
     public Collection<Material> getMaterials() {
-        List<Material> mats = new ArrayList<Material>(20);
+        List<Material> mats = new ArrayList<>(20);
         for (Material mat : mats) {
             if (Boolean.TRUE.equals(get(mat))) {
                 mats.add(mat);

@@ -104,7 +104,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
             int i1 = PlayerChunkMapRef.radius.get(this);
             int j1 = i - k;
             int k1 = j - l;
-            List<ChunkCoordIntPair> chunksToLoad = new LinkedList<ChunkCoordIntPair>();
+            List<ChunkCoordIntPair> chunksToLoad = new LinkedList<>();
 
             if ((j1 != 0) || (k1 != 0)) {
                 for (int l1 = i - i1; l1 <= i + i1; l1++) {
@@ -220,6 +220,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
             this.z = ((int) entityplayer.locZ >> 4);
         }
 
+        @Override
         public int compare(ChunkCoordIntPair a, ChunkCoordIntPair b) {
             if (a.equals(b)) {
                 return 0;

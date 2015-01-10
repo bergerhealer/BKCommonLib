@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.config.ConfigurationNode;
  */
 public class StringReplaceBundle {
 
-    private EntryList<String, String> entries = new EntryList<String, String>();
+    private EntryList<String, String> entries = new EntryList<>();
 
     /**
      * Adds a single entry to the replaced Strings
@@ -30,7 +30,7 @@ public class StringReplaceBundle {
         if (to == null) {
             throw new IllegalArgumentException("Can not use a 'to' value of null");
         }
-        this.entries.add(new SimpleEntry<String, String>(from, to));
+        this.entries.add(new SimpleEntry<>(from, to));
         return this;
     }
 

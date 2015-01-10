@@ -227,6 +227,7 @@ public class BlockProxy extends ProxyBase<Block> implements Block {
         return base.getDrops();
     }
 
+    @Override
     public Collection<ItemStack> getDrops(ItemStack item) {
         return base.getDrops(item);
     }

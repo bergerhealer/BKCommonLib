@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_8_R1.PathPoint;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -217,7 +218,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
                 int dx = MathUtil.floor(x);
                 int dy = (int) y;
                 int dz = MathUtil.floor(z);
-                PathEntity path = nmsEntity.world.a(nmsEntity, dx, dy, dz, (float) this.getPathfindingRange(), true, false, false, true);
+                PathEntity path = navigation.a(dx, dy, dz);//nmsEntity.world.a(nmsEntity, dx, dy, dz, (float) this.getPathfindingRange(), true, false, false, true);
                 this.moveWithPath(path, speed);
             }
         }

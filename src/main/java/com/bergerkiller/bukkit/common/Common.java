@@ -69,7 +69,7 @@ public class Common {
         CommonServer runningServer = new UnknownServer();
         try {
             // Get all available server types
-            List<CommonServer> servers = new ArrayList<CommonServer>();
+            List<CommonServer> servers = new ArrayList<>();
             servers.add(new MCPCPlusServer());
             servers.add(new SpigotServer());
             servers.add(new SportBukkitServer());

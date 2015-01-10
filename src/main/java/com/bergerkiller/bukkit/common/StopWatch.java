@@ -97,6 +97,7 @@ public class StopWatch {
     /**
      * Performs the next measurement
      *
+     * @param strength
      * @return This Stop Watch
      */
     public StopWatch next(double strength) {
@@ -106,6 +107,7 @@ public class StopWatch {
     /**
      * Stops the measurement
      *
+     * @param strength
      * @return This Stop Watch
      */
     public StopWatch stop(double strength) {

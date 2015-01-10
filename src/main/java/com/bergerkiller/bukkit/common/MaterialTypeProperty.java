@@ -23,7 +23,7 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
      * @param properties to set the types of
      */
     public MaterialTypeProperty(MaterialTypeProperty... properties) {
-        HashSet<Material> elems = new HashSet<Material>();
+        HashSet<Material> elems = new HashSet<>();
         for (MaterialTypeProperty prop : properties) {
             for (Material mat : prop.allowedTypes) {
                 elems.add(mat);

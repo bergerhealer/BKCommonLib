@@ -24,7 +24,7 @@ public class StackTraceFilter {
     public static final StackTraceFilter SERVER = new StackTraceFilter();
     public final String className;
     public final String methodName;
-    private final List<StackTraceFilter> next = new ArrayList<StackTraceFilter>(2);
+    private final List<StackTraceFilter> next = new ArrayList<>(2);
 
     public StackTraceFilter() {
         this("*", "*");
@@ -50,7 +50,7 @@ public class StackTraceFilter {
     public void print(Throwable error, Level level) {
         final Logger log = Bukkit.getLogger();
         log.log(level, getMessage(error));
-        ArrayList<StackTraceElement> elements = new ArrayList<StackTraceElement>(Arrays.asList(error.getStackTrace()));
+        ArrayList<StackTraceElement> elements = new ArrayList<>(Arrays.asList(error.getStackTrace()));
 
         // Filter pointless information
         final int filteredCount = filter(elements);
