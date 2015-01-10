@@ -8,17 +8,18 @@ import org.bukkit.event.entity.EntityEvent;
  * Fired when an Entity is removed from a World
  */
 public class EntityRemoveEvent extends EntityEvent {
-	private static final HandlerList handlers = new HandlerList();
 
-	public EntityRemoveEvent(Entity removed) {
-		super(removed);
-	}
+    private static final HandlerList handlers = new HandlerList();
 
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    public EntityRemoveEvent(Entity removed) {
+        super(removed);
+    }
 
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

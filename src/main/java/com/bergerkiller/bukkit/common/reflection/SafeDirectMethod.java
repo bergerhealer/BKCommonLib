@@ -5,8 +5,8 @@ package com.bergerkiller.bukkit.common.reflection;
  */
 public abstract class SafeDirectMethod<T> implements MethodAccessor<T> {
 
-	@Override
-	public boolean isValid() {
-		return true;
-	}
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 }

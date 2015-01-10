@@ -8,17 +8,18 @@ import org.bukkit.event.entity.EntityEvent;
  * Fired when an Entity is added to a World
  */
 public class EntityAddEvent extends EntityEvent {
-	private static final HandlerList handlers = new HandlerList();
 
-	public EntityAddEvent(Entity added) {
-		super(added);
-	}
+    private static final HandlerList handlers = new HandlerList();
 
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    public EntityAddEvent(Entity added) {
+        super(added);
+    }
 
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

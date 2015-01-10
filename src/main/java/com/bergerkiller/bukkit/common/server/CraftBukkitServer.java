@@ -12,114 +12,115 @@ import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class CraftBukkitServer extends CommonServerBase {
-	/**
-	 * Defines the Package Version
-	 */
-	public String PACKAGE_VERSION;
-	/**
-	 * Defines the Minecraft Version
-	 */
-	public String MC_VERSION;
-	/**
-	 * Defines the net.minecraft.server root path
-	 */
-	public String NMS_ROOT_VERSIONED;
-	/**
-	 * Defines the org.bukkit.craftbukkit root path
-	 */
-	public String CB_ROOT_VERSIONED;
 
-	@Override
-	public boolean init() {
-		// Find out what package version is used
-		String serverPath = Bukkit.getServer().getClass().getName();
-		if (!serverPath.startsWith(Common.CB_ROOT)) {
-			return false;
-		}
-		PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(Common.CB_ROOT.length() + 1), ".");
+    /**
+     * Defines the Package Version
+     */
+    public String PACKAGE_VERSION;
+    /**
+     * Defines the Minecraft Version
+     */
+    public String MC_VERSION;
+    /**
+     * Defines the net.minecraft.server root path
+     */
+    public String NMS_ROOT_VERSIONED;
+    /**
+     * Defines the org.bukkit.craftbukkit root path
+     */
+    public String CB_ROOT_VERSIONED;
 
-		// Obtain the versioned roots
-		if (PACKAGE_VERSION.isEmpty()) {
-			NMS_ROOT_VERSIONED = Common.NMS_ROOT;
-			CB_ROOT_VERSIONED = Common.CB_ROOT;
-		} else {
-			NMS_ROOT_VERSIONED = Common.NMS_ROOT + "." + PACKAGE_VERSION;
-			CB_ROOT_VERSIONED = Common.CB_ROOT + "." + PACKAGE_VERSION;
-		}
+    @Override
+    public boolean init() {
+        // Find out what package version is used
+        String serverPath = Bukkit.getServer().getClass().getName();
+        if (!serverPath.startsWith(Common.CB_ROOT)) {
+            return false;
+        }
+        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(Common.CB_ROOT.length() + 1), ".");
 
-		// Figure out the MC version from the server
-		MC_VERSION = PACKAGE_VERSION;
-		return true;
-	}
+        // Obtain the versioned roots
+        if (PACKAGE_VERSION.isEmpty()) {
+            NMS_ROOT_VERSIONED = Common.NMS_ROOT;
+            CB_ROOT_VERSIONED = Common.CB_ROOT;
+        } else {
+            NMS_ROOT_VERSIONED = Common.NMS_ROOT + "." + PACKAGE_VERSION;
+            CB_ROOT_VERSIONED = Common.CB_ROOT + "." + PACKAGE_VERSION;
+        }
 
-	@Override
-	public void postInit() {
-		try {
-			// Obtain MinecraftServer instance from server
-			Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
-			MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
-			Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
+        // Figure out the MC version from the server
+        MC_VERSION = PACKAGE_VERSION;
+        return true;
+    }
 
-			// Use MinecraftServer instance to obtain the version
-			Class<?> mcServer = minecraftServerInstance.getClass();
-			MethodAccessor<String> getVersion = new SafeMethod<String>(mcServer, "getVersion");
-			MC_VERSION = getVersion.invoke(minecraftServerInstance);
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
+    @Override
+    public void postInit() {
+        try {
+            // Obtain MinecraftServer instance from server
+            Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
+            MethodAccessor<Object> getServer = new SafeMethod<>(server, "getServer");
+            Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
 
-	@Override
-	public String getClassName(String path) {
-		if (path.startsWith(Common.NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
-			return NMS_ROOT_VERSIONED + path.substring(Common.NMS_ROOT.length());
-		}
-		if (path.startsWith(Common.CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
-			return CB_ROOT_VERSIONED + path.substring(Common.CB_ROOT.length());
-		}
-		return path;
-	}
+            // Use MinecraftServer instance to obtain the version
+            Class<?> mcServer = minecraftServerInstance.getClass();
+            MethodAccessor<String> getVersion = new SafeMethod<>(mcServer, "getVersion");
+            MC_VERSION = getVersion.invoke(minecraftServerInstance);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
-	@Override
-	public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
-		return methodName;
-	}
+    @Override
+    public String getClassName(String path) {
+        if (path.startsWith(Common.NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
+            return NMS_ROOT_VERSIONED + path.substring(Common.NMS_ROOT.length());
+        }
+        if (path.startsWith(Common.CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
+            return CB_ROOT_VERSIONED + path.substring(Common.CB_ROOT.length());
+        }
+        return path;
+    }
 
-	@Override
-	public String getFieldName(Class<?> type, String fieldName) {
-		return fieldName;
-	}
+    @Override
+    public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
+        return methodName;
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Integer> getEntityRemoveQueue(Player player) {
-		return CommonNMS.getNative(player).removeQueue;
-	}
+    @Override
+    public String getFieldName(Class<?> type, String fieldName) {
+        return fieldName;
+    }
 
-	@Override
-	public boolean isCompatible() {
-		return PACKAGE_VERSION.isEmpty() || PACKAGE_VERSION.equals(Common.DEPENDENT_MC_VERSION);
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Integer> getEntityRemoveQueue(Player player) {
+        return CommonNMS.getNative(player).removeQueue;
+    }
 
-	@Override
-	public String getMinecraftVersion() {
-		return MC_VERSION;
-	}
+    @Override
+    public boolean isCompatible() {
+        return PACKAGE_VERSION.isEmpty() || PACKAGE_VERSION.equals(Common.DEPENDENT_MC_VERSION);
+    }
 
-	@Override
-	public String getServerVersion() {
-		return (PACKAGE_VERSION.isEmpty() ? "(Unknown)" : PACKAGE_VERSION) + " (Minecraft " + MC_VERSION + ")";
-	}
+    @Override
+    public String getMinecraftVersion() {
+        return MC_VERSION;
+    }
 
-	@Override
-	public String getServerDescription() {
-		String desc = Bukkit.getServer().getVersion();
-		desc = desc.replace(" (MC: " + MC_VERSION + ")", "");
-		return desc;
-	}
+    @Override
+    public String getServerVersion() {
+        return (PACKAGE_VERSION.isEmpty() ? "(Unknown)" : PACKAGE_VERSION) + " (Minecraft " + MC_VERSION + ")";
+    }
 
-	@Override
-	public String getServerName() {
-		return "CraftBukkit";
-	}
+    @Override
+    public String getServerDescription() {
+        String desc = Bukkit.getServer().getVersion();
+        desc = desc.replace(" (MC: " + MC_VERSION + ")", "");
+        return desc;
+    }
+
+    @Override
+    public String getServerName() {
+        return "CraftBukkit";
+    }
 }

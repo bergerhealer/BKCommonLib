@@ -14,17 +14,18 @@ import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("deprecation")
 public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState {
-	static {
-		validate(BlockStateProxy.class);
-	}
 
-	public BlockStateProxy(BlockState base) {
-		super(base);
-	}
+    static {
+        validate(BlockStateProxy.class);
+    }
+
+    public BlockStateProxy(BlockState base) {
+        super(base);
+    }
 
     @Override
     public World getWorld() {
-    	return base.getWorld();
+        return base.getWorld();
     }
 
     @Override
@@ -49,27 +50,27 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
 
     @Override
     public void setData(final MaterialData data) {
-    	base.setData(data);
+        base.setData(data);
     }
 
     @Override
     public MaterialData getData() {
-    	return base.getData();
+        return base.getData();
     }
 
     @Override
     public void setType(final Material type) {
-    	base.setType(type);
+        base.setType(type);
     }
 
     @Override
     public boolean setTypeId(final int type) {
-    	return base.setTypeId(type);
+        return base.setTypeId(type);
     }
 
     @Override
     public Material getType() {
-    	return base.getType();
+        return base.getType();
     }
 
     @Override
@@ -94,37 +95,37 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
 
     @Override
     public boolean update(boolean force) {
-    	return base.update(force);
+        return base.update(force);
     }
 
     @Override
     public byte getRawData() {
-    	return base.getRawData();
+        return base.getRawData();
     }
 
     @Override
     public Location getLocation() {
-    	return base.getLocation();
+        return base.getLocation();
     }
 
     @Override
     public Location getLocation(Location loc) {
-    	return base.getLocation(loc);
+        return base.getLocation(loc);
     }
 
     @Override
     public void setRawData(byte data) {
-    	base.setRawData(data);
+        base.setRawData(data);
     }
 
     @Override
     public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
-    	base.setMetadata(metadataKey, newMetadataValue);
+        base.setMetadata(metadataKey, newMetadataValue);
     }
 
     @Override
     public List<MetadataValue> getMetadata(String metadataKey) {
-    	return base.getMetadata(metadataKey);
+        return base.getMetadata(metadataKey);
     }
 
     @Override
@@ -134,11 +135,11 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
 
     @Override
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
-    	base.removeMetadata(metadataKey, owningPlugin);
+        base.removeMetadata(metadataKey, owningPlugin);
     }
 
-	@Override
-	public boolean update(boolean arg0, boolean arg1) {
-		return base.update(arg0, arg1);
-	}
+    @Override
+    public boolean update(boolean arg0, boolean arg1) {
+        return base.update(arg0, arg1);
+    }
 }

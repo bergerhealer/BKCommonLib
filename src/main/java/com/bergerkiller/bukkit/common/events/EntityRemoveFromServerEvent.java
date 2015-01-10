@@ -7,17 +7,18 @@ import org.bukkit.event.HandlerList;
  * Fired when an Entity is removed from the server
  */
 public class EntityRemoveFromServerEvent extends EntityRemoveEvent {
-	private static final HandlerList handlers = new HandlerList();
 
-	public EntityRemoveFromServerEvent(Entity removed) {
-		super(removed);
-	}
+    private static final HandlerList handlers = new HandlerList();
 
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    public EntityRemoveFromServerEvent(Entity removed) {
+        super(removed);
+    }
 
-	public static HandlerList getHandlerList() {
-		return handlers;
-	}
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

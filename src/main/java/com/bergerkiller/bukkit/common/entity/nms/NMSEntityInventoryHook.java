@@ -2,20 +2,21 @@ package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 
-import net.minecraft.server.ItemStack;
+import net.minecraft.server.v1_8_R1.ItemStack;
 
 public interface NMSEntityInventoryHook {
-	public EntityInventoryController<?> getInventoryController();
 
-	public void setInventoryController(EntityInventoryController<?> controller);
+    public EntityInventoryController<?> getInventoryController();
 
-	/**
-	 * onItemSet
-	 */
-	public void setItem(int index, ItemStack item);
+    public void setInventoryController(EntityInventoryController<?> controller);
 
-	/**
-	 * onItemSet super
-	 */
-	public void super_setItem(int index, ItemStack item);
+    /**
+     * onItemSet
+     */
+    public void setItem(int index, ItemStack item);
+
+    /**
+     * onItemSet super
+     */
+    public void super_setItem(int index, ItemStack item);
 }

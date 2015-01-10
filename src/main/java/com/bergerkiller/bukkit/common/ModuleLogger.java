@@ -11,45 +11,48 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
- * A logger that is meant to log a given module of the server, for example that of a Plugin
+ * A logger that is meant to log a given module of the server, for example that
+ * of a Plugin
  */
 public class ModuleLogger extends Logger {
-	private final String[] modulePath;
-	private final String prefix;
 
-	public ModuleLogger(Plugin plugin, String... modulePath) {
-		this(LogicUtil.appendArray(new String[] {getPrefix(plugin)}, modulePath));
-	}
+    private final String[] modulePath;
+    private final String prefix;
 
-	public ModuleLogger(String... modulePath) {
-		this(Bukkit.getLogger(), modulePath);
-	}
+    public ModuleLogger(Plugin plugin, String... modulePath) {
+        this(LogicUtil.appendArray(new String[]{getPrefix(plugin)}, modulePath));
+    }
 
-	public ModuleLogger(Logger parent, String... modulePath) {
-		super(StringUtil.join(".", modulePath), null);
-		this.setParent(parent);
-		this.setLevel(Level.ALL);
-		this.modulePath = modulePath;
-		StringBuilder builder = new StringBuilder();
-		for (String module : modulePath) {
-			builder.append("[").append(module).append("] ");
-		}
-		this.prefix = builder.toString();
-	}
+    public ModuleLogger(String... modulePath) {
+        this(Bukkit.getLogger(), modulePath);
+    }
 
-	private static String getPrefix(Plugin plugin) {
-		return LogicUtil.fixNull(plugin.getDescription().getPrefix(), plugin.getDescription().getName());
-	}
+    public ModuleLogger(Logger parent, String... modulePath) {
+        super(StringUtil.join(".", modulePath), null);
+        this.setParent(parent);
+        this.setLevel(Level.ALL);
+        this.modulePath = modulePath;
+        StringBuilder builder = new StringBuilder();
+        for (String module : modulePath) {
+            builder.append("[").append(module).append("] ");
+        }
+        this.prefix = builder.toString();
+    }
 
-	/**
-	 * Obtains a Module Logger for the path specified
-	 * 
-	 * @param path to get the Module Logger for
-	 * @return new Module Logger pointing to the path relative to this Module Logger
-	 */
-	public ModuleLogger getModule(String... path) {
-		return new ModuleLogger(this.getParent(), LogicUtil.appendArray(this.modulePath, path));
-	}
+    private static String getPrefix(Plugin plugin) {
+        return LogicUtil.fixNull(plugin.getDescription().getPrefix(), plugin.getDescription().getName());
+    }
+
+    /**
+     * Obtains a Module Logger for the path specified
+     *
+     * @param path to get the Module Logger for
+     * @return new Module Logger pointing to the path relative to this Module
+     * Logger
+     */
+    public ModuleLogger getModule(String... path) {
+        return new ModuleLogger(this.getParent(), LogicUtil.appendArray(this.modulePath, path));
+    }
 
     @Override
     public void log(LogRecord logRecord) {

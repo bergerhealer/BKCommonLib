@@ -12,24 +12,24 @@ import org.bukkit.plugin.Plugin;
  */
 public abstract class CompressedDataReader extends DataReader {
 
-	public CompressedDataReader(File folder, String filename) {
-		super(folder, filename);
-	}
+    public CompressedDataReader(File folder, String filename) {
+        super(folder, filename);
+    }
 
-	public CompressedDataReader(File file) {
-		super(file);
-	}
+    public CompressedDataReader(File file) {
+        super(file);
+    }
 
-	public CompressedDataReader(Plugin plugin, String filename) {
-		super(plugin, filename);
-	}
+    public CompressedDataReader(Plugin plugin, String filename) {
+        super(plugin, filename);
+    }
 
-	public CompressedDataReader(String filepath) {
-		super(filepath);
-	}
+    public CompressedDataReader(String filepath) {
+        super(filepath);
+    }
 
-	@Override
-	public DataInputStream getStream(InputStream stream) {
-		return super.getStream(new InflaterInputStream(stream));
-	}
+    @Override
+    public DataInputStream getStream(InputStream stream) {
+        return super.getStream(new InflaterInputStream(stream));
+    }
 }

@@ -12,17 +12,17 @@ import org.bukkit.inventory.ItemStack;
  */
 public class CommonMinecartChest extends CommonMinecartInventory<StorageMinecart> {
 
-	public CommonMinecartChest(StorageMinecart base) {
-		super(base);
-	}
+    public CommonMinecartChest(StorageMinecart base) {
+        super(base);
+    }
 
-	@Override
-	public List<ItemStack> getBrokenDrops() {
-		return Arrays.asList(new ItemStack(Material.MINECART, 1), new ItemStack(Material.CHEST, 1));
-	}
+    @Override
+    public List<ItemStack> getBrokenDrops() {
+        return Arrays.asList(new ItemStack(Material.MINECART, 1), new ItemStack(Material.CHEST, 1));
+    }
 
-	@Override
-	public Material getCombinedItem() {
-		return Material.STORAGE_MINECART;
-	}
+    @Override
+    public Material getCombinedItem() {
+        return Material.STORAGE_MINECART;
+    }
 }

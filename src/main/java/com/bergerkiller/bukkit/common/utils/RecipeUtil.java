@@ -23,151 +23,153 @@ import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
 
 public class RecipeUtil {
-	private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
-	static {
-		ItemStack item;
-		for (Material material : Material.values()) {
-			item = new ItemStack(material, 1);
-			if (CommonNMS.getNative(item).getItem() == null) {
-				continue;
-			}
-			int fuel = TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
-			if (fuel > 0) {
-				fuelTimes.put(MaterialUtil.getTypeId(material), fuel);
-			}
-		}
-	}
 
-	@Deprecated
-	public static Set<Integer> getFuelItems() {
-		return fuelTimes.keySet();
-	}
+    private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
 
-	@Deprecated
-	public static Map<Integer, Integer> getFuelTimes() {
-		return fuelTimes;
-	}
+    static {
+        ItemStack item;
+        for (Material material : Material.values()) {
+            item = new ItemStack(material, 1);
+            if (CommonNMS.getNative(item).getItem() == null) {
+                continue;
+            }
+            int fuel = TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
+            if (fuel > 0) {
+                fuelTimes.put(MaterialUtil.getTypeId(material), fuel);
+            }
+        }
+    }
 
-	@Deprecated
-	public static int getFuelTime(int itemid) {
-		return getFuelTime(new ItemStack(itemid, 1));
-	}
+    @Deprecated
+    public static Set<Integer> getFuelItems() {
+        return fuelTimes.keySet();
+    }
 
-	public static int getFuelTime(Material material) {
-		return getFuelTime(new ItemStack(material, 1));
-	}
+    @Deprecated
+    public static Map<Integer, Integer> getFuelTimes() {
+        return fuelTimes;
+    }
 
-	public static int getFuelTime(org.bukkit.inventory.ItemStack item) {
-		if (item == null) {
-			return 0;
-		} else {
-			return item.getAmount() * TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
-		}
-	}
+    @Deprecated
+    public static int getFuelTime(int itemid) {
+        return getFuelTime(new ItemStack(itemid, 1));
+    }
 
-	public static boolean isFuelItem(int itemid) {
-		return fuelTimes.containsKey(itemid);
-	}
+    public static int getFuelTime(Material material) {
+        return getFuelTime(new ItemStack(material, 1));
+    }
 
-	public static boolean isFuelItem(Material material) {
-		return isFuelItem(MaterialUtil.getTypeId(material));
-	}
+    public static int getFuelTime(org.bukkit.inventory.ItemStack item) {
+        if (item == null) {
+            return 0;
+        } else {
+            return item.getAmount() * TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
+        }
+    }
 
-	public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
-		return isFuelItem(MaterialUtil.getTypeId(item));
-	}
+    public static boolean isFuelItem(int itemid) {
+        return fuelTimes.containsKey(itemid);
+    }
 
-	@Deprecated
-	public static boolean isHeatableItem(int itemid) {
-		return getFurnaceResult(itemid) != null;
-	}
+    public static boolean isFuelItem(Material material) {
+        return isFuelItem(MaterialUtil.getTypeId(material));
+    }
 
-	public static boolean isHeatableItem(Material material) {
-		return getFurnaceResult(material) != null;
-	}
+    public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
+        return isFuelItem(MaterialUtil.getTypeId(item));
+    }
 
-	public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
-		return getFurnaceResult(item) != null;
-	}
+    @Deprecated
+    public static boolean isHeatableItem(int itemid) {
+        return getFurnaceResult(itemid) != null;
+    }
 
-	@Deprecated
-	public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
-		return getFurnaceResult(new ItemStack(itemid, 1));
-	}
+    public static boolean isHeatableItem(Material material) {
+        return getFurnaceResult(material) != null;
+    }
 
-	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.Material cookedType) {
-		return getFurnaceResult(new ItemStack(cookedType, 1));
-	}
+    public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
+        return getFurnaceResult(item) != null;
+    }
 
-	public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-		return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(CommonNMS.getNative(cooked)));
-	}
+    @Deprecated
+    public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
+        return getFurnaceResult(new ItemStack(itemid, 1));
+    }
 
-	public static Collection<ItemStack> getHeatableItemStacks() {
-		return ConversionPairs.itemStack.convertAll(RecipesFurnace.getInstance().recipes.keySet());
-	}
+    public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.Material cookedType) {
+        return getFurnaceResult(new ItemStack(cookedType, 1));
+    }
 
-	@Deprecated
-	public static Set<Integer> getHeatableItems() {
-		return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(),
-				Conversion.toItemStackHandle, Conversion.toItemId);
-	}
+    public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
+        return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(CommonNMS.getNative(cooked)));
+    }
 
-	/**
-	 * Gets all Crafting Recipes able to produce the ItemStack specified
-	 * 
-	 * @param itemid of the item to craft
-	 * @param data of the item to craft (-1 for any data)
-	 * @return the Crafting Recipes that can craft the item specified
-	 */
-	public static CraftRecipe[] getCraftingRequirements(int itemid, int data) {
-		List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
-		for (Object rec : getCraftRecipes()) {
-			ItemStack item = RecipeRef.getOutput(rec);
-			if (item != null && MaterialUtil.getTypeId(item) == itemid && (data == -1 || MaterialUtil.getRawData(item) == data)) {
-				CraftRecipe crec = CraftRecipe.create(rec);
-				if (crec != null) {
-					poss.add(crec);
-				}
-			}
-		}
-		return poss.toArray(new CraftRecipe[0]);
-	}
+    public static Collection<ItemStack> getHeatableItemStacks() {
+        return ConversionPairs.itemStack.convertAll(RecipesFurnace.getInstance().recipes.keySet());
+    }
 
-	/**
-	 * Crafts items specified in an Inventory
-	 * 
-	 * @param parser that specified the item type, data and amount to craft
-	 * @param source inventory to craft in
-	 */
-	public static void craftItems(ItemParser parser, Inventory source) {
-		if (parser.hasType()) {
-			final int limit;
-			if (parser.hasAmount()) {
-				limit = parser.getAmount();
-			} else {
-				limit = Integer.MAX_VALUE;
-			}
-			craftItems(parser.getTypeId(), parser.getData(), source, limit);
-		}
-	}
+    @Deprecated
+    public static Set<Integer> getHeatableItems() {
+        return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(),
+                Conversion.toItemStackHandle, Conversion.toItemId);
+    }
 
-	/**
-	 * Crafts items specified in an Inventory
-	 * 
-	 * @param itemid of the item to craft
-	 * @param data of the item to craft (-1 for any data)
-	 * @param source inventory to craft in
-	 * @param limit amount of items to craft
-	 */
-	public static void craftItems(int itemid, int data, Inventory source, int limit) {
-		for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
-			limit -= rec.craftItems(source, limit);
-		}
-	}
+    /**
+     * Gets all Crafting Recipes able to produce the ItemStack specified
+     *
+     * @param itemid of the item to craft
+     * @param data of the item to craft (-1 for any data)
+     * @return the Crafting Recipes that can craft the item specified
+     */
+    public static CraftRecipe[] getCraftingRequirements(int itemid, int data) {
+        List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
+        for (Object rec : getCraftRecipes()) {
+            ItemStack item = RecipeRef.getOutput(rec);
+            if (item != null && MaterialUtil.getTypeId(item) == itemid && (data == -1 || MaterialUtil.getRawData(item) == data)) {
+                CraftRecipe crec = CraftRecipe.create(rec);
+                if (crec != null) {
+                    poss.add(crec);
+                }
+            }
+        }
+        return poss.toArray(new CraftRecipe[0]);
+    }
 
-	@SuppressWarnings("unchecked")
-	private static List<Object> getCraftRecipes() {
-		return (List<Object>) CraftingManager.getInstance().getRecipes();
-	}
+    /**
+     * Crafts items specified in an Inventory
+     *
+     * @param parser that specified the item type, data and amount to craft
+     * @param source inventory to craft in
+     */
+    public static void craftItems(ItemParser parser, Inventory source) {
+        if (parser.hasType()) {
+            final int limit;
+            if (parser.hasAmount()) {
+                limit = parser.getAmount();
+            } else {
+                limit = Integer.MAX_VALUE;
+            }
+            craftItems(parser.getTypeId(), parser.getData(), source, limit);
+        }
+    }
+
+    /**
+     * Crafts items specified in an Inventory
+     *
+     * @param itemid of the item to craft
+     * @param data of the item to craft (-1 for any data)
+     * @param source inventory to craft in
+     * @param limit amount of items to craft
+     */
+    public static void craftItems(int itemid, int data, Inventory source, int limit) {
+        for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
+            limit -= rec.craftItems(source, limit);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> getCraftRecipes() {
+        return (List<Object>) CraftingManager.getInstance().getRecipes();
+    }
 }

@@ -16,61 +16,62 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 public class SportBukkitServer extends CraftBukkitServer {
-	private Task removeQueueFlusher;
 
-	@Override
-	public boolean init() {
-		if (!super.init()) {
-			return false;
-		}
-		return Bukkit.getServer().getVersion().contains("SportBukkit");
-	}
+    private Task removeQueueFlusher;
 
-	@Override
-	public void postInit() {
-		super.postInit();
-		// Checkup that the Entity Remove queue for players is indeed missing
-		if (SafeField.contains(EntityPlayerRef.TEMPLATE.getType(), "removeQueue")) {
-			CommonPlugin.LOGGER.log(Level.WARNING, "Entity Removal queue of SportBukkit was added again! (update needed?)");
-		}
-	}
+    @Override
+    public boolean init() {
+        if (!super.init()) {
+            return false;
+        }
+        return Bukkit.getServer().getVersion().contains("SportBukkit");
+    }
 
-	@Override
-	public List<Integer> getEntityRemoveQueue(Player player) {
-		return CommonPlugin.getInstance().getPlayerMeta(player).getRemoveQueue();
-	}
+    @Override
+    public void postInit() {
+        super.postInit();
+        // Checkup that the Entity Remove queue for players is indeed missing
+        if (SafeField.contains(EntityPlayerRef.TEMPLATE.getType(), "removeQueue")) {
+            CommonPlugin.LOGGER.log(Level.WARNING, "Entity Removal queue of SportBukkit was added again! (update needed?)");
+        }
+    }
 
-	@Override
-	public void enable(CommonPlugin plugin) {
-		removeQueueFlusher = new EntityRemoveQueueFlusher(plugin).start(1, 1);
-	}
+    @Override
+    public List<Integer> getEntityRemoveQueue(Player player) {
+        return CommonPlugin.getInstance().getPlayerMeta(player).getRemoveQueue();
+    }
 
-	@Override
-	public void disable(CommonPlugin plugin) {
-		Task.stop(removeQueueFlusher);
-		removeQueueFlusher = null;
-	}
+    @Override
+    public void enable(CommonPlugin plugin) {
+        removeQueueFlusher = new EntityRemoveQueueFlusher(plugin).start(1, 1);
+    }
 
-	@Override
-	public String getServerName() {
-		return "SportBukkit";
-	}
+    @Override
+    public void disable(CommonPlugin plugin) {
+        Task.stop(removeQueueFlusher);
+        removeQueueFlusher = null;
+    }
 
-	private class EntityRemoveQueueFlusher extends Task {
+    @Override
+    public String getServerName() {
+        return "SportBukkit";
+    }
 
-		public EntityRemoveQueueFlusher(JavaPlugin plugin) {
-			super(plugin);
-		}
+    private class EntityRemoveQueueFlusher extends Task {
 
-		@Override
-		public void run() {
-			for (Player player : CommonUtil.getOnlinePlayers()) {
-				List<Integer> idList = getEntityRemoveQueue(player);
-				if (!idList.isEmpty()) {
-					PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(idList));
-					idList.clear();
-				}
-			}
-		}
-	}
+        public EntityRemoveQueueFlusher(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            for (Player player : CommonUtil.getOnlinePlayers()) {
+                List<Integer> idList = getEntityRemoveQueue(player);
+                if (!idList.isEmpty()) {
+                    PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(idList));
+                    idList.clear();
+                }
+            }
+        }
+    }
 }

@@ -7,20 +7,20 @@ import com.bergerkiller.bukkit.common.conversion.ConverterPair;
  */
 public abstract class SafeDirectField<T> implements FieldAccessor<T> {
 
-	@Override
-	public boolean isValid() {
-		return true;
-	}
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
-	@Override
-	public T transfer(Object from, Object to) {
-		T old = get(to);
-		set(to, get(from));
-		return old;
-	}
+    @Override
+    public T transfer(Object from, Object to) {
+        T old = get(to);
+        set(to, get(from));
+        return old;
+    }
 
-	@Override
-	public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
-		return new TranslatorFieldAccessor<K>(this, converterPair);
-	}
+    @Override
+    public <K> TranslatorFieldAccessor<K> translate(ConverterPair<?, K> converterPair) {
+        return new TranslatorFieldAccessor<K>(this, converterPair);
+    }
 }

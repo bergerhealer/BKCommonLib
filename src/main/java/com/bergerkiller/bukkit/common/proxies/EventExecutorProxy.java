@@ -7,12 +7,12 @@ import org.bukkit.plugin.EventExecutor;
 
 public class EventExecutorProxy extends ProxyBase<EventExecutor> implements EventExecutor {
 
-	public EventExecutorProxy(EventExecutor base) {
-		super(base);
-	}
+    public EventExecutorProxy(EventExecutor base) {
+        super(base);
+    }
 
-	@Override
-	public void execute(Listener listener, Event event) throws EventException {
-		base.execute(listener, event);
-	}
+    @Override
+    public void execute(Listener listener, Event event) throws EventException {
+        base.execute(listener, event);
+    }
 }

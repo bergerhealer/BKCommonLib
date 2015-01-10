@@ -12,219 +12,232 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public abstract class VectorXZAbstract {
-	public final DoubleAbstract x = new DoubleAbstract() {
-		public double get() {return VectorXZAbstract.this.getX();}
-		public DoubleAbstract set(double value) {VectorXZAbstract.this.setX(value); return this;}
-	};
-	public final DoubleAbstract z = new DoubleAbstract() {
-		public double get() {return VectorXZAbstract.this.getZ();}
-		public DoubleAbstract set(double value) {VectorXZAbstract.this.setZ(value); return this;}
-	};
 
-	/**
-	 * Gets the X-component
-	 * 
-	 * @return the X-component
-	 */
-	public abstract double getX();
+    public final DoubleAbstract x = new DoubleAbstract() {
+        public double get() {
+            return VectorXZAbstract.this.getX();
+        }
 
-	/**
-	 * Gets the Z-component
-	 * 
-	 * @return the Z-component
-	 */
-	public abstract double getZ();
+        public DoubleAbstract set(double value) {
+            VectorXZAbstract.this.setX(value);
+            return this;
+        }
+    };
+    public final DoubleAbstract z = new DoubleAbstract() {
+        public double get() {
+            return VectorXZAbstract.this.getZ();
+        }
 
-	/**
-	 * Sets the X-component
-	 * 
-	 * @param x value to set to
-	 * @return this same instance
-	 */
-	public abstract VectorXZAbstract setX(double x);
+        public DoubleAbstract set(double value) {
+            VectorXZAbstract.this.setZ(value);
+            return this;
+        }
+    };
 
-	/**
-	 * Sets the Z-component
-	 * 
-	 * @param z value to set to
-	 * @return this same instance
-	 */
-	public abstract VectorXZAbstract setZ(double z);
+    /**
+     * Gets the X-component
+     *
+     * @return the X-component
+     */
+    public abstract double getX();
 
-	public VectorXZAbstract setZero() {
-		return setX(0.0).setZ(0.0);
-	}
+    /**
+     * Gets the Z-component
+     *
+     * @return the Z-component
+     */
+    public abstract double getZ();
 
-	public VectorXZAbstract set(double x, double z) {
-		return setX(x).setZ(z);
-	}
+    /**
+     * Sets the X-component
+     *
+     * @param x value to set to
+     * @return this same instance
+     */
+    public abstract VectorXZAbstract setX(double x);
 
-	public VectorXZAbstract set(VectorXZAbstract value) {
-		return set(value.getX(), value.getZ());
-	}
+    /**
+     * Sets the Z-component
+     *
+     * @param z value to set to
+     * @return this same instance
+     */
+    public abstract VectorXZAbstract setZ(double z);
 
-	public IntVector2 floor() {
-		return new IntVector2(x.getFloor(), z.getFloor());
-	}
-	
-	public IntVector2 toBlock() {
-		return new IntVector2(x.block(), z.block());
-	}
+    public VectorXZAbstract setZero() {
+        return setX(0.0).setZ(0.0);
+    }
 
-	public VectorXZAbstract add(double x, double z) {
-		return setX(getX() + x).setZ(getZ() + z);
-	}
+    public VectorXZAbstract set(double x, double z) {
+        return setX(x).setZ(z);
+    }
 
-	public VectorXZAbstract add(Vector vector) {
-		return add(vector.getX(), vector.getZ());
-	}
+    public VectorXZAbstract set(VectorXZAbstract value) {
+        return set(value.getX(), value.getZ());
+    }
 
-	public VectorXZAbstract add(VectorXZAbstract value) {
-		return add(value.getX(), value.getZ());
-	}
+    public IntVector2 floor() {
+        return new IntVector2(x.getFloor(), z.getFloor());
+    }
 
-	public VectorXZAbstract add(VectorXZAbstract value, double length) {
-		return add(length * value.getX(), length * value.getZ());
-	}
+    public IntVector2 toBlock() {
+        return new IntVector2(x.block(), z.block());
+    }
 
-	public VectorXZAbstract add(BlockFace face, double length) {
-		return add(length * face.getModX(), length * face.getModZ());
-	}
+    public VectorXZAbstract add(double x, double z) {
+        return setX(getX() + x).setZ(getZ() + z);
+    }
 
-	public VectorXZAbstract subtract(double x, double z) {
-		return setX(getX() - x).setZ(getZ() - z);
-	}
+    public VectorXZAbstract add(Vector vector) {
+        return add(vector.getX(), vector.getZ());
+    }
 
-	public VectorXZAbstract subtract(Vector vector) {
-		return subtract(vector.getX(), vector.getZ());
-	}
+    public VectorXZAbstract add(VectorXZAbstract value) {
+        return add(value.getX(), value.getZ());
+    }
 
-	public VectorXZAbstract subtract(VectorXZAbstract value) {
-		return subtract(value.getX(), value.getZ());
-	}
+    public VectorXZAbstract add(VectorXZAbstract value, double length) {
+        return add(length * value.getX(), length * value.getZ());
+    }
 
-	public VectorXZAbstract subtract(BlockFace face, double length) {
-		return subtract(length * face.getModX(), length * face.getModZ());
-	}
+    public VectorXZAbstract add(BlockFace face, double length) {
+        return add(length * face.getModX(), length * face.getModZ());
+    }
 
-	public VectorXZAbstract subtract(VectorXZAbstract value, double length) {
-		return subtract(length * value.getX(), length * value.getZ());
-	}
+    public VectorXZAbstract subtract(double x, double z) {
+        return setX(getX() - x).setZ(getZ() - z);
+    }
 
-	public VectorXZAbstract multiply(double mx, double mz) {
-		return setX(getX() * mx).setZ(getZ() * mz);
-	}
+    public VectorXZAbstract subtract(Vector vector) {
+        return subtract(vector.getX(), vector.getZ());
+    }
 
-	public VectorXZAbstract multiply(Vector vector) {
-		return multiply(vector.getX(), vector.getZ());
-	}
+    public VectorXZAbstract subtract(VectorXZAbstract value) {
+        return subtract(value.getX(), value.getZ());
+    }
 
-	public VectorXZAbstract multiply(double factor) {
-		return multiply(factor, factor);
-	}
+    public VectorXZAbstract subtract(BlockFace face, double length) {
+        return subtract(length * face.getModX(), length * face.getModZ());
+    }
 
-	public VectorXZAbstract divide(double dx, double dz) {
-		return setX(getX() / dx).setZ(getZ() / dz);
-	}
+    public VectorXZAbstract subtract(VectorXZAbstract value, double length) {
+        return subtract(length * value.getX(), length * value.getZ());
+    }
 
-	public VectorXZAbstract divide(Vector vector) {
-		return divide(vector.getX(), vector.getZ());
-	}
+    public VectorXZAbstract multiply(double mx, double mz) {
+        return setX(getX() * mx).setZ(getZ() * mz);
+    }
 
-	public VectorXZAbstract divide(double factor) {
-		return divide(factor, factor);
-	}
+    public VectorXZAbstract multiply(Vector vector) {
+        return multiply(vector.getX(), vector.getZ());
+    }
 
-	public VectorXZAbstract fixNaN() {
-		x.fixNaN();
-		z.fixNaN();
-		return this;
-	}
+    public VectorXZAbstract multiply(double factor) {
+        return multiply(factor, factor);
+    }
 
-	public VectorXZAbstract fixNaN(double defx, double defz) {
-		x.fixNaN(defx);
-		z.fixNaN(defz);
-		return this;
-	}
+    public VectorXZAbstract divide(double dx, double dz) {
+        return setX(getX() / dx).setZ(getZ() / dz);
+    }
 
-	public IntVector2 chunk() {
-		return new IntVector2(x.chunk(), z.chunk());
-	}
+    public VectorXZAbstract divide(Vector vector) {
+        return divide(vector.getX(), vector.getZ());
+    }
 
-	public double length() {
-		return MathUtil.length(getX(), getZ());
-	}
+    public VectorXZAbstract divide(double factor) {
+        return divide(factor, factor);
+    }
 
-	public double lengthSquared() {
-		return MathUtil.lengthSquared(getX(), getZ());
-	}
+    public VectorXZAbstract fixNaN() {
+        x.fixNaN();
+        z.fixNaN();
+        return this;
+    }
 
-	public double distance(double x,  double z) {
-		return MathUtil.distance(getX(), getZ(), x, z);
-	}
+    public VectorXZAbstract fixNaN(double defx, double defz) {
+        x.fixNaN(defx);
+        z.fixNaN(defz);
+        return this;
+    }
 
-	public double distanceSquared(double x,  double z) {
-		return MathUtil.distance(getX(), getZ(), x, z);
-	}
+    public IntVector2 chunk() {
+        return new IntVector2(x.chunk(), z.chunk());
+    }
 
-	public double distance(VectorAbstract other) {
-		return distance(other.getX(), other.getZ());
-	}
+    public double length() {
+        return MathUtil.length(getX(), getZ());
+    }
 
-	public double distanceSquared(VectorAbstract other) {
-		return distanceSquared(other.getX(), other.getZ());
-	}
+    public double lengthSquared() {
+        return MathUtil.lengthSquared(getX(), getZ());
+    }
 
-	public double distance(VectorXZAbstract other) {
-		return distance(other.getX(), other.getZ());
-	}
+    public double distance(double x, double z) {
+        return MathUtil.distance(getX(), getZ(), x, z);
+    }
 
-	public double distanceSquared(VectorXZAbstract other) {
-		return distanceSquared(other.getX(), other.getZ());
-	}
+    public double distanceSquared(double x, double z) {
+        return MathUtil.distance(getX(), getZ(), x, z);
+    }
 
-	public double distance(Location other) {
-		return distance(other.getX(), other.getZ());
-	}
+    public double distance(VectorAbstract other) {
+        return distance(other.getX(), other.getZ());
+    }
 
-	public double distanceSquared(Location other) {
-		return distanceSquared(other.getX(), other.getZ());
-	}
+    public double distanceSquared(VectorAbstract other) {
+        return distanceSquared(other.getX(), other.getZ());
+    }
 
-	public double distance(Vector other) {
-		return distance(other.getX(), other.getZ());
-	}
+    public double distance(VectorXZAbstract other) {
+        return distance(other.getX(), other.getZ());
+    }
 
-	public double distanceSquared(Vector other) {
-		return distanceSquared(other.getX(), other.getZ());
-	}
+    public double distanceSquared(VectorXZAbstract other) {
+        return distanceSquared(other.getX(), other.getZ());
+    }
 
-	public double distance(Block block) {
-		return distance(block.getX() + 0.5, block.getZ() + 0.5);
-	}
+    public double distance(Location other) {
+        return distance(other.getX(), other.getZ());
+    }
 
-	public double distanceSquared(Block block) {
-		return distanceSquared(block.getX() + 0.5, block.getZ() + 0.5);
-	}
+    public double distanceSquared(Location other) {
+        return distanceSquared(other.getX(), other.getZ());
+    }
 
-	public double distance(Entity other) {
-		return distance(EntityUtil.getLocX(other), EntityUtil.getLocZ(other));
-	}
+    public double distance(Vector other) {
+        return distance(other.getX(), other.getZ());
+    }
 
-	public double distanceSquared(Entity other) {
-		return distanceSquared(EntityUtil.getLocX(other), EntityUtil.getLocZ(other));
-	}
+    public double distanceSquared(Vector other) {
+        return distanceSquared(other.getX(), other.getZ());
+    }
 
-	public double distance(CommonEntity<?> other) {
-		return distance(other.loc);
-	}
+    public double distance(Block block) {
+        return distance(block.getX() + 0.5, block.getZ() + 0.5);
+    }
 
-	public double distanceSquared(CommonEntity<?> other) {
-		return distanceSquared(other.loc);
-	}
+    public double distanceSquared(Block block) {
+        return distanceSquared(block.getX() + 0.5, block.getZ() + 0.5);
+    }
 
-	@Override
-	public String toString() {
-		return "{x=" + getX() + ", z=" + getZ() + "}";
-	}
+    public double distance(Entity other) {
+        return distance(EntityUtil.getLocX(other), EntityUtil.getLocZ(other));
+    }
+
+    public double distanceSquared(Entity other) {
+        return distanceSquared(EntityUtil.getLocX(other), EntityUtil.getLocZ(other));
+    }
+
+    public double distance(CommonEntity<?> other) {
+        return distance(other.loc);
+    }
+
+    public double distanceSquared(CommonEntity<?> other) {
+        return distanceSquared(other.loc);
+    }
+
+    @Override
+    public String toString() {
+        return "{x=" + getX() + ", z=" + getZ() + "}";
+    }
 }
