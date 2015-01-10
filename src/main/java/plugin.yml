@@ -1,0 +1,14 @@
+name: ${project.name}
+main: com.bergerkiller.bukkit.common.internal.CommonPlugin
+version: ${project.version}
+authors: [bergerkiller, lenis0012, timstans]
+metrics: true
+load: startup
+description: Is used in all of my plugins to re-use common functions
+softdepend: [Vault, ProtocolLib, Spout]
+dev-url: ${project.url}
+commands:
+    commondebug:
+        description: Developer debugging commands for changing values
+        aliases: [debug]
+        usage: /debug [name] [value...]
