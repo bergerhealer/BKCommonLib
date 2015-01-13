@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
 
 import regalowl.hyperconomy.HyperConomy;
+import regalowl.hyperconomy.minecraft.HItem;
 
 import com.bergerkiller.bukkit.common.filtering.Filter;
 import com.kellerkindt.scs.ShowCaseStandalone;
@@ -37,8 +39,9 @@ public class CommonEntityBlacklist implements Filter<Entity> {
         availableFilters.add(new BlacklistFilter("HyperConomy") {
             @Override
             public boolean isFiltered(Entity element) {
-                if (element instanceof Item) {
-                    return HyperConomy.hyperAPI.isItemDisplay((Item) element);
+                if (element instanceof HItem) {
+                    HyperConomy hc = (HyperConomy) Bukkit.getPluginManager().getPlugin("HyperConomy");
+                    return hc.getAPI().isItemDisplay((HItem) element);
                 }
                 return false;
             }

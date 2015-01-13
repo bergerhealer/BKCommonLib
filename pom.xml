@@ -67,7 +67,7 @@
         <dependency>
             <groupId>regalowl.hyperconomy</groupId>
             <artifactId>hyperconomy</artifactId>
-            <version>0.975.2</version>
+            <version>0.975.2-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/HyperConomy.jar</systemPath>
             <optional>true</optional>
