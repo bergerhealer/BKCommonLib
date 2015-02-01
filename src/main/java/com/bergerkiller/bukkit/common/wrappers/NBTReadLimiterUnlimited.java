@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.NBTReadLimiter;
+import net.minecraft.server.v1_8_R1.NBTReadLimiter;
 
 public class NBTReadLimiterUnlimited extends NBTReadLimiter {
 

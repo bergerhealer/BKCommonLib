@@ -3,11 +3,11 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.minecraft.server.Packet;
+import net.minecraft.server.v1_8_R1.Packet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -59,6 +59,7 @@ public class PacketUtil {
 
         // Entity spawn messages
         CommonUtil.nextTick(new Runnable() {
+            @Override
             public void run() {
                 WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
             }

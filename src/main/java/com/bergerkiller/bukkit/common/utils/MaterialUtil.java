@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.Item;
+import net.minecraft.server.v1_8_R1.Item;
 
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
@@ -36,6 +36,10 @@ public class MaterialUtil {
     @SuppressWarnings("deprecation")
     public static Material getType(int typeId) {
         return Material.getMaterial(typeId);
+    }
+    
+    public static Material getType(String blockname) {
+        return Material.getMaterial(blockname);
     }
 
     @SuppressWarnings("deprecation")
@@ -211,7 +215,9 @@ public class MaterialUtil {
     /**
      * The material is a type of door (iron or wooden door)
      */
-    public static final MaterialTypeProperty ISDOOR = new MaterialTypeProperty(Material.WOOD_DOOR, Material.IRON_DOOR);
+    public static final MaterialTypeProperty ISDOOR = new MaterialTypeProperty(Material.WOOD_DOOR,
+            Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.DARK_OAK_DOOR,
+            Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.IRON_DOOR);
 
     /**
      * The material is a type of piston base
@@ -221,7 +227,8 @@ public class MaterialUtil {
     /**
      * The material is a type of redstone torch
      */
-    public static final MaterialTypeProperty ISREDSTONETORCH = new MaterialTypeProperty(Material.REDSTONE_TORCH_OFF, Material.REDSTONE_TORCH_ON);
+    public static final MaterialTypeProperty ISREDSTONETORCH = new MaterialTypeProperty(Material.REDSTONE_TORCH_OFF,
+            Material.REDSTONE_TORCH_ON);
 
     /**
      * The material is a type of diode (item type excluded)
@@ -231,17 +238,20 @@ public class MaterialUtil {
     /**
      * The material is a type of comparator (item type excluded)
      */
-    public static final MaterialTypeProperty ISCOMPARATOR = new MaterialTypeProperty(Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON);
+    public static final MaterialTypeProperty ISCOMPARATOR = new MaterialTypeProperty(Material.REDSTONE_COMPARATOR_OFF,
+            Material.REDSTONE_COMPARATOR_ON);
 
     /**
      * The material is a type of bucket (milk bucket is excluded)
      */
-    public static final MaterialTypeProperty ISBUCKET = new MaterialTypeProperty(Material.WATER_BUCKET, Material.LAVA_BUCKET, Material.BUCKET);
+    public static final MaterialTypeProperty ISBUCKET = new MaterialTypeProperty(Material.WATER_BUCKET,
+            Material.LAVA_BUCKET, Material.BUCKET);
 
     /**
      * The material is a type of rails
      */
-    public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL);
+    public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(Material.RAILS,
+            Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL);
 
     /**
      * The material is a type of sign (item type is excluded)
@@ -251,7 +261,8 @@ public class MaterialUtil {
     /**
      * The material is a type of pressure plate
      */
-    public static final MaterialTypeProperty ISPRESSUREPLATE = new MaterialTypeProperty(Material.WOOD_PLATE, Material.STONE_PLATE, Material.IRON_PLATE, Material.GOLD_PLATE);
+    public static final MaterialTypeProperty ISPRESSUREPLATE = new MaterialTypeProperty(Material.WOOD_PLATE,
+            Material.STONE_PLATE, Material.IRON_PLATE, Material.GOLD_PLATE);
 
     /**
      * The material is a type of Minecart item
@@ -262,7 +273,8 @@ public class MaterialUtil {
     /**
      * The material is a type of wieldable sword
      */
-    public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD,
+    public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(Material.WOOD_SWORD,
+            Material.STONE_SWORD, Material.IRON_SWORD,
             Material.GOLD_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD);
 
     /**
@@ -298,11 +310,19 @@ public class MaterialUtil {
      * The material can be interacted with, such as buttons and levers.
      * Materials of this type suppress block placement upon interaction.
      */
-    public static final MaterialTypeProperty ISINTERACTABLE = new MaterialTypeProperty(Material.LEVER, Material.WOOD_DOOR, Material.IRON_DOOR,
-            Material.TRAP_DOOR, Material.CHEST, Material.HOPPER, Material.DROPPER, Material.ENDER_CHEST, Material.FURNACE, Material.BURNING_FURNACE,
-            Material.DISPENSER, Material.WORKBENCH, Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF, Material.BED, Material.CAKE,
-            Material.NOTE_BLOCK, Material.JUKEBOX, Material.WOOD_BUTTON, Material.STONE_BUTTON, Material.REDSTONE_COMPARATOR_OFF,
-            Material.REDSTONE_COMPARATOR_ON, Material.ANVIL, Material.FENCE_GATE);
+    public static final MaterialTypeProperty ISINTERACTABLE = new MaterialTypeProperty(Material.LEVER,
+            Material.WOOD_DOOR, Material.ACACIA_DOOR, Material.BIRCH_DOOR,
+            Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.IRON_DOOR,
+            Material.TRAP_DOOR, Material.IRON_TRAPDOOR ,
+            Material.CHEST, Material.TRAPPED_CHEST, Material.ENDER_CHEST,
+            Material.HOPPER, Material.DROPPER,
+            Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ANVIL, Material.ENCHANTMENT_TABLE,
+            Material.DISPENSER, Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+            Material.BED, Material.CAKE,
+            Material.NOTE_BLOCK, Material.JUKEBOX,
+            Material.WOOD_BUTTON, Material.STONE_BUTTON,
+            Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON,
+            Material.FENCE_GATE);
 
     /**
      * The material causes suffocation to entities inside
@@ -364,7 +384,7 @@ public class MaterialUtil {
         @Override
         public Boolean get(Material type) {
             final Item item = CommonNMS.getItem(type);
-            return item == null ? false : item.n();
+            return item == null ? false : item.k();
         }
     };
 

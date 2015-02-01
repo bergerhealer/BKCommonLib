@@ -9,7 +9,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_8_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -25,14 +25,15 @@ import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import net.minecraft.server.v1_8_R1.BlockPosition;
 
-import net.minecraft.server.Entity;
-import net.minecraft.server.IDataManager;
-import net.minecraft.server.MovingObjectPosition;
-import net.minecraft.server.Vec3D;
-import net.minecraft.server.World;
-import net.minecraft.server.WorldNBTStorage;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R1.IDataManager;
+import net.minecraft.server.v1_8_R1.MovingObjectPosition;
+import net.minecraft.server.v1_8_R1.Vec3D;
+import net.minecraft.server.v1_8_R1.World;
+import net.minecraft.server.v1_8_R1.WorldNBTStorage;
+import net.minecraft.server.v1_8_R1.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
 
@@ -70,7 +71,7 @@ public class WorldUtil extends ChunkUtil {
      * @return block data
      */
     public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return CommonNMS.getNative(world).getData(x, y, z);
+        return ((Block) CommonNMS.getNative(world).getType(new BlockPosition(x, y, z))).getData();
     }
 
     /**
@@ -81,10 +82,12 @@ public class WorldUtil extends ChunkUtil {
      * @param y - coordinate of the block
      * @param z - coordinate of the block
      * @return block type Id
+     * @deprecated returns -1
      */
     @Deprecated
     public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
-        return CommonNMS.getNative(world).getTypeId(x, y, z);
+        //return CommonNMS.getNative(world).getTypeId(x, y, z);
+        return -1;
     }
 
     /**
@@ -97,7 +100,7 @@ public class WorldUtil extends ChunkUtil {
      * @return block type
      */
     public static org.bukkit.Material getBlockType(org.bukkit.World world, int x, int y, int z) {
-        return MaterialUtil.getType(CommonNMS.getNative(world).getTypeId(x, y, z));
+        return MaterialUtil.getType(CommonNMS.getNative(world).getType(new BlockPosition(x, y, z)).getBlock().toString());
     }
 
     /**
@@ -291,7 +294,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension Id
      */
     public static int getDimension(org.bukkit.World world) {
-        return ((World) Conversion.toWorldHandle.convert(world)).worldProvider.dimension;
+        return ((World) Conversion.toWorldHandle.convert(world)).worldProvider.getDimension();
     }
 
     /**
@@ -365,7 +368,7 @@ public class WorldUtil extends ChunkUtil {
      * @return A (referenced) list of entities nearby
      */
     public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
-        return CommonNMS.getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).boundingBox.grow(radX, radY, radZ));
+        return CommonNMS.getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).getBoundingBox().grow(radX, radY, radZ));
     }
 
     /**
@@ -396,7 +399,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
         final Vec3D vec = (Vec3D) Conversion.toVec3DHandle.convert(explosionPosition);
-        return CommonNMS.getNative(explosionPosition.getWorld()).a(vec, CommonNMS.getNative(entity).boundingBox);
+        return CommonNMS.getNative(explosionPosition.getWorld()).a(vec, CommonNMS.getNative(entity).getBoundingBox());
     }
 
     /**
@@ -454,7 +457,7 @@ public class WorldUtil extends ChunkUtil {
     }
 
     public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
-        return CommonNMS.getNative(world).areChunksLoaded(blockCenterX, 0, blockCenterZ, distance);
+        return CommonNMS.getNative(world).areChunksLoaded(new BlockPosition(blockCenterX, 0, blockCenterZ), distance);
     }
 
     public static void queueChunkSend(org.bukkit.Chunk chunk) {
@@ -508,7 +511,7 @@ public class WorldUtil extends ChunkUtil {
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
         MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(CommonNMS.newVec3D(startX, startY, startZ),
                 CommonNMS.newVec3D(endX, endY, endZ), false);
-        return mop == null ? null : world.getBlockAt(mop.b, mop.c, mop.d);
+        return mop == null ? null : world.getBlockAt(mop.a().getX(), mop.a().getY(), mop.a().getZ());
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.util.com.google.common.collect.BiMap;
+import com.google.common.collect.BiMap;
 
 import org.bukkit.block.Block;
 

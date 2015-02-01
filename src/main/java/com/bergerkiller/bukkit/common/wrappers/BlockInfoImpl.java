@@ -6,9 +6,10 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
-import net.minecraft.server.Block;
-import net.minecraft.server.Explosion;
-import net.minecraft.server.World;
+import net.minecraft.server.v1_8_R1.Block;
+import net.minecraft.server.v1_8_R1.Explosion;
+import net.minecraft.server.v1_8_R1.World;
+import org.bukkit.Location;
 
 /**
  * Class implementation for Block Info that has a backing handle. Override all
@@ -22,12 +23,12 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public int getOpacity() {
-        return getHandle(Block.class).k();
+        return getHandle(Block.class).n();
     }
 
     @Override
     public int getLightEmission() {
-        return getHandle(Block.class).m();
+        return getHandle(Block.class).p();
     }
 
     @Override
@@ -42,7 +43,7 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public boolean isSuffocating() {
-        return getHandle(Block.class).r();
+        return getHandle(Block.class).isOccluding();
     }
 
     @Override
@@ -56,9 +57,9 @@ class BlockInfoImpl extends BlockInfo {
     }
 
     @Override
-    public void ignite(org.bukkit.World world, int x, int y, int z) {
+    public void ignite(org.bukkit.World world, Location loc) {
         World worldhandle = CommonNMS.getNative(world);
-        Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0);
-        BlockRef.ignite.invoke(handle, worldhandle, x, y, z, ex);
+        Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0, false, false);
+        BlockRef.ignite.invoke(handle, worldhandle, loc.getX(), loc.getY(), loc.getZ(), ex);
     }
 }

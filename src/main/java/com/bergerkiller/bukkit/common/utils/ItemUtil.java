@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -12,9 +12,9 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 
-import net.minecraft.server.EntityItem;
-import net.minecraft.server.Item;
-import net.minecraft.server.ItemStack;
+import net.minecraft.server.v1_8_R1.EntityItem;
+import net.minecraft.server.v1_8_R1.Item;
+import net.minecraft.server.v1_8_R1.ItemStack;
 
 /**
  * Contains item stack, item and inventory utilities
@@ -367,7 +367,8 @@ public class ItemUtil {
         newItemHandle.motX = oldItemHandle.motX;
         newItemHandle.motY = oldItemHandle.motY;
         newItemHandle.motZ = oldItemHandle.motZ;
-        newItemHandle.age = oldItemHandle.age;
+        //newItemHandle.age = oldItemHandle.age;
+        // NEEDS FIXING IN SPIGOT IT SELF
         newItemHandle.world.addEntity(newItemHandle);
         return CommonNMS.getItem(newItemHandle);
     }
@@ -611,7 +612,7 @@ public class ItemUtil {
         if (displayName != null) {
             CommonNMS.getNative(stack).c(displayName);
         } else if (hasDisplayName(stack)) {
-            CommonNMS.getNative(stack).tag.remove("display");
+            CommonNMS.getNative(stack).getTag().remove("display");
         }
     }
 }

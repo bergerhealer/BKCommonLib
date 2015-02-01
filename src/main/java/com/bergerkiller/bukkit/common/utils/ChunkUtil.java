@@ -155,10 +155,10 @@ public class ChunkUtil {
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
-            section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.g);
+            section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.o());
         }
-        ChunkSectionRef.setTypeId(section, blockposition, typeId);
-        ChunkSectionRef.setData(section, blockposition, data);
+        ChunkSectionRef.setTypeId(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), typeId);
+        ChunkSectionRef.setData(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), data);
     }
 
     /**
@@ -192,7 +192,7 @@ public class ChunkUtil {
         if (result) {
             result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), blockposition, typeBlock, data);
             world.methodProfiler.a("checkLight");
-            world.z(blockposition);
+            world.t(blockposition); // WorldServer#z(int, int, int);
             world.methodProfiler.b();
         }
         if (result) {

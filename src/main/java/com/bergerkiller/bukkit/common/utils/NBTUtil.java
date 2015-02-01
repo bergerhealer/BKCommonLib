@@ -7,21 +7,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import net.minecraft.server.AttributeMapServer;
-import net.minecraft.server.Entity;
-import net.minecraft.server.FoodMetaData;
-import net.minecraft.server.GenericAttributes;
-import net.minecraft.server.InventoryEnderChest;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.MobEffect;
-import net.minecraft.server.NBTCompressedStreamTools;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.PlayerInventory;
+import net.minecraft.server.v1_8_R1.AttributeMapServer;
+import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R1.FoodMetaData;
+import net.minecraft.server.v1_8_R1.GenericAttributes;
+import net.minecraft.server.v1_8_R1.InventoryEnderChest;
+import net.minecraft.server.v1_8_R1.ItemStack;
+import net.minecraft.server.v1_8_R1.MobEffect;
+import net.minecraft.server.v1_8_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_8_R1.NBTTagCompound;
+import net.minecraft.server.v1_8_R1.NBTTagList;
+import net.minecraft.server.v1_8_R1.PlayerInventory;
 
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.inventory.CraftInventoryCustom;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.Inventory;
 

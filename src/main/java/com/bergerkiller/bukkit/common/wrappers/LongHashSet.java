@@ -29,19 +29,19 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
     }
 
     public boolean add(int msw, int lsw) {
-        return ((org.bukkit.craftbukkit.util.LongHashSet) handle).add(msw, lsw);
+        return ((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).add(msw, lsw);
     }
 
     public boolean add(long value) {
-        return ((org.bukkit.craftbukkit.util.LongHashSet) handle).add(value);
+        return ((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).add(value);
     }
 
     public boolean contains(int msw, int lsw) {
-        return ((org.bukkit.craftbukkit.util.LongHashSet) handle).contains(msw, lsw);
+        return ((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).contains(msw, lsw);
     }
 
     public boolean contains(long value) {
-        return ((org.bukkit.craftbukkit.util.LongHashSet) handle).contains(value);
+        return ((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).contains(value);
     }
 
     public void remove(int msw, int lsw) {
@@ -61,7 +61,7 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
     }
 
     public long popFirst() {
-        return ((org.bukkit.craftbukkit.util.LongHashSet) handle).popFirst();
+        return ((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).popFirst();
     }
 
     public long[] popAll() {
@@ -90,7 +90,7 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
      * @return size
      */
     public int size() {
-        return Math.max(((org.bukkit.craftbukkit.util.LongHashSet) handle).size(), 0);
+        return Math.max(((org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet) handle).size(), 0);
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.DamageSource;
-import net.minecraft.server.Explosion;
-import net.minecraft.server.World;
+import net.minecraft.server.v1_8_R1.DamageSource;
+import net.minecraft.server.v1_8_R1.Explosion;
+import net.minecraft.server.v1_8_R1.World;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -179,7 +179,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
         if (cause == DamageCause.BLOCK_EXPLOSION) {
             Location loc = entity.getLocation();
             World worldhandle = CommonNMS.getNative(loc.getWorld());
-            Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0);
+            Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0, false, false);
             source = DamageSource.explosion(ex);
         } else if (cause == DamageCause.CONTACT) {
             source = DamageSource.CACTUS;
@@ -314,6 +314,6 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return entity maximum portal cooldown ticks
      */
     public static int getPortalCooldownMaximum(Entity entity) {
-        return CommonNMS.getNative(entity).ai();
+        return CommonNMS.getNative(entity).ar();
     }
 }

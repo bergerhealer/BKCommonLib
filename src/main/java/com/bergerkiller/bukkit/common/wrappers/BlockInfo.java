@@ -12,6 +12,9 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R1.IBlockData;
+import org.bukkit.Location;
 
 /**
  * Stores Block material information and method calls
@@ -179,18 +182,16 @@ public class BlockInfo extends BasicWrapper {
      * @param block to ignite at
      */
     public final void ignite(Block block) {
-        ignite(block.getWorld(), block.getX(), block.getY(), block.getZ());
+        ignite(block.getWorld(), block.getLocation());
     }
 
     /**
      * Ignites the block (for example, ignites TNT)
      *
      * @param world the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
+     * @param loc - location of the block
      */
-    public void ignite(World world, int x, int y, int z) {
+    public void ignite(World world, Location loc) {
     }
 
     /**
@@ -213,7 +214,7 @@ public class BlockInfo extends BasicWrapper {
      * @param yield (e.g. 20.0f)
      */
     public final void destroy(World world, int x, int y, int z, float yield) {
-        destroy(world, x, y, z, CommonNMS.getNative(world).getData(x, y, z), yield);
+        destroy(world, x, y, z, CommonNMS.getNative(world).getType(new BlockPosition(x, y, z)), yield);
     }
 
     /**
@@ -233,6 +234,23 @@ public class BlockInfo extends BasicWrapper {
 //		net.minecraft.server.Block nativeBlock = nativeWorld.getType(x, y, z);
 //		nativeWorld.setTypeId(x, y, z, nativeBlock, 0);
         //DAT NMS IS WUT SUX
+
+        world.getBlockAt(x, y, z).setTypeId(0);
+    }
+    
+    /**
+     * Destroys the block, spawning item drops naturally in the process
+     *
+     * @param world the block is in
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
+     * @param data of the block
+     * @param yield (e.g. 20.0f)
+     */
+    @SuppressWarnings("deprecation")
+    public final void destroy(World world, int x, int y, int z, IBlockData data, float yield) {
+        dropNaturally(world, x, y, z, data.getBlock().toLegacyData(data), yield);
 
         world.getBlockAt(x, y, z).setTypeId(0);
     }

@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.EnumEntityUseAction;
+import net.minecraft.server.v1_8_R1.EnumEntityUseAction;
 
 public enum UseAction {
 
