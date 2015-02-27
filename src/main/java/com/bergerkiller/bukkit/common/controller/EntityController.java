@@ -184,7 +184,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dy = aabb.b(handle.getBoundingBox(), dy);
             }
             handle.getBoundingBox().c(0.0, dy, 0.0);
-            if (!handle.J && oldDy != dy) {
+            if (!handle.aS() && oldDy != dy) {
                 dx = dy = dz = 0.0;
             }
             boolean isOnGround = handle.onGround || oldDy != dy && oldDy < 0.0;
@@ -194,7 +194,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dx = aabb.a(handle.getBoundingBox(), dx);
             }
             handle.getBoundingBox().c(dx, 0.0, 0.0);
-            if (!handle.J && oldDx != dx) {
+            if (!handle.aS() && oldDx != dx) {
                 dx = dy = dz = 0.0;
             }
 
@@ -202,8 +202,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             for (AxisAlignedBB aabb : list) {
                 dz = aabb.c(handle.getBoundingBox(), dz);
             }
-            handle.getBoundingBox().d(0.0, 0.0, dz);
-            if (!handle.J && oldDz != dz) {
+            handle.getBoundingBox().c(0.0, 0.0, dz);
+            if (!handle.aS() && oldDz != dz) {
                 dx = dy = dz = 0.0;
             }
 
@@ -218,8 +218,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dy = (double) handle.U;
                 dz = oldDz;
 
-                AxisAlignedBB axisalignedbb1 = handle.boundingBox.clone();
-                handle.getBoundingBox().d(axisalignedbb);
+                AxisAlignedBB axisalignedbb1 = handle.getBoundingBox();
+                handle.getBoundingBox().a(axisalignedbb);
 
                 list = EntityControllerCollisionHelper.getCollisions(this, handle.getBoundingBox().a(oldDx, dy, oldDz));
 
@@ -227,8 +227,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 for (AxisAlignedBB aabb : list) {
                     dy = aabb.b(handle.getBoundingBox(), dy);
                 }
-                handle.getBoundingBox().d(0.0, dy, 0.0);
-                if (!handle.J && oldDy != dy) {
+                handle.getBoundingBox().c(0.0, dy, 0.0);
+                if (!handle.aS() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 }
 
@@ -236,8 +236,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 for (AxisAlignedBB aabb : list) {
                     dx = aabb.a(handle.getBoundingBox(), dx);
                 }
-                handle.getBoundingBox().d(dx, 0.0, 0.0);
-                if (!handle.J && oldDx != dx) {
+                handle.getBoundingBox().c(dx, 0.0, 0.0);
+                if (!handle.aS() && oldDx != dx) {
                     dx = dy = dz = 0.0;
                 }
 
@@ -245,25 +245,25 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 for (AxisAlignedBB aabb : list) {
                     dz = aabb.c(handle.getBoundingBox(), dz);
                 }
-                handle.getBoundingBox().d(0.0, 0.0, dz);
-                if (!handle.J && oldDz != dz) {
+                handle.getBoundingBox().c(0.0, 0.0, dz);
+                if (!handle.aS() && oldDz != dz) {
                     dx = dy = dz = 0.0;
                 }
 
-                if (!handle.J && oldDy != dy) {
+                if (!handle.aS() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 } else {
                     dy = (double) -handle.U;
                     for (int k = 0; k < list.size(); k++) {
                         dy = list.get(k).b(handle.getBoundingBox(), dy);
                     }
-                    handle.getBoundingBox().d(0.0, dy, 0.0);
+                    handle.getBoundingBox().c(0.0, dy, 0.0);
                 }
                 if (MathUtil.lengthSquared(moveDx, moveDz) >= MathUtil.lengthSquared(dx, dz)) {
                     dx = moveDx;
                     dy = moveDy;
                     dz = moveDz;
-                    handle.getBoundingBox().d(axisalignedbb1);
+                    handle.getBoundingBox().a(axisalignedbb1);
                 } else {
                     double subY = handle.getBoundingBox().b - (int) handle.getBoundingBox().b;
                     if (subY > 0.0) {
@@ -297,7 +297,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             moveDz = handle.locZ - oldLocZ;
             if (entity.getEntity() instanceof Vehicle && entity.isMovementImpaired()) {
                 Vehicle vehicle = (Vehicle) entity.getEntity();
-                org.bukkit.block.Block block = entity.getWorld().getBlockAt(entity.loc.x.block(), MathUtil.floor(handle.locY - (double) handle.height), entity.loc.z.block());
+                org.bukkit.block.Block block = entity.getWorld().getBlockAt(entity.loc.x.block(), MathUtil.floor(handle.locY - (double) handle.width/2), entity.loc.z.block());
                 if (oldDx > dx) {
                     block = block.getRelative(BlockFace.EAST);
                 } else if (oldDx < dx) {
@@ -344,15 +344,15 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                     entity.makeRandomSound(EntityRef.getSwimSound.invoke(handle), f, 1.0f);
                 }
                 entity.makeStepSound(bX, bY, bZ, CommonNMS.getMaterial(block));
-                block.b(handle.world, bX, bY, bZ, handle);
+                block.a(handle.world, new BlockPosition(bX, bY, bZ), handle);
             }
         }
 
         EntityRef.updateBlockCollision(handle);
 
         // Fire tick calculation (check using block collision)
-        final boolean isInWater = handle.L(); // In water or raining
-        if (handle.world.e(handle.boundingBox.shrink(0.001, 0.001, 0.001))) {
+        final boolean isInWater = handle.U(); // In water or raining
+        if (handle.world.e(handle.getBoundingBox().shrink(0.001, 0.001, 0.001))) {
             onBurnDamage(1);
             if (!isInWater) {
                 handle.fireTicks++;
