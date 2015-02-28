@@ -84,9 +84,11 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>3.6.3-SNAPSHOT</version>
+            <systemPath>${project.basedir}/lib/ProtocolLib.jar</systemPath>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.googlecode.openpojo</groupId>
             <artifactId>openpojo</artifactId>
@@ -100,6 +102,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        -->
     </dependencies>
 
     <!-- Build -->

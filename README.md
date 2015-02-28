@@ -1,3 +1,4 @@
+[![Build Status](https://drone.io/github.com/bergerhealer/BKCommonLib/status.png)](https://drone.io/github.com/bergerhealer/BKCommonLib/latest)
 #BKCommonLib
 This is a library-plugin system, introducing a lot of utility classes
 It also simplifies coding:
