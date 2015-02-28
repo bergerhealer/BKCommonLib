@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 /**
@@ -281,6 +282,16 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         @Override
         protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
             if (value instanceof UseAction) {
+                return ((UseAction) value).getHandle();
+            } else {
+                return def;
+            }
+        }
+    };
+    public static final HandleConverter toScoreboardActionHandle = new HandleConverter("EnumScoreboardAction") {
+        @Override
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof ScoreboardAction) {
                 return ((UseAction) value).getHandle();
             } else {
                 return def;

@@ -855,8 +855,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
 			packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
 			// Rotation
-			packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (byte) locSynched.getYaw());
-			packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (byte) locSynched.getPitch());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, locSynched.getYaw());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, locSynched.getPitch());
 		}
 		return packet;
 	}

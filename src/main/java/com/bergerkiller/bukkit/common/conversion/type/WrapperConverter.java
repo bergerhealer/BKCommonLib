@@ -63,7 +63,9 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import net.minecraft.server.v1_8_R1.EnumScoreboardAction;
 
 /**
  * Converter for converting to wrapper classes (from handles and other types)
@@ -396,6 +398,15 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
         protected UseAction convertSpecial(Object value, Class<?> valueType, UseAction def) {
             if (value instanceof EnumEntityUseAction) {
                 return UseAction.fromHandle(value);
+            }
+            return def;
+        }
+    };
+    public static final WrapperConverter<ScoreboardAction> toScoreboardAction = new WrapperConverter<ScoreboardAction>(ScoreboardAction.class) {
+        @Override
+        protected ScoreboardAction convertSpecial(Object value, Class<?> valueType, ScoreboardAction def) {
+            if (value instanceof EnumScoreboardAction) {
+                return ScoreboardAction.fromHandle(value);
             }
             return def;
         }

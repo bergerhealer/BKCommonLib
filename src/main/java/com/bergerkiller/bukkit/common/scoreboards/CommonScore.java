@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.scoreboards;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 
 public class CommonScore {
 
@@ -56,7 +57,7 @@ public class CommonScore {
         packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
         packet.write(PacketType.OUT_SCOREBOARD_SCORE.objName, this.objName);
         packet.write(PacketType.OUT_SCOREBOARD_SCORE.value, this.value);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, 0);
+        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, ScoreboardAction.CHANGE);
         PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
     }
 
@@ -80,7 +81,7 @@ public class CommonScore {
         }
         CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_SCORE);
         packet.write(PacketType.OUT_SCOREBOARD_SCORE.name, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, 1);
+        packet.write(PacketType.OUT_SCOREBOARD_SCORE.action, ScoreboardAction.REMOVE);
         PacketUtil.sendPacket(scoreboard.getPlayer(), packet);
         this.created = false;
     }

@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
+import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 
 /**
  * Stores all Converter pairs available
@@ -65,6 +66,7 @@ public class ConversionPairs {
     public static final ConverterPair<Object, BlockState> blockState = toTileEntityHandle.formPair(toBlockState);
     public static final ConverterPair<Object, Material> block = toBlockHandle.formPair(toMaterial);
     public static final ConverterPair<Object, Material> item = toItemHandle.formPair(toMaterial);
+    public static final ConverterPair<Object, ScoreboardAction> scoreboardAction = toScoreboardActionHandle.formPair(toScoreboardAction);
     public static final ConverterPair<Object, UseAction> useAction = toUseActionHandle.formPair(toUseAction);
     public static final ConverterPair<Object, UUID> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
 }

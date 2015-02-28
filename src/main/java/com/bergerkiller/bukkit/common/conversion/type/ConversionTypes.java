@@ -31,6 +31,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 
 public class ConversionTypes {
@@ -93,6 +94,7 @@ public class ConversionTypes {
     public static final HandleConverter toLongHashMapHandle = HandleConverter.toLongHashMapHandle;
     public static final HandleConverter toLongHashSetHandle = HandleConverter.toLongHashSetHandle;
     public static final HandleConverter toIntHashMapHandle = HandleConverter.toIntHashMapHandle;
+    public static final HandleConverter toScoreboardActionHandle = HandleConverter.toScoreboardActionHandle;
     public static final HandleConverter toUseActionHandle = HandleConverter.toUseActionHandle;
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
@@ -118,6 +120,7 @@ public class ConversionTypes {
     public static final WrapperConverter<LongHashSet> toLongHashSet = WrapperConverter.toLongHashSet;
     public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = WrapperConverter.toLongHashMap;
     public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = WrapperConverter.toIntHashMap;
+    public static final WrapperConverter<ScoreboardAction> toScoreboardAction = WrapperConverter.toScoreboardAction;
     public static final WrapperConverter<UseAction> toUseAction = WrapperConverter.toUseAction;
     // Properties
     @Deprecated
