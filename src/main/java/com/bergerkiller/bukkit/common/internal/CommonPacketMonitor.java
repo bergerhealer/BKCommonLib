@@ -27,7 +27,7 @@ class CommonPacketMonitor implements PacketMonitor {
         CommonPlayerMeta meta = CommonPlugin.getInstance().getPlayerMeta(player);
         if (packet.getType() == PacketType.OUT_MAP_CHUNK) {
             // Update it for a single chunk
-            boolean visible = packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap) != 0;
+            boolean visible = packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap) != null;
             int chunkX = packet.read(PacketType.OUT_MAP_CHUNK.x);
             int chunkZ = packet.read(PacketType.OUT_MAP_CHUNK.z);
             meta.setChunkVisible(chunkX, chunkZ, visible);

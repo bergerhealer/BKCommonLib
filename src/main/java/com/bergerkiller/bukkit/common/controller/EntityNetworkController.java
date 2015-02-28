@@ -401,13 +401,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Potential leash
 		Entity leashHolder = entity.getLeashHolder();
 		if (leashHolder != null) {
-			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), leashHolder, 1));
+			//PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), leashHolder, 1));
 		}
 
 		// Human entity sleeping action
 		if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
-			PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(), 
-					entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
+			//PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(), entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
 		}
 
 		// Initial entity head rotation
@@ -823,7 +822,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with absolute position information
 	 */
 	public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, false, false);
+		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, false);
 	}
 
 	/**
