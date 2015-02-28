@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Server;
@@ -16,7 +15,7 @@ public class WorldRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("World");
     private static final MethodAccessor<Server> getServer = TEMPLATE.getMethod("getServer");
-    public static final FieldAccessor<Collection> tileEntityList = TEMPLATE.getField("tileEntityList");
+    public static final FieldAccessor<List> tileEntityList = TEMPLATE.getField("h");
     public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("f");
     public static final FieldAccessor<World> bukkitWorld = TEMPLATE.getField("world");
 

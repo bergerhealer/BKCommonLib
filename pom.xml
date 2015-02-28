@@ -85,6 +85,7 @@
             <artifactId>ProtocolLib</artifactId>
             <version>3.6.3-SNAPSHOT</version>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.googlecode.openpojo</groupId>

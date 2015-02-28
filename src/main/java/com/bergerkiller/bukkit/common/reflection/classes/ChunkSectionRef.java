@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import net.minecraft.server.v1_8_R1.IBlockData;
+
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
@@ -19,12 +21,12 @@ public class ChunkSectionRef {
     public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("getSkyLightArray");
     private static final MethodAccessor<Integer> blocks = TEMPLATE.getMethod("getTypeId", int.class, int.class, int.class);
     private static final MethodAccessor<Void> setTypeBlock = TEMPLATE.getMethod("setTypeId", int.class, int.class, int.class, BlockRef.TEMPLATE.getType());
-    private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("getData", int.class, int.class, int.class);
-    private static final MethodAccessor<Void> setData = TEMPLATE.getMethod("setData", int.class, int.class, int.class, int.class);
-    private static final MethodAccessor<Integer> getSkyLight = TEMPLATE.getMethod("getSkyLight", int.class, int.class, int.class);
-    private static final MethodAccessor<Void> setSkyLight = TEMPLATE.getMethod("setSkyLight", int.class, int.class, int.class, int.class);
-    private static final MethodAccessor<Integer> getBlockLight = TEMPLATE.getMethod("getEmittedLight", int.class, int.class, int.class);
-    private static final MethodAccessor<Void> setBlockLight = TEMPLATE.getMethod("setEmittedLight", int.class, int.class, int.class, int.class);
+    private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("c", int.class, int.class, int.class);
+    private static final MethodAccessor<Void> setData = TEMPLATE.getMethod("setData", int.class, int.class, int.class, int.class, IBlockData.class);
+    private static final MethodAccessor<Integer> getSkyLight = TEMPLATE.getMethod("d", int.class, int.class, int.class);
+    private static final MethodAccessor<Void> setSkyLight = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
+    private static final MethodAccessor<Integer> getBlockLight = TEMPLATE.getMethod("e", int.class, int.class, int.class);
+    private static final MethodAccessor<Void> setBlockLight = TEMPLATE.getMethod("b", int.class, int.class, int.class, int.class);
 
     public static int getTypeId(Object section, int x, int y, int z) {
         return blocks.invoke(section, x & 0xf, y & 0xf, z & 0xf);

@@ -53,7 +53,7 @@ class EntityControllerCollisionHelper {
                     for (y = ymin - 1; y < ymax; ++y) {
                         Block block = handle.world.getType(new BlockPosition(x, y, z)).getBlock();
                         if (block != null) {
-                            block.a(handle.world, new BlockPosition(x, y, z), bounds, collisionBuffer, handle);
+                        	block.a(handle.world, new BlockPosition(x, y, z),block.getBlockData(), bounds, collisionBuffer, handle);
                         }
                     }
                 }
@@ -97,7 +97,7 @@ class EntityControllerCollisionHelper {
              * entityBounds.a(bounds)) { collisionBuffer.add(entityBounds); }
              */
 
-            entityBounds = collider.boundingBox;
+            entityBounds = collider.getBoundingBox();
             // Entity collision event after the null/inBounds check
             if (entityBounds != null && entityBounds.b(bounds) && controller.onEntityCollision(Conversion.toEntity.convert(collider))) {
                 collisionBuffer.add(entityBounds);

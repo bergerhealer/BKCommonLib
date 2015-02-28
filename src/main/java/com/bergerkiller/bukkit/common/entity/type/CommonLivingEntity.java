@@ -236,7 +236,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
         if (nmsEntity instanceof EntityInsentient) {
             Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
             if (!navigation.a(nmsTargetEntity, speed)) {
-                PathEntity path = nmsEntity.world.findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfindingRange(), true, false, false, true);
+            	PathEntity path = null;//findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfindingRange(), true, false, false, true);
+				//nmsEntity.world.
                 this.moveWithPath(path, speed);
             }
         }
@@ -246,7 +247,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
         EntityLiving nmsEntity = CommonNMS.getNative(entity);
         if (nmsEntity instanceof EntityInsentient) {
             if (nmsEntity instanceof EntityCreature) {
-                ((EntityCreature) nmsEntity).setPathEntity(path);
+            	EntityCreature creature = ((EntityCreature) nmsEntity);
+				creature.move(path.c().a, path.c().b, path.c().c);
             }
 
             Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
