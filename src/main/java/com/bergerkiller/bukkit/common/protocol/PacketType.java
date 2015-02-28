@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import java.util.logging.Level;
 
+import net.minecraft.server.v1_8_R1.EnumProtocolDirection;
+
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
@@ -124,7 +126,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInTransaction IN_WINDOW_TRANSACTION = new NMSPacketPlayInTransaction();
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 
-    private final int id;
+    private final EnumProtocolDirection id;
     private final boolean outgoing;
     private final FieldAccessor<DataWatcher> dataWatcherField;
 
@@ -151,16 +153,16 @@ public class PacketType extends ClassTemplate<Object> {
         this.setClass((Class<Object>) packetClass);
 
         // Obtain ID and determine in/outgoing
-        Integer tmpId;
+        EnumProtocolDirection tmpId;
         if ((tmpId = EnumProtocolRef.getPacketIdIn(getType())) != null) {
             this.outgoing = false;
-            this.id = tmpId.intValue();
+            this.id = tmpId;
         } else if ((tmpId = EnumProtocolRef.getPacketIdOut(getType())) != null) {
             this.outgoing = true;
-            this.id = tmpId.intValue();
+            this.id = tmpId;
         } else {
             this.outgoing = false;
-            this.id = -1;
+            this.id = null;
             if (packetClass == null || !packetClass.equals(CommonUtil.getNMSClass("Packet"))) {
                 CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getClass().getSimpleName() + " is not registered!");
             }
@@ -181,7 +183,7 @@ public class PacketType extends ClassTemplate<Object> {
         return this.outgoing;
     }
 
-    public int getId() {
+    public EnumProtocolDirection getId() {
         return this.id;
     }
 

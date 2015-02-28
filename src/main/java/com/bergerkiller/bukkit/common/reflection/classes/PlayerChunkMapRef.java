@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.List;
 import java.util.Queue;
 
+import net.minecraft.server.v1_8_R1.BlockPosition;
+
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
@@ -20,7 +22,7 @@ public class PlayerChunkMapRef {
     public static final FieldAccessor<Queue<?>> dirtyBlockChunks = TEMPLATE.getField("f");
     public static final MethodAccessor<Boolean> shouldUnload = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class, int.class);
     public static final MethodAccessor<Object> getChunk = TEMPLATE.getMethod("a", int.class, int.class, boolean.class);
-    private static final MethodAccessor<Void> flagDirty = TEMPLATE.getMethod("flagDirty", int.class, int.class, int.class);
+    private static final MethodAccessor<Void> flagDirty = TEMPLATE.getMethod("flagDirty", BlockPosition.class);
 
     public static void flagBlockDirty(Object playerChunkMap, int x, int y, int z) {
         flagDirty.invoke(playerChunkMap, x, y, z);

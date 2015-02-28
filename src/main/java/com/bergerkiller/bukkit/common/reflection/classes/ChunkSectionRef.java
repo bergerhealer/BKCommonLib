@@ -13,7 +13,7 @@ public class ChunkSectionRef {
     public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("ChunkSection");
     public static final FieldAccessor<Object> skyLight = TEMPLATE.getField("skyLight");
     public static final FieldAccessor<Object> blockLight = TEMPLATE.getField("emittedLight");
-    public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("isEmpty");
+    public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("a");
     public static final MethodAccessor<byte[]> getBlockIds = TEMPLATE.getMethod("getIdArray");
     public static final MethodAccessor<Object> getExtBlockIds = TEMPLATE.getMethod("getExtendedIdArray");
     public static final MethodAccessor<Object> getBlockData = TEMPLATE.getMethod("getDataArray");
