@@ -16,7 +16,7 @@ public class WorldRef {
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("World");
     private static final MethodAccessor<Server> getServer = TEMPLATE.getMethod("getServer");
     public static final FieldAccessor<List> tileEntityList = TEMPLATE.getField("h");
-    public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("f");
+    public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("g");
     public static final FieldAccessor<World> bukkitWorld = TEMPLATE.getField("world");
 
     public static Server getServer(Object worldHandle) {

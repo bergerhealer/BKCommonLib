@@ -43,21 +43,21 @@ public class EntityRef {
     public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
     public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
     public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
-    public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("d");
+    public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("h");
     public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("k"); //Note: Not sure if the name is correct!
     public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ag");
     public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("an");
 
     /* Methods */
     private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class, Block.class, BlockPosition.class);//double.class,boolean.class
-    private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("I");
-    private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, BlockRef.TEMPLATE.getType());
-    private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("g_");
+    private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("checkBlockCollisions");
+    private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", BlockPosition.class, BlockRef.TEMPLATE.getType());
+    private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("r_");
     private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("setYawPitch", float.class, float.class);
     private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
-    private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("N");
-    private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("M");
-    public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("H");
+    private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("W");
+    private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("V");
+    public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("P");
 
     /* External */
     public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
