@@ -84,9 +84,9 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>3.6.3-SNAPSHOT</version>
+            <scope>system</scope>
             <systemPath>${project.basedir}/lib/ProtocolLib.jar</systemPath>
             <optional>true</optional>
-            <scope>provided</scope>
         </dependency>
         <!--
         <dependency>
