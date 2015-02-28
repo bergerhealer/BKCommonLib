@@ -18,9 +18,9 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
     private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
-    private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("fuse");
-    private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("c", double.class);
-    private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("e");
+    private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("a");//fuse
+    private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("b", double.class);//c
+    private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("j");//e
     /**
      * The velocity (squared) at which the Minecart is considered 'fast moving'.
      */
