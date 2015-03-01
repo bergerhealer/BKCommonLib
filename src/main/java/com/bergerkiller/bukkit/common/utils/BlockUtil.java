@@ -466,7 +466,7 @@ public class BlockUtil extends MaterialUtil {
         try {
             if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
                 // simplified coding instead
-                offerTile(world, new BlockPosition(x, y, z));
+                offerTile(world, x, y, z);
             } else {
                 // loop through tile entity list
                 int xMin = x - radiusX;
@@ -477,14 +477,14 @@ public class BlockUtil extends MaterialUtil {
                 int zMax = z + radiusZ;
                 int tx, ty, tz;
                 for (Object tile : WorldRef.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
-                    tx = TileEntityRef.x.get(tile);
-                    ty = TileEntityRef.y.get(tile);
-                    tz = TileEntityRef.z.get(tile);
+                    tx = TileEntityRef.position.get(tile).getX();
+                    ty = TileEntityRef.position.get(tile).getY();
+                    tz = TileEntityRef.position.get(tile).getZ();
                     if (tx < xMin || ty < yMin || tz < zMin || tx > xMax || ty > yMax || tz > zMax) {
                         continue;
                     }
                     // Get again - security against ghost tiles
-                    offerTile(world, new BlockPosition(tx, ty, tz));
+                    offerTile(world, tx, ty, tz);
                 }
             }
             return new ArrayList<>(blockStateBuff);
@@ -493,8 +493,8 @@ public class BlockUtil extends MaterialUtil {
         }
     }
 
-    private static void offerTile(World world, BlockPosition blockposition) {
-        BlockState state = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, blockposition));
+    private static void offerTile(World world, int x, int y, int z) {
+        BlockState state = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, x, y, z));
         if (state != null) {
             blockStateBuff.add(state);
         }

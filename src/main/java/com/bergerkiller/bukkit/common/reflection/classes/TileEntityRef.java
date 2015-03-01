@@ -20,9 +20,7 @@ public class TileEntityRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("TileEntity");
     public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);
-    public static final FieldAccessor<Integer> x = TEMPLATE.getField("x");
-    public static final FieldAccessor<Integer> y = TEMPLATE.getField("y");
-    public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
+    public static final FieldAccessor<BlockPosition> position = TEMPLATE.getField("position");
     private static final MethodAccessor<Object> getUpdatePacket = TEMPLATE.getMethod("getUpdatePacket");
 
     public static boolean hasWorld(Object tileEntity) {
@@ -30,11 +28,15 @@ public class TileEntityRef {
     }
 
     public static Object getFromWorld(Block block) {
-        return getFromWorld(block.getWorld(), new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        return getFromWorld(block.getWorld(), block.getX(), block.getY(), block.getZ());
     }
 
-    public static Object getFromWorld(World world, BlockPosition blockposition) {
-        return CommonNMS.getNative(world).getTileEntity(blockposition);
+    public static Object getFromWorld(World world, int x, int y, int z) {
+        return CommonNMS.getNative(world).getTileEntity(new BlockPosition(x, y, z));
+    }
+    
+    public static Object getFromWorld(World world, BlockPosition position) {
+        return CommonNMS.getNative(world).getTileEntity(position);
     }
 
     public static CommonPacket getUpdatePacket(Object tileEntity) {
