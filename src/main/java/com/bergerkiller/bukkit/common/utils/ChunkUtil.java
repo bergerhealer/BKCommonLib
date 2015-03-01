@@ -158,7 +158,7 @@ public class ChunkUtil {
         if (section == null) {
             section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.o());
         }
-        ChunkSectionRef.setTypeId(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), typeId);
+        ChunkSectionRef.setType(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), typeId);
         ChunkSectionRef.setData(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), data);
     }
 
