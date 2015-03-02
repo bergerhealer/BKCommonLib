@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class LongHashSetRef {
 
-    public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("util.LongHashSet"));
+    /*public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("util.LongHashSet"));
     public static final SafeConstructor<?> constructor1;
     public static final SafeConstructor<?> constructor2;
     public static final MethodAccessor<Boolean> add2 = TEMPLATE.getMethod("add", int.class, int.class);
@@ -38,7 +38,7 @@ public class LongHashSetRef {
     public static final long REMOVED = TEMPLATE.<Long>getStaticFieldValue("REMOVED").longValue();
 
     static {
-        /*
+        
          if (Common.IS_SPIGOT_SERVER) {
          // Load the Spigot dummy flatmap in advance
          SpigotDummyFlatMap.getInstance();
@@ -66,9 +66,9 @@ public class LongHashSetRef {
          }
          };
          } else {
-         */
+         
         constructor1 = TEMPLATE.getConstructor();
         constructor2 = TEMPLATE.getConstructor(int.class);
-        //}
-    }
+        }
+    }*/
 }

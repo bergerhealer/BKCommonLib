@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 public class BlockRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("Block");
-    public static final FieldAccessor<String> name = TEMPLATE.getField("d");
+    public static final FieldAccessor<String> name = TEMPLATE.getField("name");
     public static final MethodAccessor<Void> dropNaturally = TEMPLATE.getMethod("dropNaturally", WorldRef.TEMPLATE.getType(), BlockPosition.class, IBlockData.class, float.class, int.class);
     public static final MethodAccessor<Void> ignite = TEMPLATE.getMethod("wasExploded", WorldRef.TEMPLATE.getType(), BlockPosition.class, Explosion.class);
 

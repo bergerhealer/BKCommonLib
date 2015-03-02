@@ -376,11 +376,11 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<LongHashSet> toLongHashSet = new WrapperConverter<LongHashSet>(LongHashSet.class) {
         @Override
         protected LongHashSet convertSpecial(Object value, Class<?> valueType, LongHashSet def) {
-            if (LongHashSetRef.TEMPLATE.isInstance(value)) {
+            /*if (LongHashSetRef.TEMPLATE.isInstance(value)) {
                 return new LongHashSet(value);
-            } else {
+            } else {*/
                 return def;
-            }
+            //}
         }
     };
     public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = new WrapperConverter<IntHashMap<Object>>(IntHashMap.class) {
