@@ -1,5 +1,5 @@
-[![Build Status](https://drone.io/github.com/bergerhealer/BKCommonLib/status.png)](https://drone.io/github.com/bergerhealer/BKCommonLib/latest)
-#BKCommonLib
+#BKCommonLib [![Build Status](https://drone.io/github.com/bergerhealer/BKCommonLib/status.png)](https://drone.io/github.com/bergerhealer/BKCommonLib/latest)
+
 This is a library-plugin system, introducing a lot of utility classes
 It also simplifies coding:
 * PluginBase: allows quick registering and monitoring of plugins being enabled
