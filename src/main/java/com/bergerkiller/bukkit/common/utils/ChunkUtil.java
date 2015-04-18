@@ -6,18 +6,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.Chunk;
-import net.minecraft.server.v1_8_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R1.ChunkSection;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.Chunk;
+import net.minecraft.server.v1_8_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R2.ChunkSection;
+import net.minecraft.server.v1_8_R2.WorldServer;
 
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R1.util.LongHash;
-import org.bukkit.craftbukkit.v1_8_R1.util.LongHashSet;
-import org.bukkit.craftbukkit.v1_8_R1.util.LongObjectHashMap;
+import org.bukkit.craftbukkit.v1_8_R2.util.LongHash;
+import org.bukkit.craftbukkit.v1_8_R2.util.LongHashSet;
+import org.bukkit.craftbukkit.v1_8_R2.util.LongObjectHashMap;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
@@ -36,8 +36,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.EntitySlice;
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.EntitySlice;
 
 /**
  * Contains utilities to get and set chunks of a world

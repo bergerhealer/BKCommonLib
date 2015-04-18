@@ -1,17 +1,17 @@
 package com.bergerkiller.bukkit.common.proxies;
 
 import java.util.List;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
-import net.minecraft.server.v1_8_R1.Chunk;
+import net.minecraft.server.v1_8_R2.Chunk;
 //import net.minecraft.server.v1_8_R1.ChunkPosition;
-import net.minecraft.server.v1_8_R1.ChunkProviderServer;
-import net.minecraft.server.v1_8_R1.EnumCreatureType;
-import net.minecraft.server.v1_8_R1.IChunkLoader;
-import net.minecraft.server.v1_8_R1.IChunkProvider;
-import net.minecraft.server.v1_8_R1.IProgressUpdate;
-import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.ChunkProviderServer;
+import net.minecraft.server.v1_8_R2.EnumCreatureType;
+import net.minecraft.server.v1_8_R2.IChunkLoader;
+import net.minecraft.server.v1_8_R2.IChunkProvider;
+import net.minecraft.server.v1_8_R2.IProgressUpdate;
+import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R2.WorldServer;
 
 /**
  * A chunk provider server proxy class. To call methods in the base class, call

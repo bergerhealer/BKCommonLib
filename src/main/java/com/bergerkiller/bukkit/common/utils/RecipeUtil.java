@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.server.v1_8_R1.CraftingManager;
-import net.minecraft.server.v1_8_R1.RecipesFurnace;
-import net.minecraft.server.v1_8_R1.TileEntityFurnace;
+import net.minecraft.server.v1_8_R2.CraftingManager;
+import net.minecraft.server.v1_8_R2.RecipesFurnace;
+import net.minecraft.server.v1_8_R2.TileEntityFurnace;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

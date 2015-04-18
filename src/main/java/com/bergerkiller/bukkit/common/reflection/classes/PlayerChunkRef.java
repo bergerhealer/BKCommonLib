@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.List;
 
-import net.minecraft.server.v1_8_R1.EntityPlayer;
+import net.minecraft.server.v1_8_R2.EntityPlayer;
 
 import org.bukkit.entity.Player;
 

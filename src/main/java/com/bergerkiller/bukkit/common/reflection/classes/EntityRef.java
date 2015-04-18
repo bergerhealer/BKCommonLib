@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Random;
 
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;

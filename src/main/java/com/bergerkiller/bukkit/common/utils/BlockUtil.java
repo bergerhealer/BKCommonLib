@@ -27,7 +27,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block

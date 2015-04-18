@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.server.v1_8_R1.Vec3D;
-import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R2.Vec3D;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
@@ -39,12 +38,13 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+
 import java.util.Set;
 import java.util.UUID;
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.ChunkMap;
-import net.minecraft.server.v1_8_R1.MapIcon;
-import net.minecraft.server.v1_8_R1.PacketDataSerializer;
+
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.MapIcon;
+import net.minecraft.server.v1_8_R2.PacketPlayOutMapChunk.ChunkMap;
 
 public class PacketTypeClasses {
 

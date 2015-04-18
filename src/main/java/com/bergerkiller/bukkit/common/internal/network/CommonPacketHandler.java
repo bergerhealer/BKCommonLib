@@ -4,7 +4,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R2.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;

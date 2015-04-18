@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_8_R1.Item;
+import net.minecraft.server.v1_8_R2.Item;
 
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;

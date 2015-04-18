@@ -1,38 +1,37 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.Chunk;
-import net.minecraft.server.v1_8_R1.Container;
-import net.minecraft.server.v1_8_R1.Entity;
-import net.minecraft.server.v1_8_R1.EnumDifficulty;
-import net.minecraft.server.v1_8_R1.EnumEntityUseAction;
-import net.minecraft.server.v1_8_R1.IInventory;
-import net.minecraft.server.v1_8_R1.InventoryCrafting;
-import net.minecraft.server.v1_8_R1.InventoryMerchant;
-import net.minecraft.server.v1_8_R1.Item;
-import net.minecraft.server.v1_8_R1.ItemStack;
-import net.minecraft.server.v1_8_R1.PlayerInventory;
-import net.minecraft.server.v1_8_R1.TileEntity;
-import net.minecraft.server.v1_8_R1.TileEntityBeacon;
-import net.minecraft.server.v1_8_R1.TileEntityBrewingStand;
-import net.minecraft.server.v1_8_R1.TileEntityFurnace;
-import net.minecraft.server.v1_8_R1.World;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.Chunk;
+import net.minecraft.server.v1_8_R2.Container;
+import net.minecraft.server.v1_8_R2.Entity;
+import net.minecraft.server.v1_8_R2.EnumDifficulty;
+import net.minecraft.server.v1_8_R2.IInventory;
+import net.minecraft.server.v1_8_R2.InventoryCrafting;
+import net.minecraft.server.v1_8_R2.InventoryMerchant;
+import net.minecraft.server.v1_8_R2.Item;
+import net.minecraft.server.v1_8_R2.ItemStack;
+import net.minecraft.server.v1_8_R2.PacketPlayInUseEntity.EnumEntityUseAction;
+import net.minecraft.server.v1_8_R2.PacketPlayOutScoreboardScore.EnumScoreboardAction;
+import net.minecraft.server.v1_8_R2.PlayerInventory;
+import net.minecraft.server.v1_8_R2.TileEntity;
+import net.minecraft.server.v1_8_R2.TileEntityBeacon;
+import net.minecraft.server.v1_8_R2.TileEntityBrewingStand;
+import net.minecraft.server.v1_8_R2.TileEntityFurnace;
+import net.minecraft.server.v1_8_R2.World;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryBeacon;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryCrafting;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R1.util.CraftMagicNumbers;
-
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryBeacon;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryBrewer;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryCrafting;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryFurnace;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryMerchant;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R2.util.CraftMagicNumbers;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
 
@@ -49,7 +48,6 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
 import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.LongHashMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.LongHashSetRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
@@ -65,7 +63,6 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import net.minecraft.server.v1_8_R1.EnumScoreboardAction;
 
 /**
  * Converter for converting to wrapper classes (from handles and other types)

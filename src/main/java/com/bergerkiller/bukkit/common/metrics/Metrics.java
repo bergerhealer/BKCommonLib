@@ -409,13 +409,13 @@ public class Metrics {
         boolean onlineMode = Bukkit.getServer().getOnlineMode(); // TRUE if online mode is enabled
         String pluginVersion = description.getVersion();
         String serverVersion = Bukkit.getVersion();
-        int playersOnline = Bukkit.getServer().getOnlinePlayers().length;
+        int playersOnline = Bukkit.getServer().getOnlinePlayers().size();
 
 		// END server software specific section -- all code below does not use any code outside of this class / Java
         // Construct the post data
         final StringBuilder data = new StringBuilder();
 
-        // The plugin's description file containg all of the plugin data such as name, version, author, etc
+        // The plugin's description file containing all of the plugin data such as name, version, author, etc
         data.append(encode("guid")).append('=').append(encode(guid));
         encodeDataPair(data, "version", pluginVersion);
         encodeDataPair(data, "server", serverVersion);

@@ -16,18 +16,18 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
-import net.minecraft.server.v1_8_R1.BiomeMeta;
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.BlockSand;
-import net.minecraft.server.v1_8_R1.Chunk;
-import net.minecraft.server.v1_8_R1.ChunkProviderServer;
-import net.minecraft.server.v1_8_R1.CrashReport;
-import net.minecraft.server.v1_8_R1.CrashReportSystemDetails;
-import net.minecraft.server.v1_8_R1.EnumCreatureType;
-import net.minecraft.server.v1_8_R1.IChunkLoader;
-import net.minecraft.server.v1_8_R1.IChunkProvider;
-import net.minecraft.server.v1_8_R1.ReportedException;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockSand;
+import net.minecraft.server.v1_8_R2.Chunk;
+import net.minecraft.server.v1_8_R2.ChunkProviderServer;
+import net.minecraft.server.v1_8_R2.CrashReport;
+import net.minecraft.server.v1_8_R2.CrashReportSystemDetails;
+import net.minecraft.server.v1_8_R2.EnumCreatureType;
+import net.minecraft.server.v1_8_R2.IChunkLoader;
+import net.minecraft.server.v1_8_R2.IChunkProvider;
+import net.minecraft.server.v1_8_R2.ReportedException;
+import net.minecraft.server.v1_8_R2.WorldServer;
 
 /**
  * A CPS Hook class that provides various new events, timings and other useful
@@ -81,8 +81,8 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 
         Chunk chunk = this.getOrCreateChunk(i, j);
 
-        if (!chunk.done) {
-            chunk.done = true;
+        if (!chunk.isDone()) {
+            chunk.d(true);
             this.chunkProvider.getChunkAt(ichunkprovider, i, j);
 
             // CraftBukkit start

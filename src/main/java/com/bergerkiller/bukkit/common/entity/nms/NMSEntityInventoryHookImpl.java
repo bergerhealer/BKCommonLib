@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import net.minecraft.server.v1_8_R1.ItemStack;
+import net.minecraft.server.v1_8_R2.ItemStack;
 
 import com.bergerkiller.bukkit.common.controller.DefaultEntityInventoryController;
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;

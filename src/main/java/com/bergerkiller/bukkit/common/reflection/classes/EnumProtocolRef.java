@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Map;
 
-import net.minecraft.server.v1_8_R1.EnumProtocol;
-import net.minecraft.server.v1_8_R1.EnumProtocolDirection;
+import net.minecraft.server.v1_8_R2.EnumProtocol;
+import net.minecraft.server.v1_8_R2.EnumProtocolDirection;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;

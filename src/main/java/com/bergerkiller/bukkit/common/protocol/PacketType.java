@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_8_R1.EnumProtocolDirection;
+import net.minecraft.server.v1_8_R2.EnumProtocolDirection;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;

@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.List;
 
-import net.minecraft.server.v1_8_R1.EntityPlayer;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.EntityPlayer;
+import net.minecraft.server.v1_8_R2.WorldServer;
 import com.mojang.authlib.GameProfile;
 
 import org.bukkit.Chunk;

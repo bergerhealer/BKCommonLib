@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.List;
 import java.util.Queue;
 
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;

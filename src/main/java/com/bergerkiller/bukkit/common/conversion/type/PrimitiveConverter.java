@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.lang.reflect.Array;
 import java.util.Collection;
 
-import net.minecraft.server.v1_8_R1.WorldType;
+import net.minecraft.server.v1_8_R2.WorldType;
 
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;

@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.v1_8_R1.BiomeMeta;
-import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R2.Entity;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;

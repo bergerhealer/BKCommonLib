@@ -251,4 +251,9 @@ public class BlockProxy extends ProxyBase<Block> implements Block {
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
         base.removeMetadata(metadataKey, owningPlugin);
     }
+
+	@Override
+	public void setType(Material type, boolean applyPhysics) {
+		base.setType(type, applyPhysics);
+	}
 }

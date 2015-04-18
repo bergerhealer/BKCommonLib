@@ -7,10 +7,10 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import net.minecraft.server.v1_8_R1.DedicatedPlayerList;
-import net.minecraft.server.v1_8_R1.EntityHuman;
-import net.minecraft.server.v1_8_R1.IPlayerFileData;
-import net.minecraft.server.v1_8_R1.NBTTagCompound;
+import net.minecraft.server.v1_8_R2.DedicatedPlayerList;
+import net.minecraft.server.v1_8_R2.EntityHuman;
+import net.minecraft.server.v1_8_R2.IPlayerFileData;
+import net.minecraft.server.v1_8_R2.NBTTagCompound;
 
 /**
  * A controller for dealing with player data loading and saving. To hook it up

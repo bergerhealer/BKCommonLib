@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 
-import net.minecraft.server.v1_8_R1.Entity;
-import net.minecraft.server.v1_8_R1.NBTTagCompound;
+import net.minecraft.server.v1_8_R2.Entity;
+import net.minecraft.server.v1_8_R2.NBTTagCompound;
 
 public class CommonDisabledEntity extends Entity {
 

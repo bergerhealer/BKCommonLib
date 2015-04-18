@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import java.util.UUID;
-import net.minecraft.server.v1_8_R1.Entity;
-import net.minecraft.server.v1_8_R1.EntityLiving;
-import net.minecraft.server.v1_8_R1.GenericAttributes;
+import net.minecraft.server.v1_8_R2.Entity;
+import net.minecraft.server.v1_8_R2.EntityLiving;
+import net.minecraft.server.v1_8_R2.GenericAttributes;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;

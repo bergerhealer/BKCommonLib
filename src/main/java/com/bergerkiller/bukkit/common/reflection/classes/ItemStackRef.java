@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_8_R1.Blocks;
+import net.minecraft.server.v1_8_R2.Blocks;
 
 import org.bukkit.Material;
 

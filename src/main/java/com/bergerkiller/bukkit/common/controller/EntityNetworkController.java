@@ -3,11 +3,11 @@ package com.bergerkiller.bukkit.common.controller;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.minecraft.server.v1_8_R1.AttributeMapServer;
-import net.minecraft.server.v1_8_R1.EntityLiving;
-import net.minecraft.server.v1_8_R1.EntityTrackerEntry;
-import net.minecraft.server.v1_8_R1.MathHelper;
-import net.minecraft.server.v1_8_R1.MobEffect;
+import net.minecraft.server.v1_8_R2.AttributeMapServer;
+import net.minecraft.server.v1_8_R2.EntityLiving;
+import net.minecraft.server.v1_8_R2.EntityTrackerEntry;
+import net.minecraft.server.v1_8_R2.MathHelper;
+import net.minecraft.server.v1_8_R2.MobEffect;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

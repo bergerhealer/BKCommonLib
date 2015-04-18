@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_8_R1.TileEntity;
+import net.minecraft.server.v1_8_R2.TileEntity;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
 public class TileEntityRef {
 

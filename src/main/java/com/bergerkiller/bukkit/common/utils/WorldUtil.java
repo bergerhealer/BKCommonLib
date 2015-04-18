@@ -9,7 +9,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R1.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_8_R2.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -25,15 +25,15 @@ import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
-import net.minecraft.server.v1_8_R1.Entity;
-import net.minecraft.server.v1_8_R1.IDataManager;
-import net.minecraft.server.v1_8_R1.MovingObjectPosition;
-import net.minecraft.server.v1_8_R1.Vec3D;
-import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.WorldNBTStorage;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.Entity;
+import net.minecraft.server.v1_8_R2.IDataManager;
+import net.minecraft.server.v1_8_R2.MovingObjectPosition;
+import net.minecraft.server.v1_8_R2.Vec3D;
+import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R2.WorldNBTStorage;
+import net.minecraft.server.v1_8_R2.WorldServer;
 
 public class WorldUtil extends ChunkUtil {
 

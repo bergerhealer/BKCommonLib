@@ -5,7 +5,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 
-import net.minecraft.server.v1_8_R1.IInventory;
+import net.minecraft.server.v1_8_R2.IInventory;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;

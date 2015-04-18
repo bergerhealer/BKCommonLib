@@ -11,15 +11,15 @@ import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-import net.minecraft.server.v1_8_R1.BlockSand;
-import net.minecraft.server.v1_8_R1.Chunk;
-import net.minecraft.server.v1_8_R1.ChunkProviderServer;
-import net.minecraft.server.v1_8_R1.CrashReport;
-import net.minecraft.server.v1_8_R1.CrashReportSystemDetails;
-import net.minecraft.server.v1_8_R1.IChunkLoader;
-import net.minecraft.server.v1_8_R1.IChunkProvider;
-import net.minecraft.server.v1_8_R1.ReportedException;
-import net.minecraft.server.v1_8_R1.WorldServer;
+import net.minecraft.server.v1_8_R2.BlockSand;
+import net.minecraft.server.v1_8_R2.Chunk;
+import net.minecraft.server.v1_8_R2.ChunkProviderServer;
+import net.minecraft.server.v1_8_R2.CrashReport;
+import net.minecraft.server.v1_8_R2.CrashReportSystemDetails;
+import net.minecraft.server.v1_8_R2.IChunkLoader;
+import net.minecraft.server.v1_8_R2.IChunkProvider;
+import net.minecraft.server.v1_8_R2.ReportedException;
+import net.minecraft.server.v1_8_R2.WorldServer;
 
 public class ChunkProviderServerBase extends ChunkProviderServer {
 
@@ -149,8 +149,8 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
         checkGenerator();
         Chunk chunk = this.getOrCreateChunk(i, j);
 
-        if (!chunk.done) {
-            chunk.done = true;
+        if (!chunk.isDone()) {
+            chunk.d(true);
             this.chunkProvider.getChunkAt(ichunkprovider, i, j);
 
             // CraftBukkit start

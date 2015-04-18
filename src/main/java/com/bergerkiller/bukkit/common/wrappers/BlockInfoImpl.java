@@ -6,9 +6,9 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
 
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.Explosion;
-import net.minecraft.server.v1_8_R1.World;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.Explosion;
+import net.minecraft.server.v1_8_R2.World;
 import org.bukkit.Location;
 
 /**
@@ -23,12 +23,14 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public int getOpacity() {
-        return getHandle(Block.class).n();
+    	// 1.8.0: public int n() { return this.s; }
+        return getHandle(Block.class).p();
     }
 
     @Override
     public int getLightEmission() {
-        return getHandle(Block.class).p();
+    	// 1.8.0: public int p() { return this.u; }
+        return getHandle(Block.class).r();
     }
 
     @Override

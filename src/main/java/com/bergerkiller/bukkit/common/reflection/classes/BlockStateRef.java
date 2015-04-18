@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import java.util.Locale;
 
-import net.minecraft.server.v1_8_R1.CommandBlockListenerAbstract;
-import net.minecraft.server.v1_8_R1.TileEntitySkull;
+import net.minecraft.server.v1_8_R2.CommandBlockListenerAbstract;
+import net.minecraft.server.v1_8_R2.TileEntitySkull;
 import com.mojang.authlib.GameProfile;
 
 import org.bukkit.Chunk;
@@ -11,7 +11,7 @@ import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlockState;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.collections.ClassMap;
@@ -77,7 +77,7 @@ public class BlockStateRef {
             @Override
             protected void apply(BlockState state, Object tile) {
                 CommandBlockListenerAbstract list = listener.get(tile);
-                state_command.set(state, list.e);
+                state_command.set(state, list.getCommand());
                 state_name.set(state, list.getName());
             }
         });

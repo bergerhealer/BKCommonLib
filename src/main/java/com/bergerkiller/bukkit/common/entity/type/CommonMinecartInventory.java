@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import net.minecraft.server.v1_8_R1.IInventory;
+import net.minecraft.server.v1_8_R2.IInventory;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Minecart;

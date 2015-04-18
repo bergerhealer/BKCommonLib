@@ -12,8 +12,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>v1_8_R1</project.mcversion>
-        <project.cbversion>1.8-R0.1</project.cbversion>
+        <project.mcversion>v1_8_R2</project.mcversion>
+        <project.cbversion>1.8-R0.2</project.cbversion>
         <project.stableversion>1.59</project.stableversion>
         <project.stableserver>1.7.10-R0.1</project.stableserver>
         <project.stabledate>27 October 2014</project.stabledate>

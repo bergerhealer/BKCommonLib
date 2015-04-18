@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import org.bukkit.Chunk;
-import org.bukkit.craftbukkit.v1_8_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
 
 import com.bergerkiller.bukkit.common.proxies.BlockProxy;
 

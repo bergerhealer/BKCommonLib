@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.proxies.ChunkProviderServerProxy;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 
-import net.minecraft.server.v1_8_R1.Chunk;
+import net.minecraft.server.v1_8_R2.Chunk;
 
 /**
  * This class is mainly used by NoLagg chunks - for compatibilities' sake, it is

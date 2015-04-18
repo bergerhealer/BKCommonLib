@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import net.minecraft.server.v1_8_R1.EntityCreature;
-import net.minecraft.server.v1_8_R1.EntityInsentient;
-import net.minecraft.server.v1_8_R1.EntityLiving;
-import net.minecraft.server.v1_8_R1.GenericAttributes;
-import net.minecraft.server.v1_8_R1.Navigation;
-import net.minecraft.server.v1_8_R1.PathEntity;
+import net.minecraft.server.v1_8_R2.EntityCreature;
+import net.minecraft.server.v1_8_R2.EntityInsentient;
+import net.minecraft.server.v1_8_R2.EntityLiving;
+import net.minecraft.server.v1_8_R2.GenericAttributes;
+import net.minecraft.server.v1_8_R2.Navigation;
+import net.minecraft.server.v1_8_R2.PathEntity;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -19,7 +19,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R1.PathPoint;
+import net.minecraft.server.v1_8_R2.PathPoint;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -232,7 +232,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      */
     public void moveTo(Entity entity, double speed) {
         EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
-        net.minecraft.server.v1_8_R1.Entity nmsTargetEntity = CommonNMS.getNative(entity);
+        net.minecraft.server.v1_8_R2.Entity nmsTargetEntity = CommonNMS.getNative(entity);
         if (nmsEntity instanceof EntityInsentient) {
             Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
             if (!navigation.a(nmsTargetEntity, speed)) {

@@ -19,7 +19,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
-import net.minecraft.server.v1_8_R1.IPlayerFileData;
+import net.minecraft.server.v1_8_R2.IPlayerFileData;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 
@@ -27,7 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

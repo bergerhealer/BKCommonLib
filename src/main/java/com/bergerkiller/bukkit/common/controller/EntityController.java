@@ -9,11 +9,11 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
-import net.minecraft.server.v1_8_R1.AxisAlignedBB;
-import net.minecraft.server.v1_8_R1.Block;
-import net.minecraft.server.v1_8_R1.Blocks;
-import net.minecraft.server.v1_8_R1.DamageSource;
-import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R2.AxisAlignedBB;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.Blocks;
+import net.minecraft.server.v1_8_R2.DamageSource;
+import net.minecraft.server.v1_8_R2.Entity;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R2.BlockPosition;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
 
@@ -148,7 +148,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
      */
     public void onMove(double dx, double dy, double dz) {
         final Entity handle = entity.getHandle(Entity.class);
-        if (handle.T) {
+        if (handle.noclip) {
             handle.getBoundingBox().c(dx, dy, dz);
             handle.locX = CommonNMS.getMiddleX(handle.getBoundingBox());
             handle.locY = handle.getBoundingBox().b;
@@ -184,7 +184,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dy = aabb.b(handle.getBoundingBox(), dy);
             }
             handle.getBoundingBox().c(0.0, dy, 0.0);
-            if (!handle.aS() && oldDy != dy) {
+            if (!handle.aT() && oldDy != dy) {
                 dx = dy = dz = 0.0;
             }
             boolean isOnGround = handle.onGround || oldDy != dy && oldDy < 0.0;
@@ -194,7 +194,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dx = aabb.a(handle.getBoundingBox(), dx);
             }
             handle.getBoundingBox().c(dx, 0.0, 0.0);
-            if (!handle.aS() && oldDx != dx) {
+            if (!handle.aT() && oldDx != dx) {
                 dx = dy = dz = 0.0;
             }
 
@@ -203,7 +203,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 dz = aabb.c(handle.getBoundingBox(), dz);
             }
             handle.getBoundingBox().c(0.0, 0.0, dz);
-            if (!handle.aS() && oldDz != dz) {
+            if (!handle.aT() && oldDz != dz) {
                 dx = dy = dz = 0.0;
             }
 
@@ -228,7 +228,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                     dy = aabb.b(handle.getBoundingBox(), dy);
                 }
                 handle.getBoundingBox().c(0.0, dy, 0.0);
-                if (!handle.aS() && oldDy != dy) {
+                if (!handle.aT() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 }
 
@@ -237,7 +237,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                     dx = aabb.a(handle.getBoundingBox(), dx);
                 }
                 handle.getBoundingBox().c(dx, 0.0, 0.0);
-                if (!handle.aS() && oldDx != dx) {
+                if (!handle.aT() && oldDx != dx) {
                     dx = dy = dz = 0.0;
                 }
 
@@ -246,11 +246,11 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                     dz = aabb.c(handle.getBoundingBox(), dz);
                 }
                 handle.getBoundingBox().c(0.0, 0.0, dz);
-                if (!handle.aS() && oldDz != dz) {
+                if (!handle.aT() && oldDz != dz) {
                     dx = dy = dz = 0.0;
                 }
 
-                if (!handle.aS() && oldDy != dy) {
+                if (!handle.aT() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 } else {
                     dy = (double) -handle.U;

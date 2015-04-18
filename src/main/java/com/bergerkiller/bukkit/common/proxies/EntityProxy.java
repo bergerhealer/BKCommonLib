@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.proxies;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.EntityEffect;
@@ -12,6 +13,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
@@ -238,5 +242,85 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
     @Override
     public boolean isCustomNameVisible() {
         return base.isCustomNameVisible();
+    }
+
+    @Override
+    public String getName() {
+        return base.getName();
+    }
+
+    @Override
+    public void sendMessage(String arg0) {
+        base.sendMessage(arg0);
+    }
+
+    @Override
+    public void sendMessage(String[] arg0) {
+        base.sendMessage(arg0);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin arg0) {
+        return base.addAttachment(arg0);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin arg0, int arg1) {
+        return base.addAttachment(arg0, arg1);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2) {
+        return base.addAttachment(arg0, arg1, arg2);
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2, int arg3) {
+        return base.addAttachment(arg0, arg1, arg2, arg3);
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return base.getEffectivePermissions();
+    }
+
+    @Override
+    public boolean hasPermission(String arg0) {
+        return base.hasPermission(arg0);
+    }
+
+    @Override
+    public boolean hasPermission(Permission arg0) {
+        return base.hasPermission(arg0);
+    }
+
+    @Override
+    public boolean isPermissionSet(String arg0) {
+        return base.isPermissionSet(arg0);
+    }
+
+    @Override
+    public boolean isPermissionSet(Permission arg0) {
+        return base.isPermissionSet(arg0);
+    }
+
+    @Override
+    public void recalculatePermissions() {
+        base.recalculatePermissions();        
+    }
+
+    @Override
+    public void removeAttachment(PermissionAttachment arg0) {
+        base.removeAttachment(arg0);
+    }
+
+    @Override
+    public boolean isOp() {
+        return base.isOp();
+    }
+
+    @Override
+    public void setOp(boolean value) {
+        base.setOp(value);        
     }
 }

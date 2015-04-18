@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -12,9 +12,9 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
 
-import net.minecraft.server.v1_8_R1.EntityItem;
-import net.minecraft.server.v1_8_R1.Item;
-import net.minecraft.server.v1_8_R1.ItemStack;
+import net.minecraft.server.v1_8_R2.EntityItem;
+import net.minecraft.server.v1_8_R2.Item;
+import net.minecraft.server.v1_8_R2.ItemStack;
 
 /**
  * Contains item stack, item and inventory utilities

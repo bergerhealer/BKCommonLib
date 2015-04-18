@@ -46,7 +46,7 @@ public class LongHashMap<V> extends BasicWrapper {
      * @return size
      */
     public int size() {
-        return Math.max(((net.minecraft.server.v1_8_R1.LongHashMap) handle).count(), 0);
+        return Math.max(((net.minecraft.server.v1_8_R2.LongHashMap) handle).count(), 0);
     }
 
     /**
@@ -63,7 +63,7 @@ public class LongHashMap<V> extends BasicWrapper {
     }
 
     public boolean contains(long key) {
-        return ((net.minecraft.server.v1_8_R1.LongHashMap) handle).contains(key);
+        return ((net.minecraft.server.v1_8_R2.LongHashMap) handle).contains(key);
     }
 
     /**
@@ -81,7 +81,7 @@ public class LongHashMap<V> extends BasicWrapper {
 
     @SuppressWarnings("unchecked")
     public V get(long key) {
-        return (V) ((net.minecraft.server.v1_8_R1.LongHashMap) handle).getEntry(key);
+        return (V) ((net.minecraft.server.v1_8_R2.LongHashMap) handle).getEntry(key);
     }
 
     /**
@@ -100,7 +100,7 @@ public class LongHashMap<V> extends BasicWrapper {
 
     @SuppressWarnings("unchecked")
     public V remove(long key) {
-        return (V) ((net.minecraft.server.v1_8_R1.LongHashMap) handle).remove(key);
+        return (V) ((net.minecraft.server.v1_8_R2.LongHashMap) handle).remove(key);
     }
 
     /**
@@ -117,7 +117,7 @@ public class LongHashMap<V> extends BasicWrapper {
     }
 
     public void put(long key, V value) {
-        ((net.minecraft.server.v1_8_R1.LongHashMap) handle).put(key, value);
+        ((net.minecraft.server.v1_8_R2.LongHashMap) handle).put(key, value);
     }
 
     @SuppressWarnings("unchecked")

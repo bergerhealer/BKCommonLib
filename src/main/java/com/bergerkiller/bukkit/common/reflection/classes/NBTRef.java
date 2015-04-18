@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.util.Collection;
 
-import net.minecraft.server.v1_8_R1.NBTReadLimiter;
+import net.minecraft.server.v1_8_R2.NBTReadLimiter;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
