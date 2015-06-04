@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.metrics;
 
-import java.util.List;
-
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import java.util.List;
 
 /**
  * Graph implementation for showing the enabled soft dependencies of a plugin.

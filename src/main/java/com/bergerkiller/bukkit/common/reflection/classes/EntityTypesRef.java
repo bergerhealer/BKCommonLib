@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.HashMap;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+
+import java.util.HashMap;
 
 @SuppressWarnings("rawtypes")
 public class EntityTypesRef {

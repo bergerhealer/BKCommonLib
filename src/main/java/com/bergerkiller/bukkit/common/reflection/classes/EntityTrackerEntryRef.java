@@ -1,19 +1,14 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.Set;
 
 public class EntityTrackerEntryRef {
 

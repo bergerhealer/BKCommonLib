@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 
 public class MobEffectRef {
@@ -13,4 +12,5 @@ public class MobEffectRef {
     public static final FieldAccessor<Integer> amplification = TEMPLATE.getField("amplification");
     public static final FieldAccessor<Boolean> splash = TEMPLATE.getField("splash");
     public static final FieldAccessor<Boolean> ambient = TEMPLATE.getField("ambient");
+    public static final FieldAccessor<Boolean> particles = TEMPLATE.getField("particles");
 }

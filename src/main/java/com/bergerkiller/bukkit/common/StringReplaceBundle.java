@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.collections.EntryList;
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import com.bergerkiller.bukkit.common.collections.EntryList;
-import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 
 /**
  * Can perform a large amount of String replacements at once. The entries added
@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.config.ConfigurationNode;
  */
 public class StringReplaceBundle {
 
-    private EntryList<String, String> entries = new EntryList<>();
+    private EntryList<String, String> entries = new EntryList<String, String>();
 
     /**
      * Adds a single entry to the replaced Strings
@@ -30,7 +30,7 @@ public class StringReplaceBundle {
         if (to == null) {
             throw new IllegalArgumentException("Can not use a 'to' value of null");
         }
-        this.entries.add(new SimpleEntry<>(from, to));
+        this.entries.add(new SimpleEntry<String, String>(from, to));
         return this;
     }
 

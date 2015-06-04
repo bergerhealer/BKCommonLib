@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-
-import org.bukkit.entity.Entity;
-
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import org.bukkit.entity.Entity;
+
+import java.util.List;
 
 public class MobSpawnerAbstractRef {
 
@@ -25,6 +24,6 @@ public class MobSpawnerAbstractRef {
     public static final FieldAccessor<Integer> spawnRange = TEMPLATE.getField("spawnRange");
 
     public static final MethodAccessor<String> getMobName = TEMPLATE.getMethod("getMobName");
-    public static final MethodAccessor<Void> setMobName = TEMPLATE.getMethod("a", String.class);
-    public static final MethodAccessor<Void> onTick = TEMPLATE.getMethod("g");
+    public static final MethodAccessor<Void> setMobName = TEMPLATE.getMethod("setMobName", String.class);
+    public static final MethodAccessor<Void> onTick = TEMPLATE.getMethod("c");
 }

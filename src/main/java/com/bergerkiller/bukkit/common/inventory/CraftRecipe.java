@@ -1,18 +1,14 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
+import com.bergerkiller.bukkit.common.utils.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
-import com.bergerkiller.bukkit.common.utils.BlockUtil;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class CraftRecipe {
 
@@ -174,7 +170,7 @@ public class CraftRecipe {
         final Inventory inventoryClone = new InventoryBaseImpl(items, true);
         int amount, i;
 
-		// Craft items until the limit is reached, or crafting is impossible
+        // Craft items until the limit is reached, or crafting is impossible
         // Below is the craftloop label, which is used to break out of crafting
         craftloop:
         for (amount = 0; amount < limit; amount++) {
@@ -198,7 +194,7 @@ public class CraftRecipe {
                 }
             }
 
-			// Crafting was successful, transfer items over
+            // Crafting was successful, transfer items over
             // Be sure NOT to produce new ItemStack instances!
             for (i = 0; i < size; i++) {
                 ItemStack newItem = inventoryClone.getItem(i);
@@ -242,7 +238,7 @@ public class CraftRecipe {
             return null;
         } else {
             CraftRecipe rval = new CraftRecipe(input, output);
-			// Check that input and output are not causing a loop
+            // Check that input and output are not causing a loop
             // For example Sandstone has an infinite crafting loop going on
             // (You can craft 4 Sandstone using 4 Sandstone...yeah)
             if (rval.input.length == 1 && rval.output.length == 1 && MaterialUtil.getTypeId(rval.input[0]) == MaterialUtil.getTypeId(rval.output[0])) {

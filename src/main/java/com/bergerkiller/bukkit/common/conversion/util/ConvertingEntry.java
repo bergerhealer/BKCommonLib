@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
-import java.util.Map.Entry;
-
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
+import java.util.Map.Entry;
 
 /**
  * Wraps around another Entry of unknown contents and performs conversions

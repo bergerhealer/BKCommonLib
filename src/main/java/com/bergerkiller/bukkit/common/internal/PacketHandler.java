@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.Collection;
-
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Collection;
 
 /**
  * All the methods needed for internally handling the packet sending and

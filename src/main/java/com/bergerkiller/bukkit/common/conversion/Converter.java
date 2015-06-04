@@ -39,7 +39,7 @@ public interface Converter<T> {
      * of the output type<br>
      * Typically, interfaces do not support this, as they can conflict with
      * other converters<br><br>
-     *
+     * <p/>
      * <b>Do not give a converter for multipurpose types this property! For
      * example, an Object converter would end up being used for all cases,
      * rendering isCastingSupported unusable globally.</b>

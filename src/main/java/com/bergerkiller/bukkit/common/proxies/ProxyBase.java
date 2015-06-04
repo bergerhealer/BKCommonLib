@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.proxies;
 
+import org.bukkit.Bukkit;
+
 import java.lang.reflect.Method;
 import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
 
 /**
  * A base class for classes redirecting method calls to another class instance.
@@ -82,7 +82,7 @@ public class ProxyBase<T> implements Proxy<T> {
                 }
             }
             return succ;
-        } catch (SecurityException t) {
+        } catch (Throwable t) {
             t.printStackTrace();
             return false;
         }

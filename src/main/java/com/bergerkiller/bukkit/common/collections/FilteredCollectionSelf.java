@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.Collection;
-
 import com.bergerkiller.bukkit.common.filtering.Filter;
+
+import java.util.Collection;
 
 /**
  * A self-filtering FilteredCollection implementation. This implementation

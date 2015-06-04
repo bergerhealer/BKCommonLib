@@ -80,8 +80,6 @@ public class CircularInteger implements Iterable<Integer> {
     /**
      * Gets the Iterator of this Circular Integer<br>
      * Note that iterating over a Circular Integer never ends
-     * 
-     * @return boolean
      */
     @Override
     public Iterator<Integer> iterator() {

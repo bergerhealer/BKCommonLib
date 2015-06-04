@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.Common;
 
 class CommonClasses {
-    /* 
+    /*
      * In here we pre-load several classes to prevent unexpected ClassNotFound exceptions
      * This is required, as someone might be calling one of our classes from the main server thread
      * Then the main server thread class loader is used, which is unable to find (our) net.minecraft.server references

@@ -7,7 +7,7 @@ public class SpigotServer extends CraftBukkitServer {
         if (!super.init()) {
             return false;
         }
-		// Check that the Spigot install is available
+        // Check that the Spigot install is available
         // Method 1 (older): Spigot class in org.bukkit.craftbukkit
         try {
             Class.forName(CB_ROOT_VERSIONED + ".Spigot");

@@ -27,32 +27,20 @@
  */
 package com.bergerkiller.bukkit.common.metrics;
 
+import com.bergerkiller.bukkit.common.ModuleLogger;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.bergerkiller.bukkit.common.ModuleLogger;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -271,12 +259,12 @@ public class Metrics {
                                     }
                                 }
 
-								// We use the inverse of firstPost because if it is the first time we are posting,
+                                // We use the inverse of firstPost because if it is the first time we are posting,
                                 // it is not a interval ping, so it evaluates to FALSE
                                 // Each time thereafter it will evaluate to TRUE, i.e PING!
                                 postPlugin(!firstPost);
 
-								// After the first post we set firstPost to false
+                                // After the first post we set firstPost to false
                                 // Each post thereafter will be a ping
                                 firstPost = false;
                             } catch (Throwable t) {
@@ -388,7 +376,7 @@ public class Metrics {
      * @return the File object for the config file
      */
     public File getConfigFile() {
-		// I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
+        // I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
         // is to abuse the plugin object we already have
         // plugin.getDataFolder() => base/plugins/PluginA/
         // pluginsFolder => base/plugins/
@@ -411,11 +399,11 @@ public class Metrics {
         String serverVersion = Bukkit.getVersion();
         int playersOnline = Bukkit.getServer().getOnlinePlayers().size();
 
-		// END server software specific section -- all code below does not use any code outside of this class / Java
+        // END server software specific section -- all code below does not use any code outside of this class / Java
         // Construct the post data
         final StringBuilder data = new StringBuilder();
 
-        // The plugin's description file containing all of the plugin data such as name, version, author, etc
+        // The plugin's description file containg all of the plugin data such as name, version, author, etc
         data.append(encode("guid")).append('=').append(encode(guid));
         encodeDataPair(data, "version", pluginVersion);
         encodeDataPair(data, "server", serverVersion);
@@ -446,7 +434,7 @@ public class Metrics {
             encodeDataPair(data, "ping", "true");
         }
 
-		// Acquire a lock on the graphs, which lets us make the assumption we also lock everything
+        // Acquire a lock on the graphs, which lets us make the assumption we also lock everything
         // inside of the graph (e.g plotters)
         synchronized (graphs) {
             final Iterator<Graph> iter = graphs.iterator();
@@ -458,7 +446,7 @@ public class Metrics {
                     if (entry.getValue() == null) {
                         continue;
                     }
-					// The key name to send to the metrics server
+                    // The key name to send to the metrics server
                     // The format is C-GRAPHNAME-PLOTTERNAME where separator - is defined at the top
                     // Legacy (R4) submitters use the format Custom%s, or CustomPLOTTERNAME
                     final String key = String.format("C%s%s%s%s", CUSTOM_DATA_SEPARATOR, graph.getName(), CUSTOM_DATA_SEPARATOR, entry.getKey());
@@ -475,7 +463,7 @@ public class Metrics {
         // Connect to the website
         URLConnection connection;
 
-		// Mineshafter creates a socks proxy, so we can safely bypass it
+        // Mineshafter creates a socks proxy, so we can safely bypass it
         // It does not reroute POST requests so we need to go around it
         if (isMineshafterPresent()) {
             connection = url.openConnection(Proxy.NO_PROXY);

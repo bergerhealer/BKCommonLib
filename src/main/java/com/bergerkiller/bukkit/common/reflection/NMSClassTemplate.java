@@ -18,7 +18,7 @@ public class NMSClassTemplate extends ClassTemplate<Object> {
      * 'net.minecraft.server.[version].Packet'<br>
      * A leading 'NMS' or trailing 'Ref' is omitted from the Class name,
      * avoiding the Class showing up in the imports<br>
-     *
+     * <p/>
      * This constructor should and can only be called by an extension of this
      * Class
      */

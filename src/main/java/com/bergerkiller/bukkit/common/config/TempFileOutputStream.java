@@ -1,18 +1,18 @@
 package com.bergerkiller.bukkit.common.config;
 
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * A {@link FileOutputStream} wrapper that writes to a temporary file prior to
  * closing the stream and flushing the data to the official output file. It can
  * be used to safely write data to disk without resulting in partially-written
  * data when writing is interrupted.<br><br>
- *
+ * <p/>
  * Flushing this stream does <b>NOT</b> flush data to the output file, only to
  * the temporary file. If the temporary file stream needs to be closed without
  * replacing the original output file, use {@link #close(boolean) close(false)}.

@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import org.bukkit.inventory.ItemStack;
 
 public class EntityInventoryController<T extends CommonEntity<?>> extends CommonEntityController<T> {
 

@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.config;
 
+import com.bergerkiller.bukkit.common.ModuleLogger;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.bergerkiller.bukkit.common.ModuleLogger;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 public class FileConfiguration extends BasicConfiguration {
 

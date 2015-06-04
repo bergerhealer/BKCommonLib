@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.logging.Level;
-
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import org.bukkit.entity.Player;
+
+import java.util.logging.Level;
 
 /**
  * Packet listener of BKCommonLib to keep track of send chunks. This is used to
@@ -27,12 +26,13 @@ class CommonPacketMonitor implements PacketMonitor {
         CommonPlayerMeta meta = CommonPlugin.getInstance().getPlayerMeta(player);
         if (packet.getType() == PacketType.OUT_MAP_CHUNK) {
             // Update it for a single chunk
-            boolean visible = packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap) != null;
+            boolean visible = packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap).b != 0;
             int chunkX = packet.read(PacketType.OUT_MAP_CHUNK.x);
             int chunkZ = packet.read(PacketType.OUT_MAP_CHUNK.z);
             meta.setChunkVisible(chunkX, chunkZ, visible);
+
         } else if (packet.getType() == PacketType.OUT_MAP_CHUNK_BULK) {
-			// Update it for multiple chunks at once
+            // Update it for multiple chunks at once
             // This type of packet only makes new chunks visible - it never unloads
             int[] chunkX = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_x);
             int[] chunkZ = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_z);

@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.bukkit.plugin.Plugin;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import org.bukkit.plugin.Plugin;
 
 public class CraftTaskRef {
 

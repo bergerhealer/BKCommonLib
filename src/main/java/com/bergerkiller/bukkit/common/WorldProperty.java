@@ -1,15 +1,14 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
+import org.bukkit.World;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.World;
-
-import com.bergerkiller.bukkit.common.config.ConfigurationNode;
-
 public class WorldProperty<T> {
 
-    private Map<String, T> worldmap = new HashMap<>();
+    private Map<String, T> worldmap = new HashMap<String, T>();
     private T def;
 
     public WorldProperty(T defaultValue) {

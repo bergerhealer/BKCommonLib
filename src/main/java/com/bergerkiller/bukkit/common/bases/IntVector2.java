@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.utils.MathUtil;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * Represents a class containing two immutable integer coordinates: x and z

@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_8_R2.util.LongHash;
 
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-
-public class LongHashSetBase extends org.bukkit.craftbukkit.v1_8_R2.util.LongHashSet {
+public class LongHashSetBase extends org.bukkit.craftbukkit.v1_8_R3.util.LongHashSet {
 
     public void addAllChunks(World world) {
         for (org.bukkit.Chunk chunk : WorldUtil.getChunks(world)) {

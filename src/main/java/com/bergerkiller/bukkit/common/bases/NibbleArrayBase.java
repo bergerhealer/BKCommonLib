@@ -1,26 +1,29 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.reflection.classes.NibbleArrayRef;
-
-import net.minecraft.server.v1_8_R2.NibbleArray;
+import net.minecraft.server.v1_8_R3.NibbleArray;
 
 /**
  * Base class to work with Nibble Array implementations
  */
 public class NibbleArrayBase extends NibbleArray {
 
-    @Deprecated //TODO: Needs somework
+    @Deprecated
     public NibbleArrayBase(byte[] data, int dataBits) {
-        //super(data, dataBits);
+        super(data);
     }
-    
+
+    @Deprecated
+    public NibbleArrayBase(int size, int dataBits) {
+        super();
+    }
+
     public NibbleArrayBase(byte[] data) {
         super(data);
     }
-    
-    @Deprecated //TODO: Needs somework
-    public NibbleArrayBase (int size, int dataBits) {
-        //super(size, dataBits);
+
+    public NibbleArrayBase() {
+        super();
     }
 
     /**
@@ -29,7 +32,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @return data element bit count
      */
     public int getBitCount() {
-        return NibbleArrayRef.bitCount.get(this);
+        return NibbleArrayRef.bitCount.invoke(this);
     }
 
     /**

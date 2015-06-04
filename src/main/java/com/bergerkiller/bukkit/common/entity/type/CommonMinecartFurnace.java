@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Material;
-import org.bukkit.entity.minecart.PoweredMinecart;
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import org.bukkit.Material;
+import org.bukkit.entity.minecart.PoweredMinecart;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Common Entity implementation for Minecarts with a Furnace
@@ -21,8 +20,8 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     private static final FieldAccessor<Double> pushForceX = TEMPLATE.getField("a");
     private static final FieldAccessor<Double> pushForceZ = TEMPLATE.getField("b");
     private static final FieldAccessor<Integer> fuel = TEMPLATE.getField("c");
-    private static final MethodAccessor<Boolean> isSmokingMethod = TEMPLATE.getMethod("j");//e
-    private static final MethodAccessor<Void> setSmokingMethod = TEMPLATE.getMethod("i", boolean.class);//f
+    private static final MethodAccessor<Boolean> isSmokingMethod = TEMPLATE.getMethod("j");
+    private static final MethodAccessor<Void> setSmokingMethod = TEMPLATE.getMethod("i", boolean.class);
 
     /**
      * The amount of fuel ticks a single item of coal gives to a furnace

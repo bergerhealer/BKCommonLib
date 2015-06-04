@@ -1,16 +1,14 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.Arrays;
-import java.util.List;
-
-import net.minecraft.server.v1_8_R2.EntityMinecartHopper;
-
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import net.minecraft.server.v1_8_R3.EntityMinecartHopper;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Common Entity implementation for Minecarts with a Hopper

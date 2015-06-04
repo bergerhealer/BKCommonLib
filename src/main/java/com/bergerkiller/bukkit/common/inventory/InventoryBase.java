@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-
+import com.bergerkiller.bukkit.common.bases.IInventoryBase;
+import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
@@ -11,9 +10,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.bases.IInventoryBase;
-import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A basic implementation of Inventory that excludes the getting and setting of

@@ -1,19 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.EnumDifficulty;
-
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
-import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R2.util.CraftMagicNumbers;
-import org.bukkit.util.Vector;
-
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
@@ -21,19 +7,25 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.proxies.EntityProxy;
 import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.CraftItemStackRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.EnumDifficulty;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.util.Vector;
 
 /**
  * Converter for converting to internal handles (from wrapper classes)<br>
@@ -235,13 +227,14 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isPair(value)) {
-                final int x = VectorRef.getPairX(value);
-                final int z = VectorRef.getPairZ(value);
-                return VectorRef.newPair(x, z);
+            if (VectorRef.isPosition(value)) {
+                final int x = VectorRef.getPositionX(value);
+                final int y = VectorRef.getPositionY(value);
+                final int z = VectorRef.getPositionZ(value);
+                return VectorRef.newCoord(x, y, z);
             } else if (value instanceof IntVector3) {
                 IntVector3 iv3 = (IntVector3) value;
-                return VectorRef.newPair(iv3.x, iv3.z);
+                return VectorRef.newCoord(iv3.x, iv3.y, iv3.z);
             } else {
                 return def;
             }
@@ -250,13 +243,14 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toChunkPositionHandle = new HandleConverter("ChunkPosition") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isPair(value)) {
-                final int x = VectorRef.getPairX(value);
-                final int z = VectorRef.getPairZ(value);
-                return VectorRef.newPair(x, z);
+            if (VectorRef.isCoord(value)) {
+                final int x = VectorRef.getCoordX(value);
+                final int y = VectorRef.getCoordX(value);
+                final int z = VectorRef.getCoordX(value);
+                return VectorRef.newPosition(x, y, z);
             } else if (value instanceof IntVector3) {
                 IntVector3 iv3 = (IntVector3) value;
-                return new IntVector3(iv3.x, iv3.y, iv3.z);
+                return VectorRef.newPosition(iv3.x, iv3.y, iv3.z);
             } else {
                 return def;
             }
@@ -288,16 +282,6 @@ public abstract class HandleConverter extends BasicConverter<Object> {
             }
         }
     };
-    public static final HandleConverter toScoreboardActionHandle = new HandleConverter("EnumScoreboardAction") {
-        @Override
-        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (value instanceof ScoreboardAction) {
-                return ((UseAction) value).getHandle();
-            } else {
-                return def;
-            }
-        }
-    };
     public static final HandleConverter toDifficultyHandle = new HandleConverter("EnumDifficulty") {
         @Override
         @SuppressWarnings("deprecation")
@@ -311,6 +295,17 @@ public abstract class HandleConverter extends BasicConverter<Object> {
                 return def;
             }
             return EnumDifficulty.getById(id);
+        }
+    };
+
+    public static final HandleConverter toScoreboardActionHandle = new HandleConverter("EnumScoreboardAction") {
+        @Override
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof ScoreboardAction) {
+                return ((UseAction) value).getHandle();
+            } else {
+                return def;
+            }
         }
     };
 

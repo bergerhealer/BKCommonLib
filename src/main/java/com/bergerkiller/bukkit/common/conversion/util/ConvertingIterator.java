@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
-import java.util.Iterator;
-
 import com.bergerkiller.bukkit.common.conversion.Converter;
+
+import java.util.Iterator;
 
 /**
  * An iterator that dynamically converts the elements as they are iterated

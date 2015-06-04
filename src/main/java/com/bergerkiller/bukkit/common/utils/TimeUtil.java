@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.collections.StringMap;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import com.bergerkiller.bukkit.common.collections.StringMap;
 
 public class TimeUtil {
 

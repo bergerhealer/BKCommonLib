@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import com.bergerkiller.bukkit.common.utils.MathUtil;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * Represents a class containing three immutable integer coordinates: x, y and z

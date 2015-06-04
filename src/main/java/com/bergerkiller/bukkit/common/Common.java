@@ -1,19 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.server.*;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.server.CommonServer;
-import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
-import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
-import com.bergerkiller.bukkit.common.server.SpigotServer;
-import com.bergerkiller.bukkit.common.server.SportBukkitServer;
-import com.bergerkiller.bukkit.common.server.UnknownServer;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class Common {
 
@@ -23,11 +17,11 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 160;
+    public static final int VERSION = 162;
     /**
      * The Minecraft package path version BKCommonLib is built against
      */
-    public static final String DEPENDENT_MC_VERSION = "v1_8_R2";
+    public static final String DEPENDENT_MC_VERSION = "v1_8_R3";
     /**
      * Defines the Minecraft version that runs on the server.
      */
@@ -69,7 +63,7 @@ public class Common {
         CommonServer runningServer = new UnknownServer();
         try {
             // Get all available server types
-            List<CommonServer> servers = new ArrayList<>();
+            List<CommonServer> servers = new ArrayList<CommonServer>();
             servers.add(new MCPCPlusServer());
             servers.add(new SpigotServer());
             servers.add(new SportBukkitServer());

@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class EntityPlayerRef extends EntityHumanRef {
 

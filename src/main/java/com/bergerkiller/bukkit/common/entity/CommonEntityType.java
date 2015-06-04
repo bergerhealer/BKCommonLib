@@ -1,16 +1,5 @@
 package com.bergerkiller.bukkit.common.entity;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.logging.Level;
-
-import net.minecraft.server.v1_8_R2.IInventory;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -26,6 +15,15 @@ import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import net.minecraft.server.v1_8_R3.IInventory;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Stores all internal information about an Entity
@@ -164,7 +162,7 @@ public class CommonEntityType {
     }
 
     static {
-		// Register all available entities here
+        // Register all available entities here
         // Misc
         add(EntityType.PLAYER, "Player", 512, 2, true);
         add(EntityType.FISHING_HOOK, "FishingHook", 64, 5, true);
@@ -199,19 +197,15 @@ public class CommonEntityType {
         add(EntityType.COW, "Cow", 80, 3, true);
         add(EntityType.CREEPER, "Creeper", 80, 3, true);
         add(EntityType.ENDERMAN, "Enderman", 80, 3, true);
-        add(EntityType.ENDERMITE, "Endermite", 80, 3, true);
         add(EntityType.ENDER_DRAGON, "EnderDragon", 160, 3, true);
         add(EntityType.GHAST, "Ghast", 80, 3, true);
         add(EntityType.GIANT, "GiantZombie", 80, 3, true);
-        add(EntityType.GUARDIAN, "Guardian", 80, 3, true);
-        add(EntityType.HORSE, "Horse", 80, 3, true);
         add(EntityType.IRON_GOLEM, "IronGolem", 80, 3, true);
         add(EntityType.MAGMA_CUBE, "MagmaCube", 80, 3, true);
         add(EntityType.MUSHROOM_COW, "MushroomCow", 80, 3, true);
         add(EntityType.OCELOT, "Ocelot", 80, 3, true);
         add(EntityType.PIG, "Pig", 80, 3, true);
         add(EntityType.PIG_ZOMBIE, "PigZombie", 80, 3, true);
-        add(EntityType.RABBIT, "Rabbit", 80, 3, true);
         add(EntityType.SHEEP, "Sheep", 80, 3, true);
         add(EntityType.SILVERFISH, "Silverfish", 80, 3, true);
         add(EntityType.SKELETON, "Skeleton", 80, 3, true);
@@ -219,21 +213,27 @@ public class CommonEntityType {
         add(EntityType.SNOWMAN, "Snowman", 80, 3, true);
         add(EntityType.SPIDER, "Spider", 80, 3, true);
         add(EntityType.SQUID, "Squid", 64, 3, true);
-        add(EntityType.VILLAGER, "Villager", 80, 3, true);
         add(EntityType.WITCH, "Witch", 80, 3, true);
         add(EntityType.WITHER, "Wither", 80, 3, false);
         add(EntityType.WITHER_SKULL, "WitherSkull", 80, 3, true);
         add(EntityType.WOLF, "Wolf", 80, 3, true);
         add(EntityType.ZOMBIE, "Zombie", 80, 3, true);
-        
+        add(EntityType.HORSE, "Horse", 80, 3, true);
+        add(EntityType.VILLAGER, "Villager", 80, 3, true);
+
         // Blocks/Tiles
         add(EntityType.PRIMED_TNT, "TNTPrimed", 160, 10, true);
         add(EntityType.FALLING_BLOCK, "FallingBlock", 160, 20, true);
         add(EntityType.PAINTING, "Painting", 160, Integer.MAX_VALUE, false);
         add(EntityType.ENDER_CRYSTAL, "EnderCrystal", 256, Integer.MAX_VALUE, false);
         add(EntityType.ITEM_FRAME, "ItemFrame", 160, Integer.MAX_VALUE, false);
-        add(EntityType.ARMOR_STAND, "ArmorStand", 160, 10, true); // Check if it chrashes
         add(EntityType.LEASH_HITCH, "Leash", 160, Integer.MAX_VALUE, false);
+
+        //New 1.8 stuff
+        add(EntityType.ARMOR_STAND, "ArmorStand", 80, 3, true);
+        add(EntityType.ENDERMITE, "Endermite", 80, 3, true);
+        add(EntityType.GUARDIAN, "Guardian", 80, 3, true);
+        add(EntityType.RABBIT, "Rabbit", 80, 3, true);
 
         // Check that all entity types are registered properly
         EntityType[] invalidTypes = {EntityType.UNKNOWN, EntityType.WEATHER, EntityType.LIGHTNING, EntityType.COMPLEX_PART};

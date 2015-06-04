@@ -1,12 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
 import org.bukkit.Material;
+
+import java.util.*;
 
 /**
  * Base class for material properties that return a Boolean when getting.
@@ -21,7 +17,7 @@ public abstract class MaterialBooleanProperty extends MaterialProperty<Boolean> 
      * @return True material collection
      */
     public Collection<Material> getMaterials() {
-        List<Material> mats = new ArrayList<>(20);
+        List<Material> mats = new ArrayList<Material>(20);
         for (Material mat : mats) {
             if (Boolean.TRUE.equals(get(mat))) {
                 mats.add(mat);

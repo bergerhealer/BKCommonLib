@@ -1,8 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
+import net.minecraft.server.v1_8_R3.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -12,22 +18,10 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.material.Attachable;
-import org.bukkit.material.Lever;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.PoweredRail;
-import org.bukkit.material.Rails;
-import org.bukkit.material.Directional;
+import org.bukkit.material.*;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import net.minecraft.server.v1_8_R2.BlockPosition;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
@@ -460,7 +454,7 @@ public class BlockUtil extends MaterialUtil {
         return getBlockStates(middle.getWorld(), middle.getX(), middle.getY(), middle.getZ(), radiusX, radiusY, radiusZ);
     }
 
-    private static final ArrayList<BlockState> blockStateBuff = new ArrayList<>();
+    private static final ArrayList<BlockState> blockStateBuff = new ArrayList<BlockState>();
 
     public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
         try {
@@ -487,7 +481,7 @@ public class BlockUtil extends MaterialUtil {
                     offerTile(world, tx, ty, tz);
                 }
             }
-            return new ArrayList<>(blockStateBuff);
+            return new ArrayList<BlockState>(blockStateBuff);
         } finally {
             blockStateBuff.clear();
         }

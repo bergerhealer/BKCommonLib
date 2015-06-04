@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import java.util.Collection;
-
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import java.util.Collection;
 
 /**
  * A basic inventory implementation that uses a backing array of ItemStacks

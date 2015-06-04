@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import org.bukkit.entity.Entity;
 
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * A HashMap that allows binding data to live entities without causing memory

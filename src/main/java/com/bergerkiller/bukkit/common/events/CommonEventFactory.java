@@ -1,14 +1,5 @@
 package com.bergerkiller.bukkit.common.events;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_8_R2.Entity;
-
-import org.bukkit.World;
-import org.bukkit.entity.EntityType;
-
 import com.bergerkiller.bukkit.common.collections.InstanceBuffer;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -17,6 +8,14 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.EntityInsentient;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Processes server happenings and raises events accordingly
@@ -24,9 +23,9 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 public class CommonEventFactory {
 
     private final EntityMoveEvent entityMoveEvent = new EntityMoveEvent();
-    private final List<Entity> entityMoveEntities = new ArrayList<>();
+    private final List<Entity> entityMoveEntities = new ArrayList<Entity>();
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
-    private final FieldAccessor<Integer> biomeMetaChance = new SafeField<>(BiomeMeta.class, "a");
+    private final FieldAccessor<Integer> biomeMetaChance = new SafeField<Integer>(BiomeMeta.class, "a");
     private final InstanceBuffer<BiomeMeta> creaturePreSpawnMobs = new InstanceBuffer<BiomeMeta>() {
         @Override
         public BiomeMeta createElement() {
@@ -107,7 +106,7 @@ public class CommonEventFactory {
 
             // Add element to buffer
             final BiomeMeta outputMeta = creaturePreSpawnMobs.add();
-            outputMeta.b = entityClass;
+            outputMeta.b = (Class<? extends EntityInsentient>) entityClass;
             outputMeta.c = creaturePreSpawnEvent.minSpawnCount;
             outputMeta.d = creaturePreSpawnEvent.maxSpawnCount;
             biomeMetaChance.transfer(inputMeta, outputMeta);

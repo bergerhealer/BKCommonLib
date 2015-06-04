@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Arrays;
-import java.util.logging.Level;
-
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.ClassBuilder;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
+import java.util.Arrays;
+import java.util.logging.Level;
 
 public class SpigotDummyFlatMap {
 

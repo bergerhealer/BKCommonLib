@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.List;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
+
+import java.util.List;
 
 /**
  * This class is a wrapper of the DataWatcher class from CraftBukkit<br>

@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-
-import com.bergerkiller.bukkit.common.config.ConfigurationNode;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 /**
  * Contains a world name and block coordinates
@@ -99,7 +98,7 @@ public class BlockLocation {
                 }
             }
             return new BlockLocation(world.toString(), x, y, z);
-        } catch (NumberFormatException t) {
+        } catch (Throwable t) {
             return null;
         }
     }

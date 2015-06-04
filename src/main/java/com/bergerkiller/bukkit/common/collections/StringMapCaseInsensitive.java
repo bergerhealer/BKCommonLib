@@ -1,16 +1,16 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingEntrySet;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A high-performance HashMap implementation that ignores the case of keys. The

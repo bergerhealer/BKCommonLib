@@ -1,33 +1,22 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-
-import net.minecraft.server.v1_8_R2.IPlayerFileData;
+import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.StackTraceFilter;
+import com.bergerkiller.bukkit.common.config.BasicConfiguration;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
-
+import net.minecraft.server.v1_8_R3.IPlayerFileData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -39,15 +28,16 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.SimplePluginManager;
 
-import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.StackTraceFilter;
-import com.bergerkiller.bukkit.common.config.BasicConfiguration;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
 
 public class CommonUtil {
 
@@ -349,7 +339,7 @@ public class CommonUtil {
      * @throws IOException if loading fails or the file can not be found
      */
     public static InputStream getPluginResource(File pluginJarFile, String resourcePath) throws IOException {
-		// First, find the plugin by Jar file (avoids Jar File decompression times)
+        // First, find the plugin by Jar file (avoids Jar File decompression times)
         // Then we can use the ClassLoader of this Jar File to load the resource instead
         synchronized (Bukkit.getPluginManager()) {
             for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
@@ -520,7 +510,7 @@ public class CommonUtil {
             // Try to find out what plugin this Runnable belongs to
             Plugin plugin = CommonUtil.getPluginByClass(runnable.getClass());
             if (plugin == null) {
-				// Well...ain't that a pickle.
+                // Well...ain't that a pickle.
                 // Maybe there is some other plugin we can dump this to?
                 // It's a fallback...it does not have to be fair or perfect!
                 synchronized (Bukkit.getPluginManager()) {
@@ -566,7 +556,7 @@ public class CommonUtil {
      * synchronized (Bukkit.getPluginManager()) {
      * 	for (Plugin plugin : CommonUtil.getPluginsUnsafe()) {
      *  		System.out.println(plugin.getName());
-     * 	}
+     *    }
      * }
      * </pre>
      *

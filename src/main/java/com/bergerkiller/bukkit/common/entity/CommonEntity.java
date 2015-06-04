@@ -1,32 +1,7 @@
 package com.bergerkiller.bukkit.common.entity;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.logging.Level;
-
-import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.EntityTrackerEntry;
-import net.minecraft.server.v1_8_R2.IInventory;
-import net.minecraft.server.v1_8_R2.World;
-
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
-import com.bergerkiller.bukkit.common.controller.DefaultEntityNetworkController;
-import com.bergerkiller.bukkit.common.controller.EntityController;
-import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
-import com.bergerkiller.bukkit.common.controller.ExternalEntityNetworkController;
+import com.bergerkiller.bukkit.common.controller.*;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
@@ -36,17 +11,27 @@ import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.logging.Level;
 
 /**
  * Wrapper class for additional methods Bukkit can't or doesn't provide.
@@ -193,7 +178,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * Checks whether this particular Entity supports the use of Entity
      * Controllers. If this method returns True,
      * {@link #setController(EntityController)} can be used.<br><br>
-     *
+     * <p/>
      * Note that Entity Network Controllers are always supported.
      *
      * @return True if Entity Controllers are supported, False if not
@@ -249,6 +234,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             type.nmsType.transfer(oldInstance, newInstance);
             replaceEntity((Entity) newInstance);
         } catch (Throwable t) {
+            t.printStackTrace();
             throw new RuntimeException("Failed to set controller:", t);
         }
     }
@@ -282,7 +268,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // Only do this replacement logic for Entities that are already spawned
         if (this.isSpawned()) {
-			// Now proceed to replace this NMS Entity in all places imaginable.
+            // Now proceed to replace this NMS Entity in all places imaginable.
             // First load the chunk so we can at least work on something
             Chunk chunk = CommonNMS.getNative(getWorld().getChunkAt(getChunkX(), getChunkZ()));
 
@@ -327,9 +313,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     }
 
     private static boolean replaceInChunk(Chunk chunk, int chunkY, Entity entity) {
-        if (replaceInList((List) chunk.entitySlices[chunkY], entity)) {
-            // Make field p public in CraftBukkit Source code
+        if (replaceInList(chunk.entitySlices[chunkY], entity)) {
             //chunk.p = true;
+            chunk.b(true); //Ugly replacement
             return true;
         } else {
             return false;
@@ -338,11 +324,18 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static boolean replaceInList(List list, Entity entity) {
-        ListIterator<Entity> iter = list.listIterator();
+        ListIterator<Object> iter = list.listIterator();
         while (iter.hasNext()) {
-            if (iter.next().getId() == entity.getId()) {
-                iter.set(entity);
-                return true;
+            Object obj = iter.next();
+            if (obj instanceof Entity) {
+                if (((Entity) obj).getId() == entity.getId()) {
+                    iter.set(entity);
+                    return true;
+                }
+            } else if (obj instanceof TileEntity) {
+                CommonPlugin.LOGGER.log(Level.WARNING, "TileEntity is in Entity List!");
+            } else {
+                CommonPlugin.LOGGER.log(Level.WARNING, "Invalid Object is in Entity List!");
             }
         }
         return false;
@@ -384,7 +377,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final boolean changedChunks = oldcx != newcx || oldcy != newcy || oldcz != newcz;
         boolean isLoaded = this.isInLoadedChunk();
 
-		// Handle chunk/slice movement
+        // Handle chunk/slice movement
         // Remove from the previous chunk
         if (isLoaded && changedChunks) {
             final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, oldcx, oldcz);

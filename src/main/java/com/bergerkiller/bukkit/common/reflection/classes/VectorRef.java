@@ -1,13 +1,13 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.bukkit.util.Vector;
-
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-
-import net.minecraft.server.v1_8_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R2.Vec3D;
+import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R3.ChunkCoordinates;
+import net.minecraft.server.v1_8_R3.ChunkPosition;
+import net.minecraft.server.v1_8_R3.Vec3D;
+import org.bukkit.util.Vector;
 
 /**
  * All NMS Vector related classes can be used here. ChunkCoordIntPair,
@@ -59,5 +59,55 @@ public class VectorRef {
 
     public static boolean isPair(Object chunkCoordIntPair) {
         return chunkCoordIntPair instanceof ChunkCoordIntPair;
+    }
+
+    public static Object newCoord(int x, int y, int z) {
+        return new ChunkCoordinates(x, y, z);
+    }
+
+    public static IntVector3 getCoord(Object chunkCoordinates) {
+        ChunkCoordinates coord = (ChunkCoordinates) chunkCoordinates;
+        return new IntVector3(coord.x, coord.y, coord.z);
+    }
+
+    public static int getCoordX(Object chunkCoordinates) {
+        return ((ChunkCoordinates) chunkCoordinates).x;
+    }
+
+    public static int getCoordY(Object chunkCoordinates) {
+        return ((ChunkCoordinates) chunkCoordinates).y;
+    }
+
+    public static int getCoordZ(Object chunkCoordinates) {
+        return ((ChunkCoordinates) chunkCoordinates).z;
+    }
+
+    public static boolean isCoord(Object chunkCoordinates) {
+        return chunkCoordinates instanceof ChunkCoordinates;
+    }
+
+    public static Object newPosition(int x, int y, int z) {
+        return new ChunkPosition(x, y, z);
+    }
+
+    public static IntVector3 getPosition(Object chunkPosition) {
+        ChunkPosition position = (ChunkPosition) chunkPosition;
+        return new IntVector3(position.getX(), position.getY(), position.getZ());
+    }
+
+    public static int getPositionX(Object chunkPosition) {
+        return ((ChunkPosition) chunkPosition).getX();
+    }
+
+    public static int getPositionY(Object chunkPosition) {
+        return ((ChunkPosition) chunkPosition).getY();
+    }
+
+    public static int getPositionZ(Object chunkPosition) {
+        return ((ChunkPosition) chunkPosition).getZ();
+    }
+
+    public static boolean isPosition(Object chunkPosition) {
+        return chunkPosition instanceof ChunkPosition;
     }
 }

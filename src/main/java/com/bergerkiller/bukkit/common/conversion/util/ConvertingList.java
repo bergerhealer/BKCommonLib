@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
+import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.bergerkiller.bukkit.common.conversion.Converter;
-import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 
 /**
  * Wraps around another list of unknown contents and performs conversions

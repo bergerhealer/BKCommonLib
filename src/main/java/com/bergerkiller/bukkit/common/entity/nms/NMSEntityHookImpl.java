@@ -1,19 +1,17 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import org.bukkit.Location;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.util.Vector;
-
-import net.minecraft.server.v1_8_R2.DamageSource;
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.EntityHuman;
-import net.minecraft.server.v1_8_R2.NBTTagCompound;
-
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
+import net.minecraft.server.v1_8_R3.DamageSource;
+import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.Location;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
 
 public class NMSEntityHookImpl implements NMSEntityHook {
 
@@ -35,7 +33,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
     }
 
     @Override
-    public boolean c(EntityHuman human) {
+    public boolean e(EntityHuman human) {
         return controller.onInteractBy(CommonNMS.getHuman(human));
     }
 
@@ -103,7 +101,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 
     @Override
     public void teleportTo(Location exit, boolean portal) {
-		// Instead of using the default internal logic, we are better than that!
+        // Instead of using the default internal logic, we are better than that!
         // Let's bring forth our very own teleport logic!
 
         // Adjust the exit if the portal travel agent is being used
@@ -123,8 +121,8 @@ public class NMSEntityHookImpl implements NMSEntityHook {
      * The super methods are unused
      */
     @Override
-    public boolean super_c(EntityHuman human) {
-        return controller.getEntity().getHandle(NMSEntityHook.class).super_c(human);
+    public boolean super_e(EntityHuman human) {
+        return controller.getEntity().getHandle(NMSEntityHook.class).super_e(human);
     }
 
     @Override

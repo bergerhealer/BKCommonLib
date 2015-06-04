@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.util.Map.Entry;
-
 import com.bergerkiller.bukkit.common.conversion.CastingConverter;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingEntry;
+
+import java.util.Map.Entry;
 
 /**
  * Converter that uses a separate key and value converter to convert incoming

@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.type.EntryConverter;
+
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ConvertingEntrySet<K, V> extends ConvertingSet<Entry<K, V>> {
 

@@ -1,14 +1,20 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-
+import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.collections.FilteredCollectionSelf;
+import com.bergerkiller.bukkit.common.collections.UniqueList;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
+import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.tab.TabView;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,23 +24,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
-import com.bergerkiller.bukkit.common.collections.EntityMap;
-import com.bergerkiller.bukkit.common.collections.FilteredCollectionSelf;
-import com.bergerkiller.bukkit.common.collections.UniqueList;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
-import com.bergerkiller.bukkit.common.events.PacketSendEvent;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketListener;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.tab.TabView;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 public class CommonTabController implements PacketListener, Listener {
 
@@ -49,13 +41,13 @@ public class CommonTabController implements PacketListener, Listener {
 
     static {
         LinkedHashSet<Character> chars = new LinkedHashSet<Character>();
-		// Add all chars available that do not conflict with rendering
+        // Add all chars available that do not conflict with rendering
         // ===========================================================================
         LogicUtil.addArray(chars, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
         LogicUtil.addArray(chars, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j');
         LogicUtil.addArray(chars, 'p', 'q', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
         LogicUtil.addArray(chars, '+', '-', '=', '|', '(', ')', '{', '}', '[', ']');
-		// ===========================================================================
+        // ===========================================================================
 
         // Also add all upper-case versions
         for (Character c : chars.toArray(new Character[0])) {
@@ -288,15 +280,13 @@ public class CommonTabController implements PacketListener, Listener {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        /*
-         if (event.getType() == PacketType.OUT_PLAYER_INFO && !event.isCancelled()) {
-         CommonPacket packet = event.getPacket();
-         String name = packet.read(PacketType.OUT_PLAYER_INFO.playerName);
-         int ping = packet.read(PacketType.OUT_PLAYER_INFO.ping);
-         boolean register = packet.read(PacketType.OUT_PLAYER_INFO.online);
-         event.setCancelled(!getInfo(event.getPlayer()).handlePlayerInfoPacket(name, ping, register));
-         }
-         */
+        if (event.getType() == PacketType.OUT_PLAYER_INFO && !event.isCancelled()) {
+//			CommonPacket packet = event.getPacket();
+//			String name = packet.read(PacketType.OUT_PLAYER_INFO.playerName);
+//			int ping = packet.read(PacketType.OUT_PLAYER_INFO.ping);
+//			boolean register = packet.read(PacketType.OUT_PLAYER_INFO.online);
+//			event.setCancelled(!getInfo(event.getPlayer()).handlePlayerInfoPacket(name, ping, register));
+        }
     }
 
     private Collection<PlayerTabInfo> getViewers(final TabView currentTab) {
@@ -446,7 +436,7 @@ public class CommonTabController implements PacketListener, Listener {
             if (index >= names.size()) {
                 return;
             }
-			// We can (safely) instantly send here
+            // We can (safely) instantly send here
             // If text changes too, oh well, too bad!
             this.showSlot(names.get(index), ping);
         }
@@ -492,7 +482,7 @@ public class CommonTabController implements PacketListener, Listener {
                     showSlot(entry.getKey(), entry.getValue());
                 }
             } else if (currentTab != TabView.EMPTY) {
-				// Find out the end-index to stop showing information at
+                // Find out the end-index to stop showing information at
                 // No-slot is better than an empty slot, it reduces network usage
                 int endIndex = this.count - 1;
                 while (endIndex >= 0 && text[endIndex].equals(TabView.TEXT_DEFAULT)) {
@@ -517,7 +507,7 @@ public class CommonTabController implements PacketListener, Listener {
             int textLength = Math.min(text.length(), MAX_TEXT_LENGTH - 2);
             StringBuilder uniqueNameBuilder = new StringBuilder(textLength + 2);
 
-			// Initial name + chat style char
+            // Initial name + chat style char
             // Increment text length since we don't want to trim off the chat style char
             uniqueNameBuilder.append(text);
             uniqueNameBuilder.setLength(textLength);
@@ -542,11 +532,11 @@ public class CommonTabController implements PacketListener, Listener {
         }
 
         private void hideSlot(String text) {
-            //PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, false, 0), false);
+//			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, false, 0), false);
         }
 
         private void showSlot(String text, int ping) {
-            //PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, true, ping), false);
+//			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, true, ping), false);
         }
     }
 }

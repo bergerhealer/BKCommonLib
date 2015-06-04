@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.reflection;
 
-import java.lang.reflect.Constructor;
-
 import com.bergerkiller.bukkit.common.conversion.Converter;
+
+import java.lang.reflect.Constructor;
 
 /**
  * A safe version of the Constructor

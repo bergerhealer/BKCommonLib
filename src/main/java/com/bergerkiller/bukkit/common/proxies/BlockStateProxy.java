@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.proxies;
 
-import java.util.List;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,6 +9,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState {
@@ -141,5 +141,10 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
     @Override
     public boolean update(boolean arg0, boolean arg1) {
         return base.update(arg0, arg1);
+    }
+
+    @Override
+    public boolean isPlaced() {
+        return base.isPlaced();
     }
 }

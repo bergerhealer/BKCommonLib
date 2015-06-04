@@ -1,13 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.utils.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
  * Can be used to match items against, and to provide amounts. Material AIR is
@@ -62,7 +57,7 @@ public class ItemParser {
 
     /**
      * Supported formats: typedata: [type]:[data] [typeid]:[data] [typeid]
-     *
+     * <p/>
      * Amount/name relationship: [amount]x[typedata] [amount]*[typedata]
      * [amount] [typedata] [amount]@[typedata] [typedata]
      */

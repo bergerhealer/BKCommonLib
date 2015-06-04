@@ -1,19 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import net.minecraft.server.v1_8_R2.CraftingManager;
-import net.minecraft.server.v1_8_R2.RecipesFurnace;
-import net.minecraft.server.v1_8_R2.TileEntityFurnace;
-
-import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
@@ -21,6 +7,15 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
+import net.minecraft.server.v1_8_R3.CraftingManager;
+import net.minecraft.server.v1_8_R3.IRecipe;
+import net.minecraft.server.v1_8_R3.RecipesFurnace;
+import net.minecraft.server.v1_8_R3.TileEntityFurnace;
+import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
 
 public class RecipeUtil {
 
@@ -168,8 +163,7 @@ public class RecipeUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Object> getCraftRecipes() {
-        return (List<Object>) CraftingManager.getInstance().getRecipes();
+    private static List<IRecipe> getCraftRecipes() {
+        return CraftingManager.getInstance().getRecipes();
     }
 }

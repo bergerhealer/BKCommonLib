@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.metrics;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Graph implementation for showing all the plugins that depend on 'me' as a

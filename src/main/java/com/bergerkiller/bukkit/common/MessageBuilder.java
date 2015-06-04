@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.bergerkiller.bukkit.common.utils.StringUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 public class MessageBuilder {
 

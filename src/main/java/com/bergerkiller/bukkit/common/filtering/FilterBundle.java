@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.filtering;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * A bundle of Filters. If any of the Filters contained in a bundle filter an

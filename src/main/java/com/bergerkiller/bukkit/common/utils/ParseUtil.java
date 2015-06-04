@@ -1,23 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.Locale;
-
-import org.bukkit.DyeColor;
-import org.bukkit.GrassSpecies;
-import org.bukkit.Material;
-import org.bukkit.TreeSpecies;
-import org.bukkit.material.Leaves;
-import org.bukkit.material.LongGrass;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.TexturedMaterial;
-import org.bukkit.material.Tree;
-import org.bukkit.material.Wool;
-
 import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NumberConverter;
+import org.bukkit.DyeColor;
+import org.bukkit.GrassSpecies;
+import org.bukkit.Material;
+import org.bukkit.TreeSpecies;
+import org.bukkit.material.*;
+
+import java.util.Locale;
 
 public class ParseUtil {
 

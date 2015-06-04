@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.60-SNAPSHOT</version>
+    <version>1.62-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -12,9 +13,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>v1_8_R2</project.mcversion>
-        <project.cbversion>1.8-R0.2</project.cbversion>
-        <project.stableversion>1.59</project.stableversion>
+        <project.mcversion>v1_8_R3</project.mcversion>
+        <project.cbversion>1.8.6-R0.1</project.cbversion>
+        <project.stableversion>1.61</project.stableversion>
         <project.stableserver>1.7.10-R0.1</project.stableserver>
         <project.stabledate>27 October 2014</project.stabledate>
         <junit.version>4.11</junit.version>

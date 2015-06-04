@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.events;
 
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import org.bukkit.entity.Player;
 
 public class PacketSendEvent extends PacketEvent {
 

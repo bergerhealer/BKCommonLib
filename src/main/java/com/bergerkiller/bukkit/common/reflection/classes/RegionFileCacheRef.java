@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegionFileCacheRef {
 

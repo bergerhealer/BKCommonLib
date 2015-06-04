@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommonTeam implements Serializable {
 
@@ -23,7 +22,7 @@ public class CommonTeam implements Serializable {
     private List<String> players;
     private boolean sendToAll;
 
-	//Do NOT construct teams from outside
+    //Do NOT construct teams from outside
     //Use CommonScoreboard.newTeam(String name)
     protected CommonTeam(String name) {
         this.name = name;

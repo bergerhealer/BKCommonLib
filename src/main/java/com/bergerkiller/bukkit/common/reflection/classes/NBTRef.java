@@ -1,17 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import com.bergerkiller.bukkit.common.reflection.*;
+import com.bergerkiller.bukkit.common.wrappers.NBTReadLimiterUnlimited;
+import net.minecraft.server.v1_8_R3.NBTReadLimiter;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.util.Collection;
-
-import net.minecraft.server.v1_8_R2.NBTReadLimiter;
-
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
-import com.bergerkiller.bukkit.common.wrappers.NBTReadLimiterUnlimited;
 
 public class NBTRef {
 

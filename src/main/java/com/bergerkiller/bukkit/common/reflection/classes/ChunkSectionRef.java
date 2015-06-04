@@ -1,14 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import net.minecraft.server.v1_8_R2.IBlockData;
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.BlockPosition;
-
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.IBlockData;
 
 public class ChunkSectionRef {
 
@@ -17,25 +15,27 @@ public class ChunkSectionRef {
     public static final FieldAccessor<Object> blockLight = TEMPLATE.getField("emittedLight");
     public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("a");
     public static final MethodAccessor<byte[]> getBlockIds = TEMPLATE.getMethod("getIdArray");
-    //public static final MethodAccessor<Object> getExtBlockIds = TEMPLATE.getMethod("getExtendedIdArray");
-    //public static final MethodAccessor<Object> getBlockData = TEMPLATE.getMethod("getDataArray");
+    // No longer avaiable. Sry
+//	public static final MethodAccessor<Object> getExtBlockIds = TEMPLATE.getMethod("getExtendedIdArray");
+//	public static final MethodAccessor<Object> getBlockData = TEMPLATE.getMethod("getDataArray");
     public static final MethodAccessor<Object> getBlockLightNibble = TEMPLATE.getMethod("getEmittedLightArray");
     public static final MethodAccessor<Object> getSkyLightNibble = TEMPLATE.getMethod("getSkyLightArray");
-    private static final MethodAccessor<IBlockData> blocks = TEMPLATE.getMethod("getType", int.class, int.class, int.class);
+    private static final MethodAccessor<Block> blocks = TEMPLATE.getMethod("b", int.class, int.class, int.class);
     private static final MethodAccessor<Void> setTypeBlock = TEMPLATE.getMethod("setType", int.class, int.class, int.class, IBlockData.class);
     private static final MethodAccessor<Integer> getData = TEMPLATE.getMethod("c", int.class, int.class, int.class);
-    private static final MethodAccessor<Block> setData = TEMPLATE.getMethod("setType", int.class, int.class, int.class, IBlockData.class);
+    // No longer avaiable
+// private static final MethodAccessor<Void> setData = TEMPLATE.getMethod("setData", int.class, int.class, int.class, int.class);
     private static final MethodAccessor<Integer> getSkyLight = TEMPLATE.getMethod("d", int.class, int.class, int.class);
     private static final MethodAccessor<Void> setSkyLight = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class);
     private static final MethodAccessor<Integer> getBlockLight = TEMPLATE.getMethod("e", int.class, int.class, int.class);
     private static final MethodAccessor<Void> setBlockLight = TEMPLATE.getMethod("b", int.class, int.class, int.class, int.class);
 
-    public static int getType(Object section, int x, int y, int z) {
-    	return Block.getId(blocks.invoke(section, new BlockPosition(x & 0xf, y  & 0xf, z & 0xf)).getBlock());
+    public static int getTypeId(Object section, int x, int y, int z) {
+        return BlockRef.id.get(blocks.invoke(section, x & 0xf, y & 0xf, z & 0xf));
     }
 
-    public static void setType(Object section, int x, int y, int z, int typeId) {
-        setTypeBlock.invoke(section, x & 0xf, y & 0xf, z & 0xf, CommonNMS.getBlock(typeId));
+    public static void setTypeId(Object section, int x, int y, int z, int typeId) {
+        setTypeBlock.invoke(section, x & 0xf, y & 0xf, z & 0xf, CommonNMS.getBlock(typeId).getBlockData());
     }
 
     public static int getData(Object section, int x, int y, int z) {
@@ -43,7 +43,7 @@ public class ChunkSectionRef {
     }
 
     public static void setData(Object section, int x, int y, int z, int data) {
-        setData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
+        setTypeBlock.invoke(section, x & 0xf, y & 0xf, z & 0xf, blocks.invoke(section, x, y, z).fromLegacyData(data));
     }
 
     public static int getSkyLight(Object section, int x, int y, int z) {

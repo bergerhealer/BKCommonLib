@@ -1,24 +1,18 @@
 package com.bergerkiller.bukkit.common.nbt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.AbstractMap.SimpleEntry;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
+import net.minecraft.server.v1_8_R3.NBTBase;
 
-import net.minecraft.server.v1_8_R2.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * An NBT Tag wrapper implementation to safely operate on tags<br><br>
- *
+ * <p/>
  * <b>Data</b> represents actual data stored by the tag. This can be:<br>
  * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float,
  * double, byte[], int[], String</u>

@@ -1,25 +1,5 @@
 package com.bergerkiller.bukkit.common.protocol;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.server.v1_8_R2.Vec3D;
-
-import org.bukkit.Chunk;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldType;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -28,29 +8,30 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk.ChunkMap;
+import org.bukkit.Chunk;
+import org.bukkit.*;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldType;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
-import java.util.Set;
-import java.util.UUID;
-
-import net.minecraft.server.v1_8_R2.BlockPosition;
-import net.minecraft.server.v1_8_R2.MapIcon;
-import net.minecraft.server.v1_8_R2.PacketPlayOutMapChunk.ChunkMap;
+import java.util.*;
 
 public class PacketTypeClasses {
 
     public static class NMSPacket extends PacketType {
-
-        private final SafeConstructor<CommonPacket> constructor0 = getPacketConstructor();
 
         protected SafeConstructor<CommonPacket> getPacketConstructor(Class<?>... args) {
             return getConstructor(args).translateOutput(Conversion.toCommonPacket);
@@ -58,6 +39,7 @@ public class PacketTypeClasses {
 
         @Override
         public CommonPacket newInstance() {
+            SafeConstructor<CommonPacket> constructor0 = getPacketConstructor();
             return constructor0.newInstance();
         }
     }
@@ -213,18 +195,6 @@ public class PacketTypeClasses {
         }
     }
 
-    public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
-
-        public final FieldAccessor<Byte> yaw = getField("e");
-        public final FieldAccessor<Byte> pitch = getField("f");
-        public final FieldAccessor<Boolean> onGround = getField("h");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
-
-        public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch, boolean onGround) {
-            return constructor1.newInstance(entityId, dyaw, dpitch, onGround);
-        }
-    }
-
     public static class NMSPacketPlayOutEntityMetadata extends NMSPacketPlayOutEntity {
 
         /**
@@ -369,6 +339,7 @@ public class PacketTypeClasses {
     }
 
     public static class NMSPacketPlayOutMapChunk extends NMSPacket {
+
         public final FieldAccessor<Integer> x = getField("a");
         public final FieldAccessor<Integer> z = getField("b");
         public final FieldAccessor<ChunkMap> chunkDataBitMap = getField("c");
@@ -405,7 +376,7 @@ public class PacketTypeClasses {
 
         public final FieldAccessor<IntVector2> chunk = getField("a").translate(ConversionPairs.chunkIntPair);
     }
-    
+
     public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacketPlayOutEntity {
 
         public final FieldAccessor<UUID> uuid = getField("b");
@@ -440,21 +411,8 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> slotCount = getField("d");
     }
 
-    public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
-        /*
-         public final FieldAccessor<String> playerName = getField("a");
-         public final FieldAccessor<Boolean> online = getField("b");
-         public final FieldAccessor<Integer> ping = getField("c");
-         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(String.class, boolean.class, int.class);
-
-         public CommonPacket newInstance(String playerName, boolean online, int ping) {
-         return constructor1.newInstance(playerName, online, ping);
-         }
-         */
-    }
-    
     public static class NMSPacketPlayOutPlayerListHeaderFooter extends NMSPacket {
-        
+
         public final FieldAccessor<String> titleTop = getField("a");
         public final FieldAccessor<String> titleBottom = getField("b");
     }
@@ -467,34 +425,6 @@ public class PacketTypeClasses {
         public final FieldAccessor<Float> yaw = getField("d");
         public final FieldAccessor<Float> pitch = getField("e");
         public final FieldAccessor<Set> UNKNOWN1 = getField("f");
-    }
-
-    public static class NMSPacketPlayOutRelEntityMove extends NMSPacketPlayOutEntity {
-
-        public final FieldAccessor<Byte> dx = getField("b");
-        public final FieldAccessor<Byte> dy = getField("c");
-        public final FieldAccessor<Byte> dz = getField("d");
-        public final FieldAccessor<Boolean> onGround = getField("g");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
-
-        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, boolean onGround) {
-            return constructor1.newInstance(entityId, dx, dy, dz, onGround);
-        }
-    }
-
-    public static class NMSPacketPlayOutRelEntityMoveLook extends NMSPacketPlayOutEntity {
-
-        public final FieldAccessor<Byte> dx = getField("b");
-        public final FieldAccessor<Byte> dy = getField("c");
-        public final FieldAccessor<Byte> dz = getField("d");
-        public final FieldAccessor<Byte> dyaw = getField("e");
-        public final FieldAccessor<Byte> dpitch = getField("f");
-        public final FieldAccessor<Boolean> onGround = getField("g");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
-
-        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch, boolean onGround) {
-            return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, onGround);
-        }
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacketPlayOutEntity {
@@ -598,8 +528,8 @@ public class PacketTypeClasses {
     public static class NMSPacketPlayOutSpawnEntityPainting extends NMSPacketPlayOutEntity {
 
         public final FieldAccessor<BlockPosition> blockPostion = getField("b");
-        public final FieldAccessor<BlockFace> facing = getField("e").translate(ConversionPairs.paintingFacing);
-        public final FieldAccessor<String> art = getField("f");
+        public final FieldAccessor<EnumDirection> facing = getField("c").translate(ConversionPairs.paintingFacing);
+        public final FieldAccessor<String> art = getField("d");
     }
 
     public static class NMSPacketPlayOutSpawnEntityWeather extends NMSPacketPlayOutEntity {
@@ -611,7 +541,6 @@ public class PacketTypeClasses {
     }
 
     // DOWN FROM HERE NEEDS TO BE DONE!
-    
     public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
 
         public final FieldAccessor<BlockPosition> position = getField("position");
@@ -663,24 +592,22 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutUpdateSign extends NMSPacket {
 
-        public final FieldAccessor<Integer> x = getField("x");
-        public final FieldAccessor<Integer> y = getField("y");
-        public final FieldAccessor<Integer> z = getField("z");
-        public final FieldAccessor<String[]> lines = getField("lines");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, int.class, int.class, String[].class);
+        public final FieldAccessor<net.minecraft.server.v1_8_R3.World> world = getField("a");
+        public final FieldAccessor<BlockPosition> position = getField("b");
+        public final FieldAccessor<IChatBaseComponent[]> lines = getField("c");
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(WorldRef.TEMPLATE.getType(), BlockPosition.class, IChatBaseComponent[].class);
 
         public Block getBlock(Object packetInstance, World world) {
-            return world.getBlockAt(x.get(packetInstance), y.get(packetInstance), z.get(packetInstance));
+            return world.getBlockAt(position.get(packetInstance).getX(), position.get(packetInstance).getY(), position.get(packetInstance).getZ());
         }
 
         public void setBlock(Object packetInstance, Block block) {
-            x.set(packetInstance, block.getX());
-            y.set(packetInstance, block.getY());
-            z.set(packetInstance, block.getZ());
+            position.set(packetInstance, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+            world.set(packetInstance, ((CraftWorld) block.getWorld()).getHandle());
         }
 
-        public CommonPacket newInstance(int x, int y, int z, String[] lines) {
-            return constructor1.newInstance(x, y, z, lines);
+        public CommonPacket newInstance(Block b, IChatBaseComponent[] lines) {
+            return constructor1.newInstance(((CraftWorld) b.getWorld()).getHandle(), new BlockPosition(b.getX(), b.getY(), b.getZ()), lines);
         }
     }
 
@@ -700,7 +627,7 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> effectId = getField("a");
         public final FieldAccessor<BlockPosition> position = getField("b");
         public final FieldAccessor<Integer> data = getField("c");
-        public final FieldAccessor<Boolean> noRelativeVolume = getField("f");
+        public final FieldAccessor<Boolean> noRelativeVolume = getField("d");
     }
 
     public static class NMSPacketPlayOutWorldParticles extends NMSPacket {
@@ -741,7 +668,6 @@ public class PacketTypeClasses {
      */
     public static class NMSPacketPlayInWindow extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = getField("a");
     }
 
     public static class NMSPacketPlayInAbilities extends NMSPacket {
@@ -761,8 +687,8 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = getField("a");
-        public final FieldAccessor<Integer> animation = getField("b");
+        public final FieldAccessor<Long> timestamp = getField("timestamp");
+
     }
 
     public static class NMSPacketPlayInBlockDig extends NMSPacket {
@@ -793,13 +719,15 @@ public class PacketTypeClasses {
     }
 
     public static class NMSPacketPlayInCloseWindow extends NMSPacketPlayInWindow {
+
+        public final FieldAccessor<Integer> windowId = getField("id");
     }
 
     public static class NMSPacketPlayInCustomPayload extends NMSPacket {
 
-        public final FieldAccessor<String> tag = getField("tag");
-        public final FieldAccessor<Integer> length = getField("length");
-        public final FieldAccessor<byte[]> data = getField("data");
+        public final FieldAccessor<String> tag = getField("a");
+        public final FieldAccessor<PacketDataSerializer> data = getField("b");
+
     }
 
     public static class NMSPacketPlayInEnchantItem extends NMSPacketPlayInWindow {
@@ -819,12 +747,12 @@ public class PacketTypeClasses {
         public final FieldAccessor<Double> x = getField("x");
         public final FieldAccessor<Double> y = getField("y");
         public final FieldAccessor<Double> z = getField("z");
-        public final FieldAccessor<Double> stance = getField("stance");
+
         public final FieldAccessor<Float> yaw = getField("yaw");
         public final FieldAccessor<Float> pitch = getField("pitch");
         public final FieldAccessor<Boolean> hasPos = getField("hasPos");
         public final FieldAccessor<Boolean> hasLook = getField("hasLook");
-        public final FieldAccessor<Boolean> onGround = getField("g");
+        public final FieldAccessor<Boolean> onGround = getField("f");
     }
 
     public static class NMSPacketPlayInHeldItemSlot extends NMSPacket {
@@ -871,7 +799,7 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> viewDistanceId = getField("b");
         public final FieldAccessor<Object> chatVisibility = getField("c");
         public final TranslatorFieldAccessor<Difficulty> difficulty = getField("e").translate(ConversionPairs.difficulty);
-        public final FieldAccessor<Boolean> showCape = getField("f");
+        public final FieldAccessor<Boolean> showCape = getField("d");
     }
 
     public static class NMSPacketPlayInSteerVehicle extends NMSPacket {
@@ -895,19 +823,15 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInUpdateSign extends NMSPacket {
 
-        public final FieldAccessor<Integer> x = getField("a");
-        public final FieldAccessor<Integer> y = getField("b");
-        public final FieldAccessor<Integer> z = getField("c");
-        public final FieldAccessor<String[]> lines = getField("d");
+        public final FieldAccessor<BlockPosition> position = getField("a");
+        public final FieldAccessor<IChatBaseComponent[]> lines = getField("b");
 
         public Block getBlock(Object packetInstance, World world) {
-            return world.getBlockAt(x.get(packetInstance), y.get(packetInstance), z.get(packetInstance));
+            return world.getBlockAt(position.get(packetInstance).getX(), position.get(packetInstance).getY(), position.get(packetInstance).getZ());
         }
 
         public void setBlock(Object packetInstance, Block block) {
-            x.set(packetInstance, block.getX());
-            y.set(packetInstance, block.getY());
-            z.set(packetInstance, block.getZ());
+            position.set(packetInstance, new BlockPosition(block.getX(), block.getY(), block.getZ()));
         }
     }
 
@@ -925,5 +849,58 @@ public class PacketTypeClasses {
         public final FieldAccessor<Short> action = getField("d");
         public final FieldAccessor<ItemStack> item = getField("item").translate(ConversionPairs.itemStack);
         public final FieldAccessor<Integer> shift = getField("shift");
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    public static class NMSPacketPlayOutRelEntityMove extends NMSPacketPlayOutEntity {
+
+        public final FieldAccessor<Byte> dx = getField("b");
+        public final FieldAccessor<Byte> dy = getField("c");
+        public final FieldAccessor<Byte> dz = getField("d");
+        public final FieldAccessor<Boolean> onGround = getField("g");
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
+
+        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, boolean onGround) {
+            return constructor1.newInstance(entityId, dx, dy, dz, onGround);
+        }
+    }
+
+    public static class NMSPacketPlayOutRelEntityMoveLook extends NMSPacketPlayOutEntity {
+
+        public final FieldAccessor<Byte> dx = getField("b");
+        public final FieldAccessor<Byte> dy = getField("c");
+        public final FieldAccessor<Byte> dz = getField("d");
+        public final FieldAccessor<Byte> dyaw = getField("e");
+        public final FieldAccessor<Byte> dpitch = getField("f");
+        public final FieldAccessor<Boolean> onGround = getField("g");
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
+
+        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch, boolean onGround) {
+            return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, onGround);
+        }
+    }
+
+    public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
+        /*
+         public final FieldAccessor<String> playerName = getField("a");
+         public final FieldAccessor<Boolean> online = getField("b");
+         public final FieldAccessor<Integer> ping = getField("c");
+         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(String.class, boolean.class, int.class);
+         public CommonPacket newInstance(String playerName, boolean online, int ping) {
+         return constructor1.newInstance(playerName, online, ping);
+         }
+         */
+    }
+
+    public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
+
+        public final FieldAccessor<Byte> yaw = getField("e");
+        public final FieldAccessor<Byte> pitch = getField("f");
+        public final FieldAccessor<Boolean> onGround = getField("h");
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
+
+        public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch, boolean onGround) {
+            return constructor1.newInstance(entityId, dyaw, dpitch, onGround);
+        }
     }
 }

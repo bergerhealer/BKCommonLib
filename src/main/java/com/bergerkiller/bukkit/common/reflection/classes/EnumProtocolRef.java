@@ -1,53 +1,64 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.google.common.collect.BiMap;
+import net.minecraft.server.v1_8_R3.EnumProtocol;
+import net.minecraft.server.v1_8_R3.EnumProtocolDirection;
+import net.minecraft.server.v1_8_R3.Packet;
+
 import java.util.Map;
 
-import net.minecraft.server.v1_8_R2.EnumProtocol;
-import net.minecraft.server.v1_8_R2.EnumProtocolDirection;
-
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-
 public class EnumProtocolRef {
-	
-	public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EnumProtocol");
-	private static final Object PLAY = EnumProtocol.PLAY;
-	private static final MethodAccessor<Map<EnumProtocolDirection, Class<?>>> getInIdToPacketMap = TEMPLATE.getMethod("a");
-	private static final MethodAccessor<Map<EnumProtocolDirection, Class<?>>> getOutIdToPacketMap = TEMPLATE.getMethod("a"); //b
-											//Integer
-	public static Class<?> getPacketClassIn(Integer id) {
-		return getInIdToPacketMap.invoke(PLAY).get(id);
-	}
 
-	public static Class<?> getPacketClassOut(Integer id) {
-		return getOutIdToPacketMap.invoke(PLAY).get(id);
-	}
+    public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EnumProtocol");
+    private static final Object PLAY = EnumProtocol.PLAY;
+    public static final FieldAccessor<Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>>> packetMap = TEMPLATE.getField("j");
 
-	public static EnumProtocolDirection getPacketIdIn(Class<?> packetClass) {
-		return LogicUtil.getKeyAtValue(getInIdToPacketMap.invoke(PLAY), packetClass);
-	}
+    public static Class<?> getPacketClassIn(Integer id) {
+        return packetMap.get(PLAY).get(EnumProtocolDirection.CLIENTBOUND).get(id);
+    }
 
-	public static EnumProtocolDirection getPacketIdOut(Class<?> packetClass) {
-		return LogicUtil.getKeyAtValue(getOutIdToPacketMap.invoke(PLAY), packetClass);
-	}
+    public static Class<?> getPacketClassOut(Integer id) {
+        return packetMap.get(PLAY).get(EnumProtocolDirection.SERVERBOUND).get(id);
+    }
 
-	/**
-	 * Tries to obtain the Packet ID to which a specific packet is mapped.
-	 * 
-	 * @param packetClass to get
-	 * @return id to which it is mapped, or null if not found
-	 */
-	public static EnumProtocolDirection getPacketId(Class<?> packetClass) {
-		EnumProtocolDirection id = getPacketIdIn(packetClass);
-		if (id != null) {
-			return id;
-		}
-		id = getPacketIdOut(packetClass);
-		if (id != null) {
-			return id;
-		}
-		return null;
-	}
+    public static Integer getPacketIdIn(Class<?> packetClass) {
+        BiMap<Integer, Class<? extends Packet>> map = packetMap.get(PLAY).get(EnumProtocolDirection.CLIENTBOUND);
+        for (Integer i : map.keySet()) {
+            if (map.get(i).equals(packetClass)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static Integer getPacketIdOut(Class<?> packetClass) {
+        BiMap<Integer, Class<? extends Packet>> map = packetMap.get(PLAY).get(EnumProtocolDirection.SERVERBOUND);
+        for (Integer i : map.keySet()) {
+            if (map.get(i).equals(packetClass)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Tries to obtain the Packet ID to which a specific packet is mapped.
+     *
+     * @param packetClass to get
+     * @return id to which it is mapped, or null if not found
+     */
+    public static Integer getPacketId(Class<?> packetClass) {
+        Integer id = getPacketIdIn(packetClass);
+        if (id != null) {
+            return id.intValue();
+        }
+        id = getPacketIdOut(packetClass);
+        if (id != null) {
+            return id.intValue();
+        }
+        return null;
+    }
 }

@@ -1,15 +1,10 @@
 package com.bergerkiller.bukkit.common.config;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
+import java.io.*;
+import java.util.logging.Level;
 
 /**
  * An abstract version of a Data reading class used to read from a source File

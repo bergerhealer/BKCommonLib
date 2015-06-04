@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.HashMap;
-
+import com.bergerkiller.bukkit.common.BlockLocation;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import com.bergerkiller.bukkit.common.BlockLocation;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
+import java.util.HashMap;
 
 /**
  * A Map implementation for mapping values to Block Locations (offline Blocks)

@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.Locale;
-
+import com.bergerkiller.bukkit.common.ToggledState;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import net.milkbowl.vault.permission.Permission;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,8 +10,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.bergerkiller.bukkit.common.ToggledState;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
+import java.util.Locale;
 
 /**
  * Takes care of Vault permission checks, and additional logic needed to handle
@@ -56,7 +54,7 @@ public class PermissionHandler implements PermissionChecker {
         if (this.needsWildcardCheck.clear()) {
             this.hasSuperWildcardSupport = false;
 
-			// Perform a little experiment with a random player name
+            // Perform a little experiment with a random player name
             // Give the player a test node, and see if the *-permission is handled right
             // Also pass in an invalid value to check that there are no inconsistencies
             // Set up the test permission
@@ -89,7 +87,7 @@ public class PermissionHandler implements PermissionChecker {
                     // Grant permission with the *-node
                     this.vaultPermission.playerAdd(world, testPlayerName, PERMISSION_TEST_NODE_ALL);
 
-					// Adding was successful, ALWAYS do the removal phase
+                    // Adding was successful, ALWAYS do the removal phase
                     // See if it had the desired effect
                     try {
                         this.hasSuperWildcardSupport = this.vaultPermission.playerHas(world, testPlayerName, PERMISSION_TEST_NODE);
@@ -113,10 +111,10 @@ public class PermissionHandler implements PermissionChecker {
     public org.bukkit.permissions.Permission getPermission(String node) {
         org.bukkit.permissions.Permission perm = Bukkit.getPluginManager().getPermission(node);
         if (perm == null) {
-			// Figure out what permission default to use
+            // Figure out what permission default to use
             // This is done by checking all *-names, and if they exist, using that default
 
-			// ===================================
+            // ===================================
             // TRUE found or anything else: TRUE
             // NOT_OP AND OP found: TRUE
             // NOT_OP found: NOT_OP
@@ -142,7 +140,7 @@ public class PermissionHandler implements PermissionChecker {
         if (this.vaultEnabled) {
             // On a new line to avoid possible preliminary field access
             if (!this.vaultPermission.hasSuperPermsCompat()) {
-				// Use a call here
+                // Use a call here
                 // First, make sure to handle our permission defaults
                 if (perm.getDefault().getValue(sender.isOp())) {
                     return true;

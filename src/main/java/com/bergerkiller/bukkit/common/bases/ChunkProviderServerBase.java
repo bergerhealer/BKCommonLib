@@ -1,25 +1,15 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.util.Random;
-
-import org.bukkit.World;
-import org.bukkit.event.world.ChunkPopulateEvent;
-import org.bukkit.generator.BlockPopulator;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.World;
+import org.bukkit.event.world.ChunkPopulateEvent;
+import org.bukkit.generator.BlockPopulator;
 
-import net.minecraft.server.v1_8_R2.BlockSand;
-import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.ChunkProviderServer;
-import net.minecraft.server.v1_8_R2.CrashReport;
-import net.minecraft.server.v1_8_R2.CrashReportSystemDetails;
-import net.minecraft.server.v1_8_R2.IChunkLoader;
-import net.minecraft.server.v1_8_R2.IChunkProvider;
-import net.minecraft.server.v1_8_R2.ReportedException;
-import net.minecraft.server.v1_8_R2.WorldServer;
+import java.util.Random;
 
 public class ChunkProviderServerBase extends ChunkProviderServer {
 
@@ -150,7 +140,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
         Chunk chunk = this.getOrCreateChunk(i, j);
 
         if (!chunk.isDone()) {
-            chunk.d(true);
+            chunk.d(true); //Set done to true
             this.chunkProvider.getChunkAt(ichunkprovider, i, j);
 
             // CraftBukkit start

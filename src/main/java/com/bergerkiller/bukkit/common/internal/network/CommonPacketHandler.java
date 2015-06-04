@@ -1,29 +1,27 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
-import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-
-import net.minecraft.server.v1_8_R2.*;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.GenericFutureListener;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.util.concurrent.GenericFutureListener;
+import net.minecraft.server.v1_8_R3.NetworkManager;
+import net.minecraft.server.v1_8_R3.Packet;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 /**
  * Fallback packet handler which uses an injected PlayerConnection replacement
@@ -59,7 +57,14 @@ public class CommonPacketHandler extends PacketHandlerHooked {
         }
 
         // Initialize queued packet logic for silent sending
-        ClassTemplate<?> queuedPacketTemplate = NMSClassTemplate.create("QueuedPacket");
+        Class[] possible = NetworkManager.class.getDeclaredClasses();
+        Class qp = null;
+        for (Class p : possible) {
+            if (p.getName().endsWith("QueuedPacket")) {
+                qp = p;
+            }
+        }
+        ClassTemplate<?> queuedPacketTemplate = ClassTemplate.create(qp);
         this.emptyGenericFutureListener = new GenericFutureListener[0];
         this.queuedPacketConstructor = queuedPacketTemplate.getConstructor(PacketType.DEFAULT.getType(), GenericFutureListener[].class);
         if (!this.queuedPacketConstructor.isValid()) {
@@ -76,7 +81,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
     @Override
     public boolean onDisable() {
-		// Unbind all hooks - but don't do a check since we are disabling
+        // Unbind all hooks - but don't do a check since we are disabling
         // Can not create new tasks at that point
         for (Player player : Bukkit.getOnlinePlayers()) {
             CommonChannelListener.unbind(player);
@@ -94,7 +99,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
     public void sendSilentPacket(Player player, Object packet) {
         // Instead of using sendPacket, we sneakily insert the packet into the queue
         Object networkManager = EntityPlayerRef.getNetworkManager(player);
-        Queue<Object> pollQueue = NetworkManagerRef.highPriorityQueue.get(networkManager);
+        Queue<Object> pollQueue = NetworkManagerRef.queue.get(networkManager);
         pollQueue.add(this.queuedPacketConstructor.newInstance(packet, this.emptyGenericFutureListener));
     }
 

@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.reflection.gen;
 
-import java.util.Map;
-
 import net.sf.cglib.core.Signature;
 import net.sf.cglib.proxy.MethodProxy;
+
+import java.util.Map;
 
 public class SuperCallbackSignature implements CallbackSignature {
 

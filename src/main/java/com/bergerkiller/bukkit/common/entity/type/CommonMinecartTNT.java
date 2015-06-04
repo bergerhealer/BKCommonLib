@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Material;
-import org.bukkit.entity.minecart.ExplosiveMinecart;
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import org.bukkit.Material;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Common Entity implementation for Minecarts with a TNT Block (explosive)
@@ -18,9 +17,9 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
     private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
-    private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("a");//fuse
-    private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("b", double.class);//c
-    private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("j");//e
+    private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("a");
+    private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("b", double.class);
+    private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("j");
     /**
      * The velocity (squared) at which the Minecart is considered 'fast moving'.
      */

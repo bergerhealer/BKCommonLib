@@ -1,22 +1,15 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.google.common.collect.BiMap;
-
-import org.bukkit.block.Block;
-
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeDirectMethod;
+import com.google.common.collect.BiMap;
+import org.bukkit.block.Block;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations

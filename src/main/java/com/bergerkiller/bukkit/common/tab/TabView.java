@@ -1,18 +1,17 @@
 package com.bergerkiller.bukkit.common.tab;
 
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.FromToCounter;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.CommonTabController;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import org.bukkit.entity.Player;
 
 /**
  * Represents a live view of a single Player List a player sees when pressing
  * tab. Changes in this view can be sent to multiple players or all players on
  * the server. Many methods are available to ease the setting of text and ping
  * values in this view.<br><br>
- *
+ * <p/>
  * To obtain a TabView instance, call the {@link #createTab(int, int)} method
  * with the desired dimensions of the tab specified. It is only possible to
  * create new tabs this way when enabling your plugin. To create new Tab View
@@ -148,7 +147,7 @@ public abstract class TabView {
      * Sets all the text and ping values of a single row. Points outside of the
      * text or ping array bounds are ignored. If the text or ping arrays are
      * null, the values are ignored. The text is set from top to bottom<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use y2 for y1.
      *
      * @param column - x-coordinate of the column
@@ -178,7 +177,7 @@ public abstract class TabView {
      * Sets all the text and ping values of a single row. Points outside of the
      * text or ping array bounds are ignored. If the text or ping arrays are
      * null, the values are ignored. The text is set from left to right<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use x2 for x1.
      *
      * @param row - y-coordinate of the row
@@ -195,7 +194,7 @@ public abstract class TabView {
      * Sets all the text and ping values of an area. Points outside of the text
      * or ping array bounds are ignored. If the text or ping arrays are null,
      * the values are ignored. The text is set from left to right<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use x2 for x1 and y2 for y1.<br><br>
      *
      * @param x1 - x-coordinate of point 1 (inclusive)
@@ -370,9 +369,9 @@ public abstract class TabView {
      * Sets all the text values of an area. Points outside of the text array
      * bounds are ignored. If the text array is null, the values are ignored.
      * The text is set from left to right.<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use x2 for x1 and y2 for y1.<br><br>
-     *
+     * <p/>
      * This is an overload for
      * {@link #setArea(int, int, int, int, String[], int[]) setArea(x1, y1, x2, y2, text, ping)}
      * to allow variable arguments instead of fixed arrays.
@@ -391,9 +390,9 @@ public abstract class TabView {
      * Sets all the text and ping values of a single row. Points outside of the
      * text array bounds are ignored. The text is set from left to
      * right.<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use x2 for x1.<br><br>
-     *
+     * <p/>
      * This is an overload for
      * {@link #setRow(int, int, int, String[], int[]) setRow(row, x1, x2, text, ping)}
      * to allow variable arguments instead of fixed arrays.
@@ -411,7 +410,7 @@ public abstract class TabView {
      * Sets all the text and ping values of a single row. Points outside of the
      * text array bounds are ignored. The text is set from left to
      * right.<br><br>
-     *
+     * <p/>
      * This is an overload for
      * {@link #setRow(int, String[], int[]) setRow(row, text, ping)} to allow
      * variable arguments instead of fixed arrays.
@@ -427,9 +426,9 @@ public abstract class TabView {
      * Sets all the text and ping values of a single row. Points outside of the
      * text array bounds are ignored. The text is set from top to
      * bottom.<br><br>
-     *
+     * <p/>
      * To set the values in reverse, simply use y2 for y1.<br><br>
-     *
+     * <p/>
      * This is an overload for
      * {@link #setColumn(int, int, int, String[], int[]) setColumn(column, y1, y2, text, ping)}
      * to allow variable arguments instead of fixed arrays.
@@ -447,7 +446,7 @@ public abstract class TabView {
      * Sets all the text values of a single column. Points outside of the text
      * or ping array bounds are ignored. The text is set from top to
      * bottom.<br><br>
-     *
+     * <p/>
      * This is an overload for
      * {@link #setColumn(int, String[], int[]) setColumn(column, text, ping)} to
      * allow variable arguments instead of fixed arrays.
@@ -462,7 +461,7 @@ public abstract class TabView {
     /**
      * Sets all the text contents of this Tab View to the text array. Elements
      * outside of this array or if the array is null are not set.<br><br>
-     *
+     * <p/>
      * This is an overload of
      * {@link #setAll(String[], int[]) setAll(text, ping)} to allow variable
      * arguments instead of fixed arrays.
@@ -614,7 +613,7 @@ public abstract class TabView {
      * Creates a new TabView. This method can only be called while enabling your
      * plugin. Do not call this method while players are joining or logging in -
      * it does NOT work!<br><br>
-     *
+     * <p/>
      * If you need tab instances created at runtime, use clones from one tab
      * created when enabling your plugin. You can use smaller sizes than the
      * original tab, but you can not use larger sizes. You are restricted to

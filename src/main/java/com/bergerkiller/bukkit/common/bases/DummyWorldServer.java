@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-
-import net.minecraft.server.v1_8_R2.MinecraftServer;
-import net.minecraft.server.v1_8_R2.WorldServer;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.WorldServer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 
 /**
  * A dummy world that can be used to operate on or using worlds without
@@ -28,7 +26,7 @@ public class DummyWorldServer extends WorldServer {
         super(constrFail(), null, null, 12, null, null, null);
     }
 
-    private static MinecraftServer constrFail() {
+    private static final MinecraftServer constrFail() {
         throw new UnsupportedOperationException("DummyWorld constructor can not be used - use ClassTemplate.newInstanceNull");
     }
 

@@ -1,15 +1,14 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public class RecipeRef {
 

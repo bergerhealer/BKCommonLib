@@ -1,28 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
@@ -35,16 +12,28 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.bukkit.common.utils.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 /**
  * The extended javaPlugin base used to communicate with BKCommonLib<br><br>
- *
+ * <p/>
  * Handles dependencies, command registration, event listener registration,
  * permissions and permission defaults, logging, error handling and
  * localization.
@@ -106,7 +95,7 @@ public abstract class PluginBase extends JavaPlugin {
      * with separate parts not exceeding 100.<br>
      * <b>REVISION and BUILD will not be contained in this version
      * number!</b><br><br>
-     *
+     * <p/>
      * Examples:<br>
      * - v1.0 = 100<br>
      * - v8.6 = 860<br>
@@ -223,7 +212,7 @@ public abstract class PluginBase extends JavaPlugin {
         }
         try {
             this.register(listener.newInstance());
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -585,7 +574,7 @@ public abstract class PluginBase extends JavaPlugin {
                         if (plugin == null) {
                             log(Level.SEVERE, type + " a dependency of this plugin");
                             // Add all dependencies of this plugin to the cause
-                            LinkedHashSet<String> dep = new LinkedHashSet<>();
+                            LinkedHashSet<String> dep = new LinkedHashSet<String>();
                             dep.add(this.getName());
                             dep.addAll(LogicUtil.fixNull(this.getDescription().getDepend(), Collections.EMPTY_LIST));
                             dep.addAll(LogicUtil.fixNull(this.getDescription().getSoftDepend(), Collections.EMPTY_LIST));
@@ -628,7 +617,7 @@ public abstract class PluginBase extends JavaPlugin {
      * To make use of this functionality, first add the following line to the
      * <b>plugin.yml</b>:<br>
      * <pre>metrics: true</pre>
-     *
+     * <p/>
      * To avoid issues, call {@link #hasMetrics()} before using this method to
      * check whether Metrics is available.
      *
@@ -710,7 +699,7 @@ public abstract class PluginBase extends JavaPlugin {
         // Load plugin.yml configuration
         try {
             this.pluginYaml.loadFromStream(getResource("plugin.yml"));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
         }
 
@@ -721,12 +710,12 @@ public abstract class PluginBase extends JavaPlugin {
             ConfigurationNode commandsNode = getLocalizationNode("commands");
 
             // Create a new modifiable commands map to replace with
-            commands = new HashMap<>(commands);
+            commands = new HashMap<String, Map<String, Object>>(commands);
             for (Entry<String, Map<String, Object>> commandEntry : commands.entrySet()) {
                 ConfigurationNode node = commandsNode.getNode(commandEntry.getKey());
 
                 // Transfer description and usage
-                Map<String, Object> data = new HashMap<>(commandEntry.getValue());
+                Map<String, Object> data = new HashMap<String, Object>(commandEntry.getValue());
                 node.shareWith(data, "description", "No description specified");
                 node.shareWith(data, "usage", "/" + commandEntry.getKey());
                 commandEntry.setValue(Collections.unmodifiableMap(data));
@@ -920,5 +909,6 @@ public abstract class PluginBase extends JavaPlugin {
      */
     public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
     }
+
 ;
 }

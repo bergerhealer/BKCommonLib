@@ -1,14 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.List;
-
-import net.minecraft.server.v1_8_R2.EntityPlayer;
-import net.minecraft.server.v1_8_R2.WorldServer;
-import com.mojang.authlib.GameProfile;
-
-import org.bukkit.Chunk;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -20,11 +11,15 @@ import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
-import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.WorldServer;
+import org.bukkit.Chunk;
+import org.bukkit.entity.Player;
+
+import java.util.List;
 
 /**
  * Player - specific operations and tools
@@ -97,7 +92,7 @@ public class PlayerUtil extends EntityUtil {
      */
     @SuppressWarnings("unchecked")
     public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
-        CommonNMS.getNative(player).chunkCoordIntPairQueue.add(VectorRef.newPair(chunkX, chunkZ));
+        CommonNMS.getNative(player).chunkCoordIntPairQueue.add((ChunkCoordIntPair) VectorRef.newPair(chunkX, chunkZ));
     }
 
     /**

@@ -1,13 +1,5 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.List;
-
-import net.minecraft.server.v1_8_R2.EntityPlayer;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
@@ -16,6 +8,12 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+
+import java.util.List;
 
 /**
  * A Common Entity implementation for Players
@@ -53,12 +51,12 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
             return false;
         }
 
-		// Properly move the player to the new location (changed chunks?)
+        // Properly move the player to the new location (changed chunks?)
         // This was causing strange in-between world bugs
         // And since without it it works fine too...it is going to be disabled for a while
         // I added this for some reason, if this reason is found, please look into a way of fixing the bugs
-        //CommonNMS.getNative(getWorld()).getPlayerChunkMap().movePlayer(getHandle(EntityPlayer.class)); 
-		// Instantly send the chunk the vehicle is currently in
+        //CommonNMS.getNative(getWorld()).getPlayerChunkMap().movePlayer(getHandle(EntityPlayer.class));
+        // Instantly send the chunk the vehicle is currently in
         // This avoid the player losing track of the vehicle because the chunk is missing
         final IntVector2 chunk = loc.xz.chunk();
         if (getChunkSendQueue().remove(chunk)) {

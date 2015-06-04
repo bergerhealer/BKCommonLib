@@ -1,13 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.conversion.CastingConverter;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.Converter;
@@ -15,6 +7,13 @@ import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 
 public abstract class CollectionTypeConverter<T extends Collection<?>, B extends Collection<?>> implements Converter<T> {
 

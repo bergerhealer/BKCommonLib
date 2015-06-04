@@ -1,17 +1,15 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import net.minecraft.server.v1_8_R2.IInventory;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Minecart;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-
 import com.bergerkiller.bukkit.common.controller.DefaultEntityInventoryController;
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityInventory;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
+import net.minecraft.server.v1_8_R3.IInventory;
+import org.bukkit.Location;
+import org.bukkit.entity.Minecart;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 /**
  * Base class for Minecart entities with an Inventory

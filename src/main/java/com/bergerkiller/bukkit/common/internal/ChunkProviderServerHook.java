@@ -1,12 +1,5 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Server;
-import org.bukkit.event.world.ChunkPopulateEvent;
-import org.bukkit.generator.BlockPopulator;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
@@ -15,19 +8,14 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Server;
+import org.bukkit.event.world.ChunkPopulateEvent;
+import org.bukkit.generator.BlockPopulator;
 
-import net.minecraft.server.v1_8_R2.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_8_R2.BlockPosition;
-import net.minecraft.server.v1_8_R2.BlockSand;
-import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.ChunkProviderServer;
-import net.minecraft.server.v1_8_R2.CrashReport;
-import net.minecraft.server.v1_8_R2.CrashReportSystemDetails;
-import net.minecraft.server.v1_8_R2.EnumCreatureType;
-import net.minecraft.server.v1_8_R2.IChunkLoader;
-import net.minecraft.server.v1_8_R2.IChunkProvider;
-import net.minecraft.server.v1_8_R2.ReportedException;
-import net.minecraft.server.v1_8_R2.WorldServer;
+import java.util.List;
+import java.util.Random;
 
 /**
  * A CPS Hook class that provides various new events, timings and other useful
@@ -44,12 +32,13 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         return super.world.getWorld();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, int x, int y, int z) {
-        List<BiomeMeta> mobs = super.getMobsFor(enumcreaturetype, new BlockPosition(x, y, z));
+    public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
+        List<BiomeMeta> mobs = super.getMobsFor(enumcreaturetype, pos);
         if (CommonPlugin.hasInstance()) {
             org.bukkit.World world = this.world.getWorld();
-            return CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, x, y, z, mobs);
+            return CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), mobs);
         } else {
             return mobs;
         }
@@ -82,6 +71,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         Chunk chunk = this.getOrCreateChunk(i, j);
 
         if (!chunk.isDone()) {
+            //chunk.done = true;
             chunk.d(true);
             this.chunkProvider.getChunkAt(ichunkprovider, i, j);
 
@@ -149,7 +139,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         boolean newChunk;
         if (newChunk = (chunk == null)) {
             if (this.chunkProvider == null) {
-				// Nothing to do here
+                // Nothing to do here
                 // Don't even fire a chunk load event - empty chunk is not a valid Chunk
                 // Registering it is also a bad idea...
                 return this.emptyChunk;
@@ -194,7 +184,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
              */
             server.getPluginManager().callEvent(new org.bukkit.event.world.ChunkLoadEvent(chunk, newChunk));
         }
-		// CraftBukkit end
+        // CraftBukkit end
 
         // Perhaps load some neighboring chunks? (population related)
         ChunkRef.loadNeighbours(chunkHandle, this, this, x, z);

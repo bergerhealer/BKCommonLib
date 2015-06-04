@@ -1,15 +1,14 @@
 package com.bergerkiller.bukkit.common.server;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class CraftBukkitServer extends CommonServerBase {
 
@@ -58,12 +57,12 @@ public class CraftBukkitServer extends CommonServerBase {
         try {
             // Obtain MinecraftServer instance from server
             Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
-            MethodAccessor<Object> getServer = new SafeMethod<>(server, "getServer");
+            MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
             Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
 
             // Use MinecraftServer instance to obtain the version
             Class<?> mcServer = minecraftServerInstance.getClass();
-            MethodAccessor<String> getVersion = new SafeMethod<>(mcServer, "getVersion");
+            MethodAccessor<String> getVersion = new SafeMethod<String>(mcServer, "getVersion");
             MC_VERSION = getVersion.invoke(minecraftServerInstance);
         } catch (Throwable t) {
             t.printStackTrace();

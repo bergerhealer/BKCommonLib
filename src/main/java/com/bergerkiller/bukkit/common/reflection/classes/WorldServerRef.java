@@ -1,15 +1,11 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeDirectField;
-import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+
+import java.util.List;
 
 public class WorldServerRef extends WorldRef {
 
@@ -23,7 +19,7 @@ public class WorldServerRef extends WorldRef {
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = TEMPLATE.getField("entitiesById").translate(ConversionPairs.intHashMap);
     public static final FieldAccessor<Object> chunkProviderServer = new SafeDirectField<Object>() {
         private final FieldAccessor<Object> field1 = TEMPLATE.getField("chunkProviderServer");
-        private final FieldAccessor<Object> field2 = TEMPLATE.getField("chunkProvider");
+//		private final FieldAccessor<Object> field2 = TEMPLATE.getField("chunkProvider");
 
         @Override
         public Object get(Object instance) {
@@ -32,7 +28,7 @@ public class WorldServerRef extends WorldRef {
 
         @Override
         public boolean set(Object instance, Object value) {
-            return field1.set(instance, value) && field2.set(instance, value);
+            return field1.set(instance, value);// && field2.set(instance, value);
         }
     };
 }

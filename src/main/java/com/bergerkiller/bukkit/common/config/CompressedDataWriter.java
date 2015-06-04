@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.config;
 
+import org.bukkit.plugin.Plugin;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.zip.DeflaterOutputStream;
-
-import org.bukkit.plugin.Plugin;
 
 /**
  * A compression based Data writer

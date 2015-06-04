@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.tab;
 
-import java.util.Iterator;
-
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import org.bukkit.entity.Player;
+
+import java.util.Iterator;
 
 final class TabViewDefault extends TabViewUnmodifiable {
 

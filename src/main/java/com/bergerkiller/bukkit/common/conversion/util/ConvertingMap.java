@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 
 /**
  * Wraps around another Map of unknown contents and performs key/value

@@ -1,13 +1,9 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import com.bergerkiller.bukkit.common.reflection.*;
+
 import java.io.File;
 import java.io.RandomAccessFile;
-
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 
 public class RegionFileRef {
 

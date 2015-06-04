@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import org.bukkit.Location;
-
-import net.minecraft.server.v1_8_R2.DamageSource;
-import net.minecraft.server.v1_8_R2.EntityHuman;
-import net.minecraft.server.v1_8_R2.NBTTagCompound;
-
 import com.bergerkiller.bukkit.common.controller.EntityController;
+import net.minecraft.server.v1_8_R3.DamageSource;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.Location;
 
 /**
  * The default methods provided by all Entity types
@@ -20,12 +18,12 @@ public interface NMSEntityHook {
     /**
      * onInteractBy super
      */
-    public boolean super_c(EntityHuman human);
+    public boolean super_e(EntityHuman human);
 
     /**
      * onInteractBy
      */
-    public boolean c(EntityHuman human);
+    public boolean e(EntityHuman human);
 
     /**
      * onTick super

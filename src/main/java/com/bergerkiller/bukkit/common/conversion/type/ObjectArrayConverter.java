@@ -1,17 +1,16 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import org.bukkit.inventory.ItemStack;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Converter for converting objects into various kinds of Object[] arrays
@@ -100,7 +99,7 @@ public class ObjectArrayConverter<T> extends BasicConverter<T> {
 
     /**
      * Converts a collection to an array of the given component type<br>
-     *
+     * <p/>
      * Example:<br>
      * Integer[] values = convert(list, Integer.class);
      *

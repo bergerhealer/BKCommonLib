@@ -1,25 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R2.ChunkSection;
-import net.minecraft.server.v1_8_R2.WorldServer;
-
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R2.util.LongHash;
-import org.bukkit.craftbukkit.v1_8_R2.util.LongHashSet;
-import org.bukkit.craftbukkit.v1_8_R2.util.LongObjectHashMap;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -29,15 +9,21 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkSectionRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_8_R3.util.LongHash;
+import org.bukkit.craftbukkit.v1_8_R3.util.LongHashSet;
+import org.bukkit.craftbukkit.v1_8_R3.util.LongObjectHashMap;
+import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_8_R2.BlockPosition;
-import net.minecraft.server.v1_8_R2.EntitySlice;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Contains utilities to get and set chunks of a world
@@ -74,81 +60,80 @@ public class ChunkUtil {
      * Gets the block light level
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @return Block light level
      */
     public static int getBlockLight(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return ChunkRef.getBlockLight(CommonNMS.getNative(chunk), x, y, z);
+        return ChunkRef.getBlockLight(CommonNMS.getNative(chunk), x, y, z);
     }
 
     /**
      * Gets the sky light level
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @return Sky light level
      */
     public static int getSkyLight(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return ChunkRef.getSkyLight(CommonNMS.getNative(chunk), x, y, z);
+        return ChunkRef.getSkyLight(CommonNMS.getNative(chunk), x, y, z);
     }
 
     /**
      * Gets the block data
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @return block data
      */
     public static int getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return ChunkRef.getData(CommonNMS.getNative(chunk), x, y, z);
+        return ChunkRef.getData(CommonNMS.getNative(chunk), x, y, z);
     }
 
     /**
      * Gets the block type Id
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @return block type Id
      */
     @Deprecated
     public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z);
+        return ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z);
     }
 
     /**
      * Gets the block type Id
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @return block type
      */
     @SuppressWarnings("deprecation")
     public static Material getBlockType(org.bukkit.Chunk chunk, int x, int y, int z) {
-		return MaterialUtil.getType(ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z));
-    }
-    
-    /**
-     * Gets the block type Id
-     *
-     * @param world the block is in
-     * @param blockposition - coordinates of the block
-     * @return block type
-     */
-    @SuppressWarnings("deprecation")
-    public static Material getBlockType(org.bukkit.World world, int x, int y, int z) {
-        return MaterialUtil.getType(ChunkRef.getTypeId(CommonNMS.getNative(world), x, y, z));
+        return MaterialUtil.getType(ChunkRef.getTypeId(CommonNMS.getNative(chunk), x, y, z));
     }
 
     /**
      * Sets a block type id and data without causing physics or lighting updates
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @param typeId to set to
      * @param data to set to
      */
-    public static void setBlockFast(org.bukkit.Chunk chunk, BlockPosition blockposition, int typeId, int data) {
-        int y = blockposition.getY();
+    public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
         if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
             return;
         }
@@ -158,49 +143,52 @@ public class ChunkUtil {
         if (section == null) {
             section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.o());
         }
-        ChunkSectionRef.setType(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), typeId);
-        ChunkSectionRef.setData(section, blockposition.getX(), blockposition.getY(), blockposition.getZ(), data);
+        ChunkSectionRef.setTypeId(section, x, y, z, typeId);
+        ChunkSectionRef.setData(section, x, y, z, data);
     }
 
     /**
      * Sets a block type id and data, causing physics and lighting updates
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @param typeId to set to
      * @param data to set to
      * @return True if a block got changed, False if not
      */
     @Deprecated
-	public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
-		return setBlock(chunk, x, y, z, MaterialUtil.getType(typeId), data);
+    public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
+        return setBlock(chunk, x, y, z, MaterialUtil.getType(typeId), data);
     }
 
     /**
      * Sets a block type id and data, causing physics and lighting updates
      *
      * @param chunk the block is in
-     * @param blockposition - coordinates of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
      * @param type to set to
      * @param data to set to
      * @return True if a block got changed, False if not
      */
-    @SuppressWarnings("deprecation")
-	public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, Material type, int data) {
-		boolean result = y >= 0 && y <= chunk.getWorld().getMaxHeight();
-		WorldServer world = CommonNMS.getNative(chunk.getWorld());
-		Block typeBlock = CommonNMS.getBlock(type);
-		if (result) {
-			result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, Block.getId(typeBlock), data);
+    public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, Material type, int data) {
+        boolean result = y >= 0 && y <= chunk.getWorld().getMaxHeight();
+        WorldServer world = CommonNMS.getNative(chunk.getWorld());
+        Block typeBlock = CommonNMS.getBlock(type);
+        if (result) {
+            result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, typeBlock, data);
             world.methodProfiler.a("checkLight");
-            world.A(new BlockPosition(x, y, z));
-            //z
+            world.x(new BlockPosition(x, y, z));
             world.methodProfiler.b();
-		}
-		if (result) {
-			world.applyPhysics(new BlockPosition(x, y, z), typeBlock);
-		}
-		return result;
+        }
+        if (result) {
+//			world.notifyAndUpdatePhysics(pos, chunk, typeBlock);
+            return chunk.getBlock(x, y, z).setTypeIdAndData(type.getId(), (byte) data, true);
+        }
+        return result;
     }
 
     /**
@@ -212,7 +200,7 @@ public class ChunkUtil {
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
         List<Object>[] entitySlices = ChunkRef.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
-        return new ConvertingList<>(new List2D<>(entitySlices), ConversionPairs.entity);
+        return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
     }
 
     /**
@@ -469,7 +457,7 @@ public class ChunkUtil {
      */
     @SuppressWarnings("unchecked")
     public static boolean removeEntity(org.bukkit.Chunk chunk, org.bukkit.entity.Entity entity) {
-        final EntitySlice[] slices = CommonNMS.getNative(chunk).entitySlices;
+        final List<Entity>[] slices = CommonNMS.getNative(chunk).entitySlices;
         final int sliceY = MathUtil.clamp(MathUtil.toChunk(EntityUtil.getLocY(entity)), 0, slices.length - 1);
         final Object handle = Conversion.toEntityHandle.convert(entity);
         if (slices[sliceY].remove(handle)) {

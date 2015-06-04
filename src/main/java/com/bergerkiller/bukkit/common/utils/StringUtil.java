@@ -1,17 +1,13 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.map.MinecraftFont;
 import org.bukkit.map.MapFont.CharacterSprite;
+import org.bukkit.map.MinecraftFont;
+
+import java.util.*;
 
 public class StringUtil {
 

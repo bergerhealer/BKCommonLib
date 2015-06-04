@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Map;
-
-import org.bukkit.plugin.PluginDescriptionFile;
-
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import org.bukkit.plugin.PluginDescriptionFile;
+
+import java.util.Map;
 
 public class PluginDescriptionFileRef {
 

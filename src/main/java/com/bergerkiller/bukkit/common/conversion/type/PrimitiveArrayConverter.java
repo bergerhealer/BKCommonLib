@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
-
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
  * Converts values to a primitive array

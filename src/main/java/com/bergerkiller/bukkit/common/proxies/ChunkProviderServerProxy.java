@@ -1,17 +1,9 @@
 package com.bergerkiller.bukkit.common.proxies;
 
-import java.util.List;
-import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_8_R3.*;
 
-import net.minecraft.server.v1_8_R2.Chunk;
-//import net.minecraft.server.v1_8_R1.ChunkPosition;
-import net.minecraft.server.v1_8_R2.ChunkProviderServer;
-import net.minecraft.server.v1_8_R2.EnumCreatureType;
-import net.minecraft.server.v1_8_R2.IChunkLoader;
-import net.minecraft.server.v1_8_R2.IChunkProvider;
-import net.minecraft.server.v1_8_R2.IProgressUpdate;
-import net.minecraft.server.v1_8_R2.World;
-import net.minecraft.server.v1_8_R2.WorldServer;
+import java.util.List;
 
 /**
  * A chunk provider server proxy class. To call methods in the base class, call
@@ -60,12 +52,22 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
     }
 
     @Override
-    public BlockPosition findNearestMapFeature(World world, String s, BlockPosition blockposition) {
-        return base.chunkProvider.findNearestMapFeature(world, s, blockposition);
+    public ChunkPosition findNearestMapFeature(World world, String s, BlockPosition pos) {
+        return new ChunkPosition(base.findNearestMapFeature(world, s, pos));
     }
 
-    public BlockPosition super_findNearestMapFeature(World world, String s, BlockPosition blockposition) {
-        return super.chunkProvider.findNearestMapFeature(world, s, blockposition);
+    @Deprecated
+    public ChunkPosition findNearestMapFeature(World world, String s, int i, int j, int k) {
+        return new ChunkPosition(base.findNearestMapFeature(world, s, new BlockPosition(i, j, k)));
+    }
+
+    @Deprecated
+    public ChunkPosition super_findNearestMapFeature(World world, String s, int i, int j, int k) {
+        return new ChunkPosition(super.findNearestMapFeature(world, s, new BlockPosition(i, j, k)));
+    }
+
+    public ChunkPosition super_findNearestMapFeature(World world, String s, BlockPosition pos) {
+        return new ChunkPosition(super.findNearestMapFeature(world, s, pos));
     }
 
     @Override
@@ -105,14 +107,21 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public List getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition blockposition) {
-        return base.chunkProvider.getMobsFor(enumcreaturetype, blockposition);
+    public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
+        return base.getMobsFor(enumcreaturetype, pos);
     }
 
-    @SuppressWarnings("rawtypes")
-    public List super_getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition blockposition) {
-        return super.chunkProvider.getMobsFor(enumcreaturetype, blockposition);
+    @Deprecated
+    public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, int i, int j, int k) {
+        return base.getMobsFor(enumcreaturetype, new BlockPosition(i, j, k));
+    }
+
+    public List<BiomeMeta> super_getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
+        return super.getMobsFor(enumcreaturetype, pos);
+    }
+
+    public List<BiomeMeta> super_getMobsFor(EnumCreatureType enumcreaturetype, int i, int j, int k) {
+        return super.getMobsFor(enumcreaturetype, new BlockPosition(i, j, k));
     }
 
     @Override
@@ -203,14 +212,5 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
 
     public boolean super_unloadChunks() {
         return super.unloadChunks();
-    }
-    
-    @Override
-    public Chunk getChunkAt(BlockPosition blockposition) {
-        return base.getChunkAt(blockposition);
-    }
-    
-    public Chunk super_getChunkAt(BlockPosition blockposition) {
-        return super.getChunkAt(blockposition);
     }
 }

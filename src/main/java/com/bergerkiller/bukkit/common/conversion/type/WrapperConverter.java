@@ -1,72 +1,35 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.Container;
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.EnumDifficulty;
-import net.minecraft.server.v1_8_R2.IInventory;
-import net.minecraft.server.v1_8_R2.InventoryCrafting;
-import net.minecraft.server.v1_8_R2.InventoryMerchant;
-import net.minecraft.server.v1_8_R2.Item;
-import net.minecraft.server.v1_8_R2.ItemStack;
-import net.minecraft.server.v1_8_R2.PacketPlayInUseEntity.EnumEntityUseAction;
-import net.minecraft.server.v1_8_R2.PacketPlayOutScoreboardScore.EnumScoreboardAction;
-import net.minecraft.server.v1_8_R2.PlayerInventory;
-import net.minecraft.server.v1_8_R2.TileEntity;
-import net.minecraft.server.v1_8_R2.TileEntityBeacon;
-import net.minecraft.server.v1_8_R2.TileEntityBrewingStand;
-import net.minecraft.server.v1_8_R2.TileEntityFurnace;
-import net.minecraft.server.v1_8_R2.World;
-
-import org.bukkit.Difficulty;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryBeacon;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryCrafting;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R2.util.CraftMagicNumbers;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.util.Vector;
-
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EnumGamemodeRef;
-import com.bergerkiller.bukkit.common.reflection.classes.IntHashMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.LongHashMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.VectorRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldTypeRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.PacketPlayInUseEntity.EnumEntityUseAction;
+import net.minecraft.server.v1_8_R3.PacketPlayOutScoreboardScore.EnumScoreboardAction;
+import org.bukkit.Difficulty;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
+import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.util.Vector;
 
 /**
  * Converter for converting to wrapper classes (from handles and other types)
- *
+ * <p/>
  * <T> - type of wrapper
  */
 public abstract class WrapperConverter<T> extends BasicConverter<T> {
@@ -313,10 +276,10 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<IntVector3> toIntVector3 = new WrapperConverter<IntVector3>(IntVector3.class) {
         @Override
         public IntVector3 convertSpecial(Object value, Class<?> valueType, IntVector3 def) {
-            if (VectorRef.isPair(value)) {
-                return VectorRef.getPair(value).toIntVector3(0);
-            } else if (VectorRef.isVec(value)) {
-                return VectorRef.getPair(value).toIntVector3(0);
+            if (VectorRef.isPosition(value)) {
+                return VectorRef.getPosition(value);
+            } else if (VectorRef.isCoord(value)) {
+                return VectorRef.getCoord(value);
             } else {
                 return def;
             }
@@ -364,7 +327,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
         @Override
         protected LongHashMap<Object> convertSpecial(Object value, Class<?> valueType, LongHashMap<Object> def) {
             if (LongHashMapRef.TEMPLATE.isInstance(value)) {
-                return new LongHashMap<>(value);
+                return new LongHashMap<Object>(value);
             } else {
                 return def;
             }
@@ -373,18 +336,18 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<LongHashSet> toLongHashSet = new WrapperConverter<LongHashSet>(LongHashSet.class) {
         @Override
         protected LongHashSet convertSpecial(Object value, Class<?> valueType, LongHashSet def) {
-            /*if (LongHashSetRef.TEMPLATE.isInstance(value)) {
+            if (LongHashSetRef.TEMPLATE.isInstance(value)) {
                 return new LongHashSet(value);
-            } else {*/
+            } else {
                 return def;
-            //}
+            }
         }
     };
     public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = new WrapperConverter<IntHashMap<Object>>(IntHashMap.class) {
         @Override
         protected IntHashMap<Object> convertSpecial(Object value, Class<?> valueType, IntHashMap<Object> def) {
             if (IntHashMapRef.TEMPLATE.isInstance(value)) {
-                return new IntHashMap<>(value);
+                return new IntHashMap<Object>(value);
             } else {
                 return def;
             }

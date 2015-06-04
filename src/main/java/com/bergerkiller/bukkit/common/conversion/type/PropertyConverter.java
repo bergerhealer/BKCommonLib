@@ -1,14 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
@@ -16,9 +7,17 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
-
-import net.minecraft.server.v1_8_R2.*;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R3.EntityItem;
+import net.minecraft.server.v1_8_R3.EnumDirection;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 /**
  * Converter to convert to a certain property obtained from various kinds of
@@ -30,7 +29,7 @@ import com.mojang.authlib.GameProfile;
  */
 public abstract class PropertyConverter<T> extends BasicConverter<T> {
 
-    private static final BlockFace[] paintingFaces = {BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST};
+    private static final EnumDirection[] paintingFaces = {EnumDirection.DOWN, EnumDirection.UP, EnumDirection.NORTH, EnumDirection.SOUTH, EnumDirection.WEST, EnumDirection.EAST};
 
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
@@ -77,7 +76,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
             if (value instanceof Number) {
                 return ((Number) value).intValue();
             } else {
-                BlockFace face = Conversion.convert(value, BlockFace.class);
+                EnumDirection face = Conversion.convert(value, EnumDirection.class);
                 if (face != null) {
                     for (int i = 0; i < paintingFaces.length; i++) {
                         if (paintingFaces[i] == face) {
@@ -89,9 +88,9 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
             }
         }
     };
-    public static final PropertyConverter<BlockFace> toPaintingFacing = new PropertyConverter<BlockFace>(BlockFace.class) {
+    public static final PropertyConverter<EnumDirection> toPaintingFacing = new PropertyConverter<EnumDirection>(EnumDirection.class) {
         @Override
-        public BlockFace convertSpecial(Object value, Class<?> valueType, BlockFace def) {
+        public EnumDirection convertSpecial(Object value, Class<?> valueType, EnumDirection def) {
             Integer id = toPaintingFacingId.convert(value);
             if (id != null) {
                 final int idInt = id.intValue();
@@ -127,7 +126,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
                     case HOPPER:
                     case HOPPER_MINECART:
                         return EntityType.MINECART_HOPPER;
-					//case MOB_SPAWNER :
+                    //case MOB_SPAWNER :
                     //case MOB_SPAWNER_MINECART : return EntityType.MINECART_MOB_SPAWNER; (TODO: missing!)
                     case TNT:
                     case EXPLOSIVE_MINECART:

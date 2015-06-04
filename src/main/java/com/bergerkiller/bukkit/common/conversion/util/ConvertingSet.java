@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
-import java.util.Set;
-
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
+import java.util.Set;
 
 /**
  * Wraps around another set of unknown contents and performs conversions

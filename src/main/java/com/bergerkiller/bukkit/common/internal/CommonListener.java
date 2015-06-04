@@ -1,5 +1,11 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
+import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -14,13 +20,6 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-
-import com.bergerkiller.bukkit.common.PluginBase;
-import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
-import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.EntityUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener {
@@ -45,7 +44,6 @@ class CommonListener implements Listener {
     private void onWorldInit(final WorldInitEvent event) {
         ChunkProviderServerHook.hook(event.getWorld());
         CommonUtil.nextTick(new Runnable() {
-            @Override
             public void run() {
                 CommonPlugin.getInstance().notifyWorldAdded(event.getWorld());
             }

@@ -1,35 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.generator.BlockPopulator;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.MessageBuilder;
-import com.bergerkiller.bukkit.common.ModuleLogger;
-import com.bergerkiller.bukkit.common.PluginBase;
-import com.bergerkiller.bukkit.common.Task;
-import com.bergerkiller.bukkit.common.TypedValue;
+import com.bergerkiller.bukkit.common.*;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
@@ -43,6 +14,21 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.lang.ref.SoftReference;
+import java.util.*;
+import java.util.logging.Level;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
@@ -379,7 +365,7 @@ public class CommonPlugin extends PluginBase {
             log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
             log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);
             log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
-            log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
+            log(Level.SEVERE, "http://www.spigotmc.org/resources/updated-bkcommonlib.7716/");
             this.onCriticalFailure();
             return;
         }
@@ -415,8 +401,10 @@ public class CommonPlugin extends PluginBase {
                 "If you need syntax help visit javadocs.a.b.v1_2_3.net",
                 "v1_1_R1 1+1+1 = 3, Half life 3 confirmed?",
                 "BKCommonLib > Minecraft.a.b().q.f * Achievement.OBFUSCATED.value",
-                "BKCommonLib isn't a plugin, its a language based on english.");
-        setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+                "BKCommonLib isn't a plugin, its a language based on english.",
+                "Updating is like reinventing the wheel for BKCommonLib.",
+                "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999");
+        setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size() + 1)));
         setDisableMessage(null);
 
         // Initialize permissions

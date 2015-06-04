@@ -1,20 +1,15 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
+import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
  * Represents a single Scoreboard as displayed to a single Player. Also keeps

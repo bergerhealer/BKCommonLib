@@ -1,19 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -30,6 +16,14 @@ import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 /**
  * Basic packet handler implementation for handling packets using a send/receive
@@ -41,11 +35,11 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
  */
 public abstract class PacketHandlerHooked implements PacketHandler {
 
-    private final Map<PacketType, List<PacketListener>> listeners = new HashMap<>();
-    private final Map<PacketType, List<PacketMonitor>> monitors = new HashMap<>();
-    private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<>();
-    private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<>();
-    private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<>();
+    private final Map<PacketType, List<PacketListener>> listeners = new HashMap<PacketType, List<PacketListener>>();
+    private final Map<PacketType, List<PacketMonitor>> monitors = new HashMap<PacketType, List<PacketMonitor>>();
+    private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
+    private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
+    private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
 
     @Override
     public boolean onEnable() {
@@ -356,8 +350,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (!NetworkManagerRef.TEMPLATE.isInstance(nm)) {
             return 0L;
         }
-        Collection<Object> low = NetworkManagerRef.lowPriorityQueue.get(nm);
-        Collection<Object> high = NetworkManagerRef.highPriorityQueue.get(nm);
+        Collection<Object> low = NetworkManagerRef.queue.get(nm);
+        Collection<Object> high = NetworkManagerRef.queue.get(nm);
         if (low == null || high == null) {
             return 0L;
         }

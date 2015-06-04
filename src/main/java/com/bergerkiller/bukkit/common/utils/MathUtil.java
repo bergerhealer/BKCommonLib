@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.bases.LongHash;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R2.TrigMath;
+import org.bukkit.craftbukkit.v1_8_R3.TrigMath;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
-
-import com.bergerkiller.bukkit.common.bases.LongHash;
 
 /**
  * Multiple Math utilities to compare and calculate using Vectors and raw values

@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Material;
-import org.bukkit.entity.minecart.SpawnerMinecart;
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
+import org.bukkit.Material;
+import org.bukkit.entity.minecart.SpawnerMinecart;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Common Entity implementation for Minecarts with a Mob Spawner

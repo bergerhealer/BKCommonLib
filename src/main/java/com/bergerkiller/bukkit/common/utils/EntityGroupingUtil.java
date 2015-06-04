@@ -1,22 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
+import org.bukkit.Material;
+import org.bukkit.entity.*;
+
 import java.util.EnumMap;
 import java.util.Locale;
-
-import org.bukkit.Material;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Golem;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.NPC;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Squid;
-
-import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 
 /**
  * Contains entity naming and grouping functions to categorize entities

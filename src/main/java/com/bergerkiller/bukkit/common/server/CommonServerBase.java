@@ -1,21 +1,20 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import org.bukkit.Bukkit;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
-
-import org.bukkit.Bukkit;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public Collection<String> getLoadableWorlds() {
         File[] files = Bukkit.getWorldContainer().listFiles();
-        Collection<String> rval = new ArrayList<>(files.length);
+        Collection<String> rval = new ArrayList<String>(files.length);
         for (String worldName : Bukkit.getWorldContainer().list()) {
             if (isLoadableWorld(worldName)) {
                 rval.add(worldName);

@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.conversion.util;
 
-import java.util.ListIterator;
-
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+
+import java.util.ListIterator;
 
 public class ConvertingListIterator<T> implements ListIterator<T> {
 

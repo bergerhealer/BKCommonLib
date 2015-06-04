@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard.Display;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class CommonObjective {
 

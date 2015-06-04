@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.permissions;
 
-import java.util.Locale;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.PermissionDefault;
-
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.PermissionDefault;
+
+import java.util.Locale;
 
 /**
  * Basic implementation of IPermissionDefault that supplies additional function

@@ -1,19 +1,12 @@
 package com.bergerkiller.bukkit.common.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.util.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ConfigurationNode implements Cloneable {
@@ -200,7 +193,7 @@ public class ConfigurationNode implements Cloneable {
      */
     public Map<String, String> getHeaders() {
         String root = this.getPath();
-        Map<String, String> rval = new HashMap<>(this.headers.size());
+        Map<String, String> rval = new HashMap<String, String>(this.headers.size());
         if (LogicUtil.nullOrEmpty(root)) {
             rval.putAll(this.headers);
         } else {
@@ -276,7 +269,7 @@ public class ConfigurationNode implements Cloneable {
      * @return Set of configuration nodes
      */
     public Set<ConfigurationNode> getNodes() {
-        Set<ConfigurationNode> rval = new HashSet<>();
+        Set<ConfigurationNode> rval = new HashSet<ConfigurationNode>();
         for (String path : this.getKeys()) {
             if (this.isNode(path)) {
                 rval.add(this.getNode(path));
@@ -327,8 +320,6 @@ public class ConfigurationNode implements Cloneable {
     /**
      * Clones this ConfigurationNode in a way that it no longer references the
      * backing file configuration
-     * 
-     * @return ConfigurationNode
      */
     @Override
     public ConfigurationNode clone() {
@@ -423,16 +414,12 @@ public class ConfigurationNode implements Cloneable {
             this.setRead(path);
             if (value.getClass().isEnum()) {
                 String text = value.toString();
-                switch (text) {
-                    case "true":
-                        value = true;
-                        break;
-                    case "false":
-                        value = false;
-                        break;
-                    default:
-                        value = text;
-                        break;
+                if (text.equals("true")) {
+                    value = true;
+                } else if (text.equals("false")) {
+                    value = false;
+                } else {
+                    value = text;
                 }
             }
         }
@@ -472,7 +459,7 @@ public class ConfigurationNode implements Cloneable {
     public <T> List<T> getList(String path, Class<T> type, List<T> def) {
         List list = this.getList(path);
         if (list != null) {
-            def = new ArrayList<>();
+            def = new ArrayList<T>();
             T val;
             for (Object o : list) {
                 val = ParseUtil.convert(o, type);
@@ -530,7 +517,7 @@ public class ConfigurationNode implements Cloneable {
     public <T> T get(String path, Class<T> type, T def) {
         Object rawValue = this.get(path);
         if (type == String.class && rawValue instanceof String[]) {
-			// Special conversion to line-by-line String
+            // Special conversion to line-by-line String
             // This is needed, as it saves line-split Strings as such
             return (T) StringUtil.join("\n", (String[]) rawValue);
         }

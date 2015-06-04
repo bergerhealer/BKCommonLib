@@ -1,17 +1,14 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.Chunk;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldType;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.wrappers.*;
+import net.minecraft.server.v1_8_R3.EnumDirection;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -20,19 +17,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Converter;
-import com.bergerkiller.bukkit.common.nbt.CommonTag;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
-import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class ConversionTypes {
 
@@ -94,8 +81,8 @@ public class ConversionTypes {
     public static final HandleConverter toLongHashMapHandle = HandleConverter.toLongHashMapHandle;
     public static final HandleConverter toLongHashSetHandle = HandleConverter.toLongHashSetHandle;
     public static final HandleConverter toIntHashMapHandle = HandleConverter.toIntHashMapHandle;
-    public static final HandleConverter toScoreboardActionHandle = HandleConverter.toScoreboardActionHandle;
     public static final HandleConverter toUseActionHandle = HandleConverter.toUseActionHandle;
+    public static final HandleConverter toScoreboardActionHandle = HandleConverter.toScoreboardActionHandle;
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
     public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
@@ -127,7 +114,7 @@ public class ConversionTypes {
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
     public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
     public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
-    public static final PropertyConverter<BlockFace> toPaintingFacing = PropertyConverter.toPaintingFacing;
+    public static final PropertyConverter<EnumDirection> toPaintingFacing = PropertyConverter.toPaintingFacing;
     public static final PropertyConverter<EntityType> toMinecartType = PropertyConverter.toMinecartType;
     public static final PropertyConverter<Object> toGameProfileFromId = PropertyConverter.toGameProfileFromId;
     public static final PropertyConverter<UUID> toGameProfileId = PropertyConverter.toGameProfileId;

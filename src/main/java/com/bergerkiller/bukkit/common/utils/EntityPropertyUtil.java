@@ -1,9 +1,13 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import net.minecraft.server.v1_8_R2.DamageSource;
-import net.minecraft.server.v1_8_R2.Explosion;
-import net.minecraft.server.v1_8_R2.World;
-
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import net.minecraft.server.v1_8_R3.DamageSource;
+import net.minecraft.server.v1_8_R3.Explosion;
+import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -11,12 +15,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
 
@@ -179,7 +177,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
         if (cause == DamageCause.BLOCK_EXPLOSION) {
             Location loc = entity.getLocation();
             World worldhandle = CommonNMS.getNative(loc.getWorld());
-            Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0, false, false);
+            Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0, true, true);
             source = DamageSource.explosion(ex);
         } else if (cause == DamageCause.CONTACT) {
             source = DamageSource.CACTUS;

@@ -1,9 +1,5 @@
 package com.bergerkiller.bukkit.common.proxies;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -18,6 +14,10 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entity {
 
@@ -225,26 +225,6 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
     }
 
     @Override
-    public void setCustomName(String string) {
-        base.setCustomName(string);
-    }
-
-    @Override
-    public String getCustomName() {
-        return base.getCustomName();
-    }
-
-    @Override
-    public void setCustomNameVisible(boolean bln) {
-        base.setCustomNameVisible(bln);
-    }
-
-    @Override
-    public boolean isCustomNameVisible() {
-        return base.isCustomNameVisible();
-    }
-
-    @Override
     public String getName() {
         return base.getName();
     }
@@ -270,12 +250,14 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2) {
+    public PermissionAttachment addAttachment(Plugin arg0, String arg1,
+            boolean arg2) {
         return base.addAttachment(arg0, arg1, arg2);
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2, int arg3) {
+    public PermissionAttachment addAttachment(Plugin arg0, String arg1,
+            boolean arg2, int arg3) {
         return base.addAttachment(arg0, arg1, arg2, arg3);
     }
 
@@ -306,7 +288,7 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
 
     @Override
     public void recalculatePermissions() {
-        base.recalculatePermissions();        
+        base.recalculatePermissions();
     }
 
     @Override
@@ -320,7 +302,27 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
     }
 
     @Override
-    public void setOp(boolean value) {
-        base.setOp(value);        
+    public void setOp(boolean arg0) {
+        base.setOp(arg0);
+    }
+
+    @Override
+    public String getCustomName() {
+        return base.getCustomName();
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return base.isCustomNameVisible();
+    }
+
+    @Override
+    public void setCustomName(String arg0) {
+        base.setCustomName(arg0);
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean arg0) {
+        base.setCustomNameVisible(arg0);
     }
 }

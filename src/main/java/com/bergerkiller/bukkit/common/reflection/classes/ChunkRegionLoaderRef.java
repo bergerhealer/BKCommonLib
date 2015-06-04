@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import org.bukkit.World;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import org.bukkit.World;
 
 public class ChunkRegionLoaderRef {
 

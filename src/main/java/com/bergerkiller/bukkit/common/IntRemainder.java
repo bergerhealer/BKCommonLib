@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.Arrays;
-
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+
+import java.util.Arrays;
 
 /**
  * The Int Remainder uses a set amount of different Integer values to represent

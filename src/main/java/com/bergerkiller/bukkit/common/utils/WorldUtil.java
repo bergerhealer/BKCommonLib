@@ -1,39 +1,26 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R2.CraftTravelAgent;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
+import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.CraftTravelAgent;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.IDataManager;
-import net.minecraft.server.v1_8_R2.MovingObjectPosition;
-import net.minecraft.server.v1_8_R2.Vec3D;
-import net.minecraft.server.v1_8_R2.World;
-import net.minecraft.server.v1_8_R2.WorldNBTStorage;
-import net.minecraft.server.v1_8_R2.WorldServer;
+import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 public class WorldUtil extends ChunkUtil {
 
@@ -71,7 +58,8 @@ public class WorldUtil extends ChunkUtil {
      * @return block data
      */
     public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return ((Block) CommonNMS.getNative(world).getType(new BlockPosition(x, y, z))).getData();
+        return world.getBlockAt(x, y, z).getData();
+        //return CommonNMS.getNative(world).chunkProviderServer.getChunkAt(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z));
     }
 
     /**
@@ -82,12 +70,11 @@ public class WorldUtil extends ChunkUtil {
      * @param y - coordinate of the block
      * @param z - coordinate of the block
      * @return block type Id
-     * @deprecated returns -1
      */
     @Deprecated
     public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
+        return world.getBlockAt(x, y, z).getTypeId();
         //return CommonNMS.getNative(world).getTypeId(x, y, z);
-        return -1;
     }
 
     /**
@@ -100,7 +87,8 @@ public class WorldUtil extends ChunkUtil {
      * @return block type
      */
     public static org.bukkit.Material getBlockType(org.bukkit.World world, int x, int y, int z) {
-        return MaterialUtil.getType(CommonNMS.getNative(world).getType(new BlockPosition(x, y, z)).getBlock().toString());
+        return world.getBlockAt(x, y, z).getType();
+        //return MaterialUtil.getType(CommonNMS.getNative(world).getTypeId(x, y, z));
     }
 
     /**
@@ -262,7 +250,7 @@ public class WorldUtil extends ChunkUtil {
         CraftTravelAgent travelAgent = new CraftTravelAgent(ws);
         travelAgent.setCanCreatePortal(createPortals);
         Location exit = travelAgent.findOrCreate(startLocation);
-		// Adjust the exit to make it suitable for players
+        // Adjust the exit to make it suitable for players
         // Note: this will raise an NPE while trying to fire the PortalExit event
         // This is expected behavior
         try {
@@ -511,7 +499,7 @@ public class WorldUtil extends ChunkUtil {
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
         MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(CommonNMS.newVec3D(startX, startY, startZ),
                 CommonNMS.newVec3D(endX, endY, endZ), false);
-        return mop == null ? null : world.getBlockAt(mop.a().getX(), mop.a().getY(), mop.a().getZ());
+        return mop == null ? null : world.getBlockAt((int) mop.pos.a, (int) mop.pos.b, (int) mop.pos.c);
     }
 
     /**

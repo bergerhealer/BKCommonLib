@@ -1,17 +1,16 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Iterator;
-
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
+import java.util.Iterator;
+
 public class LongHashSetRef {
 
-    /*public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("util.LongHashSet"));
+    public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("util.LongHashSet"));
     public static final SafeConstructor<?> constructor1;
     public static final SafeConstructor<?> constructor2;
     public static final MethodAccessor<Boolean> add2 = TEMPLATE.getMethod("add", int.class, int.class);
@@ -38,37 +37,35 @@ public class LongHashSetRef {
     public static final long REMOVED = TEMPLATE.<Long>getStaticFieldValue("REMOVED").longValue();
 
     static {
-        
-         if (Common.IS_SPIGOT_SERVER) {
-         // Load the Spigot dummy flatmap in advance
-         SpigotDummyFlatMap.getInstance();
-         // Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases
-         constructor1 = constructor2 = new SafeConstructor<Object>(null) {
-         private final FieldAccessor<Object> flat = TEMPLATE.getField("flat");
-
-         @Override
-         public boolean isValid() {
-         return true;
-         }
-
-         @Override
-         public Object newInstance(Object... parameters) {
-         Object instance = TEMPLATE.newInstanceNull();
-         final int size = parameters.length == 1 ? Math.max((Integer) parameters[0], 1) : 3;
-         // Set the initial field values
-         values.set(instance, new long[size]);
-         elements.set(instance, 0);
-         freeEntries.set(instance, size);
-         modCount.set(instance, 0);
-         flat.set(instance, SpigotDummyFlatMap.getInstance());
-         // All done!
-         return instance;
-         }
-         };
-         } else {
-         
+//		if (Common.IS_SPIGOT_SERVER) {
+//			// Load the Spigot dummy flatmap in advance
+//			SpigotDummyFlatMap.getInstance();
+//			// Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases
+//			constructor1 = constructor2 = new SafeConstructor<Object>(null) {
+//				private final FieldAccessor<Object> flat = TEMPLATE.getField("flat");
+//
+//				@Override
+//				public boolean isValid() {
+//					return true;
+//				}
+//
+//				@Override
+//				public Object newInstance(Object... parameters) {
+//					Object instance = TEMPLATE.newInstanceNull();
+//					final int size = parameters.length == 1 ? Math.max((Integer) parameters[0], 1) : 3;
+//					// Set the initial field values
+//					values.set(instance, new long[size]);
+//					elements.set(instance, 0);
+//					freeEntries.set(instance, size);
+//					modCount.set(instance, 0);
+//					flat.set(instance, SpigotDummyFlatMap.getInstance());
+//					// All done!
+//					return instance;
+//				}
+//			};
+//		} else {
         constructor1 = TEMPLATE.getConstructor();
         constructor2 = TEMPLATE.getConstructor(int.class);
-        }
-    }*/
+//		}
+    }
 }

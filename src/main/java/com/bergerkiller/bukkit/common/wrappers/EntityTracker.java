@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
 
 /**
  * Wrapper class for the Entity Tracker

@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import org.bukkit.entity.Entity;
-
 import com.bergerkiller.bukkit.common.reflection.classes.DamageSourceRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import org.bukkit.entity.Entity;
 
 public class DamageSource extends BasicWrapper {
 
@@ -55,7 +54,7 @@ public class DamageSource extends BasicWrapper {
                 return value;
             }
         }
-		// Try to obtain it generic
+        // Try to obtain it generic
         // TODO: Unique damage source types?
         return new DamageSource(damageSource);
     }

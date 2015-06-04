@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.localization;
 
-import org.bukkit.command.CommandSender;
-
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import org.bukkit.command.CommandSender;
 
 /**
  * Basic implementation of ILocationDefault that supplies additional function

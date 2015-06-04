@@ -1,22 +1,14 @@
 package com.bergerkiller.bukkit.common.config;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.Arrays;
-
-import org.bukkit.configuration.InvalidConfigurationException;
-
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import org.bukkit.configuration.InvalidConfigurationException;
+
+import java.io.*;
+import java.util.Arrays;
 
 /**
  * A basic YAML configuration implementation
@@ -185,7 +177,7 @@ public class BasicConfiguration extends ConfigurationNode {
                 indent = StringUtil.getSuccessiveCharCount(line, ' ');
                 line = line.substring(indent);
                 wasAnchor = false;
-				// ===== Logic start =====
+                // ===== Logic start =====
                 // Get rid of the unneeded '-characters around certain common names
                 if (line.equals("'*':")) {
                     line = "*:";

@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import com.bergerkiller.bukkit.common.filtering.Filter;
 import com.bergerkiller.bukkit.common.filtering.FilterBundle;
 import com.bergerkiller.bukkit.common.filtering.FilterNull;
 import com.bergerkiller.bukkit.common.filtering.FilterType;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A basic implementation of a Collection that filters some elements from a base
@@ -180,7 +180,7 @@ public class FilteredCollection<E> implements Collection<E> {
             // Use remove on each element in the Collection
             return CollectionBasics.removeAll(this, c);
         } else {
-			// Go by all elements in this Collection
+            // Go by all elements in this Collection
             // If contained in c, remove them
             Iterator<E> iter = base.iterator();
             boolean removed = false;
@@ -224,7 +224,7 @@ public class FilteredCollection<E> implements Collection<E> {
      * Constructs a new Filtered Collection using the base Collection and
      * Filters specified. If any of the Filters filter an element, that element
      * is not exposed.<br><br>
-     *
+     * <p/>
      * The Filter element types can not be checked, so be sure to only use
      * Filters that can accept the element type of the base Collection.
      *
@@ -240,7 +240,7 @@ public class FilteredCollection<E> implements Collection<E> {
      * Constructs a new Filtered Collection using the base Collection and
      * Filters specified. If any of the Filters filter an element, that element
      * is not exposed.<br><br>
-     *
+     * <p/>
      * The Filter element types can not be checked, so be sure to only use
      * Filters that can accept the element type of the base Collection.
      *

@@ -2,11 +2,24 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import net.minecraft.server.v1_8_R3.LongHashMap;
 
 public class LongHashMapEntryRef {
 
-    public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("LongHashMapEntry");
-    public static final FieldAccessor<Long> entryKey = TEMPLATE.getField("a");
-    public static final FieldAccessor<Object> entryValue = TEMPLATE.getField("b");
+    public static ClassTemplate<?> TEMPLATE = null;
+    public static FieldAccessor<Long> entryKey = null;
+    public static FieldAccessor<Object> entryValue = null;
+
+    static {
+        Class[] possible = LongHashMap.class.getDeclaredClasses();
+        Class qp = null;
+        for (Class p : possible) {
+            if (p.getName().endsWith("LongHashMapEntry")) {
+                qp = p;
+            }
+        }
+        TEMPLATE = ClassTemplate.create(qp);
+        entryKey = TEMPLATE.getField("a");
+        TEMPLATE.getField("b");
+    }
 }

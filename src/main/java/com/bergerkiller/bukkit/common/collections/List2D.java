@@ -1,10 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * A list implementation that uses a backing array of lists. The amount of

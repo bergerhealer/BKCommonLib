@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.reflection;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.logging.Level;
-
-import org.bukkit.Bukkit;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import org.bukkit.Bukkit;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.logging.Level;
 
 /**
  * Wraps around the java.lang.reflect.Method class to provide an error-free

@@ -1,15 +1,9 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Converter implementation for converting to various kinds of collections

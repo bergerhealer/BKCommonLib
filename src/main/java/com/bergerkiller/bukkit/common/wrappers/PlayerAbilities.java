@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import org.bukkit.entity.Player;
 
 /**
  * Player abilities wrapper class. Note that Bukkit already provides methods to

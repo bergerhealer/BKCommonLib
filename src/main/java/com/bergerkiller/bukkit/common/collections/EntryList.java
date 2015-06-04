@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Map.Entry;
-import java.util.AbstractMap.SimpleEntry;
 
 /**
  * A basic ArrayList implementation for storing entries

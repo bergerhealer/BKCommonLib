@@ -1,30 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import net.minecraft.server.v1_8_R2.AttributeMapServer;
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.FoodMetaData;
-import net.minecraft.server.v1_8_R2.GenericAttributes;
-import net.minecraft.server.v1_8_R2.InventoryEnderChest;
-import net.minecraft.server.v1_8_R2.ItemStack;
-import net.minecraft.server.v1_8_R2.MobEffect;
-import net.minecraft.server.v1_8_R2.NBTCompressedStreamTools;
-import net.minecraft.server.v1_8_R2.NBTTagCompound;
-import net.minecraft.server.v1_8_R2.NBTTagList;
-import net.minecraft.server.v1_8_R2.PlayerInventory;
-
-import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryCustom;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.Inventory;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -34,6 +9,15 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCustom;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.Inventory;
+
+import java.io.*;
+import java.util.List;
 
 /**
  * Contains utility functions for dealing with NBT data
@@ -305,8 +289,7 @@ public class NBTUtil {
         Object livingHandle = Conversion.toEntityHandle.convert(livingEntity);
 
         // Clear old attributes and force a re-create
-        EntityLivingRef.attributeMap.set(livingHandle, null);
-        EntityLivingRef.resetAttributes.invoke(livingHandle);
+        EntityLivingRef.attributeMap.set(livingHandle, new AttributeMapServer());
     }
 
     /**

@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
 
 /**
  * A Common Entity implementation for Items

@@ -1,12 +1,10 @@
 package com.bergerkiller.bukkit.common.events;
 
-import net.minecraft.server.v1_8_R2.Entity;
-
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import net.minecraft.server.v1_8_R3.Entity;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
-
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 /**
  * Fired when an entity moves

@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-
-import net.minecraft.server.v1_8_R2.WorldType;
-
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
+import net.minecraft.server.v1_8_R3.WorldType;
+
+import java.lang.reflect.Array;
+import java.util.Collection;
 
 /**
  * Base class for a type converter that deals with primitives that can not be

@@ -1,18 +1,17 @@
 package com.bergerkiller.bukkit.common.reflection;
 
+import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import org.objenesis.ObjenesisHelper;
+import org.objenesis.instantiator.ObjectInstantiator;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.objenesis.ObjenesisHelper;
-import org.objenesis.instantiator.ObjectInstantiator;
-
-import com.bergerkiller.bukkit.common.conversion.Converter;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Uses reflection to transfer/copy all the fields of a class

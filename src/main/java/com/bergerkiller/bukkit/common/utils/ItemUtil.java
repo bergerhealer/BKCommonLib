@@ -1,9 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.inventory.Inventory;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
@@ -11,10 +7,13 @@ import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
-
-import net.minecraft.server.v1_8_R2.EntityItem;
-import net.minecraft.server.v1_8_R2.Item;
-import net.minecraft.server.v1_8_R2.ItemStack;
+import net.friwi.reflection.EntityItemReflector;
+import net.minecraft.server.v1_8_R3.EntityItem;
+import net.minecraft.server.v1_8_R3.Item;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
 
 /**
  * Contains item stack, item and inventory utilities
@@ -367,8 +366,7 @@ public class ItemUtil {
         newItemHandle.motX = oldItemHandle.motX;
         newItemHandle.motY = oldItemHandle.motY;
         newItemHandle.motZ = oldItemHandle.motZ;
-        //newItemHandle.age = oldItemHandle.age;
-        // NEEDS FIXING IN SPIGOT IT SELF
+        EntityItemReflector.setAge(newItemHandle, EntityItemReflector.getAge(oldItemHandle));
         newItemHandle.world.addEntity(newItemHandle);
         return CommonNMS.getItem(newItemHandle);
     }

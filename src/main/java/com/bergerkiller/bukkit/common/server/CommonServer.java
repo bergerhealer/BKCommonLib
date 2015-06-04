@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import org.bukkit.entity.Player;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-
-import org.bukkit.entity.Player;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 public interface CommonServer {
 

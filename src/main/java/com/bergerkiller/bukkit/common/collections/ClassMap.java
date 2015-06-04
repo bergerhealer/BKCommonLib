@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 
 /**
  * A map that obtains the value bound to a given Class. Only if the key

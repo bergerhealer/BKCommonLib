@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.server;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import org.bukkit.Bukkit;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 public class MCPCPlusServer extends SpigotServer {
 
@@ -87,7 +86,7 @@ public class MCPCPlusServer extends SpigotServer {
     public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
         final String methodPath = getOriginalOwner(type) + "/" + methodName + " ";
         for (Map.Entry<String, String> entry : methodsMap.entrySet()) {
-			// Try to find the (obfuscated) method, if it exists with the parameters, we found our method
+            // Try to find the (obfuscated) method, if it exists with the parameters, we found our method
             // We can not use the JarRemapper to do this, because the methods map includes a return type
             // We do not know the return type here, which makes that impossible to use
             if (entry.getKey().startsWith(methodPath)) {

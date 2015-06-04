@@ -134,8 +134,8 @@ public class CommonPacket {
     /**
      * Get the data watcher from a packet
      *
-     * @throws IllegalArgumentException no datawatcher field found
      * @return DataWatcher
+     * @throws IllegalArgumentException no datawatcher field found
      */
     public Object getDatawatcher() throws IllegalArgumentException {
         return this.read(type.getMetaDataField());

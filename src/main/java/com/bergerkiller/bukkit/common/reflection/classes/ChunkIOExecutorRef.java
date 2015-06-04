@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Map;
-
-import org.bukkit.craftbukkit.v1_8_R2.chunkio.ChunkIOExecutor;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import org.bukkit.craftbukkit.v1_8_R3.chunkio.ChunkIOExecutor;
+
+import java.util.Map;
 
 public class ChunkIOExecutorRef {
 

@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.PriorityQueue;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
+import java.util.PriorityQueue;
 
 public class CraftSchedulerRef {
 

@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common.conversion;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Converts between two different types

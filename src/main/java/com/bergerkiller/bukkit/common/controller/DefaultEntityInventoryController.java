@@ -1,11 +1,9 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_8_R2.IInventory;
-
-import org.bukkit.inventory.ItemStack;
-
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import net.minecraft.server.v1_8_R3.IInventory;
+import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("rawtypes")
 public final class DefaultEntityInventoryController extends EntityInventoryController {

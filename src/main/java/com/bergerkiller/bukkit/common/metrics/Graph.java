@@ -27,11 +27,11 @@
  */
 package com.bergerkiller.bukkit.common.metrics;
 
+import org.bukkit.plugin.Plugin;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.bukkit.plugin.Plugin;
 
 /**
  * Represents a custom graph on the website

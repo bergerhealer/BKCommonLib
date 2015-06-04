@@ -1,12 +1,11 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.HashSet;
-
+import com.bergerkiller.bukkit.common.BlockLocation;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import com.bergerkiller.bukkit.common.BlockLocation;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
+import java.util.HashSet;
 
 /**
  * A Set implementation for storing Block Locations (offline Blocks)

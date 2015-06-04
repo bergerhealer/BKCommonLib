@@ -1,16 +1,11 @@
 package com.bergerkiller.bukkit.common.config;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.logging.Level;
-
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import java.io.*;
+import java.util.logging.Level;
 
 /**
  * An abstract version of a Data writing class used to write to a destination

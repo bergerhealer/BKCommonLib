@@ -1,13 +1,13 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
-version: 1.60
-authors: [bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg-1999]
-metrics: false
+version: 1.62
+authors: [bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg_1999, Friwi]
+metrics: true
 load: startup
-description: Is used in all of my plugins to re-use common functions, updated by bubba1234119, mg-1999, and KamikazePlatypus
+description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib]
 commands:
-commondebug:
-description: Developer debugging commands for changing values
-aliases: [debug]
-usage: /debug [name] [value...]
+  commondebug:
+    description: Developer debugging commands for changing values
+    aliases: [debug]
+    usage: /debug [name] [value...]

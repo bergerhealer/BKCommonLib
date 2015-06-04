@@ -1,16 +1,15 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.UUID;
-import net.minecraft.server.v1_8_R2.Entity;
-import net.minecraft.server.v1_8_R2.EntityLiving;
-import net.minecraft.server.v1_8_R2.GenericAttributes;
-
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.EntityLiving;
+import net.minecraft.server.v1_8_R3.GenericAttributes;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
+
+import java.util.UUID;
 
 public class EntityUtil extends EntityPropertyUtil {
 
@@ -66,7 +65,7 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static void setSpeed(LivingEntity entity, double speed) {
         EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        nmsEntity.getAttributeInstance(GenericAttributes.d).setValue(speed);
+        nmsEntity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
     }
 
     /**
@@ -77,7 +76,7 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static double getSpeed(LivingEntity entity) {
         EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        return nmsEntity.getAttributeInstance(GenericAttributes.d).getValue();
+        return nmsEntity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).getValue();
     }
 
     /**

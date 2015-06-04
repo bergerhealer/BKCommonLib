@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.List;
-
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+
+import java.util.List;
 
 public class DataWatcherRef {
 
@@ -14,7 +14,7 @@ public class DataWatcherRef {
     public static final MethodAccessor<Void> watch = TEMPLATE.getMethod("watch", int.class, Object.class);
     public static final MethodAccessor<List<Object>> returnAllWatched = TEMPLATE.getMethod("c");
     public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = TEMPLATE.getMethod("b");
-    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("i", int.class);
+    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("j", int.class);
     public static final MethodAccessor<Boolean> isChanged = TEMPLATE.getMethod("a");
     public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("d");
     public static final SafeConstructor<Object> constructor1 = TEMPLATE.getConstructor(EntityRef.TEMPLATE.getType());

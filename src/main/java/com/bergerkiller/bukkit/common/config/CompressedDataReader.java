@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.config;
 
+import org.bukkit.plugin.Plugin;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.zip.InflaterInputStream;
-
-import org.bukkit.plugin.Plugin;
 
 /**
  * A compression based Data reader

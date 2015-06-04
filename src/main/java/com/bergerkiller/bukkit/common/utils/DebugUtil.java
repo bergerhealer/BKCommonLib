@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 /**
  * Contains utilities to debug code, such as logging objects

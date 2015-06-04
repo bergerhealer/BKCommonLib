@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 public class MergedInventory extends InventoryBase {
 

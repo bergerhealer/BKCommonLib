@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.config;
 
-import java.util.LinkedList;
-
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+
+import java.util.LinkedList;
 
 /**
  * Can handle node formatting lines to keep track of the currently active node

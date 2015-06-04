@@ -1,10 +1,9 @@
 package com.bergerkiller.bukkit.common.bases.mutable;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 public abstract class LocationAbstract extends VectorAbstract {
 

@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import java.util.EnumMap;
-
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
+
+import java.util.EnumMap;
 
 public class FaceUtil {
 

@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Provides basic implementations for various methods used in collections

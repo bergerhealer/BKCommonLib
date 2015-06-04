@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import com.bergerkiller.bukkit.common.collections.CollectionBasics.ListEntry;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.bergerkiller.bukkit.common.collections.CollectionBasics.ListEntry;
 
 /**
  * A List Iterator that can iterate over a collection of collections. For

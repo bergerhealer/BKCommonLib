@@ -1,21 +1,19 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.bukkit.block.BlockFace;
-
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
+import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.Entity;
+import org.bukkit.block.BlockFace;
 
-import net.minecraft.server.v1_8_R2.AxisAlignedBB;
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.BlockPosition;
-import net.minecraft.server.v1_8_R2.Entity;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class that deals with AABB-collision resolving for Entity Controllers. This
@@ -51,9 +49,9 @@ class EntityControllerCollisionHelper {
             for (z = zmin; z < zmax; ++z) {
                 if (handle.world.isLoaded(new BlockPosition(x, 64, z))) {
                     for (y = ymin - 1; y < ymax; ++y) {
-                        Block block = handle.world.getType(new BlockPosition(x, y, z)).getBlock();
+                        Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getType(new BlockPosition(x, y, z));
                         if (block != null) {
-                        	block.a(handle.world, new BlockPosition(x, y, z),block.getBlockData(), bounds, collisionBuffer, handle);
+                            block.a(handle.world, new BlockPosition(x, y, z), handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z)), bounds, collisionBuffer, handle);
                         }
                     }
                 }

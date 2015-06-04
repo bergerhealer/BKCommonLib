@@ -1,13 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import org.bukkit.Material;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-
-import org.bukkit.Material;
-
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 /**
  * Can compare a material with an internal whitelist of materials
@@ -23,7 +22,7 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
      * @param properties to set the types of
      */
     public MaterialTypeProperty(MaterialTypeProperty... properties) {
-        HashSet<Material> elems = new HashSet<>();
+        HashSet<Material> elems = new HashSet<Material>();
         for (MaterialTypeProperty prop : properties) {
             for (Material mat : prop.allowedTypes) {
                 elems.add(mat);

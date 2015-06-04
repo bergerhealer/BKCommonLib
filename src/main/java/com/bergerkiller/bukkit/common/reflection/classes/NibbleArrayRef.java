@@ -1,16 +1,12 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeDirectMethod;
+import com.bergerkiller.bukkit.common.reflection.*;
 
 public class NibbleArrayRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("NibbleArray");
-    private static final FieldAccessor<byte[]> array = TEMPLATE.getField("a");
-    public static final FieldAccessor<Integer> bitCount = TEMPLATE.getField("b");
+    public static final FieldAccessor<byte[]> array = TEMPLATE.getField("a");
+    public static final MethodAccessor<Integer> bitCount = TEMPLATE.getMethod("b");
     private static final MethodAccessor<Integer> getByteLength;
     private static final MethodAccessor<Integer> copyToByteArray;
     private static final MethodAccessor<byte[]> getValueArray;

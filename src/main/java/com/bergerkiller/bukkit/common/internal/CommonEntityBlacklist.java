@@ -1,23 +1,17 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.filtering.Filter;
+import com.kellerkindt.scs.ShowCaseStandalone;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.plugin.Plugin;
-
-import regalowl.hyperconomy.HyperConomy;
-import regalowl.hyperconomy.minecraft.HItem;
-
-import com.bergerkiller.bukkit.common.filtering.Filter;
-import com.kellerkindt.scs.ShowCaseStandalone;
-
 public class CommonEntityBlacklist implements Filter<Entity> {
 
-    private final List<BlacklistFilter> availableFilters = new ArrayList<>();
+    private final List<BlacklistFilter> availableFilters = new ArrayList<BlacklistFilter>();
 
     public CommonEntityBlacklist() {
         // ===============================================
@@ -31,17 +25,6 @@ public class CommonEntityBlacklist implements Filter<Entity> {
                 if (element instanceof Item) {
                     ShowCaseStandalone plugin = (ShowCaseStandalone) getPlugin();
                     return plugin.getShopHandler().isShopItem((Item) element);
-                }
-                return false;
-            }
-        });
-        // HyperConomy
-        availableFilters.add(new BlacklistFilter("HyperConomy") {
-            @Override
-            public boolean isFiltered(Entity element) {
-                if (element instanceof HItem) {
-                    HyperConomy hc = (HyperConomy) Bukkit.getPluginManager().getPlugin("HyperConomy");
-                    return hc.getAPI().isItemDisplay((HItem) element);
                 }
                 return false;
             }

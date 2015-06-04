@@ -1,22 +1,21 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.server.SportBukkitServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import org.bukkit.entity.Player;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An instance of Player metadata stored by BKCommonLib
  */
 public class CommonPlayerMeta {
 
-    private final HashMap<Integer,Integer> visibleChunks = new HashMap<Integer,Integer>(441);
+    private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
     private final List<Integer> removeQueue;
 
@@ -50,7 +49,7 @@ public class CommonPlayerMeta {
 
     public boolean isChunkVisible(int chunkX, int chunkZ) {
         synchronized (visibleChunks) {
-        	return visibleChunks.keySet().contains(Integer.valueOf(chunkX)) && visibleChunks.values().contains(Integer.valueOf(chunkZ));
+            return visibleChunks.contains(chunkX, chunkZ);
         }
     }
 
@@ -60,7 +59,7 @@ public class CommonPlayerMeta {
         }
         synchronized (visibleChunks) {
             for (int i = 0; i < chunkX.length; i++) {
-            	visibleChunks.put(Integer.valueOf(chunkX[i]), Integer.valueOf(chunkZ[i]));
+                visibleChunks.add(chunkX[i], chunkZ[i]);
             }
         }
     }
@@ -68,25 +67,9 @@ public class CommonPlayerMeta {
     public void setChunkVisible(int chunkX, int chunkZ, boolean visible) {
         synchronized (visibleChunks) {
             if (visible) {
-                visibleChunks.put(chunkX, chunkZ);
+                visibleChunks.add(chunkX, chunkZ);
             } else {
-            	ArrayList<Integer> keys = new ArrayList<Integer>(visibleChunks.keySet());
-				ArrayList<Integer> vals = new ArrayList<Integer>(visibleChunks.values());
-				
-				for(int i = 0; i < keys.size(); i++)
-				{
-					if(keys.get(i) == Integer.valueOf(chunkX) && vals.get(i) == Integer.valueOf(chunkZ))
-					{
-						keys.remove(i);
-						vals.remove(i);
-						break;
-					}
-				}
-				visibleChunks.clear();
-				for(int j = 0; j < keys.size(); j++)
-				{
-					visibleChunks.put(keys.get(j), vals.get(j));
-				}
+                visibleChunks.remove(chunkX, chunkZ);
             }
         }
     }

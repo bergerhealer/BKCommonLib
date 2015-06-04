@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+
+import java.util.Map;
 
 public class CraftServerRef {
 

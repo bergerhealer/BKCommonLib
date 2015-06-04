@@ -1,20 +1,16 @@
 package com.bergerkiller.bukkit.common.proxies;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class BlockProxy extends ProxyBase<Block> implements Block {
@@ -227,7 +223,6 @@ public class BlockProxy extends ProxyBase<Block> implements Block {
         return base.getDrops();
     }
 
-    @Override
     public Collection<ItemStack> getDrops(ItemStack item) {
         return base.getDrops(item);
     }
@@ -252,8 +247,8 @@ public class BlockProxy extends ProxyBase<Block> implements Block {
         base.removeMetadata(metadataKey, owningPlugin);
     }
 
-	@Override
-	public void setType(Material type, boolean applyPhysics) {
-		base.setType(type, applyPhysics);
-	}
+    @Override
+    public void setType(Material arg0, boolean arg1) {
+        base.setType(arg0, arg1);
+    }
 }

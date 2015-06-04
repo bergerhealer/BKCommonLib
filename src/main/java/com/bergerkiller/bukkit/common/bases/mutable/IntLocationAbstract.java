@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.bases.mutable;
 
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
-
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public abstract class IntLocationAbstract extends IntVectorAbstract {
 

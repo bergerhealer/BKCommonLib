@@ -1,41 +1,29 @@
 package com.bergerkiller.bukkit.common.reflection;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.sf.cglib.asm.Type;
-import net.sf.cglib.core.Signature;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.CallbackFilter;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-import net.sf.cglib.proxy.NoOp;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.reflection.gen.CallbackMethod;
 import com.bergerkiller.bukkit.common.reflection.gen.CallbackSignature;
 import com.bergerkiller.bukkit.common.reflection.gen.ProxyCallbackSignature;
 import com.bergerkiller.bukkit.common.reflection.gen.SuperCallbackSignature;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import net.sf.cglib.asm.Type;
+import net.sf.cglib.core.Signature;
+import net.sf.cglib.proxy.*;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * A simple implementation builder that allows the creation of extensions of
  * classes. This is done by specifying interfaces and implementations for these
  * interfaces.<br><br>
- *
+ * <p/>
  * To construct new extensions of classes, do the following:<br>
  * - Make new interface(s) containing the methods to override<br>
  * - Implement these interface(s) in your own implementation class(es)<br>
  * - Construct a new Class Builder using the superclass and
  * implementation<br><br>
- *
+ * <p/>
  * To call super methods in the superclass, add interface methods starting with
  * 'super_'. These methods are never called in the implemented version, you can
  * leave them empty there.
@@ -101,7 +89,7 @@ public class ClassBuilder {
                         try {
                             // Try to get the method in the superclass - prior
                             if (!SafeMethod.contains(superClass, methodName, method.getParameterTypes())) {
-                                throw new RuntimeException("Could not find super method: " + superSig);
+                                throw new RuntimeException("Could not find super method: " + superSig + " in " + interfaceClass.getName());
                             }
                             callback = new SuperCallbackSignature(superSig);
                         } catch (IllegalArgumentException ex) {
@@ -124,6 +112,7 @@ public class ClassBuilder {
                 }
             }
         } catch (Throwable t) {
+            t.printStackTrace();
             throw new RuntimeException("Could not initialize Entity Class Builder for '" + superclass.getSimpleName() + "':", t);
         }
     }

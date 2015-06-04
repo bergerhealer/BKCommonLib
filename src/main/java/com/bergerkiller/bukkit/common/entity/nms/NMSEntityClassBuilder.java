@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.ClassBuilder;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Takes care of NMS Entity class creation, allowing multiple callback methods

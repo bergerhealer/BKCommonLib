@@ -1,14 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * A logger that is meant to log a given module of the server, for example that

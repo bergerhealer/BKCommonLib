@@ -1,27 +1,25 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
+import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.PlayerChunkMap;
+import net.minecraft.server.v1_8_R3.WorldServer;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
-
-import net.minecraft.server.v1_8_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R2.EntityPlayer;
-import net.minecraft.server.v1_8_R2.PlayerChunkMap;
-import net.minecraft.server.v1_8_R2.WorldServer;
-
 public class PlayerChunkMapBase extends PlayerChunkMap {
 
-    public PlayerChunkMapBase(World world, int viewDistace) {
-        super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistace);
+    public PlayerChunkMapBase(World world, int viewDistance) {
+        super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistance);
     }
 
     /**
@@ -104,7 +102,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
             int i1 = PlayerChunkMapRef.radius.get(this);
             int j1 = i - k;
             int k1 = j - l;
-            List<ChunkCoordIntPair> chunksToLoad = new LinkedList<>();
+            List<ChunkCoordIntPair> chunksToLoad = new LinkedList<ChunkCoordIntPair>();
 
             if ((j1 != 0) || (k1 != 0)) {
                 for (int l1 = i - i1; l1 <= i + i1; l1++) {
@@ -220,7 +218,6 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
             this.z = ((int) entityplayer.locZ >> 4);
         }
 
-        @Override
         public int compare(ChunkCoordIntPair a, ChunkCoordIntPair b) {
             if (a.equals(b)) {
                 return 0;

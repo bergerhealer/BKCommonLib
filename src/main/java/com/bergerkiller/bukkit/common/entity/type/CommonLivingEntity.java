@@ -1,25 +1,18 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import net.minecraft.server.v1_8_R2.EntityCreature;
-import net.minecraft.server.v1_8_R2.EntityInsentient;
-import net.minecraft.server.v1_8_R2.EntityLiving;
-import net.minecraft.server.v1_8_R2.GenericAttributes;
-import net.minecraft.server.v1_8_R2.Navigation;
-import net.minecraft.server.v1_8_R2.PathEntity;
-
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_8_R3.EntityLiving;
+import net.minecraft.server.v1_8_R3.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
-
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R2.PathPoint;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -169,7 +162,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      */
     public void setPathfindingRange(double range) {
         EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        nmsEntity.getAttributeInstance(GenericAttributes.b).setValue(range);
+        nmsEntity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(range);
     }
 
     /**
@@ -179,80 +172,77 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      */
     public double getPathfindingRange() {
         EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        return nmsEntity.getAttributeInstance(GenericAttributes.b).getValue();
+        return nmsEntity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).getValue();
     }
 
-    /**
-     * Move to a location with pathfinding
-     *
-     * @param location to move to
-     * @param speed to move with
-     */
-    public void moveTo(Location location) {
-        this.moveTo(location, GenericAttributes.d.b());
-    }
-
-    /**
-     * Move to an entity with pathfinding
-     *
-     * @param entity to find
-     */
-    public void moveTo(Entity entity) {
-        this.moveTo(entity, GenericAttributes.d.b());
-    }
-
-    /**
-     * Move to a location with pathfinding
-     *
-     * @param location to move to
-     * @param speed to move with
-     */
-    public void moveTo(Location location, double speed) {
-        EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
-        if (nmsEntity instanceof EntityInsentient) {
-            Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
-            double x = location.getX();
-            double y = location.getY();
-            double z = location.getZ();
-            if (!navigation.a(x, y, z, speed)) {
-                int dx = MathUtil.floor(x);
-                int dy = (int) y;
-                int dz = MathUtil.floor(z);
-                PathEntity path = navigation.a(dx, dy, dz);//nmsEntity.world.a(nmsEntity, dx, dy, dz, (float) this.getPathfindingRange(), true, false, false, true);
-                this.moveWithPath(path, speed);
-            }
-        }
-    }
-
-    /**
-     * Move to an entity with pathfinding
-     *
-     * @param entity to find
-     * @param speed to move with
-     */
-    public void moveTo(Entity entity, double speed) {
-        EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
-        net.minecraft.server.v1_8_R2.Entity nmsTargetEntity = CommonNMS.getNative(entity);
-        if (nmsEntity instanceof EntityInsentient) {
-            Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
-            if (!navigation.a(nmsTargetEntity, speed)) {
-            	PathEntity path = null;//findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfindingRange(), true, false, false, true);
-				//nmsEntity.world.
-                this.moveWithPath(path, speed);
-            }
-        }
-    }
-
-    private void moveWithPath(PathEntity path, double speed) {
-        EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        if (nmsEntity instanceof EntityInsentient) {
-            if (nmsEntity instanceof EntityCreature) {
-            	EntityCreature creature = ((EntityCreature) nmsEntity);
-				creature.move(path.c().a, path.c().b, path.c().c);
-            }
-
-            Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
-            navigation.a(path, speed);
-        }
-    }
+//	/**
+//	 * Move to a location with pathfinding
+//	 * 
+//	 * @param location to move to
+//	 * @param speed to move with
+//	 */
+//	public void moveTo(Location location) {
+//		this.moveTo(location, GenericAttributes.d.b());
+//	}
+//	
+//	/**
+//	 * Move to an entity with pathfinding
+//	 * 
+//	 * @param entity to find
+//	 */
+//	public void moveTo(Entity entity) {
+//		this.moveTo(entity, GenericAttributes.d.b());
+//	}
+//	
+//	/**
+//	 * Move to a location with pathfinding
+//	 * 
+//	 * @param location to move to
+//	 * @param speed to move with
+//	 */
+//	public void moveTo(Location location, double speed) {
+//		EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
+//		if(nmsEntity instanceof EntityInsentient) {
+//			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
+//			double x = location.getX();
+//			double y = location.getY();
+//			double z = location.getZ();
+//			if(!navigation.a(x, y, z, speed)) {
+//				int dx = MathUtil.floor(x);
+//				int dy = (int) y;
+//				int dz = MathUtil.floor(z);
+//				PathEntity path = nmsEntity.world.a(nmsEntity, new BlockPosition(dx, dy, dz), (float) this.getPathfindingRange(), true, false, false, true);
+//				this.moveWithPath(path, speed);
+//			}
+//		}
+//	}
+//	
+//	/**
+//	 * Move to an entity with pathfinding
+//	 * 
+//	 * @param entity to find
+//	 * @param speed to move with
+//	 */
+//	public void moveTo(Entity entity, double speed) {
+//		EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
+//		net.minecraft.server.v1_8_R3.Entity nmsTargetEntity = CommonNMS.getNative(entity);
+//		if(nmsEntity instanceof EntityInsentient) {
+//			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
+//			if(!navigation.a(nmsTargetEntity, speed)) {
+//				PathEntity path = nmsEntity.world.findPath(nmsEntity, nmsTargetEntity, (float) this.getPathfindingRange(), true, false, false, true);
+//				this.moveWithPath(path, speed);
+//			}
+//		}
+//	}
+//	
+//	private void moveWithPath(PathEntity path, double speed) {
+//		EntityLiving nmsEntity = CommonNMS.getNative(entity);
+//		if(nmsEntity instanceof EntityInsentient) {
+//			if(nmsEntity instanceof EntityCreature)
+//				((EntityCreature) nmsEntity).setPathEntity(path);
+//			
+//			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
+//			navigation.a(path, speed);
+//		}
+//	}
 }

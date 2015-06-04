@@ -9,7 +9,7 @@ import java.util.List;
  * creation of new instances. This can be used to store an infinite or undefined
  * amount of elements. The get and set operations allow operating outside the
  * size of the buffer, and dynamically allocate the new capacity needed.<br><br>
- *
+ * <p/>
  * The {@link #createElement()} method needs to be implemented to use this
  * buffer.
  *

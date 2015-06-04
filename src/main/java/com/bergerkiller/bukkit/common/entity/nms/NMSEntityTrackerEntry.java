@@ -1,18 +1,16 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import java.util.List;
-import java.util.logging.Level;
-
-import org.bukkit.entity.Entity;
-
-import net.minecraft.server.v1_8_R2.EntityPlayer;
-import net.minecraft.server.v1_8_R2.EntityTrackerEntry;
-
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.EntityTrackerEntry;
+import org.bukkit.entity.Entity;
+
+import java.util.List;
+import java.util.logging.Level;
 
 public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 
@@ -26,8 +24,8 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
     public NMSEntityTrackerEntry(final Entity entity) {
         super(CommonNMS.getNative(entity), 80, 3, true);
         // Fix these two: Wrongly set in Constructor
-        //this.xLoc = tracker.as.a(tracker.locX);
-        //this.zLoc = tracker.as.a(tracker.locZ);
+        this.xLoc = EntityNetworkController.a(tracker.locX);
+        this.zLoc = EntityNetworkController.a(tracker.locZ);
         // Set proper update interval/viewdistance/mobile
         final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
         EntityTrackerEntryRef.isMobile.set(this, type.networkIsMobile);

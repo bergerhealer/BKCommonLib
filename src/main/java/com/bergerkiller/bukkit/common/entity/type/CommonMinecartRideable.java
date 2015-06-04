@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.RideableMinecart;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Common Entity implementation for Minecarts without a Block that can be
