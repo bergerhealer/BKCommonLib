@@ -1,4 +1,5 @@
 #BKCommonLib [![Build Status](https://drone.io/github.com/bergerhealer/BKCommonLib/status.png)](https://drone.io/github.com/bergerhealer/BKCommonLib/latest)
+[Spigot Resource Page](http://www.spigotmc.org/threads/updated-bkcommonlib.69358/) | [Dev Builds](https://drone.io/github.com/bergerhealer/BKCommonLib/files)
 
 This is a library-plugin system, introducing a lot of utility classes
 It also simplifies coding:
