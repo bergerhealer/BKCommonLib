@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-
 class EntitySizes {
 
     static final int[] a = new int[EnumEntitySize.values().length];
