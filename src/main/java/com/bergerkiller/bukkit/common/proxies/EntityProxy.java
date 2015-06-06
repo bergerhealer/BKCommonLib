@@ -220,10 +220,6 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
         return base.isOnGround();
     }
 
-    public org.bukkit.entity.Entity.Spigot spigot() {
-        return base.spigot();
-    }
-
     @Override
     public String getName() {
         return base.getName();
