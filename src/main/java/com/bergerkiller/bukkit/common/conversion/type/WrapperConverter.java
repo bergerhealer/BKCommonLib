@@ -244,9 +244,11 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<org.bukkit.GameMode> toGameMode = new WrapperConverter<org.bukkit.GameMode>(org.bukkit.GameMode.class) {
         @Override
         public org.bukkit.GameMode convertSpecial(Object value, Class<?> valueType, org.bukkit.GameMode def) {
+/*
             if (EnumGamemodeRef.TEMPLATE.isInstance(value)) {
                 return org.bukkit.GameMode.getByValue(EnumGamemodeRef.egmId.get(value));
-            } else if (value instanceof Number) {
+            } else*/
+            if (value instanceof Number) {
                 return org.bukkit.GameMode.getByValue(((Number) value).intValue());
             } else {
                 return ParseUtil.parseEnum(org.bukkit.GameMode.class, value.toString(), def);

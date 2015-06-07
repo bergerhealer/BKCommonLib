@@ -20,7 +20,8 @@ class CommonClasses {
         loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
         loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashSet", "LongHashMap");
         loadRef("NetworkManager", "PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader");
-        loadRef("Recipe", "NBT", "RegionFile", "TileEntity", "WorldServer", "Chunk", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
+        loadRef("Recipe", "NBT", "RegionFile", "TileEntity", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
+        loadRef("EnumGamemode", "EnumProtocol");
         // Internal
         loadCommon("internal.CommonWorldListener", "internal.CommonTabController");
         // Utility classes (only those that interact with nms)
