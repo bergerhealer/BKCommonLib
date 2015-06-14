@@ -3,7 +3,10 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
-import com.bergerkiller.bukkit.common.reflection.*;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.HumanEntity;
@@ -20,7 +23,6 @@ public class EntityHumanRef extends EntityLivingRef {
     public static final FieldAccessor<Float> exp = TEMPLATE.getField("exp");
     public static final FieldAccessor<Integer> expLevel = TEMPLATE.getField("expLevel");
     public static final FieldAccessor<Integer> expTotal = TEMPLATE.getField("expTotal");
-
     // The below two fields are actually in EntityLiving!
     public static final FieldAccessor<HashMap<Integer, Object>> mobEffects = TEMPLATE.getField("effects");
     public static final FieldAccessor<Boolean> updateEffects = TEMPLATE.getField("updateEffects");
