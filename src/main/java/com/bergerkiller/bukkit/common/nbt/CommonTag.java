@@ -187,7 +187,6 @@ public class CommonTag extends BasicWrapper {
      * Creates a CommonTag storing the data under the name specified<br>
      * The most suitable tag type and handle to represent the data are created
      *
-     * @param name of the new tag
      * @param data to store
      * @return a new CommonTag instance
      */

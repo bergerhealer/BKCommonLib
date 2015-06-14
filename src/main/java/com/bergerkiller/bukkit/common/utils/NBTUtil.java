@@ -29,7 +29,6 @@ public class NBTUtil {
      * All primitive types, including byte[] and int[], and list/maps are
      * supported
      *
-     * @param name of the handle
      * @param data to store in this handle initially
      * @return new handle
      */

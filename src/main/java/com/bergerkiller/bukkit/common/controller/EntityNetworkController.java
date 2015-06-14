@@ -1053,7 +1053,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * This method is copied from mc 1.7.10 source. This might not work
      *
      * @param paramDouble
-     * @return
+     * @return int
      */
     public static int a(double paramDouble) {
         double d = paramDouble - (MathHelper.floor(paramDouble) + 0.5D);
