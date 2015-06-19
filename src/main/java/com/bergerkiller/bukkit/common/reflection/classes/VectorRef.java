@@ -108,6 +108,6 @@ public class VectorRef {
     }
 
     public static boolean isPosition(Object chunkPosition) {
-        return chunkPosition instanceof ChunkPosition;
+        return chunkPosition.getClass().getName().toLowerCase().contains("pos")||chunkPosition.getClass().getName().toLowerCase().contains("loc");
     }
 }
