@@ -38,7 +38,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
     }
 
     @Override
-    public void h() {
+    public void t_() {
         controller.onTick();
     }
 
@@ -126,8 +126,8 @@ public class NMSEntityHookImpl implements NMSEntityHook {
     }
 
     @Override
-    public void super_h() {
-        controller.getEntity().getHandle(NMSEntityHook.class).super_h();
+    public void super_t_() {
+        controller.getEntity().getHandle(NMSEntityHook.class).super_t_();
     }
 
     @Override
