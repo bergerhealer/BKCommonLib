@@ -28,12 +28,12 @@ public interface NMSEntityHook {
     /**
      * onTick super
      */
-    public void super_h();
+    public void super_t_();
 
     /**
      * onTick
      */
-    public void h();
+    public void t_();
 
     /**
      * Damage Entity super

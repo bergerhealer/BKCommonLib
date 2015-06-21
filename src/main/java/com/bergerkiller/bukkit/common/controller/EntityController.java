@@ -53,7 +53,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
      * Called every tick to update the entity
      */
     public void onTick() {
-        entity.getHandle(NMSEntityHook.class).super_h();
+        entity.getHandle(NMSEntityHook.class).super_t_();
     }
 
     /**
