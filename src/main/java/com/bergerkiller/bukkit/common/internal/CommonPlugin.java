@@ -404,7 +404,7 @@ public class CommonPlugin extends PluginBase {
                 "BKCommonLib isn't a plugin, its a language based on english.",
                 "Updating is like reinventing the wheel for BKCommonLib.",
                 "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999");
-        setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size() + 1)));
+        setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
 
         // Initialize permissions

@@ -264,7 +264,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 }
             }
             handle.locX = CommonNMS.getMiddleX(handle.getBoundingBox());
-            handle.locY = handle.getBoundingBox().b + (double) handle.length - (double) handle.U;
+            handle.locY = handle.getBoundingBox().b;
             handle.locZ = CommonNMS.getMiddleZ(handle.getBoundingBox());
             entity.setMovementImpaired(oldDx != dx || oldDz != dz);
             handle.onGround = oldDy != dy && oldDy < 0.0;
