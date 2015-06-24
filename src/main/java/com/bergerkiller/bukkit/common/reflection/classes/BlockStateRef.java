@@ -17,6 +17,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class BlockStateRef {
@@ -41,12 +43,22 @@ public class BlockStateRef {
     static {
         // Initialize some instantiators
         registerInst(new TileInstantiator("Sign") {
-            private final FieldAccessor<IChatBaseComponent[]> state_lines = STATE.getField("lines");
+            // Sign lines are IChatBaseComponent in n.m.s. but String in Craftbukkit
+            private final FieldAccessor<String[]> state_lines = STATE.getField("lines");
             private final FieldAccessor<IChatBaseComponent[]> tile_lines = TILE.getField("lines");
 
             @Override
             protected void apply(BlockState state, Object tile) {
-                state_lines.set(state, LogicUtil.cloneArray(tile_lines.get(tile)));
+                IChatBaseComponent[] tileLineArray = tile_lines.get(tile);
+                List<String> signLines = new ArrayList<String>(tileLineArray.length);
+                for (IChatBaseComponent line : tileLineArray) {
+                    if (line == null) { // Avoid NPE later calling string functions
+                        signLines.add("");
+                    } else {
+                        signLines.add(line.getText());
+                    }
+                }
+                state_lines.set(state, signLines.toArray(new String[signLines.size()]));
             }
         });
         registerInst(new TileInstantiator("Skull") {
