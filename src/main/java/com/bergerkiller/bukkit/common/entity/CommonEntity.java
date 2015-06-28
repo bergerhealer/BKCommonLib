@@ -333,9 +333,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                     return true;
                 }
             } else if (obj instanceof TileEntity) {
-                CommonPlugin.LOGGER.log(Level.WARNING, "TileEntity is in Entity List!");
+               // CommonPlugin.LOGGER.log(Level.WARNING, "TileEntity is in Entity List!");
             } else {
-                CommonPlugin.LOGGER.log(Level.WARNING, "Invalid Object is in Entity List!");
+               // CommonPlugin.LOGGER.log(Level.WARNING, "Invalid Object is in Entity List!");
             }
         }
         return false;

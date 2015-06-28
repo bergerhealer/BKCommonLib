@@ -5,7 +5,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.64-SNAPSHOT</version>
+    <version>1.65-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -16,7 +16,7 @@
         <project.mcversion>v1_8_R3</project.mcversion>
         <project.bversion>1.8.7-R0.1</project.bversion>
         <project.cbversion>1.8.6-R0.1</project.cbversion>
-        <project.stableversion>1.63</project.stableversion>
+        <project.stableversion>1.65</project.stableversion>
         <project.stableserver>1.8.7-R0.1</project.stableserver>
         <project.stabledate>24 Juni 2015</project.stabledate>
         <junit.version>4.11</junit.version>
