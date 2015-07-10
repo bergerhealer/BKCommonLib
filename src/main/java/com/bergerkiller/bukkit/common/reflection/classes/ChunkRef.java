@@ -19,9 +19,8 @@ public class ChunkRef {
     public static final ClassTemplate<Object> TEMPLATE = new NMSClassTemplate("Chunk");
     public static final FieldAccessor<Integer> x = TEMPLATE.getField("locX");
     public static final FieldAccessor<Integer> z = TEMPLATE.getField("locZ");
-    public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("e");
+    public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("getBiomeIndex");
     public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("getSections");
-    public static final FieldAccessor<Boolean> seenByPlayer = TEMPLATE.getField("t");
     private static final MethodAccessor<Void> addEntities = TEMPLATE.getMethod("addEntities");
     private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("loadNearby", icp, icp, int.class, int.class);
     private static final MethodAccessor<Boolean> needsSaving = TEMPLATE.getMethod("a", boolean.class);

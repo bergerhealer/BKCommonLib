@@ -40,7 +40,6 @@ public class PacketUtil {
      */
     public static void sendChunk(final Player player, final org.bukkit.Chunk chunk, boolean sendPayload) {
         final Object chunkHandle = Conversion.toChunkHandle.convert(chunk);
-        ChunkRef.seenByPlayer.set(chunkHandle, true);
 
         // Send payload
         if (sendPayload) {
