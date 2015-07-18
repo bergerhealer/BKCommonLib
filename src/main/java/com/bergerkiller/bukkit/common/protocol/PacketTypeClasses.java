@@ -921,12 +921,7 @@ public class PacketTypeClasses {
          public final FieldAccessor<Object> enumPlayerInfoAction = getField("a");
          public final FieldAccessor<List<Object>> playerInfoData = getField("b");
 
-         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(Object.class, Iterable.class);
          private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(Object.class, Object.class);
-
-         public CommonPacket newInstance(Object enumPlayerInfoAction, Iterator<Object> entityPlayer) {
-             return constructor1.newInstance(enumPlayerInfoAction, entityPlayer);
-         }
 
          public CommonPacket newInstance(Object enumPlayerInfoAction, Object... entityPlayer) {
              return constructor2.newInstance(enumPlayerInfoAction, entityPlayer);
