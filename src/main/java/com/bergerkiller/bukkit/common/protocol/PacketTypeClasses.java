@@ -920,12 +920,6 @@ public class PacketTypeClasses {
     public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
          public final FieldAccessor<Object> enumPlayerInfoAction = getField("a");
          public final FieldAccessor<List<Object>> playerInfoData = getField("b");
-
-         private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(Object.class, Object.class);
-
-         public CommonPacket newInstance(Object enumPlayerInfoAction, Object... entityPlayer) {
-             return constructor2.newInstance(enumPlayerInfoAction, entityPlayer);
-         }
     }
 
     public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
