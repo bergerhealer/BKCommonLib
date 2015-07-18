@@ -57,9 +57,11 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutStatistic OUT_STATISTIC = new NMSPacketPlayOutStatistic();
     public static final NMSPacketPlayOutTabComplete OUT_TAB_COMPLETE = new NMSPacketPlayOutTabComplete();
     public static final NMSPacketPlayOutTileEntityData OUT_TILE_ENTITY_DATA = new NMSPacketPlayOutTileEntityData();
+    public static final NMSPacketPlayOutTitle OUT_TITLE = new NMSPacketPlayOutTitle();
     public static final NMSPacketPlayOutUpdateHealth OUT_UPDATE_HEALTH = new NMSPacketPlayOutUpdateHealth();
     public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
     public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
+    public static final NMSPacketPlayOutWorldBorder OUT_WORLD_BORDER = new NMSPacketPlayOutWorldBorder();
     public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
     public static final NMSPacketPlayOutWorldParticles OUT_WORLD_PARTICLES = new NMSPacketPlayOutWorldParticles();
     /* Scoreboard-related packets */
@@ -114,6 +116,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInFlying IN_FLYING = new NMSPacketPlayInFlying();
     public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
     public static final NMSPacketPlayInKeepAlive IN_KEEP_ALIVE = new NMSPacketPlayInKeepAlive();
+    public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();
     public static final NMSPacketPlayInLook IN_LOOK = new NMSPacketPlayInLook();
     public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
     public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
@@ -127,6 +130,7 @@ public class PacketType extends ClassTemplate<Object> {
     /* Window-related packets */
     public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
     public static final NMSPacketPlayInEnchantItem IN_WINDOW_ENCHANT_ITEM = new NMSPacketPlayInEnchantItem();
+    public static final NMSPacketPlayInResourcePackStatus IN_WINDOW_RESOURCEPACK_STATUS = new NMSPacketPlayInResourcePackStatus();
     public static final NMSPacketPlayInTransaction IN_WINDOW_TRANSACTION = new NMSPacketPlayInTransaction();
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 

@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import net.minecraft.server.v1_8_R3.*;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk.ChunkMap;
+import net.minecraft.server.v1_8_R3.WorldBorder;
 import org.bukkit.Chunk;
 import org.bukkit.*;
 import org.bukkit.Material;
@@ -563,6 +564,22 @@ public class PacketTypeClasses {
         public final FieldAccessor<Object> data = getField("c");
     }
 
+    public static class NMSPacketPlayOutTitle extends NMSPacket {
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(PacketPlayOutTitle.EnumTitleAction.class, IChatBaseComponent.class, int.class, int.class, int.class);
+
+        public CommonPacket newInstance(int a, int b, int c) {
+            return constructor1.newInstance(PacketPlayOutTitle.EnumTitleAction.TIMES, (IChatBaseComponent) null, a, b, c);
+        }
+
+        public CommonPacket newInstance(PacketPlayOutTitle.EnumTitleAction enumTitleAction, IChatBaseComponent iChatBaseComponent) {
+            return constructor1.newInstance(enumTitleAction, iChatBaseComponent, -1, -1, -1);
+        }
+
+        public CommonPacket newInstance(PacketPlayOutTitle.EnumTitleAction enumTitleAction, IChatBaseComponent iChatBaseComponent, int a, int b, int c) {
+            return constructor1.newInstance(enumTitleAction, iChatBaseComponent, a, b, c);
+        }
+    }
+
     public static class NMSPacketPlayOutTransaction extends NMSPacketPlayOutWindow {
 
         public final FieldAccessor<Short> action = getField("b");
@@ -615,6 +632,14 @@ public class PacketTypeClasses {
 
         public final FieldAccessor<Long> age = getField("a");
         public final FieldAccessor<Long> timeOfDay = getField("b");
+    }
+
+    public static class NMSPacketPlayOutWorldBorder extends NMSPacket {
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(WorldBorder.class, PacketPlayOutWorldBorder.EnumWorldBorderAction.class);
+
+        public CommonPacket newInstance (WorldBorder worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction enumw) {
+            return constructor1.newInstance(worldBorder, enumw);
+        }
     }
 
     public static class NMSPacketPlayOutWindowItems extends NMSPacketPlayOutWindow {
@@ -765,6 +790,18 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> key = getField("a");
     }
 
+    public static class NMSPacketPlayInResourcePackStatus extends NMSPacket {
+        // No constructor needed
+    }
+
+    public static class NMSPacketPlayInSpectate extends NMSPacket {
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(UUID.class);
+
+        public CommonPacket newInstance(UUID uuid) {
+            return constructor1.newInstance(uuid);
+        }
+    }
+
     public static class NMSPacketPlayInLook extends NMSPacket {
 
         public final FieldAccessor<Float> yaw = getField("yaw");
@@ -881,15 +918,19 @@ public class PacketTypeClasses {
     }
 
     public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
-        /*
-         public final FieldAccessor<String> playerName = getField("a");
-         public final FieldAccessor<Boolean> online = getField("b");
-         public final FieldAccessor<Integer> ping = getField("c");
-         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(String.class, boolean.class, int.class);
-         public CommonPacket newInstance(String playerName, boolean online, int ping) {
-         return constructor1.newInstance(playerName, online, ping);
+         public final FieldAccessor<Object> enumPlayerInfoAction = getField("a");
+         public final FieldAccessor<List<Object>> playerInfoData = getField("b");
+
+         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(Object.class, Iterable.class);
+         private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(Object.class, Object.class);
+
+         public CommonPacket newInstance(Object enumPlayerInfoAction, Iterator<Object> entityPlayer) {
+             return constructor1.newInstance(enumPlayerInfoAction, entityPlayer);
          }
-         */
+
+         public CommonPacket newInstance(Object enumPlayerInfoAction, Object... entityPlayer) {
+             return constructor2.newInstance(enumPlayerInfoAction, entityPlayer);
+         }
     }
 
     public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
