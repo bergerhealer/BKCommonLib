@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.io.DataInputStream;
@@ -18,6 +19,10 @@ public class IntVector2 {
 
     public IntVector2(Chunk chunk) {
         this(chunk.getX(), chunk.getZ());
+    }
+
+    public IntVector2(Location loc) {
+        this(loc.getX(), loc.getZ());
     }
 
     public IntVector2(final double x, final double z) {

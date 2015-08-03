@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,6 +20,10 @@ public class IntVector3 implements Comparable<IntVector3> {
 
     public IntVector3(Block block) {
         this(block.getX(), block.getY(), block.getZ());
+    }
+
+    public IntVector3(Location loc) {
+        this(loc.getX(), loc.getY(), loc.getZ());
     }
 
     public IntVector3(final double x, final double y, final double z) {
