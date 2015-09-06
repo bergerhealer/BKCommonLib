@@ -1,7 +1,6 @@
 package net.minecraft.server.v1_8_R3;
 
-public class ChunkCoordinates
-        implements Comparable {
+public class ChunkCoordinates implements Comparable {
 
     public int x;
     public int y;

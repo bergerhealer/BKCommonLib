@@ -21,4 +21,9 @@ public class ChunkPosition extends BlockPosition {
     public ChunkPosition(double x, double y, double z) {
         super(x, y, z);
     }
+
+    @Override
+    public int compareTo(BaseBlockPosition o) {
+        return -1;
+    }
 }
