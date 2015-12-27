@@ -5,6 +5,7 @@ import com.kellerkindt.scs.ShowCaseStandalone;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.Plugin;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

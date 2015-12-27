@@ -4,8 +4,8 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R3.ChunkCoordinates;
-import net.minecraft.server.v1_8_R3.ChunkPosition;
+import net.friwi.reflection.ChunkCoordinates;
+import net.friwi.reflection.ChunkPosition;
 import net.minecraft.server.v1_8_R3.Vec3D;
 import org.bukkit.util.Vector;
 

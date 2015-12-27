@@ -92,7 +92,7 @@ public class IInventoryBase implements IInventory {
                 this.setItem(index, null);
                 return itemstack;
             } else {
-                itemstack = item.a(size);
+                itemstack = item.cloneAndSubtract(size); //TODO: CHECK IF NOTHING BROKE
                 if (item.count == 0) {
                     this.setItem(index, null);
                 }

@@ -2,17 +2,11 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.logging.Level;
 
 /**

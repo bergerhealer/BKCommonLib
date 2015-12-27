@@ -6,17 +6,13 @@ import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import net.friwi.reflection.WorldManagerReflector;
-import net.minecraft.server.v1_8_R3.Entity;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.WorldManager;
+import net.minecraft.server.v1_8_R3.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
-import net.minecraft.server.v1_8_R3.BlockPosition;
 
 /**
  *

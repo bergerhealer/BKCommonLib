@@ -15,8 +15,8 @@ import java.util.Locale;
 
 public class ParseUtil {
 
-    private static final StringMapCaseInsensitive<Boolean> BOOL_NAME_MAP = new StringMapCaseInsensitive<Boolean>();
-    private static final StringMap<Material> MAT_NAME_MAP = new StringMap<Material>();
+    private static final StringMapCaseInsensitive<Boolean> BOOL_NAME_MAP = new StringMapCaseInsensitive<>();
+    private static final StringMap<Material> MAT_NAME_MAP = new StringMap<>();
     private static final StringReplaceBundle MAT_ALIASES = new StringReplaceBundle();
 
     static {
@@ -44,8 +44,7 @@ public class ParseUtil {
         MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
         MAT_NAME_MAP.put("COBBLEFENCE", Material.COBBLE_WALL);
         MAT_NAME_MAP.put("STONEFENCE", Material.COBBLE_WALL);
-        MAT_NAME_MAP.put("COBBLEFENCE", Material.COBBLE_WALL);
-        MAT_NAME_MAP.put("STONEFENCE", Material.COBBLE_WALL);
+        MAT_NAME_MAP.put("COBBLEWALL", Material.COBBLE_WALL);
         MAT_NAME_MAP.put("STONEWALL", Material.COBBLE_WALL);
 
         // Material by name aliases
@@ -399,6 +398,7 @@ public class ParseUtil {
         if (LogicUtil.nullOrEmpty(text)) {
             return def;
         }
+
         // From ID
         try {
             return LogicUtil.fixNull(MaterialUtil.getType(Integer.parseInt(text)), def);
@@ -437,7 +437,7 @@ public class ParseUtil {
         if (data < 0 || data > 255) {
             return def;
         } else {
-            return Byte.valueOf((byte) data);
+            return (byte) data;
         }
     }
 

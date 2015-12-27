@@ -1,17 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import static org.junit.Assert.*;
+import com.bergerkiller.bukkit.common.utils.EntityGroupingUtil.EntityCategory;
+import org.bukkit.entity.*;
+import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import com.bergerkiller.bukkit.common.utils.EntityGroupingUtil;
-import com.bergerkiller.bukkit.common.utils.EntityGroupingUtil.EntityCategory;
-
-import org.bukkit.entity.*;
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class EntityGroupingUtilTest {
 

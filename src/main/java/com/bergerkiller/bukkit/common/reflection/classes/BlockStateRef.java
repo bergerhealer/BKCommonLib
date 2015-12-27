@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_8_R3.CommandBlockListenerAbstract;

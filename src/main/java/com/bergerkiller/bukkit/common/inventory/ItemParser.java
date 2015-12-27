@@ -77,6 +77,7 @@ public class ItemParser {
 
     public static ItemParser parse(String name, String amount) {
         int index = name.indexOf(':');
+
         if (index == -1) {
             return parse(name, null, amount);
         } else {
@@ -85,6 +86,7 @@ public class ItemParser {
     }
 
     public static ItemParser parse(String name, String dataname, String amount) {
+
         ItemParser parser = new ItemParser();
         // parse amount
         parser.amount = ParseUtil.parseInt(amount, -1);
@@ -98,6 +100,7 @@ public class ItemParser {
         if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname)) {
             parser.data = ParseUtil.parseMaterialData(dataname, parser.type, -1);
         }
+
         return parser;
     }
 

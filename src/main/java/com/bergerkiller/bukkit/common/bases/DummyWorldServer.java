@@ -32,7 +32,7 @@ public class DummyWorldServer extends WorldServer {
 
     public static DummyWorldServer newInstance() {
         DummyWorldServer world = TEMPLATE.newInstanceNull();
-        world.chunkProvider = world.chunkProviderServer = world.DUMMYCPS = new DummyChunkProviderServer(world);
+        world.chunkProviderServer = world.DUMMYCPS = new DummyChunkProviderServer(world);
         WorldRef.bukkitWorld.set(world, new CraftWorld(world, null, null));
         return world;
     }

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.proxies;
 
+import net.friwi.reflection.ChunkPosition;
 import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_8_R3.*;
 
@@ -51,9 +52,14 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         return super.canSave();
     }
 
-    @Override
-    public ChunkPosition findNearestMapFeature(World world, String s, BlockPosition pos) {
+    @Deprecated
+    public ChunkPosition _findNearestMapFeature(World world, String s, BlockPosition pos) {
         return new ChunkPosition(base.findNearestMapFeature(world, s, pos));
+    }
+
+    @Override
+    public BlockPosition findNearestMapFeature(World world, String s, BlockPosition pos) {
+        return new BlockPosition(base.findNearestMapFeature(world, s, pos));
     }
 
     @Deprecated
@@ -66,8 +72,13 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         return new ChunkPosition(super.findNearestMapFeature(world, s, new BlockPosition(i, j, k)));
     }
 
-    public ChunkPosition super_findNearestMapFeature(World world, String s, BlockPosition pos) {
+    @Deprecated
+    public ChunkPosition _super_findNearestMapFeature(World world, String s, BlockPosition pos) {
         return new ChunkPosition(super.findNearestMapFeature(world, s, pos));
+    }
+
+    public BlockPosition super_findNearestMapFeature(World world, String s, BlockPosition pos) {
+        return new BlockPosition(super.findNearestMapFeature(world, s, pos));
     }
 
     @Override
