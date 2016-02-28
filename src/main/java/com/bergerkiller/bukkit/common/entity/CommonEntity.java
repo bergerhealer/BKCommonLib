@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.*;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -298,7 +299,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
             // *** World ***
             replaceInList(oldInstance.world.entityList, newInstance);
-            replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
+//            if (!Common.IS_PAPERSPIGOT_SERVER) {
+//                replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
+//            }
 
             // *** Chunk ***
             final int chunkY = getChunkY();

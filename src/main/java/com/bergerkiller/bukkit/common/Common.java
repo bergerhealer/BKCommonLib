@@ -17,7 +17,7 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 166;
+    public static final int VERSION = 167;
     /**
      * The Minecraft package path version BKCommonLib is built against
      */
@@ -53,6 +53,11 @@ public class Common {
      */
     public static final boolean IS_SPIGOT_SERVER;
     /**
+     * Gets whether the current server software used is the PaperSpigot
+     * implementation
+     */
+    public static final boolean IS_PAPERSPIGOT_SERVER;
+    /**
      * Whether BKCommonLib is compatible with the server it is currently running
      * on
      */
@@ -63,8 +68,9 @@ public class Common {
         CommonServer runningServer = new UnknownServer();
         try {
             // Get all available server types
-            List<CommonServer> servers = new ArrayList<CommonServer>();
+            List<CommonServer> servers = new ArrayList<>();
             servers.add(new MCPCPlusServer());
+            servers.add(new PaperSpigotServer());
             servers.add(new SpigotServer());
             servers.add(new SportBukkitServer());
             servers.add(new CraftBukkitServer());
@@ -86,6 +92,7 @@ public class Common {
         SERVER.postInit();
         IS_COMPATIBLE = SERVER.isCompatible();
         IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
+        IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
         MC_VERSION = SERVER.getMinecraftVersion();
     }
 

@@ -7,6 +7,8 @@ import org.bukkit.entity.Entity;
 public class DamageSource extends BasicWrapper {
 
     public static final DamageSource FIRE = new DamageSource(DamageSourceRef.FIRE);
+    public static final DamageSource LIGHTNING = new DamageSource(DamageSourceRef.LIGHTNING);
+    public static final DamageSource BURN = new DamageSource(DamageSourceRef.BURN);
     public static final DamageSource LAVA = new DamageSource(DamageSourceRef.LAVA);
     public static final DamageSource STUCK = new DamageSource(DamageSourceRef.STUCK);
     public static final DamageSource DROWN = new DamageSource(DamageSourceRef.DROWN);

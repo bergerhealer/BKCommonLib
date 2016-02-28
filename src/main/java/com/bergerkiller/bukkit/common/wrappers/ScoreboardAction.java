@@ -4,7 +4,8 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutScoreboardScore.EnumScoreboardA
 
 public enum ScoreboardAction {
 
-    CHANGE(EnumScoreboardAction.CHANGE), REMOVE(EnumScoreboardAction.REMOVE);
+    CHANGE(EnumScoreboardAction.CHANGE),
+    REMOVE(EnumScoreboardAction.REMOVE);
 
     private final Object handle;
 

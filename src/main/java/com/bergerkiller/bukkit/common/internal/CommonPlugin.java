@@ -50,17 +50,17 @@ public class CommonPlugin extends PluginBase {
      * Remaining internal variables
      */
     private static CommonPlugin instance;
-    public final List<PluginBase> plugins = new ArrayList<PluginBase>();
+    public final List<PluginBase> plugins = new ArrayList<>();
     private EntityMap<Player, CommonPlayerMeta> playerVisibleChunks;
-    protected final Map<World, CommonWorldListener> worldListeners = new HashMap<World, CommonWorldListener>();
+    protected final Map<World, CommonWorldListener> worldListeners = new HashMap<>();
     private CommonListener listener;
-    private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<SoftReference<EntityMap>>();
-    private final List<Runnable> nextTickTasks = new ArrayList<Runnable>();
-    private final List<Runnable> nextTickSync = new ArrayList<Runnable>();
-    private final List<TimingsListener> timingsListeners = new ArrayList<TimingsListener>(1);
-    private final List<Task> startedTasks = new ArrayList<Task>();
-    private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<org.bukkit.entity.Entity>();
-    private final HashMap<String, TypedValue> debugVariables = new HashMap<String, TypedValue>();
+    private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<>();
+    private final List<Runnable> nextTickTasks = new ArrayList<>();
+    private final List<Runnable> nextTickSync = new ArrayList<>();
+    private final List<TimingsListener> timingsListeners = new ArrayList<>(1);
+    private final List<Task> startedTasks = new ArrayList<>();
+    private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<>();
+    private final HashMap<String, TypedValue> debugVariables = new HashMap<>();
     private CommonEventFactory eventFactory;
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;

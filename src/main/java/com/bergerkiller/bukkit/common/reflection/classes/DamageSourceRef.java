@@ -10,6 +10,8 @@ import org.bukkit.entity.*;
 public class DamageSourceRef {
 
     public static final Object FIRE = DamageSource.FIRE;
+    public static final Object LIGHTNING = DamageSource.LIGHTNING;
+    public static final Object BURN = DamageSource.BURN;
     public static final Object LAVA = DamageSource.LAVA;
     public static final Object STUCK = DamageSource.STUCK;
     public static final Object DROWN = DamageSource.DROWN;

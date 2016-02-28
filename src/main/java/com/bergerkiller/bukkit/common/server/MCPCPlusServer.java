@@ -22,7 +22,7 @@ public class MCPCPlusServer extends SpigotServer {
 
     @Override
     public boolean init() {
-        if (!super.init() || (!Bukkit.getServer().getVersion().contains("MCPC-Plus") && !Bukkit.getServer().getVersion().contains("Cauldron"))) {
+        if (!super.init() || (!Bukkit.getServer().getVersion().contains("MCPC-Plus") && !Bukkit.getServer().getVersion().contains("Cauldron") && !Bukkit.getServer().getVersion().contains("KCauldron"))) {
             return false;
         }
         // Obtain the Class remapper used by MCPC+
