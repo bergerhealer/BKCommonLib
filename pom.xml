@@ -30,7 +30,7 @@
         </repository>
         <repository>
           <id>bukkit-repo</id>
-          <url>http://hub.spigotmc.org/nexus/content/groups/public/</url>
+          <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
         <!-- Repo for access to Vault -->
         <repository>
