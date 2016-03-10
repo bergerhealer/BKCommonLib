@@ -18,7 +18,7 @@ public class MobSpawnerAbstractRef {
     public static final FieldAccessor<Integer> minSpawnDelay = TEMPLATE.getField("minSpawnDelay");
     public static final FieldAccessor<Integer> maxSpawnDelay = TEMPLATE.getField("maxSpawnDelay");
     public static final FieldAccessor<Integer> spawnCount = TEMPLATE.getField("spawnCount");
-    public static final FieldAccessor<Entity> entity = TEMPLATE.getField("j").translate(ConversionPairs.entity);
+    public static final FieldAccessor<Entity> entity = TEMPLATE.getField("i").translate(ConversionPairs.entity);
     public static final FieldAccessor<Integer> maxNearbyEntities = TEMPLATE.getField("maxNearbyEntities");
     public static final FieldAccessor<Integer> requiredPlayerRange = TEMPLATE.getField("requiredPlayerRange");
     public static final FieldAccessor<Integer> spawnRange = TEMPLATE.getField("spawnRange");

@@ -2,11 +2,14 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.Chunk;
-import net.minecraft.server.v1_8_R3.EnumSkyBlock;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.Chunk;
+import net.minecraft.server.v1_9_R1.EnumSkyBlock;
+import net.minecraft.server.v1_9_R1.ChunkGenerator;
+import net.minecraft.server.v1_9_R1.IChunkProvider;
+
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ public class ChunkRef {
     public static final MethodAccessor<byte[]> biomeData = TEMPLATE.getMethod("getBiomeIndex");
     public static final MethodAccessor<Object[]> sections = TEMPLATE.getMethod("getSections");
     private static final MethodAccessor<Void> addEntities = TEMPLATE.getMethod("addEntities");
-    private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("loadNearby", icp, icp, int.class, int.class);
+    private static final MethodAccessor<Void> loadNeighbours = TEMPLATE.getMethod("loadNearby", IChunkProvider.class, ChunkGenerator.class);
     private static final MethodAccessor<Boolean> needsSaving = TEMPLATE.getMethod("a", boolean.class);
     public static final FieldAccessor<Object> world = TEMPLATE.getField("world");
     public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
@@ -97,11 +100,11 @@ public class ChunkRef {
 
     public static int getData(Object chunkHandle, int x, int y, int z) {
         BlockPosition pos = new BlockPosition(x & XZ_MASK, y, z & XZ_MASK);
-        return ((Chunk) chunkHandle).getType(pos).toLegacyData(((Chunk) chunkHandle).getBlockData(pos));
+        return 0;
     }
 
     public static Object getType(Object chunkHandle, int x, int y, int z) {
-        return ((Chunk) chunkHandle).getType(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
+        return ((Chunk) chunkHandle).world.getType(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
     }
 
     @Deprecated

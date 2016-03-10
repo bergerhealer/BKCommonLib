@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import net.minecraft.server.v1_8_R3.MinecraftServer;
-import net.minecraft.server.v1_8_R3.WorldServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+
+import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.WorldServer;
 
 /**
  * A dummy world that can be used to operate on or using worlds without
