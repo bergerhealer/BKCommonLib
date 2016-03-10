@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PlayerChunkMap;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.PlayerChunkMap;
 import org.bukkit.entity.Player;
 
 import java.util.List;

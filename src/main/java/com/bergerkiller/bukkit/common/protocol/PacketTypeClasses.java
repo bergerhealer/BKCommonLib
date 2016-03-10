@@ -1,5 +1,25 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Chunk;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldType;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -8,27 +28,32 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.classes.*;
+import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
+import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import net.minecraft.server.v1_8_R3.*;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk.ChunkMap;
-import net.minecraft.server.v1_8_R3.WorldBorder;
-import org.bukkit.Chunk;
-import org.bukkit.*;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldType;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
-import java.util.*;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.EnumDirection;
+import net.minecraft.server.v1_9_R1.EnumItemSlot;
+import net.minecraft.server.v1_9_R1.EnumParticle;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.MapIcon;
+import net.minecraft.server.v1_9_R1.MobEffectList;
+import net.minecraft.server.v1_9_R1.PacketDataSerializer;
+import net.minecraft.server.v1_9_R1.PacketPlayOutTitle;
+import net.minecraft.server.v1_9_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_9_R1.SoundCategory;
+import net.minecraft.server.v1_9_R1.SoundEffect;
+import net.minecraft.server.v1_9_R1.Vec3D;
+import net.minecraft.server.v1_9_R1.WorldBorder;
 
 public class PacketTypeClasses {
 
@@ -84,8 +109,7 @@ public class PacketTypeClasses {
 
         public final FieldAccessor<Integer> lead = getField("a");
         public final FieldAccessor<Integer> passengerId = getField("b");
-        public final FieldAccessor<Integer> vehicleId = getField("c");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType(), EntityRef.TEMPLATE.getType());
 
         public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
             return newInstance(0, passenger, vehicle);
@@ -177,9 +201,9 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutEntityEquipment extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> slot = getField("b");
+        public final FieldAccessor<EnumItemSlot> slot = getField("b");
         public final TranslatorFieldAccessor<ItemStack> item = getField("c").translate(ConversionPairs.itemStack);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, int.class, ItemStackRef.TEMPLATE.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, EnumItemSlot.class, ItemStackRef.TEMPLATE.getType());
 
         public CommonPacket newInstance(int entityId, int slotId, ItemStack item) {
             return constructor1.newInstance(entityId, slotId, Conversion.toItemStackHandle.convert(item));
@@ -217,21 +241,16 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutEntityTeleport extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> x = getField("b");
-        public final FieldAccessor<Integer> y = getField("c");
-        public final FieldAccessor<Integer> z = getField("d");
+        public final FieldAccessor<Double> x = getField("b");
+        public final FieldAccessor<Double> y = getField("c");
+        public final FieldAccessor<Double> z = getField("d");
         public final FieldAccessor<Byte> yaw = getField("e");
         public final FieldAccessor<Byte> pitch = getField("f");
         public final FieldAccessor<Boolean> onGround = getField("g");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
-        private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
-        }
-
-        public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch, boolean b) {
-            return constructor2.newInstance(entityId, x, y, z, yaw, pitch, b);
         }
     }
 
@@ -332,10 +351,10 @@ public class PacketTypeClasses {
 
         public final FieldAccessor<Integer> itemId = getField("a");
         public final FieldAccessor<Byte> UNKNOWN1 = getField("b");
-        public final FieldAccessor<MapIcon[]> UNKNOWN2 = getField("c");
-        public final FieldAccessor<Integer> UNKNOWN3 = getField("d");
-        public final FieldAccessor<Integer> UNKNOWN4 = getField("d");
-        public final FieldAccessor<Integer> UNKNOWN5 = getField("d");
+        public final FieldAccessor<MapIcon[]> UNKNOWN2 = getField("d");
+        public final FieldAccessor<Integer> UNKNOWN3 = getField("e");
+        public final FieldAccessor<Integer> UNKNOWN4 = getField("f");
+        public final FieldAccessor<Integer> UNKNOWN5 = getField("g");
         public final FieldAccessor<byte[]> text = getField("h");
     }
 
@@ -343,7 +362,7 @@ public class PacketTypeClasses {
 
         public final FieldAccessor<Integer> x = getField("a");
         public final FieldAccessor<Integer> z = getField("b");
-        public final FieldAccessor<ChunkMap> chunkDataBitMap = getField("c");
+        //public final FieldAccessor<ChunkMap> chunkDataBitMap = getField("c");
         public final FieldAccessor<Boolean> hasBiomeData = getField("d");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
 
@@ -360,18 +379,18 @@ public class PacketTypeClasses {
         }
     }
 
-    public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
+    /*public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
 
         public final FieldAccessor<int[]> bulk_x = getField("a");
         public final FieldAccessor<int[]> bulk_z = getField("b");
-        public final FieldAccessor<ChunkMap[]> bulk_chunkDataBitMap = getField("c");
+        //public final FieldAccessor<ChunkMap[]> bulk_chunkDataBitMap = getField("c");
         public final FieldAccessor<Boolean> hasSkyLight = getField("d");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(List.class);
 
         public CommonPacket newInstance(List<Chunk> chunks) {
             return constructor1.newInstance(new ConvertingList<>(chunks, ConversionPairs.chunk.reverse()));
         }
-    }
+    }*/
 
     public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
 
@@ -392,12 +411,13 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutNamedSoundEffect extends NMSPacket {
 
-        public final FieldAccessor<String> soundName = getField("a");
-        public final FieldAccessor<Integer> x = getField("b");
-        public final FieldAccessor<Integer> y = getField("c");
-        public final FieldAccessor<Integer> z = getField("d");
-        public final FieldAccessor<Float> volume = getField("e");
-        public final FieldAccessor<Integer> pitch = getField("f");
+        public final FieldAccessor<SoundEffect> soundName = getField("a");
+        public final FieldAccessor<SoundCategory> cat = getField("b");
+        public final FieldAccessor<Integer> x = getField("c");
+        public final FieldAccessor<Integer> y = getField("d");
+        public final FieldAccessor<Integer> z = getField("e");
+        public final FieldAccessor<Float> f = getField("f");
+        public final FieldAccessor<Integer> g = getField("g");
     }
 
     public static class NMSPacketPlayOutOpenSignEditor extends NMSPacket {
@@ -426,14 +446,15 @@ public class PacketTypeClasses {
         public final FieldAccessor<Float> yaw = getField("d");
         public final FieldAccessor<Float> pitch = getField("e");
         public final FieldAccessor<Set> UNKNOWN1 = getField("f");
+        public final FieldAccessor<Integer> g = getField("g");
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Byte> effectId = getField("b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("MobEffect"));
+        public final FieldAccessor<MobEffectList> effectId = getField("b");
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("MobEffectList"));
 
-        public CommonPacket newInstance(int entityId, Object mobEffect) {
+        public CommonPacket newInstance(int entityId, MobEffectList mobEffect) {
             return constructor1.newInstance(entityId, mobEffect);
         }
     }
@@ -474,8 +495,8 @@ public class PacketTypeClasses {
         public final FieldAccessor<String> prefix = getField("c");
         public final FieldAccessor<String> suffix = getField("d");
         public final FieldAccessor<Collection<String>> players = getField("g");
-        public final FieldAccessor<Integer> mode = getField("h");
-        public final FieldAccessor<Integer> friendlyFire = getField("i");
+        public final FieldAccessor<Integer> mode = getField("i");
+        public final FieldAccessor<Integer> friendlyFire = getField("j");
     }
 
     public static class NMSPacketPlayOutSetSlot extends NMSPacketPlayOutWindow {
@@ -486,39 +507,43 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutSpawnEntity extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> x = getField("b");
-        public final FieldAccessor<Integer> y = getField("c");
-        public final FieldAccessor<Integer> z = getField("d");
-        public final FieldAccessor<Integer> motX = getField("e");
-        public final FieldAccessor<Integer> motY = getField("f");
-        public final FieldAccessor<Integer> motZ = getField("g");
-        public final FieldAccessor<Integer> pitch = getField("h"); // Byte -> Integer
-        public final FieldAccessor<Integer> yaw = getField("i"); // Byte -> Integer
-        public final FieldAccessor<Integer> entityType = getField("j");
-        public final FieldAccessor<Integer> extraData = getField("k");
+    	public final FieldAccessor<Integer> UUID = getField("b");
+        public final FieldAccessor<Double> x = getField("c");
+        public final FieldAccessor<Double> y = getField("d");
+        public final FieldAccessor<Double> z = getField("e");
+        public final FieldAccessor<Integer> motX = getField("f");
+        public final FieldAccessor<Integer> motY = getField("g");
+        public final FieldAccessor<Integer> motZ = getField("h");
+        public final FieldAccessor<Integer> pitch = getField("i"); // Byte -> Integer
+        public final FieldAccessor<Integer> yaw = getField("j"); // Byte -> Integer
+        public final FieldAccessor<Integer> entityType = getField("k");
+        public final FieldAccessor<Integer> extraData = getField("l");
     }
 
     public static class NMSPacketPlayOutSpawnEntityExperienceOrb extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> x = getField("b");
-        public final FieldAccessor<Integer> y = getField("c");
-        public final FieldAccessor<Integer> z = getField("d");
+        public final FieldAccessor<Double> x = getField("b");
+        public final FieldAccessor<Double> y = getField("c");
+        public final FieldAccessor<Double> z = getField("d");
         public final FieldAccessor<Integer> experience = getField("e");
     }
 
     public static class NMSPacketPlayOutSpawnEntityLiving extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> entityType = getField("b");
-        public final FieldAccessor<Integer> x = getField("c");
-        public final FieldAccessor<Integer> y = getField("d");
-        public final FieldAccessor<Integer> z = getField("e");
-        public final FieldAccessor<Integer> motX = getField("f");
-        public final FieldAccessor<Integer> motY = getField("g");
-        public final FieldAccessor<Integer> motZ = getField("h");
-        public final FieldAccessor<Byte> yaw = getField("i");
-        public final FieldAccessor<Byte> pitch = getField("j");
-        public final FieldAccessor<Byte> headYaw = getField("k");
-        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("l").translate(ConversionPairs.dataWatcher);
+    	public final FieldAccessor<UUID> UUID = getField("b");
+        public final FieldAccessor<Integer> entityType = getField("c");
+        public final FieldAccessor<Integer> x = getField("d");
+        public final FieldAccessor<Integer> y = getField("e");
+        public final FieldAccessor<Integer> z = getField("f");
+        public final FieldAccessor<Integer> motX = getField("g");
+        public final FieldAccessor<Integer> motY = getField("h");
+        public final FieldAccessor<Integer> motZ = getField("i");
+        public final FieldAccessor<Byte> yaw = getField("j");
+        public final FieldAccessor<Byte> pitch = getField("k");
+        public final FieldAccessor<Byte> headYaw = getField("l");
+        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("m").translate(ConversionPairs.dataWatcher);
+        
+        
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("EntityLiving"));
 
         public CommonPacket newInstance(Object entityLiving) {
@@ -535,9 +560,9 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutSpawnEntityWeather extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Integer> x = getField("b");
-        public final FieldAccessor<Integer> y = getField("c");
-        public final FieldAccessor<Integer> z = getField("d");
+        public final FieldAccessor<Double> x = getField("b");
+        public final FieldAccessor<Double> y = getField("c");
+        public final FieldAccessor<Double> z = getField("d");
         public final FieldAccessor<Integer> type = getField("e");
     }
 
@@ -609,7 +634,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutUpdateSign extends NMSPacket {
 
-        public final FieldAccessor<net.minecraft.server.v1_8_R3.World> world = getField("a");
+        public final FieldAccessor<net.minecraft.server.v1_9_R1.World> world = getField("a");
         public final FieldAccessor<BlockPosition> position = getField("b");
         public final FieldAccessor<IChatBaseComponent[]> lines = getField("c");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(WorldRef.TEMPLATE.getType(), BlockPosition.class, IChatBaseComponent[].class);
@@ -657,7 +682,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutWorldParticles extends NMSPacket {
 
-        public final FieldAccessor<String> effectName = getField("a");
+        public final FieldAccessor<EnumParticle> effectName = getField("a");
         public final FieldAccessor<Float> x = getField("b");
         public final FieldAccessor<Float> y = getField("c");
         public final FieldAccessor<Float> z = getField("d");
@@ -673,7 +698,7 @@ public class PacketTypeClasses {
 
         public CommonPacket newInstance(String name, int count, double x, double y, double z, double rx, double ry, double rz, double speed) {
             final CommonPacket packet = newInstance();
-            packet.write(this.effectName, name);
+            packet.write(this.effectName, EnumParticle.a(name));
             packet.write(this.particleCount, count);
             packet.write(this.x, (float) x);
             packet.write(this.y, (float) y);
@@ -712,7 +737,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
 
-        public final FieldAccessor<Long> timestamp = getField("timestamp");
+        //public final FieldAccessor<Long> timestamp = getField("timestamp");
 
     }
 
@@ -725,12 +750,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
 
-        public final FieldAccessor<BlockPosition> position = getField("b");
-        public final FieldAccessor<Integer> direction = getField("c");
-        public final FieldAccessor<ItemStack> itemStack = getField("d").translate(ConversionPairs.itemStack);
-        public final FieldAccessor<Float> cursorX = getField("e");
-        public final FieldAccessor<Float> cursorY = getField("f");
-        public final FieldAccessor<Float> cursorZ = getField("g");
+        //public final FieldAccessor<BlockPosition> position = getField("b");
     }
 
     public static class NMSPacketPlayInChat extends NMSPacket {
@@ -895,10 +915,10 @@ public class PacketTypeClasses {
         public final FieldAccessor<Byte> dy = getField("c");
         public final FieldAccessor<Byte> dz = getField("d");
         public final FieldAccessor<Boolean> onGround = getField("g");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, boolean.class);
 
-        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, boolean onGround) {
-            return constructor1.newInstance(entityId, dx, dy, dz, onGround);
+        public CommonPacket newInstance(int paramInt, long paramLong1, long paramLong2, long paramLong3, boolean paramBoolean) {
+            return constructor1.newInstance(paramInt,paramLong1,paramLong2,paramLong3,paramBoolean);
         }
     }
 
@@ -910,9 +930,9 @@ public class PacketTypeClasses {
         public final FieldAccessor<Byte> dyaw = getField("e");
         public final FieldAccessor<Byte> dpitch = getField("f");
         public final FieldAccessor<Boolean> onGround = getField("g");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, byte.class, byte.class, boolean.class);
 
-        public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch, boolean onGround) {
+        public CommonPacket newInstance(int entityId, long dx, long dy, long dz, byte dyaw, byte dpitch, boolean onGround) {
             return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, onGround);
         }
     }

@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import net.minecraft.server.v1_8_R3.DamageSource;
-import net.minecraft.server.v1_8_R3.EntityArrow;
-import net.minecraft.server.v1_8_R3.EntityFireball;
-import net.minecraft.server.v1_8_R3.Explosion;
+import net.minecraft.server.v1_9_R1.DamageSource;
+import net.minecraft.server.v1_9_R1.EntityArrow;
+import net.minecraft.server.v1_9_R1.EntityFireball;
+import net.minecraft.server.v1_9_R1.Explosion;
 import org.bukkit.entity.*;
 
 public class DamageSourceRef {
