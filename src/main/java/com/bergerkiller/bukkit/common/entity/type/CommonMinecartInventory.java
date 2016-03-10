@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityInventory;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.IInventory;
 import org.bukkit.Location;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;

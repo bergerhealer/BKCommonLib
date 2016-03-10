@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import net.friwi.reflection.WorldManagerReflector;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -95,7 +95,7 @@ public class CommonWorldListener extends WorldManager {
     }
 
     @Override
-    public void a(EntityHuman human, String name, double x, double y, double z, float yaw, float pitch) {
+    public void a(EntityHuman human, SoundEffect soundeffect, SoundCategory soundcategory, double x, double y, double z, float yaw, float pitch) {
     }
 
     /*
@@ -109,23 +109,11 @@ public class CommonWorldListener extends WorldManager {
     }
 
     @Override
-    public void a(String s, double d0, double d1, double d2, float f, float f1) {
-    }
-
-    @Override
     public void a(int i, int j, int k, int l, int i1, int j1) {
     }
 
     @Override
     public void a(BlockPosition blockposition) {
-    }
-
-    @Override
-    public void b(BlockPosition blockposition) {
-    }
-
-    @Override
-    public void a(String s, BlockPosition blockposition) {
     }
 
     @Override
