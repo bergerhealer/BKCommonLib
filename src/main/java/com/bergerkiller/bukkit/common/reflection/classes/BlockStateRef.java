@@ -1,36 +1,44 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.reflection.*;
-import com.bergerkiller.bukkit.common.utils.BlockUtil;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_8_R3.CommandBlockListenerAbstract;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.TileEntitySkull;
-import org.bukkit.Chunk;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlockState;
 import org.bukkit.material.MaterialData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import com.bergerkiller.bukkit.common.collections.ClassMap;
+import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.utils.BlockUtil;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.mojang.authlib.GameProfile;
+
+import net.minecraft.server.v1_9_R1.CommandBlockListenerAbstract;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.TileEntitySkull;
 
 public class BlockStateRef {
 
     public static final ClassTemplate<?> TEMPLATE = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
     private static final ClassMap<TileInstantiator> tileToInst = new ClassMap<TileInstantiator>();
     private static final ClassMap<TileInstantiator> stateToInst = new ClassMap<TileInstantiator>();
-    public static final FieldAccessor<World> world = TEMPLATE.getField("world");
-    public static final FieldAccessor<Chunk> chunk = TEMPLATE.getField("chunk");
+    public static final FieldAccessor<CraftWorld> world = TEMPLATE.getField("world");
+    public static final FieldAccessor<CraftChunk> chunk = TEMPLATE.getField("chunk");
     public static final FieldAccessor<Integer> x = TEMPLATE.getField("x");
     public static final FieldAccessor<Integer> y = TEMPLATE.getField("y");
     public static final FieldAccessor<Integer> z = TEMPLATE.getField("z");
-    public static final FieldAccessor<Integer> type = TEMPLATE.getField("type");
+    public static final FieldAccessor<Integer> type = TEMPLATE.getField("flag");
     public static final FieldAccessor<MaterialData> data = TEMPLATE.getField("data");
     public static final FieldAccessor<Byte> light = TEMPLATE.getField("light");
 
@@ -108,16 +116,15 @@ public class BlockStateRef {
     }
 
     public static BlockState toBlockState(Block block) {
-//		Object tileEntity = TileEntityRef.getFromWorld(block);
-//		if (tileEntity != null) {
-//			TileInstantiator inst = tileToInst.get(tileEntity);
-//			if (inst != null) {
-//				return inst.newInstance(block, tileEntity);
-//			}
-//		}
-//		// All BlockState types REQUIRE a tile entity, just return the default BlockState here
-//		return new CraftBlockState(block);
-        return block.getState();
+		Object tileEntity = TileEntityRef.getFromWorld(block);
+		if (tileEntity != null) {
+			TileInstantiator inst = tileToInst.get(tileEntity);
+			if (inst != null) {
+				return inst.newInstance(block, tileEntity);
+			}
+		}
+		// All BlockState types REQUIRE a tile entity, just return the default BlockState here
+		return new CraftBlockState(block);
     }
 
     public static BlockState toBlockState(Object tileEntity) {
@@ -166,9 +173,9 @@ public class BlockStateRef {
             final BlockState state = (BlockState) STATE.newInstanceNull();
             final int typeId = MaterialUtil.getTypeId(block);
             tileField.set(state, tileEntity);
-            world.set(state, block.getWorld());
+            world.set(state, (CraftWorld)block.getWorld());
             secondWorld.set(state, block.getWorld());
-            chunk.set(state, block.getChunk());
+            chunk.set(state, (CraftChunk)block.getChunk());
             type.set(state, typeId);
             light.set(state, block.getLightLevel());
             x.set(state, block.getX());

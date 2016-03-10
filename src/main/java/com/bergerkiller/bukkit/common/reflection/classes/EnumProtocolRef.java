@@ -4,9 +4,9 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.google.common.collect.BiMap;
-import net.minecraft.server.v1_8_R3.EnumProtocol;
-import net.minecraft.server.v1_8_R3.EnumProtocolDirection;
-import net.minecraft.server.v1_8_R3.Packet;
+import net.minecraft.server.v1_9_R1.EnumProtocol;
+import net.minecraft.server.v1_9_R1.EnumProtocolDirection;
+import net.minecraft.server.v1_9_R1.Packet;
 
 import java.util.Map;
 
