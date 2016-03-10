@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import com.bergerkiller.bukkit.common.proxies.BlockProxy;
 import org.bukkit.Chunk;
-import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
-import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlock;
+
+import com.bergerkiller.bukkit.common.proxies.BlockProxy;
+
 
 public class BlockBase extends BlockProxy {
 
