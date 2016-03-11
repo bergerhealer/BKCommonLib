@@ -5,7 +5,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.7-PRE</version>
+    <version>1.70-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -16,7 +16,7 @@
         <project.mcversion>v1_9_R1</project.mcversion>
         <project.bversion>1.9-R0.1</project.bversion>
         <project.cbversion>1.9-R0.1</project.cbversion>
-        <project.stableversion>1.70</project.stableversion>
+        <project.stableversion>1.68</project.stableversion>
         <project.stableserver>1.8.9-R0.1</project.stableserver>
         <project.stabledate>30 June 2015</project.stabledate>
         <junit.version>4.11</junit.version>
@@ -26,10 +26,6 @@
         <!-- Repo for access to CraftBukkit -->
         <repository>
           <id>spigot-repo</id>
-          <url>https://repo.md-5.net/content/groups/public/</url>
-        </repository>
-        <repository>
-          <id>bukkit-repo</id>
           <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
         <!-- Repo for access to Vault -->
@@ -52,8 +48,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
             <version>${project.bversion}-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -91,7 +87,7 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>3.6.3-SNAPSHOT</version>
+            <version>3.7.0-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ProtocolLib.jar</systemPath>
             <optional>true</optional>

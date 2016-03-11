@@ -205,8 +205,8 @@ public class PacketTypeClasses {
         public final TranslatorFieldAccessor<ItemStack> item = getField("c").translate(ConversionPairs.itemStack);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, EnumItemSlot.class, ItemStackRef.TEMPLATE.getType());
 
-        public CommonPacket newInstance(int entityId, int slotId, ItemStack item) {
-            return constructor1.newInstance(entityId, slotId, Conversion.toItemStackHandle.convert(item));
+        public CommonPacket newInstance(int entityId, EnumItemSlot slot, ItemStack item) {
+            return constructor1.newInstance(entityId, slot, Conversion.toItemStackHandle.convert(item));
         }
     }
 

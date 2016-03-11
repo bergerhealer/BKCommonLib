@@ -201,7 +201,8 @@ public class CommonNMS {
 
     public static List<Entity> getEntities(World world, Entity ignore,
             double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-        return getEntitiesIn(world, ignore, new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax));
+    	AxisAlignedBB aa = new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
+        return getEntitiesIn(world, ignore, aa.a(aa));
     }
 
     @SuppressWarnings("unchecked")

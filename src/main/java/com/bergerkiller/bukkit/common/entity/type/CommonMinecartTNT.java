@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
-    private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
+	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
     private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("a");
     private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("c", double.class);
     private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("j");
