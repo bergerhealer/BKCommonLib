@@ -48,6 +48,18 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         base.setContents(items);
     }
 
+    //TODO FIX
+    @Override
+    public ItemStack[] getStorageContents() {
+        return new ItemStack[0];
+    }
+
+    //TODO FIX
+    @Override
+    public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
+
+    }
+
     @Override
     public void setItem(int index, ItemStack item) {
         base.setItem(index, item);

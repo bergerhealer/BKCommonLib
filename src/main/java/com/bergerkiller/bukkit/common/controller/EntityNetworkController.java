@@ -1023,9 +1023,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // This has some big issues when new players join...
 
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.x, (double) locSynched.getX());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.y, (double) locSynched.getY());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.z, (double) locSynched.getZ());
             // Rotation
             packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (int) locSynched.getYaw());
             packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (int) locSynched.getPitch());

@@ -51,9 +51,9 @@ class EntityControllerCollisionHelper {
             for (z = zmin; z < zmax; ++z) {
                 if (handle.world.isLoaded(new BlockPosition(x, 64, z))) {
                     for (y = ymin - 1; y < ymax; ++y) {
-                        Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getType(new BlockPosition(x, y, z));
+                        Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z)).getBlock();
                         if (block != null) {
-                            block.a(handle.world, new BlockPosition(x, y, z), handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z)), bounds, collisionBuffer, handle);
+                            block.a(handle.world.getChunkAtWorldCoords(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z)), handle.world, new BlockPosition(x, y, z), bounds, collisionBuffer, handle);
                         }
                     }
                 }

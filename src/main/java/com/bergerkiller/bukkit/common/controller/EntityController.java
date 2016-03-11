@@ -318,16 +318,16 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
     private void onPostMove(double moveDx, double moveDy, double moveDz) {
         Entity handle = this.entity.getHandle(Entity.class);
         // Update entity movement sounds
-        if (/*EntityRef.hasMovementSound(handle)*/true && handle.vehicle == null) {
+        if (/*EntityRef.hasMovementSound(handle) == true &&*/ handle.getVehicle() == null) {
             int bX = entity.loc.x.block();
             int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.length);
             int bZ = entity.loc.z.block();
-            Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY, bZ)).getType(new BlockPosition(bX, bY, bZ));
-            int j1 = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getType(new BlockPosition(bX, bY - 1, bZ)).b();
+            Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY, bZ)).getBlockData(new BlockPosition(bX, bY, bZ)).getBlock();
+            int j1 = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getBlockData(new BlockPosition(bX, bY - 1, bZ)).getBlock().m(block.getBlockData()); //TODO CHECK
 
             // Magic values! *gasp* Bad, BAD Minecraft! Go sit in a corner!
             if (j1 == 11 || j1 == 32 || j1 == 21) {
-                block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getType(new BlockPosition(bX, bY - 1, bZ));
+                block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getBlockData(new BlockPosition(bX, bY - 1, bZ)).getBlock();
             }
             if (block != Blocks.LADDER) {
                 moveDy = 0.0;
@@ -370,7 +370,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             handle.fireTicks = -handle.maxFireTicks;
         }
         if (isInWater && handle.fireTicks > 0) {
-            entity.makeRandomSound(Sound.FIZZ, 0.7f, 1.6f);
+            entity.makeRandomSound(Sound.AMBIENT_CAVE, 0.7f, 1.6f); // FIX
             handle.fireTicks = -handle.maxFireTicks;
         }
     }

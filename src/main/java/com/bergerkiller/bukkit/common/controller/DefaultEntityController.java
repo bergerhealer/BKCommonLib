@@ -7,6 +7,7 @@ import net.minecraft.server.v1_9_R1.DamageSource;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EnumHand;
 
+import net.minecraft.server.v1_9_R1.ItemStack;
 import org.bukkit.entity.HumanEntity;
 
 /**
@@ -40,10 +41,10 @@ public final class DefaultEntityController extends EntityController {
     }
 
     @Override
-    public boolean onInteractBy(HumanEntity interacter) {
+    public boolean onInteractBy(HumanEntity interacter, ItemStack is, EnumHand hand) {
         final Object handle = entity.getHandle();
         if (handle instanceof NMSEntityHook) {
-            return super.onInteractBy(interacter);
+            return super.onInteractBy(interacter, is, hand);
         } else {
             return ((Entity) handle).a(CommonNMS.getNative(interacter), CommonNMS.getNative(interacter).getItemInMainHand(), EnumHand.MAIN_HAND);
         }
