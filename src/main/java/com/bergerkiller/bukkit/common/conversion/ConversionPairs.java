@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.wrappers.*;
-import net.minecraft.server.v1_8_R3.EnumDirection;
+import net.minecraft.server.v1_9_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;

@@ -8,8 +8,8 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Server;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
@@ -24,7 +24,7 @@ import java.util.Random;
  */
 public class ChunkProviderServerHook extends ChunkProviderServer {
 
-    public ChunkProviderServerHook(WorldServer worldserver, IChunkLoader ichunkloader, IChunkProvider ichunkprovider) {
+    public ChunkProviderServerHook(WorldServer worldserver, IChunkLoader ichunkloader, ChunkGenerator ichunkprovider) {
         super(worldserver, ichunkloader, ichunkprovider);
     }
 
@@ -32,10 +32,9 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         return super.world.getWorld();
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
-        List<BiomeMeta> mobs = super.getMobsFor(enumcreaturetype, pos);
+        List<BiomeMeta> mobs = super.chunkGenerator.getMobsFor(enumcreaturetype, pos);
         if (CommonPlugin.hasInstance()) {
             org.bukkit.World world = this.world.getWorld();
             return CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), mobs);
@@ -60,20 +59,19 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         }
     }
 
-    @Override
-    public void getChunkAt(IChunkProvider ichunkprovider, int i, int j) {
+    public Chunk getChunkAt(int i, int j) {
         // Perform chunk population timings
         if (!CommonPlugin.TIMINGS.isActive()) {
-            super.getChunkAt(ichunkprovider, i, j);
-            return;
+            return super.getChunkAt(i, j);
         }
 
-        Chunk chunk = this.getOrCreateChunk(i, j);
+        Chunk chunk = this.getOrLoadChunkAt(i, j);
 
         if (!chunk.isDone()) {
             //chunk.done = true;
             chunk.d(true);
-            this.chunkProvider.getChunkAt(ichunkprovider, i, j);
+            chunk = this.chunkGenerator.getOrCreateChunk(i, j);
+            chunk.d(true);
 
             // CraftBukkit start
             BlockSand.instaFall = true;
@@ -104,6 +102,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
 
             chunk.e();
         }
+        return chunk;
     }
 
     @Override
@@ -138,23 +137,23 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         // Try to generate the chunk instead
         boolean newChunk;
         if (newChunk = (chunk == null)) {
-            if (this.chunkProvider == null) {
+            if (this.chunkGenerator == null) {
                 // Nothing to do here
                 // Don't even fire a chunk load event - empty chunk is not a valid Chunk
                 // Registering it is also a bad idea...
-                return this.emptyChunk;
+                return null;
             }
 
             // Generate the chunk
             long time = System.nanoTime();
             try {
-                chunk = CommonNMS.getChunk(this.chunkProvider.getOrCreateChunk(x, z));
+                chunk = CommonNMS.getChunk(this.chunkGenerator.getOrCreateChunk(x, z));
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.a(throwable, "Exception generating new chunk");
                 CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Chunk to be generated");
                 crashreportsystemdetails.a("Location", String.format("%d,%d", x, z));
                 crashreportsystemdetails.a("Position hash", Long.valueOf(MathUtil.longHashToLong(x, z)));
-                crashreportsystemdetails.a("Generator", this.chunkProvider.getName());
+                crashreportsystemdetails.a("Generator", this.chunkGenerator.getClass().getName());
                 throw new ReportedException(crashreport);
             }
             if (chunk != null) {
@@ -222,7 +221,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         if (oldCPS instanceof ChunkProviderServerHook) {
             return;
         }
-        ChunkProviderServerHook newCPS = new ChunkProviderServerHook(oldCPS.world, getLoader(oldCPS), oldCPS.chunkProvider);
+        ChunkProviderServerHook newCPS = new ChunkProviderServerHook(oldCPS.world, getLoader(oldCPS), oldCPS.chunkGenerator);
         ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
         WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
     }
@@ -232,7 +231,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         if (oldCPS == null) {
             return;
         }
-        ChunkProviderServer newCPS = new ChunkProviderServer(oldCPS.world, getLoader(oldCPS), oldCPS.chunkProvider);
+        ChunkProviderServer newCPS = new ChunkProviderServer(oldCPS.world, getLoader(oldCPS), oldCPS.chunkGenerator);
         ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
         WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
     }

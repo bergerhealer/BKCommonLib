@@ -16,7 +16,7 @@
         <project.mcversion>v1_9_R1</project.mcversion>
         <project.bversion>1.9-R0.1</project.bversion>
         <project.cbversion>1.9-R0.1</project.cbversion>
-        <project.stableversion>1.67</project.stableversion>
+        <project.stableversion>1.70</project.stableversion>
         <project.stableserver>1.8.9-R0.1</project.stableserver>
         <project.stabledate>30 June 2015</project.stabledate>
         <junit.version>4.11</junit.version>

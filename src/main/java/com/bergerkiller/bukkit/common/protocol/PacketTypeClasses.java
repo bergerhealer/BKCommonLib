@@ -241,17 +241,31 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutEntityTeleport extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<Double> x = getField("b");
+    	public final FieldAccessor<Integer> id = getField("a");
+    	public final FieldAccessor<Double> x = getField("b");
         public final FieldAccessor<Double> y = getField("c");
         public final FieldAccessor<Double> z = getField("d");
         public final FieldAccessor<Byte> yaw = getField("e");
         public final FieldAccessor<Byte> pitch = getField("f");
         public final FieldAccessor<Boolean> onGround = getField("g");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
+        private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor();
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
         }
+
+		public CommonPacket newInstance(int entityId, double posX, double posY, double posZ, byte yaw2, byte pitch2, boolean b) {
+			CommonPacket packet = constructor2.newInstance();
+			id.set(packet, entityId);
+			x.set(packet, posX);
+			y.set(packet, posY);
+			z.set(packet, posZ);
+			yaw.set(packet, yaw2);
+			pitch.set(packet, pitch2);
+			onGround.set(packet, b);
+			return packet;
+		}
     }
 
     public static class NMSPacketPlayOutEntityVelocity extends NMSPacketPlayOutEntity {
@@ -378,7 +392,7 @@ public class PacketTypeClasses {
             return constructor1.newInstance(chunk, hasBiomeData, sectionsMask);
         }
     }
-
+//Got removed
     /*public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
 
         public final FieldAccessor<int[]> bulk_x = getField("a");

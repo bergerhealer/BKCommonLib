@@ -3,9 +3,9 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.Explosion;
-import net.minecraft.server.v1_8_R3.World;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.Explosion;
+import net.minecraft.server.v1_9_R1.World;
 import org.bukkit.entity.Entity;
 
 /**
@@ -20,12 +20,12 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public int getOpacity() {
-        return getHandle(Block.class).p();
+        return getHandle(Block.class).o(getHandle(Block.class).getBlockData());
     }
 
     @Override
     public int getLightEmission() {
-        return getHandle(Block.class).r();
+        return getHandle(Block.class).m(getHandle(Block.class).getBlockData());
     }
 
     @Override
@@ -35,12 +35,12 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public boolean isPowerSource() {
-        return getHandle(Block.class).isPowerSource();
+        return getHandle(Block.class).isPowerSource(getHandle(Block.class).getBlockData());
     }
 
     @Override
     public boolean isSuffocating() {
-        return getHandle(Block.class).isOccluding();
+        return getHandle(Block.class).isOccluding(getHandle(Block.class).getBlockData());
     }
 
     @Override

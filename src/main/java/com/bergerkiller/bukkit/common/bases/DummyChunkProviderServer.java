@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.bases;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.proxies.ChunkProviderServerProxy;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
-import net.minecraft.server.v1_8_R3.Chunk;
+import net.minecraft.server.v1_9_R1.Chunk;
 
 /**
  * This class is mainly used by NoLagg chunks - for compatibilities' sake, it is

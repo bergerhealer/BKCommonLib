@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import net.minecraft.server.v1_8_R3.Packet;
+import net.minecraft.server.v1_9_R1.Packet;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -38,12 +38,13 @@ public class PacketUtil {
      * @param chunk to send the information of
      * @param sendPayload - whether the block data is sent
      */
+    @Deprecated
     public static void sendChunk(final Player player, final org.bukkit.Chunk chunk, boolean sendPayload) {
         final Object chunkHandle = Conversion.toChunkHandle.convert(chunk);
 
         // Send payload
         if (sendPayload) {
-            sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
+            //sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
         }
         // Tile entities
         CommonPacket packet;
@@ -215,7 +216,7 @@ public class PacketUtil {
         if (packet instanceof CommonPacket) {
             packet = ((CommonPacket) packet).getHandle();
         }
-        CommonNMS.getPlayerList().sendPacketNearby(x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
+        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
     }
 
     /**

@@ -10,7 +10,7 @@ public class PlayerConnectionRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerConnection");
     public static final FieldAccessor<Object> networkManager = TEMPLATE.getField("networkManager");
-    //public static final FieldAccessor<Boolean> checkMovement = TEMPLATE.getField("checkMovement");
+    public static final FieldAccessor<Boolean> checkMovement = TEMPLATE.getField("B");
     private static final MethodAccessor<Void> sendPacket = TEMPLATE.getMethod("sendPacket", PacketType.DEFAULT.getType());
 
     public static void sendPacket(Object instance, Object packet) {

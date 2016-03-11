@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
-import net.minecraft.server.v1_8_R3.Item;
+import net.minecraft.server.v1_9_R1.Item;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
 import org.bukkit.block.BlockFace;

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.World;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
@@ -33,13 +33,13 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
         return (IChunkLoader) ChunkProviderServerRef.chunkLoader.get(chunkProviderServer);
     }
 
-    private static IChunkProvider getGenerator(Object chunkProviderServer) {
-        return ((ChunkProviderServer) chunkProviderServer).chunkProvider;
+    private static ChunkGenerator getGenerator(Object chunkProviderServer) {
+        return ((ChunkProviderServer) chunkProviderServer).chunkGenerator;
     }
 
     private void checkGenerator() {
-        if (this.chunkProvider == null) {
-            throw new RuntimeException("Chunk provider has no generator set: " + (world == null ? "null" : world.getName()));
+        if (this.chunkGenerator == null) {
+            throw new RuntimeException("Chunk generator has no generator set: " + (world == null ? "null" : world.getName()));
         }
     }
 
@@ -121,47 +121,12 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
      */
     public org.bukkit.Chunk generateChunk(int x, int z) {
         checkGenerator();
-        return Conversion.toChunk.convert(this.chunkProvider.getOrCreateChunk(x, z));
+        return Conversion.toChunk.convert(this.chunkGenerator.getOrCreateChunk(x, z));
     }
 
     @Override
     public boolean unloadChunks() {
         return super.unloadChunks();
-    }
-
-    /**
-     * @deprecated Use {@link #onPopulate(Chunk, BlockPopulator, Random)} to
-     * handle populators instead
-     */
-    @Override
-    @Deprecated
-    public void getChunkAt(IChunkProvider ichunkprovider, int i, int j) {
-        checkGenerator();
-        Chunk chunk = this.getOrCreateChunk(i, j);
-
-        if (!chunk.isDone()) {
-            chunk.d(true); //Set done to true
-            this.chunkProvider.getChunkAt(ichunkprovider, i, j);
-
-            // CraftBukkit start
-            BlockSand.instaFall = true;
-            final Random random = new Random();
-            random.setSeed(world.getSeed());
-            long xRand = random.nextLong() / 2L * 2L + 1L;
-            long zRand = random.nextLong() / 2L * 2L + 1L;
-            random.setSeed((long) i * xRand + (long) j * zRand ^ world.getSeed());
-
-            if (world != null) {
-                for (BlockPopulator populator : world.getPopulators()) {
-                    onPopulate(chunk.bukkitChunk, populator, random);
-                }
-            }
-            BlockSand.instaFall = false;
-            super.world.getServer().getPluginManager().callEvent(new ChunkPopulateEvent(chunk.bukkitChunk));
-            // CraftBukkit end
-
-            chunk.e();
-        }
     }
 
     /**
@@ -176,7 +141,7 @@ public class ChunkProviderServerBase extends ChunkProviderServer {
         CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Chunk to be generated");
         crashreportsystemdetails.a("Location", String.format("%d,%d", chunkX, chunkZ));
         crashreportsystemdetails.a("Position hash", Long.valueOf(MathUtil.longHashToLong(chunkX, chunkZ)));
-        crashreportsystemdetails.a("Generator", this.chunkProvider.getName());
+        crashreportsystemdetails.a("Generator", this.chunkGenerator.getClass().getName());
         throw new ReportedException(crashreport);
     }
 }

@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
+import org.bukkit.Location;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -69,4 +71,14 @@ public class MergedInventory extends InventoryBase {
             }
         }
     }
+
+    Location loc = null;
+    
+	@Override
+	public Location getLocation() {
+		return loc;
+	}
+	public void setLocation(Location loc){
+		this.loc = loc;
+	}
 }

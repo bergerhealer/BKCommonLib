@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.controller;
 
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityInventoryHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.IInventory;
 import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("rawtypes")

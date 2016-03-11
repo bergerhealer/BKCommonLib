@@ -10,13 +10,13 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.*;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_8_R3.util.LongHash;
-import org.bukkit.craftbukkit.v1_8_R3.util.LongHashSet;
-import org.bukkit.craftbukkit.v1_8_R3.util.LongObjectHashMap;
+import org.bukkit.craftbukkit.v1_9_R1.util.LongHash;
+import org.bukkit.craftbukkit.v1_9_R1.util.LongHashSet;
+import org.bukkit.craftbukkit.v1_9_R1.util.LongObjectHashMap;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -91,7 +91,7 @@ public class ChunkUtil {
      * @param z - coordinate of the block
      * @return block data
      */
-    public static int getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
+    public static IBlockData getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
         return ChunkRef.getData(CommonNMS.getNative(chunk), x, y, z);
     }
 
@@ -141,7 +141,7 @@ public class ChunkUtil {
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
-            section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.o());
+            section = sections[secIndex] = new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(chunk.getWorld()).worldProvider.m());
         }
         ChunkSectionRef.setTypeId(section, x, y, z, typeId);
         ChunkSectionRef.setData(section, x, y, z, data);
@@ -181,7 +181,7 @@ public class ChunkUtil {
         if (result) {
             result = ChunkRef.setBlock(Conversion.toChunkHandle.convert(chunk), x, y, z, typeBlock, data);
             world.methodProfiler.a("checkLight");
-            world.x(new BlockPosition(x, y, z));
+            world.A(new BlockPosition(x, y, z));
             world.methodProfiler.b();
         }
         if (result) {
@@ -259,14 +259,14 @@ public class ChunkUtil {
     public static Collection<org.bukkit.Chunk> getChunks(World world) {
         // ChunkList field (if available)
         if (chunkListField != null) {
-            Object cps = CommonNMS.getNative(world).chunkProviderServer;
+            Object cps = CommonNMS.getNative(world).getChunkProviderServer();
             List<Object> rawChunkList = chunkListField.get(cps);
             Collection<org.bukkit.Chunk> chunkList = CommonNMS.getChunks(rawChunkList);
             return FilteredCollection.createNullFilter(chunkList);
         }
         // LongObjectHashMap mirror
         if (canUseLongObjectHashMap) {
-            Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
+            Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).getChunkProviderServer());
             if (chunks != null) {
                 try {
                     if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
@@ -294,7 +294,7 @@ public class ChunkUtil {
     @SuppressWarnings("rawtypes")
     public static org.bukkit.Chunk getChunk(World world, final int x, final int z) {
         final long key = LongHash.toLong(x, z);
-        Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).chunkProviderServer);
+        Object chunks = ChunkProviderServerRef.chunks.get(CommonNMS.getNative(world).getChunkProviderServer());
         if (chunks != null) {
             if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
                 try {
@@ -325,7 +325,7 @@ public class ChunkUtil {
      * @param runnable to execute once the chunk is loaded or obtained
      */
     public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
-        CommonNMS.getNative(world).chunkProviderServer.getChunkAt(x, z, runnable);
+        CommonNMS.getNative(world).getChunkProviderServer().getChunkAt(x, z);
     }
 
     /**
@@ -343,7 +343,7 @@ public class ChunkUtil {
             throw new RuntimeException("Can not put a chunk that has no BukkitChunk");
         }
         if (canUseLongObjectHashMap) {
-            Object cps = CommonNMS.getNative(world).chunkProviderServer;
+            Object cps = CommonNMS.getNative(world).getChunkProviderServer();
             Object chunks = ChunkProviderServerRef.chunks.get(cps);
             if (chunks != null) {
                 final long key = LongHash.toLong(x, z);
@@ -384,7 +384,7 @@ public class ChunkUtil {
      * @param chunk to save
      */
     public static void saveChunk(org.bukkit.Chunk chunk) {
-        CommonNMS.getNative(chunk.getWorld()).chunkProviderServer.saveChunk(CommonNMS.getNative(chunk));
+        CommonNMS.getNative(chunk.getWorld()).getChunkProviderServer().saveChunk(CommonNMS.getNative(chunk));
     }
 
     /**
@@ -407,7 +407,7 @@ public class ChunkUtil {
      */
     public static void setChunkUnloading(World world, final int x, final int z, boolean unload) {
         if (canUseLongHashSet) {
-            Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(CommonNMS.getNative(world).chunkProviderServer);
+            Object unloadQueue = ChunkProviderServerRef.unloadQueue.get(CommonNMS.getNative(world).getChunkProviderServer());
             if (unloadQueue != null) {
                 try {
                     if (canUseLongHashSet && unloadQueue instanceof LongHashSet) {

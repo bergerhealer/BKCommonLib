@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.controller.DefaultEntityInventoryControlle
 import com.bergerkiller.bukkit.common.controller.EntityInventoryController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_9_R1.ItemStack;
 
 public class NMSEntityInventoryHookImpl implements NMSEntityInventoryHook {
 

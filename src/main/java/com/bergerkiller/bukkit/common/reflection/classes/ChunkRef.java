@@ -6,6 +6,7 @@ import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.Chunk;
 import net.minecraft.server.v1_9_R1.EnumSkyBlock;
+import net.minecraft.server.v1_9_R1.IBlockData;
 import net.minecraft.server.v1_9_R1.ChunkGenerator;
 import net.minecraft.server.v1_9_R1.IChunkProvider;
 
@@ -98,9 +99,9 @@ public class ChunkRef {
         return setBlock(chunkHandle, x, y, z, CraftMagicNumbers.getBlock(typeId), data);
     }
 
-    public static int getData(Object chunkHandle, int x, int y, int z) {
+    public static IBlockData getData(Object chunkHandle, int x, int y, int z) {
         BlockPosition pos = new BlockPosition(x & XZ_MASK, y, z & XZ_MASK);
-        return 0;
+        return ((Chunk) chunkHandle).getBlockData(pos);
     }
 
     public static Object getType(Object chunkHandle, int x, int y, int z) {

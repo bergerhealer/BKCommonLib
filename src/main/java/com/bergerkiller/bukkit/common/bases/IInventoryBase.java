@@ -1,12 +1,14 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.conversion.ChatComponentConvertor;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.IInventory;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.IInventory;
+import net.minecraft.server.v1_9_R1.ItemStack;
+
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -174,7 +176,7 @@ public class IInventoryBase implements IInventory {
     }
 
     @Override
-    public void b(int i, int j) {
+    public void setProperty(int i, int j) {
     }
 
     @Override
@@ -185,4 +187,9 @@ public class IInventoryBase implements IInventory {
     @Override
     public void l() {
     }
+
+	@Override
+	public Location getLocation() {
+		return null;
+	}
 }

@@ -117,7 +117,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             } else {
                 // Create a new entry
                 final CommonEntityType type = CommonEntityType.byEntity(entity);
-                newEntry = new EntityTrackerEntry(getHandle(Entity.class), type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
+                newEntry = new EntityTrackerEntry(getHandle(Entity.class), type.networkViewDistance, type.networkUpdateInterval, 0, type.networkIsMobile);
                 // Transfer data if needed
                 if (storedEntry != null) {
                     EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
@@ -260,11 +260,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         EntityRef.bukkitEntity.set(oldInstance, EntityRef.createEntity(oldInstance));
 
         // *** Passenger/Vehicle ***
-        if (newInstance.vehicle != null) {
-            newInstance.vehicle.passenger = newInstance;
-        }
-        if (newInstance.passenger != null) {
-            newInstance.passenger.vehicle = newInstance;
+        if (newInstance.getVehicle() != null && newInstance.getVehicle().passengers !=null) {
+            newInstance.getVehicle().passengers.remove(oldInstance);
+            newInstance.getVehicle().passengers.add(newInstance);
         }
 
         // Only do this replacement logic for Entities that are already spawned

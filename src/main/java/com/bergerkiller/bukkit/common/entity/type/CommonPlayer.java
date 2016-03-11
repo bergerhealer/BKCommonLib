@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,7 +125,10 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
      *
      * @return list of chunk coordinates pending for sending
      */
+    //?
+    @Deprecated
     public List<IntVector2> getChunkSendQueue() {
-        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
+    	return new ArrayList<IntVector2>();
+//        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
     }
 }

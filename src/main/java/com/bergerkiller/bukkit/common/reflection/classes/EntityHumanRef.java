@@ -27,7 +27,7 @@ public class EntityHumanRef extends EntityLivingRef {
     public static final FieldAccessor<HashMap<Integer, Object>> mobEffects = TEMPLATE.getField("effects");
     public static final FieldAccessor<Boolean> updateEffects = TEMPLATE.getField("updateEffects");
     public static final TranslatorFieldAccessor<PlayerAbilities> abilities = TEMPLATE.getField("abilities").translate(ConversionPairs.playerAbilities);
-    //public static final FieldAccessor<GameProfile> gameProfile = TEMPLATE.getField("bH");
+    public static final FieldAccessor<GameProfile> gameProfile = TEMPLATE.getField("bR");
 
     public static boolean canInstaBuild(HumanEntity human) {
         return abilities.get(HandleConverter.toEntityHandle.convert(human)).canInstantlyBuild();

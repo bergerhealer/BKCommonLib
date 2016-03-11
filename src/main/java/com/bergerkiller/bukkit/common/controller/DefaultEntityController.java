@@ -1,13 +1,13 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import org.bukkit.entity.HumanEntity;
-
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-
 import net.minecraft.server.v1_9_R1.DamageSource;
 import net.minecraft.server.v1_9_R1.Entity;
+import net.minecraft.server.v1_9_R1.EnumHand;
+
+import org.bukkit.entity.HumanEntity;
 
 /**
  * Does nothing but redirect to the default entity behavior
@@ -35,7 +35,7 @@ public final class DefaultEntityController extends EntityController {
         if (handle instanceof NMSEntityHook) {
             super.onTick();
         } else {
-            ((Entity) handle).m(); //Tick the entity
+            ((Entity) handle).U(); //Tick the entity
         }
     }
 
@@ -45,7 +45,7 @@ public final class DefaultEntityController extends EntityController {
         if (handle instanceof NMSEntityHook) {
             return super.onInteractBy(interacter);
         } else {
-            return ((Entity) handle).e(CommonNMS.getNative(interacter));
+            return ((Entity) handle).a(CommonNMS.getNative(interacter), CommonNMS.getNative(interacter).getItemInMainHand(), EnumHand.MAIN_HAND);
         }
     }
 

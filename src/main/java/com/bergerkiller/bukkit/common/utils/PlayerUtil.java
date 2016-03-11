@@ -13,9 +13,9 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.WorldServer;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
@@ -91,8 +91,9 @@ public class PlayerUtil extends EntityUtil {
      * @param chunkZ - coordinate
      */
     @SuppressWarnings("unchecked")
+    @Deprecated
     public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
-        CommonNMS.getNative(player).chunkCoordIntPairQueue.add((ChunkCoordIntPair) VectorRef.newPair(chunkX, chunkZ));
+//        CommonNMS.getNative(player).chunkCoordIntPairQueue.add((ChunkCoordIntPair) VectorRef.newPair(chunkX, chunkZ));
     }
 
     /**
@@ -122,8 +123,9 @@ public class PlayerUtil extends EntityUtil {
      * @param chunkX - coordinate
      * @param chunkZ - coordinate
      */
+    @Deprecated
     public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
-        CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(VectorRef.newPair(chunkX, chunkZ));
+//        CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(VectorRef.newPair(chunkX, chunkZ));
     }
 
     /**

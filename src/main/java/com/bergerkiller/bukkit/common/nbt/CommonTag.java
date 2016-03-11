@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import net.minecraft.server.v1_8_R3.NBTBase;
+import net.minecraft.server.v1_9_R1.NBTBase;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;

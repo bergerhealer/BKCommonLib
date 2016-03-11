@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.*;
-import net.minecraft.server.v1_8_R3.EnumDirection;
+import net.minecraft.server.v1_9_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;

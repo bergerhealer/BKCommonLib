@@ -5,5 +5,5 @@ package com.bergerkiller.bukkit.common.bases;
  * <p/>
  * All credits go to CraftBukkit
  */
-public class LongHash extends org.bukkit.craftbukkit.v1_8_R3.util.LongHash {
+public class LongHash extends org.bukkit.craftbukkit.v1_9_R1.util.LongHash {
 }

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -460,7 +461,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     public void makeSound(String soundName, float volume, float pitch) {
         final Entity handle = getHandle(Entity.class);
-        handle.world.makeSound(handle, soundName, volume, pitch);
+        //TODO Find method again
+//        handle.world.makeSound(handle, soundName, volume, pitch);
     }
 
     public void makeStepSound(org.bukkit.block.Block block) {
@@ -570,11 +572,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public boolean hasPassenger() {
-        return getHandle(Entity.class).passenger != null;
+        return getHandle(Entity.class).passengers != null && getHandle(Entity.class).passengers.size()>0;
     }
 
     public boolean hasPlayerPassenger() {
-        return getHandle(Entity.class).passenger instanceof EntityPlayer;
+        for(Entity passenger : getHandle(Entity.class).passengers)if(passenger instanceof EntityPlayer)return true;
+        return false;
     }
 
     /**
@@ -778,15 +781,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             }
 
             // Properly set to null
-            handle.passenger.vehicle = null;
-            handle.passenger = null;
+            for(Entity p : handle.passengers)p.stopRiding(); //.as = .vehicle
+            handle.passengers.clear();
         }
 
         // Set the new passenger
         if (newPassenger != null) {
             // Properly set it
-            handle.passenger = CommonNMS.getNative(newPassenger);
-            handle.passenger.vehicle = handle;
+            handle.passengers.add(CommonNMS.getNative(newPassenger));
+            for(Entity p : handle.passengers)p.stopRiding();
 
             // Send proper eject packet for the new passenger
             if (hasPlayerPassenger()) {
@@ -864,8 +867,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param index to set at
      * @param value to set to
      */
+    @Deprecated
     public void setWatchedData(int index, Object value) {
-        h().getDataWatcher().watch(index, value);
+    	throw new IllegalStateException("The method setWatchedData from ExtendedEntity.class has been removed");
+//        h().getDataWatcher().watch(index, value);
     }
 
     /**
@@ -889,11 +894,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return data, or def if not found
      */
     public <K> K getWatchedData(int index, Class<K> type, K def) {
-        WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
-        if (object == null) {
-            return def;
-        }
-        return Conversion.convert(object.b(), type, def);
+    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
+//    	WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
+//        if (object == null) {
+//            return def;
+//        }
+//        return Conversion.convert(object.b(), type, def);
     }
 
     @Override
