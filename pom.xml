@@ -5,7 +5,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.70-SNAPSHOT</version>
+    <version>1.7-PRE</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -17,7 +17,7 @@
         <project.bversion>1.9-R0.1</project.bversion>
         <project.cbversion>1.9-R0.1</project.cbversion>
         <project.stableversion>1.70</project.stableversion>
-        <project.stableserver>1.9-R0.1</project.stableserver>
+        <project.stableserver>1.8.9-R0.1</project.stableserver>
         <project.stabledate>30 June 2015</project.stabledate>
         <junit.version>4.11</junit.version>
     </properties>
@@ -26,7 +26,7 @@
         <!-- Repo for access to CraftBukkit -->
         <repository>
           <id>spigot-repo</id>
-          <url>http://repo.md-5.net/content/groups/public/</url>
+          <url>https://repo.md-5.net/content/groups/public/</url>
         </repository>
         <repository>
           <id>bukkit-repo</id>
@@ -61,7 +61,7 @@
             <artifactId>craftbukkit</artifactId>
             <version>${project.cbversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot-1.9.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
