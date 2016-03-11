@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.IInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;

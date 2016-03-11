@@ -1,18 +1,20 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R3.EntityLiving;
-import net.minecraft.server.v1_8_R3.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
+
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
+
+import net.minecraft.server.v1_9_R1.EntityLiving;
+import net.minecraft.server.v1_9_R1.GenericAttributes;
 
 /**
  * A Common Entity implementation for Living Entities
