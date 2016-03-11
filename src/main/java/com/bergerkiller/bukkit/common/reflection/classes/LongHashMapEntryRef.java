@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import net.minecraft.server.v1_8_R3.LongHashMap;
+import net.minecraft.server.v1_9_R1.LongHashMap;
 
 public class LongHashMapEntryRef {
 

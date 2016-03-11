@@ -3,15 +3,10 @@ package com.bergerkiller.bukkit.common.controller;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-<<<<<<< HEAD
 import net.minecraft.server.v1_9_R1.DamageSource;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EnumHand;
 
-=======
-import net.minecraft.server.v1_8_R3.DamageSource;
-import net.minecraft.server.v1_8_R3.Entity;
->>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 import org.bukkit.entity.HumanEntity;
 
 /**
@@ -40,11 +35,7 @@ public final class DefaultEntityController extends EntityController {
         if (handle instanceof NMSEntityHook) {
             super.onTick();
         } else {
-<<<<<<< HEAD
             ((Entity) handle).U(); //Tick the entity
-=======
-            ((Entity) handle).t_(); //Tick the entity
->>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
         }
     }
 

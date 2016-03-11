@@ -18,21 +18,10 @@ import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-<<<<<<< HEAD
 
 import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.IBlockData;
-=======
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-
-import java.util.Random;
->>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
 public class EntityRef {
 
@@ -40,10 +29,10 @@ public class EntityRef {
 
     /* Fields */
     public static final FieldAccessor<org.bukkit.entity.Entity> bukkitEntity = TEMPLATE.getField("bukkitEntity");
-    public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("ae");
-    public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("af");
-    public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("ag");
-    public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("ai");
+    public static final FieldAccessor<Integer> chunkX = TEMPLATE.getField("ab");
+    public static final FieldAccessor<Integer> chunkY = TEMPLATE.getField("ac");
+    public static final FieldAccessor<Integer> chunkZ = TEMPLATE.getField("ad");
+    public static final FieldAccessor<Boolean> positionChanged = TEMPLATE.getField("impulse");
     public static final FieldAccessor<Boolean> velocityChanged = TEMPLATE.getField("velocityChanged");
     //	public static final FieldAccessor<Boolean> justLanded = TEMPLATE.getField("g");
     public static final FieldAccessor<Double> locX = TEMPLATE.getField("locX");
@@ -55,9 +44,9 @@ public class EntityRef {
     public static final FieldAccessor<Float> yaw = TEMPLATE.getField("yaw");
     public static final FieldAccessor<Float> pitch = TEMPLATE.getField("pitch");
     public static final FieldAccessor<Random> random = TEMPLATE.getField("random");
-    public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("h");
-    public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("k"); //Note: Not sure if the name is correct!
-    public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("ad");
+    public static final FieldAccessor<Integer> stepCounter = TEMPLATE.getField("av");
+    public static final FieldAccessor<Boolean> ignoreChunkCheck = TEMPLATE.getField("i"); //Note: Not sure if the name is correct!
+    public static final FieldAccessor<Boolean> isLoaded = TEMPLATE.getField("aa");
     public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("ak");
 
     /* Methods */
@@ -67,9 +56,9 @@ public class EntityRef {
     //	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("g_");
     private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("setYawPitch", float.class, float.class);
     private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
-    private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("W");
-    private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("V");
-    public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("P");
+    private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("aj");
+    private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("isInWater");
+    public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("aa");
 
     /* External */
     public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);

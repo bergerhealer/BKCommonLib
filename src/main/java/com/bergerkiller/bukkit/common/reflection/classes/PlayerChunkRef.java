@@ -9,12 +9,6 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-<<<<<<< HEAD
-=======
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PlayerChunkMap;
-import org.bukkit.entity.Player;
->>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.PlayerChunk;

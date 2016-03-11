@@ -17,7 +17,7 @@ public class EntityHumanRef extends EntityLivingRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityHuman");
     public static final TranslatorFieldAccessor<IntVector3> spawnCoord = TEMPLATE.getField("c").translate(ConversionPairs.chunkCoordinates);
-    public static final FieldAccessor<Boolean> spawnForced = TEMPLATE.getField("d");
+    public static final FieldAccessor<Boolean> spawnForced = TEMPLATE.getField("f");
     public static final FieldAccessor<String> spawnWorld = TEMPLATE.getField("spawnWorld");
     public static final FieldAccessor<Object> foodData = TEMPLATE.getField("foodData");
     public static final FieldAccessor<Float> exp = TEMPLATE.getField("exp");
@@ -27,11 +27,7 @@ public class EntityHumanRef extends EntityLivingRef {
     public static final FieldAccessor<HashMap<Integer, Object>> mobEffects = TEMPLATE.getField("effects");
     public static final FieldAccessor<Boolean> updateEffects = TEMPLATE.getField("updateEffects");
     public static final TranslatorFieldAccessor<PlayerAbilities> abilities = TEMPLATE.getField("abilities").translate(ConversionPairs.playerAbilities);
-<<<<<<< HEAD
     public static final FieldAccessor<GameProfile> gameProfile = TEMPLATE.getField("bR");
-=======
-    public static final FieldAccessor<GameProfile> gameProfile = TEMPLATE.getField("bH");
->>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
     public static boolean canInstaBuild(HumanEntity human) {
         return abilities.get(HandleConverter.toEntityHandle.convert(human)).canInstantlyBuild();

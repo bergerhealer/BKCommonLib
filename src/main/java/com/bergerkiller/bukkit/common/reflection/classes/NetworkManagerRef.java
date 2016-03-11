@@ -14,5 +14,5 @@ public class NetworkManagerRef {
     public static final FieldAccessor<Queue<Object>> queue = TEMPLATE.getField("i");
     //	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("l");
     public static final FieldAccessor<Channel> channel = TEMPLATE.getField("channel");
-    public static final MethodAccessor<Boolean> getIsOpen = TEMPLATE.getMethod("g");
+    public static final MethodAccessor<Boolean> getIsOpen = TEMPLATE.getMethod("isConnected");
 }

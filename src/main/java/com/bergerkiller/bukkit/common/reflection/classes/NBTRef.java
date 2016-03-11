@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.wrappers.NBTReadLimiterUnlimited;
-import net.minecraft.server.v1_8_R3.NBTReadLimiter;
+import net.minecraft.server.v1_9_R1.NBTReadLimiter;
 
 import java.io.DataInput;
 import java.io.DataOutput;

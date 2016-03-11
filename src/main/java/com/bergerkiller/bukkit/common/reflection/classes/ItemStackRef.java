@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import net.minecraft.server.v1_8_R3.Blocks;
+import net.minecraft.server.v1_9_R1.Blocks;
 import org.bukkit.Material;
 
 public class ItemStackRef {
