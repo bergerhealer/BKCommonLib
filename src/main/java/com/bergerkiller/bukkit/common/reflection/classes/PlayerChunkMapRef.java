@@ -12,8 +12,13 @@ public class PlayerChunkMapRef {
 
     public static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("PlayerChunkMap");
     public static final FieldAccessor<List<?>> managedPlayers = TEMPLATE.getField("managedPlayers");
+<<<<<<< HEAD
+    public static final FieldAccessor<Integer> radius = TEMPLATE.getField("j");
+    public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = TEMPLATE.getField("e").translate(ConversionPairs.longHashMap);
+=======
     public static final FieldAccessor<Integer> radius = TEMPLATE.getField("g");
     public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = TEMPLATE.getField("d").translate(ConversionPairs.longHashMap);
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
     public static final FieldAccessor<Queue<?>> dirtyBlockChunks = TEMPLATE.getField("f");
     public static final MethodAccessor<Boolean> shouldUnload = TEMPLATE.getMethod("a", int.class, int.class, int.class, int.class, int.class);
     public static final MethodAccessor<Object> getChunk = TEMPLATE.getMethod("a", int.class, int.class, boolean.class);

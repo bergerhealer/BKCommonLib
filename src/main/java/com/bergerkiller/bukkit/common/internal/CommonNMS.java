@@ -9,12 +9,12 @@ import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
@@ -201,7 +201,7 @@ public class CommonNMS {
 
     public static List<Entity> getEntities(World world, Entity ignore,
             double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-        return getEntitiesIn(world, ignore, AxisAlignedBB.a(xmin, ymin, zmin, xmax, ymax, zmax));
+        return getEntitiesIn(world, ignore, new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax));
     }
 
     @SuppressWarnings("unchecked")

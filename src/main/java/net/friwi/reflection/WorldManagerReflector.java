@@ -1,8 +1,8 @@
 package net.friwi.reflection;
 
 import com.bergerkiller.bukkit.common.internal.CommonWorldListener;
-import net.minecraft.server.v1_8_R3.WorldManager;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_9_R1.WorldManager;
+import net.minecraft.server.v1_9_R1.WorldServer;
 
 import java.lang.reflect.Field;
 

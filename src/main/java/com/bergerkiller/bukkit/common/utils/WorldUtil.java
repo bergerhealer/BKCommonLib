@@ -8,11 +8,11 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_9_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -282,7 +282,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension Id
      */
     public static int getDimension(org.bukkit.World world) {
-        return ((World) Conversion.toWorldHandle.convert(world)).worldProvider.getDimension();
+        return ((World) Conversion.toWorldHandle.convert(world)).getWorldData().getType().g();
     }
 
     /**
@@ -499,7 +499,7 @@ public class WorldUtil extends ChunkUtil {
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
         MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(CommonNMS.newVec3D(startX, startY, startZ),
                 CommonNMS.newVec3D(endX, endY, endZ), false);
-        return mop == null ? null : world.getBlockAt((int) mop.pos.a, (int) mop.pos.b, (int) mop.pos.c);
+        return mop == null ? null : world.getBlockAt((int) mop.pos.x, (int) mop.pos.y, (int) mop.pos.z);
     }
 
     /**

@@ -13,7 +13,7 @@ import java.util.logging.Level;
  */
 class CommonPacketMonitor implements PacketMonitor {
 
-    public static final PacketType[] TYPES = {PacketType.OUT_MAP_CHUNK, PacketType.OUT_MAP_CHUNK_BULK, PacketType.OUT_RESPAWN};
+    public static final PacketType[] TYPES = {PacketType.OUT_MAP_CHUNK/*, PacketType.OUT_MAP_CHUNK_BULK*/, PacketType.OUT_RESPAWN};
     private boolean listenError = false;
 
     @Override
@@ -26,17 +26,17 @@ class CommonPacketMonitor implements PacketMonitor {
         CommonPlayerMeta meta = CommonPlugin.getInstance().getPlayerMeta(player);
         if (packet.getType() == PacketType.OUT_MAP_CHUNK) {
             // Update it for a single chunk
-            boolean visible = packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap).b != 0;
+            boolean visible = true;//packet.read(PacketType.OUT_MAP_CHUNK.chunkDataBitMap).b != 0;
             int chunkX = packet.read(PacketType.OUT_MAP_CHUNK.x);
             int chunkZ = packet.read(PacketType.OUT_MAP_CHUNK.z);
             meta.setChunkVisible(chunkX, chunkZ, visible);
-
-        } else if (packet.getType() == PacketType.OUT_MAP_CHUNK_BULK) {
-            // Update it for multiple chunks at once
-            // This type of packet only makes new chunks visible - it never unloads
-            int[] chunkX = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_x);
-            int[] chunkZ = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_z);
-            meta.setChunksAsVisible(chunkX, chunkZ);
+//Removed?
+//        } else if (packet.getType() == PacketType.OUT_MAP_CHUNK_BULK) {
+//            // Update it for multiple chunks at once
+//            // This type of packet only makes new chunks visible - it never unloads
+//            int[] chunkX = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_x);
+//            int[] chunkZ = packet.read(PacketType.OUT_MAP_CHUNK_BULK.bulk_z);
+//            meta.setChunksAsVisible(chunkX, chunkZ);
         } else if (packet.getType() == PacketType.OUT_RESPAWN) {
             // Clear all known chunks
             meta.clearVisibleChunks();

@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_9_R1.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

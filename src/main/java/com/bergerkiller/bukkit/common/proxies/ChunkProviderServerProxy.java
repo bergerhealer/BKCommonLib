@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.proxies;
 
 import net.friwi.reflection.ChunkPosition;
-import net.minecraft.server.v1_8_R3.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_9_R1.*;
 
 import java.util.List;
 
@@ -19,8 +19,8 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         ProxyBase.validate(ChunkProviderServerProxy.class);
     }
 
-    public ChunkProviderServerProxy(Object worldServer, Object iChunkLoader, Object iChunkProvider, Object base) {
-        super((WorldServer) worldServer, (IChunkLoader) iChunkLoader, (IChunkProvider) iChunkProvider);
+    public ChunkProviderServerProxy(Object worldServer, Object iChunkLoader, ChunkGenerator iChunkProvider, Object base) {
+        super((WorldServer) worldServer, (IChunkLoader) iChunkLoader, (ChunkGenerator) iChunkProvider);
         setProxyBase(base);
     }
 
@@ -42,53 +42,51 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
     public void super_b() {
         super.b();
     }
-
-    @Override
-    public boolean canSave() {
-        return base.canSave();
+    
+    public boolean canSave(){
+    	return base.e();
     }
 
-    public boolean super_canSave() {
-        return super.canSave();
+    public boolean super_canSave(){
+    	return super.e();
     }
 
     @Deprecated
     public ChunkPosition _findNearestMapFeature(World world, String s, BlockPosition pos) {
-        return new ChunkPosition(base.findNearestMapFeature(world, s, pos));
+        return new ChunkPosition(base.a(world, s, pos));
     }
 
-    @Override
     public BlockPosition findNearestMapFeature(World world, String s, BlockPosition pos) {
-        return new BlockPosition(base.findNearestMapFeature(world, s, pos));
+        return new BlockPosition(base.a(world, s, pos));
     }
 
     @Deprecated
     public ChunkPosition findNearestMapFeature(World world, String s, int i, int j, int k) {
-        return new ChunkPosition(base.findNearestMapFeature(world, s, new BlockPosition(i, j, k)));
+        return new ChunkPosition(base.a(world, s, new BlockPosition(i, j, k)));
     }
 
     @Deprecated
     public ChunkPosition super_findNearestMapFeature(World world, String s, int i, int j, int k) {
-        return new ChunkPosition(super.findNearestMapFeature(world, s, new BlockPosition(i, j, k)));
+        return new ChunkPosition(super.a(world, s, new BlockPosition(i, j, k)));
     }
 
     @Deprecated
     public ChunkPosition _super_findNearestMapFeature(World world, String s, BlockPosition pos) {
-        return new ChunkPosition(super.findNearestMapFeature(world, s, pos));
+        return new ChunkPosition(super.a(world, s, pos));
     }
 
     public BlockPosition super_findNearestMapFeature(World world, String s, BlockPosition pos) {
-        return new BlockPosition(super.findNearestMapFeature(world, s, pos));
+        return new BlockPosition(super.a(world, s, pos));
     }
 
-    @Override
     public void getChunkAt(IChunkProvider arg0, int arg1, int arg2) {
-        base.getChunkAt(arg0, arg1, arg2);
+        base.getChunkAt(arg1, arg2, null);
     }
 
     public void super_getChunkAt(IChunkProvider arg0, int arg1, int arg2) {
-        super.getChunkAt(arg0, arg1, arg2);
+        super.getChunkAt(arg1, arg2, null);
     }
+
 
     @Override
     public Chunk getChunkAt(int x, int z, Runnable task) {
@@ -108,31 +106,29 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         return super.getChunkAt(x, z);
     }
 
-    @Override
     public int getLoadedChunks() {
-        return base.getLoadedChunks();
+        return base.chunks.size();
     }
 
     public int super_getLoadedChunks() {
-        return super.getLoadedChunks();
+        return super.chunks.size();
     }
 
-    @Override
     public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
-        return base.getMobsFor(enumcreaturetype, pos);
+        return base.a(enumcreaturetype, pos);
     }
 
     @Deprecated
     public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, int i, int j, int k) {
-        return base.getMobsFor(enumcreaturetype, new BlockPosition(i, j, k));
+        return base.a(enumcreaturetype, new BlockPosition(i, j, k));
     }
 
     public List<BiomeMeta> super_getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
-        return super.getMobsFor(enumcreaturetype, pos);
+        return super.a(enumcreaturetype, pos);
     }
 
     public List<BiomeMeta> super_getMobsFor(EnumCreatureType enumcreaturetype, int i, int j, int k) {
-        return super.getMobsFor(enumcreaturetype, new BlockPosition(i, j, k));
+        return super.a(enumcreaturetype, new BlockPosition(i, j, k));
     }
 
     @Override
@@ -144,13 +140,12 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         return super.getName();
     }
 
-    @Override
     public Chunk getOrCreateChunk(int x, int z) {
-        return base.getOrCreateChunk(x, z);
+        return base.getOrLoadChunkAt(x, z);
     }
 
     public Chunk super_getOrCreateChunk(int x, int z) {
-        return super.getOrCreateChunk(x, z);
+        return super.getOrLoadChunkAt(x, z);
     }
 
     @Override
@@ -180,13 +175,12 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         super.queueUnload(x, z);
     }
 
-    @Override
     public void recreateStructures(Chunk chunk, int x, int z) {
-        base.recreateStructures(chunk, x, z);
+        base.chunkGenerator.recreateStructures(chunk, x, z);
     }
 
     public void super_recreateStructures(Chunk chunk, int x, int z) {
-        super.recreateStructures(chunk, x, z);
+        super.chunkGenerator.recreateStructures(chunk, x, z);
     }
 
     @Override
@@ -207,14 +201,14 @@ public class ChunkProviderServerProxy extends ChunkProviderServer implements Pro
         super.saveChunkNOP(chunk);
     }
 
-    @Override
-    public boolean saveChunks(boolean arg0, IProgressUpdate arg1) {
-        return base.saveChunks(arg0, arg1);
-    }
-
-    public boolean super_saveChunks(boolean arg0, IProgressUpdate arg1) {
-        return super.saveChunks(arg0, arg1);
-    }
+//    @Override
+//    public boolean saveChunks(boolean arg0, IProgressUpdate arg1) {
+//        return base.e(arg0, arg1);
+//    }
+//
+//    public boolean super_saveChunks(boolean arg0, IProgressUpdate arg1) {
+//        return super.e(arg0, arg1);
+//    }
 
     @Override
     public boolean unloadChunks() {

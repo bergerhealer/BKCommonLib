@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -59,29 +60,29 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public VectorAbstract velSynched = new VectorAbstract() {
         public double getX() {
-            return ((EntityTrackerEntry) handle).j;
+            return ((EntityTrackerEntry) handle).b().locX;
         }
 
         public double getY() {
-            return ((EntityTrackerEntry) handle).k;
+            return ((EntityTrackerEntry) handle).b().locY;
         }
 
         public double getZ() {
-            return ((EntityTrackerEntry) handle).l;
+            return ((EntityTrackerEntry) handle).b().locZ;
         }
 
         public VectorAbstract setX(double x) {
-            ((EntityTrackerEntry) handle).j = x;
+            ((EntityTrackerEntry) handle).b().locX = x;
             return this;
         }
 
         public VectorAbstract setY(double y) {
-            ((EntityTrackerEntry) handle).k = y;
+            ((EntityTrackerEntry) handle).b().locY = y;
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-            ((EntityTrackerEntry) handle).l = z;
+            ((EntityTrackerEntry) handle).b().locZ = z;
             return this;
         }
     };
@@ -132,47 +133,47 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         public int getX() {
-            return ((EntityTrackerEntry) handle).xLoc;
+            return (int) ((EntityTrackerEntry) handle).b().locX;
         }
 
         public int getY() {
-            return ((EntityTrackerEntry) handle).yLoc;
+            return (int) ((EntityTrackerEntry) handle).b().locY;
         }
 
         public int getZ() {
-            return ((EntityTrackerEntry) handle).zLoc;
+            return (int) ((EntityTrackerEntry) handle).b().locZ;
         }
 
         public IntLocationAbstract setX(int x) {
-            ((EntityTrackerEntry) handle).xLoc = x;
+            ((EntityTrackerEntry) handle).b().locX = x;
             return this;
         }
 
         public IntLocationAbstract setY(int y) {
-            ((EntityTrackerEntry) handle).yLoc = y;
+            ((EntityTrackerEntry) handle).b().locY = y;
             return this;
         }
 
         public IntLocationAbstract setZ(int z) {
-            ((EntityTrackerEntry) handle).zLoc = z;
+            ((EntityTrackerEntry) handle).b().locZ = z;
             return this;
         }
 
         public int getYaw() {
-            return ((EntityTrackerEntry) handle).yRot;
+            return (int) ((EntityTrackerEntry) handle).b().yaw;
         }
 
         public int getPitch() {
-            return ((EntityTrackerEntry) handle).xRot;
+            return (int) ((EntityTrackerEntry) handle).b().pitch;
         }
 
         public IntLocationAbstract setYaw(int yaw) {
-            ((EntityTrackerEntry) handle).yRot = yaw;
+            ((EntityTrackerEntry) handle).b().yaw = yaw;
             return this;
         }
 
         public IntLocationAbstract setPitch(int pitch) {
-            ((EntityTrackerEntry) handle).xRot = pitch;
+            ((EntityTrackerEntry) handle).b().pitch = pitch;
             return this;
         }
     };
@@ -243,11 +244,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract headRotSynched = new IntegerAbstract() {
         public int get() {
-            return ((EntityTrackerEntry) handle).i;
+            return ((EntityTrackerEntry) handle).a;
         }
 
         public IntegerAbstract set(int value) {
-            ((EntityTrackerEntry) handle).i = value;
+            ((EntityTrackerEntry) handle).a = value;
             return this;
         }
     };
@@ -272,11 +273,26 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract ticks = new IntegerAbstract() {
         public int get() {
-            return ((EntityTrackerEntry) handle).m;
+        	
+			try {
+				Field f = EntityTrackerEntry.class.getDeclaredField("v");
+				f.setAccessible(true);
+				return f.getInt(((EntityTrackerEntry) handle));
+			} catch (Exception e) {
+				e.printStackTrace();
+				return 0;
+			}
+        	
         }
 
         public IntegerAbstract set(int value) {
-            ((EntityTrackerEntry) handle).m = value;
+        	try {
+				Field f = EntityTrackerEntry.class.getDeclaredField("v");
+				f.setAccessible(true);
+				f.set(((EntityTrackerEntry) handle), value);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
             return this;
         }
     };
@@ -591,10 +607,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
             // Entity Equipment
             EntityLiving living = (EntityLiving) handle;
-            for (int i = 0; i < 5; ++i) {
+            for (EnumItemSlot i : EnumItemSlot.values()) {
                 org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(i));
                 if (itemstack != null) {
-                    PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i, itemstack));
+                    PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i.ordinal(), itemstack));
                 }
             }
 
@@ -1000,9 +1016,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // This has some big issues when new players join...
 
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX()+0D);
+            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY()+0D);
+            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ()+0D);
             // Rotation
             packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (int) locSynched.getYaw());
             packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (int) locSynched.getPitch());

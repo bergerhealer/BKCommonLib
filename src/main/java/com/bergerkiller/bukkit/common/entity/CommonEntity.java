@@ -18,10 +18,10 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -117,7 +117,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             } else {
                 // Create a new entry
                 final CommonEntityType type = CommonEntityType.byEntity(entity);
-                newEntry = new EntityTrackerEntry(getHandle(Entity.class), type.networkViewDistance, type.networkUpdateInterval, type.networkIsMobile);
+                newEntry = new EntityTrackerEntry(getHandle(Entity.class), type.networkViewDistance, type.networkUpdateInterval, 0, type.networkIsMobile);
                 // Transfer data if needed
                 if (storedEntry != null) {
                     EntityTrackerEntryRef.TEMPLATE.transfer(storedEntry, newEntry);
@@ -260,11 +260,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         EntityRef.bukkitEntity.set(oldInstance, EntityRef.createEntity(oldInstance));
 
         // *** Passenger/Vehicle ***
-        if (newInstance.vehicle != null) {
-            newInstance.vehicle.passenger = newInstance;
-        }
-        if (newInstance.passenger != null) {
-            newInstance.passenger.vehicle = newInstance;
+        if (newInstance.getVehicle() != null && newInstance.getVehicle().passengers !=null) {
+            newInstance.getVehicle().passengers.remove(oldInstance);
+            newInstance.getVehicle().passengers.add(newInstance);
         }
 
         // Only do this replacement logic for Entities that are already spawned

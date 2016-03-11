@@ -8,11 +8,12 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,7 +125,10 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
      *
      * @return list of chunk coordinates pending for sending
      */
+    //?
+    @Deprecated
     public List<IntVector2> getChunkSendQueue() {
-        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
+    	return new ArrayList<IntVector2>();
+//        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
     }
 }

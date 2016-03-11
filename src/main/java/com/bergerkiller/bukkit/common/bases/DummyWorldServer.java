@@ -2,9 +2,15 @@ package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
+<<<<<<< HEAD
+import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.WorldServer;
+import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
+=======
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
 /**
  * A dummy world that can be used to operate on or using worlds without
@@ -32,7 +38,7 @@ public class DummyWorldServer extends WorldServer {
 
     public static DummyWorldServer newInstance() {
         DummyWorldServer world = TEMPLATE.newInstanceNull();
-        world.chunkProviderServer = world.DUMMYCPS = new DummyChunkProviderServer(world);
+        world.chunkProvider = world.DUMMYCPS = new DummyChunkProviderServer(world);
         WorldRef.bukkitWorld.set(world, new CraftWorld(world, null, null));
         return world;
     }

@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
-import net.minecraft.server.v1_8_R3.MathHelper;
+import net.minecraft.server.v1_9_R1.MathHelper;
 
 public enum EnumEntitySize {
 

@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.EntityTrackerEntry;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.EntityTrackerEntry;
 import org.bukkit.entity.Entity;
 
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.logging.Level;
 public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 
     private EntityNetworkController<?> controller;
+    Entity ent = null;
 
     /**
      * Initializes a new Entity Tracker Entry hook
@@ -22,12 +23,13 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
      * @param entity that this tracker entry belongs to
      */
     public NMSEntityTrackerEntry(final Entity entity) {
-        super(CommonNMS.getNative(entity), 80, 3, true);
-        // Fix these two: Wrongly set in Constructor
-        this.xLoc = EntityNetworkController.a(tracker.locX);
-        this.zLoc = EntityNetworkController.a(tracker.locZ);
+        super(CommonNMS.getNative(entity), 80, 3, 0, true);
+        ent = entity;
+//        // Fix these two: Wrongly set in Constructor
+//        this.xLoc = EntityNetworkController.a(CommonNMS.getNative(entity).locX);
+//        this.zLoc = EntityNetworkController.a(CommonNMS.getNative(entity).locZ);
         // Set proper update interval/viewdistance/mobile
-        final CommonEntityType type = CommonEntityType.byNMSEntity(tracker);
+        final CommonEntityType type = CommonEntityType.byNMSEntity(CommonNMS.getNative(entity));
         EntityTrackerEntryRef.isMobile.set(this, type.networkIsMobile);
         EntityTrackerEntryRef.updateInterval.set(this, type.networkUpdateInterval);
         EntityTrackerEntryRef.viewDistance.set(this, type.networkViewDistance);
@@ -52,7 +54,7 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
             CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
             t.printStackTrace();
         }
-        this.m++;
+        this.a++;
     }
 
     @SuppressWarnings("rawtypes")
@@ -61,14 +63,14 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
             double lastSyncX = EntityTrackerEntryRef.prevX.get(this);
             double lastSyncY = EntityTrackerEntryRef.prevY.get(this);
             double lastSyncZ = EntityTrackerEntryRef.prevZ.get(this);
-            if (tracker.e(lastSyncX, lastSyncY, lastSyncZ) <= 16.0) {
+            if (CommonNMS.getNative(ent).e(lastSyncX, lastSyncY, lastSyncZ) <= 16.0) {
                 return;
             }
         }
         // Update tracking data
-        EntityTrackerEntryRef.prevX.set(this, tracker.locX);
-        EntityTrackerEntryRef.prevY.set(this, tracker.locY);
-        EntityTrackerEntryRef.prevZ.set(this, tracker.locZ);
+        EntityTrackerEntryRef.prevX.set(this, CommonNMS.getNative(ent).locX);
+        EntityTrackerEntryRef.prevY.set(this, CommonNMS.getNative(ent).locY);
+        EntityTrackerEntryRef.prevZ.set(this, CommonNMS.getNative(ent).locZ);
         EntityTrackerEntryRef.synched.set(this, true);
         this.scanPlayers(list);
     }
@@ -105,7 +107,7 @@ public class NMSEntityTrackerEntry extends EntityTrackerEntry {
 
     @Override
     public void updatePlayer(EntityPlayer entityplayer) {
-        if (entityplayer != tracker) {
+        if (entityplayer != CommonNMS.getNative(ent)) {
             try {
                 controller.updateViewer(CommonNMS.getPlayer(entityplayer));
             } catch (Throwable t) {

@@ -217,22 +217,47 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutEntityTeleport extends NMSPacketPlayOutEntity {
 
+<<<<<<< HEAD
+    	public final FieldAccessor<Integer> id = getField("a");
+    	public final FieldAccessor<Double> x = getField("b");
+        public final FieldAccessor<Double> y = getField("c");
+        public final FieldAccessor<Double> z = getField("d");
+=======
         public final FieldAccessor<Integer> x = getField("b");
         public final FieldAccessor<Integer> y = getField("c");
         public final FieldAccessor<Integer> z = getField("d");
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
         public final FieldAccessor<Byte> yaw = getField("e");
         public final FieldAccessor<Byte> pitch = getField("f");
         public final FieldAccessor<Boolean> onGround = getField("g");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
+<<<<<<< HEAD
+        private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor();
+=======
         private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
         }
 
+<<<<<<< HEAD
+		public CommonPacket newInstance(int entityId, double posX, double posY, double posZ, byte yaw2, byte pitch2, boolean b) {
+			CommonPacket packet = constructor2.newInstance();
+			id.set(packet, entityId);
+			x.set(packet, posX);
+			y.set(packet, posY);
+			z.set(packet, posZ);
+			yaw.set(packet, yaw2);
+			pitch.set(packet, pitch2);
+			onGround.set(packet, b);
+			return packet;
+		}
+=======
         public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch, boolean b) {
             return constructor2.newInstance(entityId, x, y, z, yaw, pitch, b);
         }
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
     }
 
     public static class NMSPacketPlayOutEntityVelocity extends NMSPacketPlayOutEntity {
@@ -359,8 +384,13 @@ public class PacketTypeClasses {
             return constructor1.newInstance(chunk, hasBiomeData, sectionsMask);
         }
     }
+<<<<<<< HEAD
+//Got removed
+    /*public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
+=======
 
     public static class NMSPacketPlayOutMapChunkBulk extends NMSPacket {
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
         public final FieldAccessor<int[]> bulk_x = getField("a");
         public final FieldAccessor<int[]> bulk_z = getField("b");

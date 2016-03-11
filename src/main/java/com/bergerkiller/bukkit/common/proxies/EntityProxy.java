@@ -321,4 +321,19 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
     public void setCustomNameVisible(boolean arg0) {
         base.setCustomNameVisible(arg0);
     }
+
+	@Override
+	public Spigot spigot() {
+		return base.spigot();
+	}
+
+	@Override
+	public boolean isGlowing() {
+		return base.isGlowing();
+	}
+
+	@Override
+	public void setGlowing(boolean arg0) {
+		base.setGlowing(arg0);
+	}
 }

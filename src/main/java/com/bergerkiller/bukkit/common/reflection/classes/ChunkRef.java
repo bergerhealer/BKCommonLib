@@ -2,11 +2,23 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 
 import com.bergerkiller.bukkit.common.reflection.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+<<<<<<< HEAD
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.Chunk;
+import net.minecraft.server.v1_9_R1.EnumSkyBlock;
+import net.minecraft.server.v1_9_R1.IBlockData;
+import net.minecraft.server.v1_9_R1.ChunkGenerator;
+import net.minecraft.server.v1_9_R1.IChunkProvider;
+
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
+=======
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
 import java.util.List;
 import java.util.Map;
@@ -95,9 +107,13 @@ public class ChunkRef {
         return setBlock(chunkHandle, x, y, z, CraftMagicNumbers.getBlock(typeId), data);
     }
 
-    public static int getData(Object chunkHandle, int x, int y, int z) {
+    public static IBlockData getData(Object chunkHandle, int x, int y, int z) {
         BlockPosition pos = new BlockPosition(x & XZ_MASK, y, z & XZ_MASK);
+<<<<<<< HEAD
+        return ((Chunk) chunkHandle).getBlockData(pos);
+=======
         return ((Chunk) chunkHandle).getType(pos).toLegacyData(((Chunk) chunkHandle).getBlockData(pos));
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
     }
 
     public static Object getType(Object chunkHandle, int x, int y, int z) {

@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.reflection.gen.CallbackSignature;
 import com.bergerkiller.bukkit.common.reflection.gen.ProxyCallbackSignature;
 import com.bergerkiller.bukkit.common.reflection.gen.SuperCallbackSignature;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import net.sf.cglib.asm.Type;
+import org.objectweb.asm.Type;
 import net.sf.cglib.core.Signature;
 import net.sf.cglib.proxy.*;
 

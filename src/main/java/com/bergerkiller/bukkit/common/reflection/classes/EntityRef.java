@@ -1,10 +1,29 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
+import java.util.Random;
+
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.*;
+import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
+import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
+import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+<<<<<<< HEAD
+
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.IBlockData;
+=======
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import org.bukkit.Bukkit;
@@ -13,6 +32,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 
 import java.util.Random;
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
 
 public class EntityRef {
 
@@ -41,7 +61,7 @@ public class EntityRef {
     public static final FieldAccessor<Boolean> allowTeleportation = TEMPLATE.getField("ak");
 
     /* Methods */
-    private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class, Block.class, BlockPosition.class);
+    private static final MethodAccessor<Void> updateFalling = TEMPLATE.getMethod("a", double.class, boolean.class, IBlockData.class, BlockPosition.class);
     private static final MethodAccessor<Void> updateBlockCollision = TEMPLATE.getMethod("checkBlockCollisions");
     private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", BlockPosition.class, BlockRef.TEMPLATE.getType());
     //	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("g_");
@@ -68,7 +88,7 @@ public class EntityRef {
         return update ? isInWaterUpdate.invoke(entityHandle) : isInWaterNoUpdate.invoke(entityHandle);
     }
 
-    public static void updateFalling(Object entityHandle, double deltaY, boolean hitGround, Block block, BlockPosition bpos) {
+    public static void updateFalling(Object entityHandle, double deltaY, boolean hitGround, IBlockData block, BlockPosition bpos) {
         updateFalling.invoke(entityHandle, deltaY, hitGround, block, bpos);
     }
 

@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.EntityController;
-import net.minecraft.server.v1_8_R3.DamageSource;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_9_R1.DamageSource;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.NBTTagCompound;
 import org.bukkit.Location;
 
 /**

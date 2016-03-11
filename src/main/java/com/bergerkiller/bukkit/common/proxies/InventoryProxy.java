@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.proxies;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
@@ -196,4 +197,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
     public void setMaxStackSize(int size) {
         base.setMaxStackSize(size);
     }
+
+	@Override
+	public Location getLocation() {
+		return base.getLocation();
+	}
 }

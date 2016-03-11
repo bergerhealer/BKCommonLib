@@ -4,10 +4,10 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
 import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
-import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PlayerChunkMap;
-import net.minecraft.server.v1_8_R3.WorldServer;
+import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.PlayerChunkMap;
+import net.minecraft.server.v1_9_R1.WorldServer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -22,14 +22,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
         super((WorldServer) Conversion.toWorldHandle.convert(world), viewDistance);
     }
 
-    /**
-     * @deprecated use {@link #getWorld()} instead
-     */
-    @Deprecated
-    @Override
-    public final WorldServer a() {
-        return CommonNMS.getNative(this.getWorld());
-    }
+    //Removed deprecated method
 
     /**
      * @deprecated use
@@ -46,7 +39,6 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @deprecated use {@link #addChunksToSend(Player)} instead
      */
     @Deprecated
-    @Override
     public final void b(EntityPlayer entityplayer) {
         this.addChunksToSend(CommonNMS.getPlayer(entityplayer));
     }
@@ -132,7 +124,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
                 }
 
                 if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1)) {
-                    Collections.sort(entityplayer.chunkCoordIntPairQueue, new ChunkCoordComparator(entityplayer));
+                    Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
                 }
             }
         }
@@ -177,7 +169,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @param player to add the chunks to send to
      */
     public void addChunksToSend(Player player) {
-        super.b(CommonNMS.getNative(player));
+        super.addPlayer(CommonNMS.getNative(player));
     }
 
     /**
@@ -198,10 +190,10 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * Gets the world from this PlayerManager<br>
      * Is called by the PlayerChunkInstance initializer as well
      *
-     * @return World
+     * @return WorldServer
      */
-    public World getWorld() {
-        return Conversion.toWorld.convert(super.a());
+    public WorldServer getWorld() {
+        return super.getWorld();
     }
 
     /**

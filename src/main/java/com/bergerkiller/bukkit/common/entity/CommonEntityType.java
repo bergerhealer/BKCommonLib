@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
 import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.IInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -234,6 +234,14 @@ public class CommonEntityType {
         add(EntityType.ENDERMITE, "Endermite", 80, 3, true);
         add(EntityType.GUARDIAN, "Guardian", 80, 3, true);
         add(EntityType.RABBIT, "Rabbit", 80, 3, true);
+        
+        //New 1.9 stuff
+        add(EntityType.TIPPED_ARROW, "TippedArrow", 80, 3, true);
+        add(EntityType.SPECTRAL_ARROW, "SpectralArrow", 80, 3, true);
+        add(EntityType.SHULKER_BULLET, "ShulkerBullet", 80, 3, true);
+        add(EntityType.DRAGON_FIREBALL, "DragonFireball", 80, 3, true);
+        add(EntityType.SHULKER, "Shulker", 80, 3, true);
+        add(EntityType.AREA_EFFECT_CLOUD, "AreaEffectCloud", 80, 3, true);
 
         // Check that all entity types are registered properly
         EntityType[] invalidTypes = {EntityType.UNKNOWN, EntityType.WEATHER, EntityType.LIGHTNING, EntityType.COMPLEX_PART};

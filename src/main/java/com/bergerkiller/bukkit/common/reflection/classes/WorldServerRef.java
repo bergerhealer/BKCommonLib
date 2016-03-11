@@ -18,6 +18,20 @@ public class WorldServerRef extends WorldRef {
      */
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = TEMPLATE.getField("entitiesById").translate(ConversionPairs.intHashMap);
     public static final FieldAccessor<Object> chunkProviderServer = new SafeDirectField<Object>() {
+<<<<<<< HEAD
+        private final FieldAccessor<Object> field1 = TEMPLATE.getField("chunkProvider");
+//		private final FieldAccessor<Object> field2 = TEMPLATE.getField("generator");
+		 @Override
+	        public Object get(Object instance) {
+	            return field1.get(instance);
+	        }
+
+	        @Override
+	        public boolean set(Object instance, Object value) {
+	            return field1.set(instance, value);// && field2.set(instance, value);
+	        }
+
+=======
         private final FieldAccessor<Object> field1 = TEMPLATE.getField("chunkProviderServer");
 //		private final FieldAccessor<Object> field2 = TEMPLATE.getField("chunkProvider");
 
@@ -30,5 +44,6 @@ public class WorldServerRef extends WorldRef {
         public boolean set(Object instance, Object value) {
             return field1.set(instance, value);// && field2.set(instance, value);
         }
+>>>>>>> 6c6809c31fa3f2895f50a974cd9b182317b26eb3
     };
 }

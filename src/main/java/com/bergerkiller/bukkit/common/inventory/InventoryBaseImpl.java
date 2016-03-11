@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -60,4 +62,14 @@ public class InventoryBaseImpl extends InventoryBase {
     public ItemStack[] getContents() {
         return ItemUtil.cloneItems(this.items);
     }
+
+    Location loc = null;
+    
+	@Override
+	public Location getLocation() {
+		return loc;
+	}
+	public void setLocation(Location loc){
+		this.loc = loc;
+	}
 }

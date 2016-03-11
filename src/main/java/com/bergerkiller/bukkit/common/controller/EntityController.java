@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
@@ -143,10 +143,10 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
         if (handle.noclip) {
             addToBoundingBox(handle, dx, dy, dz);
             handle.locX = CommonNMS.getMiddleX(handle.getBoundingBox());
-            handle.locY = (handle.getBoundingBox().b + (double) handle.length) - (double) handle.S;
+            handle.locY = (handle.getBoundingBox().b + (double) handle.length) - (double) handle.R;
             handle.locZ = CommonNMS.getMiddleZ(handle.getBoundingBox());
         } else {
-            handle.S *= 0.4f;
+            handle.R *= 0.4f;
             final double oldLocX = handle.locX;
             final double oldLocY = handle.locY;
             final double oldLocZ = handle.locZ;
@@ -202,12 +202,12 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             double moveDx;
             double moveDy;
             double moveDz;
-            if (handle.U > 0.0f && handle.U < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
+            if (handle.P > 0.0f && handle.P < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
                 moveDx = dx;
                 moveDy = dy;
                 moveDz = dz;
                 dx = oldDx;
-                dy = (double) handle.U;
+                dy = (double) handle.P;
                 dz = oldDz;
 
                 AxisAlignedBB axisalignedbb1 = handle.getBoundingBox().c(0, 0, 0);
@@ -245,7 +245,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 if (!handle.aT() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 } else {
-                    dy = (double) -handle.U;
+                    dy = (double) -handle.P;
                     for (int k = 0; k < list.size(); k++) {
                         dy = list.get(k).b(handle.getBoundingBox(), dy);
                     }
@@ -259,7 +259,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 } else {
                     double subY = handle.getBoundingBox().b - (int) handle.getBoundingBox().b;
                     if (subY > 0.0) {
-                        handle.U += subY + 0.01;
+                        handle.P += subY + 0.01;
                     }
                 }
             }
@@ -268,8 +268,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             handle.locZ = CommonNMS.getMiddleZ(handle.getBoundingBox());
             entity.setMovementImpaired(oldDx != dx || oldDz != dz);
             handle.onGround = oldDy != dy && oldDy < 0.0;
-            handle.F = oldDy != dy;
-            handle.E = entity.isMovementImpaired() || handle.F;
+            handle.C = oldDy != dy;
+            handle.B = entity.isMovementImpaired() || handle.C;
 //			EntityRef.updateFalling(handle, dy, handle.onGround);
 
             // ================ Collision slowdown caused by ==============
@@ -309,16 +309,16 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
     private void onPostMove(double moveDx, double moveDy, double moveDz) {
         Entity handle = this.entity.getHandle(Entity.class);
         // Update entity movement sounds
-        if (/*EntityRef.hasMovementSound(handle)*/true && handle.vehicle == null) {
+        if (/*EntityRef.hasMovementSound(handle)*/true && handle.getVehicle() == null) {
             int bX = entity.loc.x.block();
             int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.length);
             int bZ = entity.loc.z.block();
-            Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY, bZ)).getType(new BlockPosition(bX, bY, bZ));
-            int j1 = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getType(new BlockPosition(bX, bY - 1, bZ)).b();
+            Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY, bZ)).getBlockData(new BlockPosition(bX, bY, bZ)).getBlock();
+            int j1 = Block.getId(handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getBlockData(new BlockPosition(bX, bY - 1, bZ)).getBlock());
 
             // Magic values! *gasp* Bad, BAD Minecraft! Go sit in a corner!
             if (j1 == 11 || j1 == 32 || j1 == 21) {
-                block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getType(new BlockPosition(bX, bY - 1, bZ));
+                block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getBlockData(new BlockPosition(bX, bY - 1, bZ)).getBlock();
             }
             if (block != Blocks.LADDER) {
                 moveDy = 0.0;
@@ -336,15 +336,15 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                     entity.makeRandomSound(EntityRef.getSwimSound.invoke(handle), f, 1.0f);
                 }
                 entity.makeStepSound(bX, bY, bZ, CommonNMS.getMaterial(block));
-                block.a(handle.world, new BlockPosition(bX, bY, bZ), handle);
+//                block.a(handle.world, new BlockPosition(bX, bY, bZ), handle);
             }
         }
 
         EntityRef.updateBlockCollision(handle);
 
         // Fire tick calculation (check using block collision)
-        final boolean isInWater = handle.U(); // In water or raining
-        if (handle.world.e(handle.getBoundingBox().shrink(0.001, 0.001, 0.001))) {
+        final boolean isInWater = handle.isInWater(); // In water or raining
+        if (handle.world.d(handle.getBoundingBox().shrink(0.001))) {
             onBurnDamage(1);
             if (!isInWater) {
                 handle.fireTicks++;
@@ -361,7 +361,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             handle.fireTicks = -handle.maxFireTicks;
         }
         if (isInWater && handle.fireTicks > 0) {
-            entity.makeRandomSound(Sound.FIZZ, 0.7f, 1.6f);
+            entity.makeRandomSound(Sound.BLOCK_FIRE_EXTINGUISH, 0.7f, 1.6f);
             handle.fireTicks = -handle.maxFireTicks;
         }
     }

@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_8_R3.EntityLiving;
-import net.minecraft.server.v1_8_R3.GenericAttributes;
+import net.minecraft.server.v1_9_R1.EntityLiving;
+import net.minecraft.server.v1_9_R1.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -225,7 +225,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 //	 */
 //	public void moveTo(Entity entity, double speed) {
 //		EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
-//		net.minecraft.server.v1_8_R3.Entity nmsTargetEntity = CommonNMS.getNative(entity);
+//		net.minecraft.server.v1_9_R1.Entity nmsTargetEntity = CommonNMS.getNative(entity);
 //		if(nmsEntity instanceof EntityInsentient) {
 //			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
 //			if(!navigation.a(nmsTargetEntity, speed)) {
