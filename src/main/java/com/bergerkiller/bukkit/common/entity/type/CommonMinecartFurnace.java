@@ -16,12 +16,12 @@ import java.util.List;
  */
 public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
 
-    private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartFurnace");
+	private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartFurnace");
     private static final FieldAccessor<Double> pushForceX = TEMPLATE.getField("a");
     private static final FieldAccessor<Double> pushForceZ = TEMPLATE.getField("b");
-    private static final FieldAccessor<Integer> fuel = TEMPLATE.getField("c");
+    private static final FieldAccessor<Integer> fuel = TEMPLATE.getField("d");
     private static final MethodAccessor<Boolean> isSmokingMethod = TEMPLATE.getMethod("j");
-    private static final MethodAccessor<Void> setSmokingMethod = TEMPLATE.getMethod("i", boolean.class);
+    private static final MethodAccessor<Void> setSmokingMethod = TEMPLATE.getMethod("k", boolean.class);
 
     /**
      * The amount of fuel ticks a single item of coal gives to a furnace

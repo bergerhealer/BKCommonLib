@@ -1,14 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-import net.minecraft.server.v1_8_R3.BlockPosition;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,10 +12,23 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.material.*;
+import org.bukkit.material.Attachable;
+import org.bukkit.material.Directional;
+import org.bukkit.material.Lever;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.PoweredRail;
+import org.bukkit.material.Rails;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.reflection.SafeField;
+import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
+
+import net.minecraft.server.v1_9_R1.BlockPosition;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block

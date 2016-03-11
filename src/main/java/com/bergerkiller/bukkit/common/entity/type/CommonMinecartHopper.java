@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
-import net.minecraft.server.v1_8_R3.EntityMinecartHopper;
+import net.minecraft.server.v1_9_R1.EntityMinecartHopper;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -37,7 +37,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return True if Items were sucked in, False if not
      */
     public boolean suckItems() {
-        return getHandle(EntityMinecartHopper.class).D();
+        return getHandle(EntityMinecartHopper.class).I();
     }
 
     /**
@@ -46,7 +46,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return True if sucking items, False if not
      */
     public boolean isSuckingItems() {
-        return getHandle(EntityMinecartHopper.class).y();
+        return getHandle(EntityMinecartHopper.class).C();
     }
 
     /**

@@ -1,17 +1,21 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
+import org.bukkit.Location;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.util.Vector;
+
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTypesRef;
-import net.minecraft.server.v1_8_R3.DamageSource;
-import net.minecraft.server.v1_8_R3.Entity;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import org.bukkit.Location;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.util.Vector;
+
+import net.minecraft.server.v1_9_R1.DamageSource;
+import net.minecraft.server.v1_9_R1.Entity;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.EnumHand;
+import net.minecraft.server.v1_9_R1.ItemStack;
+import net.minecraft.server.v1_9_R1.NBTTagCompound;
 
 public class NMSEntityHookImpl implements NMSEntityHook {
 
@@ -33,12 +37,12 @@ public class NMSEntityHookImpl implements NMSEntityHook {
     }
 
     @Override
-    public boolean e(EntityHuman human) {
+    public boolean a(EntityHuman human, ItemStack is, EnumHand hand) {
         return controller.onInteractBy(CommonNMS.getHuman(human));
     }
 
     @Override
-    public void t_() {
+    public void m() {
         controller.onTick();
     }
 
@@ -121,13 +125,13 @@ public class NMSEntityHookImpl implements NMSEntityHook {
      * The super methods are unused
      */
     @Override
-    public boolean super_e(EntityHuman human) {
-        return controller.getEntity().getHandle(NMSEntityHook.class).super_e(human);
+    public boolean super_a(EntityHuman human, ItemStack is, EnumHand hand) {
+        return controller.getEntity().getHandle(NMSEntityHook.class).super_a(human,is,hand);
     }
 
     @Override
-    public void super_t_() {
-        controller.getEntity().getHandle(NMSEntityHook.class).super_t_();
+    public void super_m() {
+        controller.getEntity().getHandle(NMSEntityHook.class).super_m();
     }
 
     @Override
