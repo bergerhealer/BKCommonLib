@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
 import net.friwi.reflection.ChunkCoordinates;
 import net.friwi.reflection.ChunkPosition;
-import net.minecraft.server.v1_9_R1.Vec3D;
+import net.minecraft.server.v1_8_R3.Vec3D;
 import org.bukkit.util.Vector;
 
 /**
@@ -21,19 +21,19 @@ public class VectorRef {
 
     public static Vector getVec(Object vec3D) {
         Vec3D vec = (Vec3D) vec3D;
-        return new Vector(vec.x, vec.y, vec.z);
+        return new Vector(vec.a, vec.b, vec.c);
     }
 
     public static double getVecX(Object vec3D) {
-        return ((Vec3D) vec3D).x;
+        return ((Vec3D) vec3D).a;
     }
 
     public static double getVecY(Object vec3D) {
-        return ((Vec3D) vec3D).y;
+        return ((Vec3D) vec3D).b;
     }
 
     public static double getVecZ(Object vec3D) {
-        return ((Vec3D) vec3D).z;
+        return ((Vec3D) vec3D).c;
     }
 
     public static boolean isVec(Object vec3D) {

@@ -19,8 +19,8 @@ public class EntityTrackerEntryRef {
     public static final FieldAccessor<Double> prevX = TEMPLATE.getField("q");
     public static final FieldAccessor<Double> prevY = TEMPLATE.getField("r");
     public static final FieldAccessor<Double> prevZ = TEMPLATE.getField("s");
-    public static final FieldAccessor<Integer> viewDistance = TEMPLATE.getField("e");
-    public static final FieldAccessor<Integer> updateInterval = TEMPLATE.getField("f");
+    public static final FieldAccessor<Integer> viewDistance = TEMPLATE.getField("b");
+    public static final FieldAccessor<Integer> updateInterval = TEMPLATE.getField("c");
     public static final FieldAccessor<Integer> timeSinceLocationSync = TEMPLATE.getField("v");
     public static final FieldAccessor<Boolean> isMobile = TEMPLATE.getField("u");
     public static final TranslatorFieldAccessor<Set<Player>> viewers = TEMPLATE.getField("trackedPlayers").translate(ConversionPairs.playerSet);

@@ -61,7 +61,7 @@
             <artifactId>craftbukkit</artifactId>
             <version>${project.cbversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot-1.9.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>

@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import org.bukkit.craftbukkit.v1_9_R1.chunkio.ChunkIOExecutor;
+import org.bukkit.craftbukkit.v1_8_R3.chunkio.ChunkIOExecutor;
 
 import java.util.Map;
 
