@@ -272,4 +272,8 @@ public class CommonNMS {
     public static AttributeMapServer getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
         return (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(Conversion.toEntityHandle.convert(entity));
     }
+
+    public static MainHand getHand(EnumHand hand) {
+        return HandUtil.toMainHand(hand);
+    }
 }

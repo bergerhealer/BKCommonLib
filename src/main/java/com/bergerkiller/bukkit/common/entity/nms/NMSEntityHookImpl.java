@@ -38,7 +38,7 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 
     @Override
     public boolean a(EntityHuman human, ItemStack is, EnumHand hand) {
-        return controller.onInteractBy(CommonNMS.getHuman(human), is, hand);
+        return controller.onInteractBy(CommonNMS.getHuman(human), CommonNMS.getItemStack(is), CommonNMS.getHand(hand));
     }
 
     @Override
