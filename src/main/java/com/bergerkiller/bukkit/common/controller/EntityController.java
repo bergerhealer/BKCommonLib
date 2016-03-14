@@ -6,6 +6,8 @@ import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
@@ -23,8 +25,6 @@ import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.Blocks;
 import net.minecraft.server.v1_9_R1.DamageSource;
 import net.minecraft.server.v1_9_R1.Entity;
-import net.minecraft.server.v1_9_R1.EnumHand;
-import net.minecraft.server.v1_9_R1.ItemStack;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
 
@@ -69,10 +69,12 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
      * Called when the entity is interacted by something
      *
      * @param interacter that interacted
+     * @param is in hand
+     * @param hand that is used
      * @return True if interaction occurred, False if not
      */
-    public boolean onInteractBy(HumanEntity interacter, ItemStack is, EnumHand hand) {
-        return entity.getHandle(NMSEntityHook.class).super_a(CommonNMS.getNative(interacter),is,hand);
+    public boolean onInteractBy(HumanEntity interacter, ItemStack is, MainHand hand) {
+        return entity.getHandle(NMSEntityHook.class).super_a(CommonNMS.getNative(interacter), CommonNMS.getNative(is), CommonNMS.getNative(hand));
     }
 
     /**
