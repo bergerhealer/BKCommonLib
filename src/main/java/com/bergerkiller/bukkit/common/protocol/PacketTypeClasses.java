@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -162,7 +163,7 @@ public class PacketTypeClasses {
     public static class NMSPacketPlayOutCustomPayload extends NMSPacket {
 
         public final FieldAccessor<String> tag = getField("a");
-        //public final FieldAccessor<PacketDataSerializer> data = getField("b");
+        public final FieldAccessor<PacketDataSerializer> data = getField("b");
     }
 
     public static class NMSPacketPlayOutEntityDestroy extends NMSPacket {
@@ -346,7 +347,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
 
-        public final FieldAccessor<String> reason = getField("a");
+        public final FieldAccessor<IChatBaseComponent> reason = getField("a");
     }
 
     public static class NMSPacketPlayOutLogin extends NMSPacket {
@@ -358,7 +359,7 @@ public class PacketTypeClasses {
         public final TranslatorFieldAccessor<Difficulty> difficulty = getField("e").translate(ConversionPairs.difficulty);
         public final FieldAccessor<Integer> maxPlayers = getField("f");
         public final TranslatorFieldAccessor<WorldType> worldType = getField("g").translate(ConversionPairs.worldType);
-        public final FieldAccessor<Boolean> UNKNOWN1 = getField("h"); // Unkown field
+        public final FieldAccessor<Boolean> UNKNOWN1 = getField("h"); // Unknown field
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
@@ -377,7 +378,7 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> x = getField("a");
         public final FieldAccessor<Integer> z = getField("b");
         //public final FieldAccessor<ChunkMap> chunkDataBitMap = getField("c");
-        public final FieldAccessor<Boolean> hasBiomeData = getField("d");
+        public final FieldAccessor<Boolean> hasBiomeData = getField("e");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
 
         public CommonPacket newInstance(Chunk chunk) {
@@ -413,14 +414,14 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacketPlayOutEntity {
 
+        public final FieldAccessor<Integer> entityId = getField("a");
         public final FieldAccessor<UUID> uuid = getField("b");
         public final FieldAccessor<Integer> x = getField("c");
         public final FieldAccessor<Integer> y = getField("d");
         public final FieldAccessor<Integer> z = getField("e");
         public final FieldAccessor<Byte> yaw = getField("f");
         public final FieldAccessor<Byte> pitch = getField("g");
-        public final FieldAccessor<Integer> heldItemId = getField("h");
-        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("i").translate(ConversionPairs.dataWatcher);
+        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = getField("h").translate(ConversionPairs.dataWatcher);
     }
 
     public static class NMSPacketPlayOutNamedSoundEffect extends NMSPacket {
@@ -442,7 +443,7 @@ public class PacketTypeClasses {
     public static class NMSPacketPlayOutOpenWindow extends NMSPacketPlayOutWindow {
 
         public final FieldAccessor<Integer> type = getField("a");
-        public final FieldAccessor<String> title = getField("c"); // Or field 'B'
+        public final FieldAccessor<IChatBaseComponent> title = getField("c"); // Or field 'B'
         public final FieldAccessor<Integer> slotCount = getField("d");
     }
 
@@ -567,9 +568,9 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutSpawnEntityPainting extends NMSPacketPlayOutEntity {
 
-        public final FieldAccessor<BlockPosition> blockPostion = getField("b");
-        public final FieldAccessor<EnumDirection> facing = getField("c").translate(ConversionPairs.paintingFacing);
-        public final FieldAccessor<String> art = getField("d");
+        public final FieldAccessor<BlockPosition> blockPostion = getField("c");
+        public final FieldAccessor<EnumDirection> facing = getField("d").translate(ConversionPairs.paintingFacing);
+        public final FieldAccessor<String> art = getField("e");
     }
 
     public static class NMSPacketPlayOutSpawnEntityWeather extends NMSPacketPlayOutEntity {
@@ -580,7 +581,6 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> type = getField("e");
     }
 
-    // DOWN FROM HERE NEEDS TO BE DONE!
     public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
 
         public final FieldAccessor<BlockPosition> position = getField("position");
@@ -648,7 +648,7 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayOutUpdateSign extends NMSPacket {
 
-        public final FieldAccessor<net.minecraft.server.v1_9_R1.World> world = getField("a");
+        public final FieldAccessor<World> world = getField("a").translate(ConversionPairs.world);
         public final FieldAccessor<BlockPosition> position = getField("b");
         public final FieldAccessor<IChatBaseComponent[]> lines = getField("c");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(WorldRef.TEMPLATE.getType(), BlockPosition.class, IChatBaseComponent[].class);
@@ -659,7 +659,7 @@ public class PacketTypeClasses {
 
         public void setBlock(Object packetInstance, Block block) {
             position.set(packetInstance, new BlockPosition(block.getX(), block.getY(), block.getZ()));
-            world.set(packetInstance, ((CraftWorld) block.getWorld()).getHandle());
+            world.set(packetInstance, block.getWorld());
         }
 
         public CommonPacket newInstance(Block b, IChatBaseComponent[] lines) {
@@ -751,8 +751,8 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
 
+        public final FieldAccessor<Object> enumHand = getField("a");
         //public final FieldAccessor<Long> timestamp = getField("timestamp");
-
     }
 
     public static class NMSPacketPlayInBlockDig extends NMSPacket {
@@ -763,8 +763,8 @@ public class PacketTypeClasses {
     }
 
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
-
-        //public final FieldAccessor<BlockPosition> position = getField("b");
+        public final FieldAccessor<Object> enumHand = getField("a");
+        public final FieldAccessor<Long> timestamp = getField("timestamp");
     }
 
     public static class NMSPacketPlayInChat extends NMSPacket {
@@ -791,7 +791,8 @@ public class PacketTypeClasses {
 
     public static class NMSPacketPlayInEnchantItem extends NMSPacketPlayInWindow {
 
-        public final FieldAccessor<Integer> enchantment = getField("b");
+        public final FieldAccessor<Integer> enchantment = getField("a");
+        public final FieldAccessor<Integer> windowId = getField("b");
     }
 
     public static class NMSPacketPlayInEntityAction extends NMSPacket {
@@ -806,7 +807,6 @@ public class PacketTypeClasses {
         public final FieldAccessor<Double> x = getField("x");
         public final FieldAccessor<Double> y = getField("y");
         public final FieldAccessor<Double> z = getField("z");
-
         public final FieldAccessor<Float> yaw = getField("yaw");
         public final FieldAccessor<Float> pitch = getField("pitch");
         public final FieldAccessor<Boolean> hasPos = getField("hasPos");
@@ -825,7 +825,24 @@ public class PacketTypeClasses {
     }
 
     public static class NMSPacketPlayInResourcePackStatus extends NMSPacket {
-        // No constructor needed
+
+        public final FieldAccessor<Object> enumStatus = getField("status");
+    }
+
+    public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
+
+        public final FieldAccessor<String> slot = getField("slot");
+        public final FieldAccessor<Object> item = getField("b");
+    }
+
+    public static class NMSPacketPlayInSettings extends NMSPacket {
+
+        public final FieldAccessor<String> lang = getField("a");
+        public final FieldAccessor<Integer> view = getField("b");
+        public final FieldAccessor<Object> chatVisibility = getField("c");
+        public final FieldAccessor<Boolean> enableColors = getField("d");
+        public final FieldAccessor<Integer> modelPartFlags = getField("e");
+        public final FieldAccessor<Object> mainHand = getField("f");
     }
 
     public static class NMSPacketPlayInSpectate extends NMSPacket {
@@ -834,43 +851,6 @@ public class PacketTypeClasses {
         public CommonPacket newInstance(UUID uuid) {
             return constructor1.newInstance(uuid);
         }
-    }
-
-    public static class NMSPacketPlayInLook extends NMSPacket {
-
-        public final FieldAccessor<Float> yaw = getField("yaw");
-        public final FieldAccessor<Float> pitch = getField("pitch");
-    }
-
-    public static class NMSPacketPlayInPosition extends NMSPacket {
-
-        public final FieldAccessor<Double> x = getField("x");
-        public final FieldAccessor<Double> y = getField("y");
-        public final FieldAccessor<Double> z = getField("z");
-    }
-
-    public static class NMSPacketPlayInPositionLook extends NMSPacket {
-
-        public final FieldAccessor<Double> x = getField("x");
-        public final FieldAccessor<Double> y = getField("y");
-        public final FieldAccessor<Double> z = getField("z");
-        public final FieldAccessor<Float> yaw = getField("yaw");
-        public final FieldAccessor<Float> pitch = getField("pitch");
-    }
-
-    public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
-
-        public final FieldAccessor<Integer> slot = getField("slot");
-        public final FieldAccessor<ItemStack> itemStack = getField("b").translate(ConversionPairs.itemStack);
-    }
-
-    public static class NMSPacketPlayInSettings extends NMSPacket {
-
-        public final FieldAccessor<String> locale = getField("a");
-        public final FieldAccessor<Integer> viewDistanceId = getField("b");
-        public final FieldAccessor<Object> chatVisibility = getField("c");
-        public final TranslatorFieldAccessor<Difficulty> difficulty = getField("e").translate(ConversionPairs.difficulty);
-        public final FieldAccessor<Boolean> showCape = getField("d");
     }
 
     public static class NMSPacketPlayInSteerVehicle extends NMSPacket {
@@ -919,7 +899,29 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> button = getField("button");
         public final FieldAccessor<Short> action = getField("d");
         public final FieldAccessor<ItemStack> item = getField("item").translate(ConversionPairs.itemStack);
-        public final FieldAccessor<Integer> shift = getField("shift");
+        public final FieldAccessor<Integer> shift = getField("f");
+    }
+
+    public static class NMSPacketPlayInLook extends NMSPacket {
+
+        public final FieldAccessor<Float> yaw = getField("yaw");
+        public final FieldAccessor<Float> pitch = getField("pitch");
+    }
+
+    public static class NMSPacketPlayInPosition extends NMSPacket {
+
+        public final FieldAccessor<Double> x = getField("x");
+        public final FieldAccessor<Double> y = getField("y");
+        public final FieldAccessor<Double> z = getField("z");
+    }
+
+    public static class NMSPacketPlayInPositionLook extends NMSPacket {
+
+        public final FieldAccessor<Double> x = getField("x");
+        public final FieldAccessor<Double> y = getField("y");
+        public final FieldAccessor<Double> z = getField("z");
+        public final FieldAccessor<Float> yaw = getField("yaw");
+        public final FieldAccessor<Float> pitch = getField("pitch");
     }
 
     //////////////////////////////////////////////////////////////////////
