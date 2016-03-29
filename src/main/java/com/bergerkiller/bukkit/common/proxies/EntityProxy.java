@@ -336,4 +336,14 @@ public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entit
 	public void setGlowing(boolean arg0) {
 		base.setGlowing(arg0);
 	}
+    
+    public boolean isInvulnerable() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setInvulnerable(boolean invulnerable) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+
 }
