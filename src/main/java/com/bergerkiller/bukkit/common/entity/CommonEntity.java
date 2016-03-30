@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.entity;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.*;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -19,17 +18,17 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -94,7 +93,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // Properly handle a previously set controller
         if (storedEntry instanceof NMSEntityTrackerEntry) {
-            final EntityNetworkController oldController = ((NMSEntityTrackerEntry) storedEntry).getController();
+            final EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>> oldController = (EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>>) ((NMSEntityTrackerEntry) storedEntry).getController();
             if (oldController == controller) {
                 return;
             } else if (oldController != null) {
@@ -291,12 +290,15 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             if (hasPassenger()) {
                 entry = tracker.getEntry(getPassenger());
                 if (entry != null) {
-                    EntityTrackerEntryRef.vehicle.set(entry, entity);
+                    List<org.bukkit.entity.Entity> list = new ArrayList<>();
+                    list.add(entity);
+                    EntityTrackerEntryRef.vehicle.set(entry, list);
                 }
             }
 
             // *** World ***
             replaceInList(oldInstance.world.entityList, newInstance);
+            // Fixes for PaperSpigot
 //            if (!Common.IS_PAPERSPIGOT_SERVER) {
 //                replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
 //            }

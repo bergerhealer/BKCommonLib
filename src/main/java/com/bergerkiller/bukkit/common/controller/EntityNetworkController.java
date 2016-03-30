@@ -27,8 +27,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * A controller that deals with the server to client network synchronization.
@@ -307,14 +309,32 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Obtains the vehicle of this (passenger) Entity as the clients know it,
      * allowing it to be read from or written to
      */
-    public ObjectAbstract<Entity> vehicleSynched = new ObjectAbstract<Entity>() {
-        public Entity get() {
+    public ObjectAbstract<List<Entity>> vehicleSynched = new ObjectAbstract<List<Entity>>() {
+        public List<Entity> get() {
             return EntityTrackerEntryRef.vehicle.get(handle);
         }
 
-        public ObjectAbstract<Entity> set(Entity value) {
+        public ObjectAbstract<List<Entity>> set(List<Entity> value) {
             EntityTrackerEntryRef.vehicle.set(handle, value);
             return this;
+        }
+    };
+    /**
+     * @deprecated Use of Lists instead of an direct Entity
+     */
+    @Deprecated
+    public ObjectAbstract<Entity> vehicleSynchedOld = new ObjectAbstract<Entity>() {
+        @Deprecated
+        public Entity get() {
+            throw new IllegalStateException("Method has been deprecated");
+//            return EntityTrackerEntryRef.vehicle.get(handle);
+        }
+
+        @Deprecated
+        public ObjectAbstract<Entity> set(Entity value) {
+            throw new IllegalStateException("Method has been deprecated");
+//            EntityTrackerEntryRef.vehicle.set(handle, value);
+//            return this;
         }
     };
 
@@ -791,7 +811,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public void syncVehicle(org.bukkit.entity.Entity vehicle) {
         if (vehicleSynched.get() != vehicle) {
-            vehicleSynched.set(vehicle);
+            List<Entity> entity = new ArrayList<>();
+            entity.add(vehicle);
+            vehicleSynched.set(entity);
             broadcast(getVehiclePacket(vehicle));
         }
     }
@@ -1052,6 +1074,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     public CommonPacket getVehiclePacket(Entity vehicle) {
         return PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle);
     }
+
 
     /**
      * Gets a new packet with head rotation information for this Entity

@@ -16,7 +16,7 @@ public class DataWatcherRef {
     public static final MethodAccessor<Void> watch = TEMPLATE.getMethod("registerObject", DataWatcherObject.class, Object.class);
     public static final MethodAccessor<List<Object>> returnAllWatched = TEMPLATE.getMethod("c");
     public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = TEMPLATE.getMethod("b");
-    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("c", DataWatcherObject.class);
+    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("a", DataWatcherObject.class);
     public static final MethodAccessor<Boolean> isChanged = TEMPLATE.getMethod("a");
     public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("d");
     public static final SafeConstructor<Object> constructor1 = TEMPLATE.getConstructor(EntityRef.TEMPLATE.getType());

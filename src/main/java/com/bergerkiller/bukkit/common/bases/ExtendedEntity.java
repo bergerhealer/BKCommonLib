@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import net.minecraft.server.v1_9_R1.DataWatcherObject;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -894,12 +894,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return data, or def if not found
      */
     public <K> K getWatchedData(int index, Class<K> type, K def) {
-    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
-//    	WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
-//        if (object == null) {
-//            return def;
-//        }
-//        return Conversion.convert(object.b(), type, def);
+//    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
+    	DataWatcherObject object = (DataWatcherObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
+        if (object == null) {
+            return def;
+        }
+        return Conversion.convert(object.b(), type, def);
     }
 
     @Override

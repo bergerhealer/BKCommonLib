@@ -50,6 +50,8 @@ public class ConversionTypes {
     public static final PrimitiveArrayConverter<double[]> toDoubleArr = PrimitiveArrayConverter.toDoubleArr;
     // Collections
     public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
+    public static final CollectionTypeConverter<List<Entity>, List<?>> toEntityList = CollectionTypeConverter.toEntityList;
+    public static final CollectionTypeConverter<List<Object>, List<?>> toEntityHandleList = CollectionTypeConverter.toEntityHandleList;
     public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = CollectionTypeConverter.toPlayerList;
     public static final CollectionTypeConverter<List<Object>, List<?>> toPlayerHandleList = CollectionTypeConverter.toPlayerHandleList;
     public static final CollectionTypeConverter<Set<Player>, Set<?>> toPlayerSet = CollectionTypeConverter.toPlayerSet;
