@@ -128,6 +128,14 @@ public class CommonWorldListener extends WorldManager {
     public void b(int i, BlockPosition blockposition, int j) {
     }
 
+    @Override
+    public void a(SoundEffect soundeffect, BlockPosition blockposition) {
+    }
+
+    @Override
+    public void a(World world, BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1, int i) {
+    }
+
     static {
         // Validate that ALL methods in WorldManager are properly overrided
         for (Method method : WorldManager.class.getDeclaredMethods()) {

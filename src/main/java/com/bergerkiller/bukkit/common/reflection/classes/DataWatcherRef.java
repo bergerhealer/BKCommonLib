@@ -1,9 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.*;
 
 import net.minecraft.server.v1_9_R1.DataWatcherObject;
 
@@ -16,7 +13,7 @@ public class DataWatcherRef {
     public static final MethodAccessor<Void> watch = TEMPLATE.getMethod("registerObject", DataWatcherObject.class, Object.class);
     public static final MethodAccessor<List<Object>> returnAllWatched = TEMPLATE.getMethod("c");
     public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = TEMPLATE.getMethod("b");
-    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("a", DataWatcherObject.class);
+    public static final MethodAccessor<Object> read = TEMPLATE.getMethod("c", DataWatcherObject.class);
     public static final MethodAccessor<Boolean> isChanged = TEMPLATE.getMethod("a");
     public static final MethodAccessor<Boolean> isEmpty = TEMPLATE.getMethod("d");
     public static final SafeConstructor<Object> constructor1 = TEMPLATE.getConstructor(EntityRef.TEMPLATE.getType());

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -40,21 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-
-import net.minecraft.server.v1_9_R1.BlockPosition;
-import net.minecraft.server.v1_9_R1.EnumDirection;
-import net.minecraft.server.v1_9_R1.EnumItemSlot;
-import net.minecraft.server.v1_9_R1.EnumParticle;
-import net.minecraft.server.v1_9_R1.IChatBaseComponent;
-import net.minecraft.server.v1_9_R1.MapIcon;
-import net.minecraft.server.v1_9_R1.MobEffectList;
-import net.minecraft.server.v1_9_R1.PacketDataSerializer;
-import net.minecraft.server.v1_9_R1.PacketPlayOutTitle;
-import net.minecraft.server.v1_9_R1.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_9_R1.SoundCategory;
-import net.minecraft.server.v1_9_R1.SoundEffect;
-import net.minecraft.server.v1_9_R1.Vec3D;
-import net.minecraft.server.v1_9_R1.WorldBorder;
 
 public class PacketTypeClasses {
 
@@ -899,7 +885,7 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> button = getField("button");
         public final FieldAccessor<Short> action = getField("d");
         public final FieldAccessor<ItemStack> item = getField("item").translate(ConversionPairs.itemStack);
-        public final FieldAccessor<Integer> shift = getField("f");
+        public final FieldAccessor<InventoryClickType> shift = getField("shift"); // FIXME: Translate into Bukkit o
     }
 
     public static class NMSPacketPlayInLook extends NMSPacket {
