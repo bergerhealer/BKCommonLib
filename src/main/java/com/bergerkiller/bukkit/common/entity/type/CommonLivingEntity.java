@@ -1,20 +1,18 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import net.minecraft.server.v1_9_R1.EntityLiving;
+import net.minecraft.server.v1_9_R1.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
-
-import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-
-import net.minecraft.server.v1_9_R1.EntityLiving;
-import net.minecraft.server.v1_9_R1.GenericAttributes;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -227,7 +225,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
 //	 */
 //	public void moveTo(Entity entity, double speed) {
 //		EntityLiving nmsEntity = CommonNMS.getNative(this.entity);
-//		net.minecraft.server.v1_8_R3.Entity nmsTargetEntity = CommonNMS.getNative(entity);
+//		net.minecraft.server.v1_9_R1.Entity nmsTargetEntity = CommonNMS.getNative(entity);
 //		if(nmsEntity instanceof EntityInsentient) {
 //			Navigation navigation = (Navigation) EntityLivingRef.getNavigation.invoke(nmsEntity);
 //			if(!navigation.a(nmsTargetEntity, speed)) {

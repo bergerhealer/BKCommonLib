@@ -39,18 +39,6 @@ public class MergedInventory extends InventoryBase {
         }
     }
 
-    //TODO FIX
-    @Override
-    public ItemStack[] getStorageContents() {
-        return new ItemStack[0];
-    }
-
-    //TODO FIX
-    @Override
-    public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
-
-    }
-
     @Override
     public int getSize() {
         return this.size;

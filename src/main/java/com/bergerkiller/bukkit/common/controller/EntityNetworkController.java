@@ -1,5 +1,18 @@
 package com.bergerkiller.bukkit.common.controller;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.util.Vector;
+
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
@@ -11,24 +24,25 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
-import com.bergerkiller.bukkit.common.utils.*;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.google.common.primitives.Ints;
 
-import net.minecraft.server.v1_9_R1.*;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerVelocityEvent;
-import org.bukkit.util.Vector;
-
-import java.util.Collection;
-import java.util.Collections;
+import net.minecraft.server.v1_9_R1.AttributeMapServer;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.EntityLiving;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.EntityTrackerEntry;
+import net.minecraft.server.v1_9_R1.EnumItemSlot;
+import net.minecraft.server.v1_9_R1.MathHelper;
+import net.minecraft.server.v1_9_R1.MobEffect;
 
 /**
  * A controller that deals with the server to client network synchronization.
@@ -62,35 +76,29 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public VectorAbstract velSynched = new VectorAbstract() {
         public double getX() {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "n");
-            return n.get(handle);
+            return ((EntityTrackerEntry) handle).b().locX;
         }
 
         public double getY() {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "o");
-            return o.get(handle);
+            return ((EntityTrackerEntry) handle).b().locY;
         }
 
         public double getZ() {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "p");
-            return p.get(handle);
+            return ((EntityTrackerEntry) handle).b().locZ;
         }
 
         public VectorAbstract setX(double x) {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "n");
-        	n.set(handle, x);
+            ((EntityTrackerEntry) handle).b().locX = x;
             return this;
         }
 
         public VectorAbstract setY(double y) {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "o");
-        	o.set(handle, y);
+            ((EntityTrackerEntry) handle).b().locY = y;
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "p");
-        	p.set(handle, z);
+            ((EntityTrackerEntry) handle).b().locZ = z;
             return this;
         }
     };
@@ -141,57 +149,47 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         public int getX() {
-        	SafeField<Long> xLoc = new SafeField<>(EntityTrackerEntry.class, "xLoc");
-        	return Ints.checkedCast(xLoc.get(handle));
+            return (int) ((EntityTrackerEntry) handle).b().locX;
         }
 
         public int getY() {
-        	SafeField<Long> yLoc = new SafeField<>(EntityTrackerEntry.class, "yLoc");
-        	return Ints.checkedCast(yLoc.get(handle));
+            return (int) ((EntityTrackerEntry) handle).b().locY;
         }
 
         public int getZ() {
-        	SafeField<Long> zLoc = new SafeField<>(EntityTrackerEntry.class, "zLoc");
-        	return Ints.checkedCast(zLoc.get(handle));
+            return (int) ((EntityTrackerEntry) handle).b().locZ;
         }
 
         public IntLocationAbstract setX(int x) {
-        	SafeField<Long> xLoc = new SafeField<>(EntityTrackerEntry.class, "xLoc");
-        	xLoc.set(handle, (long) x);
+            ((EntityTrackerEntry) handle).b().locX = x;
             return this;
         }
 
         public IntLocationAbstract setY(int y) {
-        	SafeField<Long> yLoc = new SafeField<>(EntityTrackerEntry.class, "yLoc");
-        	yLoc.set(handle, (long) y);
+            ((EntityTrackerEntry) handle).b().locY = y;
             return this;
         }
 
         public IntLocationAbstract setZ(int z) {
-        	SafeField<Long> zLoc = new SafeField<>(EntityTrackerEntry.class, "zLoc");
-        	zLoc.set(handle, (long) z);
+            ((EntityTrackerEntry) handle).b().locZ = z;
             return this;
         }
 
         public int getYaw() {
-        	SafeField<Integer> yRot = new SafeField<>(EntityTrackerEntry.class, "yRot");
-        	return yRot.get(handle);
+            return (int) ((EntityTrackerEntry) handle).b().yaw;
         }
 
         public int getPitch() {
-        	SafeField<Integer> xRot = new SafeField<>(EntityTrackerEntry.class, "xRot");
-        	return xRot.get(handle);
+            return (int) ((EntityTrackerEntry) handle).b().pitch;
         }
 
         public IntLocationAbstract setYaw(int yaw) {
-        	
-        	SafeField<Integer> yRot = new SafeField<>(EntityTrackerEntry.class, "yRot");
+            ((EntityTrackerEntry) handle).b().yaw = yaw;
             return this;
         }
 
         public IntLocationAbstract setPitch(int pitch) {
-        	SafeField<Integer> xRot = new SafeField<>(EntityTrackerEntry.class, "xRot");
-        	xRot.set(handle, pitch);
+            ((EntityTrackerEntry) handle).b().pitch = pitch;
             return this;
         }
     };
@@ -262,15 +260,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract headRotSynched = new IntegerAbstract() {
         public int get() {
-        	SafeField<Integer> headYaw = new SafeField<>(EntityTrackerEntry.class, "headYaw");
-        	return headYaw.get(handle);
-            //return ((EntityTrackerEntry) handle).i;
+            return ((EntityTrackerEntry) handle).a;
         }
 
         public IntegerAbstract set(int value) {
-        	SafeField<Integer> headYaw = new SafeField<>(EntityTrackerEntry.class, "headYaw");
-        	headYaw.set(handle, value);
-            //((EntityTrackerEntry) handle).i = value;
+            ((EntityTrackerEntry) handle).a = value;
             return this;
         }
     };
@@ -295,11 +289,26 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract ticks = new IntegerAbstract() {
         public int get() {
-            return ((EntityTrackerEntry) handle).a;
+        	
+			try {
+				Field f = EntityTrackerEntry.class.getDeclaredField("v");
+				f.setAccessible(true);
+				return f.getInt(((EntityTrackerEntry) handle));
+			} catch (Exception e) {
+				e.printStackTrace();
+				return 0;
+			}
+        	
         }
 
         public IntegerAbstract set(int value) {
-            ((EntityTrackerEntry) handle).a = value;
+        	try {
+				Field f = EntityTrackerEntry.class.getDeclaredField("v");
+				f.setAccessible(true);
+				f.set(((EntityTrackerEntry) handle), value);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
             return this;
         }
     };
@@ -308,12 +317,15 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * allowing it to be read from or written to
      */
     public ObjectAbstract<Entity> vehicleSynched = new ObjectAbstract<Entity>() {
-        public Entity get() {
-            return EntityTrackerEntryRef.vehicle.get(handle);
+        @SuppressWarnings("unchecked")
+		public Entity get() {
+            return ((List<Entity>)(EntityTrackerEntryRef.vehicle.getInternal(handle))).get(0);
         }
 
         public ObjectAbstract<Entity> set(Entity value) {
-            EntityTrackerEntryRef.vehicle.set(handle, value);
+        	ArrayList<Entity> list = new ArrayList<Entity>();
+        	list.add(value);
+            EntityTrackerEntryRef.vehicle.setInternal(handle, list);
             return this;
         }
     };
@@ -614,10 +626,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
             // Entity Equipment
             EntityLiving living = (EntityLiving) handle;
-            for (EnumItemSlot slot : EnumItemSlot.values()) {
-                org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(slot));
+            for (EnumItemSlot i : EnumItemSlot.values()) {
+                org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(i));
                 if (itemstack != null) {
-                    PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), slot, itemstack));
+                    PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), i.ordinal(), itemstack));
                 }
             }
 
@@ -1023,9 +1035,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // This has some big issues when new players join...
 
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, (double) locSynched.getX());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, (double) locSynched.getY());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, (double) locSynched.getZ());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX()+0D);
+            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY()+0D);
+            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ()+0D);
             // Rotation
             packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (int) locSynched.getYaw());
             packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (int) locSynched.getPitch());

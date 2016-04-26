@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -14,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R1.CraftSound;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -29,7 +29,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -38,6 +37,8 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 
+import net.minecraft.server.v1_9_R1.DataWatcher.Item;
+import net.minecraft.server.v1_9_R1.DataWatcherObject;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityInsentient;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
@@ -846,7 +847,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param force to drop at
      * @return the dropped Item
      */
-    public Item spawnItemDrop(Material material, int amount, float force) {
+    public org.bukkit.entity.Item spawnItemDrop(Material material, int amount, float force) {
         return CommonNMS.getItem(getHandle(Entity.class).a(CraftMagicNumbers.getItem(material), amount, force));
     }
 
@@ -857,7 +858,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param force to drop at
      * @return the dropped Item
      */
-    public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
+    public org.bukkit.entity.Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
         return CommonNMS.getItem(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
     }
 
@@ -869,8 +870,27 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     @Deprecated
     public void setWatchedData(int index, Object value) {
-    	throw new IllegalStateException("The method setWatchedData from ExtendedEntity.class has been removed");
-//        h().getDataWatcher().watch(index, value);
+    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+    	Field f;
+		try {
+			f = watcher.getClass().getDeclaredField("c");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+    	f.setAccessible(true);
+    	HashMap<Integer, Item<?>> map;
+		try {
+			map = (HashMap<Integer, Item<?>>) f.get(watcher);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return;
+		}
+        Item<T> item = (Item<T>) map.get(index);
+    	if (item == null) {
+            return;
+        }
+    	item.a((T)value);
     }
 
     /**
@@ -894,12 +914,27 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return data, or def if not found
      */
     public <K> K getWatchedData(int index, Class<K> type, K def) {
-    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
-//    	WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
-//        if (object == null) {
-//            return def;
-//        }
-//        return Conversion.convert(object.b(), type, def);
+    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+    	Field f;
+		try {
+			f = watcher.getClass().getDeclaredField("c");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return def;
+		}
+    	f.setAccessible(true);
+    	HashMap<Integer, Item<?>> map;
+		try {
+			map = (HashMap<Integer, Item<?>>) f.get(watcher);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return def;
+		}
+        Item<?> item = map.get(index);
+    	if (item == null) {
+            return def;
+        }
+        return Conversion.convert(item.b(), type, def);
     }
 
     @Override

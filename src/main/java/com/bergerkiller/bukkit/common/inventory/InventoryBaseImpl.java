@@ -63,18 +63,6 @@ public class InventoryBaseImpl extends InventoryBase {
         return ItemUtil.cloneItems(this.items);
     }
 
-    //TODO FIX
-    @Override
-    public ItemStack[] getStorageContents() {
-        return new ItemStack[0];
-    }
-
-    //TODO FIX
-    @Override
-    public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
-
-    }
-
     Location loc = null;
     
 	@Override

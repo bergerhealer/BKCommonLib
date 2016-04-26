@@ -37,12 +37,12 @@ public class NMSEntityHookImpl implements NMSEntityHook {
     }
 
     @Override
-    public boolean a(EntityHuman human, ItemStack is, EnumHand hand) {
-        return controller.onInteractBy(CommonNMS.getHuman(human), CommonNMS.getItemStack(is), CommonNMS.getHand(hand));
+    public boolean a(EntityHuman human, ItemStack stack, EnumHand hand) {
+        return controller.onInteractBy(CommonNMS.getHuman(human), stack, hand);
     }
 
     @Override
-    public void m() {
+    public void U() {
         controller.onTick();
     }
 
@@ -125,13 +125,13 @@ public class NMSEntityHookImpl implements NMSEntityHook {
      * The super methods are unused
      */
     @Override
-    public boolean super_a(EntityHuman human, ItemStack is, EnumHand hand) {
-        return controller.getEntity().getHandle(NMSEntityHook.class).super_a(human,is,hand);
+    public boolean super_a(EntityHuman human, ItemStack stack, EnumHand hand) {
+        return controller.getEntity().getHandle(NMSEntityHook.class).super_a(human, stack, hand);
     }
 
     @Override
-    public void super_m() {
-        controller.getEntity().getHandle(NMSEntityHook.class).super_m();
+    public void super_U() {
+        controller.getEntity().getHandle(NMSEntityHook.class).super_U();
     }
 
     @Override
