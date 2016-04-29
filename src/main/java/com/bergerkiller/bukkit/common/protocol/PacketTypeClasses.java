@@ -55,7 +55,6 @@ import net.minecraft.server.v1_9_R1.SoundCategory;
 import net.minecraft.server.v1_9_R1.SoundEffect;
 import net.minecraft.server.v1_9_R1.Vec3D;
 import net.minecraft.server.v1_9_R1.WorldBorder;
-import net.minecraft.server.v1_9_R1.InventoryClickType;
 
 public class PacketTypeClasses {
 
@@ -900,7 +899,7 @@ public class PacketTypeClasses {
         public final FieldAccessor<Integer> button = getField("button");
         public final FieldAccessor<Short> action = getField("d");
         public final FieldAccessor<ItemStack> item = getField("item").translate(ConversionPairs.itemStack);
-        public final FieldAccessor<InventoryClickType> shift = getField("shift");
+        public final FieldAccessor<Integer> shift = getField("f");
     }
 
     public static class NMSPacketPlayInLook extends NMSPacket {
