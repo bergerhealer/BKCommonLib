@@ -46,7 +46,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutLogin OUT_LOGIN = new NMSPacketPlayOutLogin();
     public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
     public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
-    //Removed?
+    public static final NMSPacketPlayOutPlayerListHeaderFooter OUT_PLAYER_LIST_HEADER_FOOTER = new NMSPacketPlayOutPlayerListHeaderFooter();
+//    Removed?
 //    public static final NMSPacketPlayOutMapChunkBulk OUT_MAP_CHUNK_BULK = new NMSPacketPlayOutMapChunkBulk();
     public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
     public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();

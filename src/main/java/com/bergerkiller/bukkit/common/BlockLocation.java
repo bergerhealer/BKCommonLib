@@ -114,7 +114,7 @@ public class BlockLocation {
         if (world == null) {
             return null;
         }
-        return world.getChunkAt(this.x / 16, this.z / 16);
+        return world.getChunkAt(this.x >> 4, this.z >> 4);
     }
 
     /**
@@ -180,7 +180,7 @@ public class BlockLocation {
      */
     public boolean isIn(Chunk chunk) {
         if (chunk != null && this.isIn(chunk.getWorld())) {
-            return (this.x / 16) == chunk.getX() && (this.z / 16) == chunk.getZ();
+            return (this.x >> 4) == chunk.getX() && (this.z >> 4) == chunk.getZ();
         }
         return false;
     }

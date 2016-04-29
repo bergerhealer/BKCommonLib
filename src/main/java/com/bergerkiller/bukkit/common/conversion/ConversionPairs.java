@@ -27,7 +27,6 @@ public class ConversionPairs {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static final ConverterPair NONE = ConversionTypes.NONE.formPair(ConversionTypes.NONE);
     public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
-    public static final ConverterPair<List<Entity>, List<Entity>> entityList = toEntityHandleList.formPair(toEntityList);
     public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
     public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);
     public static final ConverterPair<Set<Object>, Set<Player>> playerSet = toPlayerHandleSet.formPair(toPlayerSet);

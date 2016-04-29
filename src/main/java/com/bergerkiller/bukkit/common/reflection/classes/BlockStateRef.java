@@ -83,7 +83,7 @@ public class BlockStateRef {
             }
         });
         registerInst(new TileInstantiator("Command", "CommandBlock", "commandBlock") {
-            private final FieldAccessor<CommandBlockListenerAbstract> listener = TILE.getField("a");
+            private final FieldAccessor<CommandBlockListenerAbstract> listener = TILE.getField("i");
             private final FieldAccessor<String> state_command = STATE.getField("command");
             private final FieldAccessor<String> state_name = STATE.getField("name");
 

@@ -30,7 +30,6 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -292,9 +291,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             if (hasPassenger()) {
                 entry = tracker.getEntry(getPassenger());
                 if (entry != null) {
-                	ArrayList<T> arry = new ArrayList<T>();
-                	arry.add(entity);
-                    EntityTrackerEntryRef.vehicle.setInternal(entry, arry);
+                    EntityTrackerEntryRef.vehicle.set(entry, entity);
                 }
             }
 

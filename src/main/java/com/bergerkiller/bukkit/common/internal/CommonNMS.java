@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
 import com.bergerkiller.bukkit.common.reflection.classes.CraftServerRef;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.HandUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.MainHand;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -131,6 +133,10 @@ public class CommonNMS {
         return (TileEntity) BlockStateRef.toTileEntity(blockState);
     }
 
+    public static EnumHand getNative(MainHand hand) {
+        return HandUtil.toEnumHand(hand);
+    }
+
     public static Inventory getInventory(IInventory inventory) {
         return Conversion.toInventory.convert(inventory);
     }
@@ -201,7 +207,8 @@ public class CommonNMS {
 
     public static List<Entity> getEntities(World world, Entity ignore,
             double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-        return getEntitiesIn(world, ignore, new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax));
+    	AxisAlignedBB aa = new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
+        return getEntitiesIn(world, ignore, aa.a(aa));
     }
 
     @SuppressWarnings("unchecked")
@@ -264,5 +271,9 @@ public class CommonNMS {
 
     public static AttributeMapServer getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
         return (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(Conversion.toEntityHandle.convert(entity));
+    }
+
+    public static MainHand getHand(EnumHand hand) {
+        return HandUtil.toMainHand(hand);
     }
 }

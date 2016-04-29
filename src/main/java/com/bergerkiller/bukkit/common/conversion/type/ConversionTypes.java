@@ -51,9 +51,7 @@ public class ConversionTypes {
     // Collections
     public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
     public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = CollectionTypeConverter.toPlayerList;
-    public static final CollectionTypeConverter<List<Entity>, List<?>> toEntityList = CollectionTypeConverter.toEntityList;
     public static final CollectionTypeConverter<List<Object>, List<?>> toPlayerHandleList = CollectionTypeConverter.toPlayerHandleList;
-    public static final CollectionTypeConverter<List<Entity>, List<?>> toEntityHandleList = CollectionTypeConverter.toEntityList;
     public static final CollectionTypeConverter<Set<Player>, Set<?>> toPlayerSet = CollectionTypeConverter.toPlayerSet;
     public static final CollectionTypeConverter<Set<Object>, Set<?>> toPlayerHandleSet = CollectionTypeConverter.toPlayerHandleSet;
     public static final CollectionTypeConverter<List<ItemStack>, List<?>> toItemStackList = CollectionTypeConverter.toItemStackList;
