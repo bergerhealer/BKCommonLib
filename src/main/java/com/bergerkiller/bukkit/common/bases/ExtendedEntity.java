@@ -895,11 +895,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     public <K> K getWatchedData(int index, Class<K> type, K def) {
 //    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
-    	DataWatcherObject object = (DataWatcherObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
+    	DataWatcherObject object = (DataWatcherObject) DataWatcherRef.read.invoke(h().getDataWatcher(), h().getDataWatcher().c().get(index));
         if (object == null) {
             return def;
         }
-        return Conversion.convert(object.b(), type, def);
+        return Conversion.convert(object, type, def);
     }
 
     @Override
