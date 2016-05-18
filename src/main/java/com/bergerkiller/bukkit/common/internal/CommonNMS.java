@@ -205,10 +205,9 @@ public class CommonNMS {
         return Item.getById(blockId) != null;
     }
 
-    public static List<Entity> getEntities(World world, Entity ignore,
-            double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
+    public static List<Entity> getEntities(World world, Entity ignore, double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
     	AxisAlignedBB aa = new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
-        return getEntitiesIn(world, ignore, aa.a(aa));
+        return getEntitiesIn(world, ignore, new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax));
     }
 
     @SuppressWarnings("unchecked")

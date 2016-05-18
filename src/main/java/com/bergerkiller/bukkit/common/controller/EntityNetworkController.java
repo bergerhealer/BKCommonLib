@@ -64,34 +64,34 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public VectorAbstract velSynched = new VectorAbstract() {
         public double getX() {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "n");
+        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "e");
             return n.get(handle);
         }
 
         public double getY() {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "o");
+        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "f");
             return o.get(handle);
         }
 
         public double getZ() {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "p");
+        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "g");
             return p.get(handle);
         }
 
         public VectorAbstract setX(double x) {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "n");
+        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "e");
         	n.set(handle, x);
             return this;
         }
 
         public VectorAbstract setY(double y) {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "o");
+        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "f");
         	o.set(handle, y);
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "p");
+        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "g");
         	p.set(handle, z);
             return this;
         }
@@ -297,11 +297,13 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract ticks = new IntegerAbstract() {
         public int get() {
-            return ((EntityTrackerEntry) handle).a;
+            SafeField<Integer> ticks = new SafeField<>(EntityTrackerEntry.class, "v");
+            return ticks.get(handle);
         }
 
         public IntegerAbstract set(int value) {
-            ((EntityTrackerEntry) handle).a = value;
+            SafeField<Integer> ticks = new SafeField<>(EntityTrackerEntry.class, "v");
+            ticks.set(handle, value);
             return this;
         }
     };
@@ -1049,8 +1051,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             packet.write(PacketType.OUT_ENTITY_SPAWN.y, (double) locSynched.getY());
             packet.write(PacketType.OUT_ENTITY_SPAWN.z, (double) locSynched.getZ());
             // Rotation
-            packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (int) locSynched.getYaw());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (int) locSynched.getPitch());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, locSynched.getYaw());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, locSynched.getPitch());
         }
         return packet;
     }

@@ -9,108 +9,108 @@ import org.bukkit.Location;
  */
 public interface NMSEntityHook {
 
-	public EntityController<?> getController();
+	EntityController<?> getController();
 
-	public void setController(EntityController<?> controller);
+	void setController(EntityController<?> controller);
 
 	/**
 	 * onInteractBy super
 	 */
 	//Changed
-	public boolean super_a(EntityHuman human, ItemStack itemstack, EnumHand enumHand);
+	boolean super_a(EntityHuman human, ItemStack itemstack, EnumHand enumHand);
 
 	/**
 	 * onInteractBy
 	 */
-	public boolean a(EntityHuman human, ItemStack itemstack, EnumHand enumHand);
+	boolean a(EntityHuman human, ItemStack itemstack, EnumHand enumHand);
 
 	/**
 	 * onTick super
 	 */
-	public void super_m();
+	void super_U();
 
 	/**
 	 * onTick
 	 */
-	public void m();
+	void u();
 
 	/**
 	 * Damage Entity super
 	 */
-	public boolean super_damageEntity(DamageSource damagesource, float damage);
+	boolean super_damageEntity(DamageSource damagesource, float damage);
 
 	/**
 	 * Damage Entity
 	 */
-	public boolean damageEntity(DamageSource damagesource, float damage);
+	boolean damageEntity(DamageSource damagesource, float damage);
 
 	/**
 	 * onBurn super
 	 */
-	public void super_burn(float damage);
+	void super_burn(float damage);
 
 	/**
 	 * onBurn
 	 */
-	public void burn(float damage);
+	void burn(float damage);
 
 	/**
 	 * onPush super
 	 */
-	public void super_g(double dx, double dy, double dz);
+	void super_g(double dx, double dy, double dz);
 
 	/**
 	 * onPush
 	 */
-	public void g(double dx, double dy, double dz);
+	void g(double dx, double dy, double dz);
 
 	/**
 	 * onMove super
 	 */
-	public void super_move(double dx, double dy, double dz);
+	void super_move(double dx, double dy, double dz);
 
 	/**
 	 * onMove
 	 */
-	public void move(double dx, double dy, double dz);
+	void move(double dx, double dy, double dz);
 
 	/**
 	 * onDie super
 	 */
-	public void super_die();
+	void super_die();
 
 	/**
 	 * onDie
 	 */
-	public void die();
+	void die();
 
 	/**
 	 * getLocalizedName super
 	 */
-	public String super_getName();
+	String super_getName();
 
 	/**
 	 * getLocalizedName
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * onSave
 	 */
-	public boolean c(NBTTagCompound nbttagcompound);
+	boolean c(NBTTagCompound nbttagcompound);
 
 	/**
 	 * onSave for takeables
 	 */
-	public boolean d(NBTTagCompound nbttagcompound);
+	boolean d(NBTTagCompound nbttagcompound);
 
 	/**
 	 * Teleport super
 	 */
-	public void super_teleportTo(Location exit, boolean portal);
+	void super_teleportTo(Location exit, boolean portal);
 
 	/**
 	 * Teleport
 	 */
-	public void teleportTo(Location exit, boolean portal);
+	void teleportTo(Location exit, boolean portal);
 }
