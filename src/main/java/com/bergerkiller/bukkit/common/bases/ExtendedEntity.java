@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import net.minecraft.server.v1_9_R1.DataWatcherObject;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -867,10 +869,30 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param index to set at
      * @param value to set to
      */
-    @Deprecated
+    @SuppressWarnings("unchecked")
     public void setWatchedData(int index, Object value) {
-    	throw new IllegalStateException("The method setWatchedData from ExtendedEntity.class has been removed");
-//        h().getDataWatcher().watch(index, value);
+    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+        Field f;
+        try {
+            f = watcher.getClass().getDeclaredField("c");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        f.setAccessible(true);
+        HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item> map;
+        try {
+            map = (HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item>) f.get(watcher);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return;
+        }
+        net.minecraft.server.v1_9_R1.DataWatcher.Item item = map.get(index);
+        if (item != null) {
+            item.a((T) value);
+        }
+        return;
+
     }
 
     /**
@@ -894,12 +916,27 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return data, or def if not found
      */
     public <K> K getWatchedData(int index, Class<K> type, K def) {
-    	throw new IllegalStateException("The method getWatchedData from ExtendedEntity.class has been removed");
-//    	WatchableObject object = (WatchableObject) DataWatcherRef.read.invoke(h().getDataWatcher(), index);
-//        if (object == null) {
-//            return def;
-//        }
-//        return Conversion.convert(object.b(), type, def);
+    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+        Field f;
+        try {
+            f = watcher.getClass().getDeclaredField("c");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
+        f.setAccessible(true);
+        HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item> map;
+        try {
+            map = (HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item>) f.get(watcher);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return def;
+        }
+        net.minecraft.server.v1_9_R1.DataWatcher.Item item = map.get(index);
+        if (item == null) {
+            return def;
+        }
+        return Conversion.convert(item.b(), type, def);
     }
 
     @Override

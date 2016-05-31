@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.nms;
 
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;

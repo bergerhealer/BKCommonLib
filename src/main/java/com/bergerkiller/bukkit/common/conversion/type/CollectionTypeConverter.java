@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,6 +18,18 @@ import java.util.logging.Level;
 
 public abstract class CollectionTypeConverter<T extends Collection<?>, B extends Collection<?>> implements Converter<T> {
 
+    public static final CollectionTypeConverter<List<Entity>, List<?>> toEntityList = new CollectionTypeConverter<List<Entity>, List<?>>(CollectionConverter.toList) {
+        @Override
+        protected List<Entity> convertSpecial(List<?> value, List<Entity> def) {
+            return new ConvertingList<Entity>(value, ConversionPairs.entity);
+        }
+    };
+    public static final CollectionTypeConverter<List<Object>, List<?>> toEntityHandleList = new CollectionTypeConverter<List<Object>, List<?>>(CollectionConverter.toList) {
+        @Override
+        protected List<Object> convertSpecial(List<?> value, List<Object> def) {
+            return new ConvertingList<Object>(value, ConversionPairs.entity.reverse());
+        }
+    };
     public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = new CollectionTypeConverter<List<Player>, List<?>>(CollectionConverter.toList) {
         @Override
         protected List<Player> convertSpecial(List<?> value, List<Player> def) {

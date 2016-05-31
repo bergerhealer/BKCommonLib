@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.controller;
 
 import java.util.List;
 
+import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
@@ -18,13 +19,6 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-
-import net.minecraft.server.v1_9_R1.AxisAlignedBB;
-import net.minecraft.server.v1_9_R1.Block;
-import net.minecraft.server.v1_9_R1.BlockPosition;
-import net.minecraft.server.v1_9_R1.Blocks;
-import net.minecraft.server.v1_9_R1.DamageSource;
-import net.minecraft.server.v1_9_R1.Entity;
 
 public class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
 
@@ -62,8 +56,8 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
      * Called every tick to update the entity
      */
     public void onTick() {
-        entity.getHandle(NMSEntityHook.class).super_m();
-    }
+        entity.getHandle(NMSEntityHook.class).super_U();
+    } //TODO change to super_U
 
     /**
      * Called when the entity is interacted by something
@@ -154,10 +148,10 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
         if (handle.noclip) {
             addToBoundingBox(handle, dx, dy, dz);
             handle.locX = CommonNMS.getMiddleX(handle.getBoundingBox());
-            handle.locY = (handle.getBoundingBox().b + (double) handle.length) - (double) handle.P;
+            handle.locY = (handle.getBoundingBox().b + (double) handle.length) - (double) handle.R;
             handle.locZ = CommonNMS.getMiddleZ(handle.getBoundingBox());
         } else {
-            handle.P *= 0.4f;
+            handle.R *= 0.4f;
             final double oldLocX = handle.locX;
             final double oldLocY = handle.locY;
             final double oldLocZ = handle.locZ;
@@ -213,12 +207,12 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             double moveDx;
             double moveDy;
             double moveDz;
-            if (handle.R > 0.0f && handle.R < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
+            if (handle.P > 0.0f && handle.P < 0.05f && isOnGround && (oldDx != dx || oldDz != dz)) {
                 moveDx = dx;
                 moveDy = dy;
                 moveDz = dz;
                 dx = oldDx;
-                dy = (double) handle.R;
+                dy = (double) handle.P;
                 dz = oldDz;
 
                 AxisAlignedBB axisalignedbb1 = handle.getBoundingBox().c(0, 0, 0);
@@ -256,7 +250,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
                 if (!handle.aT() && oldDy != dy) {
                     dx = dy = dz = 0.0;
                 } else {
-                    dy = (double) -handle.R;
+                    dy = (double) -handle.P;
                     for (int k = 0; k < list.size(); k++) {
                         dy = list.get(k).b(handle.getBoundingBox(), dy);
                     }
@@ -325,7 +319,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             int bY = MathUtil.floor(handle.locY - 0.2 - (double) handle.length);
             int bZ = entity.loc.z.block();
             Block block = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY, bZ)).getBlockData(new BlockPosition(bX, bY, bZ)).getBlock();
-            int j1 = handle.world.getChunkAtWorldCoords(new BlockPosition(bX, bY - 1, bZ)).getBlockData(new BlockPosition(bX, bY - 1, bZ)).getBlock().m(block.getBlockData()); //TODO CHECK
+            int j1 = Block.getId(handle.world.getType(new BlockPosition(bX, bY - 1, bZ)).getBlock()); //TODO CHECK
 
             // Magic values! *gasp* Bad, BAD Minecraft! Go sit in a corner!
             if (j1 == 11 || j1 == 32 || j1 == 21) {
@@ -355,7 +349,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 
         // Fire tick calculation (check using block collision)
         final boolean isInWater = handle.ah(); // In water or raining
-        if (handle.world.f(handle.getBoundingBox().shrink(0.001))) {
+        if (handle.world.a(handle.getBoundingBox().shrink(0.001), Material.FIRE, handle) || (handle.world.a(handle.getBoundingBox().shrink(0.001), Material.LAVA, handle))) {
             onBurnDamage(1);
             if (!isInWater) {
                 handle.fireTicks++;
@@ -372,7 +366,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
             handle.fireTicks = -handle.maxFireTicks;
         }
         if (isInWater && handle.fireTicks > 0) {
-            entity.makeRandomSound(Sound.AMBIENT_CAVE, 0.7f, 1.6f); // FIX
+            entity.makeRandomSound(Sound.BLOCK_FIRE_EXTINGUISH, 0.7f, 1.6f);
             handle.fireTicks = -handle.maxFireTicks;
         }
     }

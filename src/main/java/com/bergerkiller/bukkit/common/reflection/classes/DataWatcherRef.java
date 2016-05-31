@@ -1,9 +1,6 @@
 package com.bergerkiller.bukkit.common.reflection.classes;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.*;
 
 import net.minecraft.server.v1_9_R1.DataWatcherObject;
 
