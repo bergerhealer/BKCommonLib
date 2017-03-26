@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.server.CommonNMS;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -32,11 +33,20 @@ public class BlockInfo extends BasicWrapper {
                 }
             }
         } catch (Throwable t) {
-            CommonPlugin.LOGGER.log(Level.SEVERE, "Unable to initialize BlockInfo API:", t);
+        	Logging.LOGGER.log(Level.SEVERE, "Unable to initialize BlockInfo API:", t);
         }
     }
 
     protected BlockInfo() {
+    }
+
+    /**
+     * Gets the IBlockData internal type value from this BlockInfo
+     * 
+     * @return IBlockData
+     */
+    public Object getIBlockData() {
+        return null;
     }
 
     /**
@@ -211,7 +221,8 @@ public class BlockInfo extends BasicWrapper {
      * @param z - coordinate of the block
      * @param yield (e.g. 20.0f)
      */
-    public final void destroy(World world, int x, int y, int z, float yield) {
+    @SuppressWarnings("deprecation")
+	public final void destroy(World world, int x, int y, int z, float yield) {
         destroy(world, x, y, z, world.getBlockAt(x, y, z).getData(), yield);
     }
 

@@ -1,30 +1,42 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
-import com.bergerkiller.bukkit.common.proxies.EntityProxy;
 import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
-import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import net.minecraft.server.v1_9_R1.Entity;
-import net.minecraft.server.v1_9_R1.EnumDifficulty;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
+import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
+import com.bergerkiller.server.proxies.EntityProxy;
+
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.EnumDifficulty;
+import net.minecraft.server.v1_11_R1.EnumHand;
+
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_11_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 /**
@@ -83,12 +95,12 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             if (value instanceof CraftItemStack) {
-                return CraftItemStackRef.handle.get(value);
+                return CBCraftItemStack.handle.get(value);
             } else if (value instanceof org.bukkit.inventory.ItemStack) {
                 org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
                 Object rval = CraftItemStack.asNMSCopy(stack);
                 if (rval == null) {
-                    rval = ItemStackRef.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
+                    rval = NMSItemStack.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
                 }
                 return rval;
             } else {
@@ -100,11 +112,11 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             if (value instanceof BlockState) {
-                return BlockStateRef.toTileEntity((BlockState) value);
+                return CBCraftBlockState.toTileEntity((BlockState) value);
             }
             org.bukkit.block.Block block = Conversion.toBlock.convert(value);
             if (block != null) {
-                Object tile = TileEntityRef.getFromWorld(block);
+                Object tile = NMSTileEntity.getFromWorld(block);
                 if (tile != null) {
                     return tile;
                 }
@@ -148,7 +160,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
                 return ((CommonTag) value).getHandle();
             } else {
                 try {
-                    return NBTUtil.createHandle(value);
+                    return NMSNBT.createHandle(value);
                 } catch (Exception ex) {
                     return def;
                 }
@@ -196,17 +208,31 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             GameMode gameMode = Conversion.toGameMode.convert(value);
             if (gameMode != null) {
-                return EnumGamemodeRef.getFromId.invoke(null, gameMode.getValue());
+                return NMSEnumGamemode.getFromId.invoke(null, gameMode.getValue());
             }
             return def;
         }
+    };
+    public static final HandleConverter toMainHandHandle = new HandleConverter("EnumHand") {
+		@Override
+		protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+			if (value instanceof MainHand) {
+		        switch((MainHand) value) {
+	            case LEFT:
+	                return EnumHand.OFF_HAND;
+	            case RIGHT:
+	                return EnumHand.MAIN_HAND;
+		        }
+			}
+			return def;
+		}
     };
     public static final HandleConverter toWorldTypeHandle = new HandleConverter("WorldType") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             org.bukkit.WorldType type = Conversion.toWorldType.convert(value);
             if (type != null) {
-                return WorldTypeRef.getType.invoke(null, type.getName());
+                return NMSWorldType.getType.invoke(null, type.getName());
             } else {
                 return def;
             }
@@ -219,39 +245,18 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             if (value instanceof IntVector2) {
                 IntVector2 iv2 = (IntVector2) value;
-                return VectorRef.newPair(iv2.x, iv2.z);
+                return NMSVector.newPair(iv2.x, iv2.z);
             } else {
                 return def;
             }
         }
     };
-    public static final HandleConverter toChunkCoordinatesHandle = new HandleConverter("ChunkCoordinates") {
+    public static final HandleConverter toBlockPositionHandle = new HandleConverter("BlockPosition") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isPosition(value)) {
-                final int x = VectorRef.getPositionX(value);
-                final int y = VectorRef.getPositionY(value);
-                final int z = VectorRef.getPositionZ(value);
-                return VectorRef.newCoord(x, y, z);
-            } else if (value instanceof IntVector3) {
+            if (value instanceof IntVector3) {
                 IntVector3 iv3 = (IntVector3) value;
-                return VectorRef.newCoord(iv3.x, iv3.y, iv3.z);
-            } else {
-                return def;
-            }
-        }
-    };
-    public static final HandleConverter toChunkPositionHandle = new HandleConverter("ChunkPosition") {
-        @Override
-        public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (VectorRef.isCoord(value)) {
-                final int x = VectorRef.getCoordX(value);
-                final int y = VectorRef.getCoordX(value);
-                final int z = VectorRef.getCoordX(value);
-                return VectorRef.newPosition(x, y, z);
-            } else if (value instanceof IntVector3) {
-                IntVector3 iv3 = (IntVector3) value;
-                return VectorRef.newPosition(iv3.x, iv3.y, iv3.z);
+                return NMSVector.newPosition(iv3.x, iv3.y, iv3.z);
             } else {
                 return def;
             }
@@ -262,7 +267,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
             Vector vec = WrapperConverter.toVector.convert(value);
             if (vec != null) {
-                return VectorRef.newVec(vec.getX(), vec.getY(), vec.getZ());
+                return NMSVector.newVec(vec.getX(), vec.getY(), vec.getZ());
             } else {
                 return def;
             }
@@ -270,19 +275,10 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     };
     public static final HandleConverter toPlayerAbilitiesHandle = new WrapperHandleConverter("PlayerAbilities");
     public static final HandleConverter toEntityTrackerHandle = new WrapperHandleConverter("EntityTracker");
-    public static final HandleConverter toLongHashMapHandle = new WrapperHandleConverter("LongHashMap");
+    public static final HandleConverter toLongHashMapHandle = new WrapperHandleConverter(Long2ObjectMap.class);
     public static final HandleConverter toLongHashSetHandle = new WrapperHandleConverter(CommonUtil.getCBClass("util.LongHashSet"));
     public static final HandleConverter toIntHashMapHandle = new WrapperHandleConverter("IntHashMap");
-    public static final HandleConverter toUseActionHandle = new HandleConverter("EnumEntityUseAction") {
-        @Override
-        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (value instanceof UseAction) {
-                return ((UseAction) value).getHandle();
-            } else {
-                return def;
-            }
-        }
-    };
+    public static final HandleConverter toUseActionHandle = new WrapperHandleConverter("EnumEntityUseAction");
     public static final HandleConverter toDifficultyHandle = new HandleConverter("EnumDifficulty") {
         @Override
         @SuppressWarnings("deprecation")

@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -16,23 +16,26 @@ import java.util.logging.Level;
  * @param <T> - type of primitive array
  */
 public class PrimitiveArrayConverter<T> extends BasicConverter<T> {
-
-    public static final PrimitiveArrayConverter<boolean[]> toBoolArr = new PrimitiveArrayConverter<boolean[]>(boolean[].class, PrimitiveConverter.toBool);
-    public static final PrimitiveArrayConverter<char[]> toCharArr = new PrimitiveArrayConverter<char[]>(char[].class, PrimitiveConverter.toChar);
-    public static final PrimitiveArrayConverter<byte[]> toByteArr = new PrimitiveArrayConverter<byte[]>(byte[].class, PrimitiveConverter.toByte);
-    public static final PrimitiveArrayConverter<short[]> toShortArr = new PrimitiveArrayConverter<short[]>(short[].class, PrimitiveConverter.toShort);
-    public static final PrimitiveArrayConverter<int[]> toIntArr = new PrimitiveArrayConverter<int[]>(int[].class, PrimitiveConverter.toInt);
-    public static final PrimitiveArrayConverter<long[]> toLongArr = new PrimitiveArrayConverter<long[]>(long[].class, PrimitiveConverter.toLong);
-    public static final PrimitiveArrayConverter<float[]> toFloatArr = new PrimitiveArrayConverter<float[]>(float[].class, PrimitiveConverter.toFloat);
-    public static final PrimitiveArrayConverter<double[]> toDoubleArr = new PrimitiveArrayConverter<double[]>(double[].class, PrimitiveConverter.toDouble);
+    public static final PrimitiveArrayConverter<boolean[]> toBoolArr = create(boolean[].class, PrimitiveConverter.toBool);
+    public static final PrimitiveArrayConverter<char[]> toCharArr = create(char[].class, PrimitiveConverter.toChar);
+    public static final PrimitiveArrayConverter<byte[]> toByteArr = create(byte[].class, PrimitiveConverter.toByte);
+    public static final PrimitiveArrayConverter<short[]> toShortArr = create(short[].class, PrimitiveConverter.toShort);
+    public static final PrimitiveArrayConverter<int[]> toIntArr = create(int[].class, PrimitiveConverter.toInt);
+    public static final PrimitiveArrayConverter<long[]> toLongArr = create(long[].class, PrimitiveConverter.toLong);
+    public static final PrimitiveArrayConverter<float[]> toFloatArr = create(float[].class, PrimitiveConverter.toFloat);
+    public static final PrimitiveArrayConverter<double[]> toDoubleArr = create(double[].class, PrimitiveConverter.toDouble);
 
     private final PrimitiveConverter<?> elementConverter;
 
-    public PrimitiveArrayConverter(Class<T> outputType, PrimitiveConverter<?> elementConverter) {
+    private static <T> PrimitiveArrayConverter<T> create(Class<T> outputType, PrimitiveConverter<?> elementConverter) {
+    	return new PrimitiveArrayConverter<T>(outputType, elementConverter);
+    }
+
+    private PrimitiveArrayConverter(Class<T> outputType, PrimitiveConverter<?> elementConverter) {
         super(outputType);
         this.elementConverter = elementConverter;
         if (elementConverter == null) {
-            CommonPlugin.LOGGER_CONVERSION.log(Level.SEVERE, "Converter to " + outputType.getComponentType().getSimpleName()
+        	Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Converter to " + outputType.getComponentType().getSimpleName()
                     + "[] lacks a primitive element converter!");
         }
     }

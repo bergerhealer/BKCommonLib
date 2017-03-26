@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import com.bergerkiller.bukkit.common.reflection.classes.NibbleArrayRef;
-import net.minecraft.server.v1_9_R1.NibbleArray;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
+
+import net.minecraft.server.v1_11_R1.NibbleArray;
 
 /**
  * Base class to work with Nibble Array implementations
@@ -27,22 +28,13 @@ public class NibbleArrayBase extends NibbleArray {
     }
 
     /**
-     * Gets the amount of bits a single value is stored as
-     *
-     * @return data element bit count
-     */
-    public int getBitCount() {
-        return NibbleArrayRef.bitCount.invoke(this);
-    }
-
-    /**
      * Gets the backing array, which is still referenced. Do not modify the
      * returned array! Use toArray() if data not being referenced is important.
      *
      * @return data
      */
     public byte[] getData() {
-        return NibbleArrayRef.getValueArray(this);
+        return NMSNibbleArray.getValueArray(this);
     }
 
     /**
@@ -51,7 +43,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @return nibble array data copy
      */
     public byte[] toArray() {
-        return NibbleArrayRef.getArrayCopy(this);
+        return NMSNibbleArray.getArrayCopy(this);
     }
 
     /**

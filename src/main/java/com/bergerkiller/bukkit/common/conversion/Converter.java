@@ -1,11 +1,13 @@
 package com.bergerkiller.bukkit.common.conversion;
 
+import com.bergerkiller.bukkit.common.conversion.generic.ArrayElementConverter;
+
 /**
  * Represents a data type converter
  *
  * @param <T> output type
  */
-public interface Converter<T> {
+public abstract class Converter<T> {
 
     /**
      * Converts the input value to the output type
@@ -14,7 +16,7 @@ public interface Converter<T> {
      * @param def value to return when conversion fails
      * @return converted output type
      */
-    public T convert(Object value, T def);
+    public abstract T convert(Object value, T def);
 
     /**
      * Converts the input value to the output type<br>
@@ -23,14 +25,14 @@ public interface Converter<T> {
      * @param value to convert
      * @return converted output type
      */
-    public T convert(Object value);
+    public abstract T convert(Object value);
 
     /**
      * Gets the Class type returned by convert
      *
      * @return output Class type
      */
-    public Class<T> getOutputType();
+    public abstract Class<T> getOutputType();
 
     /**
      * Checks whether the returned output value can be casted to another
@@ -46,7 +48,7 @@ public interface Converter<T> {
      *
      * @return True if casting is supported, False if not
      */
-    public boolean isCastingSupported();
+    public abstract boolean isCastingSupported();
 
     /**
      * Checks whether this converter supports registering in the Conversion
@@ -56,7 +58,7 @@ public interface Converter<T> {
      *
      * @return True if Conversion table registration is enabled, False if not
      */
-    public boolean isRegisterSupported();
+    public abstract boolean isRegisterSupported();
 
     /**
      * Creates a new ConverterPair with this converter as A and the specified
@@ -65,7 +67,9 @@ public interface Converter<T> {
      * @param converterB to form a pair with
      * @return new ConverterPair
      */
-    public <K> ConverterPair<T, K> formPair(Converter<K> converterB);
+    public <K> ConverterPair<T, K> formPair(Converter<K> converterB) {
+    	return new ConverterPair<T, K>(this, converterB);
+    }
 
     /**
      * Creates a new Converter that uses this base converter, but attempts to
@@ -74,5 +78,16 @@ public interface Converter<T> {
      * @param type to cast to
      * @return new Casting Converter
      */
-    public <K> Converter<K> cast(Class<K> type);
+    public <K> Converter<K> cast(Class<K> type) {
+    	return new CastingConverter<K>(type, this);
+    }
+
+    /**
+     * Applies this Conversion to a collection of elements and converts each element
+     * 
+     * @return new Array element converter
+     */
+    public Converter<T[]> toArray() {
+    	return ArrayElementConverter.create(this);
+    }
 }

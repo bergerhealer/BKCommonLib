@@ -3,9 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
-import net.minecraft.server.v1_9_R1.Item;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
 import org.bukkit.block.BlockFace;
@@ -362,7 +363,8 @@ public class MaterialUtil {
         @Override
         public Boolean get(Material type) {
             final Item item = CommonNMS.getItem(type);
-            return item == null ? false : item.k();
+            // return (this.durability > 0) && ((!this.m) || (this.maxStackSize == 1));
+            return (item == null) ? false : item.usesDurability();
         }
     };
 

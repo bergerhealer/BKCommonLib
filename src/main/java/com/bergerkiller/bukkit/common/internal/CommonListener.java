@@ -1,11 +1,14 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.server.CommonNMS;
+
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -19,6 +22,7 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 @SuppressWarnings("unused")
@@ -51,11 +55,13 @@ class CommonListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onWorldLoad(WorldLoadEvent event) {
+        WorldListenerHook.hook(event.getWorld());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onWorldUnload(WorldUnloadEvent event) {
-        CommonWorldListener listener = CommonPlugin.getInstance().worldListeners.remove(event.getWorld());
-        if (listener != null) {
-            listener.disable();
-        }
+        WorldListenerHook.unhook(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -4,7 +4,10 @@ import com.bergerkiller.bukkit.common.*;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
+import com.bergerkiller.bukkit.common.events.EntityAddEvent;
+import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
+import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
@@ -14,6 +17,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.server.CommonNMS;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -33,16 +38,6 @@ import java.util.logging.Level;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
     /*
-     * Loggers for internal BKCommonLib processes
-     */
-
-    public static final ModuleLogger LOGGER = new ModuleLogger("BKCommonLib");
-    public static final ModuleLogger LOGGER_CONVERSION = LOGGER.getModule("Conversion");
-    public static final ModuleLogger LOGGER_REFLECTION = LOGGER.getModule("Reflection");
-    public static final ModuleLogger LOGGER_NETWORK = LOGGER.getModule("Network");
-    public static final ModuleLogger LOGGER_TIMINGS = LOGGER.getModule("Timings");
-    public static final ModuleLogger LOGGER_PERMISSIONS = LOGGER.getModule("Permissions");
-    /*
      * Timings class
      */
     public static final TimingsRootListener TIMINGS = new TimingsRootListener();
@@ -52,7 +47,6 @@ public class CommonPlugin extends PluginBase {
     private static CommonPlugin instance;
     public final List<PluginBase> plugins = new ArrayList<>();
     private EntityMap<Player, CommonPlayerMeta> playerVisibleChunks;
-    protected final Map<World, CommonWorldListener> worldListeners = new HashMap<>();
     private CommonListener listener;
     private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<>();
     private final List<Runnable> nextTickTasks = new ArrayList<>();
@@ -77,29 +71,6 @@ public class CommonPlugin extends PluginBase {
             throw new RuntimeException("BKCommonLib is not enabled - Plugin Instance can not be obtained! (disjointed Class state?)");
         }
         return instance;
-    }
-
-    /**
-     * Handles the message and/or stack trace logging when something related to
-     * reflection is missing
-     *
-     * @param type of thing that is missing
-     * @param name of the thing that is missing
-     * @param source class in which it is missing
-     */
-    public void handleReflectionMissing(String type, String name, Class<?> source) {
-        String msg = type + " '" + name + "' does not exist in class file " + source.getName();
-        Exception ex = new Exception(msg);
-        for (StackTraceElement elem : ex.getStackTrace()) {
-            if (elem.getClassName().startsWith(Common.COMMON_ROOT + ".reflection.classes")) {
-                LOGGER_REFLECTION.log(Level.SEVERE, msg + " (Update BKCommonLib?)");
-                for (StackTraceElement ste : ex.getStackTrace()) {
-                    log(Level.SEVERE, "at " + ste.toString());
-                }
-                return;
-            }
-        }
-        ex.printStackTrace();
     }
 
     public void registerMap(EntityMap map) {
@@ -150,20 +121,20 @@ public class CommonPlugin extends PluginBase {
     }
 
     public void notifyAdded(org.bukkit.entity.Entity e) {
+        // Remove from mapping
         this.entitiesToRemove.remove(e);
+        // Event
+        CommonUtil.callEvent(new EntityAddEvent(e));
     }
 
     public void notifyRemoved(org.bukkit.entity.Entity e) {
         this.entitiesToRemove.add(e);
+        // Event
+        CommonUtil.callEvent(new EntityRemoveEvent(e));
     }
 
     public void notifyWorldAdded(org.bukkit.World world) {
-        if (worldListeners.containsKey(world)) {
-            return;
-        }
-        CommonWorldListener listener = new CommonWorldListener(world);
-        listener.enable();
-        worldListeners.put(world, listener);
+        WorldListenerHook.hook(world);
     }
 
     /**
@@ -259,10 +230,10 @@ public class CommonPlugin extends PluginBase {
             if (!this.packetHandler.onEnable()) {
                 return false;
             }
-            LOGGER_NETWORK.log(Level.INFO, "Now using " + handler.getName() + " to provide Packet Listener and Monitor support");
+            Logging.LOGGER_NETWORK.log(Level.INFO, "Now using " + handler.getName() + " to provide Packet Listener and Monitor support");
             return true;
         } catch (Throwable t) {
-            LOGGER_NETWORK.log(Level.SEVERE, "Failed to register a valid Packet Handler:");
+        	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to register a valid Packet Handler:");
             t.printStackTrace();
             return false;
         }
@@ -311,10 +282,9 @@ public class CommonPlugin extends PluginBase {
     @Override
     public void disable() {
         // Disable listeners
-        for (CommonWorldListener listener : worldListeners.values()) {
-            listener.disable();
+        for (World world : Bukkit.getWorlds()) {
+            WorldListenerHook.unhook(world);
         }
-        worldListeners.clear();
         HandlerList.unregisterAll(listener);
 
         // Clear running tasks
@@ -651,7 +621,7 @@ public class CommonPlugin extends PluginBase {
                         instance.timingsListeners.get(i).onNextTicked(runnable, executionTime);
                     }
                 } catch (Throwable t) {
-                    LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+                	Logging.LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
                 }
             }
         }
@@ -664,7 +634,7 @@ public class CommonPlugin extends PluginBase {
                         instance.timingsListeners.get(i).onChunkLoad(chunk, executionTime);
                     }
                 } catch (Throwable t) {
-                    LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+                	Logging.LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
                 }
             }
         }
@@ -677,7 +647,7 @@ public class CommonPlugin extends PluginBase {
                         instance.timingsListeners.get(i).onChunkGenerate(chunk, executionTime);
                     }
                 } catch (Throwable t) {
-                    LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+                	Logging.LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
                 }
             }
         }
@@ -690,7 +660,7 @@ public class CommonPlugin extends PluginBase {
                         instance.timingsListeners.get(i).onChunkUnloading(world, executionTime);
                     }
                 } catch (Throwable t) {
-                    LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+                	Logging.LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
                 }
             }
         }
@@ -703,7 +673,7 @@ public class CommonPlugin extends PluginBase {
                         instance.timingsListeners.get(i).onChunkPopulate(chunk, populator, executionTime);
                     }
                 } catch (Throwable t) {
-                    LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
+                	Logging.LOGGER_TIMINGS.log(Level.SEVERE, "An error occurred while calling timings event", t);
                 }
             }
         }

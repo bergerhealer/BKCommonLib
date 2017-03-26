@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
 import com.bergerkiller.bukkit.common.utils.*;
+import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -223,13 +224,12 @@ public class CraftRecipe {
      * @return the CraftRecipe, or null on failure
      */
     public static CraftRecipe create(Object recipe) {
-        final ItemStack output = RecipeRef.getOutput(recipe);
-        if (RecipeRef.SHAPED_TEMPLATE.isInstance(recipe)) {
-            return create(RecipeRef.shapedInput.get(recipe), output);
-        } else if (RecipeRef.SHAPELESS_TEMPLATE.isInstance(recipe)) {
-            return create(RecipeRef.shapelessInput.get(recipe), output);
+        final ItemStack output = NMSRecipe.getOutput(recipe);
+        final List<ItemStack> inputs = NMSRecipe.getInputItems(recipe);
+        if (inputs != null) {
+        	return create(inputs, output);
         } else {
-            return null;
+        	return null;
         }
     }
 

@@ -1,8 +1,9 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerAbilitiesRef;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerAbilities;
+
 import org.bukkit.entity.Player;
 
 /**
@@ -13,7 +14,7 @@ import org.bukkit.entity.Player;
 public class PlayerAbilities extends BasicWrapper {
 
     public PlayerAbilities() {
-        this(PlayerAbilitiesRef.TEMPLATE.newInstance());
+        this(NMSPlayerAbilities.T.newInstance());
     }
 
     public PlayerAbilities(Object handle) {
@@ -21,59 +22,59 @@ public class PlayerAbilities extends BasicWrapper {
     }
 
     public boolean isInvulnerable() {
-        return PlayerAbilitiesRef.isInvulnerable.get(handle);
+        return NMSPlayerAbilities.isInvulnerable.get(handle);
     }
 
     public void setInvulnerable(boolean invulnerable) {
-        PlayerAbilitiesRef.isInvulnerable.set(handle, invulnerable);
+        NMSPlayerAbilities.isInvulnerable.set(handle, invulnerable);
     }
 
     public boolean isFlying() {
-        return PlayerAbilitiesRef.isFlying.get(handle);
+        return NMSPlayerAbilities.isFlying.get(handle);
     }
 
     public void setFlying(boolean flying) {
-        PlayerAbilitiesRef.isFlying.set(handle, flying);
+        NMSPlayerAbilities.isFlying.set(handle, flying);
     }
 
     public boolean canFly() {
-        return PlayerAbilitiesRef.canFly.get(handle);
+        return NMSPlayerAbilities.canFly.get(handle);
     }
 
     public void setCanFly(boolean canFly) {
-        PlayerAbilitiesRef.canFly.set(handle, canFly);
+        NMSPlayerAbilities.canFly.set(handle, canFly);
     }
 
     public boolean canInstantlyBuild() {
-        return PlayerAbilitiesRef.canInstantlyBuild.get(handle);
+        return NMSPlayerAbilities.canInstantlyBuild.get(handle);
     }
 
     public void setCanInstantlyBuild(boolean canInstantlyBuild) {
-        PlayerAbilitiesRef.canInstantlyBuild.set(handle, canInstantlyBuild);
+        NMSPlayerAbilities.canInstantlyBuild.set(handle, canInstantlyBuild);
     }
 
     public boolean canBuild() {
-        return PlayerAbilitiesRef.mayBuild.get(handle);
+        return NMSPlayerAbilities.mayBuild.get(handle);
     }
 
     public void setCanBuild(boolean canBuild) {
-        PlayerAbilitiesRef.mayBuild.set(handle, canBuild);
+        NMSPlayerAbilities.mayBuild.set(handle, canBuild);
     }
 
     public float getFlySpeed() {
-        return PlayerAbilitiesRef.flySpeed.get(handle);
+        return NMSPlayerAbilities.flySpeed.get(handle);
     }
 
     public void setFlySpeed(float speed) {
-        PlayerAbilitiesRef.flySpeed.set(handle, speed);
+        NMSPlayerAbilities.flySpeed.set(handle, speed);
     }
 
     public float getWalkSpeed() {
-        return PlayerAbilitiesRef.walkSpeed.get(handle);
+        return NMSPlayerAbilities.walkSpeed.get(handle);
     }
 
     public void setWalkSpeed(float speed) {
-        PlayerAbilitiesRef.walkSpeed.set(handle, speed);
+        NMSPlayerAbilities.walkSpeed.set(handle, speed);
     }
 
     /**

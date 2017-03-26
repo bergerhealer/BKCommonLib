@@ -4,14 +4,19 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.*;
-import net.minecraft.server.v1_9_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Set;
@@ -26,12 +31,9 @@ public class ConversionPairs {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static final ConverterPair NONE = ConversionTypes.NONE.formPair(ConversionTypes.NONE);
+    
     public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
-    public static final ConverterPair<List<Object>, List<Entity>> entityList = toEntityHandleList.formPair(toEntityList);
     public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);
-    public static final ConverterPair<List<Object>, List<Player>> playerList = toPlayerHandleList.formPair(toPlayerList);
-    public static final ConverterPair<Set<Object>, Set<Player>> playerSet = toPlayerHandleSet.formPair(toPlayerSet);
-    public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = toItemStackHandleList.formPair(toItemStackList);
     public static final ConverterPair<Object[], ItemStack[]> itemStackArr = toItemStackHandleArr.formPair(toItemStackArr);
     public static final ConverterPair<Object, World> world = toWorldHandle.formPair(toWorld);
     public static final ConverterPair<Object, Chunk> chunk = toChunkHandle.formPair(toChunk);
@@ -42,10 +44,12 @@ public class ConversionPairs {
     public static final ConverterPair<Object, WorldType> worldType = toWorldTypeHandle.formPair(toWorldType);
     public static final ConverterPair<Object, DataWatcher> dataWatcher = toDataWatcherHandle.formPair(toDataWatcher);
     public static final ConverterPair<Object, CommonTag> commonTag = toNBTTagHandle.formPair(toCommonTag);
+    public static final ConverterPair<Object, CommonTagCompound> commonTagCompound = CommonUtil.unsafeCast(commonTag);
+    public static final ConverterPair<Object, CommonTagList> commonTagList = CommonUtil.unsafeCast(commonTag);
     public static final ConverterPair<Integer, EnumDirection> paintingFacing = toPaintingFacingId.formPair(toPaintingFacing);
-    public static final ConverterPair<Object, IntVector3> chunkCoordinates = toChunkCoordinatesHandle.formPair(toIntVector3);
-    public static final ConverterPair<Object, IntVector3> chunkPosition = toChunkPositionHandle.formPair(toIntVector3);
+    public static final ConverterPair<Object, IntVector3> blockPosition = toBlockPositionHandle.formPair(toIntVector3);
     public static final ConverterPair<Object, IntVector2> chunkIntPair = toChunkCoordIntPairHandle.formPair(toIntVector2);
+    public static final ConverterPair<Object, Vector> vector = toVec3DHandle.formPair(toVector);
     public static final ConverterPair<Object, PlayerAbilities> playerAbilities = toPlayerAbilitiesHandle.formPair(toPlayerAbilities);
     public static final ConverterPair<Object, EntityTracker> entityTracker = toEntityTrackerHandle.formPair(toEntityTracker);
     public static final ConverterPair<Object, LongHashSet> longHashSet = toLongHashSetHandle.formPair(toLongHashSet);
@@ -57,5 +61,14 @@ public class ConversionPairs {
     public static final ConverterPair<Object, UseAction> useAction = toUseActionHandle.formPair(toUseAction);
     public static final ConverterPair<Object, UUID> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
     public static final ConverterPair<Object, ScoreboardAction> scoreboardAction = toScoreboardActionHandle.formPair(toScoreboardAction);
+    public static final ConverterPair<Object, MainHand> mainHand = toMainHandHandle.formPair(toMainHand);
+    
+    // Collection element transformation
+    public static final ConverterPair<List<Object>, List<Entity>> entityList = entity.toList();
+    public static final ConverterPair<List<Object>, List<Player>> playerList = player.toList();
+    public static final ConverterPair<Set<Object>, Set<Player>> playerSet = player.toSet();
+    public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = itemStack.toList();
+    public static final ConverterPair<List<Object>, List<DataWatcher>> dataWatcherList = dataWatcher.toList();
+    
 
 }

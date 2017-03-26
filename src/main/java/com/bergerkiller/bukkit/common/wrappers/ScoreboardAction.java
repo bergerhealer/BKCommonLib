@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_9_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction;
+import net.minecraft.server.v1_11_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction;
 
 public enum ScoreboardAction {
 

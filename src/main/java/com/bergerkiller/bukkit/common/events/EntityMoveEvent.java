@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.events;
 
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import net.minecraft.server.v1_9_R1.Entity;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.Entity;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;

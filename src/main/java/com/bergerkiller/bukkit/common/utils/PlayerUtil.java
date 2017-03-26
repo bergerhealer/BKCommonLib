@@ -5,17 +5,18 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.CBClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.classes.*;
+import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+import com.bergerkiller.server.CommonNMS;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_9_R1.EntityPlayer;
-import net.minecraft.server.v1_9_R1.WorldServer;
+import net.minecraft.server.v1_11_R1.EntityPlayer;
+import net.minecraft.server.v1_11_R1.WorldServer;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class PlayerUtil extends EntityUtil {
 
-    private static final ClassTemplate<?> CRAFTPLAYER = CBClassTemplate.create("entity.CraftPlayer");
+    private static final ClassTemplate<?> CRAFTPLAYER = ClassTemplate.createCB("entity.CraftPlayer");
     private static final MethodAccessor<Void> setFirstPlayed = CRAFTPLAYER.getMethod("setFirstPlayed", long.class);
     private static final FieldAccessor<Boolean> hasPlayedBefore = CRAFTPLAYER.getField("hasPlayedBefore");
 
@@ -41,12 +42,12 @@ public class PlayerUtil extends EntityUtil {
         if (handle == null) {
             return true;
         }
-        final Object connection = EntityPlayerRef.playerConnection.get(handle);
+        final Object connection = NMSEntityPlayer.playerConnection.get(handle);
         if (connection == null) {
             return true;
         }
-        final Object network = PlayerConnectionRef.networkManager.get(connection);
-        return network == null || !NetworkManagerRef.getIsOpen.invoke(network);
+        final Object network = NMSPlayerConnection.networkManager.get(connection);
+        return network == null || !NMSNetworkManager.getIsOpen.invoke(network);
     }
 
     /**
@@ -90,9 +91,9 @@ public class PlayerUtil extends EntityUtil {
      * @param chunkX - coordinate
      * @param chunkZ - coordinate
      */
-    @SuppressWarnings("unchecked")
     @Deprecated
     public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
+    	throw new RuntimeException("METHOD IS BROKEN!!");
 //        CommonNMS.getNative(player).chunkCoordIntPairQueue.add((ChunkCoordIntPair) VectorRef.newPair(chunkX, chunkZ));
     }
 
@@ -175,7 +176,7 @@ public class PlayerUtil extends EntityUtil {
      * @return The player's GameProfile
      */
     public static GameProfile getGameProfile(Player player) {
-        return EntityHumanRef.gameProfile.get(Conversion.toEntityHandle.convert(player));
+        return NMSEntityHuman.gameProfile.get(Conversion.toEntityHandle.convert(player));
     }
 
     /**

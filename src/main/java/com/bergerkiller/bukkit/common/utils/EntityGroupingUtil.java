@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 
@@ -576,7 +576,7 @@ public class EntityGroupingUtil {
                 Method methodTry = (EntityGroupingUtil.class).getMethod(methodName, Entity.class);
                 this.setMethod(methodTry);
             } catch (Exception e) {
-                CommonPlugin.LOGGER.log(Level.WARNING, String.format("Unable to reference method %s(Entity) in EntityGroupingUtil: %s", methodName, e.getMessage()));
+            	Logging.LOGGER.log(Level.WARNING, String.format("Unable to reference method %s(Entity) in EntityGroupingUtil: %s", methodName, e.getMessage()));
                 this.setMethod(null);
             }
         }

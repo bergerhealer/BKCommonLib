@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.server.CommonNMS;
 
 /**
  * This class exposes net.minecraft.server references directly.<br>

@@ -3,14 +3,15 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import com.bergerkiller.bukkit.common.reflection.classes.RecipeRef;
-import net.minecraft.server.v1_9_R1.CraftingManager;
-import net.minecraft.server.v1_9_R1.IRecipe;
-import net.minecraft.server.v1_9_R1.RecipesFurnace;
-import net.minecraft.server.v1_9_R1.TileEntityFurnace;
+import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.CraftingManager;
+import net.minecraft.server.v1_11_R1.IRecipe;
+import net.minecraft.server.v1_11_R1.RecipesFurnace;
+import net.minecraft.server.v1_11_R1.TileEntityFurnace;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -120,7 +121,7 @@ public class RecipeUtil {
     public static CraftRecipe[] getCraftingRequirements(int itemid, int data) {
         List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
         for (Object rec : getCraftRecipes()) {
-            ItemStack item = RecipeRef.getOutput(rec);
+            ItemStack item = NMSRecipe.getOutput(rec);
             if (item != null && MaterialUtil.getTypeId(item) == itemid && (data == -1 || MaterialUtil.getRawData(item) == data)) {
                 CraftRecipe crec = CraftRecipe.create(rec);
                 if (crec != null) {

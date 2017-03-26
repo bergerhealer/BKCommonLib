@@ -19,7 +19,8 @@ public class CollectionBasics {
      * @param collection to set the contents of
      * @param elements to set to
      */
-    public static <T, E extends T> void setAll(Collection<T> collection, E... elements) {
+    @SuppressWarnings("unchecked")
+	public static <T, E extends T> void setAll(Collection<T> collection, E... elements) {
         setAll(collection, Arrays.asList(elements));
     }
 

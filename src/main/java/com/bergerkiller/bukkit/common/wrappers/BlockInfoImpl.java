@@ -1,11 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockRef;
-import net.minecraft.server.v1_9_R1.Block;
-import net.minecraft.server.v1_9_R1.Explosion;
-import net.minecraft.server.v1_9_R1.World;
+import com.bergerkiller.reflection.net.minecraft.server.NMSBlock;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.Block;
+import net.minecraft.server.v1_11_R1.Explosion;
+import net.minecraft.server.v1_11_R1.World;
 import org.bukkit.entity.Entity;
 
 /**
@@ -13,11 +14,18 @@ import org.bukkit.entity.Entity;
  * methods here and perform block-specific logic instead.
  */
 class BlockInfoImpl extends BlockInfo {
+    private Object defIBlockData;
 
     public BlockInfoImpl(Object handle) {
         setHandle(handle);
+        this.defIBlockData = getHandle(Block.class).fromLegacyData(0);
     }
 
+    @Override
+    public Object getIBlockData() {
+        return defIBlockData;
+    }
+    
     @Override
     public int getOpacity() {
         return getHandle(Block.class).o(getHandle(Block.class).getBlockData());
@@ -50,13 +58,13 @@ class BlockInfoImpl extends BlockInfo {
 
     @Override
     public void dropNaturally(org.bukkit.World world, int x, int y, int z, int data, float yield, int chance) {
-        BlockRef.dropNaturally.invoke(handle, Conversion.toWorldHandle.convert(world), x, y, z, data, yield, chance);
+        NMSBlock.dropNaturally.invoke(handle, Conversion.toWorldHandle.convert(world), x, y, z, data, yield, chance);
     }
 
     @Override
     public void ignite(org.bukkit.World world, int x, int y, int z) {
         World worldhandle = CommonNMS.getNative(world);
         Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0, true, true);
-        BlockRef.ignite.invoke(handle, worldhandle, x, y, z, ex);
+        NMSBlock.ignite.invoke(handle, worldhandle, x, y, z, ex);
     }
 }

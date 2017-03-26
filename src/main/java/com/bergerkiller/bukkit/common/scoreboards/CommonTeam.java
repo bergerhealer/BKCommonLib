@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.scoreboards;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -270,8 +271,8 @@ public class CommonTeam implements Serializable {
      */
     private CommonPacket getPacket(int action) {
         CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_TEAM);
-        packet.write(PacketType.OUT_SCOREBOARD_TEAM.team, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_TEAM.display, this.displayName);
+        packet.write(PacketType.OUT_SCOREBOARD_TEAM.name, this.name);
+        packet.write(PacketType.OUT_SCOREBOARD_TEAM.displayName, this.displayName);
         packet.write(PacketType.OUT_SCOREBOARD_TEAM.prefix, this.prefix);
         packet.write(PacketType.OUT_SCOREBOARD_TEAM.suffix, this.suffix);
         packet.write(PacketType.OUT_SCOREBOARD_TEAM.players, this.players);

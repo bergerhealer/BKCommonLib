@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.bases.IInventoryBase;
-import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.server.proxies.CraftInventoryProxy;
+
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
@@ -219,5 +221,20 @@ public abstract class InventoryBase implements Inventory {
     @Override
     public String toString() {
         return proxy.super_toString();
+    }
+
+    @Override
+    public Location getLocation() {
+        return proxy.super_getLocation();
+    }
+
+    @Override
+    public ItemStack[] getStorageContents() {
+        return this.proxy.super_getStorageContents();
+    }
+
+    @Override
+    public void setStorageContents(ItemStack[] items) throws IllegalArgumentException {
+        this.proxy.setStorageContents(items);
     }
 }

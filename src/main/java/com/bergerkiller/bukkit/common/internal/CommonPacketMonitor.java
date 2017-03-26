@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+
 import org.bukkit.entity.Player;
 
 import java.util.logging.Level;
@@ -42,7 +44,7 @@ class CommonPacketMonitor implements PacketMonitor {
             meta.clearVisibleChunks();
         } else if (!listenError) {
             listenError = true;
-            CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet entered listener that the listener was not registered for: type=" + packet.getType());
+            Logging.LOGGER_NETWORK.log(Level.WARNING, "Packet entered listener that the listener was not registered for: type=" + packet.getType());
         }
     }
 }

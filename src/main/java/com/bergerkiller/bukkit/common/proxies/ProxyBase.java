@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common.proxies;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 
@@ -76,9 +79,9 @@ public class ProxyBase<T> implements Proxy<T> {
                     succ = false;
                     if (!loggedHeader) {
                         loggedHeader = true;
-                        Bukkit.getLogger().log(Level.WARNING, "[Proxy] Some method(s) are not overrided in '" + proxy.getName() + "':");
+                        Common.LOGGER.log(Level.WARNING, "[Proxy] Some method(s) are not overrided in '" + proxy.getName() + "':");
                     }
-                    Bukkit.getLogger().log(Level.WARNING, "    - '" + method.toGenericString());
+                    Common.LOGGER.log(Level.WARNING, "    - '" + method.toGenericString());
                 }
             }
             return succ;

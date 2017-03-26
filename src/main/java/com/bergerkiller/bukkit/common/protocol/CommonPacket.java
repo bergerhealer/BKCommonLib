@@ -2,10 +2,10 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.reflection.SafeField;
 
 public class CommonPacket {
 
@@ -49,7 +49,7 @@ public class CommonPacket {
     }
 
     /**
-     * Write data on a cusotm field in the packet
+     * Write data on a custom field in the packet
      *
      * @param fieldAccessor Custom field
      * @param value Value
@@ -103,7 +103,23 @@ public class CommonPacket {
      */
     public Object read(String field) {
         try {
-            return SafeField.get(packet, field);
+            return SafeField.get(packet, field, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Invalid field name: " + field);
+        }
+    }
+    
+    /**
+     * Read data from a field by name and a known field type
+     *
+     * @param field Field name
+     * @param fieldType Type
+     * @return Data
+     */
+    public <T> T read(String field, Class<T> fieldType) {
+        try {
+            return SafeField.get(packet, field, fieldType);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalArgumentException("Invalid field name: " + field);

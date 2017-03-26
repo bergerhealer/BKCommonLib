@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.events;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 

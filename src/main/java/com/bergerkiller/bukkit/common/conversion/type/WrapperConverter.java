@@ -6,25 +6,36 @@ import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import net.minecraft.server.v1_9_R1.*;
-import net.minecraft.server.v1_9_R1.PacketPlayInUseEntity.EnumEntityUseAction;
-import net.minecraft.server.v1_9_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
+import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerAbilities;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBLongHashSet;
+
+import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.PacketPlayInUseEntity.EnumEntityUseAction;
+import net.minecraft.server.v1_11_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
-import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.*;
+import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 /**
@@ -41,10 +52,10 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
                 final Entity handle = (Entity) value;
                 if (handle.world == null) {
                     // We need this to avoid NPE's for non-spawned entities!
-                    org.bukkit.entity.Entity entity = EntityRef.bukkitEntity.get(handle);
+                    org.bukkit.entity.Entity entity = NMSEntity.bukkitEntity.get(handle);
                     if (entity == null) {
-                        entity = EntityRef.createEntity(handle);
-                        EntityRef.bukkitEntity.set(handle, entity);
+                        entity = NMSEntity.createEntity(handle);
+                        NMSEntity.bukkitEntity.set(handle, entity);
                     }
                     return entity;
                 } else {
@@ -75,7 +86,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
                 return ((Entity) value).world.getWorld();
             } else if (value instanceof TileEntity) {
                 TileEntity tile = (TileEntity) value;
-                return TileEntityRef.world.get(tile);
+                return NMSTileEntity.world.get(tile);
             } else if (value instanceof org.bukkit.entity.Entity) {
                 return ((org.bukkit.entity.Entity) value).getWorld();
             } else if (value instanceof BlockState) {
@@ -109,7 +120,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
             } else if (value instanceof BlockState) {
                 return ((BlockState) value).getBlock();
             } else if (value instanceof TileEntity) {
-                return TileEntityRef.getBlock(value);
+                return NMSTileEntity.getBlock(value);
             } else {
                 return def;
             }
@@ -120,7 +131,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
         public BlockState convertSpecial(Object value, Class<?> valueType, BlockState def) {
             // Alternative construction methods - Tile Entities can not be obtained from the world in some cases
             if (value instanceof TileEntity) {
-                return BlockStateRef.toBlockState(value);
+                return CBCraftBlockState.toBlockState(value);
             }
             org.bukkit.block.Block block = toBlock.convert(value);
             if (block != null) {
@@ -138,7 +149,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<CommonTag> toCommonTag = new WrapperConverter<CommonTag>(CommonTag.class) {
         @Override
         public CommonTag convertSpecial(Object value, Class<?> valueType, CommonTag def) {
-            if (NBTRef.NBTBase.isInstance(value)) {
+            if (NMSNBT.Base.T.isInstance(value)) {
                 return CommonTag.create(value);
             } else {
                 try {
@@ -157,7 +168,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<DataWatcher> toDataWatcher = new WrapperConverter<DataWatcher>(DataWatcher.class) {
         @Override
         public DataWatcher convertSpecial(Object value, Class<?> valueType, DataWatcher def) {
-            if (DataWatcherRef.TEMPLATE.isInstance(value)) {
+            if (NMSDataWatcher.T.isInstance(value)) {
                 return new DataWatcher(value);
             } else {
                 return def;
@@ -231,8 +242,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<org.bukkit.WorldType> toWorldType = new WrapperConverter<org.bukkit.WorldType>(org.bukkit.WorldType.class) {
         @Override
         public org.bukkit.WorldType convertSpecial(Object value, Class<?> valueType, org.bukkit.WorldType def) {
-            if (WorldTypeRef.TEMPLATE.isInstance(value)) {
-                return org.bukkit.WorldType.getByName(WorldTypeRef.name.get(value));
+            if (NMSWorldType.T.isInstance(value)) {
+                return org.bukkit.WorldType.getByName(NMSWorldType.name.get(value));
             } else if (value != null) {
                 return ParseUtil.parseEnum(org.bukkit.WorldType.class, value.toString(), def);
             } else {
@@ -255,6 +266,20 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
             }
         }
     };
+    public static final WrapperConverter<MainHand> toMainHand = new WrapperConverter<MainHand>(MainHand.class) {
+        @Override
+        public MainHand convertSpecial(Object value, Class<?> valueType, MainHand def) {
+            if (value instanceof EnumHand) {
+                switch((EnumHand) value) {
+                case OFF_HAND:
+                    return MainHand.LEFT;
+                case MAIN_HAND:
+                    return MainHand.RIGHT;            
+                }
+            }
+            return def;
+        }
+    };    
     public static final WrapperConverter<CommonPacket> toCommonPacket = new WrapperConverter<CommonPacket>(CommonPacket.class) {
         @Override
         public CommonPacket convertSpecial(Object value, Class<?> valueType, CommonPacket def) {
@@ -268,8 +293,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<IntVector2> toIntVector2 = new WrapperConverter<IntVector2>(IntVector2.class) {
         @Override
         public IntVector2 convertSpecial(Object value, Class<?> valueType, IntVector2 def) {
-            if (VectorRef.isPair(value)) {
-                return VectorRef.getPair(value);
+            if (NMSVector.isPair(value)) {
+                return NMSVector.getPair(value);
             } else {
                 return def;
             }
@@ -278,10 +303,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<IntVector3> toIntVector3 = new WrapperConverter<IntVector3>(IntVector3.class) {
         @Override
         public IntVector3 convertSpecial(Object value, Class<?> valueType, IntVector3 def) {
-            if (VectorRef.isPosition(value)) {
-                return VectorRef.getPosition(value);
-            } else if (VectorRef.isCoord(value)) {
-                return VectorRef.getCoord(value);
+            if (NMSVector.isPosition(value)) {
+                return NMSVector.getPosition(value);
             } else {
                 return def;
             }
@@ -293,8 +316,8 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
             if (value instanceof Location) {
                 Location loc = (Location) value;
                 return new Vector(loc.getX(), loc.getY(), loc.getZ());
-            } else if (VectorRef.isVec(value)) {
-                return VectorRef.getVec(value);
+            } else if (NMSVector.isVec(value)) {
+                return NMSVector.getVec(value);
             } else {
                 IntVector3 v3 = toIntVector3.convert(value);
                 if (value != null) {
@@ -308,7 +331,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = new WrapperConverter<PlayerAbilities>(PlayerAbilities.class) {
         @Override
         protected PlayerAbilities convertSpecial(Object value, Class<?> valueType, PlayerAbilities def) {
-            if (PlayerAbilitiesRef.TEMPLATE.isInstance(value)) {
+            if (NMSPlayerAbilities.T.isInstance(value)) {
                 return new PlayerAbilities(value);
             } else {
                 return def;
@@ -318,7 +341,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<EntityTracker> toEntityTracker = new WrapperConverter<EntityTracker>(EntityTracker.class) {
         @Override
         protected EntityTracker convertSpecial(Object value, Class<?> valueType, EntityTracker def) {
-            if (EntityTrackerRef.TEMPLATE.isInstance(value)) {
+            if (NMSEntityTracker.T.isInstance(value)) {
                 return new EntityTracker(value);
             } else {
                 return def;
@@ -328,7 +351,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = new WrapperConverter<LongHashMap<Object>>(LongHashMap.class) {
         @Override
         protected LongHashMap<Object> convertSpecial(Object value, Class<?> valueType, LongHashMap<Object> def) {
-            if (LongHashMapRef.TEMPLATE.isInstance(value)) {
+            if (value instanceof it.unimi.dsi.fastutil.longs.Long2ObjectMap) {
                 return new LongHashMap<Object>(value);
             } else {
                 return def;
@@ -338,7 +361,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<LongHashSet> toLongHashSet = new WrapperConverter<LongHashSet>(LongHashSet.class) {
         @Override
         protected LongHashSet convertSpecial(Object value, Class<?> valueType, LongHashSet def) {
-            if (LongHashSetRef.TEMPLATE.isInstance(value)) {
+            if (CBLongHashSet.T.isInstance(value)) {
                 return new LongHashSet(value);
             } else {
                 return def;
@@ -348,7 +371,7 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
     public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = new WrapperConverter<IntHashMap<Object>>(IntHashMap.class) {
         @Override
         protected IntHashMap<Object> convertSpecial(Object value, Class<?> valueType, IntHashMap<Object> def) {
-            if (IntHashMapRef.TEMPLATE.isInstance(value)) {
+            if (NMSIntHashMap.T.isInstance(value)) {
                 return new IntHashMap<Object>(value);
             } else {
                 return def;

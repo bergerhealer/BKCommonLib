@@ -5,14 +5,21 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.*;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import net.minecraft.server.v1_9_R1.*;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.*;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_9_R1.CraftTravelAgent;
+import org.bukkit.craftbukkit.v1_11_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -24,7 +31,7 @@ import java.util.Random;
 
 public class WorldUtil extends ChunkUtil {
 
-    private static final Object findSpawnDummyEntity = EntityPlayerRef.TEMPLATE.newInstanceNull();
+    private static final Object findSpawnDummyEntity = NMSEntityPlayer.T.newInstanceNull();
 
     /**
      * Gets the block type Id
@@ -57,7 +64,8 @@ public class WorldUtil extends ChunkUtil {
      * @param z - coordinate of the block
      * @return block data
      */
-    public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
+    @SuppressWarnings("deprecation")
+	public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
         return world.getBlockAt(x, y, z).getData();
         //return CommonNMS.getNative(world).chunkProviderServer.getChunkAt(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z));
     }
@@ -119,7 +127,7 @@ public class WorldUtil extends ChunkUtil {
     public static void removeEntity(org.bukkit.entity.Entity entity) {
         Entity e = CommonNMS.getNative(entity);
         e.world.removeEntity(e);
-        WorldServerRef.entityTracker.get(e.world).stopTracking(entity);
+        NMSWorldServer.entityTracker.get(e.world).stopTracking(entity);
     }
 
     /**
@@ -129,7 +137,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void removeWorld(org.bukkit.World world) {
         // Remove the world from the Bukkit worlds mapping
-        Iterator<org.bukkit.World> iter = CraftServerRef.worlds.values().iterator();
+        Iterator<org.bukkit.World> iter = getWorlds().iterator();
         while (iter.hasNext()) {
             if (iter.next() == world) {
                 iter.remove();
@@ -146,7 +154,7 @@ public class WorldUtil extends ChunkUtil {
      * @return A collection of World instances
      */
     public static Collection<org.bukkit.World> getWorlds() {
-        return CraftServerRef.worlds.values();
+        return CBCraftServer.worlds.get(Bukkit.getServer()).values();
     }
 
     /**
@@ -292,7 +300,7 @@ public class WorldUtil extends ChunkUtil {
      * @return server
      */
     public static Server getServer(org.bukkit.World world) {
-        return WorldServerRef.getServer(Conversion.toWorldHandle.convert(world));
+        return NMSWorldServer.getServer(Conversion.toWorldHandle.convert(world));
     }
 
     /**
@@ -302,7 +310,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world Entity Tracker
      */
     public static EntityTracker getTracker(org.bukkit.World world) {
-        return WorldServerRef.entityTracker.get(Conversion.toWorldHandle.convert(world));
+        return NMSWorldServer.entityTracker.get(Conversion.toWorldHandle.convert(world));
     }
 
     /**
@@ -460,12 +468,12 @@ public class WorldUtil extends ChunkUtil {
      * @param chunkZ of the chunk
      */
     public static void queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
-        Object playerChunkMap = WorldServerRef.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
-        Object playerChunk = PlayerChunkMapRef.getPlayerChunk(playerChunkMap, chunkX, chunkZ);
+        Object playerChunkMap = NMSWorldServer.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
+        Object playerChunk = NMSPlayerChunkMap.getPlayerChunk(playerChunkMap, chunkX, chunkZ);
         if (playerChunk == null) {
             return;
         }
-        for (Player player : PlayerChunkRef.players.get(playerChunk)) {
+        for (Player player : NMSPlayerChunk.players.get(playerChunk)) {
             PlayerUtil.queueChunkSend(player, chunkX, chunkZ);
         }
     }
@@ -479,8 +487,8 @@ public class WorldUtil extends ChunkUtil {
      * @param blockZ of the block
      */
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
-        Object playerChunkMap = WorldServerRef.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
-        PlayerChunkMapRef.flagBlockDirty(playerChunkMap, blockX, blockY, blockZ);
+        Object playerChunkMap = NMSWorldServer.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
+        NMSPlayerChunkMap.flagBlockDirty(playerChunkMap, blockX, blockY, blockZ);
     }
 
     /**

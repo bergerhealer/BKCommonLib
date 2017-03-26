@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerRef;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
+
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ public class EntityTracker extends BasicWrapper {
      * @param packet to send
      */
     public void sendPacket(Entity entity, Object packet) {
-        EntityTrackerRef.sendPacket(handle, entity, packet);
+        NMSEntityTracker.sendPacket(handle, entity, packet);
     }
 
     /**
@@ -42,7 +43,7 @@ public class EntityTracker extends BasicWrapper {
      * @param chunk containing the entities to update
      */
     public void spawnEntities(Player player, Chunk chunk) {
-        EntityTrackerRef.spawnEntities(handle, player, chunk);
+        NMSEntityTracker.spawnEntities(handle, player, chunk);
     }
 
     /**
@@ -54,7 +55,7 @@ public class EntityTracker extends BasicWrapper {
      * @param player to remove from this Entity Tracker
      */
     public void removeViewer(Player player) {
-        EntityTrackerRef.removeViewer(handle, player);
+        NMSEntityTracker.removeViewer(handle, player);
     }
 
     /**
@@ -64,7 +65,7 @@ public class EntityTracker extends BasicWrapper {
      * @param player to update
      */
     public void updateViewer(Player player) {
-        EntityTrackerRef.updatePlayer(handle, player);
+        NMSEntityTracker.updatePlayer(handle, player);
     }
 
     /**
@@ -74,7 +75,7 @@ public class EntityTracker extends BasicWrapper {
      * @param entity to start tracking
      */
     public void startTracking(Entity entity) {
-        EntityTrackerRef.startTracking(handle, entity);
+        NMSEntityTracker.startTracking(handle, entity);
     }
 
     /**
@@ -84,7 +85,7 @@ public class EntityTracker extends BasicWrapper {
      * @param entity to remove
      */
     public void stopTracking(Entity entity) {
-        EntityTrackerRef.stopTracking(handle, entity);
+        NMSEntityTracker.stopTracking(handle, entity);
     }
 
     /**
@@ -95,7 +96,7 @@ public class EntityTracker extends BasicWrapper {
      * @return previously set entity tracker entry, null if there was none
      */
     public Object setEntry(Entity entity, Object entityTrackerEntry) {
-        return EntityTrackerRef.setEntry(handle, entity, entityTrackerEntry);
+        return NMSEntityTracker.setEntry(handle, entity, entityTrackerEntry);
     }
 
     /**
@@ -105,6 +106,16 @@ public class EntityTracker extends BasicWrapper {
      * @return entity tracker entry
      */
     public Object getEntry(Entity entity) {
-        return EntityTrackerRef.getEntry(handle, entity);
+        return NMSEntityTracker.getEntry(handle, entity);
+    }
+
+    /**
+     * Gets the entity tracker entry of an entity Id
+     *
+     * @param id of the entity to get the entry of
+     * @return entity tracker entry
+     */
+    public Object getEntry(int id) {
+        return NMSEntityTracker.getEntry(handle, id);
     }
 }

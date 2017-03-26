@@ -2,8 +2,7 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
-import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.*;
 import java.util.*;
@@ -37,8 +36,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         return (Map<String, Object>) super.getRawData();
     }
 
-    private Collection<Object> getHandleValues() {
-        return NBTRef.nbtCompoundGetValues.invoke(handle);
+    private Collection<?> getHandleValues() {
+        return NMSNBT.Compound.getValues.invoke(handle);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             return null;
         }
         Object removedHandle = getRawData().remove(key);
-        return removedHandle == null ? null : nbtToCommon(NBTUtil.getData(removedHandle), false);
+        return removedHandle == null ? null : nbtToCommon(NMSNBT.getData(removedHandle), false);
     }
 
     /**
@@ -88,13 +87,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public void putValue(String key, Object value) {
         if (value == null) {
-            NBTRef.nbtCompoundRemove.invoke(handle, key);
+            NMSNBT.Compound.remove.invoke(handle, key);
         } else {
             Object elementHandle = commonToNbt(value);
-            if (!NBTRef.NBTBase.isInstance(elementHandle)) {
-                elementHandle = NBTUtil.createHandle(value);
+            if (!NMSNBT.Base.T.isInstance(elementHandle)) {
+                elementHandle = NMSNBT.createHandle(value);
             }
-            NBTRef.nbtCompoundSet.invoke(handle, key, elementHandle);
+            NMSNBT.Compound.set.invoke(handle, key, elementHandle);
         }
     }
 
@@ -123,7 +122,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
-        return nbtToCommon(NBTUtil.getData(NBTRef.nbtCompoundGet.invoke(handle, key)), false);
+        return nbtToCommon(NMSNBT.getData(NMSNBT.Compound.get.invoke(handle, key)), false);
     }
 
     /**
@@ -239,8 +238,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
         Object elementHandle = getRawData().get(key);
-        if (!NBTRef.NBTTagCompound.isInstance(elementHandle)) {
-            elementHandle = NBTRef.NBTTagCompound.newInstance();
+        if (!NMSNBT.Compound.T.isInstance(elementHandle)) {
+            elementHandle = NMSNBT.Compound.T.newInstance();
             getRawData().put(key.toString(), elementHandle);
         }
         return (CommonTagCompound) create(elementHandle);
@@ -258,8 +257,8 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             throw new IllegalArgumentException("Can not store elements under null keys");
         }
         Object elementHandle = getRawData().get(key);
-        if (!NBTRef.NBTTagList.isInstance(elementHandle)) {
-            elementHandle = NBTRef.NBTTagList.newInstance();
+        if (!NMSNBT.List.T.isInstance(elementHandle)) {
+            elementHandle = NMSNBT.List.T.newInstance();
             getRawData().put(key.toString(), elementHandle);
         }
         return (CommonTagList) create(elementHandle);
@@ -281,7 +280,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
-        return create(NBTRef.nbtCompoundGet.invoke(handle, key.toString()));
+        return create(NMSNBT.Compound.get.invoke(handle, key.toString()));
     }
 
     @Override
@@ -303,12 +302,12 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 
     @Override
     public boolean isEmpty() {
-        return NBTRef.nbtCompoundIsEmpty.invoke(handle);
+        return NMSNBT.Compound.isEmpty.invoke(handle);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return NBTRef.nbtCompoundContains.invoke(handle, key.toString());
+        return NMSNBT.Compound.contains.invoke(handle, key.toString());
     }
 
     @Override
@@ -318,13 +317,13 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         } else if (value instanceof CommonTag) {
             value = ((CommonTag) value).getHandle();
         }
-        if (NBTRef.NBTBase.isInstance(value)) {
+        if (NMSNBT.Base.T.isInstance(value)) {
             // Compare NBT elements
             return getHandleValues().contains(value);
         } else {
             // Compare the data of the NBT elements
             for (Object base : getHandleValues()) {
-                if (NBTUtil.getData(base).equals(value)) {
+                if (NMSNBT.getData(base).equals(value)) {
                     return true;
                 }
             }
@@ -354,41 +353,44 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         return Collections.unmodifiableSet((Set<Entry<String, CommonTag>>) nbtToCommon(getRawData(), true));
     }
 
-    /**
-     * Writes this CommonTagCompound to the OutputStream specified. This method
-     * writes the compound as raw, uncompressed data.
-     *
-     * @param stream to write to
-     * @throws IOException
-     */
-    public void writeToUncompressed(OutputStream stream) throws IOException {
-        NBTUtil.writeCompoundUncompressed(getHandle(), stream);
+    @Override
+    public void writeToStream(OutputStream out) throws IOException {
+    	writeToStream(out, false);
     }
 
     /**
-     * Writes this CommonTagCompound to the OutputStream specified. This method
-     * writes the compound as GZIP-compressed data.
-     *
-     * @param stream to write to
-     * @throws IOException
+     * Writes this Tag Compound to the stream specified. If compressed, the
+     * data is compressed in GZIP format.
+     * 
+     * @param out Stream to write to
+     * @param compressed Whether to compress the data with GZIP
+     * @throws IOException on failure
      */
-    public void writeTo(OutputStream stream) throws IOException {
-        NBTUtil.writeCompound(getHandle(), stream);
+    public void writeToStream(OutputStream out, boolean compressed) throws IOException {
+    	if (compressed) {
+    		NMSNBT.StreamTools.Compressed.writeTagCompound.invoke(null, getHandle(), out);
+    	} else {
+        	if (!(out instanceof DataOutput)) {
+        		out = new DataOutputStream(out);
+        	}
+        	NMSNBT.StreamTools.Uncompressed.writeTagCompound.invoke(null, getHandle(), out);
+    	}
     }
 
     /**
      * Writes this CommonTagCompound to the file specified. First writes to a
-     * temporary file to avoid corrupted files. This method writes the compound
-     * as GZIP-compressed data to the file.
+     * temporary file to avoid corrupted files. If compressed, the
+     * data is compressed in GZIP format.
      *
      * @param file to write to
+     * @param compressed Whether to compress the data with GZIP
      * @throws IOException on failure
      */
-    public void writeTo(File file) throws IOException {
+    public void writeToFile(File file, boolean compressed) throws IOException {
         TempFileOutputStream stream = new TempFileOutputStream(file);
         boolean successful = false;
         try {
-            writeTo(stream);
+        	writeToStream(stream, compressed);
             successful = true;
         } finally {
             stream.close(successful);
@@ -396,41 +398,51 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     }
 
     /**
-     * Reads a CommonTagCompound from the InputStream specified. This method
-     * expects an Input Stream containing raw, uncompressed data.
-     *
-     * @param stream to read from
-     * @return read compound
-     * @throws IOException on failure
+     * Deserializes and reads a compound tag from a stream. The input data should be uncompressed.
+     * 
+     * @param in Stream to read from
+     * @return read compound tag
+     * @throws IOException
      */
-    public static CommonTagCompound readFromUncompressed(InputStream stream) throws IOException {
-        return (CommonTagCompound) create(NBTUtil.readCompoundUncompressed(stream));
+    public static CommonTagCompound readFromStream(InputStream in) throws IOException {
+    	return readFromStream(in, false);
     }
 
     /**
-     * Reads a CommonTagCompound from the InputStream specified. This method
-     * expects an Input Stream containing GZIP-compressed data.
+     * Reads a CommonTagCompound from the InputStream specified. If compressed, the
+     * data is expected to be compressed with the GZIP format.
      *
-     * @param stream to read from
+     * @param in Stream to read from
+     * @param compressed Whether to the data needs to be uncompressed with GZIP
      * @return read compound
      * @throws IOException on failure
      */
-    public static CommonTagCompound readFrom(InputStream stream) throws IOException {
-        return (CommonTagCompound) create(NBTUtil.readCompound(stream));
+    public static CommonTagCompound readFromStream(InputStream in, boolean compressed) throws IOException {
+    	Object handle;
+    	if (compressed) {
+    		handle = NMSNBT.StreamTools.Compressed.readTagCompound.invoke(null, in);
+    	} else {
+    		if (!(in instanceof DataInput)) {
+    			in = new DataInputStream(in);
+    		}
+    		handle = NMSNBT.StreamTools.Uncompressed.readTagCompound.invoke(null, in);
+    	}
+        return (CommonTagCompound) create(handle);
     }
 
     /**
-     * Reads a CommonTagCompound from the file specified. This method expects a
-     * file containing GZIP-compressed data.
+     * Reads a CommonTagCompound from the file specified. If compressed, the
+     * data is expected to be compressed with the GZIP format.
      *
      * @param file to read from
+     * @param compressed Whether to the data needs to be uncompressed with GZIP
      * @return read compound
      * @throws IOException on failure
      */
-    public static CommonTagCompound readFrom(File file) throws IOException {
+    public static CommonTagCompound readFromFile(File file, boolean compressed) throws IOException {
         FileInputStream stream = new FileInputStream(file);
         try {
-            return readFrom(stream);
+            return readFromStream(stream, compressed);
         } finally {
             stream.close();
         }

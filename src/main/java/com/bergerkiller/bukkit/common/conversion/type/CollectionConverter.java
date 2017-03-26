@@ -32,6 +32,12 @@ public abstract class CollectionConverter<T extends Collection<?>> extends Basic
             }
         }
     };
+    public static final CollectionConverter<Collection<?>> toCollection = new CollectionConverter<Collection<?>>(Collection.class) {
+        @Override
+        public Collection<?> convert(Collection<?> collection) {
+        	return collection;
+        }
+    };
 
     @SuppressWarnings("unchecked")
     public CollectionConverter(Class<?> outputType) {
@@ -51,7 +57,7 @@ public abstract class CollectionConverter<T extends Collection<?>> extends Basic
         if (value instanceof Collection) {
             return convert((Collection<?>) value);
         } else if (value instanceof Map) {
-            return convert(((Map<?, ?>) value).values());
+            return convert(((Map<?, ?>) value).entrySet());
         } else {
             final Class<?> type = value.getClass();
             if (type.isArray()) {

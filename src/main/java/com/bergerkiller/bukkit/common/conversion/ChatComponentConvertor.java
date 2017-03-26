@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion;
 
-import net.minecraft.server.v1_9_R1.IChatBaseComponent;
-import net.minecraft.server.v1_9_R1.IChatBaseComponent.ChatSerializer;
+import net.minecraft.server.v1_11_R1.IChatBaseComponent;
+import net.minecraft.server.v1_11_R1.IChatBaseComponent.ChatSerializer;
 import org.bukkit.entity.Player;
 
 public class ChatComponentConvertor {

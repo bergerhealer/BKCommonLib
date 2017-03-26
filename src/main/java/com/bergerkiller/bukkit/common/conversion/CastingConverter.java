@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  *
  * @param <T> - type to cast the output to
  */
-public class CastingConverter<T> implements Converter<T> {
+public class CastingConverter<T> extends Converter<T> {
 
     private final Class<T> outputType;
     private final Converter<?> baseConvertor;

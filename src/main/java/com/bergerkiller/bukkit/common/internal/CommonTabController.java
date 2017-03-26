@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.FilteredCollectionSelf;
 import com.bergerkiller.bukkit.common.collections.UniqueList;
@@ -8,13 +9,14 @@ import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.tab.TabView;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerList;
+import com.bergerkiller.server.CommonNMS;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +34,6 @@ public class CommonTabController implements PacketListener, Listener {
 
     public static final int MAX_TEXT_LENGTH = 16;
     private static final char[] RANDOM_STYLE_CHARS;
-    private final FieldAccessor<Integer> maxPlayersField;
     private int serverMaxPlayers;
     private int serverListWidth, serverListHeight, serverListCount;
     private int customListWidth, customListHeight, customListCount;
@@ -56,13 +57,12 @@ public class CommonTabController implements PacketListener, Listener {
         // To char array and check length
         RANDOM_STYLE_CHARS = Conversion.toCharArr.convert(chars);
         if (RANDOM_STYLE_CHARS.length < 60) {
-            CommonPlugin.LOGGER.log(Level.WARNING, "Not enough unique characters to use: " + RANDOM_STYLE_CHARS.length);
+        	Logging.LOGGER.log(Level.WARNING, "Not enough unique characters to use: " + RANDOM_STYLE_CHARS.length);
         }
     }
 
     protected CommonTabController() {
         // Read server max players
-        maxPlayersField = new SafeField<Integer>(CommonNMS.getPlayerList(), "maxPlayers");
         serverMaxPlayers = 0;
         // Default (startup) dimensions
         customListCount = serverListCount = 0;
@@ -259,7 +259,7 @@ public class CommonTabController implements PacketListener, Listener {
         if (event.getResult() == Result.ALLOWED) {
             // Temporarily set the max player count to the one as specified here
             if (hasChangedMaxPlayers()) {
-                maxPlayersField.set(CommonNMS.getPlayerList(), customListCount);
+            	NMSPlayerList.maxPlayers.set(CommonNMS.getPlayerList(), customListCount);
             }
         }
     }
@@ -268,7 +268,7 @@ public class CommonTabController implements PacketListener, Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (hasChangedMaxPlayers()) {
             // Restore server max players (required, otherwise new people can join a full server all of a sudden!)
-            maxPlayersField.set(CommonNMS.getPlayerList(), serverMaxPlayers);
+        	NMSPlayerList.maxPlayers.set(CommonNMS.getPlayerList(), serverMaxPlayers);
         }
         // Send all the elements of the current tab for this player
         getInfo(event.getPlayer()).refresh();

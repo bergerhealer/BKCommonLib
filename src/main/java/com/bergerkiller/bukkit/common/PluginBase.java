@@ -11,8 +11,9 @@ import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.PluginDescriptionFileRef;
 import com.bergerkiller.bukkit.common.utils.*;
+import com.bergerkiller.reflection.org.bukkit.BPluginDescriptionFile;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
@@ -700,12 +701,12 @@ public abstract class PluginBase extends JavaPlugin {
         try {
             this.pluginYaml.loadFromStream(getResource("plugin.yml"));
         } catch (Exception ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
+        	Common.LOGGER.log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
         }
 
         // Load all the commands for this Plugin
         Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
-        if (commands != null && PluginDescriptionFileRef.commands.isValid()) {
+        if (commands != null && BPluginDescriptionFile.commands.isValid()) {
             // Prepare commands localization node
             ConfigurationNode commandsNode = getLocalizationNode("commands");
 
@@ -722,7 +723,7 @@ public abstract class PluginBase extends JavaPlugin {
             }
 
             // Set the new commands map using reflection
-            PluginDescriptionFileRef.commands.set(this.getDescription(), Collections.unmodifiableMap(commands));
+            BPluginDescriptionFile.commands.set(this.getDescription(), Collections.unmodifiableMap(commands));
         }
 
         // ==== Permissions ====
@@ -785,7 +786,7 @@ public abstract class PluginBase extends JavaPlugin {
         if (this.enableMessage != null) {
             log(Level.INFO, this.enableMessage);
         }
-        Bukkit.getLogger().log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
+        Common.LOGGER.log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
     }
 
     @Override
@@ -821,7 +822,7 @@ public abstract class PluginBase extends JavaPlugin {
 
         // If specified to do so, a disable message is shown
         if (doDisableMessage) {
-            Bukkit.getLogger().log(Level.INFO, this.disableMessage);
+        	Common.LOGGER.log(Level.INFO, this.disableMessage);
         }
     }
 
@@ -847,7 +848,7 @@ public abstract class PluginBase extends JavaPlugin {
         } catch (Throwable t) {
             StringBuilder msg = new StringBuilder("Unhandled exception executing command '");
             msg.append(command).append("' in plugin ").append(this.getName()).append(" v").append(this.getVersion());
-            Bukkit.getLogger().log(Level.SEVERE, msg.toString());
+            Common.LOGGER.log(Level.SEVERE, msg.toString());
             t.printStackTrace();
             sender.sendMessage(ChatColor.RED + "An internal error occured while executing this command");
         }

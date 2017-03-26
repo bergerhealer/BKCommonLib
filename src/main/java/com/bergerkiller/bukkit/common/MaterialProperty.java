@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.reflection.SafeMethod;
+
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -82,7 +83,8 @@ public abstract class MaterialProperty<T> {
      * @param material to get this property of
      * @return The property of the material
      */
-    public T get(Material material) {
+    @SuppressWarnings("deprecation")
+	public T get(Material material) {
         return material == null ? get(0) : get(MaterialUtil.getTypeId(material));
     }
 

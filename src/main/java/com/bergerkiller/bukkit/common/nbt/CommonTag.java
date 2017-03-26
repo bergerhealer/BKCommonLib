@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
-import com.bergerkiller.bukkit.common.utils.NBTUtil;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import net.minecraft.server.v1_9_R1.NBTBase;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
+import java.io.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.Map.Entry;
@@ -18,14 +17,27 @@ import java.util.Map.Entry;
  * double, byte[], int[], String</u>
  */
 public class CommonTag extends BasicWrapper {
-
-    protected final NBTTagInfo info;
+    protected final NMSNBT.Type info;
 
     public CommonTag(Object data) {
-        info = NBTTagInfo.findInfo(data);
+    	info = NMSNBT.Type.find(data);
         setHandle(info.createHandle(commonToNbt(data)));
     }
 
+    /**
+     * Gets the NBT Type used in this Common Tag
+     * 
+     * @return NBT Type
+     */
+    public NMSNBT.Type getType() {
+    	return info;
+    }
+
+    /**
+     * Gets the raw data stored inside this tag
+     * 
+     * @return Raw data
+     */
     protected Object getRawData() {
         return info.getData(handle);
     }
@@ -85,14 +97,43 @@ public class CommonTag extends BasicWrapper {
 
     @Override
     public CommonTag clone() {
-        return create(NBTRef.clone.invoke(handle));
+        return create(NMSNBT.Base.clone.invoke(handle));
+    }
+
+    /**
+     * Serializes and writes this tag to a stream. The data is uncompressed.
+     *
+     * @param out Stream to write to
+     * @throws IOException
+     */
+    public void writeToStream(OutputStream out) throws IOException {
+    	if (!(out instanceof DataOutput)) {
+    		out = new DataOutputStream(out);
+    	}
+        NMSNBT.StreamTools.Uncompressed.writeTag.invoke(null, getHandle(), out);
+    }
+
+    /**
+     * Deserializes and reads a tag from a stream. The input data should be uncompressed.
+     * 
+     * @param in Stream to read from
+     * @return read tag
+     * @throws IOException
+     */
+    public static CommonTag readFromStream(InputStream in) throws IOException {
+    	if (!(in instanceof DataInput)) {
+    		in = new DataInputStream(in);
+    	}
+    	Object limiter = NMSNBT.StreamTools.Uncompressed.getNoReadLimiter();
+    	Object handle = NMSNBT.StreamTools.Uncompressed.readTag.invoke(null, in, 0, limiter);
+    	return create(handle);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected static Object commonToNbt(Object data) {
         if (data instanceof CommonTag) {
             return ((CommonTag) data).getHandle();
-        } else if (data instanceof NBTBase || data == null) {
+        } else if (NMSNBT.Base.T.isInstance(data) || data == null) {
             return data;
         } else if (data instanceof Entry) {
             Entry old = (Entry) data;
@@ -131,13 +172,13 @@ public class CommonTag extends BasicWrapper {
             }
             return tags;
         } else {
-            return NBTUtil.createHandle(data);
+            return NMSNBT.createHandle(data);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected static Object nbtToCommon(Object data, boolean wrapData) {
-        if (data instanceof NBTBase) {
+        if (NMSNBT.Base.T.isInstance(data)) {
             return create(data);
         } else if (data instanceof CommonTag || data == null) {
             return data;
@@ -191,7 +232,7 @@ public class CommonTag extends BasicWrapper {
      * @return a new CommonTag instance
      */
     public static CommonTag createForData(Object data) {
-        return create(NBTUtil.createHandle(data));
+        return create(NMSNBT.createHandle(data));
     }
 
     /**
@@ -206,9 +247,9 @@ public class CommonTag extends BasicWrapper {
             return null;
         }
         CommonTag tag;
-        if (NBTRef.NBTTagCompound.isInstance(handle)) {
+        if (NMSNBT.Compound.T.isInstance(handle)) {
             tag = new CommonTagCompound(handle);
-        } else if (NBTRef.NBTTagList.isInstance(handle)) {
+        } else if (NMSNBT.List.T.isInstance(handle)) {
             tag = new CommonTagList(handle);
         } else {
             tag = new CommonTag(handle);

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -10,12 +11,13 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -45,7 +47,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     public boolean onEnable() {
         // Initialize all receiver methods
         Class<?> packetType = PacketType.DEFAULT.getType();
-        for (Method method : PlayerConnectionRef.TEMPLATE.getType().getDeclaredMethods()) {
+        for (Method method : NMSPlayerConnection.T.getType().getDeclaredMethods()) {
             if (method.getReturnType() != void.class || method.getParameterTypes().length != 1
                     || !Modifier.isPublic(method.getModifiers())) {
                 continue;
@@ -181,7 +183,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     public void receivePacket(Player player, Object packet) {
         SafeMethod<?> method = this.receiverMethods.get(packet);
         if (method == null) {
-            CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
+        	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
         } else {
             method.invoke(getPlayerConnection(player), packet);
         }
@@ -199,8 +201,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             return;
         }
         if (throughListeners) {
-            final Object connection = EntityPlayerRef.playerConnection.get(handle);
-            PlayerConnectionRef.sendPacket(connection, packet);
+            final Object connection = NMSEntityPlayer.playerConnection.get(handle);
+            NMSPlayerConnection.sendPacket(connection, packet);
         } else {
             handlePacketSendMonitor(player, PacketType.getType(packet), packet);
             sendSilentPacket(player, packet);
@@ -240,7 +242,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     }
 
     protected Object getPlayerConnection(Player player) {
-        return EntityPlayerRef.playerConnection.get(Conversion.toEntityHandle.convert(player));
+        return NMSEntityPlayer.playerConnection.get(Conversion.toEntityHandle.convert(player));
     }
 
     private PacketType[] getListenerTypes(PacketListener listener) {
@@ -344,14 +346,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 
     protected static long calculatePendingBytes(Player player) {
         final Object playerHandle = Conversion.toEntityHandle.convert(player);
-        final Object playerConnection = EntityPlayerRef.playerConnection.get(playerHandle);
-        final Object nm = PlayerConnectionRef.networkManager.get(playerConnection);
+        final Object playerConnection = NMSEntityPlayer.playerConnection.get(playerHandle);
+        final Object nm = NMSPlayerConnection.networkManager.get(playerConnection);
         // We can only work on Network manager implementations, INetworkManager implementations are unknown to us
-        if (!NetworkManagerRef.TEMPLATE.isInstance(nm)) {
+        if (!NMSNetworkManager.T.isInstance(nm)) {
             return 0L;
         }
-        Collection<Object> low = NetworkManagerRef.queue.get(nm);
-        Collection<Object> high = NetworkManagerRef.queue.get(nm);
+        Collection<Object> low = NMSNetworkManager.queue.get(nm);
+        Collection<Object> high = NMSNetworkManager.queue.get(nm);
         if (low == null || high == null) {
             return 0L;
         }

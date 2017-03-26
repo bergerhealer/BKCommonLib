@@ -1,26 +1,27 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.reflection.classes.DamageSourceRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDamageSource;
+
 import org.bukkit.entity.Entity;
 
 public class DamageSource extends BasicWrapper {
 
-    public static final DamageSource FIRE = new DamageSource(DamageSourceRef.FIRE);
-    public static final DamageSource LIGHTNING = new DamageSource(DamageSourceRef.LIGHTNING);
-    public static final DamageSource BURN = new DamageSource(DamageSourceRef.BURN);
-    public static final DamageSource LAVA = new DamageSource(DamageSourceRef.LAVA);
-    public static final DamageSource STUCK = new DamageSource(DamageSourceRef.STUCK);
-    public static final DamageSource DROWN = new DamageSource(DamageSourceRef.DROWN);
-    public static final DamageSource STARVE = new DamageSource(DamageSourceRef.STARVE);
-    public static final DamageSource CACTUS = new DamageSource(DamageSourceRef.CACTUS);
-    public static final DamageSource FALL = new DamageSource(DamageSourceRef.FALL);
-    public static final DamageSource OUT_OF_WORLD = new DamageSource(DamageSourceRef.OUT_OF_WORLD);
-    public static final DamageSource GENERIC = new DamageSource(DamageSourceRef.GENERIC);
-    public static final DamageSource MAGIC = new DamageSource(DamageSourceRef.MAGIC);
-    public static final DamageSource WITHER = new DamageSource(DamageSourceRef.WITHER);
-    public static final DamageSource ANVIL = new DamageSource(DamageSourceRef.ANVIL);
-    public static final DamageSource FALLING_BLOCK = new DamageSource(DamageSourceRef.FALLING_BLOCK);
+    public static final DamageSource FIRE = new DamageSource(NMSDamageSource.FIRE);
+    public static final DamageSource LIGHTNING = new DamageSource(NMSDamageSource.LIGHTNING);
+    public static final DamageSource BURN = new DamageSource(NMSDamageSource.BURN);
+    public static final DamageSource LAVA = new DamageSource(NMSDamageSource.LAVA);
+    public static final DamageSource STUCK = new DamageSource(NMSDamageSource.STUCK);
+    public static final DamageSource DROWN = new DamageSource(NMSDamageSource.DROWN);
+    public static final DamageSource STARVE = new DamageSource(NMSDamageSource.STARVE);
+    public static final DamageSource CACTUS = new DamageSource(NMSDamageSource.CACTUS);
+    public static final DamageSource FALL = new DamageSource(NMSDamageSource.FALL);
+    public static final DamageSource OUT_OF_WORLD = new DamageSource(NMSDamageSource.OUT_OF_WORLD);
+    public static final DamageSource GENERIC = new DamageSource(NMSDamageSource.GENERIC);
+    public static final DamageSource MAGIC = new DamageSource(NMSDamageSource.MAGIC);
+    public static final DamageSource WITHER = new DamageSource(NMSDamageSource.WITHER);
+    public static final DamageSource ANVIL = new DamageSource(NMSDamageSource.ANVIL);
+    public static final DamageSource FALLING_BLOCK = new DamageSource(NMSDamageSource.FALLING_BLOCK);
     private static final DamageSource[] values = CommonUtil.getClassConstants(DamageSource.class);
 
     protected DamageSource(Object damageSource) {
@@ -28,11 +29,11 @@ public class DamageSource extends BasicWrapper {
     }
 
     public boolean isFireDamage() {
-        return DamageSourceRef.isFireDamage(handle);
+        return NMSDamageSource.isFireDamage(handle);
     }
 
     public boolean isExplosive() {
-        return DamageSourceRef.isExplosive(handle);
+        return NMSDamageSource.isExplosive(handle);
     }
 
     /**
@@ -41,7 +42,7 @@ public class DamageSource extends BasicWrapper {
      * @return the Damager Entity, or null if there is none
      */
     public Entity getEntity() {
-        return DamageSourceRef.getEntity(handle);
+        return NMSDamageSource.getEntity(handle);
     }
 
     /**

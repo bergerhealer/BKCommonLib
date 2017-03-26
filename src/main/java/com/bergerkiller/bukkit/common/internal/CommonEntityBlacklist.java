@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.filtering.Filter;
 import com.kellerkindt.scs.ShowCaseStandalone;
 import org.bukkit.entity.Entity;
@@ -48,7 +49,7 @@ public class CommonEntityBlacklist implements Filter<Entity> {
                     return true;
                 }
             } catch (Throwable t) {
-                CommonPlugin.LOGGER.log(Level.SEVERE, filter.getPluginName()
+            	Logging.LOGGER.log(Level.SEVERE, filter.getPluginName()
                         + " entity filter verification failed (update needed?), contact the authors!");
                 filter.trySetEnabled(filter.getPlugin(), false);
             }
@@ -71,10 +72,10 @@ public class CommonEntityBlacklist implements Filter<Entity> {
             try {
                 onEnabledChange(plugin, enabled);
                 if (enabled) {
-                    CommonPlugin.LOGGER.log(Level.INFO, pluginName + " detected: Items belonging to this plugin will be ignored");
+                	Logging.LOGGER.log(Level.INFO, pluginName + " detected: Items belonging to this plugin will be ignored");
                 }
             } catch (Throwable t) {
-                CommonPlugin.LOGGER.log(Level.SEVERE, "Error while " + (enabled ? "adding" : "removing")
+            	Logging.LOGGER.log(Level.SEVERE, "Error while " + (enabled ? "adding" : "removing")
                         + " item ignore support for " + pluginName, t);
             }
             this.pluginInstance = enabled ? plugin : null;

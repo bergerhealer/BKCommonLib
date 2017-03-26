@@ -1,19 +1,15 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityHumanRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import net.minecraft.server.v1_9_R1.DamageSource;
-import net.minecraft.server.v1_9_R1.Explosion;
-import net.minecraft.server.v1_9_R1.World;
-import org.bukkit.Location;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
+import com.bergerkiller.server.CommonNMS;
+import com.bergerkiller.server.Methods;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
@@ -103,27 +99,27 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     }
 
     public static int getChunkX(Entity entity) {
-        return EntityRef.chunkX.get(Conversion.toEntityHandle.convert(entity));
+        return NMSEntity.chunkX.get(Conversion.toEntityHandle.convert(entity));
     }
 
     public static void setChunkX(Entity entity, int chunkX) {
-        EntityRef.chunkX.set(Conversion.toEntityHandle.convert(entity), chunkX);
+        NMSEntity.chunkX.set(Conversion.toEntityHandle.convert(entity), chunkX);
     }
 
     public static int getChunkY(Entity entity) {
-        return EntityRef.chunkY.get(Conversion.toEntityHandle.convert(entity));
+        return NMSEntity.chunkY.get(Conversion.toEntityHandle.convert(entity));
     }
 
     public static void setChunkY(Entity entity, int chunkY) {
-        EntityRef.chunkY.set(Conversion.toEntityHandle.convert(entity), chunkY);
+        NMSEntity.chunkY.set(Conversion.toEntityHandle.convert(entity), chunkY);
     }
 
     public static int getChunkZ(Entity entity) {
-        return EntityRef.chunkZ.get(Conversion.toEntityHandle.convert(entity));
+        return NMSEntity.chunkZ.get(Conversion.toEntityHandle.convert(entity));
     }
 
     public static void setChunkZ(Entity entity, int chunkZ) {
-        EntityRef.chunkZ.set(Conversion.toEntityHandle.convert(entity), chunkZ);
+        NMSEntity.chunkZ.set(Conversion.toEntityHandle.convert(entity), chunkZ);
     }
 
     public static void setDead(Entity entity, boolean dead) {
@@ -146,15 +142,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param damage to deal
      */
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
-        DamageSource source;
-        if (damager instanceof Player) {
-            source = DamageSource.playerAttack(CommonNMS.getNative((Player) damager));
-        } else if (damager instanceof LivingEntity) {
-            source = DamageSource.mobAttack(CommonNMS.getNative((LivingEntity) damager));
-        } else {
-            source = DamageSource.GENERIC;
-        }
-        CommonNMS.getNative(entity).damageEntity(source, (float) damage);
+        Methods.damageBy(entity, damager, damage);
     }
 
     /**
@@ -173,57 +161,11 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param damage to deal
      */
     public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
-        DamageSource source;
         if (cause == DamageCause.BLOCK_EXPLOSION) {
-            Location loc = entity.getLocation();
-            World worldhandle = CommonNMS.getNative(loc.getWorld());
-            Explosion ex = new Explosion(worldhandle, null, loc.getX(), loc.getY(), loc.getZ(), (float) 4.0, true, true);
-            source = DamageSource.explosion(ex);
-        } else if (cause == DamageCause.CONTACT) {
-            source = DamageSource.CACTUS;
-        } else if (cause == DamageCause.DROWNING) {
-            source = DamageSource.DROWN;
-        } else if (cause == DamageCause.FALL) {
-            source = DamageSource.FALL;
-        } else if (cause == DamageCause.FALLING_BLOCK) {
-            source = DamageSource.FALLING_BLOCK;
-        } else if (cause == DamageCause.FIRE) {
-            source = DamageSource.FIRE;
-        } else if (cause == DamageCause.LAVA) {
-            source = DamageSource.LAVA;
-        } else if (cause == DamageCause.MAGIC) {
-            source = DamageSource.MAGIC;
-        } else if (cause == DamageCause.VOID) {
-            source = DamageSource.OUT_OF_WORLD;
-        } else if (cause == DamageCause.STARVATION) {
-            source = DamageSource.STARVE;
-        } else if (cause == DamageCause.SUFFOCATION) {
-            source = DamageSource.STUCK;
-        } else if (cause == DamageCause.WITHER) {
-            source = DamageSource.WITHER;
+        	CommonNMS.getNative(entity).damageEntity(Methods.DamageSource_explosion(entity,  cause, damage), (float) damage);
         } else {
-            source = DamageSource.GENERIC;
+        	CommonNMS.getNative(entity).damageEntity(Methods.DamageSource_from_damagecause(cause), (float) damage);
         }
-        CommonNMS.getNative(entity).damageEntity(source, (float) damage);
-    }
-
-    /**
-     * @deprecated use the double damage version instead
-     */
-    @Deprecated
-    public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {
-        damage_explode(entity, (double) damage, explosion);
-    }
-
-    /**
-     * Damages an entity with the reason of an explosion
-     *
-     * @param entity to be demaged
-     * @param damage of the damage
-     * @param explosion wich has damaged the player
-     */
-    public static void damage_explode(org.bukkit.entity.Entity entity, double damage, Explosion explosion) {
-        CommonNMS.getNative(entity).damageEntity(DamageSource.explosion(explosion), (float) damage);
     }
 
     /**
@@ -233,7 +175,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return human player abilities
      */
     public static PlayerAbilities getAbilities(HumanEntity human) {
-        return EntityHumanRef.abilities.get(Conversion.toEntityHandle.convert(human));
+        return NMSEntityHuman.abilities.get(Conversion.toEntityHandle.convert(human));
     }
 
     /**
@@ -270,7 +212,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param state to set to
      */
     public static void setAllowTeleportation(Entity entity, boolean state) {
-        EntityRef.allowTeleportation.set(Conversion.toEntityHandle.convert(entity), state);
+        NMSEntity.allowTeleportation.set(Conversion.toEntityHandle.convert(entity), state);
     }
 
     /**
@@ -281,7 +223,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param entity to get it for
      */
     public static boolean getAllowTeleportation(Entity entity) {
-        return EntityRef.allowTeleportation.get(Conversion.toEntityHandle.convert(entity));
+        return NMSEntity.allowTeleportation.get(Conversion.toEntityHandle.convert(entity));
     }
 
     /**
@@ -312,6 +254,8 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return entity maximum portal cooldown ticks
      */
     public static int getPortalCooldownMaximum(Entity entity) {
-        return CommonNMS.getNative(entity).aC();
+    	//TODO: Broken!!!!
+    	return 0;
+        //return CommonNMS.getNative(entity).aC();
     }
 }

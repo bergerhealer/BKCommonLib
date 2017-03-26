@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.Bukkit;
@@ -17,11 +16,11 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 170;
+    public static final int VERSION = 180;
     /**
      * The Minecraft package path version BKCommonLib is built against
      */
-    public static final String DEPENDENT_MC_VERSION = "v1_9_R1";
+    public static final String DEPENDENT_MC_VERSION = "v1_11_R1";
     /**
      * Defines the Minecraft version that runs on the server.
      */
@@ -62,29 +61,35 @@ public class Common {
      * on
      */
     public static final boolean IS_COMPATIBLE;
+    /**
+     * Server or test level logger that is in use
+     */
+    public static final ModuleLogger LOGGER = Logging.LOGGER;
 
     static {
         // Find out what server software we are running on
         CommonServer runningServer = new UnknownServer();
-        try {
-            // Get all available server types
-            List<CommonServer> servers = new ArrayList<>();
-            servers.add(new MCPCPlusServer());
-            servers.add(new PaperSpigotServer());
-            servers.add(new SpigotServer());
-            servers.add(new SportBukkitServer());
-            servers.add(new CraftBukkitServer());
-            servers.add(new UnknownServer());
+        if (Bukkit.getServer() != null) {
+            try {
+                // Get all available server types
+                List<CommonServer> servers = new ArrayList<>();
+                servers.add(new MCPCPlusServer());
+                servers.add(new PaperSpigotServer());
+                servers.add(new SpigotServer());
+                servers.add(new SportBukkitServer());
+                servers.add(new CraftBukkitServer());
+                servers.add(new UnknownServer());
 
-            // Use the first one that initializes correctly
-            for (CommonServer server : servers) {
-                if (server.init()) {
-                    runningServer = server;
-                    break;
+                // Use the first one that initializes correctly
+                for (CommonServer server : servers) {
+                    if (server.init()) {
+                        runningServer = server;
+                        break;
+                    }
                 }
+            } catch (Throwable t) {
+               Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
             }
-        } catch (Throwable t) {
-            CommonPlugin.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
         }
 
         // Set up the constants

@@ -1,13 +1,14 @@
 package com.bergerkiller.bukkit.common.controller;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import net.minecraft.server.v1_9_R1.DedicatedPlayerList;
-import net.minecraft.server.v1_9_R1.EntityHuman;
-import net.minecraft.server.v1_9_R1.IPlayerFileData;
-import net.minecraft.server.v1_9_R1.NBTTagCompound;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.DedicatedPlayerList;
+import net.minecraft.server.v1_11_R1.EntityHuman;
+import net.minecraft.server.v1_11_R1.IPlayerFileData;
+import net.minecraft.server.v1_11_R1.NBTTagCompound;
 import org.bukkit.entity.HumanEntity;
 
 /**

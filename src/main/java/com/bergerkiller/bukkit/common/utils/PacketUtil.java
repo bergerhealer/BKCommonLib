@@ -1,21 +1,26 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import net.minecraft.server.v1_9_R1.Packet;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.Packet;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 public class PacketUtil {
 
@@ -44,12 +49,13 @@ public class PacketUtil {
 
         // Send payload
         if (sendPayload) {
+            sendPacket(player, PacketType.OUT_MAP_CHUNK.newInstance(chunk));
             //sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
         }
         // Tile entities
         CommonPacket packet;
-        for (Object tile : ChunkRef.tileEntities.get(chunkHandle).values()) {
-            if ((packet = BlockUtil.getUpdatePacket(tile)) != null) {
+        for (Object tile : NMSChunk.tileEntities.get(chunkHandle).values()) {
+            if ((packet = NMSTileEntity.getUpdatePacket(tile)) != null) {
                 PacketUtil.sendPacket(player, packet);
             }
         }
@@ -149,6 +155,40 @@ public class PacketUtil {
         }
         for (Player player : CommonUtil.getOnlinePlayers()) {
             sendPacket(player, packet, throughListeners);
+        }
+    }
+
+    /**
+     * Sends a packet relating a certain entity to all players that can see it.
+     * If the entity is a player itself, he also receives the packet.
+     * 
+     * @param entity the packet is about
+     * @param packet to send
+     */
+    public static void broadcastEntityPacket(Entity entity, CommonPacket packet) {
+        broadcastEntityPacket(entity, packet, true);
+    }
+
+    /**
+     * Sends a packet relating a certain entity to all players that can see it
+     * 
+     * @param entity the packet is about
+     * @param packet to send
+     * @param sendToSelf whether to also send to the player itself, if the entity is a player
+     */
+    public static void broadcastEntityPacket(Entity entity, CommonPacket packet, boolean sendToSelf) {
+        if (entity == null || packet == null) return;
+
+        EntityTracker tracker = WorldUtil.getTracker(entity.getWorld());
+        Object entry = tracker.getEntry(entity);
+        if (entry != null) {
+            Set<Player> viewers = NMSEntityTrackerEntry.viewers.get(entry);
+            for (Player viewer : viewers) {
+                sendPacket(viewer, packet);
+            }
+        }
+        if (sendToSelf && entity instanceof Player) {
+            sendPacket((Player) entity, packet);
         }
     }
 

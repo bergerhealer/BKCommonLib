@@ -3,14 +3,15 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.server.Methods;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_9_R1.EntityItem;
-import net.minecraft.server.v1_9_R1.EnumDirection;
-import net.minecraft.server.v1_9_R1.ItemStack;
+import net.minecraft.server.v1_11_R1.EntityItem;
+import net.minecraft.server.v1_11_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.ItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -58,9 +59,9 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
             if (value instanceof org.bukkit.block.Block) {
                 return ((org.bukkit.block.Block) value).getType();
             } else if (value instanceof ItemStack) {
-                return Material.getMaterial(((ItemStack) value).c);
+                return Material.getMaterial(Methods.ItemStack_TypeId(value));
             } else if (value instanceof EntityItem) {
-                return Material.getMaterial(((EntityItem) value).getItemStack().c);
+                return Material.getMaterial(Methods.ItemStack_TypeId(((EntityItem) value).getItemStack()));
             } else if (value instanceof org.bukkit.entity.Item) {
                 return ((org.bukkit.entity.Item) value).getItemStack().getType();
             } else if (value instanceof org.bukkit.inventory.ItemStack) {
@@ -104,7 +105,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
     public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
         @Override
         protected EntityType convertSpecial(Object value, Class<?> valueType, EntityType def) {
-            if (EntityRef.TEMPLATE.isInstance(value)) {
+            if (NMSEntity.T.isInstance(value)) {
                 value = Conversion.toEntity.convert(value);
             }
             if (value instanceof Minecart) {

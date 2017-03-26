@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.conversion;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.conversion.type.EmptyConverter;
 import com.bergerkiller.bukkit.common.conversion.type.EnumConverter;
 import com.bergerkiller.bukkit.common.conversion.type.ObjectArrayConverter;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -24,7 +24,7 @@ public class Conversion extends ConversionTypes {
             registerAll(ConversionTypes.class);
             ConversionPairs.class.getModifiers(); // Load this class
         } catch (Throwable t) {
-            CommonPlugin.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+        	Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
         }
     }
 

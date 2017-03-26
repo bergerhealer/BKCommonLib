@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
+import com.bergerkiller.reflection.ClassTemplate;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

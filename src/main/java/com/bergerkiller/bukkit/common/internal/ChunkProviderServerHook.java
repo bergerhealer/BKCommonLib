@@ -1,15 +1,18 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkProviderServerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRef;
-import com.bergerkiller.bukkit.common.reflection.classes.ChunkRegionLoaderRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_9_R1.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_9_R1.*;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBChunkIOExecutor;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.Server;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.generator.BlockPopulator;
@@ -123,10 +126,10 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
             return CommonNMS.getNative(chunk);
         } else if (runnable != null) {
             // Queue chunk for loading Async
-            final Object chunkRegionLoader = CommonUtil.tryCast(ChunkProviderServerRef.chunkLoader.get(this), ChunkRegionLoaderRef.TEMPLATE.getType());
-            if (chunkRegionLoader != null && ChunkRegionLoaderRef.chunkExists(chunkRegionLoader, getWorld(), x, z)) {
+            final Object chunkRegionLoader = CommonUtil.tryCast(NMSChunkProviderServer.chunkLoader.get(this), NMSChunkRegionLoader.T.getType());
+            if (chunkRegionLoader != null && NMSChunkRegionLoader.chunkExists(chunkRegionLoader, getWorld(), x, z)) {
                 // Schedule for loading Async - return null to indicate that no chunk is loaded yet
-                ChunkRegionLoaderRef.queueChunkLoad(chunkRegionLoader, getWorld(), this, x, z, runnable);
+                CBChunkIOExecutor.queueChunkLoad(chunkRegionLoader, getWorld(), this, x, z, runnable);
                 return null;
             }
         }
@@ -170,7 +173,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         // Initial registration of the chunk on the server
         WorldUtil.setChunk(getWorld(), x, z, chunk);
         Chunk chunkHandle = CommonNMS.getNative(chunk);
-        ChunkRef.addEntities(chunkHandle);
+        NMSChunk.addEntities(chunkHandle);
 
         // CraftBukkit start
         Server server = WorldUtil.getServer(getWorld());
@@ -186,7 +189,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         // CraftBukkit end
 
         // Perhaps load some neighboring chunks? (population related)
-        ChunkRef.loadNeighbours(chunkHandle, this, this, x, z);
+        NMSChunk.loadNeighbours(chunkHandle, this, this, x, z);
 
         // Successful load!
         return chunkHandle;
@@ -209,11 +212,11 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
     }
 
     private static <T> T getCPS(org.bukkit.World world, Class<T> type) {
-        return CommonUtil.tryCast(WorldServerRef.chunkProviderServer.get(Conversion.toWorldHandle.convert(world)), type);
+        return CommonUtil.tryCast(NMSWorldServer.chunkProviderServer.get(Conversion.toWorldHandle.convert(world)), type);
     }
 
     private static IChunkLoader getLoader(Object cps) {
-        return (IChunkLoader) ChunkProviderServerRef.chunkLoader.get(cps);
+        return (IChunkLoader) NMSChunkProviderServer.chunkLoader.get(cps);
     }
 
     public static void hook(org.bukkit.World world) {
@@ -222,8 +225,8 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
             return;
         }
         ChunkProviderServerHook newCPS = new ChunkProviderServerHook(oldCPS.world, getLoader(oldCPS), oldCPS.chunkGenerator);
-        ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
-        WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
+        NMSChunkProviderServer.T.transfer(oldCPS, newCPS);
+        NMSWorldServer.chunkProviderServer.set(newCPS.world, newCPS);
     }
 
     public static void unhook(org.bukkit.World world) {
@@ -232,7 +235,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
             return;
         }
         ChunkProviderServer newCPS = new ChunkProviderServer(oldCPS.world, getLoader(oldCPS), oldCPS.chunkGenerator);
-        ChunkProviderServerRef.TEMPLATE.transfer(oldCPS, newCPS);
-        WorldServerRef.chunkProviderServer.set(newCPS.world, newCPS);
+        NMSChunkProviderServer.T.transfer(oldCPS, newCPS);
+        NMSWorldServer.chunkProviderServer.set(newCPS.world, newCPS);
     }
 }

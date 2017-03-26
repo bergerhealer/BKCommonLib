@@ -1,11 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import net.minecraft.server.v1_9_R1.Entity;
-import net.minecraft.server.v1_9_R1.EntityLiving;
-import net.minecraft.server.v1_9_R1.GenericAttributes;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.EntityLiving;
+import net.minecraft.server.v1_11_R1.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 

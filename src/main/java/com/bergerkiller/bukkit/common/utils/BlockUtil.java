@@ -16,36 +16,22 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.Directional;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.PoweredRail;
 import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.BlockStateRef;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WorldRef;
-
-import net.minecraft.server.v1_9_R1.BlockPosition;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
+import com.bergerkiller.server.CommonNMS;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
  * information
  */
 public class BlockUtil extends MaterialUtil {
-
-    static {
-        // Temporary hack because Bukkit is updating far too slowly
-        try {
-            if (Material.ACTIVATOR_RAIL.getData() == MaterialData.class) {
-                SafeField.set(Material.ACTIVATOR_RAIL, "ctor", PoweredRail.class.getConstructor(int.class, byte.class));
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
     /**
      * Performs an event asking other plugins whether a block can change to a
@@ -368,19 +354,19 @@ public class BlockUtil extends MaterialUtil {
      * is no caller)
      */
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType) {
-        CommonNMS.getNative(block.getWorld()).applyPhysics(new BlockPosition(block.getX(), block.getY(), block.getZ()), CommonNMS.getBlock(callerType));
+    	CommonNMS.applyPhysics(CommonNMS.getNative(block.getWorld()), block.getX(), block.getY(), block.getZ(), CommonNMS.getBlock(callerType));
     }
 
     /**
-     * Obtains a new packet that can be used to update tile entity information
+     * Obtains a new packet that can be used to update tile entity (block state) information
      * to nearby players<br>
      * Returns null if none are needed or supported by the tile entity
      *
-     * @param tileEntity to get the update packet for
+     * @param blockState to get the update packet for
      * @return update packet
      */
-    public static CommonPacket getUpdatePacket(Object tileEntity) {
-        return TileEntityRef.getUpdatePacket(tileEntity);
+    public static CommonPacket getUpdatePacket(BlockState state) {
+        return NMSTileEntity.getUpdatePacket(Conversion.toTileEntityHandle.convert(state));
     }
 
     /**
@@ -422,7 +408,7 @@ public class BlockUtil extends MaterialUtil {
      * @return the Block State
      */
     public static BlockState getState(org.bukkit.block.Block block) {
-        return BlockStateRef.toBlockState(block);
+        return CBCraftBlockState.toBlockState(block);
     }
 
     /**
@@ -467,7 +453,7 @@ public class BlockUtil extends MaterialUtil {
         try {
             if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
                 // simplified coding instead
-                offerTile(world, x, y, z);
+                offerTile(world, NMSVector.newPosition(x, y, z));
             } else {
                 // loop through tile entity list
                 int xMin = x - radiusX;
@@ -476,16 +462,14 @@ public class BlockUtil extends MaterialUtil {
                 int xMax = x + radiusX;
                 int yMax = y + radiusY;
                 int zMax = z + radiusZ;
-                int tx, ty, tz;
-                for (Object tile : WorldRef.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
-                    tx = TileEntityRef.position.get(tile).getX();
-                    ty = TileEntityRef.position.get(tile).getY();
-                    tz = TileEntityRef.position.get(tile).getZ();
-                    if (tx < xMin || ty < yMin || tz < zMin || tx > xMax || ty > yMax || tz > zMax) {
-                        continue;
-                    }
-                    // Get again - security against ghost tiles
-                    offerTile(world, tx, ty, tz);
+                Object blockPosition;
+                for (Object tile : NMSWorld.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
+                	blockPosition = NMSTileEntity.position.getInternal(tile);
+
+                	// Check again - security against ghost tiles
+                	if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
+                		offerTile(world, blockPosition);
+                	}
                 }
             }
             return new ArrayList<BlockState>(blockStateBuff);
@@ -494,8 +478,8 @@ public class BlockUtil extends MaterialUtil {
         }
     }
 
-    private static void offerTile(World world, int x, int y, int z) {
-        BlockState state = Conversion.toBlockState.convert(TileEntityRef.getFromWorld(world, x, y, z));
+    private static void offerTile(World world, Object blockPosition) {
+        BlockState state = Conversion.toBlockState.convert(NMSTileEntity.getFromWorld(world, blockPosition));
         if (state != null) {
             blockStateBuff.add(state);
         }

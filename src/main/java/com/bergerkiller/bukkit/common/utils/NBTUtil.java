@@ -2,115 +2,24 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
-import net.minecraft.server.v1_9_R1.*;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventoryCustom;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.Inventory;
 
-import java.io.*;
 import java.util.List;
 
 /**
- * Contains utility functions for dealing with NBT data
+ * Contains utility functions for dealing with NBT data such as saving and loading
  */
 public class NBTUtil {
-
-    /**
-     * Creates an NBT Tag handle to store the data specified in<br>
-     * All primitive types, including byte[] and int[], and list/maps are
-     * supported
-     *
-     * @param data to store in this handle initially
-     * @return new handle
-     */
-    public static Object createHandle(Object data) {
-        return NBTTagInfo.findInfo(data).createHandle(data);
-    }
-
-    /**
-     * Obtains the raw data from an NBT Tag handle. NBTTagList and
-     * NBTTagCompound return a List and Map of NBT Tags respectively. If a null
-     * handle is specified, null is returned to indicate no data.
-     *
-     * @param nbtTagHandle to get the value of
-     * @return the NBTTag data
-     */
-    public static Object getData(Object nbtTagHandle) {
-        if (nbtTagHandle == null) {
-            return null;
-        }
-        return NBTTagInfo.findInfo(nbtTagHandle).getData(nbtTagHandle);
-    }
-
-    /**
-     * Gets the type Id of the tag used to identify it
-     *
-     * @param nbtTagHandle to read from
-     * @return tag type id
-     */
-    public static byte getTypeId(Object nbtTagHandle) {
-        if (nbtTagHandle == null) {
-            return (byte) 0;
-        }
-        return NBTRef.getTypeId.invoke(nbtTagHandle).byteValue();
-    }
-
-    /**
-     * Reads an NBTTagCompound handle from an input stream. This method expects
-     * an Input Stream containing GZIP-compressed data.
-     *
-     * @param stream to read from
-     * @return NBTTagCompound
-     * @throws IOException
-     */
-    public static Object readCompound(InputStream stream) throws IOException {
-        return NBTCompressedStreamTools.a(stream);
-    }
-
-    /**
-     * Reads an NBTTagCompound handle from an input stream. This method expects
-     * an Input Stream containing raw, uncompressed data.
-     *
-     * @param stream to read from
-     * @return NBTTagCompound
-     * @throws IOException
-     */
-    public static Object readCompoundUncompressed(InputStream stream) throws IOException {
-        return NBTCompressedStreamTools.a(stream);
-    }
-
-    /**
-     * Writes an NBTTagCompound to an output stream. This method writes the
-     * compound as GZIP-compressed data.
-     *
-     * @param compound to write
-     * @param stream to write to
-     * @throws IOException
-     */
-    public static void writeCompound(Object compound, OutputStream stream) throws IOException {
-        NBTCompressedStreamTools.a((NBTTagCompound) compound, stream);
-    }
-
-    /**
-     * Writes an NBTTagCompound to an output stream. This method writes the
-     * compound as raw, uncompressed data.
-     *
-     * @param compound to write
-     * @param stream to write to
-     * @throws IOException
-     */
-    public static void writeCompoundUncompressed(Object compound, OutputStream stream) throws IOException {
-        NBTCompressedStreamTools.a((NBTTagCompound) compound, stream);
-    }
 
     /**
      * Reads a mob effect from an NBT Tag Compound
@@ -159,22 +68,15 @@ public class NBTUtil {
     }
 
     /**
-     * Saves a tag list to an output
-     *
-     * @param list Tag list
-     * @param out Output
-     */
-    public static void saveList(CommonTagList list, DataOutput out) {
-        NBTRef.writeTag(list.getHandle(), out);
-    }
-
-    /**
      * Creates an inventory from a tag list
      *
      * @param tags Tag list
      * @return Inventory
      */
     public static Inventory createInventory(CommonTagList tags) {
+    	//TODO: BROKEN!!!
+    	return null;
+    	/*
         Inventory inv = new CraftInventoryCustom(null, tags.size());
 
         for (int i = 0; i < tags.size(); i++) {
@@ -184,18 +86,8 @@ public class NBTUtil {
                         (NBTTagCompound) tag.getHandle())));
             }
         }
-
         return inv;
-    }
-
-    /**
-     * Creates a tag list from a DataInputStream
-     *
-     * @param in InputStream
-     * @return Tag list
-     */
-    public static CommonTagList createList(DataInputStream in) {
-        return new CommonTagList(NBTRef.readTag(in));
+        */
     }
 
     /**
@@ -245,7 +137,7 @@ public class NBTUtil {
             if (list == null) {
                 return (CommonTagList) CommonTag.create(handle);
             } else {
-                List<?> data = (List<?>) getData(handle);
+                List<?> data = (List<?>) NMSNBT.getData(handle);
                 for (Object elem : data) {
                     list.addValue(elem);
                 }
@@ -288,7 +180,7 @@ public class NBTUtil {
         Object livingHandle = Conversion.toEntityHandle.convert(livingEntity);
 
         // Clear old attributes and force a re-create
-        EntityLivingRef.attributeMap.set(livingHandle, new AttributeMapServer());
+        NMSEntityLiving.attributeMap.set(livingHandle, new AttributeMapServer());
     }
 
     /**

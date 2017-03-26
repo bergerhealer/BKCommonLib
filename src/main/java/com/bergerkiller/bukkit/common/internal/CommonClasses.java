@@ -11,24 +11,26 @@ class CommonClasses {
 
     public static void init() {
         // Converter types
-        loadConverter("Collection", "CollectionType", "Empty", "Entry", "Enum", "Handle", "Number", "ObjectArray");
+        loadConverter("Collection", "Empty", "Entry", "Enum", "Handle", "Number", "ObjectArray");
         loadConverter("PrimitiveArray", "Primitive", "Property", "Wrapper", "WrapperHandle");
         loadCommon("conversion.type.EmptyConverterUnsafe");
         // Conversion
         loadCommon("conversion.Conversion");
         // Reflection classes
+        /*
         loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");
         loadRef("Entity", "EntityTrackerEntry", "EntityTracker", "EntityTypes", "LongHashMapEntry", "LongHashSet", "LongHashMap");
         loadRef("NetworkManager", "PlayerChunk", "PlayerChunkMap", "PluginDescriptionFile", "RegionFileCache", "ChunkRegionLoader");
         loadRef("Recipe", "NBT", "RegionFile", "TileEntity", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
         loadRef("EnumGamemode", "EnumProtocol");
+        */
         // Internal
-        loadCommon("internal.CommonWorldListener", "internal.CommonTabController");
+        loadCommon("internal.hooks.WorldListenerHook", "internal.CommonTabController");
         // Utility classes (only those that interact with nms)
         loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
         loadUtil("Recipe", "Stream", "World");
         // Remaining classes
-        loadCommon("nbt.NBTTagInfo", "entity.CommonEntityType", "collections.CollectionBasics");
+        loadCommon("entity.CommonEntityType", "collections.CollectionBasics");
         loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
         loadCommon("protocol.PacketType");
     }

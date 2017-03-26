@@ -1,22 +1,16 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.protocol.PacketTypeClasses.*;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EnumProtocolRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import net.minecraft.server.v1_9_R1.PacketPlayInFlying.PacketPlayInLook;
-import net.minecraft.server.v1_9_R1.PacketPlayInFlying.PacketPlayInPosition;
-import net.minecraft.server.v1_9_R1.PacketPlayInFlying.PacketPlayInPositionLook;
-import net.minecraft.server.v1_9_R1.PacketPlayOutEntity.PacketPlayOutEntityLook;
-import net.minecraft.server.v1_9_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMove;
-import net.minecraft.server.v1_9_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook;
+import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEnumProtocol;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
 import java.util.logging.Level;
 
@@ -47,8 +41,6 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
     public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
     public static final NMSPacketPlayOutPlayerListHeaderFooter OUT_PLAYER_LIST_HEADER_FOOTER = new NMSPacketPlayOutPlayerListHeaderFooter();
-//    Removed?
-//    public static final NMSPacketPlayOutMapChunkBulk OUT_MAP_CHUNK_BULK = new NMSPacketPlayOutMapChunkBulk();
     public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
     public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();
     public static final NMSPacketPlayOutOpenSignEditor OUT_OPEN_SIGN_EDITOR = new NMSPacketPlayOutOpenSignEditor();
@@ -61,11 +53,20 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutTileEntityData OUT_TILE_ENTITY_DATA = new NMSPacketPlayOutTileEntityData();
     public static final NMSPacketPlayOutTitle OUT_TITLE = new NMSPacketPlayOutTitle();
     public static final NMSPacketPlayOutUpdateHealth OUT_UPDATE_HEALTH = new NMSPacketPlayOutUpdateHealth();
-    public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
     public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
     public static final NMSPacketPlayOutWorldBorder OUT_WORLD_BORDER = new NMSPacketPlayOutWorldBorder();
     public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
     public static final NMSPacketPlayOutWorldParticles OUT_WORLD_PARTICLES = new NMSPacketPlayOutWorldParticles();
+    public static final NMSPacketPlayOutBlockBreakAnimation OUT_BLOCK_BREAK_ANIMATION = new NMSPacketPlayOutBlockBreakAnimation();
+    public static final NMSPacketPlayOutBlockChange OUT_BLOCK_CHANGE = new NMSPacketPlayOutBlockChange();
+    public static final NMSPacketPlayOutBoss OUT_BOSS = new NMSPacketPlayOutBoss();
+    public static final NMSPacketPlayOutCamera OUT_CAMERA = new NMSPacketPlayOutCamera();
+    public static final NMSPacketPlayOutCombatEvent OUT_COMBAT_EVENT = new NMSPacketPlayOutCombatEvent();
+    public static final NMSPacketPlayOutCustomSoundEffect OUT_CUSTOM_SOUND_EFFECT = new NMSPacketPlayOutCustomSoundEffect();
+    public static final NMSPacketPlayOutResourcePackSend OUT_RESOURCE_PACK_SEND = new NMSPacketPlayOutResourcePackSend();
+    public static final NMSPacketPlayOutServerDifficulty OUT_SERVER_DIFFICULTY = new NMSPacketPlayOutServerDifficulty();
+    public static final NMSPacketPlayOutSetCooldown OUT_SET_COOLDOWN = new NMSPacketPlayOutSetCooldown();
+    public static final NMSPacketPlayOutUnloadChunk OUT_UNLOAD_CHUNK = new NMSPacketPlayOutUnloadChunk();
     /* Scoreboard-related packets */
     public static final NMSPacketPlayOutScoreboardDisplayObjective OUT_SCOREBOARD_DISPLAY_OBJECTIVE = new NMSPacketPlayOutScoreboardDisplayObjective();
     public static final NMSPacketPlayOutScoreboardObjective OUT_SCOREBOARD_OBJECTIVE = new NMSPacketPlayOutScoreboardObjective();
@@ -101,6 +102,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutRelEntityMove OUT_ENTITY_MOVE = new NMSPacketPlayOutRelEntityMove();
     public static final NMSPacketPlayOutRelEntityMoveLook OUT_ENTITY_MOVE_LOOK = new NMSPacketPlayOutRelEntityMoveLook();
     public static final NMSPacketPlayOutUpdateAttributes OUT_ENTITY_UPDATE_ATTRIBUTES = new NMSPacketPlayOutUpdateAttributes();
+    public static final NMSPacketPlayOutMount OUT_MOUNT = new NMSPacketPlayOutMount();
+    public static final NMSPacketPlayOutVehicleMove OUT_VEHICLE_MOVE = new NMSPacketPlayOutVehicleMove();
 
     /*
      * ========================
@@ -111,6 +114,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInArmAnimation IN_ENTITY_ANIMATION = new NMSPacketPlayInArmAnimation();
     public static final NMSPacketPlayInBlockDig IN_BLOCK_DIG = new NMSPacketPlayInBlockDig();
     public static final NMSPacketPlayInBlockPlace IN_BLOCK_PLACE = new NMSPacketPlayInBlockPlace();
+    public static final NMSPacketPlayInBoatMove IN_BOAT_MOVE = new NMSPacketPlayInBoatMove();
     public static final NMSPacketPlayInChat IN_CHAT = new NMSPacketPlayInChat();
     public static final NMSPacketPlayInClientCommand IN_CLIENT_COMMAND = new NMSPacketPlayInClientCommand();
     public static final NMSPacketPlayInCustomPayload IN_CUSTOM_PAYLOAD = new NMSPacketPlayInCustomPayload();
@@ -119,15 +123,15 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
     public static final NMSPacketPlayInKeepAlive IN_KEEP_ALIVE = new NMSPacketPlayInKeepAlive();
     public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();
-    public static final NMSPacketPlayInLook IN_LOOK = new NMSPacketPlayInLook();
-    public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
-    public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
     public static final NMSPacketPlayInSetCreativeSlot IN_SET_CREATIVE_SLOT = new NMSPacketPlayInSetCreativeSlot();
     public static final NMSPacketPlayInSettings IN_SETTINGS = new NMSPacketPlayInSettings();
     public static final NMSPacketPlayInSteerVehicle IN_STEER_VEHICLE = new NMSPacketPlayInSteerVehicle();
     public static final NMSPacketPlayInTabComplete IN_TAB_COMPLETE = new NMSPacketPlayInTabComplete();
+    public static final NMSPacketPlayInTeleportAccept IN_TELEPORT_ACCEPT = new NMSPacketPlayInTeleportAccept();
     public static final NMSPacketPlayInUpdateSign IN_UPDATE_SIGN = new NMSPacketPlayInUpdateSign();
     public static final NMSPacketPlayInUseEntity IN_USE_ENTITY = new NMSPacketPlayInUseEntity();
+    public static final NMSPacketPlayInUseItem IN_USE_ITEM = new NMSPacketPlayInUseItem();
+    public static final NMSPacketPlayInVehicleMove IN_VEHICLE_MOVE = new NMSPacketPlayInVehicleMove();
 
     /* Window-related packets */
     public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
@@ -159,30 +163,17 @@ public class PacketType extends ClassTemplate<Object> {
     protected PacketType(Class<?> packetClass) {
         // If not specified, resort to using the PacketType class name to obtain the Class
         if (packetClass == null) {
-
-            if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayOutRelEntityMove")) {
-                packetClass = PacketPlayOutRelEntityMove.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayOutRelEntityMoveLook")) {
-                packetClass = PacketPlayOutRelEntityMoveLook.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayOutEntityLook")) {
-                packetClass = PacketPlayOutEntityLook.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayInLook")) {
-                packetClass = PacketPlayInLook.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayInPosition")) {
-                packetClass = PacketPlayInPosition.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else if (getClass().getSimpleName().equalsIgnoreCase("NMSPacketPlayInPositionLook")) {
-                packetClass = PacketPlayInPositionLook.class;
-//				if(packetClass!=null)System.out.println(">>> "+packetClass.getName());
-            } else {
-                packetClass = CommonUtil.getNMSClass(getClass().getSimpleName().substring(3));
-//				if(packetClass!=null)System.out.println(packetClass.getName());
-            }
+            packetClass = CommonUtil.getNMSClass(getClass().getSimpleName().substring(3));
         }
+
+        if (packetClass == null) {
+            Logging.LOGGER_REFLECTION.warning("Failed to find NMS Packet class type for " + getClass().getSimpleName());
+            this.outgoing = false;
+            this.id = -1;
+            this.dataWatcherField = null;
+            return;
+        }
+
         typesByPacketClass.put(packetClass, this);
 
         // Apply the packet class
@@ -190,24 +181,24 @@ public class PacketType extends ClassTemplate<Object> {
 
         // Obtain ID and determine in/outgoing
         Integer tmpId;
-        if ((tmpId = EnumProtocolRef.getPacketIdIn(getType())) != null) {
+        if ((tmpId = NMSEnumProtocol.getPacketIdIn(getType())) != null) {
             this.outgoing = false;
             this.id = tmpId.intValue();
-        } else if ((tmpId = EnumProtocolRef.getPacketIdOut(getType())) != null) {
+        } else if ((tmpId = NMSEnumProtocol.getPacketIdOut(getType())) != null) {
             this.outgoing = true;
             this.id = tmpId.intValue();
         } else {
             this.outgoing = false;
             this.id = -1;
             if (packetClass == null || !packetClass.equals(CommonUtil.getNMSClass("Packet"))) {
-                CommonPlugin.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getClass().getSimpleName() + " is not registered!");
+                Logging.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + getClass().getSimpleName() + " is not registered!");
             }
         }
 
         // Obtain the datawatcher Field
         FieldAccessor<DataWatcher> dataWatcherField = null;
         for (SafeField<?> field : this.getFields()) {
-            if (DataWatcherRef.TEMPLATE.isType(field.getType())) {
+            if (NMSDataWatcher.T.isType(field.getType())) {
                 dataWatcherField = field.translate(ConversionPairs.dataWatcher);
                 break;
             }
@@ -223,7 +214,7 @@ public class PacketType extends ClassTemplate<Object> {
         return this.id;
     }
 
-    protected Object createPacketHandle() {
+    public Object createPacketHandle() {
         return super.newInstance();
     }
 
@@ -268,9 +259,9 @@ public class PacketType extends ClassTemplate<Object> {
     public static PacketType getType(int packetId, boolean outGoing) {
         final Class<?> type;
         if (outGoing) {
-            type = EnumProtocolRef.getPacketClassOut(packetId);
+            type = NMSEnumProtocol.getPacketClassOut(packetId);
         } else {
-            type = EnumProtocolRef.getPacketClassIn(packetId);
+            type = NMSEnumProtocol.getPacketClassIn(packetId);
         }
         if (type == null) {
             return null;

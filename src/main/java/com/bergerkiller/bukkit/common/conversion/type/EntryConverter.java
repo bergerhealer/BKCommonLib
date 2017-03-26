@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import com.bergerkiller.bukkit.common.conversion.CastingConverter;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingEntry;
@@ -14,7 +13,7 @@ import java.util.Map.Entry;
  * @param <K> - entry converter key type
  * @param <V> - entry converter value type
  */
-public class EntryConverter<K, V> implements Converter<Entry<K, V>> {
+public class EntryConverter<K, V> extends Converter<Entry<K, V>> {
 
     private final ConverterPair<Object, K> keyConverter;
     private final ConverterPair<Object, V> valueConverter;
@@ -43,16 +42,6 @@ public class EntryConverter<K, V> implements Converter<Entry<K, V>> {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Class<Entry<K, V>> getOutputType() {
         return (Class) Entry.class;
-    }
-
-    @Override
-    public <B> ConverterPair<Entry<K, V>, B> formPair(Converter<B> converterB) {
-        return new ConverterPair<Entry<K, V>, B>(this, converterB);
-    }
-
-    @Override
-    public <C> Converter<C> cast(Class<C> type) {
-        return new CastingConverter<C>(type, this);
     }
 
     @Override

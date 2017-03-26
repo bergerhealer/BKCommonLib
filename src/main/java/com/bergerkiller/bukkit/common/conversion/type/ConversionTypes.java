@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.*;
-import net.minecraft.server.v1_9_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -17,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -50,15 +51,8 @@ public class ConversionTypes {
     public static final PrimitiveArrayConverter<double[]> toDoubleArr = PrimitiveArrayConverter.toDoubleArr;
     // Collections
     public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
-    public static final CollectionTypeConverter<List<Entity>, List<?>> toEntityList = CollectionTypeConverter.toEntityList;
-    public static final CollectionTypeConverter<List<Object>, List<?>> toEntityHandleList = CollectionTypeConverter.toEntityHandleList;
-    public static final CollectionTypeConverter<List<Player>, List<?>> toPlayerList = CollectionTypeConverter.toPlayerList;
-    public static final CollectionTypeConverter<List<Object>, List<?>> toPlayerHandleList = CollectionTypeConverter.toPlayerHandleList;
-    public static final CollectionTypeConverter<Set<Player>, Set<?>> toPlayerSet = CollectionTypeConverter.toPlayerSet;
-    public static final CollectionTypeConverter<Set<Object>, Set<?>> toPlayerHandleSet = CollectionTypeConverter.toPlayerHandleSet;
-    public static final CollectionTypeConverter<List<ItemStack>, List<?>> toItemStackList = CollectionTypeConverter.toItemStackList;
-    public static final CollectionTypeConverter<List<Object>, List<?>> toItemStackHandleList = CollectionTypeConverter.toItemStackHandleList;
     public static final CollectionConverter<Set<?>> toSet = CollectionConverter.toSet;
+    public static final CollectionConverter<Collection<?>> toCollection = CollectionConverter.toCollection;
     // Handles
     public static final HandleConverter toEntityHandle = HandleConverter.toEntityHandle;
     public static final HandleConverter toWorldHandle = HandleConverter.toWorldHandle;
@@ -76,8 +70,7 @@ public class ConversionTypes {
     public static final HandleConverter toPacketHandle = HandleConverter.toPacketHandle;
     public static final HandleConverter toVec3DHandle = HandleConverter.toVec3DHandle;
     public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.toChunkCoordIntPairHandle;
-    public static final HandleConverter toChunkCoordinatesHandle = HandleConverter.toChunkCoordinatesHandle;
-    public static final HandleConverter toChunkPositionHandle = HandleConverter.toChunkPositionHandle;
+    public static final HandleConverter toBlockPositionHandle = HandleConverter.toBlockPositionHandle;
     public static final HandleConverter toPlayerAbilitiesHandle = HandleConverter.toPlayerAbilitiesHandle;
     public static final HandleConverter toEntityTrackerHandle = HandleConverter.toEntityTrackerHandle;
     public static final HandleConverter toLongHashMapHandle = HandleConverter.toLongHashMapHandle;
@@ -85,6 +78,7 @@ public class ConversionTypes {
     public static final HandleConverter toIntHashMapHandle = HandleConverter.toIntHashMapHandle;
     public static final HandleConverter toUseActionHandle = HandleConverter.toUseActionHandle;
     public static final HandleConverter toScoreboardActionHandle = HandleConverter.toScoreboardActionHandle;
+    public static final HandleConverter toMainHandHandle = HandleConverter.toMainHandHandle;
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
     public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
@@ -111,6 +105,7 @@ public class ConversionTypes {
     public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = WrapperConverter.toIntHashMap;
     public static final WrapperConverter<ScoreboardAction> toScoreboardAction = WrapperConverter.toScoreboardAction;
     public static final WrapperConverter<UseAction> toUseAction = WrapperConverter.toUseAction;
+    public static final WrapperConverter<org.bukkit.inventory.MainHand> toMainHand = WrapperConverter.toMainHand;
     // Properties
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;

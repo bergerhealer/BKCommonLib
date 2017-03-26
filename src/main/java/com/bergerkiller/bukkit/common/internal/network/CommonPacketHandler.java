@@ -1,21 +1,23 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.NetworkManagerRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerConnectionRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.SafeConstructor;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.GenericFutureListener;
-import net.minecraft.server.v1_9_R1.NetworkManager;
-import net.minecraft.server.v1_9_R1.Packet;
+import net.minecraft.server.v1_11_R1.NetworkManager;
+import net.minecraft.server.v1_11_R1.Packet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -98,8 +100,8 @@ public class CommonPacketHandler extends PacketHandlerHooked {
     @Override
     public void sendSilentPacket(Player player, Object packet) {
         // Instead of using sendPacket, we sneakily insert the packet into the queue
-        Object networkManager = EntityPlayerRef.getNetworkManager(player);
-        Queue<Object> pollQueue = NetworkManagerRef.queue.get(networkManager);
+        Object networkManager = NMSEntityPlayer.getNetworkManager(player);
+        Queue<Object> pollQueue = NMSNetworkManager.queue.get(networkManager);
         pollQueue.add(this.queuedPacketConstructor.newInstance(packet, this.emptyGenericFutureListener));
     }
 
@@ -113,27 +115,27 @@ public class CommonPacketHandler extends PacketHandlerHooked {
     }
 
     private static void showFailureMessage(String causeName) {
-        CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
-        CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by " + causeName);
-        CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
-        CommonPlugin.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
+    	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hook up a PlayerConnection to listen for received and sent packets");
+    	Logging.LOGGER_NETWORK.log(Level.SEVERE, "This was caused by " + causeName);
+        Logging.LOGGER_NETWORK.log(Level.SEVERE, "Install ProtocolLib to restore protocol compatibility");
+        Logging.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
     }
 
     public static class CommonChannelListener extends ChannelDuplexHandler {
 
         public static void bind(Player player) {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
-            Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
-            Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
-            Channel channel = NetworkManagerRef.channel.get(networkManager);
+            Object playerConnection = NMSEntityPlayer.playerConnection.get(entityPlayer);
+            Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
+            Channel channel = NMSNetworkManager.channel.get(networkManager);
             channel.pipeline().addBefore("packet_handler", "bkcommonlib", new CommonChannelListener(player));
         }
 
         public static void unbind(Player player) {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
-            Object playerConnection = EntityPlayerRef.playerConnection.get(entityPlayer);
-            Object networkManager = PlayerConnectionRef.networkManager.get(playerConnection);
-            final Channel channel = NetworkManagerRef.channel.get(networkManager);
+            Object playerConnection = NMSEntityPlayer.playerConnection.get(entityPlayer);
+            Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
+            final Channel channel = NMSNetworkManager.channel.get(networkManager);
             channel.eventLoop().submit(new Callable<Object>() {
 
                 @Override

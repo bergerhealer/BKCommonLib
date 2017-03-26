@@ -1,18 +1,19 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.bukkit.common.reflection.classes.ItemStackRef;
-import net.friwi.reflection.EntityItemReflector;
-import net.minecraft.server.v1_9_R1.EntityItem;
-import net.minecraft.server.v1_9_R1.Item;
-import net.minecraft.server.v1_9_R1.ItemStack;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityItem;
+import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.EntityItem;
+import net.minecraft.server.v1_11_R1.Item;
+import net.minecraft.server.v1_11_R1.ItemStack;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 /**
@@ -347,7 +348,7 @@ public class ItemUtil {
      * @return Empty item stack
      */
     public static org.bukkit.inventory.ItemStack emptyItem() {
-        return CraftItemStack.asCraftMirror((ItemStack) ItemStackRef.newInstance(Material.AIR, 0, 0));
+        return CraftItemStack.asCraftMirror((ItemStack) NMSItemStack.newInstance(Material.AIR, 0, 0));
     }
 
     /**
@@ -366,7 +367,7 @@ public class ItemUtil {
         newItemHandle.motX = oldItemHandle.motX;
         newItemHandle.motY = oldItemHandle.motY;
         newItemHandle.motZ = oldItemHandle.motZ;
-        EntityItemReflector.setAge(newItemHandle, EntityItemReflector.getAge(oldItemHandle));
+        NMSEntityItem.age.transfer(oldItemHandle, newItemHandle);
         newItemHandle.world.addEntity(newItemHandle);
         return CommonNMS.getItem(newItemHandle);
     }
@@ -545,7 +546,7 @@ public class ItemUtil {
      * @return metadata tag
      */
     public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
-        return ItemStackRef.tag.get(Conversion.toItemStackHandle.convert(stack));
+        return NMSItemStack.tag.get(Conversion.toItemStackHandle.convert(stack));
     }
 
     /**
@@ -556,7 +557,7 @@ public class ItemUtil {
      * @param tag to set to
      */
     public static void setMetaTag(org.bukkit.inventory.ItemStack stack, CommonTagCompound tag) {
-        ItemStackRef.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
+        NMSItemStack.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
     }
 
     /**

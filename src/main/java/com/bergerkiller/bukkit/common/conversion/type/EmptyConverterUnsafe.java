@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.conversion.ConverterPair;
  *
  * @param <T> - type of the converter
  */
-public final class EmptyConverterUnsafe<T> implements Converter<T> {
+public final class EmptyConverterUnsafe<T> extends Converter<T> {
 
     @SuppressWarnings("rawtypes")
     public static final EmptyConverterUnsafe INSTANCE = new EmptyConverterUnsafe();

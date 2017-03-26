@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.server.SportBukkitServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.server.CommonNMS;
+
 import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;

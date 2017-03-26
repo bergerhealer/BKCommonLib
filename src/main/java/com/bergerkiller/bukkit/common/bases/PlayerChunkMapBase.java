@@ -1,13 +1,14 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkMapRef;
-import com.bergerkiller.bukkit.common.reflection.classes.PlayerChunkRef;
-import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_9_R1.EntityPlayer;
-import net.minecraft.server.v1_9_R1.PlayerChunkMap;
-import net.minecraft.server.v1_9_R1.WorldServer;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
+import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
+import com.bergerkiller.server.CommonNMS;
+
+import net.minecraft.server.v1_11_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_11_R1.EntityPlayer;
+import net.minecraft.server.v1_11_R1.PlayerChunkMap;
+import net.minecraft.server.v1_11_R1.WorldServer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -79,7 +80,6 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      *
      * @param player to update
      */
-    @SuppressWarnings("unchecked")
     public void movePlayer(Player player) {
         EntityPlayer entityplayer = CommonNMS.getNative(player);
         int i = (int) entityplayer.locX >> 4;
@@ -91,7 +91,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
         if (d2 >= 64.0D) {
             int k = (int) entityplayer.d >> 4;
             int l = (int) entityplayer.e >> 4;
-            int i1 = PlayerChunkMapRef.radius.get(this);
+            int i1 = NMSPlayerChunkMap.radius.get(this);
             int j1 = i - k;
             int k1 = j - l;
             List<ChunkCoordIntPair> chunksToLoad = new LinkedList<ChunkCoordIntPair>();
@@ -99,15 +99,15 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
             if ((j1 != 0) || (k1 != 0)) {
                 for (int l1 = i - i1; l1 <= i + i1; l1++) {
                     for (int i2 = j - i1; i2 <= j + i1; i2++) {
-                        if (!PlayerChunkMapRef.shouldUnload.invoke(this, l1, i2, k, l, i1)) {
+                        if (!NMSPlayerChunkMap.shouldUnload.invoke(this, l1, i2, k, l, i1)) {
                             chunksToLoad.add(new ChunkCoordIntPair(l1, i2));
                         }
 
-                        if (!PlayerChunkMapRef.shouldUnload.invoke(this, l1 - j1, i2 - k1, i, j, i1)) {
-                            Object playerchunk = getPlayerChunk(PlayerChunkMapRef.getChunk.invoke(this, l1 - j1, i2 - k1, false));
+                        if (!NMSPlayerChunkMap.shouldUnload.invoke(this, l1 - j1, i2 - k1, i, j, i1)) {
+                            Object playerchunk = getPlayerChunk(NMSPlayerChunkMap.getChunk.invoke(this, l1 - j1, i2 - k1, false));
 
                             if (playerchunk != null) {
-                                PlayerChunkRef.unload.invoke(playerchunk, entityplayer);
+                                NMSPlayerChunk.unload.invoke(playerchunk, entityplayer);
                             }
                         }
                     }
@@ -119,8 +119,8 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
 
                 Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
                 for (ChunkCoordIntPair pair : chunksToLoad) {
-                    Object playerchunk = PlayerChunkMapRef.getChunk.invoke(this, pair.x, pair.z, true);
-                    PlayerChunkRef.load.invoke(playerchunk, entityplayer);
+                    Object playerchunk = NMSPlayerChunkMap.getChunk.invoke(this, pair.x, pair.z, true);
+                    NMSPlayerChunk.load.invoke(playerchunk, entityplayer);
                 }
 
                 if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1)) {
@@ -148,19 +148,19 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
         EntityPlayer entityplayer = CommonNMS.getNative(player);
         int i = (int) entityplayer.d >> 4;
         int j = (int) entityplayer.e >> 4;
-        int radius = PlayerChunkMapRef.radius.get(this);
+        int radius = NMSPlayerChunkMap.radius.get(this);
 
         for (int k = i - radius; k <= i + radius; k++) {
             for (int l = j - radius; l <= j + radius; l++) {
-                Object playerchunk = getPlayerChunk(PlayerChunkMapRef.getChunk.invoke(this, k, l, false));
+                Object playerchunk = getPlayerChunk(NMSPlayerChunkMap.getChunk.invoke(this, k, l, false));
 
                 if (playerchunk != null) {
-                    PlayerChunkRef.unload.invoke(playerchunk, entityplayer);
+                    NMSPlayerChunk.unload.invoke(playerchunk, entityplayer);
                 }
             }
         }
 
-        PlayerChunkMapRef.managedPlayers.get(this).remove(entityplayer);
+        NMSPlayerChunkMap.managedPlayers.get(this).remove(entityplayer);
     }
 
     /**

@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.WatchableObjectRef;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class DataWatcher extends BasicWrapper {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
-        this(DataWatcherRef.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
+        this(NMSDataWatcher.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
     }
 
     /**
@@ -24,7 +24,7 @@ public class DataWatcher extends BasicWrapper {
      * Entity-accepting constructor.
      */
     public DataWatcher() {
-        this(DataWatcherRef.constructor1.newInstance(CommonDisabledEntity.INSTANCE));
+        this(NMSDataWatcher.constructor1.newInstance(CommonDisabledEntity.INSTANCE));
     }
 
     public DataWatcher(Object handle) {
@@ -38,7 +38,7 @@ public class DataWatcher extends BasicWrapper {
      * @param value Value
      */
     public void set(int index, Object value) {
-        DataWatcherRef.write.invoke(handle, index, value);
+        NMSDataWatcher.write.invoke(handle, index, value);
     }
 
     /**
@@ -82,8 +82,8 @@ public class DataWatcher extends BasicWrapper {
      * @return Object
      */
     public Object get(int index) {
-        Object watchable = DataWatcherRef.read.invoke(handle, index);
-        return WatchableObjectRef.getHandle.invoke(watchable);
+        Object watchable = NMSDataWatcher.read.invoke(handle, index);
+        return NMSDataWatcherObject.getHandle.invoke(watchable);
     }
 
     /**
@@ -93,7 +93,7 @@ public class DataWatcher extends BasicWrapper {
      * @param value Value
      */
     public void watch(int index, Object value) {
-        DataWatcherRef.watch.invoke(handle, index, value);
+        NMSDataWatcher.watch.invoke(handle, index, value);
     }
 
     /**
@@ -102,7 +102,7 @@ public class DataWatcher extends BasicWrapper {
      * @return Watched objects
      */
     public List<Object> getAllWatched() {
-        return DataWatcherRef.returnAllWatched.invoke(handle);
+        return NMSDataWatcher.returnAllWatched.invoke(handle);
     }
 
     /**
@@ -111,7 +111,7 @@ public class DataWatcher extends BasicWrapper {
      * @return Watched objects
      */
     public List<Object> unwatchAndGetAllWatched() {
-        return DataWatcherRef.unwatchAndReturnAllWatched.invoke(handle);
+        return NMSDataWatcher.unwatchAndReturnAllWatched.invoke(handle);
     }
 
     /**
@@ -120,7 +120,7 @@ public class DataWatcher extends BasicWrapper {
      * @return True if it had changed, False if not
      */
     public boolean isChanged() {
-        return DataWatcherRef.isChanged.invoke(handle);
+        return NMSDataWatcher.isChanged.invoke(handle);
     }
 
     /**
@@ -130,6 +130,6 @@ public class DataWatcher extends BasicWrapper {
      * @return True if empty, False if not
      */
     public boolean isEmpty() {
-        return DataWatcherRef.isEmpty.invoke(handle);
+        return NMSDataWatcher.isEmpty.invoke(handle);
     }
 }

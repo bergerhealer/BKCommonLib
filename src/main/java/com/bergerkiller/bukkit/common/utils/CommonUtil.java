@@ -1,22 +1,22 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.SafeMethod;
+import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.reflection.org.bukkit.BHandlerList;
+import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
+import com.bergerkiller.server.CommonNMS;
+import com.bergerkiller.server.Methods;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_9_R1.IPlayerFileData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -40,13 +40,26 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
 public class CommonUtil {
-
-    public static final int VIEW = Bukkit.getServer().getViewDistance();
-    public static final int VIEWWIDTH = VIEW + VIEW + 1;
-    public static final int CHUNKAREA = VIEWWIDTH * VIEWWIDTH;
-    public static final int BLOCKVIEW = 32 + (VIEW << 4);
+    public static final int VIEW;
+    public static final int VIEWWIDTH;
+    public static final int CHUNKAREA;
+    public static final int BLOCKVIEW;
     public static final Thread MAIN_THREAD = Thread.currentThread();
-    private static final FieldAccessor<Collection<Plugin>> pluginsField = new SafeField<Collection<Plugin>>(SimplePluginManager.class, "plugins");
+
+    private static final Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
+    
+    static {
+    	if (Bukkit.getServer() == null) {
+    		VIEW = 5;
+    	} else {
+    		VIEW = Bukkit.getServer().getViewDistance();
+    	}
+    	VIEWWIDTH = VIEW + VIEW + 1;
+    	CHUNKAREA = VIEWWIDTH * VIEWWIDTH;
+    	BLOCKVIEW = 32 + (VIEW << 4);
+    	
+    	classMap.put("double", double.class);
+    }
 
     /**
      * Gets a mapping of all commands available on the server, so they can be
@@ -55,7 +68,7 @@ public class CommonUtil {
      * @return Bukkit command map
      */
     public static CommandMap getCommandMap() {
-        return ((CraftServer) Bukkit.getServer()).getCommandMap();
+        return Methods.CraftServer_instance().getCommandMap();
     }
 
     /**
@@ -138,7 +151,7 @@ public class CommonUtil {
      * @param playerFileData to set to
      */
     public static void setPlayerFileData(Object playerFileData) {
-        CommonNMS.getPlayerList().playerFileData = (IPlayerFileData) playerFileData;
+    	Methods.setPlayerFileData(playerFileData);
     }
 
     /**
@@ -524,8 +537,8 @@ public class CommonUtil {
                     }
                 }
                 // Well now we just don't know...
-                CommonPlugin.LOGGER.log(Level.SEVERE, "Unable to properly schedule next-tick task: " + runnable.getClass().getName());
-                CommonPlugin.LOGGER.log(Level.SEVERE, "The task is executed right away instead...we might recover!");
+                Logging.LOGGER.log(Level.SEVERE, "Unable to properly schedule next-tick task: " + runnable.getClass().getName());
+                Logging.LOGGER.log(Level.SEVERE, "The task is executed right away instead...we might recover!");
                 runnable.run();
             } else {
                 // Use the supposed plugin this Class belongs to
@@ -565,7 +578,7 @@ public class CommonUtil {
     public static Collection<Plugin> getPluginsUnsafe() {
         final PluginManager man = Bukkit.getPluginManager();
         if (man instanceof SimplePluginManager) {
-            return pluginsField.get(man);
+            return BSimplePluginManager.plugins.get(man);
         } else {
             return Arrays.asList(man.getPlugins());
         }
@@ -671,21 +684,79 @@ public class CommonUtil {
     }
 
     /**
+     * Fully loads (clint) the class and all superclasses
+     * 
+     * @param type to load
+     */
+    public static void loadClass(Class<?> type) {
+        getClass(type.getName(), true);
+        for (Class<?> superClass : type.getDeclaredClasses()) {
+            getClass(superClass.getName(), true);
+        }
+    }
+
+    /**
      * Tries to get the class at the path specified and applies translations
-     * based on the server currently running.
+     * based on the server currently running. The class is initialized.
      *
      * @param path to the class
      * @return the class, or null if not found
      */
     public static Class<?> getClass(String path) {
+    	return getClass(path, true);
+    }
+    
+    /**
+     * Tries to get the class at the path specified and applies translations
+     * based on the server currently running.
+     *
+     * @param path to the class
+     * @param initialize whether to statically initialize the class
+     * @return the class, or null if not found
+     */
+    public static Class<?> getClass(String path, boolean initialize) {
+    	// There is a strange glitch where the class loader fails to find primitive types
+    	// This is a workaround, or something. Also handles basic types like String and such.
+    	Class<?> prim = LogicUtil.getBasicType(path);
+    	if (prim != null) {
+    		return prim;
+    	}
+
+    	// Handle arrays here
+    	if (path.endsWith("[]")) {
+    		Class<?> componentType = getClass(path.substring(0, path.length() - 2), initialize);
+    		if (componentType == null) {
+    			return null;
+    		} else {
+    			return java.lang.reflect.Array.newInstance(componentType, 0).getClass();
+    		}
+    	}
+
+    	/* ===================== */
+    	String alterPath = (Common.SERVER == null) ? path : Common.SERVER.getClassName(path);
         try {
-            if (Common.SERVER == null) {
-                return Class.forName(path);
-            } else {
-                return Class.forName(Common.SERVER.getClassName(path));
-            }
+        	if (initialize) {
+        		return Class.forName(alterPath);
+        	} else {
+        		return Class.forName(alterPath, false, CommonUtil.class.getClassLoader());
+        	}
+        } catch (ExceptionInInitializerError e) {
+        	Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize class '" + alterPath + "':", e.getCause());
+        	return null;
         } catch (ClassNotFoundException e) {
-            return null;
+        	// This handles paths like these:
+        	//   net.minecraft.server.DataWatcher.Item
+        	// Which should be translated to:
+        	//   net.minecraft.server.DataWatcher$Item
+        	int last_dot = path.lastIndexOf('.');
+        	if (last_dot != -1) {
+        		int dot_before_last = path.lastIndexOf('.', last_dot-1);
+        		if (Character.isUpperCase(path.charAt(dot_before_last+1))) {
+        			String path_new = path.substring(0, last_dot) + "$" + path.substring(last_dot+1);
+        			return getClass(path_new, initialize);
+        		}
+        	}
+        	return null;
         }
     }
 
@@ -696,7 +767,7 @@ public class CommonUtil {
      * @return the class, or null if not found
      */
     public static Class<?> getNMSClass(String name) {
-        return getClass(Common.NMS_ROOT + "." + name);
+        return getClass(Common.NMS_ROOT + "." + name, false);
     }
 
     /**
@@ -706,7 +777,7 @@ public class CommonUtil {
      * @return the class, or null if not found
      */
     public static Class<?> getCBClass(String name) {
-        return getClass(Common.CB_ROOT + "." + name);
+        return getClass(Common.CB_ROOT + "." + name, false);
     }
 
     /**
@@ -859,7 +930,7 @@ public class CommonUtil {
         HandlerList list = getEventHandlerList(eventClass);
         final EventPriority prio = first ? EventPriority.LOWEST : EventPriority.MONITOR;
         synchronized (list) {
-            EnumMap<EventPriority, ArrayList<RegisteredListener>> handlerSlots = SafeField.get(list, "handlerslots");
+            EnumMap<EventPriority, ArrayList<RegisteredListener>> handlerSlots = BHandlerList.handlerslots.get(list);
             ArrayList<RegisteredListener> registeredListenerList = handlerSlots.get(prio);
             int requestedIndex = first ? 0 : (registeredListenerList.size() - 1);
 

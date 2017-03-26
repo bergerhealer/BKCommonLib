@@ -1,14 +1,14 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.conversion.ChatComponentConvertor;
-import net.minecraft.server.v1_9_R1.EntityHuman;
-import net.minecraft.server.v1_9_R1.IChatBaseComponent;
-import net.minecraft.server.v1_9_R1.IInventory;
-import net.minecraft.server.v1_9_R1.ItemStack;
+import net.minecraft.server.v1_11_R1.EntityHuman;
+import net.minecraft.server.v1_11_R1.IChatBaseComponent;
+import net.minecraft.server.v1_11_R1.IInventory;
+import net.minecraft.server.v1_11_R1.ItemStack;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -30,14 +30,15 @@ public class IInventoryBase implements IInventory {
         }
     }
 
-    @Override
-    public ItemStack[] getContents() {
-        ItemStack[] contents = new ItemStack[this.getSize()];
-        for (int i = 0; i < contents.length; i++) {
-            contents[i] = this.getItem(i);
-        }
-        return contents;
-    }
+    //TODO: BROKEN!!!
+    //@Override
+    //public ItemStack[] getContents() {
+    //    ItemStack[] contents = new ItemStack[this.getSize()];
+    //    for (int i = 0; i < contents.length; i++) {
+    //        contents[i] = this.getItem(i);
+    //    }
+    //    return contents;
+    //}
 
     @Override
     public InventoryHolder getOwner() {
@@ -89,13 +90,13 @@ public class IInventoryBase implements IInventory {
         ItemStack item = this.getItem(index);
         if (item != null) {
             ItemStack itemstack;
-            if (item.count <= size) {
+            if (item.getCount() <= size) {
                 itemstack = item;
                 this.setItem(index, null);
                 return itemstack;
             } else {
                 itemstack = item.cloneAndSubtract(size); //TODO: CHECK IF NOTHING BROKE
-                if (item.count == 0) {
+                if (item.getCount() == 0) {
                     this.setItem(index, null);
                 }
                 return itemstack;
@@ -179,17 +180,44 @@ public class IInventoryBase implements IInventory {
     public void setProperty(int i, int j) {
     }
 
-    @Override
-    public int g() {
-        return 0;
-    }
+    //TODO: BROKEN!!!
+    //@Override
+    //public int g() {
+    //    return 0;
+    //}
 
-    @Override
-    public void l() {
-    }
+    //TODO: BROKEN!!!
+    //@Override
+    //public void l() {
+    //}
 
 	@Override
 	public Location getLocation() {
+		return null;
+	}
+
+	//TODO: ALL BROKEN AND UNIMOL
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int h() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean w_() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<ItemStack> getContents() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

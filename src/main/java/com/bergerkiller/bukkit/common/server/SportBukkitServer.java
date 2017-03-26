@@ -1,12 +1,14 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityPlayerRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,8 +32,8 @@ public class SportBukkitServer extends CraftBukkitServer {
     public void postInit() {
         super.postInit();
         // Checkup that the Entity Remove queue for players is indeed missing
-        if (SafeField.contains(EntityPlayerRef.TEMPLATE.getType(), "removeQueue")) {
-            CommonPlugin.LOGGER.log(Level.WARNING, "Entity Removal queue of SportBukkit was added again! (update needed?)");
+        if (SafeField.contains(NMSEntityPlayer.T.getType(), "removeQueue", null)) {
+        	Logging.LOGGER.log(Level.WARNING, "Entity Removal queue of SportBukkit was added again! (update needed?)");
         }
     }
 

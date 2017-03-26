@@ -7,10 +7,11 @@ import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingIterator;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingListIterator;
-import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.NBTUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Map.Entry;
@@ -47,7 +48,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     private void updateListType(Object elementHandle) {
-        NBTRef.nbtListType.set(handle, NBTUtil.getTypeId(elementHandle));
+        NMSNBT.List.type.set(handle, NMSNBT.getTypeId(elementHandle));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public int size() {
-        return NBTRef.nbtListSize.invoke(handle);
+        return NMSNBT.List.size.invoke(handle);
     }
 
     @Override
@@ -87,8 +88,8 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
         } else {
             try {
                 Object handle = commonToNbt(element);
-                if (!NBTRef.NBTBase.isInstance(handle)) {
-                    handle = NBTUtil.createHandle(handle);
+                if (!NMSNBT.Base.T.isInstance(handle)) {
+                    handle = NMSNBT.createHandle(handle);
                 }
                 if (handle != null) {
                     updateListType(handle);
@@ -109,7 +110,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value
      */
     public Object getValue(int index) {
-        return nbtToCommon(NBTUtil.getData(NBTRef.nbtListGet.invoke(handle, index)), false);
+        return nbtToCommon(NMSNBT.getData(NMSNBT.List.get.invoke(handle, index)), false);
     }
 
     /**
@@ -212,7 +213,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public CommonTag get(int index) {
-        return create(NBTRef.nbtListGet.invoke(handle, index));
+        return create(NMSNBT.List.get.invoke(handle, index));
     }
 
     /**
@@ -390,5 +391,20 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     @Override
     public List<CommonTag> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException("No sublist can be made from tag data");
+    }
+    
+    /**
+     * Deserializes and reads a list tag from a stream. The input data should be uncompressed.
+     * 
+     * @param in Stream to read from
+     * @return read list tag
+     * @throws IOException
+     */
+    public static CommonTagList readFromStream(InputStream in) throws IOException {
+    	CommonTag tag = CommonTag.readFromStream(in);
+    	if (!(tag instanceof CommonTagList)) {
+    		throw new IOException("Tag read is not a list!");
+    	}
+    	return (CommonTagList) tag;
     }
 }

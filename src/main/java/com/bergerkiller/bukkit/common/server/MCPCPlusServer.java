@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.reflection.SafeField;
+
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class MCPCPlusServer extends SpigotServer {
             return false;
         }
         // Obtain the Class remapper used by MCPC+
-        this.classRemapper = SafeField.get(getClass().getClassLoader(), "remapper");
+        this.classRemapper = SafeField.get(getClass().getClassLoader(), "remapper", null);
         if (this.classRemapper == null) {
             throw new RuntimeException("Running an MCPC+ server but the remapper is unavailable...please turn it on!");
         }
@@ -34,9 +35,9 @@ public class MCPCPlusServer extends SpigotServer {
         ClassTemplate<?> template = ClassTemplate.create(this.classRemapper);
         this.mapType = template.getMethod("map", String.class);
         this.mapField = template.getMethod("mapFieldName", String.class, String.class, String.class);
-        Object jarMapping = SafeField.get(classRemapper, "jarMapping");
-        this.classesMap = SafeField.get(jarMapping, "classes");
-        this.methodsMap = SafeField.get(jarMapping, "methods");
+        Object jarMapping = SafeField.get(classRemapper, "jarMapping", null);
+        this.classesMap = SafeField.get(jarMapping, "classes", null);
+        this.methodsMap = SafeField.get(jarMapping, "methods", null);
         // Check whether the Spigot utilities are relocated
         try {
             Class.forName("org.spigotmc.FlatMap");

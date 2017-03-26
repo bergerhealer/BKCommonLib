@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.scoreboards;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -143,7 +144,7 @@ public class CommonScoreboard {
                 ois.close();
             }
         } catch (Exception e) {
-            CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to load team from disk", e);
+        	Logging.LOGGER.log(Level.SEVERE, "Failed to load team from disk", e);
         }
 
         if (team == null) {
@@ -172,7 +173,7 @@ public class CommonScoreboard {
             oos.flush();
             oos.close();
         } catch (Exception e) {
-            CommonPlugin.LOGGER.log(Level.SEVERE, "Failed to save team to disk", e);
+        	Logging.LOGGER.log(Level.SEVERE, "Failed to save team to disk", e);
         }
     }
 

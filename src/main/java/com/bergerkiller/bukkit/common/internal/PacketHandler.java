@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

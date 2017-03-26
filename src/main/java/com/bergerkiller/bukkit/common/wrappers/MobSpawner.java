@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.reflection.classes.MobSpawnerAbstractRef;
+import com.bergerkiller.reflection.net.minecraft.server.NMSMobSpawnerAbstract;
 
 public class MobSpawner extends BasicWrapper {
 
@@ -14,7 +14,7 @@ public class MobSpawner extends BasicWrapper {
      * @return mob name
      */
     public String getMobName() {
-        return MobSpawnerAbstractRef.getMobName.invoke(getHandle());
+        return NMSMobSpawnerAbstract.mobName.get(getHandle());
     }
 
     /**
@@ -23,14 +23,14 @@ public class MobSpawner extends BasicWrapper {
      * @param name of mob
      */
     public void setMobName(String name) {
-        MobSpawnerAbstractRef.setMobName.invoke(getHandle(), name);
+    	NMSMobSpawnerAbstract.mobName.set(getHandle(), name);
     }
 
     /**
      * Performs the per-tick spawning logic
      */
     public void onTick() {
-        MobSpawnerAbstractRef.onTick.invoke(getHandle());
+        NMSMobSpawnerAbstract.onTick.invoke(getHandle());
     }
 
     /**
@@ -40,7 +40,7 @@ public class MobSpawner extends BasicWrapper {
      * @return Mob spawn delay counter
      */
     public int getSpawnDelay() {
-        return MobSpawnerAbstractRef.spawnDelay.get(getHandle());
+        return NMSMobSpawnerAbstract.spawnDelay.get(getHandle());
     }
 
     /**
@@ -50,7 +50,7 @@ public class MobSpawner extends BasicWrapper {
      * @param tickDelay to set to
      */
     public void setSpawnDelay(int tickDelay) {
-        MobSpawnerAbstractRef.spawnDelay.set(getHandle(), tickDelay);
+        NMSMobSpawnerAbstract.spawnDelay.set(getHandle(), tickDelay);
     }
 
     /**
@@ -59,7 +59,7 @@ public class MobSpawner extends BasicWrapper {
      * @return minimum tick interval
      */
     public int getMinSpawnDelay() {
-        return MobSpawnerAbstractRef.minSpawnDelay.get(getHandle());
+        return NMSMobSpawnerAbstract.minSpawnDelay.get(getHandle());
     }
 
     /**
@@ -68,7 +68,7 @@ public class MobSpawner extends BasicWrapper {
      * @param tickInterval to set to
      */
     public void setMinSpawnDelay(int tickInterval) {
-        MobSpawnerAbstractRef.minSpawnDelay.set(getHandle(), tickInterval);
+        NMSMobSpawnerAbstract.minSpawnDelay.set(getHandle(), tickInterval);
     }
 
     /**
@@ -77,7 +77,7 @@ public class MobSpawner extends BasicWrapper {
      * @return maximum tick interval
      */
     public int getMaxSpawnDelay() {
-        return MobSpawnerAbstractRef.maxSpawnDelay.get(getHandle());
+        return NMSMobSpawnerAbstract.maxSpawnDelay.get(getHandle());
     }
 
     /**
@@ -86,7 +86,7 @@ public class MobSpawner extends BasicWrapper {
      * @param tickInterval to set to
      */
     public void setMaxSpawnDelay(int tickInterval) {
-        MobSpawnerAbstractRef.maxSpawnDelay.set(getHandle(), tickInterval);
+        NMSMobSpawnerAbstract.maxSpawnDelay.set(getHandle(), tickInterval);
     }
 
     /**
@@ -95,7 +95,7 @@ public class MobSpawner extends BasicWrapper {
      * @return mob spawn count
      */
     public int getSpawnCount() {
-        return MobSpawnerAbstractRef.spawnCount.get(getHandle());
+        return NMSMobSpawnerAbstract.spawnCount.get(getHandle());
     }
 
     /**
@@ -104,6 +104,6 @@ public class MobSpawner extends BasicWrapper {
      * @param mobCount to set to
      */
     public void setSpawnCount(int mobCount) {
-        MobSpawnerAbstractRef.spawnCount.set(getHandle(), mobCount);
+        NMSMobSpawnerAbstract.spawnCount.set(getHandle(), mobCount);
     }
 }
