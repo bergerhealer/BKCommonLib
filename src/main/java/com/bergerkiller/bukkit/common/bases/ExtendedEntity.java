@@ -1,20 +1,20 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import net.minecraft.server.v1_9_R1.DataWatcherObject;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_9_R1.CraftSound;
-import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_11_R1.CraftSound;
+import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -25,24 +25,28 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.classes.DataWatcherRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
+import com.bergerkiller.server.CommonNMS;
 
-import net.minecraft.server.v1_9_R1.Entity;
-import net.minecraft.server.v1_9_R1.EntityInsentient;
-import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_11_R1.DataWatcherObject;
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.EntityInsentient;
+import net.minecraft.server.v1_11_R1.EntityPlayer;
 
 /**
  * Extends the methods provided by the Entity Bukkit class.
@@ -264,27 +268,27 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public int getChunkX() {
-        return EntityRef.chunkX.get(getHandle());
+        return NMSEntity.chunkX.get(getHandle());
     }
 
     public void setChunkX(int value) {
-        EntityRef.chunkX.set(getHandle(), value);
+        NMSEntity.chunkX.set(getHandle(), value);
     }
 
     public int getChunkY() {
-        return EntityRef.chunkY.get(getHandle());
+        return NMSEntity.chunkY.get(getHandle());
     }
 
     public void setChunkY(int value) {
-        EntityRef.chunkY.set(getHandle(), value);
+        NMSEntity.chunkY.set(getHandle(), value);
     }
 
     public int getChunkZ() {
-        return EntityRef.chunkZ.get(getHandle());
+        return NMSEntity.chunkZ.get(getHandle());
     }
 
     public void setChunkZ(int value) {
-        EntityRef.chunkZ.set(getHandle(), value);
+        NMSEntity.chunkZ.set(getHandle(), value);
     }
 
     /**
@@ -384,19 +388,19 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public boolean isPositionChanged() {
-        return EntityRef.positionChanged.get(getHandle());
+        return NMSEntity.positionChanged.get(getHandle());
     }
 
     public void setPositionChanged(boolean changed) {
-        EntityRef.positionChanged.set(getHandle(), changed);
+        NMSEntity.positionChanged.set(getHandle(), changed);
     }
 
     public boolean isVelocityChanged() {
-        return EntityRef.velocityChanged.get(getHandle());
+        return NMSEntity.velocityChanged.get(getHandle());
     }
 
     public void setVelocityChanged(boolean changed) {
-        EntityRef.velocityChanged.set(getHandle(), changed);
+        NMSEntity.velocityChanged.set(getHandle(), changed);
     }
 
     /**
@@ -405,7 +409,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if loaded, False if not
      */
     public boolean isInLoadedChunk() {
-        return EntityRef.isLoaded.get(getHandle());
+        return NMSEntity.isLoaded.get(getHandle());
     }
 
     /**
@@ -431,7 +435,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public Random getRandom() {
-        return EntityRef.random.get(getHandle());
+        return NMSEntity.random.get(getHandle());
     }
 
     /**
@@ -461,7 +465,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         makeSound(CraftSound.getSound(sound), volume, pitch);
     }
 
-    public void makeSound(String soundName, float volume, float pitch) {
+    @SuppressWarnings("unused")
+	public void makeSound(String soundName, float volume, float pitch) {
         final Entity handle = getHandle(Entity.class);
         //TODO Find method again
 //        handle.world.makeSound(handle, soundName, volume, pitch);
@@ -472,13 +477,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeStepSound(int blockX, int blockY, int blockZ, Material type) {
-        EntityRef.playStepSound(getHandle(), blockX, blockY, blockZ, CommonNMS.getBlock(type));
+        NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, CommonNMS.getBlock(type));
     }
 
     @Deprecated
     public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
         if (CommonNMS.isValidBlockId(typeId)) {
-            EntityRef.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
+            NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
         }
     }
 
@@ -550,7 +555,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch to set to
      */
     public void setRotation(float yaw, float pitch) {
-        EntityRef.setRotation(getHandle(), yaw, pitch);
+        NMSEntity.setRotation(getHandle(), yaw, pitch);
     }
 
     public void setPosition(double x, double y, double z) {
@@ -565,12 +570,45 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return WorldUtil.getNearbyEntities(this.getEntity(), radX, radY, radZ);
     }
 
-    public org.bukkit.entity.Entity getPassenger() {
+    /**
+     * Use getpassengers instead!
+     */
+    @Deprecated()
+	public org.bukkit.entity.Entity getPassenger() {
         return entity.getPassenger();
     }
 
+    /**
+     * Use getPlayerPassengers() instead!
+     */
+    @Deprecated
     public Player getPlayerPassenger() {
         return CommonUtil.tryCast(getPassenger(), Player.class);
+    }
+
+    /**
+     * Retrieves a list of passenger entities
+     * 
+     * @return passenger entity list
+     */
+    public List<org.bukkit.entity.Entity> getPassengers() {
+        return entity.getPassengers();
+    }
+
+    /**
+     * Retrieves a list of passengers that are players
+     * 
+     * @return list of player passengers
+     */
+    public List<Player> getPlayerPassengers() {
+        List<org.bukkit.entity.Entity> passengers = this.getPassengers();
+        List<Player> playerPassengers = new ArrayList<Player>(passengers.size());
+        for (org.bukkit.entity.Entity entity : passengers) {
+            if (entity instanceof Player) {
+                playerPassengers.add((Player) entity);
+            }
+        }
+        return playerPassengers;
     }
 
     public boolean hasPassenger() {
@@ -677,7 +715,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if this Entity is in water, False if not
      */
     public boolean isInWater(boolean update) {
-        return EntityRef.isInWater(getHandle(), update);
+        return NMSEntity.isInWater(getHandle(), update);
     }
 
     /**
@@ -753,50 +791,118 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Sets the passenger of this Vehicle, while throwing possible events If the
-     * previous passenger could not eject, or if entering didn't happen, False
-     * is returned.
-     *
-     * @param passenger to set to
-     * @return True if the passenger was successfully set, False if not
+     * Deprecated! Use add/remove passenger instead!
      */
-    public boolean setPassenger(org.bukkit.entity.Entity passenger) {
+    @Deprecated
+	public boolean setPassenger(org.bukkit.entity.Entity passenger) {
         return passenger == null ? entity.eject() : entity.setPassenger(passenger);
     }
 
     /**
-     * Sets the passenger of this Vehicle without raising any events
+     * Checks whether a certain entity is a passenger of this entity
+     * 
+     * @param passenger to check
+     * @return true if a passenger, false if not
+     */
+    public boolean isPassenger(org.bukkit.entity.Entity passenger) {
+        for (org.bukkit.entity.Entity currPassenger : this.getPassengers()) {
+            if (currPassenger.getUniqueId().equals(passenger.getUniqueId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds a passenger to this Vehicle, while throwing possible events. If the
+     * entering didn't happen, False is returned.
+     *
+     * @param passenger to add
+     * @return True if the passenger was successfully set, False if not
+     */
+	public boolean addPassenger(org.bukkit.entity.Entity passenger) {
+	    return entity.addPassenger(passenger);
+	}
+
+    /**
+     * Removes a passenger from this Vehicle, while throwing possible events. If the
+     * exiting didn't happen, False is returned.
+     *
+     * @param passenger to add
+     * @return True if the passenger was successfully removed, False if not
+     */
+    public boolean removePassenger(org.bukkit.entity.Entity passenger) {
+        return entity.removePassenger(passenger);
+    }
+
+    /**
+     * Use setPassengersSilent instead!
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public void setPassengerSilent(org.bukkit.entity.Entity newPassenger) {
+        setPassengersSilent((newPassenger == null) ? Collections.EMPTY_LIST : Arrays.asList(newPassenger));
+    }
+
+    /**
+     * Sets the passengers of this Vehicle without raising any events
      *
      * @param newPassenger to set to
      */
-    public void setPassengerSilent(org.bukkit.entity.Entity newPassenger) {
+    public void setPassengersSilent(List<org.bukkit.entity.Entity> newPassengers) {
         final Entity handle = getHandle(Entity.class);
-        if (hasPassenger()) {
-            if (getPassenger() == newPassenger) {
-                // Ignore setting to the same Entity
-                return;
-            }
 
-            // Send proper eject packet for the previous passenger
-            if (hasPlayerPassenger()) {
-                PacketUtil.sendPacket(getPlayerPassenger(), PacketType.OUT_ENTITY_ATTACH.newInstance(getPassenger(), null));
+        // Generate a difference view between the expected list of passengers, and the current
+        List<Entity> removedPassengers = new ArrayList<Entity>(handle.passengers.size());
+        List<org.bukkit.entity.Entity> keptPassengers = new ArrayList<org.bukkit.entity.Entity>(newPassengers.size());
+        for (Entity oldPassenger : handle.passengers) {
+            boolean found = false;
+            for (org.bukkit.entity.Entity p : newPassengers) {
+                if (oldPassenger == Conversion.toEntityHandle.convert(p)) {
+                    found = true;
+                    keptPassengers.add(p);
+                    break;
+                }
             }
-
-            // Properly set to null
-            for(Entity p : handle.passengers)p.stopRiding(); //.as = .vehicle
-            handle.passengers.clear();
+            if (!found) {
+                removedPassengers.add(oldPassenger);
+            }
         }
 
-        // Set the new passenger
-        if (newPassenger != null) {
-            // Properly set it
-            handle.passengers.add(CommonNMS.getNative(newPassenger));
-            for(Entity p : handle.passengers)p.stopRiding();
+        // Update network info with the removed entities
+        /*
+        {
+            CommonPacket packet = NMSPacketTypes.OUT_MOUNT.newInstance(entity, keptPassengers);
+            PacketUtil.broadcastEntityPacket(entity, packet);
+        }
+        */
 
-            // Send proper eject packet for the new passenger
-            if (hasPlayerPassenger()) {
-                PacketUtil.sendPacket(getPlayerPassenger(), PacketType.OUT_ENTITY_ATTACH.newInstance(newPassenger, this.getEntity()));
+        // Remove vehicle information and passenger information for all removed passengers
+        for (Entity passenger : removedPassengers) {
+            NMSEntity.vehicleField.setInternal(passenger, null);
+            handle.passengers.remove(passenger);
+        }
+
+        // Add new passengers as required
+        for (org.bukkit.entity.Entity p : newPassengers) {
+            Entity passengerHandle = (Entity) Conversion.toEntityHandle.convert(p);
+            if (!handle.passengers.contains(passengerHandle)) {
+                handle.passengers.add(passengerHandle);
+                NMSEntity.vehicleField.setInternal(passengerHandle, handle);
+
+                // Send mount packet
+                CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, keptPassengers);
+                PacketUtil.broadcastEntityPacket(entity, packet);
             }
+        }
+
+        CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, ConversionPairs.entityList.convertB(handle.passengers));
+        PacketUtil.broadcastEntityPacket(entity, packet);
+
+        // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
+        Object entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
+        if (entry != null) {
+            NMSEntityTrackerEntry.passengers.set(entry, newPassengers);
         }
     }
 
@@ -870,8 +976,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param value to set to
      */
     @SuppressWarnings("unchecked")
-    public void setWatchedData(int index, Object value) {
-    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+    public void setWatchedData(Object dataWatcherObject, Object value) {
+        Logging.LOGGER_DEBUG.warnOnce("setWatchedData should use a generics-enabled key");
+        net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
+        watcher.set((DataWatcherObject) dataWatcherObject, value); 
+
+        /*
+    	net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
         Field f;
         try {
             f = watcher.getClass().getDeclaredField("c");
@@ -880,19 +991,29 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return;
         }
         f.setAccessible(true);
-        HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item> map;
+        HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item> map;
         try {
-            map = (HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item>) f.get(watcher);
+            map = (HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item>) f.get(watcher);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return;
         }
-        net.minecraft.server.v1_9_R1.DataWatcher.Item item = map.get(index);
+        net.minecraft.server.v1_11_R1.DataWatcher.Item item = map.get(index);
         if (item != null) {
             item.a((T) value);
         }
         return;
+        */
 
+    }
+
+    /**
+     * Gets the datawatcher used to synchronize certain entity properties with the viewing clients
+     * 
+     * @return datawatcher
+     */
+    public DataWatcher getDataWatcher() {
+        return new DataWatcher(this.h().getDataWatcher());
     }
 
     /**
@@ -903,8 +1024,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return data, or def if not found
      */
     @SuppressWarnings("unchecked")
-    public <K> K getWatchedData(int index, K def) {
-        return getWatchedData(index, (Class<K>) def.getClass(), def);
+    public <K> K getWatchedData(Object dataWatcherObject, K def) {
+        return getWatchedData(dataWatcherObject, (Class<K>) def.getClass(), def);
     }
 
     /**
@@ -915,8 +1036,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param def to return on failure
      * @return data, or def if not found
      */
-    public <K> K getWatchedData(int index, Class<K> type, K def) {
-    	net.minecraft.server.v1_9_R1.DataWatcher watcher = h().getDataWatcher();
+    public <K> K getWatchedData(Object dataWatcherObject,  Class<K> type, K def) {
+    	net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
+    	return Conversion.convert(watcher.get((DataWatcherObject) dataWatcherObject), type, def);
+    	/*
         Field f;
         try {
             f = watcher.getClass().getDeclaredField("c");
@@ -925,18 +1048,19 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return def;
         }
         f.setAccessible(true);
-        HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item> map;
+        HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item> map;
         try {
-            map = (HashMap<Integer, net.minecraft.server.v1_9_R1.DataWatcher.Item>) f.get(watcher);
+            map = (HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item>) f.get(watcher);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return def;
         }
-        net.minecraft.server.v1_9_R1.DataWatcher.Item item = map.get(index);
+        net.minecraft.server.v1_11_R1.DataWatcher.Item item = map.get(index);
         if (item == null) {
             return def;
         }
         return Conversion.convert(item.b(), type, def);
+        */
     }
 
     @Override

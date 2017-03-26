@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.entity;
 /**
  * A base class for various kinds of Entity Controllers
  */
-public class CommonEntityController<T extends CommonEntity<?>> {
+public class CommonEntityController<T extends CommonEntity<? extends org.bukkit.entity.Entity>> {
 
     protected T entity;
 

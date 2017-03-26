@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -15,9 +14,6 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a Mob Spawner
  */
 public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
-
-    private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartMobSpawner");
-    private static final FieldAccessor<Object> mobSpawnerHandle = TEMPLATE.getField("a");
 
     public CommonMinecartMobSpawner(SpawnerMinecart base) {
         super(base);
@@ -39,6 +35,6 @@ public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
      * @return Mob spawner
      */
     public MobSpawner getMobSpawner() {
-        return new MobSpawner(mobSpawnerHandle.get(getHandle()));
+        return new MobSpawner(NMSEntityMinecart.MobSpawner.mobSpawner.get(getHandle()));
     }
 }

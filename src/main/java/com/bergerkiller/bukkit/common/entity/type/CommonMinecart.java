@@ -1,36 +1,31 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Minecart;
-import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-
-import net.minecraft.server.v1_9_R1.EntityMinecartAbstract;
-import net.minecraft.server.v1_9_R1.EntityMinecartRideable;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 /**
  * An abstract implementation for all Minecarts
  *
  * @param <T> - type of Minecart Entity
  */
-public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
+public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
     public CommonMinecart(T base) {
         super(base);
     }
 
     public double getDamage() {
-        return getHandle(EntityMinecartAbstract.class).getDamage();
+        return getHandle(net.minecraft.server.v1_11_R1.EntityMinecartAbstract.class).getDamage();
     }
 
     public Vector getDerailedVelocityMod() {
@@ -70,19 +65,19 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
     }
 
     public void setShakingDirection(int direction) {
-        this.setWatchedData(18, direction);
+        this.setWatchedData(NMSEntityMinecart.DATA_SHAKING_DIRECTION, direction);
     }
 
     public int getShakingDirection() {
-        return this.getWatchedData(18, 0);
+        return this.getWatchedData(NMSEntityMinecart.DATA_SHAKING_DIRECTION, 0);
     }
 
     public void setShakingFactor(int factor) {
-        this.setWatchedData(17, factor);
+        this.setWatchedData(NMSEntityMinecart.DATA_SHAKING_FACTOR, factor);
     }
 
     public int getShakingFactor() {
-        return this.getWatchedData(17, 0);
+        return this.getWatchedData(NMSEntityMinecart.DATA_SHAKING_FACTOR, 0);
     }
 
     /**
@@ -91,14 +86,14 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      *
      * @return list of drops (immutable)
      */
-    public abstract List<ItemStack> getBrokenDrops();
+    public List<ItemStack> getBrokenDrops() { return Collections.emptyList(); }
 
     /**
      * Gets the combined Material type for this Minecart
      *
      * @return combined item Material type
      */
-    public abstract Material getCombinedItem();
+    public Material getCombinedItem() { return Material.MINECART; }
 
     /**
      * Gets an identifier for this type of Minecart
@@ -106,7 +101,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * @return Minecart type ID
      */
     public int getMinecartType() {
-        return getHandle(EntityMinecartAbstract.class).getType();
+        return getHandle(net.minecraft.server.v1_11_R1.EntityMinecartAbstract.class).getType();
     }
 
     /**
@@ -115,7 +110,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * @param offsetPixels to set to
      */
     public void setBlockOffset(int offsetPixels) {
-        this.setWatchedData(21, offsetPixels);
+        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_OFFSET, offsetPixels);
     }
 
     /**
@@ -124,7 +119,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * @return block offset in the Y-direction
      */
     public int getBlockOffset() {
-        return this.getWatchedData(21, 0);
+        return this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_OFFSET, 0);
     }
 
     /**
@@ -174,7 +169,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * @return block type
      */
     public Material getBlockType() {
-        int value = this.getWatchedData(20, 0) & 0xFFFF;
+        int value = this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, 0) & 0xFFFF;
         return MaterialUtil.getType(value);
     }
 
@@ -184,7 +179,7 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * @return block data
      */
     public int getBlockData() {
-        return this.getWatchedData(20, 0) >> 16;
+        return this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, 0) >> 16;
     }
 
     /**
@@ -199,22 +194,13 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
         int entryData = MathUtil.clamp(blockData, 0, Short.MAX_VALUE);
         int entryTotal = (entryId & 0xFFFF) | (entryData << 16);
         // Set the entry in the Entity data watcher, plus set INDEX=22 to 1 indicating there's a Block
-        this.setWatchedData(20, entryTotal);
-        this.setWatchedData(22, (byte) 1);
+        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, entryTotal);
+        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_VISIBLE, true);
     }
 
     @Override
     public boolean isVehicle() {
-        return getHandle() instanceof EntityMinecartRideable;
-    }
-
-    @Override
-    public boolean spawn(Location at) {
-        if (super.spawn(at)) {
-            CommonUtil.callEvent(new VehicleCreateEvent(entity));
-            return true;
-        }
-        return false;
+        return getHandle() instanceof net.minecraft.server.v1_11_R1.EntityMinecartRideable;
     }
 
     /**
@@ -227,6 +213,8 @@ public abstract class CommonMinecart<T extends Minecart> extends CommonEntity<T>
      * (not a sloped rail)
      */
     public Vector getSlopedPosition(double x, double y, double z) {
-        return Conversion.toVector.convert(getHandle(EntityMinecartAbstract.class).k(x, y, z));
+    	//TODO: BROKEN!!!!
+    	return null;
+        //return Conversion.toVector.convert(getHandle(EntityMinecartAbstract.class).k(x, y, z));
     }
 }

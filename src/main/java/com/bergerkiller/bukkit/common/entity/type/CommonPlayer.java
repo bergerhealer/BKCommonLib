@@ -2,18 +2,15 @@ package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import net.minecraft.server.v1_9_R1.EntityPlayer;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,12 +54,17 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
         // And since without it it works fine too...it is going to be disabled for a while
         // I added this for some reason, if this reason is found, please look into a way of fixing the bugs
         //CommonNMS.getNative(getWorld()).getPlayerChunkMap().movePlayer(getHandle(EntityPlayer.class));
+
+        // Broken as all heck!!!
+        // It now uses PlayerChunkMap and PlayerChunk instances to manage the sending of chunks
+        // This is completely incompatible with a "chunk send queue" as was originally implemented
+
         // Instantly send the chunk the vehicle is currently in
         // This avoid the player losing track of the vehicle because the chunk is missing
-        final IntVector2 chunk = loc.xz.chunk();
-        if (getChunkSendQueue().remove(chunk)) {
-            PacketUtil.sendChunk(getEntity(), getWorld().getChunkAt(chunk.x, chunk.z));
-        }
+        //final IntVector2 chunk = loc.xz.chunk();
+        //if (getChunkSendQueue().remove(chunk)) {
+        //    PacketUtil.sendChunk(getEntity(), getWorld().getChunkAt(chunk.x, chunk.z));
+        //}
 
         // Tell all other entities to send spawn packets
         WorldUtil.getTracker(getWorld()).updateViewer(entity);
@@ -128,7 +130,7 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
     //?
     @Deprecated
     public List<IntVector2> getChunkSendQueue() {
-    	return new ArrayList<IntVector2>();
+    	throw new RuntimeException("BROKEN!!!");
 //        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
     }
 }

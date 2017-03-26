@@ -1,25 +1,25 @@
 package com.bergerkiller.bukkit.common.controller;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
+import com.bergerkiller.bukkit.common.bases.mutable.LongLocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.ObjectAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
-import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityTrackerEntryRef;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 import com.google.common.primitives.Ints;
 
-import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -42,11 +42,15 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     /**
      * The maximum allowed distance per relative movement update
      */
-    public static final int MAX_RELATIVE_DISTANCE = 127;
+    public static final int MAX_RELATIVE_DISTANCE = 32768;
     /**
-     * The minimum value change that is able to trigger an update
+     * The minimum value position change that is able to trigger an update
      */
-    public static final int MIN_RELATIVE_CHANGE = 4;
+    public static final int MIN_RELATIVE_POS_CHANGE = 128;
+    /**
+     * The minimum value rotation change that is able to trigger an update
+     */
+    public static final int MIN_RELATIVE_ROT_CHANGE = 4;
     /**
      * The minimum velocity change that is able to trigger an update
      */
@@ -64,35 +68,29 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public VectorAbstract velSynched = new VectorAbstract() {
         public double getX() {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "e");
-            return n.get(handle);
+            return NMSEntityTrackerEntry.xVel.get(handle);
         }
 
         public double getY() {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "f");
-            return o.get(handle);
+            return NMSEntityTrackerEntry.yVel.get(handle);
         }
 
         public double getZ() {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "g");
-            return p.get(handle);
+            return NMSEntityTrackerEntry.zVel.get(handle);
         }
 
         public VectorAbstract setX(double x) {
-        	SafeField<Double> n = new SafeField<>(EntityTrackerEntry.class, "e");
-        	n.set(handle, x);
+        	NMSEntityTrackerEntry.xVel.set(handle, x);
             return this;
         }
 
         public VectorAbstract setY(double y) {
-        	SafeField<Double> o = new SafeField<>(EntityTrackerEntry.class, "f");
-        	o.set(handle, y);
+        	NMSEntityTrackerEntry.yVel.set(handle, y);
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-        	SafeField<Double> p = new SafeField<>(EntityTrackerEntry.class, "g");
-        	p.set(handle, z);
+        	NMSEntityTrackerEntry.zVel.set(handle, z);
             return this;
         }
     };
@@ -132,68 +130,58 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Obtains the protocol location as the clients know it, allowing it to be
      * read from or written to
      */
-    public IntLocationAbstract locSynched = new IntLocationAbstract() {
+    public LongLocationAbstract locSynched = new LongLocationAbstract() {
         public World getWorld() {
             return entity.getWorld();
         }
 
-        public IntLocationAbstract setWorld(World world) {
+        public LongLocationAbstract setWorld(World world) {
             entity.setWorld(world);
             return this;
         }
 
-        public int getX() {
-        	SafeField<Long> xLoc = new SafeField<>(EntityTrackerEntry.class, "xLoc");
-        	return Ints.checkedCast(xLoc.get(handle));
+        public long getX() {
+        	return Ints.checkedCast(NMSEntityTrackerEntry.xLoc.get(handle));
         }
 
-        public int getY() {
-        	SafeField<Long> yLoc = new SafeField<>(EntityTrackerEntry.class, "yLoc");
-        	return Ints.checkedCast(yLoc.get(handle));
+        public long getY() {
+        	return Ints.checkedCast(NMSEntityTrackerEntry.yLoc.get(handle));
         }
 
-        public int getZ() {
-        	SafeField<Long> zLoc = new SafeField<>(EntityTrackerEntry.class, "zLoc");
-        	return Ints.checkedCast(zLoc.get(handle));
+        public long getZ() {
+        	return Ints.checkedCast(NMSEntityTrackerEntry.zLoc.get(handle));
         }
 
-        public IntLocationAbstract setX(int x) {
-        	SafeField<Long> xLoc = new SafeField<>(EntityTrackerEntry.class, "xLoc");
-        	xLoc.set(handle, (long) x);
+        public LongLocationAbstract setX(long x) {
+        	NMSEntityTrackerEntry.xLoc.set(handle, x);
             return this;
         }
 
-        public IntLocationAbstract setY(int y) {
-        	SafeField<Long> yLoc = new SafeField<>(EntityTrackerEntry.class, "yLoc");
-        	yLoc.set(handle, (long) y);
+        public LongLocationAbstract setY(long y) {
+        	NMSEntityTrackerEntry.yLoc.set(handle, y);
             return this;
         }
 
-        public IntLocationAbstract setZ(int z) {
-        	SafeField<Long> zLoc = new SafeField<>(EntityTrackerEntry.class, "zLoc");
-        	zLoc.set(handle, (long) z);
+        public LongLocationAbstract setZ(long z) {
+        	NMSEntityTrackerEntry.zLoc.set(handle, z);
             return this;
         }
 
         public int getYaw() {
-        	SafeField<Integer> yRot = new SafeField<>(EntityTrackerEntry.class, "yRot");
-        	return yRot.get(handle);
+        	return NMSEntityTrackerEntry.yRot.get(handle);
         }
 
         public int getPitch() {
-        	SafeField<Integer> xRot = new SafeField<>(EntityTrackerEntry.class, "xRot");
-        	return xRot.get(handle);
+        	return NMSEntityTrackerEntry.xRot.get(handle);
         }
 
-        public IntLocationAbstract setYaw(int yaw) {
-        	
-        	SafeField<Integer> yRot = new SafeField<>(EntityTrackerEntry.class, "yRot");
+        public LongLocationAbstract setYaw(int yaw) {
+        	NMSEntityTrackerEntry.yRot.set(handle, yaw);
             return this;
         }
 
-        public IntLocationAbstract setPitch(int pitch) {
-        	SafeField<Integer> xRot = new SafeField<>(EntityTrackerEntry.class, "xRot");
-        	xRot.set(handle, pitch);
+        public LongLocationAbstract setPitch(int pitch) {
+        	NMSEntityTrackerEntry.xRot.set(handle, pitch);
             return this;
         }
     };
@@ -203,40 +191,43 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * setters, the loss of accuracy of the protocol values make it rather
      * pointless to use.
      */
-    public IntLocationAbstract locLive = new IntLocationAbstract() {
+    public LongLocationAbstract locLive = new LongLocationAbstract() {
+
+        @Override
         public World getWorld() {
             return entity.getWorld();
         }
 
-        public IntLocationAbstract setWorld(World world) {
+        @Override
+        public LongLocationAbstract setWorld(World world) {
             entity.setWorld(world);
             return this;
         }
 
-        public int getX() {
+        public long getX() {
             return protLoc(entity.loc.getX());
         }
 
-        public int getY() {
-            return MathUtil.floor(entity.loc.getY() * 32.0);
+        public long getY() {
+            return protLoc(entity.loc.getY());
         }
 
-        public int getZ() {
+        public long getZ() {
             return protLoc(entity.loc.getZ());
         }
 
-        public IntLocationAbstract setX(int x) {
-            entity.loc.setX(x >> 5);
+        public LongLocationAbstract setX(long x) {
+            entity.loc.setX(locProt(x));
             return this;
         }
 
-        public IntLocationAbstract setY(int y) {
-            entity.loc.setY(y >> 5);
+        public LongLocationAbstract setY(long y) {
+            entity.loc.setY(locProt(y));
             return this;
         }
 
-        public IntLocationAbstract setZ(int z) {
-            entity.loc.setZ(z >> 5);
+        public LongLocationAbstract setZ(long z) {
+            entity.loc.setZ(locProt(z));
             return this;
         }
 
@@ -248,15 +239,16 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             return protRot(entity.loc.getPitch());
         }
 
-        public IntLocationAbstract setYaw(int yaw) {
+        public LongLocationAbstract setYaw(int yaw) {
             entity.loc.setYaw((float) yaw / 256.0f * 360.0f);
             return this;
         }
 
-        public IntLocationAbstract setPitch(int pitch) {
+        public LongLocationAbstract setPitch(int pitch) {
             entity.loc.setPitch((float) pitch / 256.0f * 360.0f);
             return this;
         }
+
     };
     /**
      * Obtains the protocol head rotation as the clients know it, allowing it to
@@ -264,15 +256,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract headRotSynched = new IntegerAbstract() {
         public int get() {
-        	SafeField<Integer> headYaw = new SafeField<>(EntityTrackerEntry.class, "headYaw");
-        	return headYaw.get(handle);
-            //return ((EntityTrackerEntry) handle).i;
+        	return NMSEntityTrackerEntry.headYaw.get(handle);
         }
 
         public IntegerAbstract set(int value) {
-        	SafeField<Integer> headYaw = new SafeField<>(EntityTrackerEntry.class, "headYaw");
-        	headYaw.set(handle, value);
-            //((EntityTrackerEntry) handle).i = value;
+        	NMSEntityTrackerEntry.headYaw.set(handle, value);
             return this;
         }
     };
@@ -297,71 +285,51 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract ticks = new IntegerAbstract() {
         public int get() {
-            SafeField<Integer> ticks = new SafeField<>(EntityTrackerEntry.class, "v");
-            return ticks.get(handle);
+            return NMSEntityTrackerEntry.tickCounter.get(handle);
         }
 
         public IntegerAbstract set(int value) {
-            SafeField<Integer> ticks = new SafeField<>(EntityTrackerEntry.class, "v");
-            ticks.set(handle, value);
+            NMSEntityTrackerEntry.tickCounter.set(handle, value);
             return this;
         }
     };
     /**
-     * Obtains the vehicle of this (passenger) Entity as the clients know it,
+     * Obtains a list of (passenger) Entities as the clients know it,
      * allowing it to be read from or written to
      */
-    public ObjectAbstract<List<Entity>> vehicleSynched = new ObjectAbstract<List<Entity>>() {
+    public ObjectAbstract<List<Entity>> passengersSynched = new ObjectAbstract<List<Entity>>() {
         public List<Entity> get() {
-            return EntityTrackerEntryRef.vehicle.get(handle);
+            return NMSEntityTrackerEntry.passengers.get(handle);
         }
 
         public ObjectAbstract<List<Entity>> set(List<Entity> value) {
-            EntityTrackerEntryRef.vehicle.set(handle, value);
+            NMSEntityTrackerEntry.passengers.set(handle, value);
             return this;
-        }
-    };
-    /**
-     * @deprecated Use of Lists instead of an direct Entity
-     */
-    @Deprecated
-    public ObjectAbstract<Entity> vehicleSynchedOld = new ObjectAbstract<Entity>() {
-        @Deprecated
-        public Entity get() {
-            throw new IllegalStateException("Method has been deprecated");
-//            return EntityTrackerEntryRef.vehicle.get(handle);
-        }
-
-        @Deprecated
-        public ObjectAbstract<Entity> set(Entity value) {
-            throw new IllegalStateException("Method has been deprecated");
-//            EntityTrackerEntryRef.vehicle.set(handle, value);
-//            return this;
         }
     };
 
     public int getViewDistance() {
-        return EntityTrackerEntryRef.viewDistance.get(handle);
+        return NMSEntityTrackerEntry.viewDistance.get(handle);
     }
 
     public void setViewDistance(int blockDistance) {
-        EntityTrackerEntryRef.viewDistance.set(handle, blockDistance);
+        NMSEntityTrackerEntry.viewDistance.set(handle, blockDistance);
     }
 
     public int getUpdateInterval() {
-        return EntityTrackerEntryRef.updateInterval.get(handle);
+        return NMSEntityTrackerEntry.updateInterval.get(handle);
     }
 
     public void setUpdateInterval(int tickInterval) {
-        EntityTrackerEntryRef.updateInterval.set(handle, tickInterval);
+        NMSEntityTrackerEntry.updateInterval.set(handle, tickInterval);
     }
 
     public boolean isMobile() {
-        return EntityTrackerEntryRef.isMobile.get(handle);
+        return NMSEntityTrackerEntry.isMobile.get(handle);
     }
 
     public void setMobile(boolean mobile) {
-        EntityTrackerEntryRef.isMobile.set(handle, mobile);
+        NMSEntityTrackerEntry.isMobile.set(handle, mobile);
     }
 
     /**
@@ -372,7 +340,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return ticks since last location synchronization
      */
     public int getTicksSinceLocationSync() {
-        return EntityTrackerEntryRef.timeSinceLocationSync.get(handle);
+        return NMSEntityTrackerEntry.timeSinceLocationSync.get(handle);
     }
 
     /**
@@ -397,8 +365,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
         this.entity = entity;
         this.handle = entityTrackerEntry;
-        if (this.handle instanceof NMSEntityTrackerEntry) {
-            ((NMSEntityTrackerEntry) this.handle).setController(this);
+
+        EntityTrackerHook hook = EntityTrackerHook.get(this.handle, EntityTrackerHook.class);
+        if (hook != null) {
+            hook.setController(this);
         }
         if (this.entity.isSpawned()) {
             this.onAttached();
@@ -420,7 +390,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return viewing players
      */
     public final Collection<Player> getViewers() {
-        return Collections.unmodifiableCollection(EntityTrackerEntryRef.viewers.get(handle));
+        return Collections.unmodifiableCollection(NMSEntityTrackerEntry.viewers.get(handle));
     }
 
     /**
@@ -432,7 +402,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return True if the viewer was added, False if the viewer was already
      * added
      */
-    @SuppressWarnings("unchecked")
     public boolean addViewer(Player viewer) {
         if (!((EntityTrackerEntry) handle).trackedPlayers.add((EntityPlayer) Conversion.toEntityHandle.convert(viewer))) {
             return false;
@@ -464,33 +433,36 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param viewer to update
      */
     public final void updateViewer(Player viewer) {
-        if (isViewable(viewer)) {
-            addViewer(viewer);
-            return;
-        }
-        // Check that the passenger of this Entity is not still viewable
-        // We can not hide vehicle of passengers that are still viewable...
-        if (entity.hasPassenger()) {
-            EntityNetworkController<?> network = CommonEntity.get(entity.getPassenger()).getNetworkController();
-            if (network != null && network.getViewers().contains(viewer)) {
-                addViewer(viewer);
-                return;
+        // Check if the viewer can see this entity, or one of this entity's passengers
+        boolean viewable = isViewable(viewer);
+        if (!viewable) {
+            for (Entity passenger : entity.getPassengers()) {
+                EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
+                if (network.getViewers().contains(viewer)) {
+                    viewable = true;
+                    break;
+                }
             }
         }
-        // No longer a viewer
-        removeViewer(viewer);
+
+        // Add or remove the viewer depending on whether this entity is viewable by the viewer
+        if (viewable) {
+            addViewer(viewer);
+        } else {
+            removeViewer(viewer);
+        }
     }
 
     private boolean isViewable(Player viewer) {
         // View range check
-        final int dx = MathHelper.floor(Math.abs(EntityUtil.getLocX(viewer) - (double) (this.locSynched.getX() / 32.0)));
-        final int dz = MathHelper.floor(Math.abs(EntityUtil.getLocZ(viewer) - (double) (this.locSynched.getZ() / 32.0)));
+        final int dx = MathHelper.floor(Math.abs(EntityUtil.getLocX(viewer) - (double) locProt(this.locSynched.getX())));
+        final int dz = MathHelper.floor(Math.abs(EntityUtil.getLocZ(viewer) - (double) locProt(this.locSynched.getZ())));
         final int view = this.getViewDistance();
         if (dx > view || dz > view) {
             return false;
         }
         // The entity is in a chunk not seen by the viewer
-        if (!EntityRef.ignoreChunkCheck.get(entity.getHandle())
+        if (!NMSEntity.ignoreChunkCheck.get(entity.getHandle())
                 && !PlayerUtil.isChunkEntered(viewer, entity.getChunkX(), entity.getChunkZ())) {
             return false;
         }
@@ -584,22 +556,22 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
         // Passenger/Vehicle information
         if (entity.isInsideVehicle()) {
-            PacketUtil.sendPacket(viewer, getVehiclePacket(entity.getVehicle()));
+            Logging.LOGGER_DEBUG.warnOnce("is it required to send a separate vehicle packet?");
         }
         if (entity.hasPassenger()) {
-            PacketUtil.sendPacket(viewer, getPassengerPacket(entity.getPassenger()));
+            PacketUtil.sendPacket(viewer, getMountPacket(entity.getPassengers()));
         }
 
         // Potential leash
         Entity leashHolder = entity.getLeashHolder();
         if (leashHolder != null) {
-            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(1, leashHolder, entity.getEntity()));
+            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(leashHolder, entity.getEntity()));
         }
 
         // Human entity sleeping action
         if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
             PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(),
-                    new BlockPosition(entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block())));
+                   entity.loc.block()));
         }
 
         // Initial entity head rotation
@@ -618,7 +590,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      *
      * @param viewer to send the meta data to
      */
-    @SuppressWarnings("unchecked")
     public void initMetaData(Player viewer) {
         // Meta Data
         DataWatcher metaData = entity.getMetaData();
@@ -628,7 +599,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         // Living Entity - only data
         if (handle instanceof EntityLiving) {
             // Entity Attributes
-            AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
+            AttributeMapServer attributeMap = (AttributeMapServer) NMSEntityLiving.getAttributesMap.invoke(handle);
             Collection<?> attributes = attributeMap.c();
             if (!attributes.isEmpty()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
@@ -676,15 +647,16 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public void onSync() {
         if (entity.isDead()) {
+            System.out.println("ITS DEAD JIM");
             return;
         }
 
         //TODO: Item frame support? Meh. Not for now.
         // Vehicle
-        this.syncVehicle();
+        this.syncPassengers();
 
         // Position / Rotation
-        if (this.isUpdateTick() || entity.isPositionChanged()) {
+        if (this.isUpdateTick() || entity.isPositionChanged() || ((net.minecraft.server.v1_11_R1.Entity) entity.getHandle()).getDataWatcher().a()) {
             entity.setPositionChanged(false);
             // Update location
             if (this.getTicksSinceLocationSync() > ABSOLUTE_UPDATE_INTERVAL) {
@@ -732,7 +704,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param minChange to look for
      * @return True if changed, False if not
      */
-    public boolean isPositionChanged(int minChange) {
+    public boolean isPositionChanged(long minChange) {
         return Math.abs(locLive.getX() - locSynched.getX()) >= minChange
                 || Math.abs(locLive.getY() - locSynched.getY()) >= minChange
                 || Math.abs(locLive.getZ() - locSynched.getZ()) >= minChange;
@@ -789,7 +761,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         // Living Entity - only data
         if (handle instanceof EntityLiving) {
             // Entity Attributes
-            AttributeMapServer attributeMap = (AttributeMapServer) EntityLivingRef.getAttributesMap.invoke(handle);
+            AttributeMapServer attributeMap = (AttributeMapServer) NMSEntityLiving.getAttributesMap.invoke(handle);
             Collection<?> attributes = attributeMap.c();
             if (!attributes.isEmpty()) {
                 this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
@@ -802,8 +774,35 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Synchronizes the entity Vehicle to all viewers. Updates when the vehicle
      * changes.
      */
-    public void syncVehicle() {
-        syncVehicle(entity.getVehicle());
+    public void syncPassengers() {
+        syncPassengers(entity.getPassengers());
+    }
+
+    /**
+     * Checks whether passengers have changed since the last sync
+     * 
+     * @param passengers that are expected
+     * @return True if changed, False if not
+     */
+    public boolean isPassengersChanged() {
+        return isPassengersChanged(entity.getPassengers());
+    }
+
+    /**
+     * Checks whether passengers have changed since the last sync
+     * 
+     * @param passengers that are expected
+     * @return True if changed, False if not
+     */
+    public boolean isPassengersChanged(List<org.bukkit.entity.Entity> passengers) {
+        List<Entity> syncPassengers = this.passengersSynched.get();
+        boolean passengersDifferent = (passengers.size() != syncPassengers.size());
+        if (!passengersDifferent) {
+            for (int i = 0; i < syncPassengers.size() && !passengersDifferent; i++) {
+                passengersDifferent = (syncPassengers.get(i).getEntityId() != passengers.get(i).getEntityId());
+            }
+        }
+        return passengersDifferent;
     }
 
     /**
@@ -811,12 +810,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      *
      * @param vehicle to synchronize, NULL for no Vehicle
      */
-    public void syncVehicle(org.bukkit.entity.Entity vehicle) {
-        if (vehicleSynched.get() != vehicle) {
-            List<Entity> entity = new ArrayList<>();
-            entity.add(vehicle);
-            vehicleSynched.set(entity);
-            broadcast(getVehiclePacket(vehicle));
+    public void syncPassengers(List<org.bukkit.entity.Entity> passengers) {
+        if (isPassengersChanged(passengers)) {
+            this.passengersSynched.set(new ArrayList<Entity>(passengers));
+            broadcast(getMountPacket(passengers));
         }
     }
 
@@ -824,7 +821,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Synchronizes the entity head yaw rotation to all viewers.
      */
     public void syncHeadRotation() {
-        if (isHeadRotationChanged(MIN_RELATIVE_CHANGE)) {
+        if (isHeadRotationChanged(MIN_RELATIVE_ROT_CHANGE)) {
             syncHeadRotation(headRotLive.get());
         }
     }
@@ -882,7 +879,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * relative or absolute movement is performed.
      */
     public void syncLocation() {
-        syncLocation(isPositionChanged(MIN_RELATIVE_CHANGE), isRotationChanged(MIN_RELATIVE_CHANGE));
+        syncLocation(isPositionChanged(MIN_RELATIVE_POS_CHANGE), isRotationChanged(MIN_RELATIVE_ROT_CHANGE));
     }
 
     /**
@@ -901,12 +898,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param yaw - protocol rotation yaw
      * @param pitch - protocol rotation pitch
      */
-    public void syncLocationAbsolute(int posX, int posY, int posZ, int yaw, int pitch) {
+    public void syncLocationAbsolute(long posX, long posY, long posZ, int yaw, int pitch) {
         // Update protocol values
         locSynched.set(posX, posY, posZ, yaw, pitch);
 
         // Update last synchronization time
-        EntityTrackerEntryRef.timeSinceLocationSync.set(handle, 0);
+        NMSEntityTrackerEntry.timeSinceLocationSync.set(handle, 0);
 
         // Send synchronization messages
         broadcast(getLocationPacket(posX, posY, posZ, (byte) yaw, (byte) pitch));
@@ -937,12 +934,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param yaw - protocol rotation yaw
      * @param pitch - protocol rotation pitch
      */
-    public void syncLocation(boolean position, boolean rotation, int posX, int posY, int posZ, int yaw, int pitch) {
+    public void syncLocation(boolean position, boolean rotation, long posX, long posY, long posZ, int yaw, int pitch) {
         // No position updates allowed for passengers (this is FORCED). Rotation is allowed.
         if (position && !entity.isInsideVehicle()) {
-            final int deltaX = posX - locSynched.getX();
-            final int deltaY = posY - locSynched.getY();
-            final int deltaZ = posZ - locSynched.getZ();
+            final long deltaX = posX - locSynched.getX();
+            final long deltaY = posY - locSynched.getY();
+            final long deltaZ = posZ - locSynched.getZ();
 
             // There is no use sending relative updates with zero change...
             if (deltaX == 0 && deltaY == 0 && deltaZ == 0) {
@@ -950,7 +947,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             }
 
             // Absolute updates for too long distances
-            if (Math.abs(deltaX) > MAX_RELATIVE_DISTANCE || Math.abs(deltaY) > MAX_RELATIVE_DISTANCE || Math.abs(deltaZ) > MAX_RELATIVE_DISTANCE) {
+            if (Math.abs(deltaX) >= MAX_RELATIVE_DISTANCE || Math.abs(deltaY) >= MAX_RELATIVE_DISTANCE || Math.abs(deltaZ) >= MAX_RELATIVE_DISTANCE) {
                 // Distance too large, perform absolute update
                 // If no rotation is being updated, set the rotation to the synched rotation
                 if (!rotation) {
@@ -962,12 +959,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 // Update rotation and position relatively
                 locSynched.set(posX, posY, posZ, yaw, pitch);
                 broadcast(PacketType.OUT_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(),
-                        (byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch, entity.isOnGround()));
+                        deltaX, deltaY, deltaZ, (byte) yaw, (byte) pitch, entity.isOnGround()));
             } else {
                 // Only update position relatively
                 locSynched.set(posX, posY, posZ);
                 broadcast(PacketType.OUT_ENTITY_MOVE.newInstance(entity.getEntityId(),
-                        (byte) deltaX, (byte) deltaY, (byte) deltaZ, entity.isOnGround()));
+                        deltaX, deltaY, deltaZ, entity.isOnGround()));
             }
         } else if (rotation) {
             // Only update rotation
@@ -1017,8 +1014,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param pitch - position pitch (protocol)
      * @return a packet with absolute position information
      */
-    public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, true);
+    public CommonPacket getLocationPacket(long posX, long posY, long posZ, int yaw, int pitch) {
+        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), locProt(posX), locProt(posY), locProt(posZ), (byte) yaw, (byte) pitch, true);
     }
 
     /**
@@ -1041,15 +1038,19 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return spawn packet
      */
     public CommonPacket getSpawnPacket() {
-        final CommonPacket packet = EntityTrackerEntryRef.getSpawnPacket(handle);
-        if (PacketType.OUT_ENTITY_SPAWN.isInstance(packet)) {
+        final CommonPacket packet = NMSEntityTrackerEntry.getSpawnPacket(handle);
+        if (packet.getType() == PacketType.OUT_ENTITY_SPAWN) {
             // NMS error: They are not using the position, but the live position
             // This has some big issues when new players join...
 
+            // Motion
+            packet.write(PacketType.OUT_ENTITY_SPAWN.motX, protMot(velSynched.getX()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.motY, protMot(velSynched.getY()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.motZ, protMot(velSynched.getZ()));
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, (double) locSynched.getX());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, (double) locSynched.getY());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, (double) locSynched.getZ());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locProt(locSynched.getX()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locProt(locSynched.getY()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locProt(locSynched.getZ()));
             // Rotation
             packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, locSynched.getYaw());
             packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, locSynched.getPitch());
@@ -1058,25 +1059,14 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
-     * Gets a new packet with information for this Entity
-     *
-     * @param passenger that is now inside this vehicle Entity
-     * @return packet with passenger information
-     */
-    public CommonPacket getPassengerPacket(Entity passenger) {
-        return PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, entity.getEntity());
-    }
-
-    /**
      * Gets a new packet with vehicle information for this Entity
      *
      * @param vehicle this Entity is now a passenger of
      * @return packet with vehicle information
      */
-    public CommonPacket getVehiclePacket(Entity vehicle) {
-        return PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle);
+    public CommonPacket getMountPacket(List<Entity> passengers) {
+        return PacketType.OUT_MOUNT.newInstance(entity.getEntity(), passengers);
     }
-
 
     /**
      * Gets a new packet with head rotation information for this Entity
@@ -1092,24 +1082,31 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         return MathUtil.floor(rot * 256.0f / 360.0f);
     }
 
-    //TODO Unsure fix
-    private int protLoc(double loc) {
-        return a(loc);
+    /**
+     * Converts position information into a protocol long value.
+     * Taken from EntityTracker MC source
+     */
+    private static long protLoc(double loc) {
+        return MathHelper.d(loc * 4096.0D);
     }
 
     /**
-     * This method is copied from mc 1.7.10 source. This might not work
-     *
-     * @param paramDouble
-     * @return int
+     * Converts protocol long value into position information
+     * 
+     * @param prot protocol value
+     * @return absolute world coordinate value
      */
-    public static int a(double paramDouble) {
-        double d = paramDouble - (MathHelper.floor(paramDouble) + 0.5D);
+    private static double locProt(long prot) {
+        return prot / 4096.0D;
+    }
 
-        if (d < 0) {
-            return MathHelper.f(paramDouble * 32.0D);
-        }
-
-        return MathHelper.floor(paramDouble * 32.0D);
+    /**
+     * Converts motion information into a protocol int value
+     * 
+     * @param mot motion input
+     * @return protocol value
+     */
+    private static int protMot(double mot) {
+        return ((int)(MathHelper.a(mot, -3.9D, 3.9D) * 8000.0D));
     }
 }

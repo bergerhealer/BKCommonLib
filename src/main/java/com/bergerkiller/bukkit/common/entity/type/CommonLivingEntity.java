@@ -8,13 +8,13 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
+import com.bergerkiller.server.CommonNMS;
 
-import net.minecraft.server.v1_9_R1.EntityLiving;
-import net.minecraft.server.v1_9_R1.GenericAttributes;
+import net.minecraft.server.v1_11_R1.EntityLiving;
+import net.minecraft.server.v1_11_R1.GenericAttributes;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -154,7 +154,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return Forward movement
      */
     public double getForwardMovement() {
-        return EntityLivingRef.forwardMovement.get(getHandle(EntityLiving.class));
+        return NMSEntityLiving.forwardMovement.get(getHandle(EntityLiving.class));
     }
 
     /**

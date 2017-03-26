@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -16,13 +14,6 @@ import java.util.List;
  */
 public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
 
-    private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartFurnace");
-    private static final FieldAccessor<Double> pushForceX = TEMPLATE.getField("a");
-    private static final FieldAccessor<Double> pushForceZ = TEMPLATE.getField("b");
-    private static final FieldAccessor<Integer> fuel = TEMPLATE.getField("c");
-    private static final MethodAccessor<Boolean> isSmokingMethod = TEMPLATE.getMethod("j");
-    private static final MethodAccessor<Void> setSmokingMethod = TEMPLATE.getMethod("k", boolean.class);
-
     /**
      * The amount of fuel ticks a single item of coal gives to a furnace
      * minecart
@@ -34,11 +25,11 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     }
 
     public int getFuelTicks() {
-        return fuel.get(getHandle());
+        return NMSEntityMinecart.Furnace.fuel.get(getHandle());
     }
 
     public void setFuelTicks(int fuelTicks) {
-        fuel.set(getHandle(), fuelTicks);
+    	NMSEntityMinecart.Furnace.fuel.set(getHandle(), fuelTicks);
     }
 
     public boolean hasFuel() {
@@ -50,27 +41,27 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     }
 
     public double getPushX() {
-        return pushForceX.get(getHandle());
+        return NMSEntityMinecart.Furnace.pushForceX.get(getHandle());
     }
 
     public void setPushX(double pushX) {
-        pushForceX.set(getHandle(), pushX);
+    	NMSEntityMinecart.Furnace.pushForceX.set(getHandle(), pushX);
     }
 
     public double getPushZ() {
-        return pushForceZ.get(getHandle());
+        return NMSEntityMinecart.Furnace.pushForceZ.get(getHandle());
     }
 
     public void setPushZ(double pushZ) {
-        pushForceZ.set(getHandle(), pushZ);
+    	NMSEntityMinecart.Furnace.pushForceZ.set(getHandle(), pushZ);
     }
 
     public boolean isSmoking() {
-        return isSmokingMethod.invoke(getHandle());
+        return NMSEntityMinecart.Furnace.isSmokingMethod.invoke(getHandle());
     }
 
     public void setSmoking(boolean smoking) {
-        setSmokingMethod.invoke(getHandle(), smoking);
+    	NMSEntityMinecart.Furnace.setSmokingMethod.invoke(getHandle(), smoking);
     }
 
     @Override

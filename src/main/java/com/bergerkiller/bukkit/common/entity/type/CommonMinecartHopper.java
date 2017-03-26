@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeField;
-import net.minecraft.server.v1_9_R1.EntityMinecartHopper;
-import net.minecraft.server.v1_9_R1.TileEntityHopper;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+
+import net.minecraft.server.v1_11_R1.EntityMinecartHopper;
+import net.minecraft.server.v1_11_R1.TileEntityHopper;
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -15,8 +15,6 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a Hopper
  */
 public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart> {
-
-    private static final FieldAccessor<Integer> suckingCooldown = new SafeField<Integer>(EntityMinecartHopper.class, "b");
 
     public CommonMinecartHopper(HopperMinecart base) {
         super(base);
@@ -48,7 +46,9 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return True if sucking items, False if not
      */
     public boolean isSuckingItems() {
-        return getHandle(EntityMinecartHopper.class).C();
+    	//TODO: BROKEN!!!!
+    	return false;
+        //return getHandle(EntityMinecartHopper.class).C();
     }
 
     /**
@@ -57,7 +57,9 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @param sucking state to set to
      */
     public void setSuckingItems(boolean sucking) {
-        getHandle(EntityMinecartHopper.class).f(sucking);
+    	//TODO: BROKEN!!!!
+    	return;
+        //getHandle(EntityMinecartHopper.class).f(sucking);
     }
 
     /**
@@ -66,7 +68,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @param cooldownTicks to set to
      */
     public void setSuckingCooldown(int cooldownTicks) {
-        suckingCooldown.set(getHandle(), cooldownTicks);
+        NMSEntityMinecart.Hopper.suckingCooldown.set(getHandle(), cooldownTicks);
     }
 
     /**
@@ -75,6 +77,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return sucking cooldown ticks
      */
     public int getSuckingCooldown() {
-        return suckingCooldown.get(getHandle());
+        return NMSEntityMinecart.Hopper.suckingCooldown.get(getHandle());
     }
+
 }

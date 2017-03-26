@@ -1,9 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
-import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.ItemStack;
@@ -16,10 +14,6 @@ import java.util.List;
  */
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
-    private static final ClassTemplate<?> TEMPLATE = NMSClassTemplate.create("EntityMinecartTNT");
-    private static final FieldAccessor<Integer> fuse = TEMPLATE.getField("a");
-    private static final MethodAccessor<Void> explode = TEMPLATE.getMethod("c", double.class);
-    private static final MethodAccessor<Void> prime = TEMPLATE.getMethod("j");
     /**
      * The velocity (squared) at which the Minecart is considered 'fast moving'.
      */
@@ -53,7 +47,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @param yieldModifier - factor stating what yield the explosion has
      */
     public void explode(double yieldModifier) {
-        explode.invoke(getHandle(), yieldModifier);
+        NMSEntityMinecart.TNT.explode.invoke(getHandle(), yieldModifier);
     }
 
     /**
@@ -61,7 +55,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * animation/sound.
      */
     public void primeTNT() {
-        prime.invoke(getHandle());
+    	NMSEntityMinecart.TNT.prime.invoke(getHandle());
     }
 
     /**
@@ -90,7 +84,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @return fuse ticks
      */
     public int getFuseTicks() {
-        return fuse.get(getHandle());
+        return NMSEntityMinecart.TNT.fuse.get(getHandle());
     }
 
     /**
@@ -99,6 +93,6 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @param fuseTicks to set to
      */
     public void setFuseTicks(int fuseTicks) {
-        fuse.set(getHandle(), fuseTicks);
+    	NMSEntityMinecart.TNT.fuse.set(getHandle(), fuseTicks);
     }
 }
