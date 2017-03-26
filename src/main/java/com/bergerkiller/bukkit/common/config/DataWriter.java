@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.config;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;
@@ -61,20 +61,20 @@ public abstract class DataWriter {
             try {
                 this.write(stream);
             } catch (IOException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An IO Exception occured while saving file '" + this.file + "':");
+            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while saving file '" + this.file + "':");
                 ex.printStackTrace();
             } catch (Throwable t) {
-                Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while savingg file '" + this.file + "':");
+            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while savingg file '" + this.file + "':");
                 t.printStackTrace();
             } finally {
                 stream.close();
             }
             return true;
         } catch (FileNotFoundException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "[Configuration] Failed to access file '" + this.file + "' for saving:");
+        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to access file '" + this.file + "' for saving:");
             ex.printStackTrace();
         } catch (Throwable t) {
-            Bukkit.getLogger().log(Level.SEVERE, "[Configuration] Failed to save to file '" + this.file + "':");
+        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to save to file '" + this.file + "':");
             t.printStackTrace();
         }
         return false;

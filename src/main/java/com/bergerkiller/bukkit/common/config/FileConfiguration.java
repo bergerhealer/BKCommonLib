@@ -1,9 +1,8 @@
 package com.bergerkiller.bukkit.common.config;
 
-import com.bergerkiller.bukkit.common.ModuleLogger;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -12,8 +11,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class FileConfiguration extends BasicConfiguration {
-
-    private static final ModuleLogger LOGGER = new ModuleLogger("Configuration");
     private final File file;
 
     public FileConfiguration(JavaPlugin plugin) {
@@ -50,13 +47,13 @@ public class FileConfiguration extends BasicConfiguration {
         try {
             this.loadFromStream(new FileInputStream(this.file));
         } catch (Throwable t) {
-            LOGGER.log(Level.SEVERE, "An error occured while loading file '" + this.file + "'");
+        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "'");
             try {
                 File backup = new File(this.file.getPath() + ".old");
                 StreamUtil.copyFile(this.file, backup);
-                LOGGER.log(Level.SEVERE, "A backup of this (corrupted?) file named '" + backup.getName() + "' can be found in case you wish to restore", t);
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "A backup of this (corrupted?) file named '" + backup.getName() + "' can be found in case you wish to restore", t);
             } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, "A backup of this (corrupted?) file could not be made and its contents may be lost (overwritten)", t);
+            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "A backup of this (corrupted?) file could not be made and its contents may be lost (overwritten)", t);
             }
         }
     }
@@ -69,10 +66,10 @@ public class FileConfiguration extends BasicConfiguration {
             boolean regen = !this.exists();
             this.saveToStream(StreamUtil.createOutputStream(this.file));
             if (regen) {
-                Bukkit.getLogger().log(Level.INFO, "[Configuration] File '" + this.file + "' has been generated");
+            	Logging.LOGGER_CONFIG.log(Level.INFO, "File '" + this.file + "' has been generated");
             }
         } catch (Exception ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while saving to file '" + this.file + "':");
+        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while saving to file '" + this.file + "':");
             ex.printStackTrace();
         }
     }

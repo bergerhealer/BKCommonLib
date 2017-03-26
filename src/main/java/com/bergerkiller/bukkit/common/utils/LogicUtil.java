@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
-import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
-import com.bergerkiller.bukkit.common.reflection.SafeDirectMethod;
+import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.reflection.SafeDirectMethod;
 import com.google.common.collect.BiMap;
 import org.bukkit.block.Block;
 
@@ -19,6 +19,7 @@ public class LogicUtil {
     private static final MethodAccessor<Object> objectCloneMethod;
     private static final Map<Class<?>, Class<?>> unboxedToBoxed = new HashMap<Class<?>, Class<?>>();
     private static final Map<Class<?>, Class<?>> boxedToUnboxed = new HashMap<Class<?>, Class<?>>();
+    private static final Map<String, Class<?>> langBuiltinByName = new HashMap<String, Class<?>>();
 
     static {
         unboxedToBoxed.put(boolean.class, Boolean.class);
@@ -31,7 +32,25 @@ public class LogicUtil {
         unboxedToBoxed.put(double.class, Double.class);
         for (Entry<Class<?>, Class<?>> entry : unboxedToBoxed.entrySet()) {
             boxedToUnboxed.put(entry.getValue(), entry.getKey());
+            
+            Class<?> prim = entry.getKey();
+            langBuiltinByName.put(prim.getSimpleName(), prim);
         }
+
+        // Array types (TODO: generate these from above?)
+        langBuiltinByName.put("boolean[]", boolean[].class);
+        langBuiltinByName.put("char[]", char[].class);
+        langBuiltinByName.put("byte[]", byte[].class);
+        langBuiltinByName.put("short[]", short[].class);
+        langBuiltinByName.put("int[]", int[].class);
+        langBuiltinByName.put("long[]", long[].class);
+        langBuiltinByName.put("float[]", float[].class);
+        langBuiltinByName.put("double[]", double[].class);
+
+        // Special
+        langBuiltinByName.put("void", void.class);
+        langBuiltinByName.put("String", String.class);
+
         // Get the cloning method
         MethodAccessor<Object> objectCloneMethodAccessor;
         try {
@@ -60,6 +79,16 @@ public class LogicUtil {
             };
         }
         objectCloneMethod = objectCloneMethodAccessor;
+    }
+
+    /**
+     * Gets a primitive type by name
+     * 
+     * @param name of the primitive type
+     * @return class of the type, if found
+     */
+    public static Class<?> getBasicType(String name) {
+    	return langBuiltinByName.get(name);
     }
 
     /**
@@ -288,7 +317,11 @@ public class LogicUtil {
         if (componentType.isPrimitive()) {
             return Array.newInstance(componentType, 0).getClass();
         } else {
-            return CommonUtil.getClass("[L" + componentType.getName() + ";");
+            try {
+				return Class.forName("[L" + componentType.getName() + ";");
+			} catch (ClassNotFoundException e) {
+				return Object[].class;
+			}
         }
     }
 
@@ -354,7 +387,8 @@ public class LogicUtil {
      * @return True if the collection changed as a result of the call, False if
      * not.
      */
-    public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
+    @SafeVarargs
+	public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
         if (array.length > 20) {
             return collection.addAll(Arrays.asList(array));
         } else {
@@ -443,7 +477,8 @@ public class LogicUtil {
      * @param values to search in
      * @return True if it is contained, False if not
      */
-    public static <T> boolean contains(T value, T... values) {
+    @SafeVarargs
+	public static <T> boolean contains(T value, T... values) {
         for (T v : values) {
             if (bothNullOrEqual(v, value)) {
                 return true;
@@ -568,5 +603,19 @@ public class LogicUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets all the Class types of the objects in an array
+     * 
+     * @param values input object array
+     * @return class types
+     */
+    public static Class<?>[] getTypes(Object[] values) {
+        Class<?>[] result = new Class<?>[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = (values[i] == null) ? null : values[i].getClass();
+        }
+        return result;
     }
 }

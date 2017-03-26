@@ -1,7 +1,8 @@
 package com.bergerkiller.bukkit.common.config;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.Logging;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -78,10 +79,10 @@ public abstract class DataReader {
             try {
                 this.read(stream);
             } catch (IOException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An IO Exception occured while loading file '" + this.file + "':");
+            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while loading file '" + this.file + "':");
                 ex.printStackTrace();
             } catch (Throwable t) {
-                Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
+            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':");
                 t.printStackTrace();
             } finally {
                 stream.close();
@@ -90,7 +91,7 @@ public abstract class DataReader {
         } catch (FileNotFoundException ex) {
             // nothing, we allow non-existence of this file
         } catch (Throwable t) {
-            Bukkit.getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading file '" + this.file + "':");
+        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':");
             t.printStackTrace();
         }
         return false;
