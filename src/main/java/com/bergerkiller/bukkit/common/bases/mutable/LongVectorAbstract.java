@@ -11,59 +11,37 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
 /**
- * An abstract Class for dealing with mutable x/y/z components
+ * An abstract Class for dealing with mutable Integer x/y/z components
  */
-public abstract class VectorAbstract {
+public abstract class LongVectorAbstract {
 
-    /**
-     * Gets a referenced Vector version for only the x and z coordinates
-     */
-    public final VectorXZAbstract xz = new VectorXZAbstract() {
-        public double getX() {
-            return VectorAbstract.this.getX();
+    public final LongAbstract x = new LongAbstract() {
+        public long get() {
+            return LongVectorAbstract.this.getX();
         }
 
-        public double getZ() {
-            return VectorAbstract.this.getZ();
-        }
-
-        public VectorXZAbstract setX(double x) {
-            VectorAbstract.this.setX(x);
-            return this;
-        }
-
-        public VectorXZAbstract setZ(double z) {
-            VectorAbstract.this.setZ(z);
+        public LongAbstract set(long value) {
+            LongVectorAbstract.this.setX(value);
             return this;
         }
     };
-    public final DoubleAbstract x = new DoubleAbstract() {
-        public double get() {
-            return VectorAbstract.this.getX();
+    public final LongAbstract y = new LongAbstract() {
+        public long get() {
+            return LongVectorAbstract.this.getY();
         }
 
-        public DoubleAbstract set(double value) {
-            VectorAbstract.this.setX(value);
+        public LongAbstract set(long value) {
+            LongVectorAbstract.this.setY(value);
             return this;
         }
     };
-    public final DoubleAbstract y = new DoubleAbstract() {
-        public double get() {
-            return VectorAbstract.this.getY();
+    public final LongAbstract z = new LongAbstract() {
+        public long get() {
+            return LongVectorAbstract.this.getZ();
         }
 
-        public DoubleAbstract set(double value) {
-            VectorAbstract.this.setY(value);
-            return this;
-        }
-    };
-    public final DoubleAbstract z = new DoubleAbstract() {
-        public double get() {
-            return VectorAbstract.this.getZ();
-        }
-
-        public DoubleAbstract set(double value) {
-            VectorAbstract.this.setZ(value);
+        public LongAbstract set(long value) {
+            LongVectorAbstract.this.setZ(value);
             return this;
         }
     };
@@ -73,21 +51,21 @@ public abstract class VectorAbstract {
      *
      * @return the X-component
      */
-    public abstract double getX();
+    public abstract long getX();
 
     /**
      * Gets the Y-component
      *
      * @return the Y-component
      */
-    public abstract double getY();
+    public abstract long getY();
 
     /**
      * Gets the Z-component
      *
      * @return the Z-component
      */
-    public abstract double getZ();
+    public abstract long getZ();
 
     /**
      * Sets the X-component
@@ -95,7 +73,7 @@ public abstract class VectorAbstract {
      * @param x value to set to
      * @return this same instance
      */
-    public abstract VectorAbstract setX(double x);
+    public abstract LongVectorAbstract setX(long x);
 
     /**
      * Sets the Y-component
@@ -103,7 +81,7 @@ public abstract class VectorAbstract {
      * @param y value to set to
      * @return this same instance
      */
-    public abstract VectorAbstract setY(double y);
+    public abstract LongVectorAbstract setY(long y);
 
     /**
      * Sets the Z-component
@@ -111,112 +89,90 @@ public abstract class VectorAbstract {
      * @param z value to set to
      * @return this same instance
      */
-    public abstract VectorAbstract setZ(double z);
+    public abstract LongVectorAbstract setZ(long z);
 
-    public VectorAbstract setZero() {
-        return setX(0.0).setY(0.0).setZ(0.0);
+    public LongVectorAbstract setZero() {
+        return setX(0).setY(0).setZ(0);
     }
 
-    public VectorAbstract set(double x, double y, double z) {
+    public LongVectorAbstract set(long x, long y, long z) {
         return setX(x).setY(y).setZ(z);
     }
 
-    public VectorAbstract set(VectorAbstract value) {
+    public LongVectorAbstract set(LongVectorAbstract value) {
         return set(value.getX(), value.getY(), value.getZ());
     }
 
-    public VectorAbstract set(Vector value) {
-        return set(value.getX(), value.getY(), value.getZ());
+    public LongVectorAbstract set(IntVector3 value) {
+        return set(value.x, value.y, value.z);
     }
 
-    public IntVector3 floor() {
-        return new IntVector3(x.getFloor(), y.getFloor(), z.getFloor());
+    public IntVector3 vector() {
+        return new IntVector3(getX(), getY(), getZ());
     }
 
-    public IntVector3 block() {
-        return new IntVector3(x.block(), y.block(), z.block());
-    }
-
-    public Vector vector() {
-        return new Vector(getX(), getY(), getZ());
-    }
-
-    public VectorAbstract add(double x, double y, double z) {
+    public LongVectorAbstract add(long x, long y, long z) {
         return setX(getX() + x).setY(getY() + y).setZ(getZ() + z);
     }
 
-    public VectorAbstract add(Vector vector) {
-        return add(vector.getX(), vector.getY(), vector.getZ());
+    public LongVectorAbstract add(IntVector3 vector) {
+        return add(vector.x, vector.y, vector.z);
     }
 
-    public VectorAbstract add(VectorAbstract value) {
+    public LongVectorAbstract add(LongVectorAbstract value) {
         return add(value.getX(), value.getY(), value.getZ());
     }
 
-    public VectorAbstract add(BlockFace face, double length) {
+    public LongVectorAbstract add(BlockFace face, long length) {
         return add(length * face.getModX(), length * face.getModY(), length * face.getModZ());
     }
 
-    public VectorAbstract add(VectorAbstract value, double length) {
+    public LongVectorAbstract add(LongVectorAbstract value, long length) {
         return add(length * value.getX(), length * value.getY(), length * value.getZ());
     }
 
-    public VectorAbstract subtract(double x, double y, double z) {
+    public LongVectorAbstract subtract(long x, long y, long z) {
         return setX(getX() - x).setY(getY() - y).setZ(getZ() - z);
     }
 
-    public VectorAbstract subtract(Vector vector) {
-        return subtract(vector.getX(), vector.getY(), vector.getZ());
+    public LongVectorAbstract subtract(IntVector3 vector) {
+        return subtract(vector.x, vector.y, vector.z);
     }
 
-    public VectorAbstract subtract(VectorAbstract value) {
+    public LongVectorAbstract subtract(LongVectorAbstract value) {
         return subtract(value.getX(), value.getY(), value.getZ());
     }
 
-    public VectorAbstract subtract(BlockFace face, double length) {
+    public LongVectorAbstract subtract(BlockFace face, long length) {
         return subtract(length * face.getModX(), length * face.getModY(), length * face.getModZ());
     }
 
-    public VectorAbstract subtract(VectorAbstract value, double length) {
+    public LongVectorAbstract subtract(LongVectorAbstract value, long length) {
         return subtract(length * value.getX(), length * value.getY(), length * value.getZ());
     }
 
-    public VectorAbstract multiply(double mx, double my, double mz) {
+    public LongVectorAbstract multiply(long mx, long my, long mz) {
         return setX(getX() * mx).setY(getY() * my).setZ(getZ() * mz);
     }
 
-    public VectorAbstract multiply(Vector vector) {
-        return multiply(vector.getX(), vector.getY(), vector.getZ());
+    public LongVectorAbstract multiply(IntVector3 vector) {
+        return multiply(vector.x, vector.y, vector.z);
     }
 
-    public VectorAbstract divide(double dx, double dy, double dz) {
+    public LongVectorAbstract divide(long dx, long dy, long dz) {
         return setX(getX() / dx).setY(getY() / dy).setZ(getZ() / dz);
     }
 
-    public VectorAbstract divide(Vector vector) {
-        return divide(vector.getX(), vector.getY(), vector.getZ());
+    public LongVectorAbstract divide(IntVector3 vector) {
+        return divide(vector.x, vector.y, vector.z);
     }
 
-    public VectorAbstract multiply(double factor) {
+    public LongVectorAbstract multiply(long factor) {
         return multiply(factor, factor, factor);
     }
 
-    public VectorAbstract divide(double factor) {
+    public LongVectorAbstract divide(long factor) {
         return divide(factor, factor, factor);
-    }
-
-    public VectorAbstract fixNaN() {
-        x.fixNaN();
-        y.fixNaN();
-        z.fixNaN();
-        return this;
-    }
-
-    public VectorAbstract fixNaN(double defx, double defy, double defz) {
-        x.fixNaN(defx);
-        y.fixNaN(defy);
-        z.fixNaN(defz);
-        return this;
     }
 
     public double length() {
@@ -289,10 +245,6 @@ public abstract class VectorAbstract {
 
     public Vector offsetTo(Location l) {
         return offsetTo(l.getX(), l.getY(), l.getZ());
-    }
-
-    public Vector offsetTo(VectorAbstract other) {
-        return offsetTo(other.getX(), other.getY(), other.getZ());
     }
 
     public Vector offsetTo(CommonEntity<?> entity) {

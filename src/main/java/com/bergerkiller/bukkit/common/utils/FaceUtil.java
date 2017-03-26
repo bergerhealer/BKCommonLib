@@ -27,7 +27,20 @@ public class FaceUtil {
 
     /**
      * Gets the Notch integer representation of a BlockFace<br>
-     * <b>These are the horizontal faces, which exclude up and down</b>
+     * <b>These are the horizontal faces, which exclude up and down, and sub-faces</b>
+     * <br><br>
+     * The following mapping is maintained:
+     * <ul>
+     * <li>BlockFace.WEST = 0
+     * <li>BlockFace.NORTH_WEST = 1
+     * <li>BlockFace.NORTH = 2
+     * <li>BlockFace.NORTH_EAST = 3
+     * <li>BlockFace.EAST = 4
+     * <li>BlockFace.SOUTH_EAST = 5
+     * <li>BlockFace.SOUTH = 6
+     * <li>BlockFace.SOUTH_WEST = 7
+     * <li>Invalid = 0
+     * </ul>
      *
      * @param face to get
      * @return Notch of the face
@@ -38,7 +51,11 @@ public class FaceUtil {
     }
 
     /**
-     * Checks whether a given face is an offset along the X-axis
+     * Checks whether a given face is an offset along the X-axis. This is true for:
+     * <ul>
+     * <li>BlockFace.EAST
+     * <li>BlockFace.WEST
+     * </ul>
      *
      * @param face to check
      * @return True if it is along the X-axis, False if not
@@ -48,7 +65,11 @@ public class FaceUtil {
     }
 
     /**
-     * Checks whether a given face is an offset along the Y-axis
+     * Checks whether a given face is an offset along the Y-axis. This is true for:
+     * <ul>
+     * <li>BlockFace.UP
+     * <li>BlockFace.DOWN
+     * </ul>
      *
      * @param face to check
      * @return True if it is along the Y-axis, False if not
@@ -58,7 +79,11 @@ public class FaceUtil {
     }
 
     /**
-     * Checks whether a given face is an offset along the Z-axis
+     * Checks whether a given face is an offset along the Z-axis. This is true for:
+     * <ul>
+     * <li>BlockFace.SOUTH
+     * <li>BlockFace.NORTH
+     * </ul>
      *
      * @param face to check
      * @return True if it is along the Z-axis, False if not
@@ -68,9 +93,24 @@ public class FaceUtil {
     }
 
     /**
-     * Gets the Block Face at the notch index specified<br>
-     * <b>These are the horizontal faces, which exclude up and down</b>
-     *
+     * Gets the Block Face at the notch index modulus 8 specified<br>
+     * <b>These are the horizontal faces, which exclude up and down, and sub-faces</b>
+     * <br><br>
+     * The following mapping is maintained:
+     * <ul>
+     * <li>0 = BlockFace.WEST
+     * <li>1 = BlockFace.NORTH_WEST
+     * <li>2 = BlockFace.NORTH
+     * <li>3 = BlockFace.NORTH_EAST
+     * <li>4 = BlockFace.EAST
+     * <li>5 = BlockFace.SOUTH_EAST
+     * <li>6 = BlockFace.SOUTH
+     * <li>7 = BlockFace.SOUTH_WEST
+     * <li><i>8 = BlockFace.WEST</i>
+     * <li><i>9 = BlockFace.NORTH_WEST</i>
+     * <li>etc.
+     * </ul>
+     * 
      * @param notch to get
      * @return BlockFace of the notch
      */
@@ -405,7 +445,16 @@ public class FaceUtil {
     }
 
     /**
-     * Gets the angle from a horizontal Block Face
+     * Gets the angle from a horizontal Block Face. The following mapping is used:<br>
+     * <li>BlockFace.WEST = 0
+     * <li>BlockFace.NORTH_WEST = 45
+     * <li>BlockFace.NORTH = 90
+     * <li>BlockFace.NORTH_EAST = 135
+     * <li>BlockFace.EAST = 180
+     * <li>BlockFace.SOUTH_EAST = -135
+     * <li>BlockFace.SOUTH = -90
+     * <li>BlockFace.SOUTH_WEST = -45
+     * <li>Invalid = 0
      *
      * @param face to get the angle for
      * @return face angle
@@ -440,4 +489,5 @@ public class FaceUtil {
             return AXIS[Math.round(yaw / 90f) & 0x3];
         }
     }
+
 }

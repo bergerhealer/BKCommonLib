@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.bases.LongHash;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_9_R1.TrigMath;
+import org.bukkit.craftbukkit.v1_11_R1.TrigMath;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -505,6 +505,29 @@ public class MathUtil {
      * @return value, min or max
      */
     public static int clamp(int value, int min, int max) {
+        return value < min ? min : (value > max ? max : value);
+    }
+
+    /**
+     * Clamps the value between -limit and limit
+     *
+     * @param value to clamp
+     * @param limit
+     * @return value, -limit or limit
+     */
+    public static long clamp(long value, long limit) {
+        return clamp(value, -limit, limit);
+    }
+
+    /**
+     * Clamps the value between the min and max values
+     *
+     * @param value to clamp
+     * @param min
+     * @param max
+     * @return value, min or max
+     */
+    public static long clamp(long value, long min, long max) {
         return value < min ? min : (value > max ? max : value);
     }
 

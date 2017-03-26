@@ -2,14 +2,14 @@ package com.bergerkiller.bukkit.common.bases.mutable;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-public abstract class IntegerAbstract {
+public abstract class LongAbstract {
 
     /**
      * Gets the value
      *
      * @return value
      */
-    public abstract int get();
+    public abstract long get();
 
     /**
      * Sets the value
@@ -17,14 +17,14 @@ public abstract class IntegerAbstract {
      * @param value to set to
      * @return this instance
      */
-    public abstract IntegerAbstract set(int value);
+    public abstract LongAbstract set(long value);
 
-    public int squared() {
-        final int value = get();
+    public long squared() {
+        final long value = get();
         return value * value;
     }
 
-    public int abs() {
+    public long abs() {
         return Math.abs(get());
     }
 
@@ -33,43 +33,39 @@ public abstract class IntegerAbstract {
      *
      * @return this instance
      */
-    public IntegerAbstract setZero() {
-        return set(0);
+    public LongAbstract setZero() {
+        return set(0L);
     }
 
-    public int chunk() {
-        return MathUtil.toChunk(get());
-    }
-
-    public IntegerAbstract clamp(int limit) {
+    public LongAbstract clamp(long limit) {
         return set(getClamped(limit));
     }
 
-    public IntegerAbstract clamp(int min, int max) {
+    public LongAbstract clamp(long min, long max) {
         return set(getClamped(min, max));
     }
 
-    public int getClamped(int limit) {
+    public long getClamped(long limit) {
         return MathUtil.clamp(get(), limit);
     }
 
-    public int getClamped(int min, int max) {
+    public long getClamped(long min, long max) {
         return MathUtil.clamp(get(), min, max);
     }
 
-    public IntegerAbstract add(int value) {
+    public LongAbstract add(long value) {
         return set(get() + value);
     }
 
-    public IntegerAbstract subtract(int value) {
+    public LongAbstract subtract(long value) {
         return set(get() - value);
     }
 
-    public IntegerAbstract multiply(int value) {
+    public LongAbstract multiply(long value) {
         return set(get() * value);
     }
 
-    public IntegerAbstract divide(int value) {
+    public LongAbstract divide(long value) {
         return set(get() / value);
     }
 
@@ -88,11 +84,11 @@ public abstract class IntegerAbstract {
      * @param modulus to check
      * @return True if dividable without remainder, False if not
      */
-    public boolean isMod(int modulus) {
+    public boolean isMod(long modulus) {
         return (get() % modulus) == 0;
     }
 
-    public boolean equals(int value) {
+    public boolean equals(long value) {
         return get() == value;
     }
 
@@ -100,8 +96,8 @@ public abstract class IntegerAbstract {
     public boolean equals(Object value) {
         if (value instanceof Number) {
             return equals(((Number) value).intValue());
-        } else if (value instanceof IntegerAbstract) {
-            return equals(((IntegerAbstract) value).get());
+        } else if (value instanceof LongAbstract) {
+            return equals(((LongAbstract) value).get());
         } else {
             return false;
         }
@@ -109,6 +105,6 @@ public abstract class IntegerAbstract {
 
     @Override
     public String toString() {
-        return Integer.toString(get());
+        return Long.toString(get());
     }
 }
