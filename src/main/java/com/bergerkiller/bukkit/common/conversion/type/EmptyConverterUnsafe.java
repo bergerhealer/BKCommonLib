@@ -17,22 +17,13 @@ public final class EmptyConverterUnsafe<T> extends Converter<T> {
     public static final EmptyConverterUnsafe INSTANCE = new EmptyConverterUnsafe();
 
     private EmptyConverterUnsafe() {
+        super(null);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T convert(Object value, T def) {
         return (T) value;
-    }
-
-    @Override
-    public T convert(Object value) {
-        return convert(value, null);
-    }
-
-    @Override
-    public Class<T> getOutputType() {
-        return null;
     }
 
     @Override

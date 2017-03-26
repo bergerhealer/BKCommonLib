@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * A generic converter that converts the elements back and forth inside a List
@@ -15,12 +14,8 @@ public class ListElementConverter<A, B> extends Converter<List<B>> {
 	private final ConverterPair<A, B> pair;
 
 	private ListElementConverter(ConverterPair<A, B> converterPair) {
+	    super(List.class);
 		this.pair = converterPair;
-	}
-
-	@Override
-	public Class<List<B>> getOutputType() {
-		return CommonUtil.unsafeCast(List.class);
 	}
 
 	@Override

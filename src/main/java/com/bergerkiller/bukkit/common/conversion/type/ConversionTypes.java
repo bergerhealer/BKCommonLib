@@ -106,6 +106,13 @@ public class ConversionTypes {
     public static final WrapperConverter<ScoreboardAction> toScoreboardAction = WrapperConverter.toScoreboardAction;
     public static final WrapperConverter<UseAction> toUseAction = WrapperConverter.toUseAction;
     public static final WrapperConverter<org.bukkit.inventory.MainHand> toMainHand = WrapperConverter.toMainHand;
+    // Text Format Conversion
+    public static final TextFormatConverter<String> chatComponentToText = TextFormatConverter.chatComponentToText;
+    public static final TextFormatConverter<Object> textToChatComponent = TextFormatConverter.textToChatComponent;
+    public static final TextFormatConverter<String> chatComponentToJson = TextFormatConverter.chatComponentToJson;
+    public static final TextFormatConverter<Object> jsonToChatComponent = TextFormatConverter.jsonToChatComponent;
+    public static final TextFormatConverter<String> chatJsonToText = TextFormatConverter.jsonToText;
+    public static final TextFormatConverter<String> chatTextToJson = TextFormatConverter.textToJson;
     // Properties
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion;
 
 import com.bergerkiller.bukkit.common.conversion.generic.ArrayElementConverter;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Represents a data type converter
@@ -8,6 +9,11 @@ import com.bergerkiller.bukkit.common.conversion.generic.ArrayElementConverter;
  * @param <T> output type
  */
 public abstract class Converter<T> {
+    private final Class<T> _outputType;
+
+    public Converter(Class<?> outputType) {
+        this._outputType = CommonUtil.unsafeCast(outputType);
+    }
 
     /**
      * Converts the input value to the output type
@@ -25,14 +31,18 @@ public abstract class Converter<T> {
      * @param value to convert
      * @return converted output type
      */
-    public abstract T convert(Object value);
+    public T convert(Object value) {
+        return convert(value, null);
+    }
 
     /**
      * Gets the Class type returned by convert
      *
      * @return output Class type
      */
-    public abstract Class<T> getOutputType();
+    public Class<T> getOutputType() {
+        return this._outputType;
+    }
 
     /**
      * Checks whether the returned output value can be casted to another
@@ -54,7 +64,8 @@ public abstract class Converter<T> {
      * Checks whether this converter supports registering in the Conversion
      * look-up table. If this converter produces something that has to do with
      * reading a field or method, and not actual conversion, this should be set
-     * to True.
+     * to False. If an unique type is produced on the output, not bound to generics,
+     * this should be set to True to allow for automatic conversion to that type.
      *
      * @return True if Conversion table registration is enabled, False if not
      */

@@ -62,13 +62,17 @@ public class ConversionPairs {
     public static final ConverterPair<Object, UUID> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
     public static final ConverterPair<Object, ScoreboardAction> scoreboardAction = toScoreboardActionHandle.formPair(toScoreboardAction);
     public static final ConverterPair<Object, MainHand> mainHand = toMainHandHandle.formPair(toMainHand);
-    
+    // Text format conversion <>
+    public static final ConverterPair<Object, String> jsonChatComponent = jsonToChatComponent.formPair(chatComponentToJson);
+    public static final ConverterPair<Object, String> textChatComponent = textToChatComponent.formPair(chatComponentToText);
+    public static final ConverterPair<String, String> jsonChatText = chatJsonToText.formPair(chatTextToJson);
+
     // Collection element transformation
     public static final ConverterPair<List<Object>, List<Entity>> entityList = entity.toList();
     public static final ConverterPair<List<Object>, List<Player>> playerList = player.toList();
     public static final ConverterPair<Set<Object>, Set<Player>> playerSet = player.toSet();
     public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = itemStack.toList();
     public static final ConverterPair<List<Object>, List<DataWatcher>> dataWatcherList = dataWatcher.toList();
-    
+    public static final ConverterPair<Object[], String[]> textChatComponentArray = textChatComponent.toArray();
 
 }

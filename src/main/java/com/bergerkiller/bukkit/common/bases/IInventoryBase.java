@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import com.bergerkiller.bukkit.common.conversion.ChatComponentConvertor;
 import net.minecraft.server.v1_11_R1.EntityHuman;
 import net.minecraft.server.v1_11_R1.IChatBaseComponent;
 import net.minecraft.server.v1_11_R1.IInventory;
@@ -12,6 +11,8 @@ import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 
 import java.util.Collections;
 import java.util.List;
@@ -160,7 +161,7 @@ public class IInventoryBase implements IInventory {
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return ChatComponentConvertor.convertTextToIChatBaseComponent(getInventoryName());
+        return (IChatBaseComponent) Conversion.textToChatComponent.convert(getInventoryName());
     }
 
     @Override

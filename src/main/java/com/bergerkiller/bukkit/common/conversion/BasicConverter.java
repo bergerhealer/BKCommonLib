@@ -7,15 +7,8 @@ package com.bergerkiller.bukkit.common.conversion;
  */
 public abstract class BasicConverter<T> extends Converter<T> {
 
-    private final Class<T> outputType;
-
     public BasicConverter(Class<T> outputType) {
-        this.outputType = outputType;
-    }
-
-    @Override
-    public Class<T> getOutputType() {
-        return outputType;
+        super(outputType);
     }
 
     /**
@@ -43,11 +36,6 @@ public abstract class BasicConverter<T> extends Converter<T> {
         } else {
             return convertSpecial(value, value.getClass(), def);
         }
-    }
-
-    @Override
-    public final T convert(Object value) {
-        return convert(value, null);
     }
 
     @Override

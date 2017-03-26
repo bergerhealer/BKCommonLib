@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.map.MapFont.CharacterSprite;
 import org.bukkit.map.MinecraftFont;
 
@@ -29,6 +30,17 @@ public class StringUtil {
             CHAT_CODES[i] = c.charValue();
             i++;
         }
+    }
+
+    /**
+     * Inserts a player name in JSON-formatted chat text
+     * 
+     * @param player to set
+     * @param text to set the player in
+     * @return updated text
+     */
+    public static String setPlayerNameInChatJson(Player player, String text) {
+        return text.replaceAll("(?i)\\{PLAYER\\}", player.getName());
     }
 
     /**
@@ -85,26 +97,56 @@ public class StringUtil {
      * @param text to get the total width of (can be one or more parts)
      * @return The width of all the text combined
      */
-    public static int getWidth(String... text) {
+    public static int getTotalWidth(String... text) {
         int width = 0;
         for (String part : text) {
-            char character;
-            CharacterSprite charsprite;
-            for (int i = 0; i < part.length(); i++) {
-                character = part.charAt(i);
-                if (character == '\n') {
-                    continue;
-                }
-                if (character == StringUtil.CHAT_STYLE_CHAR) {
-                    i++;
-                    continue;
-                } else if (character == ' ') {
-                    width += SPACE_WIDTH;
-                } else {
-                    charsprite = MinecraftFont.Font.getChar(character);
-                    if (charsprite != null) {
-                        width += charsprite.getWidth();
-                    }
+            width += getWidth(part);
+        }
+        return width;
+    }
+
+    /**
+     * Calculates the width in pixels of a String if displayed on a Minecraft Sign.
+     * 
+     * @param text input
+     * @return text display width
+     */
+    public static int getSignWidth(String text) {
+        // For some reason spaces are counted one pixel too small
+        int width = 0;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == ' ') {
+                width++;
+            }
+        }
+        width += MinecraftFont.Font.getWidth(text);
+        return width;
+    }
+
+    /**
+     * Gets the full width of a string character sequence
+     *
+     * @param text character sequence to get the total width of
+     * @return The width of all the text combined
+     */
+    public static int getWidth(CharSequence text) {
+        int width = 0;
+        char character;
+        CharacterSprite charsprite;
+        for (int i = 0; i < text.length(); i++) {
+            character = text.charAt(i);
+            if (character == '\n') {
+                continue;
+            }
+            if (character == StringUtil.CHAT_STYLE_CHAR) {
+                i++;
+                continue;
+            } else if (character == ' ') {
+                width += SPACE_WIDTH;
+            } else {
+                charsprite = MinecraftFont.Font.getChar(character);
+                if (charsprite != null) {
+                    width += charsprite.getWidth();
                 }
             }
         }

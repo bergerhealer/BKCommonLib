@@ -21,7 +21,6 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
-import com.bergerkiller.bukkit.common.utils.ChatUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.reflection.ClassTemplate;
@@ -122,9 +121,9 @@ public class CBCraftBlockState {
 
             @Override
             protected void apply(BlockState state, Object tile) {
-                String[] lines = ChatUtil.chatComponentsToLines(tile_lines.get(tile));
+                String[] lines = ConversionPairs.textChatComponentArray.convertB(tile_lines.get(tile));
                 if (lines == null) {
-                    throw new RuntimeException("Sign lines are null!??");
+                    throw new RuntimeException("Failed to read lines field into a text lines array");
                 }
                 state_lines.set(state, lines);
             }

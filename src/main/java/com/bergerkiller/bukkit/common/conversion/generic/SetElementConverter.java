@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * A generic converter that converts the elements back and forth inside a Set
@@ -15,12 +14,8 @@ public class SetElementConverter<A, B> extends Converter<Set<B>> {
 	private final ConverterPair<A, B> pair;
 
 	private SetElementConverter(ConverterPair<A, B> converterPair) {
+	    super(Set.class);
 		this.pair = converterPair;
-	}
-
-	@Override
-	public Class<Set<B>> getOutputType() {
-		return CommonUtil.unsafeCast(Set.class);
 	}
 
 	@Override

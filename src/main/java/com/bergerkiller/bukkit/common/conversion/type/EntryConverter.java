@@ -20,6 +20,7 @@ public class EntryConverter<K, V> extends Converter<Entry<K, V>> {
 
     @SuppressWarnings("unchecked")
     public EntryConverter(ConverterPair<?, K> keyConverter, ConverterPair<?, V> valueConverter) {
+        super(Entry.class);
         this.keyConverter = (ConverterPair<Object, K>) keyConverter;
         this.valueConverter = (ConverterPair<Object, V>) valueConverter;
     }
@@ -31,17 +32,6 @@ public class EntryConverter<K, V> extends Converter<Entry<K, V>> {
         } else {
             return def;
         }
-    }
-
-    @Override
-    public Entry<K, V> convert(Object value) {
-        return convert(value, null);
-    }
-
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Class<Entry<K, V>> getOutputType() {
-        return (Class) Entry.class;
     }
 
     @Override
