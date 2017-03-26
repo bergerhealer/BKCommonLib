@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -14,28 +13,59 @@ public class MessageBuilder {
     private final List<StringBuilder> lines = new ArrayList<StringBuilder>();
     private StringBuilder builder;
     private int currentWidth;
-    private String separator = null;
-    private int sepwidth = 0;
-    private boolean isFirstSeparatorCall = true;
-    private int indent = 0;
+    private String separator;
+    private int sepwidth;
+    private boolean isFirstSeparatorCall;
+    private int indent;
+    private String errorStr;
+    private String resultStr;
 
     public static final int CHAT_WINDOW_WIDTH = 240;
 
     public MessageBuilder() {
-        this(new StringBuilder());
+        reset();
     }
 
     public MessageBuilder(String firstLine) {
-        this(new StringBuilder(firstLine));
+        reset(new StringBuilder(firstLine));
     }
 
     public MessageBuilder(int capacity) {
-        this(new StringBuilder(capacity));
+        reset(new StringBuilder(capacity));
     }
 
     public MessageBuilder(StringBuilder builder) {
-        this.lines.add(this.builder = builder);
+        reset(builder);
+    }
+
+    /**
+     * Resets the internal state to the defaults
+     * 
+     * @param builder StringBuilder containing the initial text
+     * @return This MessageBuilder
+     */
+    public MessageBuilder reset() {
+        return this.reset(new StringBuilder());
+    }
+
+    /**
+     * Resets the internal state to the defaults
+     * 
+     * @param builder StringBuilder containing the initial text
+     * @return This MessageBuilder
+     */
+    public MessageBuilder reset(StringBuilder builder) {
+        this.builder.setLength(0);
         this.currentWidth = 0;
+        this.separator = null;
+        this.sepwidth = 0;
+        this.isFirstSeparatorCall = true;
+        this.indent = 0;
+        this.errorStr = null;
+        this.resultStr = null;
+        this.lines.clear();
+        this.lines.add(this.builder = builder);
+        return this;
     }
 
     public MessageBuilder setSeparator(ChatColor color, String separator) {
@@ -179,7 +209,7 @@ public class MessageBuilder {
      */
     public MessageBuilder append(ChatColor color, String... text) {
         if (text != null && text.length > 0) {
-            prepareAppend(StringUtil.getWidth(text));
+            prepareAppend(StringUtil.getTotalWidth(text));
             this.builder.append(color.toString());
             for (String part : text) {
                 this.builder.append(part);
@@ -212,7 +242,7 @@ public class MessageBuilder {
      */
     public MessageBuilder append(String... text) {
         if (text != null && text.length > 0) {
-            prepareAppend(StringUtil.getWidth(text));
+            prepareAppend(StringUtil.getTotalWidth(text));
             for (String part : text) {
                 this.builder.append(part);
             }
@@ -352,8 +382,50 @@ public class MessageBuilder {
      */
     public MessageBuilder log(Level level) {
         for (StringBuilder line : this.lines) {
-            Bukkit.getLogger().log(level, line.toString());
+        	Common.LOGGER.log(level, line.toString());
         }
+        return this;
+    }
+
+    /**
+     * Gets the last error message set using {@link #error(msg)}
+     * 
+     * @return last set error message. Null if no error was set.
+     */
+    public String getLastError() {
+        return errorStr;
+    }
+
+    /**
+     * Gets the last result value set using {@link #result(val)}
+     * 
+     * @return last set result value. Null if no result was set.
+     */
+    public String getLastResult() {
+        return resultStr;
+    }
+
+    /**
+     * Appends the error message to this builder and makes it available using {@link #getLastError()}.
+     * This is used to communicate errors with third-parties.
+     * 
+     * @param error_message the error message
+     * @return This Message Builder
+     */
+    public MessageBuilder error(Object error_message) {
+        errorStr = (error_message == null) ? null : error_message.toString();
+        return this;
+    }
+
+    /**
+     * Appends the result message or value to this builder and makes it available using {@link #getLastResult()}.
+     * This is used to communicate result data with third-parties.
+     * 
+     * @param result the result value
+     * @return This Message Builder
+     */
+    public MessageBuilder result(Object result) {
+        resultStr = (result == null) ? null : result.toString();
         return this;
     }
 }
