@@ -5,13 +5,16 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
+import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
+import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.*;
 
@@ -144,7 +147,7 @@ public class WorldUtil extends ChunkUtil {
             }
         }
         // Remove the world from the MinecraftServer worlds mapping
-        CommonNMS.getWorlds().remove(CommonNMS.getNative(world));
+        CommonNMS.getMCServer().worlds.remove(Conversion.toWorldHandle.convert(world));
     }
 
     /**
@@ -165,7 +168,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return CommonNMS.getEntities(CommonNMS.getNative(world).entityList);
+        return ConversionPairs.entityList.convertB(CommonNMS.getNative(world).entityList);
     }
 
     /**
@@ -176,7 +179,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of players on the world
      */
     public static Collection<Player> getPlayers(org.bukkit.World world) {
-        return CommonNMS.getPlayers(CommonNMS.getNative(world).players);
+        return ConversionPairs.playerList.convertB(CommonNMS.getNative(world).players);
     }
 
     /**
@@ -350,8 +353,12 @@ public class WorldUtil extends ChunkUtil {
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore,
             double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-        List<Entity> list = CommonNMS.getEntities(CommonNMS.getNative(world), CommonNMS.getNative(ignore), xmin, ymin, zmin, xmax, ymax, zmax);
-        return new ConvertingList<org.bukkit.entity.Entity>(list, ConversionPairs.entity);
+
+        Object worldHandle = Conversion.toWorldHandle.convert(world);
+        Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
+        Object axisAlignedBB = NMSVector.newAxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
+        List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, ignoreHandle, axisAlignedBB);
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity);
     }
 
     /**
@@ -364,7 +371,12 @@ public class WorldUtil extends ChunkUtil {
      * @return A (referenced) list of entities nearby
      */
     public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
-        return CommonNMS.getEntities(entity.getWorld(), entity, CommonNMS.getNative(entity).getBoundingBox().grow(radX, radY, radZ));
+        Object worldHandle = Conversion.toWorldHandle.convert(entity.getWorld());
+        Object entityHandle = Conversion.toEntityHandle.convert(entity);
+        Object entityBounds = NMSEntity.getBoundingBox.invoke(entityHandle);
+        Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
+        List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, entityHandle, axisAlignedBB);
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity);
     }
 
     /**
@@ -505,8 +517,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the hit Block, or null if none was found (AIR)
      */
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(CommonNMS.newVec3D(startX, startY, startZ),
-                CommonNMS.newVec3D(endX, endY, endZ), false);
+        MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(new Vec3D(startX, startY, startZ), new Vec3D(endX, endY, endZ), false);
         return mop == null ? null : world.getBlockAt((int) mop.pos.x, (int) mop.pos.y, (int) mop.pos.z);
     }
 

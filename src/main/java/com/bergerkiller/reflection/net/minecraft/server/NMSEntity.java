@@ -10,6 +10,7 @@ import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.ClassTemplate;
@@ -18,7 +19,6 @@ import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.SafeConstructor;
 import com.bergerkiller.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.IBlockData;
@@ -310,6 +310,8 @@ public class NMSEntity {
      */
     public static final MethodAccessor<Double> calculateDistance = T.selectMethod("public double e(double d0, double d1, double d2)");
 
+    public static final MethodAccessor<Object> getBoundingBox = T.selectMethod("public AxisAlignedBB getBoundingBox()");
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static final SafeConstructor entityItemConstr = new SafeConstructor(CommonUtil.getNMSClass("EntityItem"),
             NMSWorld.T.getType(), double.class, double.class, double.class);
@@ -336,7 +338,9 @@ public class NMSEntity {
     }
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {
-        playStepSound.invoke(entityHandle, new BlockPosition(x, y, z), blockStepped);
+        if (blockStepped != null) {
+            playStepSound.invoke(entityHandle, new BlockPosition(x, y, z), blockStepped);
+        }
     }
 
     public static boolean hasMovementSound(Object entityHandle) {

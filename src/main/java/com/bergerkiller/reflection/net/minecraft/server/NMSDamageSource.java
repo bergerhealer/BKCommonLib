@@ -1,6 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.server.CommonNMS;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.DamageSource;
 import net.minecraft.server.v1_11_R1.EntityArrow;
@@ -63,7 +64,7 @@ public class NMSDamageSource {
     }
 
     public static Entity getEntity(Object damageSource) {
-        return CommonNMS.getEntity(((DamageSource) damageSource).getEntity());
+        return Conversion.toEntity.convert(((DamageSource) damageSource).getEntity());
     }
 
     public static boolean isExplosive(Object damageSource) {

@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.reflection.net.minecraft.server.NMSBlock;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Explosion;

@@ -1,4 +1,4 @@
-package com.bergerkiller.server.proxies;
+package com.bergerkiller.bukkit.common._unused;
 
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class EntityProxy<T extends Entity> extends ProxyBase<T> implements Entity {
+public class EntityProxy_unused<T extends Entity> extends ProxyBase<T> implements Entity {
 
-    public EntityProxy(T base) {
+    public EntityProxy_unused(T base) {
         super(base);
     }
 

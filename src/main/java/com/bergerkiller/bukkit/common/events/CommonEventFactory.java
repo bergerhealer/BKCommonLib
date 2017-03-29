@@ -2,11 +2,11 @@ package com.bergerkiller.bukkit.common.events;
 
 import com.bergerkiller.bukkit.common.collections.InstanceBuffer;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSBiomeMeta;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_11_R1.Entity;
@@ -40,7 +40,7 @@ public class CommonEventFactory {
             return;
         }
         for (World world : WorldUtil.getWorlds()) {
-            entityMoveEntities.addAll(CommonNMS.getEntities(world));
+            entityMoveEntities.addAll(CommonNMS.getNative(world).entityList);
         }
         for (Entity entity : entityMoveEntities) {
             if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ

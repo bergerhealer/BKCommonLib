@@ -1,13 +1,13 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityItem;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.Item;
@@ -369,7 +369,7 @@ public class ItemUtil {
         newItemHandle.motZ = oldItemHandle.motZ;
         NMSEntityItem.age.transfer(oldItemHandle, newItemHandle);
         newItemHandle.world.addEntity(newItemHandle);
-        return CommonNMS.getItem(newItemHandle);
+        return Conversion.toItem.convert(newItemHandle);
     }
 
     /**

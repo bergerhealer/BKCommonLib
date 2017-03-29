@@ -1,4 +1,4 @@
-package com.bergerkiller.server.proxies;
+package com.bergerkiller.bukkit.common._unused;
 
 import net.minecraft.server.v1_11_R1.*;
 import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
@@ -13,15 +13,15 @@ import com.bergerkiller.bukkit.common.proxies.ProxyBase;
  * the regular methods. To call methods from the current implementation, call
  * the super_ methods.
  */
-public class ChunkProviderServerProxy extends ChunkProviderServer implements Proxy<Object> {
+public class ChunkProviderServerProxy_unused extends ChunkProviderServer implements Proxy<Object> {
 
     private ChunkProviderServer base;
 
     static {
-        ProxyBase.validate(ChunkProviderServerProxy.class);
+        ProxyBase.validate(ChunkProviderServerProxy_unused.class);
     }
 
-    public ChunkProviderServerProxy(Object worldServer, Object iChunkLoader, ChunkGenerator iChunkProvider, Object base) {
+    public ChunkProviderServerProxy_unused(Object worldServer, Object iChunkLoader, ChunkGenerator iChunkProvider, Object base) {
         super((WorldServer) worldServer, (IChunkLoader) iChunkLoader, (ChunkGenerator) iChunkProvider);
         setProxyBase(base);
     }

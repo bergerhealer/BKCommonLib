@@ -1,8 +1,7 @@
-package com.bergerkiller.server.bases;
+package com.bergerkiller.bukkit.common._unused;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
-import com.bergerkiller.server.proxies.ChunkProviderServerProxy;
 
 import net.minecraft.server.v1_11_R1.Chunk;
 
@@ -10,9 +9,9 @@ import net.minecraft.server.v1_11_R1.Chunk;
  * This class is mainly used by NoLagg chunks - for compatibilities' sake, it is
  * ported to here.
  */
-public class DummyChunkProviderServer extends ChunkProviderServerProxy {
+public class DummyChunkProviderServer_unused extends ChunkProviderServerProxy_unused {
 
-    DummyChunkProviderServer(Object worldHandle) {
+    DummyChunkProviderServer_unused(Object worldHandle) {
         super(worldHandle, null, null, null);
     }
 

@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
@@ -33,7 +33,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
     @Deprecated
     @Override
     public final boolean a(EntityPlayer entityplayer, int x, int z) {
-        return this.containsPlayer(CommonNMS.getPlayer(entityplayer), x, z);
+        return this.containsPlayer(Conversion.toPlayer.convert(entityplayer), x, z);
     }
 
     /**
@@ -41,7 +41,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      */
     @Deprecated
     public final void b(EntityPlayer entityplayer) {
-        this.addChunksToSend(CommonNMS.getPlayer(entityplayer));
+        this.addChunksToSend(Conversion.toPlayer.convert(entityplayer));
     }
 
     /**
@@ -50,7 +50,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
     @Deprecated
     @Override
     public void addPlayer(EntityPlayer arg0) {
-        this.addPlayer(CommonNMS.getPlayer(arg0));
+        this.addPlayer(Conversion.toPlayer.convert(arg0));
     }
 
     /**
@@ -59,7 +59,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
     @Deprecated
     @Override
     public void movePlayer(EntityPlayer arg0) {
-        this.movePlayer(CommonNMS.getPlayer(arg0));
+        this.movePlayer(Conversion.toPlayer.convert(arg0));
     }
 
     /**
@@ -68,7 +68,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
     @Deprecated
     @Override
     public void removePlayer(EntityPlayer arg0) {
-        removePlayer(CommonNMS.getPlayer(arg0));
+        removePlayer(Conversion.toPlayer.convert(arg0));
     }
 
     public Object getPlayerChunk(Object playerChunk) {

@@ -31,6 +31,10 @@ public class NMSWorld {
 
     //public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("h"); TODO: Disabling it for now to support PaperSpigot. Fixing it later.
 
+    public static final MethodAccessor<Void> applyPhysics = T.selectMethod("public void applyPhysics(BlockPosition blockposition, Block block, boolean flag)");
+
+    public static final MethodAccessor<List<?>> getEntities = T.selectMethod("public List<Entity> getEntities(Entity entity, AxisAlignedBB axisalignedbb)");
+
     public static Server getServer(Object worldHandle) {
         return getServer.invoke(worldHandle);
     }

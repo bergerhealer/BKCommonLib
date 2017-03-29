@@ -2,12 +2,13 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
-import com.bergerkiller.server.CommonNMS;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
 import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.block.BlockState;
@@ -213,7 +214,7 @@ public class NBTUtil {
      * @param data to load into the blockState
      */
     public static void loadBlockState(BlockState blockState, CommonTagCompound data) {
-        CommonNMS.getNative(blockState).a((NBTTagCompound) data.getHandle());
+        NMSTileEntity.load.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getHandle());
     }
 
     /**
@@ -237,7 +238,7 @@ public class NBTUtil {
         if (data == null) {
             data = new CommonTagCompound();
         }
-        CommonNMS.getNative(blockState).save((NBTTagCompound) data.getHandle());
+        NMSTileEntity.save.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getHandle());
         return data;
     }
 }

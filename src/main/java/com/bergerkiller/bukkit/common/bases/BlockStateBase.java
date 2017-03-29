@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.proxies.BlockStateProxy;
-import com.bergerkiller.server.Methods;
 
 import org.bukkit.block.Block;
 
@@ -13,6 +13,6 @@ import org.bukkit.block.Block;
 public class BlockStateBase extends BlockStateProxy {
 
     public BlockStateBase(Block block) {
-        super(Methods.CraftBlockState_new(block));
+        super(CommonMethods.CraftBlockState_new(block));
     }
 }

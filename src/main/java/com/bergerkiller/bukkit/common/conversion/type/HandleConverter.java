@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
+import com.bergerkiller.bukkit.common._unused.EntityProxy_unused;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.BasicConverter;
@@ -21,7 +22,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
-import com.bergerkiller.server.proxies.EntityProxy;
 
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
@@ -49,8 +49,8 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toEntityHandle = new HandleConverter("Entity") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            if (value instanceof EntityProxy) {
-                value = ((EntityProxy<?>) value).getProxyBase();
+            if (value instanceof EntityProxy_unused) {
+                value = ((EntityProxy_unused<?>) value).getProxyBase();
             }
             if (value instanceof CraftEntity) {
                 return ((CraftEntity) value).getHandle();

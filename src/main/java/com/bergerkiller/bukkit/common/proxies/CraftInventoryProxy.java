@@ -1,4 +1,4 @@
-package com.bergerkiller.server.proxies;
+package com.bergerkiller.bukkit.common.proxies;
 
 import net.minecraft.server.v1_11_R1.IInventory;
 
@@ -11,7 +11,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.proxies.Proxy;
 
 import java.util.HashMap;
 import java.util.List;

@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.CraftingManager;
 import net.minecraft.server.v1_11_R1.IRecipe;

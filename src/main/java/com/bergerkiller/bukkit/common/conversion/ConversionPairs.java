@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -71,6 +72,7 @@ public class ConversionPairs {
     public static final ConverterPair<List<Object>, List<Entity>> entityList = entity.toList();
     public static final ConverterPair<List<Object>, List<Player>> playerList = player.toList();
     public static final ConverterPair<Set<Object>, Set<Player>> playerSet = player.toSet();
+    public static final ConverterPair<Collection<Object>, Collection<Chunk>> chunkCollection = chunk.toCollection();
     public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = itemStack.toList();
     public static final ConverterPair<List<Object>, List<DataWatcher>> dataWatcherList = dataWatcher.toList();
     public static final ConverterPair<Object[], String[]> textChatComponentArray = textChatComponent.toArray();

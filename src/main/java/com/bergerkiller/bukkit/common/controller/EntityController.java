@@ -10,10 +10,10 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
-import com.bergerkiller.server.CommonNMS;
 
 public abstract class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
     private EntityHook hook = null;

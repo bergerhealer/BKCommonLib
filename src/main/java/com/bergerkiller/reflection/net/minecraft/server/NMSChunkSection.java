@@ -1,9 +1,9 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.Block;
 

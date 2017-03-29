@@ -15,7 +15,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerList;
-import com.bergerkiller.server.CommonNMS;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package com.bergerkiller.server.bases;
+package com.bergerkiller.bukkit.common._unused;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -11,15 +11,15 @@ import org.bukkit.generator.BlockPopulator;
 
 import java.util.Random;
 
-public class ChunkProviderServerBase extends ChunkProviderServer {
+public class ChunkProviderServerBase_unused extends ChunkProviderServer {
 
     public final org.bukkit.World world;
 
-    public ChunkProviderServerBase(World world) {
+    public ChunkProviderServerBase_unused(World world) {
         this(NMSWorldServer.chunkProviderServer.get(Conversion.toWorldHandle.convert(world)));
     }
 
-    public ChunkProviderServerBase(Object chunkProviderServer) {
+    public ChunkProviderServerBase_unused(Object chunkProviderServer) {
         super(getWorld(chunkProviderServer), getLoader(chunkProviderServer), getGenerator(chunkProviderServer));
         NMSChunkProviderServer.T.transfer(chunkProviderServer, this);
         this.world = super.world.getWorld();

@@ -2,8 +2,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.server.CommonNMS;
 
+import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_11_R1.Vec3D;
@@ -21,7 +21,7 @@ public class NMSVector {
     /* ============================================================== */
 	
     public static Object newVec(double x, double y, double z) {
-        return CommonNMS.newVec3D(x, y, z);
+        return new Vec3D(x, y, z);
     }
 
     public static Vector getVec(Object vec3D) {
@@ -105,5 +105,17 @@ public class NMSVector {
     	int y = position.getY();
     	int z = position.getZ();
     	return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
+    }
+
+    /* ============================================================== */
+    /* ======================= AxisAlignedBB ======================== */
+    /* ============================================================== */
+
+    public static Object newAxisAlignedBB(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
+        return new AxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
+    }
+
+    public static Object growAxisAlignedBB(Object axisAlignedBB, double growX, double growY, double growZ) {
+        return ((AxisAlignedBB) axisAlignedBB).grow(growX, growY, growZ);
     }
 }

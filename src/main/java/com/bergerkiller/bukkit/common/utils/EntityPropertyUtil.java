@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
-import com.bergerkiller.server.CommonNMS;
-import com.bergerkiller.server.Methods;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -142,7 +142,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param damage to deal
      */
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
-        Methods.damageBy(entity, damager, damage);
+        CommonMethods.damageBy(entity, damager, damage);
     }
 
     /**
@@ -162,9 +162,9 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      */
     public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
         if (cause == DamageCause.BLOCK_EXPLOSION) {
-        	CommonNMS.getNative(entity).damageEntity(Methods.DamageSource_explosion(entity,  cause, damage), (float) damage);
+        	CommonNMS.getNative(entity).damageEntity(CommonMethods.DamageSource_explosion(entity,  cause, damage), (float) damage);
         } else {
-        	CommonNMS.getNative(entity).damageEntity(Methods.DamageSource_from_damagecause(cause), (float) damage);
+        	CommonNMS.getNative(entity).damageEntity(CommonMethods.DamageSource_from_damagecause(cause), (float) damage);
         }
     }
 

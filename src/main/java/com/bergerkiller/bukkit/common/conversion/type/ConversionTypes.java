@@ -12,6 +12,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -82,6 +84,8 @@ public class ConversionTypes {
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
     public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
+    public static final Converter<HumanEntity> toHumanEntity = WrapperConverter.toEntity.cast(HumanEntity.class);
+    public static final Converter<Item> toItem = WrapperConverter.toEntity.cast(Item.class);
     public static final WrapperConverter<World> toWorld = WrapperConverter.toWorld;
     public static final WrapperConverter<Chunk> toChunk = WrapperConverter.toChunk;
     public static final WrapperConverter<Block> toBlock = WrapperConverter.toBlock;

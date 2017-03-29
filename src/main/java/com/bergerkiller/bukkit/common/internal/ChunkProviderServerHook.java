@@ -9,7 +9,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBChunkIOExecutor;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_11_R1.*;
@@ -35,7 +34,6 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         return super.world.getWorld();
     }
 
-    @SuppressWarnings("unchecked")
     public List<BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition pos) {
         List<BiomeMeta> mobs = super.chunkGenerator.getMobsFor(enumcreaturetype, pos);
         if (CommonPlugin.hasInstance()) {
@@ -87,7 +85,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
             // Call populators
             long time;
             org.bukkit.World bWorld = getWorld();
-            org.bukkit.Chunk bChunk = CommonNMS.getChunk(chunk);
+            org.bukkit.Chunk bChunk = Conversion.toChunk.convert(chunk);
             for (BlockPopulator populator : bWorld.getPopulators()) {
                 time = System.nanoTime();
                 try {
@@ -135,7 +133,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         }
 
         // Try to load the chunk from file
-        chunk = CommonNMS.getChunk(this.loadChunk(x, z));
+        chunk = Conversion.toChunk.convert(this.loadChunk(x, z));
 
         // Try to generate the chunk instead
         boolean newChunk;
@@ -150,7 +148,7 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
             // Generate the chunk
             long time = System.nanoTime();
             try {
-                chunk = CommonNMS.getChunk(this.chunkGenerator.getOrCreateChunk(x, z));
+                chunk = Conversion.toChunk.convert(this.chunkGenerator.getOrCreateChunk(x, z));
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.a(throwable, "Exception generating new chunk");
                 CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Chunk to be generated");

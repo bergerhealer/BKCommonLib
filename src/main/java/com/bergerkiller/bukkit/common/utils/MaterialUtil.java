@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;

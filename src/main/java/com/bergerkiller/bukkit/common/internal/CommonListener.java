@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.server.CommonNMS;
 
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;

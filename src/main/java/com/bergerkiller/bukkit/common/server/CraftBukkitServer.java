@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.SafeMethod;
-import com.bergerkiller.server.CommonNMS;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

@@ -20,12 +20,12 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
-import com.bergerkiller.server.CommonNMS;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
@@ -347,14 +347,28 @@ public class BlockUtil extends MaterialUtil {
     }
 
     /**
-     * Performs Physics at the block specified
+     * Performs Physics at the block specified.
+     * The block itself is also updated.
      *
      * @param block to apply physics to
      * @param callerType Material, the source of these physics (use Air if there
      * is no caller)
      */
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType) {
-    	CommonNMS.applyPhysics(CommonNMS.getNative(block.getWorld()), block.getX(), block.getY(), block.getZ(), CommonNMS.getBlock(callerType));
+        applyPhysics(block, callerType, true);
+    }
+
+    /**
+     * Performs Physics at the block specified
+     *
+     * @param block to apply physics to
+     * @param callerType Material, the source of these physics (use Air if there is no caller)
+     * @param updateSelf whether the block itself is updated. With false, only surrounding blocks are notified.
+     */
+    public static void applyPhysics(org.bukkit.block.Block block, Material callerType, boolean updateSelf) {
+        NMSWorld.applyPhysics.invoke(Conversion.toWorldHandle.convert(block.getWorld()),
+                    NMSVector.newPosition(block.getX(), block.getY(), block.getZ()),
+                    CommonNMS.getBlock(callerType), updateSelf);
     }
 
     /**

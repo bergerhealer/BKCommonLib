@@ -8,10 +8,10 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.EntityLiving;
 import net.minecraft.server.v1_11_R1.GenericAttributes;

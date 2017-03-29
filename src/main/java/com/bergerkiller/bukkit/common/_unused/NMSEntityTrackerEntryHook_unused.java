@@ -2,9 +2,10 @@ package com.bergerkiller.bukkit.common._unused;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EntityTrackerEntry;
@@ -94,7 +95,7 @@ public class NMSEntityTrackerEntryHook_unused extends EntityTrackerEntry {
     @Override
     public void clear(EntityPlayer entityplayer) {
         try {
-            controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+            controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
         } catch (Throwable t) {
         	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
             t.printStackTrace();
@@ -104,7 +105,7 @@ public class NMSEntityTrackerEntryHook_unused extends EntityTrackerEntry {
     @Override
     public void a(EntityPlayer entityplayer) {
         try {
-            controller.removeViewer(CommonNMS.getPlayer(entityplayer));
+            controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
         } catch (Throwable t) {
         	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
             t.printStackTrace();
@@ -115,7 +116,7 @@ public class NMSEntityTrackerEntryHook_unused extends EntityTrackerEntry {
     public void updatePlayer(EntityPlayer entityplayer) {
         if (entityplayer != CommonNMS.getNative(ent)) {
             try {
-                controller.updateViewer(CommonNMS.getPlayer(entityplayer));
+                controller.updateViewer(Conversion.toPlayer.convert(entityplayer));
             } catch (Throwable t) {
             	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer:");
                 t.printStackTrace();

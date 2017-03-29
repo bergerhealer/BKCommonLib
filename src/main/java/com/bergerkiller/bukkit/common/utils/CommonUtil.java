@@ -5,12 +5,12 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.reflection.SafeMethod;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
-import com.bergerkiller.server.CommonNMS;
-import com.bergerkiller.server.Methods;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Bukkit;
@@ -68,7 +68,7 @@ public class CommonUtil {
      * @return Bukkit command map
      */
     public static CommandMap getCommandMap() {
-        return Methods.CraftServer_instance().getCommandMap();
+        return CommonMethods.CraftServer_instance().getCommandMap();
     }
 
     /**
@@ -151,7 +151,7 @@ public class CommonUtil {
      * @param playerFileData to set to
      */
     public static void setPlayerFileData(Object playerFileData) {
-    	Methods.setPlayerFileData(playerFileData);
+    	CommonMethods.setPlayerFileData(playerFileData);
     }
 
     /**

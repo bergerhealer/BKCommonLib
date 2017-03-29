@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common._unused;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
-import com.bergerkiller.server.CommonNMS;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.List;
 public class NMSEntityClassBuilder_unused {
 
     private static final Class<?>[] DEFAULT_CONSTRUCTOR_TYPES = {NMSWorld.T.getType()};
-    private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {CommonNMS.getWorlds().iterator().next()};
+    private static final Object[] DEFAULT_CONSTRUCTOR_ARGS = {CommonNMS.getMCServer().worlds.get(0)};
     private final List<Constructor<?>> callbackConstructors = new ArrayList<Constructor<?>>();
     private Class<?> baseClass;
 

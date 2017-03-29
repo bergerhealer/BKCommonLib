@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.events;
 
-import com.bergerkiller.server.CommonNMS;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 
 import net.minecraft.server.v1_11_R1.Entity;
 import org.bukkit.World;
@@ -27,7 +27,7 @@ public class EntityMoveEvent extends EntityEvent {
      */
     public void setEntity(Entity entity) {
         this.nativeEntity = entity;
-        this.entity = CommonNMS.getEntity(entity);
+        this.entity = Conversion.toEntity.convert(entity);
     }
 
     /**

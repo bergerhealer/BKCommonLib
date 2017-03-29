@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion;
 
+import com.bergerkiller.bukkit.common.conversion.generic.CollectionElementConverter;
 import com.bergerkiller.bukkit.common.conversion.generic.ListElementConverter;
 import com.bergerkiller.bukkit.common.conversion.generic.SetElementConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingCollection;
@@ -159,6 +160,15 @@ public class ConverterPair<A, B> {
      */
     public ConverterPair<Set<A>, Set<B>> toSet() {
     	return SetElementConverter.create(this.reverse()).formPair(SetElementConverter.create(this));
+    }
+
+    /**
+     * Applies this converter pair to the contents of a Collection
+     * 
+     * @return collection element converter pair
+     */
+    public ConverterPair<Collection<A>, Collection<B>> toCollection() {
+        return CollectionElementConverter.create(this.reverse()).formPair(CollectionElementConverter.create(this));
     }
 
     /**

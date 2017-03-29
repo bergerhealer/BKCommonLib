@@ -6,14 +6,14 @@ import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
-import com.bergerkiller.server.CommonNMS;
-import com.bergerkiller.server.Methods;
 
 import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.Material;
@@ -121,7 +121,7 @@ public class ChunkUtil {
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
-            section = sections[secIndex] = Methods.ChunkSection_new(chunk.getWorld(), y);
+            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y);
         }
         NMSChunkSection.setTypeId(section, x, y, z, typeId);
         NMSChunkSection.setData(section, x, y, z, data);
@@ -140,7 +140,12 @@ public class ChunkUtil {
      */
     @Deprecated
     public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
-        return setBlock(chunk, x, y, z, MaterialUtil.getType(typeId), data);
+        Logging.LOGGER_DEBUG.warnOnce("setBlock has not been tested and defaults back to using Bukkit's methods");
+        
+        return chunk.getBlock(x & NMSChunk.XZ_MASK, y & NMSChunk.Y_MASK, z & NMSChunk.XZ_MASK).setTypeIdAndData(typeId, (byte) data, true);
+        
+        // This method is so old and depends on so many calls to NMS Ive decided to deprecate it
+        //return Methods.setBlock(chunk, x, y, z, type, data);
     }
 
     /**
@@ -154,8 +159,9 @@ public class ChunkUtil {
      * @param data to set to
      * @return True if a block got changed, False if not
      */
+    @SuppressWarnings("deprecation")
     public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, Material type, int data) {
-    	return Methods.setBlock(chunk, x, y, z, type, data);
+        return setBlock(chunk, x, y, z, type.getId(), data);
     }
 
     /**
@@ -178,8 +184,9 @@ public class ChunkUtil {
      * @param cz location for the chunk Z
      * @return chunk being loaded soon?
      */
+    @Deprecated
     public static boolean isLoadRequested(Player player, int cx, int cz) {
-    	return Methods.PlayerChunkQueue_Contains(player, cx, cz);
+    	throw new RuntimeException("BROKEN");
     }
 
     /**
@@ -223,7 +230,9 @@ public class ChunkUtil {
             if (chunks != null) {
                 try {
                     if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
-                        return FilteredCollection.createNullFilter(CommonNMS.getChunks(((LongObjectHashMap) chunks).values()));
+                        Object hashmap_values = ((LongObjectHashMap) chunks).values();
+                        Collection<org.bukkit.Chunk> chunk_collection = ConversionPairs.chunkCollection.convertB(hashmap_values);
+                        return FilteredCollection.createNullFilter(chunk_collection);
                     }
                 } catch (Throwable t) {
                     canUseLongObjectHashMap = false;
@@ -251,7 +260,7 @@ public class ChunkUtil {
         if (chunks != null) {
             if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
                 try {
-                    return CommonNMS.getChunk(((Chunk) ((LongObjectHashMap) chunks).get(key)));
+                    return Conversion.toChunk.convert(((Chunk) ((LongObjectHashMap) chunks).get(key)));
                 } catch (Throwable t) {
                     canUseLongObjectHashMap = false;
                     CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");

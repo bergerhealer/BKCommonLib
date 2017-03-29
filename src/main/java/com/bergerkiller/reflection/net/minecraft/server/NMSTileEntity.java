@@ -3,11 +3,11 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.TranslatorFieldAccessor;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.TileEntity;
@@ -19,6 +19,9 @@ public class NMSTileEntity {
     public static final TranslatorFieldAccessor<World> world = T.selectField("protected World world").translate(ConversionPairs.world);
     public static final TranslatorFieldAccessor<IntVector3> position = T.selectField("protected BlockPosition position").translate(ConversionPairs.blockPosition);
     private static final MethodAccessor<Object> getUpdatePacket = T.selectMethod("public PacketPlayOutTileEntityData getUpdatePacket()");
+
+    public static final MethodAccessor<Void> load = T.selectMethod("public void a(NBTTagCompound nbttagcompound)");
+    public static final MethodAccessor<Void> save = T.selectMethod("public NBTTagCompound save(NBTTagCompound nbttagcompound)");
 
     public static boolean hasWorld(Object tileEntity) {
         return ((TileEntity) tileEntity).getWorld() != null;

@@ -1,15 +1,16 @@
 package com.bergerkiller.bukkit.common._unused;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.*;
 
@@ -79,9 +80,9 @@ public class CommonWorldListener_unused extends WorldManager {
                 return;
             }
             // Notify it is added
-            CommonPlugin.getInstance().notifyAdded(CommonNMS.getEntity(added));
+            CommonPlugin.getInstance().notifyAdded(Conversion.toEntity.convert(added));
             // Event
-            CommonUtil.callEvent(new EntityAddEvent(CommonNMS.getEntity(added)));
+            CommonUtil.callEvent(new EntityAddEvent(Conversion.toEntity.convert(added)));
         }
     }
 
@@ -93,9 +94,9 @@ public class CommonWorldListener_unused extends WorldManager {
                 return;
             }
             // Notify it is removed
-            CommonPlugin.getInstance().notifyRemoved(CommonNMS.getEntity(removed));
+            CommonPlugin.getInstance().notifyRemoved(Conversion.toEntity.convert(removed));
             // Event
-            CommonUtil.callEvent(new EntityRemoveEvent(CommonNMS.getEntity(removed)));
+            CommonUtil.callEvent(new EntityRemoveEvent(Conversion.toEntity.convert(removed)));
         }
     }
 

@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -40,7 +41,6 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
-import com.bergerkiller.server.CommonNMS;
 
 import net.minecraft.server.v1_11_R1.DataWatcherObject;
 import net.minecraft.server.v1_11_R1.Entity;
@@ -481,9 +481,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     @Deprecated
     public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
-        if (CommonNMS.isValidBlockId(typeId)) {
-            NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
-        }
+        NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
     }
 
     public List<MetadataValue> getMetadata(String arg0) {
@@ -954,7 +952,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the dropped Item
      */
     public Item spawnItemDrop(Material material, int amount, float force) {
-        return CommonNMS.getItem(getHandle(Entity.class).a(CraftMagicNumbers.getItem(material), amount, force));
+        return Conversion.toItem.convert(getHandle(Entity.class).a(CraftMagicNumbers.getItem(material), amount, force));
     }
 
     /**
@@ -965,7 +963,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the dropped Item
      */
     public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
-        return CommonNMS.getItem(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
+        return Conversion.toItem.convert(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
     }
 
     /**

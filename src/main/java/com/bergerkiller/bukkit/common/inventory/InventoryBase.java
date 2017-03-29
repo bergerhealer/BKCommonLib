@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.bases.IInventoryBase;
+import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.server.proxies.CraftInventoryProxy;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

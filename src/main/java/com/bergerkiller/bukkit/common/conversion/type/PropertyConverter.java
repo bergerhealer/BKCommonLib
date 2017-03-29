@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
-import com.bergerkiller.server.Methods;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.EnumDirection;
@@ -45,10 +44,13 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
         }
     };
 
-    @SuppressWarnings("deprecation")
     public static final PropertyConverter<Material> toItemMaterial = new PropertyConverter<Material>(Material.class) {
         @Override
         public Material convertSpecial(Object value, Class<?> valueType, Material def) {
+            // Note: this conversion is a cascade. Order matters!
+            if (value instanceof EntityItem) value = ((EntityItem) value).getItemStack();
+            if (value instanceof ItemStack) value = ((ItemStack) value).getItem();
+
             // First convert to a material directly
             Material mat = ConversionTypes.toMaterial.convert(value);
             if (mat != null) {
@@ -58,12 +60,6 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
             // Ask additional getters
             if (value instanceof org.bukkit.block.Block) {
                 return ((org.bukkit.block.Block) value).getType();
-            } else if (value instanceof ItemStack) {
-                return Material.getMaterial(Methods.ItemStack_TypeId(value));
-            } else if (value instanceof EntityItem) {
-                return Material.getMaterial(Methods.ItemStack_TypeId(((EntityItem) value).getItemStack()));
-            } else if (value instanceof org.bukkit.entity.Item) {
-                return ((org.bukkit.entity.Item) value).getItemStack().getType();
             } else if (value instanceof org.bukkit.inventory.ItemStack) {
                 return ((org.bukkit.inventory.ItemStack) value).getType();
             } else {
