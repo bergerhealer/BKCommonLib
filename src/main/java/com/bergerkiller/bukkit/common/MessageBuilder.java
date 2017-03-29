@@ -55,7 +55,6 @@ public class MessageBuilder {
      * @return This MessageBuilder
      */
     public MessageBuilder reset(StringBuilder builder) {
-        this.builder.setLength(0);
         this.currentWidth = 0;
         this.separator = null;
         this.sepwidth = 0;
@@ -65,6 +64,7 @@ public class MessageBuilder {
         this.resultStr = null;
         this.lines.clear();
         this.lines.add(this.builder = builder);
+        this.builder.setLength(0);
         return this;
     }
 
