@@ -17,7 +17,7 @@ public class SafeConstructor<T> {
 
     public SafeConstructor(Class<T> type, Class<?>... parameterTypes) {
         try {
-            constructor = type.getConstructor(parameterTypes);
+            constructor = type.getDeclaredConstructor(parameterTypes);
             constructor.setAccessible(true);
         } catch (SecurityException e) {
         	Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to access constructor", e);

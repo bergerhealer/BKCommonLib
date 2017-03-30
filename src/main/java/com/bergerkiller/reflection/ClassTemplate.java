@@ -153,7 +153,7 @@ public class ClassTemplate<T> {
             if (type == null) {
                 fields = Collections.emptyList();
             } else {
-                fields = Collections.unmodifiableList(fillFields(new ArrayList<SafeField<?>>(), type));
+                fields = Collections.unmodifiableList(ReflectionUtil.fillFields(new ArrayList<SafeField<?>>(), type));
             }
         }
         return fields;
@@ -172,21 +172,6 @@ public class ClassTemplate<T> {
             throw new IllegalArgumentException("No field exists at index " + index);
         }
         return fields.get(index);
-    }
-
-    private static List<SafeField<?>> fillFields(List<SafeField<?>> fields, Class<?> clazz) {
-        if (clazz == null) {
-            return fields;
-        }
-        Field[] declared = clazz.getDeclaredFields();
-        ArrayList<SafeField<?>> newFields = new ArrayList<SafeField<?>>(declared.length);
-        for (Field field : declared) {
-            if (!Modifier.isStatic(field.getModifiers())) {
-                newFields.add(new SafeField<Object>(field));
-            }
-        }
-        fields.addAll(0, newFields);
-        return fillFields(fields, clazz.getSuperclass());
     }
 
     /**
@@ -575,39 +560,6 @@ public class ClassTemplate<T> {
         return name;
     }
 
-    /// parses method/field modifier lists
-    private int parseModifiers(String[] parts, int count) {
-        // Read modifiers
-        int modifiers = 0;
-        for (int i = 0; i < count; i++) {
-            switch (parts[i]) {
-            case "public":
-                modifiers |= Modifier.PUBLIC; break;
-            case "private":
-                modifiers |= Modifier.PRIVATE; break;
-            case "protected":
-                modifiers |= Modifier.PROTECTED; break;
-            case "final":
-                modifiers |= Modifier.FINAL; break;
-            case "static":
-                modifiers |= Modifier.STATIC; break;
-            case "volatile":
-                modifiers |= Modifier.VOLATILE; break;
-            case "abstract":
-                modifiers |= Modifier.ABSTRACT; break;
-            }
-        }
-        return modifiers;
-    }
-
-    private boolean compareModifiers(int m1, int m2) {
-        return (Modifier.isPrivate(m1) == Modifier.isPrivate(m2) &&
-                Modifier.isPublic(m1) == Modifier.isPublic(m2) &&
-                Modifier.isProtected(m1) == Modifier.isProtected(m2) &&
-                Modifier.isStatic(m1) == Modifier.isStatic(m2) &&
-                Modifier.isFinal(m1) == Modifier.isFinal(m2));
-    }
-
     private void loadFields(boolean initNextQueue) {
         // Initialize field queue with fields if needed
         if (typeFields == null) {
@@ -958,32 +910,6 @@ public class ClassTemplate<T> {
         return null;
     }
 
-    /// removes generics from a field/method declaration
-    /// example: Map<String, String> stuff -> Map stuff
-    private static String filterGenerics(String input) {
-        String result = input;
-        int genEnd, genStart;
-        while ((genStart = result.indexOf('<')) != -1) {
-            while (true) {
-                int a = result.indexOf('<', genStart+1);
-                int b = result.indexOf('>', genStart+1);
-                if (a == -1 && b == -1) {
-                    break;
-                }
-                if (a == -1) a = result.length();
-                if (b == -1) b = result.length();
-                if (a < b) {
-                    genStart = a;
-                } else {
-                    genEnd = b;
-                    result = result.substring(0, genStart) + result.substring(genEnd + 1);
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
     private class FieldDeclare {
         final String name;
         final Class<?> type;
@@ -1008,7 +934,7 @@ public class ClassTemplate<T> {
                 declaration = declaration.substring(0, declaration.length() - 1);
             }
 
-            String declarationF = filterGenerics(declaration);
+            String declarationF = ReflectionUtil.filterGenerics(declaration);
 
             String[] parts = declarationF.split(" ");
 
@@ -1019,7 +945,7 @@ public class ClassTemplate<T> {
             if (parts.length >= 2) {
                 fieldName = parts[parts.length - 1];
                 fieldType = resolveClass(parts[parts.length - 2], true);
-                fieldModifiers = parseModifiers(parts, parts.length - 2);
+                fieldModifiers = ReflectionUtil.parseModifiers(parts, parts.length - 2);
             }
 
             if (fieldName == null || fieldType == null)
@@ -1063,7 +989,7 @@ public class ClassTemplate<T> {
          * @return True if the signature matches, False if not
          */
         public boolean matchSignature(Field f) {
-            return (f.getType() == type) && compareModifiers(f.getModifiers(), modifiers);
+            return (f.getType() == type) && ReflectionUtil.compareModifiers(f.getModifiers(), modifiers);
         }
 
         @Override
@@ -1106,7 +1032,7 @@ public class ClassTemplate<T> {
                 declaration = declaration.substring(0, declaration.length() - 1);
             }
 
-            String declarationF = filterGenerics(declaration);
+            String declarationF = ReflectionUtil.filterGenerics(declaration);
 
             String methodName = null;
             Class<?> returnType = null;
@@ -1129,7 +1055,7 @@ public class ClassTemplate<T> {
                 if (parts.length >= 2) {
                     methodName = parts[parts.length - 1];
                     returnType = resolveClass(parts[parts.length - 2], logErrors);
-                    methodModifiers = parseModifiers(parts, parts.length - 2);
+                    methodModifiers = ReflectionUtil.parseModifiers(parts, parts.length - 2);
 
                     List<Class<?>> paramTypes = new ArrayList<Class<?>>();
                     boolean paramFail = false;
@@ -1203,7 +1129,7 @@ public class ClassTemplate<T> {
             if (m.getReturnType() != returnType)
                 return false;
 
-            if (!compareModifiers(m.getModifiers(), modifiers)) {
+            if (!ReflectionUtil.compareModifiers(m.getModifiers(), modifiers)) {
                 return false;
             }
 
