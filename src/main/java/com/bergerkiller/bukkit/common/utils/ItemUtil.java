@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityItem;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.Item;
@@ -348,7 +349,7 @@ public class ItemUtil {
      * @return Empty item stack
      */
     public static org.bukkit.inventory.ItemStack emptyItem() {
-        return CraftItemStack.asCraftMirror((ItemStack) NMSItemStack.newInstance(Material.AIR, 0, 0));
+        return CBCraftItemStack.newInstanceFromHandle(NMSItemStack.newInstance(Material.AIR, 0, 0));
     }
 
     /**

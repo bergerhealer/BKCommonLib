@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 
 public abstract class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
@@ -157,6 +158,10 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @param item it was set to
      */
     public void onItemSet(int index, ItemStack item) {
-        hook.base.setInventoryItem(index, Conversion.toItemStackHandle.convert(item));
+        Object handle = Conversion.toItemStackHandle.convert(item);
+        if (handle == null) {
+            handle = Conversion.toItemStackHandle.convert(ItemUtil.emptyItem());
+        }
+        hook.base.setInventoryItem(index, handle);
     }
 }
