@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 
 import java.util.List;
 
@@ -34,56 +36,22 @@ public class DataWatcher extends BasicWrapper {
     /**
      * Write a new value to the watched objects
      *
-     * @param index Object index
-     * @param value Value
+     * @param key Object key
+     * @param value Value to set to
      */
-    public void set(int index, Object value) {
-        NMSDataWatcher.write.invoke(handle, index, value);
-    }
-
-    /**
-     * Read an object from the watched objects and convert it
-     *
-     * @param index Object index
-     * @param def value when conversion fails (can not be null)
-     * @return Object
-     */
-    public <T> T get(int index, T def) {
-        return Conversion.convert(get(index), def);
-    }
-
-    /**
-     * Read an object from the watched objects and convert it
-     *
-     * @param index Object index
-     * @param type Object type
-     * @param def value when conversion fails
-     * @return Object
-     */
-    public <T> T get(int index, Class<T> type, T def) {
-        return Conversion.convert(get(index), type, def);
-    }
-
-    /**
-     * Read an object from the watched objects and convert it
-     *
-     * @param index Object index
-     * @param type Object type
-     * @return Object
-     */
-    public <T> T get(int index, Class<T> type) {
-        return Conversion.convert(get(index), type);
+    public <V> void set(Key<V> key, V value) {
+        NMSDataWatcher.set.invoke(handle, key.handle, value);
     }
 
     /**
      * Read an object from the watched objects
      *
-     * @param index Object index
-     * @return Object
+     * @param ket Object key
+     * @return Object value at the key
      */
-    public Object get(int index) {
-        Object watchable = NMSDataWatcher.read.invoke(handle, index);
-        return NMSDataWatcherObject.getHandle.invoke(watchable);
+    @SuppressWarnings("unchecked")
+    public <V> V get(Key<V> key) {
+        return (V) NMSDataWatcher.get.invoke(handle, key.handle);
     }
 
     /**
@@ -92,8 +60,8 @@ public class DataWatcher extends BasicWrapper {
      * @param index Object index
      * @param value Value
      */
-    public void watch(int index, Object value) {
-        NMSDataWatcher.watch.invoke(handle, index, value);
+    public void watch(Key<?> key, Object value) {
+        NMSDataWatcher.watch.invoke(handle, key.handle, value);
     }
 
     /**
@@ -131,5 +99,86 @@ public class DataWatcher extends BasicWrapper {
      */
     public boolean isEmpty() {
         return NMSDataWatcher.isEmpty.invoke(handle);
+    }
+
+    /**
+     * Wrapper around a raw DataWatcher key object
+     * 
+     * @param <V> value type bound to the key
+     */
+    public static class Key<V> {
+        private final Object handle;
+
+        public Key(Object handle) {
+            this.handle = handle;
+        }
+    }
+
+    /**
+     * References the value bound to a DataWatcher Key for a particular Entity
+     *
+     * @param <V> value type bound to the key
+     */
+    public static class Item<V> {
+        private final ExtendedEntity<?> owner;
+        private final Object keyHandle;
+
+        public Item(ExtendedEntity<?> owner, Key<V> key) {
+            this.owner = owner;
+            this.keyHandle = (key == null) ? null : key.handle;
+        }
+
+        /**
+         * Gets the value of this DataWatcher metadata property
+         * 
+         * @return current value
+         */
+        @SuppressWarnings("unchecked")
+        public V get() {
+            Object watcher = NMSEntity.datawatcher.getInternal(owner.getHandle());
+            return (V) NMSDataWatcher.get.invoke(watcher, keyHandle);
+        }
+
+        /**
+         * Sets a new value for this DataWatcher metadata property. Watchers will be notified.
+         * 
+         * @param value to set to
+         */
+        public void set(V value) {
+            Object watcher = NMSEntity.datawatcher.getInternal(owner.getHandle());
+            NMSDataWatcher.set.invoke(watcher, keyHandle, value);
+        }
+
+        /**
+         * Translates the internally stored value to another type using a converter pair
+         * 
+         * @param converterPair to use for translation
+         * @return translated item
+         */
+        public <C> Item<C> translate(ConverterPair<V, C> converterPair) {
+            return new ConvertingItem<V, C>(this, converterPair);
+        }
+    }
+
+    private static class ConvertingItem<A, B> extends Item<B> {
+        private final Item<A> item;
+        private final ConverterPair<A, B> pair;
+
+        public ConvertingItem(Item<A> item, ConverterPair<A, B> pair) {
+            super(null, null);
+            this.item = item;
+            this.pair = pair;
+        }
+
+        @Override
+        public B get() {
+            return pair.convertB(item.get());
+        }
+
+        @Override
+        public void set(B value) {
+            this.item.set(pair.convertA(value));
+        }
+        
     }
 }

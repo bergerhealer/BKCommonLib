@@ -256,7 +256,7 @@ public class MaterialUtil {
      * The material is a type of Minecart item
      */
     public static final MaterialTypeProperty ISMINECART = new MaterialTypeProperty(Material.MINECART, Material.POWERED_MINECART,
-            Material.STORAGE_MINECART, Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART);
+            Material.STORAGE_MINECART, Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART, Material.COMMAND_MINECART);
 
     /**
      * The material is a type of wieldable sword

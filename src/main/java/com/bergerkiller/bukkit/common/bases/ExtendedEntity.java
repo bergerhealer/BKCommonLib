@@ -25,7 +25,6 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -42,7 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
-import net.minecraft.server.v1_11_R1.DataWatcherObject;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityInsentient;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
@@ -967,44 +965,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Sets a DataWatcher value at the specified index
-     *
-     * @param index to set at
-     * @param value to set to
-     */
-    @SuppressWarnings("unchecked")
-    public void setWatchedData(Object dataWatcherObject, Object value) {
-        Logging.LOGGER_DEBUG.warnOnce("setWatchedData should use a generics-enabled key");
-        net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
-        watcher.set((DataWatcherObject) dataWatcherObject, value); 
-
-        /*
-    	net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
-        Field f;
-        try {
-            f = watcher.getClass().getDeclaredField("c");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        f.setAccessible(true);
-        HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item> map;
-        try {
-            map = (HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item>) f.get(watcher);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return;
-        }
-        net.minecraft.server.v1_11_R1.DataWatcher.Item item = map.get(index);
-        if (item != null) {
-            item.a((T) value);
-        }
-        return;
-        */
-
-    }
-
-    /**
      * Gets the datawatcher used to synchronize certain entity properties with the viewing clients
      * 
      * @return datawatcher
@@ -1014,50 +974,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Gets a DataWatcher value at the specified index
-     *
-     * @param index to get at
-     * @param def to return on failure and type to get (can not be null)
-     * @return data, or def if not found
+     * Creates a helper DataWatcher Item class for accessing a Metadata field for this ExtendedEntity
+     * 
+     * @param key for the metadata
+     * @return DataWatcher Item
      */
-    @SuppressWarnings("unchecked")
-    public <K> K getWatchedData(Object dataWatcherObject, K def) {
-        return getWatchedData(dataWatcherObject, (Class<K>) def.getClass(), def);
-    }
-
-    /**
-     * Gets a DataWatcher value at the specified index
-     *
-     * @param index to get at
-     * @param type of data to get
-     * @param def to return on failure
-     * @return data, or def if not found
-     */
-    public <K> K getWatchedData(Object dataWatcherObject,  Class<K> type, K def) {
-    	net.minecraft.server.v1_11_R1.DataWatcher watcher = h().getDataWatcher();
-    	return Conversion.convert(watcher.get((DataWatcherObject) dataWatcherObject), type, def);
-    	/*
-        Field f;
-        try {
-            f = watcher.getClass().getDeclaredField("c");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return def;
-        }
-        f.setAccessible(true);
-        HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item> map;
-        try {
-            map = (HashMap<Integer, net.minecraft.server.v1_11_R1.DataWatcher.Item>) f.get(watcher);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return def;
-        }
-        net.minecraft.server.v1_11_R1.DataWatcher.Item item = map.get(index);
-        if (item == null) {
-            return def;
-        }
-        return Conversion.convert(item.b(), type, def);
-        */
+    public <V> DataWatcher.Item<V> getDataItem(DataWatcher.Key<V> key) {
+        return new DataWatcher.Item<V>(this, key);
     }
 
     @Override

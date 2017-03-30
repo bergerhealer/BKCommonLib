@@ -4,6 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.CommandMinecart;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,6 +15,9 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a Command Block
  */
 public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> {
+
+    public final DataWatcher.Item<String> metaCommand = getDataItem(NMSEntityMinecart.CommandBlock.DATA_COMMAND);
+    public final DataWatcher.Item<String> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT).translate(ConversionPairs.textChatComponent);
 
     public CommonMinecartCommandBlock(CommandMinecart base) {
         super(base);
@@ -25,4 +32,5 @@ public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> 
     public Material getCombinedItem() {
         return Material.COMMAND_MINECART;
     }
+
 }

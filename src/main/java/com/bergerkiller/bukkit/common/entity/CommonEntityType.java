@@ -39,7 +39,6 @@ public class CommonEntityType {
     public final ClassTemplate<?> nmsType;
     public final ClassTemplate<?> commonType;
     public final ClassTemplate<?> bukkitType;
-    private final SafeConstructor<?> nmsConstructor;
     private final SafeConstructor<?> commonConstructor;
     public final EntityType entityType;
 
@@ -52,7 +51,6 @@ public class CommonEntityType {
             this.nmsType = ClassTemplate.create((Class<?>) null);
             this.commonType = ClassTemplate.create(CommonEntity.class);
             this.bukkitType = ClassTemplate.create(Entity.class);
-            this.nmsConstructor = null;
             this.commonConstructor = this.commonType.getConstructor(Entity.class);
             return;
         }
@@ -120,21 +118,6 @@ public class CommonEntityType {
         this.nmsType = ClassTemplate.create(nmsType);
         this.commonType = ClassTemplate.create(commonType);
         this.commonConstructor = this.commonType.getConstructor(entityClass);
-
-        // Obtain NMS class constructor
-        if (nmsType == null) {
-            this.nmsConstructor = null;
-        } else {
-            if (entityType == EntityType.PLAYER || entityType == EntityType.FISHING_HOOK) {
-                this.nmsConstructor = null;
-            } else {
-                this.nmsConstructor = this.nmsType.getConstructor(NMSWorld.T.getType());
-            }
-        }
-    }
-
-    public boolean hasNMSEntity() {
-        return nmsConstructor != null;
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntity(T entity) {
@@ -146,15 +129,7 @@ public class CommonEntityType {
         return (CommonEntity<T>) createCommonEntity(e);
     }
 
-    public Object createNMSEntity() {
-        return nmsConstructor.newInstance(new Object[]{null});
-    }
-
     public <T extends Entity> CommonEntity<T> createNMSHookEntity(Location location) {
-        if (!this.hasNMSEntity()) {
-            throw new RuntimeException("Entity of type " + entityType + " has no Hook Entity support!");
-        }
-
         World world = location.getWorld();
         double x = location.getX();
         double y = location.getY();

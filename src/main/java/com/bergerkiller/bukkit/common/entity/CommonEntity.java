@@ -233,11 +233,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final CommonEntityType type = CommonEntityType.byNMSEntity(handle);
         // Check whether the handle is not of an external-plugin type
         if (handle == null || !type.nmsType.isType(handle)) {
-            System.out.println("Not type!");
             return false;
         }
-        // Check whether the CommonEntityType supports hooking
-        return type.hasNMSEntity();
+        return true;
     }
 
     /**
@@ -602,9 +600,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         CommonEntityType type = CommonEntityType.byEntityType(entityType);
         if (type == CommonEntityType.UNKNOWN) {
             throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
-        }
-        if (!type.hasNMSEntity()) {
-            throw new RuntimeException("The Entity Type '" + entityType + "' has no suitable Entity constructor to use!");
         }
 
         final CommonEntity<org.bukkit.entity.Entity> entity = type.createNMSHookEntity(location);

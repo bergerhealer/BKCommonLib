@@ -15,7 +15,6 @@ public class NMSDataWatcher {
 
     public static final TranslatorFieldAccessor<Entity> owner = T.selectField("private final Entity c").translate(ConversionPairs.entity);
 
-    public static final MethodAccessor<Void> write = T.selectMethod("public <T> void set(DataWatcherObject<T> datawatcherobject, T t0)");
     public static final MethodAccessor<Void> watch = T.selectMethod("private <T> void registerObject(DataWatcherObject<T> datawatcherobject, Object t0)");
 
     /*
@@ -33,18 +32,13 @@ public class NMSDataWatcher {
     public static final MethodAccessor<List<Object>> returnAllWatched = T.selectMethod("public List<DataWatcher.Item<?>> c()");
 
     public static final MethodAccessor<Object> read = T.selectMethod("private <T> DataWatcher.Item<T> c(DataWatcherObject<T> datawatcherobject)");
+
+    public static final MethodAccessor<Object> get = T.selectMethod("public <T> T get(DataWatcherObject<T> datawatcherobject)");
+    public static final MethodAccessor<Void> set = T.selectMethod("public <T> void set(DataWatcherObject<T> datawatcherobject, T t0)");
+    
     public static final MethodAccessor<Boolean> isChanged = T.selectMethod("public boolean a()");
     public static final MethodAccessor<Boolean> isEmpty = T.selectMethod("public boolean d()");
     public static final SafeConstructor<?> constructor1 = T.getConstructor(NMSEntity.T.getType());
-
-    /**
-     * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher
-     * instead
-     */
-    @Deprecated
-    public static void write(Object datawatcher, int index, Object value) {
-        write.invoke(datawatcher, index, value);
-    }
 
     /**
      * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher

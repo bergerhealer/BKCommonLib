@@ -3,6 +3,8 @@ package com.bergerkiller.reflection;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
 
 import net.sf.cglib.asm.Type;
 import net.sf.cglib.core.Signature;
@@ -413,6 +415,17 @@ public class ClassTemplate<T> {
      */
     public <K> void setStaticFieldValue(String name, K value) {
         SafeField.setStatic(getType(), name, value);
+    }
+
+    /**
+     * Retrieves the static value declaration for a DataWatcher key
+     * 
+     * @param fieldName of the declared key
+     * @return DataWatcher Key
+     */
+    public <K> DataWatcher.Key<K> getDataWatcherKey(String fieldName) {
+        Object keyHandle = getStaticFieldValue(fieldName, NMSDataWatcherObject.T.getType());
+        return new DataWatcher.Key<K>(keyHandle);
     }
 
     /**

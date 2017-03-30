@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 import org.bukkit.Material;
@@ -19,6 +20,8 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      * minecart
      */
     public static final int COAL_FUEL = 3600;
+
+    public final DataWatcher.Item<Boolean> metaSmoking = getDataItem(NMSEntityMinecart.Furnace.DATA_SMOKING);
 
     public CommonMinecartFurnace(PoweredMinecart base) {
         super(base);
@@ -57,11 +60,11 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     }
 
     public boolean isSmoking() {
-        return NMSEntityMinecart.Furnace.isSmokingMethod.invoke(getHandle());
+        return metaSmoking.get();
     }
 
     public void setSmoking(boolean smoking) {
-    	NMSEntityMinecart.Furnace.setSmokingMethod.invoke(getHandle(), smoking);
+        metaSmoking.set(smoking);
     }
 
     @Override

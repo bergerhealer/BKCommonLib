@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -11,6 +12,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 /**
@@ -19,6 +21,13 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
  * @param <T> - type of Minecart Entity
  */
 public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
+
+    public final DataWatcher.Item<Integer> metaShakingDirection = getDataItem(NMSEntityMinecart.DATA_SHAKING_DIRECTION);
+    public final DataWatcher.Item<Float>   metaShakingDamage    = getDataItem(NMSEntityMinecart.DATA_SHAKING_DAMAGE);
+    public final DataWatcher.Item<Integer> metaShakingFactor    = getDataItem(NMSEntityMinecart.DATA_SHAKING_FACTOR);
+    public final DataWatcher.Item<Integer> metaBlockOffset      = getDataItem(NMSEntityMinecart.DATA_BLOCK_OFFSET);
+    public final DataWatcher.Item<Integer> metaBlockType        = getDataItem(NMSEntityMinecart.DATA_BLOCK_TYPE);
+    public final DataWatcher.Item<Boolean> metaBlockVisible     = getDataItem(NMSEntityMinecart.DATA_BLOCK_VISIBLE);
 
     public CommonMinecart(T base) {
         super(base);
@@ -65,19 +74,19 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     public void setShakingDirection(int direction) {
-        this.setWatchedData(NMSEntityMinecart.DATA_SHAKING_DIRECTION, direction);
+        metaShakingDirection.set(direction);
     }
 
     public int getShakingDirection() {
-        return this.getWatchedData(NMSEntityMinecart.DATA_SHAKING_DIRECTION, 0);
+        return metaShakingDirection.get();
     }
 
     public void setShakingFactor(int factor) {
-        this.setWatchedData(NMSEntityMinecart.DATA_SHAKING_FACTOR, factor);
+        metaShakingFactor.set(factor);
     }
 
     public int getShakingFactor() {
-        return this.getWatchedData(NMSEntityMinecart.DATA_SHAKING_FACTOR, 0);
+        return metaShakingFactor.get();
     }
 
     /**
@@ -110,7 +119,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param offsetPixels to set to
      */
     public void setBlockOffset(int offsetPixels) {
-        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_OFFSET, offsetPixels);
+        metaBlockOffset.set(offsetPixels);
     }
 
     /**
@@ -119,7 +128,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @return block offset in the Y-direction
      */
     public int getBlockOffset() {
-        return this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_OFFSET, 0);
+        return metaBlockOffset.get();
     }
 
     /**
@@ -169,7 +178,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @return block type
      */
     public Material getBlockType() {
-        int value = this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, 0) & 0xFFFF;
+        int value = metaBlockType.get() & 0xFFFF;
         return MaterialUtil.getType(value);
     }
 
@@ -179,7 +188,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @return block data
      */
     public int getBlockData() {
-        return this.getWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, 0) >> 16;
+        return metaBlockType.get() >> 16;
     }
 
     /**
@@ -189,13 +198,17 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param blockData of the Block
      */
     public void setBlock(Material blockType, int blockData) {
+        if (blockType == Material.AIR) {
+            metaBlockVisible.set(false);
+            return;
+        }
         // Compile the new Block ID and Block Data into a single Integer entry (combining two short values)
         int entryId = MathUtil.clamp(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), 0, Short.MAX_VALUE);
         int entryData = MathUtil.clamp(blockData, 0, Short.MAX_VALUE);
         int entryTotal = (entryId & 0xFFFF) | (entryData << 16);
         // Set the entry in the Entity data watcher, plus set INDEX=22 to 1 indicating there's a Block
-        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_TYPE, entryTotal);
-        this.setWatchedData(NMSEntityMinecart.DATA_BLOCK_VISIBLE, true);
+        metaBlockType.set(entryTotal);
+        metaBlockVisible.set(true);
     }
 
     @Override
@@ -204,17 +217,13 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     /**
-     * Gets the position to align this Minecart on a slope
-     *
-     * @param x - coordinate of the old position
-     * @param y - coordinate of the old position
-     * @param z - coordinate of the old position
-     * @return new Vector for the new sloped position, or null if none possible
-     * (not a sloped rail)
+     * Activates the minecart as if driving on top of an Activator Rail
+     * 
+     * @param activatorBlock of the activator rail
+     * @param activated state of the activator rail
      */
-    public Vector getSlopedPosition(double x, double y, double z) {
-    	//TODO: BROKEN!!!!
-    	return null;
-        //return Conversion.toVector.convert(getHandle(EntityMinecartAbstract.class).k(x, y, z));
+    public void activate(Block activatorBlock, boolean activated) {
+        NMSEntityMinecart.activate.invoke(getHandle(), 
+                activatorBlock.getX(), activatorBlock.getY(), activatorBlock.getZ(), activated);
     }
 }
