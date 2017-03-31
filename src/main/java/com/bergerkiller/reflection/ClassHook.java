@@ -33,7 +33,7 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
         Class<?> method_class = method.getDeclaringClass();
         for (HookMethodEntry entry : methods.entries) {
             if (method.equals(entry.findMethodIn(method_class))) {
-                Logging.LOGGER_REFLECTION.info("[" + method.getDeclaringClass().getSimpleName() + "] Hooked " + getMethodName(method) + " to " + getMethodName(entry.method));
+                //Logging.LOGGER_REFLECTION.info("[" + method.getDeclaringClass().getSimpleName() + "] Hooked " + getMethodName(method) + " to " + getMethodName(entry.method));
                 return entry;
             }
         }

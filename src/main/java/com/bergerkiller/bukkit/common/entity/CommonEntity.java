@@ -619,6 +619,40 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     }
 
     /**
+     * Creates a new Entity instance by calling its default World constructor, and initialized position.
+     * Unlike {@link #spawn()} this does not spawn the entity in the world, and it will stay detached.
+     * 
+     * @param entityType to create
+     * @param location of the entity
+     * @return created entity
+     */
+    @SuppressWarnings("rawtypes")
+    public static final CommonEntity create(EntityType entityType, Location location) {
+        CommonEntityType type = CommonEntityType.byEntityType(entityType);
+        if (type == CommonEntityType.UNKNOWN) {
+            throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
+        }
+
+        return type.createNMSHookEntity(location);
+    }
+
+    /**
+     * Creates a new Entity instance without validly constructing it.
+     * Please avoid using this as it will cause serious bugs when spawned into a world.
+     * 
+     * @param entityType type to create
+     * @return CommonEntity
+     */
+    @SuppressWarnings("rawtypes")
+    public static final CommonEntity createNull(EntityType entityType) {
+        CommonEntityType type = CommonEntityType.byEntityType(entityType);
+        if (type == CommonEntityType.UNKNOWN) {
+            throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
+        }
+        return type.createCommonEntityNull();
+    }
+
+    /**
      * Called after this CommonEntity has spawned
      */
     protected void onSpawn() {

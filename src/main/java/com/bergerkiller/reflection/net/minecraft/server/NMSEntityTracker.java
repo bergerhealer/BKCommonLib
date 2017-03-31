@@ -26,6 +26,7 @@ public class NMSEntityTracker {
     public static final FieldAccessor<World> world = T.nextField("private final WorldServer world").translate(ConversionPairs.world);
     public static final FieldAccessor<Set<Object>> trackerSet = T.nextFieldSignature("private final Set<EntityTrackerEntry> c");
     public static final FieldAccessor<IntHashMap<Object>> trackedEntities = T.nextField("public final IntHashMap<EntityTrackerEntry> trackedEntities").translate(ConversionPairs.intHashMap);
+    public static final FieldAccessor<Integer> trackerViewDistance = T.nextFieldSignature("private int e");
 
     private static final MethodAccessor<Void> track = T.selectMethod("public void track(Entity entity)");
     private static final MethodAccessor<Void> untrack = T.selectMethod("public void untrackEntity(Entity entity)");
@@ -104,6 +105,7 @@ public class NMSEntityTracker {
 
             // Track it!
             world.set(dummyTracker, entity.getWorld());
+            trackerViewDistance.set(dummyTracker, (Bukkit.getViewDistance()-1) * 16);
             IntHashMap<Object> tracked = trackedEntities.get(dummyTracker);
             tracked.clear();
             track.invoke(dummyTracker, Conversion.toEntityHandle.convert(entity));

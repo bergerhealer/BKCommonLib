@@ -124,6 +124,18 @@ public class CommonEntityType {
         return (CommonEntity<T>) this.commonConstructor.newInstance(entity);
     }
 
+    public <T extends Entity> CommonEntity<T> createCommonEntityNull() {
+        EntityHook hook = new EntityHook();
+        Object handle = hook.createInstance(this.nmsType.getType());
+
+        CommonEntity<T> entity = createCommonEntityFromHandle(handle);
+
+        DefaultEntityController controller = new DefaultEntityController();
+        controller.bind(entity);
+
+        return entity;
+    }
+
     public <T extends Entity> CommonEntity<T> createCommonEntityFromHandle(Object handle) {
         Entity e = Conversion.toEntity.convert(handle); // getBukkitEntity
         return (CommonEntity<T>) createCommonEntity(e);
