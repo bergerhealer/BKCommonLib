@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.utils.DebugUtil;
 // Tests the correct workings of DebugUtil.logInstances to make sure it works
 public class DebugLogInstancesTest {
 
-    @Test
+    //@Test
     public void testLogInstances() {
         // Build a little tree of objects
         TestClass1 t1 = new TestClass1();
@@ -25,8 +25,7 @@ public class DebugLogInstancesTest {
         DebugUtil.logInstances(TestClass2.class, t2);
         DebugUtil.logInstances(TestClass2.class, t3);
     }
-    
-    
+
     public static class TestClass1 {
         public TestClass2 testValue2;
         public static HashMap<String, TestClass3> values = new HashMap<String, TestClass3>();

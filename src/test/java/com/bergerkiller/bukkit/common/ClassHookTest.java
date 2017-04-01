@@ -22,8 +22,8 @@ public class ClassHookTest {
         assertEquals("DogHook::theWoofMethod()", hook.theWoofMethod());
         assertEquals("Dog::woof()", hook.base.theWoofMethod());
 
-        testTimings(new Dog());
-        testTimings(hooked_dog);
+        testTimings("    Original", new Dog());
+        testTimings("Hooked proxy", hooked_dog);
     }
 
     @Test
@@ -39,8 +39,8 @@ public class ClassHookTest {
         assertEquals("DogSuperHook::theWoofMethod() -> Dog::woof()", hook.theWoofMethod());
         assertEquals("Dog::woof()", hook.base.theWoofMethod());
 
-        testTimings(new Dog());
-        testTimings(hooked_dog);
+        testTimings("    Original", new Dog());
+        testTimings(" Hooked base", hooked_dog);
     }
 
     /*
@@ -86,12 +86,12 @@ public class ClassHookTest {
         }
     }
 
-    private static void testTimings(Dog dog) {
+    private static void testTimings(String info, Dog dog) {
         long start = System.nanoTime();
-        for (long i = 0; i < 5000000; i++) {
+        for (long i = 0; i < 1000000; i++) {
             dog.woof();
         }
         long diff = (System.nanoTime() - start) / 1000000;
-        System.out.println("Elapsed nano time: " + diff + " ms");
+        System.out.println("[" + info + "] Elapsed nano time: " + diff + " ms");
     }
 }

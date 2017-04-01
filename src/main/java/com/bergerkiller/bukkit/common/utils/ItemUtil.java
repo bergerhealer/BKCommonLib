@@ -12,9 +12,7 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 
 /**
@@ -350,6 +348,17 @@ public class ItemUtil {
      */
     public static org.bukkit.inventory.ItemStack emptyItem() {
         return CBCraftItemStack.newInstanceFromHandle(NMSItemStack.newInstance(Material.AIR, 0, 0));
+    }
+
+    /**
+     * Checks whether a given ItemStack is that of an empty (slot) item.
+     * This includes NULL items, AIR-type items and items with 0 amount.
+     * 
+     * @param item to check
+     * @return True if empty, False if not
+     */
+    public static boolean isEmpty(org.bukkit.inventory.ItemStack item) {
+        return item == null || item.getAmount() == 0 || item.getType() == Material.AIR;
     }
 
     /**

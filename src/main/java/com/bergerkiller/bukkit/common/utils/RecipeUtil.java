@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
 import net.minecraft.server.v1_11_R1.CraftingManager;
@@ -23,13 +24,10 @@ public class RecipeUtil {
     private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
 
     static {
-        ItemStack item;
+        net.minecraft.server.v1_11_R1.ItemStack item;
         for (Material material : Material.values()) {
-            item = new ItemStack(material, 1);
-            if (CommonNMS.getNative(item).getItem() == null) {
-                continue;
-            }
-            int fuel = TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
+            item = (net.minecraft.server.v1_11_R1.ItemStack) NMSItemStack.newInstance(material, 0, 1);
+            int fuel = TileEntityFurnace.fuelTime(item);
             if (fuel > 0) {
                 fuelTimes.put(MaterialUtil.getTypeId(material), fuel);
             }
@@ -81,11 +79,11 @@ public class RecipeUtil {
     }
 
     public static boolean isHeatableItem(Material material) {
-        return getFurnaceResult(material) != null;
+        return !ItemUtil.isEmpty(getFurnaceResult(material));
     }
 
     public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
-        return getFurnaceResult(item) != null;
+        return !ItemUtil.isEmpty(getFurnaceResult(item));
     }
 
     @Deprecated

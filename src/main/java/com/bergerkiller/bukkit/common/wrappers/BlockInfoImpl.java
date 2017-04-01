@@ -6,6 +6,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSBlock;
 
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Explosion;
+import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.World;
 import org.bukkit.entity.Entity;
 
@@ -14,46 +15,48 @@ import org.bukkit.entity.Entity;
  * methods here and perform block-specific logic instead.
  */
 class BlockInfoImpl extends BlockInfo {
-    private Object defIBlockData;
+    private final Block block;
+    private final IBlockData data;
 
     public BlockInfoImpl(Object handle) {
         setHandle(handle);
-        this.defIBlockData = getHandle(Block.class).fromLegacyData(0);
+        this.block = getHandle(Block.class);
+        this.data = this.block.getBlockData();
     }
 
     @Override
     public Object getIBlockData() {
-        return defIBlockData;
+        return data;
     }
-    
+
     @Override
     public int getOpacity() {
-        return getHandle(Block.class).o(getHandle(Block.class).getBlockData());
+        return block.m(data);
     }
 
     @Override
     public int getLightEmission() {
-        return getHandle(Block.class).m(getHandle(Block.class).getBlockData());
+        return block.o(data);
     }
 
     @Override
     public boolean isSolid() {
-        return getHandle(Block.class).d();
+        return block.isOccluding(data);
     }
 
     @Override
     public boolean isPowerSource() {
-        return getHandle(Block.class).isPowerSource(getHandle(Block.class).getBlockData());
+        return block.isPowerSource(data);
     }
 
     @Override
     public boolean isSuffocating() {
-        return getHandle(Block.class).isOccluding(getHandle(Block.class).getBlockData());
+        return block.isOccluding(data);
     }
 
     @Override
     public float getDamageResilience(Entity source) {
-        return getHandle(Block.class).a(CommonNMS.getNative(source));
+        return block.a(CommonNMS.getNative(source));
     }
 
     @Override

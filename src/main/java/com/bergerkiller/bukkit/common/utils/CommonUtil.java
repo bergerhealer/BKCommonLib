@@ -13,6 +13,9 @@ import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
+
+import net.minecraft.server.v1_11_R1.DispenserRegistry;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
@@ -59,6 +62,14 @@ public class CommonUtil {
     	BLOCKVIEW = 32 + (VIEW << 4);
     	
     	classMap.put("double", double.class);
+    }
+
+    /**
+     * When under test internal classes have to be loaded in a very specific order.
+     * This function makes sure the server registers are initialized.
+     */
+    public static void bootstrap() {
+        DispenserRegistry.c();
     }
 
     /**

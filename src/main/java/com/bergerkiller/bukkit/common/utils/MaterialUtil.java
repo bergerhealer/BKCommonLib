@@ -75,28 +75,32 @@ public class MaterialUtil {
      * Obtains the Material Data using the material type Id and data value
      * specified.
      * <b>Please use the int data version instead, as Block data is expected to
-     * become more than a byte!</b>
-     *
+     * become more than a byte!</b><br><br>
+     * 
+     * <b>DEPRECATED</b>: Use {@link #getData(Material, rawData)} instead
+     * 
      * @param typeId of the material
      * @param data for the material
      * @return new MaterialData instance for this type of material and data
      */
+    @Deprecated
     public static MaterialData getData(int typeId, byte data) {
         return getData(typeId, (int) data);
     }
 
     /**
      * Obtains the Material Data using the material type Id and data value
-     * specified
+     * specified<br><br>
+     * 
+     * <b>DEPRECATED</b>: Use {@link #getData(Material, rawData)} instead
      *
      * @param typeId of the material
      * @param rawData for the material
      * @return new MaterialData instance for this type of material and data
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static MaterialData getData(int typeId, int rawData) {
-        Material type = Material.getMaterial(typeId);
-        return type == null ? new MaterialData(typeId, (byte) rawData) : getData(type, rawData);
+        return getData(Material.getMaterial(typeId), rawData);
     }
 
     /**
@@ -107,12 +111,20 @@ public class MaterialUtil {
      * @param rawData for the material
      * @return new MaterialData instance for this type of material and data
      */
-    @SuppressWarnings("deprecation")
     public static MaterialData getData(Material type, int rawData) {
+        // Null: return AIR
         if (type == null) {
             return new MaterialData(0, (byte) rawData);
         }
-        final MaterialData mdata = type.getNewData((byte) rawData);
+
+        // Create new MaterialData + some fixes.
+        final MaterialData mdata;
+        if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
+            // Bukkit bugfix.
+            mdata = new org.bukkit.material.PressurePlate(type, (byte) rawData);
+        } else {
+            mdata = type.getNewData((byte) rawData);
+        }
 
         // Fix attachable face returning NULL sometimes
         if (mdata instanceof Attachable) {
@@ -208,9 +220,11 @@ public class MaterialUtil {
     }
 
     /**
-     * The material is a type of door (iron or wooden door)
+     * The material is a type of door block.
+     * Materials of this type are guaranteed to have a Door MaterialData.
      */
-    public static final MaterialTypeProperty ISDOOR = new MaterialTypeProperty(Material.WOOD_DOOR, Material.IRON_DOOR);
+    public static final MaterialTypeProperty ISDOOR = new MaterialTypeProperty(Material.IRON_DOOR_BLOCK,
+            Material.WOODEN_DOOR, Material.SPRUCE_DOOR, Material.BIRCH_DOOR, Material.JUNGLE_DOOR, Material.ACACIA_DOOR, Material.DARK_OAK_DOOR);
 
     /**
      * The material is a type of piston base
@@ -226,6 +240,11 @@ public class MaterialUtil {
      * The material is a type of diode (item type excluded)
      */
     public static final MaterialTypeProperty ISDIODE = new MaterialTypeProperty(Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON);
+
+    /**
+     * The material is a type of button (item type excluded)
+     */
+    public static final MaterialTypeProperty ISBUTTON = new MaterialTypeProperty(Material.STONE_BUTTON, Material.WOOD_BUTTON);
 
     /**
      * The material is a type of comparator (item type excluded)
