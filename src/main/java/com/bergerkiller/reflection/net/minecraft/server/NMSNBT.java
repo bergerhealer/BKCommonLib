@@ -2,6 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -66,7 +67,7 @@ public class NMSNBT {
     }
 
     public static class Type {
-        private static final Map<Class<?>, Type> dataTags = new HashMap<Class<?>, Type>();
+        private static final ClassMap<Type> dataTags = new ClassMap<Type>();
         private static final Map<Class<?>, Type> nbtTags = new HashMap<Class<?>, Type>();
         public final Class<?> nbtType;
         public final Constructor<?> constructor;
@@ -78,12 +79,12 @@ public class NMSNBT {
             this.nbtType = nbtClass;
             if (NMSNBT.List.T.isType(nbtClass)) {
                 this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "list"));
-                this.dataType = List.class;
+                this.dataType = java.util.List.class;
                 this.constructor = nbtClass.getDeclaredConstructor();
                 this.dataName = "TagList";
             } else if (NMSNBT.Compound.T.isType(nbtClass)) {
                 this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, "map"));
-                this.dataType = Map.class;
+                this.dataType = java.util.Map.class;
                 this.constructor = nbtClass.getDeclaredConstructor();
                 this.dataName = "TagCompound";
             } else {
@@ -147,17 +148,9 @@ public class NMSNBT {
                 return info;
             } else {
                 // Get from data
-                final Class<?> dataType;
-                if (data instanceof List) {
-                    dataType = List.class;
-                } else if (data instanceof Map) {
-                    dataType = Map.class;
-                } else {
-                    dataType = data.getClass();
-                }
-                Type info = dataTags.get(dataType);
+                Type info = dataTags.get(data);
                 if (info == null) {
-                    throw new RuntimeException("Unknown tag data type: " + dataType.getName());
+                    throw new RuntimeException("Unknown tag data type: " + data.getClass().getName());
                 }
                 return info;
             }
@@ -304,7 +297,8 @@ public class NMSNBT {
 
 	public static class List extends Base {
 	    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagList");
-	    public static final FieldAccessor<Byte> type = T.selectField("private List<NBTBase> list");
+	    public static final FieldAccessor<java.util.List<Object>> list = T.selectField("private List<NBTBase> list");
+	    public static final FieldAccessor<Byte> type = T.selectField("private byte type");
 	    public static final MethodAccessor<Void> add = T.selectMethod("public void add(NBTBase value)");
 	    public static final MethodAccessor<Integer> size = T.selectMethod("public int size()");
 	    public static final MethodAccessor<Object> get = T.selectMethod("public NBTTagCompound get(int key)");

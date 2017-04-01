@@ -28,7 +28,7 @@ public class NMSEntityLiving extends NMSEntity {
 
     public static final MethodAccessor<Void> resetAttributes = T.selectMethod("protected void initAttributes()");
     public static final MethodAccessor<Object> getAttributesMap = T.selectMethod("public AttributeMapBase getAttributeMap()");
-    
+    public static final MethodAccessor<Void> initAttributes = T.selectMethod("protected void initAttributes()");
     /*
 	 * public static final TranslatorFieldAccessor<PlayerAbilities> abilities = TEMPLATE.getField("abilities").translate(ConversionPairs.playerAbilities);
      */

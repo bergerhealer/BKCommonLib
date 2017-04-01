@@ -11,15 +11,6 @@ public class NMSEntityTypes {
 
     private static final MethodAccessor<Void> register = T.selectMethod("private static void a(int entityId, String name1, Class<? extends Entity> entityClass, String name2)");
 
-    private static final MethodAccessor<Void> registerAll = T.selectMethod("public static void b()");
-
-    /**
-     * Only used during tests to initialize the entity registry
-     */
-    public static void registerAllEntities() {
-        registerAll.invoke(null);
-    }
-
     /**
      * Registers a new entity
      */
