@@ -27,6 +27,7 @@ import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
 import net.minecraft.server.v1_11_R1.EnumHand;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.block.BlockState;
@@ -98,7 +99,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
                 return CBCraftItemStack.handle.get(value);
             } else if (value instanceof org.bukkit.inventory.ItemStack) {
                 org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) value;
-                Object rval = CraftItemStack.asNMSCopy(stack);
+                Object rval = Bukkit.getServer() != null ? CraftItemStack.asNMSCopy(stack) : null;
                 if (rval == null) {
                     rval = NMSItemStack.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
                 }
