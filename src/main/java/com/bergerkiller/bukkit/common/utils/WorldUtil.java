@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
@@ -551,5 +552,160 @@ public class WorldUtil extends ChunkUtil {
      */
     public static Block rayTraceBlock(Location startLocation, double maxLength) {
         return rayTraceBlock(startLocation, startLocation.getDirection(), maxLength);
+    }
+
+    /**
+     * Gets the current weather state set for a world
+     * 
+     * @param world to get the weather state for
+     * @return weather state it is set to
+     */
+    public static WeatherState getWeatherState(org.bukkit.World world) {
+        if (world.hasStorm()) {
+            if (world.isThundering()) {
+                return WeatherState.STORM;
+            } else {
+                return WeatherState.RAIN;
+            }
+        } else {
+            return WeatherState.CLEAR;
+        }
+    }
+
+    /**
+     * Gets the duration of the current weather state, until the weather state
+     * switches to the future state obtained from {@link #getFutureWeatherState(world)}
+     * 
+     * @param world to get the current weather duration for
+     * @return duration in ticks
+     */
+    public static int getWeatherDuration(org.bukkit.World world) {
+        if (world.hasStorm()) {
+            return Math.min(world.getWeatherDuration(), world.getThunderDuration());
+        } else {
+            return world.getWeatherDuration();
+        }
+    }
+
+    /**
+     * Instantly switches the weather of a world to a new state.
+     * This function resets the weather timers to random values, causing an unpredictable
+     * future forecast. To set a predefined duration of this weather state, use
+     * {@link #setWeatherDuration(world, durationInTicks)}
+     * 
+     * @param world to set the weather state for
+     * @param state to set to
+     */
+    public static void setWeatherState(org.bukkit.World world, WeatherState state) {
+        CommonNMS.getNative(world).worldData.i(0); // reset 'clear' timer, otherwise we can not change weather!
+        if (state == WeatherState.CLEAR) {
+            if (world.hasStorm()) {
+                world.setStorm(false);
+                world.setThundering(new Random().nextBoolean());
+            }
+        } else if (state == WeatherState.RAIN) {
+            if (!world.hasStorm() || world.isThundering()) {
+                world.setStorm(true);
+                world.setThundering(false);
+            }
+        } else if (state == WeatherState.STORM) {
+            if (!world.hasStorm() || !world.isThundering()) {
+                world.setStorm(true);
+                world.setThundering(true);
+            }
+        }
+    }
+
+    /**
+     * Sets the weather duration of the current weather state, until it switches to a future state.
+     * To make the current weather state last forever, specify a duration of Integer.MAX_VALUE.<br><br>
+     * 
+     * The future weather state will always go from clear <> rain/storm.
+     * 
+     * @param world to set the weather duration for
+     * @param durationInTicks to set the duration to
+     */
+    public static void setWeatherDuration(org.bukkit.World world, int durationInTicks) {
+        world.setWeatherDuration(durationInTicks);
+        world.setThunderDuration(durationInTicks);
+    }
+
+    /**
+     * Gets the very next weather state the world will switch to after the
+     * time for the current weather state expires.
+     * 
+     * @param world to get the next weather state for
+     * @return future weather state
+     */
+    public static WeatherState getFutureWeatherState(org.bukkit.World world) {
+        int rainDuration = world.getWeatherDuration();
+        int stormDuration = world.getThunderDuration();
+        WeatherState currentState = getWeatherState(world);
+        if (currentState == WeatherState.CLEAR) {
+            // Rain or storm?
+            boolean storm = world.isThundering();
+            if (stormDuration < rainDuration) {
+                storm = !storm;
+            }
+            return storm ? WeatherState.STORM : WeatherState.RAIN;
+        } else if (currentState == WeatherState.RAIN) {
+            // Clear weather, or will it turn into a storm?
+            if (stormDuration < rainDuration) {
+                return WeatherState.STORM;
+            } else {
+                return WeatherState.CLEAR;
+            }
+        } else if (currentState == WeatherState.STORM) {
+            // Clear weather, or will the storm die down and turn into rainfall?
+            if (stormDuration < rainDuration) {
+                return WeatherState.RAIN;
+            } else {
+                return WeatherState.CLEAR;
+            }
+        }
+        return WeatherState.CLEAR; // never reached
+    }
+
+    /**
+     * Sets the very next weather state the world will switch to after the current
+     * weather state expires. Attempts to set a future state the same as the current
+     * one, or to a future state that it is already set to, are ignored.
+     * 
+     * @param world to set the future weather state for
+     * @param state to set to
+     */
+    public static void setFutureWeatherState(org.bukkit.World world, WeatherState state) {
+        WeatherState currentState = state;
+        if (currentState == state || getFutureWeatherState(world) == state)
+            return;
+
+        int rainDuration = world.getWeatherDuration();
+        int stormDuration = world.getThunderDuration();
+        if (currentState == WeatherState.CLEAR) {
+            // Got to toggle the 'thundering' state to make sure it is correct
+            world.setThundering(!world.isThundering());
+            world.setThunderDuration(stormDuration);
+        } else if (currentState == WeatherState.RAIN) {
+            if (state == WeatherState.CLEAR) {
+                // Got to make sure it does not start thundering before the rain ends
+                world.setThunderDuration(rainDuration + 1);
+            } else if (state == WeatherState.STORM) {
+                // Make sure that thunder happens after the rain finishes
+                // Use a random thundering time based on MC values
+                world.setThunderDuration(rainDuration);
+                world.setWeatherDuration(rainDuration + new Random().nextInt(12000) + 3600);
+            }
+        } else if (currentState == WeatherState.STORM) {
+            if (state == WeatherState.CLEAR) {
+                // Got to make sure it does not stop thundering before the storm ends
+                world.setThunderDuration(rainDuration + 1);
+            } else if (state == WeatherState.RAIN) {
+                // We know for certain the next state will not be rain, but clear weather
+                // Make sure thundering is stopped at the time the rain is set to stop
+                int durationOfRainAfterStorm = new Random().nextInt(12000) + 12000;
+                world.setThunderDuration(rainDuration);
+                world.setWeatherDuration(rainDuration + durationOfRainAfterStorm);
+            }
+        }
     }
 }
