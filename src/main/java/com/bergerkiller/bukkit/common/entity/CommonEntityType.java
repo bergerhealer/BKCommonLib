@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.SafeConstructor;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMinecraftKey;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRegistryMaterials;
@@ -57,27 +58,50 @@ public class CommonEntityType {
 
         // Figure out what kind of NMS Class belongs to this EntityType by comparing with the internal NMS EntityTypes listing
         Class<?> nmsType = null;
-        Object entityMapping = NMSEntityTypes.entityMapping.get(null);
-        if (entityMapping == null) {
-            Logging.LOGGER_REGISTRY.once(Level.SEVERE, "Failed to initialize CommonEntityType registry: no entity mapping registry");
-        } else {
-            // Create minecraft key from EntityType name
-            String entityTypeName;
-            if (entityType == EntityType.MINECART_FURNACE) {
-                entityTypeName = "furnace_minecart"; // DAMMIT BUKKIT
-            } else {
-                entityTypeName = entityType.getName();
+        if (entityType.getTypeId() == -1) {
+            // Some special types that don't show up as a registered class
+            String nmsName = null;
+            switch (entityType) {
+            case PLAYER: nmsName = "EntityPlayer"; break;
+            case WEATHER: nmsName = "EntityWeather"; break;
+            case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
+            case LIGHTNING: nmsName = "EntityLightning"; break;
+            case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
+            case TIPPED_ARROW: nmsName = "EntityTippedArrow"; break;
+            case LINGERING_POTION: nmsName = "EntityPotion"; break;
             }
-            if (entityTypeName != null) {
-                Object mcKey = NMSMinecraftKey.newInstance(entityTypeName);
-                nmsType = (Class<?>) NMSRegistryMaterials.getValue.invoke(entityMapping, mcKey);
-                if (nmsType == null) {
-                    // Try by EntityTypeId instead
-                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
-                }
+            if (nmsName == null) {
+                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");
             } else {
-                // EntityType without a MC name? That's not good.
-                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: no name (" + entityType.toString() + ")");
+                nmsType = CommonUtil.getNMSClass(nmsName);
+                if (nmsType == null) {
+                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: class not found (" + entityType.toString() + ") class=" + nmsName);
+                }
+            }
+        } else {
+            // Registered entity types
+            Object entityMapping = NMSEntityTypes.entityMapping.get(null);
+            if (entityMapping == null) {
+                Logging.LOGGER_REGISTRY.once(Level.SEVERE, "Failed to initialize CommonEntityType registry: no entity mapping registry");
+            } else {
+                // Create minecraft key from EntityType name
+                String entityTypeName;
+                if (entityType == EntityType.MINECART_FURNACE) {
+                    entityTypeName = "furnace_minecart"; // DAMMIT BUKKIT
+                } else {
+                    entityTypeName = entityType.getName();
+                }
+                if (entityTypeName != null) {
+                    Object mcKey = NMSMinecraftKey.newInstance(entityTypeName);
+                    nmsType = (Class<?>) NMSRegistryMaterials.getValue.invoke(entityMapping, mcKey);
+                    if (nmsType == null) {
+                        // Try by EntityTypeId instead
+                        Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
+                    }
+                } else {
+                    // EntityType without a MC name? That's not good.
+                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: no name (" + entityType.toString() + ")");
+                }
             }
         }
 
@@ -101,7 +125,7 @@ public class CommonEntityType {
         String commonTypeName = Common.COMMON_ROOT + ".entity.type.Common" + typeName;
         Class<?> commonType = CommonUtil.getClass(commonTypeName);
         Class<?> entityClass = this.bukkitType.getType();
-        if (commonType == null) {
+        if (commonType == null && entityClass != null) {
             // No specifics - try to find a sub-category
             if (LivingEntity.class.isAssignableFrom(entityClass)) {
                 commonType = CommonLivingEntity.class;
@@ -187,11 +211,12 @@ public class CommonEntityType {
 
     static {
         for (EntityType entityType : EntityType.values()) {
+            if (entityType == EntityType.UNKNOWN) {
+                continue; // ignore UNKNOWN
+            }
             CommonEntityType commonEntityType = null;
             try {
-                if (entityType.getTypeId() != -1) {
-                    commonEntityType = new CommonEntityType(entityType, false);
-                }
+                commonEntityType = new CommonEntityType(entityType, false);
             } catch (Throwable t) {
                 Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to register entity type " + entityType.toString(), t);
             }
