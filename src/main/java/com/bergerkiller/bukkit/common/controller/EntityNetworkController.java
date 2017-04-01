@@ -558,8 +558,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         if (entity.isInsideVehicle()) {
             Logging.LOGGER_DEBUG.warnOnce("is it required to send a separate vehicle packet?");
         }
-        if (entity.hasPassenger()) {
-            PacketUtil.sendPacket(viewer, getMountPacket(entity.getPassengers()));
+        List<org.bukkit.entity.Entity> passengers = this.passengersSynched.get();
+        if (!passengers.isEmpty()) {
+            PacketUtil.sendPacket(viewer, getMountPacket(passengers));
         }
 
         // Potential leash

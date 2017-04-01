@@ -277,7 +277,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     }
 
     @SuppressWarnings("unchecked")
-    private void replaceEntity(final Entity newInstance) {        
+    private void replaceEntity(final Entity newInstance) {
         final Entity oldInstance = getHandle(Entity.class);
         if (oldInstance == newInstance) {
             throw new RuntimeException("Can not replace an entity with itself!");

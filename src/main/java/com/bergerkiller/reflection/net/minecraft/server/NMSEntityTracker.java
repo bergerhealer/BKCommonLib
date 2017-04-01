@@ -123,6 +123,11 @@ public class NMSEntityTracker {
         if (createdEntry == null) {
             createdEntry = NMSEntityTrackerEntry.createNew(entity, 80, (Bukkit.getViewDistance()-1) * 16, 3, true); // defaults
         }
+
+        // Bugfix: Add all current passengers to the passengers field right now
+        // We must do this so that the next updatePlayer() update is properly synchronized
+        NMSEntityTrackerEntry.passengers.set(createdEntry, entity.getPassengers());
+
         return createdEntry;
     }
 
