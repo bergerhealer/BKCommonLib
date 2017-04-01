@@ -1034,8 +1034,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutUnloadChunk extends NMSPacket {
 
-        public final FieldAccessor<Integer> cx = nextField("private int a");
-        public final FieldAccessor<Integer> cy = nextFieldSignature("private int b");
+        public final FieldAccessor<Integer> x = nextField("private int a");
+        public final FieldAccessor<Integer> z = nextFieldSignature("private int b");
     }
 
     public static class NMSPacketPlayOutUpdateAttributes extends NMSPacket {
