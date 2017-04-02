@@ -47,6 +47,10 @@ public class ItemMaterialTest {
 
         // Note: SUFFOCATES is the same as ISSOLID right now
         // Is this correct? I have not seen any case where the values are different.
+        testProperty(MaterialUtil.SUFFOCATES, "SUFFOCATES")
+            .checkProperty(MaterialUtil.ISSOLID, true)
+            .checkOthers(false)
+            .done();
 
         testProperty(MaterialUtil.EMISSION, "EMISSION")
             .check(Material.STONE, 0)
@@ -111,6 +115,31 @@ public class ItemMaterialTest {
 
         testProperty(MaterialUtil.ISMINECART, "ISMINECART")
             .checkName("MINECART", true)
+            .checkOthers(false)
+            .done();
+
+        testProperty(MaterialUtil.ISSWORD, "ISSWORD")
+            .checkName("SWORD", true)
+            .checkOthers(false)
+            .done();
+
+        testProperty(MaterialUtil.ISBOOTS, "ISBOOTS")
+            .checkName("BOOTS", true)
+            .checkOthers(false)
+            .done();
+
+        testProperty(MaterialUtil.ISCHESTPLATE, "ISCHESTPLATE")
+            .checkName("CHESTPLATE", true)
+            .checkOthers(false)
+            .done();
+
+        testProperty(MaterialUtil.ISLEGGINGS, "ISLEGGINGS")
+            .checkName("LEGGINGS", true)
+            .checkOthers(false)
+            .done();
+
+        testProperty(MaterialUtil.ISHELMET, "ISHELMET")
+            .checkName("HELMET", true)
             .checkOthers(false)
             .done();
 
