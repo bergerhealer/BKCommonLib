@@ -160,7 +160,8 @@ public class StringUtil {
      * @return Character width in pixels
      */
     public static int getWidth(char character) {
-        return MinecraftFont.Font.getChar(character).getWidth();
+        CharacterSprite s = MinecraftFont.Font.getChar(character);
+        return (s == null) ? 1 : s.getWidth();
     }
 
     public static int firstIndexOf(String text, char... values) {
