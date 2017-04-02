@@ -602,16 +602,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
         }
 
+        // Create the common entity and Entity NMS handle to add to the server
         final CommonEntity<org.bukkit.entity.Entity> entity = type.createNMSHookEntity(location);
-        // Set entity position and spawn in the world
-        //entity.last.set(entity.loc.set(location));
-        //EntityUtil.addEntity(entity.getEntity());
 
-        // Set controllers
+        // Set controller before spawning
         entity.setController(controller);
-        entity.setNetworkController(networkController);
 
+        // Add the Entity in the world. Note that this creates a default Entity Network Controller entry.
         EntityUtil.addEntity(entity.getEntity());
+
+        // Replace the default Entity Network Controller with the one specified
+        entity.setNetworkController(networkController);
 
         // Done!
         entity.onSpawn();

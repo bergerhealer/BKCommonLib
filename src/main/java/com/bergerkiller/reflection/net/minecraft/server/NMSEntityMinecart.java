@@ -17,6 +17,10 @@ public class NMSEntityMinecart {
 
     public static final MethodAccessor<Void> activate = T.selectMethod("public void a(int x, int y, int z, boolean active)");
 
+    public static class Rideable {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartRideable");
+    }
+
     public static class Furnace {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartFurnace");
 

@@ -907,7 +907,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         NMSEntityTrackerEntry.timeSinceLocationSync.set(handle, 0);
 
         // Send synchronization messages
-        broadcast(getLocationPacket(posX, posY, posZ, (byte) yaw, (byte) pitch));
+        broadcast(getLocationPacket(posX, posY, posZ, yaw, pitch));
     }
 
     /**
