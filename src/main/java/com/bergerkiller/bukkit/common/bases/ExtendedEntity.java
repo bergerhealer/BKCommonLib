@@ -38,6 +38,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
@@ -981,6 +982,26 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     public <V> DataWatcher.Item<V> getDataItem(DataWatcher.Key<V> key) {
         return new DataWatcher.Item<V>(this, key);
+    }
+
+    /**
+     * Reads an NMS field value
+     * 
+     * @param field to read
+     * @return field value
+     */
+    public <V> V read(FieldAccessor<V> field) {
+        return field.get(getHandle());
+    }
+
+    /**
+     * Writes an NMS field value
+     * 
+     * @param field to write
+     * @param value to write
+     */
+    public <V> void write(FieldAccessor<V> field, V value) {
+        field.set(getHandle(), value);
     }
 
     @Override

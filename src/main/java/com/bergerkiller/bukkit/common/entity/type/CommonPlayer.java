@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * A Common Entity implementation for Players
  */
-public class CommonPlayer extends CommonLivingEntity<Player> {
+public class CommonPlayer extends CommonHumanEntity<Player> {
 
     public CommonPlayer(Player entity) {
         super(entity);

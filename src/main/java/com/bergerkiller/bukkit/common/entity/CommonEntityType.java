@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.type.CommonHumanEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
@@ -12,7 +13,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.SafeConstructor;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMinecraftKey;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRegistryMaterials;
@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
@@ -35,6 +36,7 @@ import java.util.logging.Level;
 public class CommonEntityType {
     public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
+    private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
 
     public final ClassTemplate<?> nmsType;
@@ -127,12 +129,16 @@ public class CommonEntityType {
         Class<?> entityClass = this.bukkitType.getType();
         if (commonType == null && entityClass != null) {
             // No specifics - try to find a sub-category
-            if (LivingEntity.class.isAssignableFrom(entityClass)) {
-                commonType = CommonLivingEntity.class;
-                entityClass = LivingEntity.class;
-            } else if (Minecart.class.isAssignableFrom(entityClass)) {
-                commonType = CommonMinecart.class;
-                entityClass = Minecart.class;
+            CommonPair foundPair = null;
+            for (CommonPair pair : commonPairs) {
+                if (pair.bukkitType.isAssignableFrom(entityClass)) {
+                    foundPair = pair;
+                    break;
+                }
+            }
+            if (foundPair != null) {
+                commonType = foundPair.commonType;
+                entityClass = foundPair.bukkitType;
             } else {
                 commonType = CommonEntity.class;
                 entityClass = Entity.class;
@@ -209,7 +215,28 @@ public class CommonEntityType {
         return LogicUtil.fixNull(byNMS.get(entityHandle), UNKNOWN);
     }
 
+    @SuppressWarnings("rawtypes")
+    private static class CommonPair {
+        public final Class<? extends Entity> bukkitType;
+        public final Class<? extends CommonEntity> commonType;
+
+        public CommonPair(Class<? extends Entity> bukkitType, Class<? extends CommonEntity> commonType) {
+            this.bukkitType = bukkitType;
+            this.commonType = commonType;
+        }
+    }
+
     static {
+        // Remappings between some Bukkit entity types and Common entity types
+        // Order is important, the first pair that can be used is selected
+        // Since humans are living entities, they must be put before living entities
+        commonPairs = new CommonPair[] {
+                new CommonPair(HumanEntity.class, CommonHumanEntity.class),
+                new CommonPair(LivingEntity.class, CommonLivingEntity.class),
+                new CommonPair(Minecart.class, CommonMinecart.class)
+        };
+
+        // Register all entity types and verify them
         for (EntityType entityType : EntityType.values()) {
             if (entityType == EntityType.UNKNOWN) {
                 continue; // ignore UNKNOWN
