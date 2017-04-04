@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import org.bukkit.Bukkit;
@@ -74,6 +75,19 @@ public class BlockLocation {
     }
 
     /**
+     * Initializes a new Block Location usinga world and coordinates pair
+     * 
+     * @param world name to use
+     * @param coordinates to use
+     */
+    public BlockLocation(final String world, IntVector3 coordinates) {
+        this.world = world;
+        this.x = coordinates.x;
+        this.y = coordinates.y;
+        this.z = coordinates.z;
+    }
+
+    /**
      * Tries to parse a Block Location from a String value
      *
      * @param value to parse
@@ -115,6 +129,15 @@ public class BlockLocation {
             return null;
         }
         return world.getChunkAt(this.x / 16, this.z / 16);
+    }
+
+    /**
+     * Gets the x/y/z coordinates of this Block Location as an IntVector3
+     * 
+     * @return block coordinates vector
+     */
+    public IntVector3 getCoordinates() {
+        return new IntVector3(this.x, this.y, this.z);
     }
 
     /**

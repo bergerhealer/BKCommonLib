@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.nbt;
 
+import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
@@ -224,6 +225,49 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         }
         putValue(key + "UUIDMost", most);
         putValue(key + "UUIDLeast", least);
+    }
+
+    /**
+     * Gets a Block Location value from previously-stored keys. If the key is
+     * 'Spawn' then the world 'SpawnWorld' and coordinates 'SpawnX', 'SpawnY' and
+     * 'SpawnZ' are read. If some of the values are missing, null is returned instead
+     *
+     * @param key to read
+     * @return value at the key
+     */
+    public BlockLocation getBlockLocation(String key) {
+        Object world = getValue(key + "World");
+        Object x = getValue(key + "X");
+        Object y = getValue(key + "Y");
+        Object z = getValue(key + "Z");
+        if (world instanceof String && !((String) world).isEmpty() && 
+                (x instanceof Integer && y instanceof Integer && z instanceof Integer)) {
+            return new BlockLocation((String) world, (Integer) x, (Integer) y, (Integer) z);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Puts a Block Location value by storing it under a world and three coordinate keys.
+     * If the key is 'Spawn', then 'SpawnWorld' and the coordinates 'SpawnX', 'SpawnY' and
+     * 'SpawnZ' are stored. If the data is null, the elements at the key are removed.
+     * 
+     * @param key to put at
+     * @param location to put
+     */
+    public void putBlockLocation(String key, BlockLocation location) {
+        if (location == null) {
+            removeValue(key + "World");
+            removeValue(key + "X");
+            removeValue(key + "Y");
+            removeValue(key + "Z");
+        } else {
+            putValue(key + "World", location.world);
+            putValue(key + "X", location.x);
+            putValue(key + "Y", location.y);
+            putValue(key + "Z", location.z);
+        }
     }
 
     /**
