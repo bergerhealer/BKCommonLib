@@ -22,10 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 public class NMSNBT {
-	
+    
     /**
      * Creates an NBT Tag handle to store the data specified in<br>
      * All primitive types, including byte[] and int[], and list/maps are
@@ -104,11 +105,11 @@ public class NMSNBT {
         }
         
         static {
-        	java.util.List<String> names = Arrays.asList("NBTTagByte", "NBTTagShort", "NBTTagInt",
-        			"NBTTagLong", "NBTTagFloat", "NBTTagDouble", "NBTTagString", "NBTTagByteArray",
-        			"NBTTagIntArray", "NBTTagList", "NBTTagCompound");
-        	
-        	for (String name : names) {
+            java.util.List<String> names = Arrays.asList("NBTTagByte", "NBTTagShort", "NBTTagInt",
+                    "NBTTagLong", "NBTTagFloat", "NBTTagDouble", "NBTTagString", "NBTTagByteArray",
+                    "NBTTagIntArray", "NBTTagList", "NBTTagCompound");
+            
+            for (String name : names) {
                 try {
                     Class<?> nbtType = CommonUtil.getNMSClass(name);
                     Type dataTag = new Type(nbtType);
@@ -123,9 +124,9 @@ public class NMSNBT {
                     dataTags.put(dataTag.dataType, dataTag);
                     nbtTags.put(dataTag.nbtType, dataTag);
                 } catch (Throwable e) {
-                	Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to load NBT Tag " + name + ":", e);
+                    Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to load NBT Tag " + name + ":", e);
                 }
-        	}
+            }
         }
 
         /**
@@ -138,7 +139,7 @@ public class NMSNBT {
             if (data == null) {
                 throw new RuntimeException("Can not find tag information of null data");
             } else if (data instanceof CommonTag) {
-            	return ((CommonTag) data).getType();
+                return ((CommonTag) data).getType();
             } else if (NMSNBT.Base.T.isInstance(data)) {
                 // Get from handle
                 Type info = nbtTags.get(data.getClass());
@@ -196,25 +197,27 @@ public class NMSNBT {
             StringBuilder text = new StringBuilder(100);
 
             // Data type and name header
-            text.append(indentTxt).append(dataName).append(": ");
+            text.append(dataName).append(": ");
 
             // Tag data information
             if (NMSNBT.List.T.isInstance(handle)) {
                 java.util.List<Object> elements = (java.util.List<Object>) getData(handle);
-                
+
                 // In case of list: show all values on several lines
-                text.append(elements.size()).append(" entries {");
+                text.append(elements.size()).append(" entries [");
                 for (Object handleElem : elements) {
-                    text.append('\n').append(find(handleElem).toString(handleElem, indent + 1));
+                    text.append('\n').append(indentTxt).append("  ").append(find(handleElem).toString(handleElem, indent + 1));
                 }
-                return text.append('\n').append(indentTxt).append("}").toString();
+                return text.append('\n').append(indentTxt).append("]").toString();
             } else if (NMSNBT.Compound.T.isInstance(handle)) {
                 // In case of compound: show all key: value pairs on several lines
-                java.util.Map<String, Object> elements = (Map<String, Object>) getData(handle);
+                // Make sure to sort the map by key name first for easier display!
+                TreeMap<String, Object> elements = new TreeMap<String, Object>((Map<String, Object>) getData(handle));
                 text.append(elements.size()).append(" entries {");
                 for (Entry<String, Object> handleElem : elements.entrySet()) {
-                    text.append('\n').append(handleElem.getKey()).append(" = ");
-                    
+                    text.append('\n').append(indentTxt).append("  ");
+                    text.append(handleElem.getKey()).append(" = ");
+
                     Object value = handleElem.getValue();
                     text.append(find(value).toString(value, indent + 1));
                 }
@@ -289,59 +292,59 @@ public class NMSNBT {
         }
     }
 
-	public static class Base {
-	    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTBase");
-	    public static final MethodAccessor<Byte> getTypeId = T.selectMethod("public abstract byte getTypeId()");
-	    public static final MethodAccessor<Object> clone = T.selectMethod("public abstract NBTBase clone()");
-	}
+    public static class Base {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTBase");
+        public static final MethodAccessor<Byte> getTypeId = T.selectMethod("public abstract byte getTypeId()");
+        public static final MethodAccessor<Object> clone = T.selectMethod("public abstract NBTBase clone()");
+    }
 
-	public static class List extends Base {
-	    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagList");
-	    public static final FieldAccessor<java.util.List<Object>> list = T.selectField("private List<NBTBase> list");
-	    public static final FieldAccessor<Byte> type = T.selectField("private byte type");
-	    public static final MethodAccessor<Void> add = T.selectMethod("public void add(NBTBase value)");
-	    public static final MethodAccessor<Integer> size = T.selectMethod("public int size()");
-	    public static final MethodAccessor<Object> get = T.selectMethod("public NBTTagCompound get(int key)");
-	}
+    public static class List extends Base {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagList");
+        public static final FieldAccessor<java.util.List<Object>> list = T.selectField("private List<NBTBase> list");
+        public static final FieldAccessor<Byte> type = T.selectField("private byte type");
+        public static final MethodAccessor<Void> add = T.selectMethod("public void add(NBTBase value)");
+        public static final MethodAccessor<Integer> size = T.selectMethod("public int size()");
+        public static final MethodAccessor<Object> get = T.selectMethod("public NBTBase h(int paramInt)");
+    }
 
-	public static class Compound extends Base {
-	    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagCompound");
-	    public static final FieldAccessor<Map<String, ?>> map = T.selectField("private final Map<String, NBTBase> map");
-	    public static final MethodAccessor<Integer> size = T.selectMethod("public int d()");
-	    public static final MethodAccessor<Set<String>> getKeys = T.selectMethod("public Set<String> c()");
-	    public static final MethodAccessor<Collection<?>> getValues = new SafeDirectMethod<Collection<?>>() {
-			@Override
-			public Collection<?> invoke(Object instance, Object... args) {
-				return map.get(instance).values();
-			}
-	    };
-	    public static final MethodAccessor<Void> remove = T.selectMethod("public void remove(String key)");
-	    public static final MethodAccessor<Void> set = T.selectMethod("public void set(String key, NBTBase value)");
-	    public static final MethodAccessor<Object> get = T.selectMethod("public NBTBase get(String key)");
-	    public static final MethodAccessor<Boolean> contains = T.selectMethod("public boolean hasKey(String key)");
-	    public static final MethodAccessor<Boolean> isEmpty = T.selectMethod("public boolean isEmpty()");
-	}
+    public static class Compound extends Base {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagCompound");
+        public static final FieldAccessor<Map<String, ?>> map = T.selectField("private final Map<String, NBTBase> map");
+        public static final MethodAccessor<Integer> size = T.selectMethod("public int d()");
+        public static final MethodAccessor<Set<String>> getKeys = T.selectMethod("public Set<String> c()");
+        public static final MethodAccessor<Collection<?>> getValues = new SafeDirectMethod<Collection<?>>() {
+            @Override
+            public Collection<?> invoke(Object instance, Object... args) {
+                return map.get(instance).values();
+            }
+        };
+        public static final MethodAccessor<Void> remove = T.selectMethod("public void remove(String key)");
+        public static final MethodAccessor<Void> set = T.selectMethod("public void set(String key, NBTBase value)");
+        public static final MethodAccessor<Object> get = T.selectMethod("public NBTBase get(String key)");
+        public static final MethodAccessor<Boolean> contains = T.selectMethod("public boolean hasKey(String key)");
+        public static final MethodAccessor<Boolean> isEmpty = T.selectMethod("public boolean isEmpty()");
+    }
 
-	public static class StreamTools {
-		public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTCompressedStreamTools")
-				.addImport("java.io.*");
+    public static class StreamTools {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTCompressedStreamTools")
+                .addImport("java.io.*");
 
-		public static class Uncompressed {
-			public static final MethodAccessor<Object> readTag = T.selectMethod("private static NBTBase a(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter)");
-			public static final MethodAccessor<Void> writeTag = T.selectMethod("private static void a(NBTBase nbtbase, DataOutput dataoutput)");
-			public static final MethodAccessor<Object> readTagCompound = T.selectMethod("public static NBTTagCompound a(DataInputStream datainputstream)");
-			public static final MethodAccessor<Void> writeTagCompound = T.selectMethod("public static void a(NBTTagCompound nbttagcompound, DataOutput dataoutput)");
+        public static class Uncompressed {
+            public static final MethodAccessor<Object> readTag = T.selectMethod("private static NBTBase a(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter)");
+            public static final MethodAccessor<Void> writeTag = T.selectMethod("private static void a(NBTBase nbtbase, DataOutput dataoutput)");
+            public static final MethodAccessor<Object> readTagCompound = T.selectMethod("public static NBTTagCompound a(DataInputStream datainputstream)");
+            public static final MethodAccessor<Void> writeTagCompound = T.selectMethod("public static void a(NBTTagCompound nbttagcompound, DataOutput dataoutput)");
 
-			private static final Class<?> readLimiter_t = CommonUtil.getNMSClass("NBTReadLimiter");
-			private static final SafeField<?> inf_lim = new SafeField<Object>(readLimiter_t, "a", readLimiter_t);
-			public static Object getNoReadLimiter() {
-				return inf_lim.get(null);
-			}
-		}
+            private static final Class<?> readLimiter_t = CommonUtil.getNMSClass("NBTReadLimiter");
+            private static final SafeField<?> inf_lim = new SafeField<Object>(readLimiter_t, "a", readLimiter_t);
+            public static Object getNoReadLimiter() {
+                return inf_lim.get(null);
+            }
+        }
 
-		public static class Compressed {
-			public static final MethodAccessor<Object> readTagCompound = T.selectMethod("public static NBTTagCompound a(InputStream inputstream)");
-			public static final MethodAccessor<Void> writeTagCompound = T.selectMethod("public static void a(NBTTagCompound nbttagcompound, OutputStream outputstream)");
-		}
-	}
+        public static class Compressed {
+            public static final MethodAccessor<Object> readTagCompound = T.selectMethod("public static NBTTagCompound a(InputStream inputstream)");
+            public static final MethodAccessor<Void> writeTagCompound = T.selectMethod("public static void a(NBTTagCompound nbttagcompound, OutputStream outputstream)");
+        }
+    }
 }
