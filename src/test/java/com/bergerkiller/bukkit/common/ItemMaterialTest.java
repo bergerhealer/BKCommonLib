@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 /*
  * Tests whether the material properties and ItemStack-related utilities are functional
@@ -239,7 +240,7 @@ public class ItemMaterialTest {
 
         public PropertyTest<T> checkData(Class<?> materialData, T value) {
             for (Material m : remaining()) {
-               MaterialData data = MaterialUtil.getData(m, 0);
+               MaterialData data = BlockData.fromMaterial(m).newMaterialData();
                if (materialData.isInstance(data)) {
                    check(m, value);
                }

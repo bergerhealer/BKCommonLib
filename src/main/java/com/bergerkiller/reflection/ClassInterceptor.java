@@ -65,6 +65,14 @@ public abstract class ClassInterceptor {
     protected abstract Invokable getCallback(Method method);
 
     /**
+     * Callback function called when a new intercepted hooked class type has been generated.
+     * 
+     * @param hookedType that was generated
+     */
+    protected void onClassGenerated(Class<?> hookedType) {
+    }
+
+    /**
      * Creates a new hooked instance of the type specified, without constructing it
      * 
      * @param type to create a new hook of
@@ -261,6 +269,22 @@ public abstract class ClassInterceptor {
     }
 
     /**
+     * Gets the Base Type of the Object that is currently being invoked, or was last hooked
+     * 
+     * @return Underlying base type
+     */
+    protected final Class<?> instanceBaseType() {
+        Object instance = this.instance();
+        if (instance instanceof EnhancedObject) {
+            return ((EnhancedObject) instance).CI_getBaseType();
+        } else if (instance != null) {
+            return instance.getClass();
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Invokes the method on the superclass. This bypasses the callbacks and enables the original base class
      * to handle the method.
      * 
@@ -384,6 +408,7 @@ public abstract class ClassInterceptor {
             // Finally create the enhanced class type and store it in the mapping for later use
             enhanced = new EnhancedClass(objectType, enhancer.createClass());
             enhancedTypes.put(key, enhanced);
+            interceptor.onClassGenerated(enhanced.enhancedType);
         }
 
         // Update EnhancedClass property

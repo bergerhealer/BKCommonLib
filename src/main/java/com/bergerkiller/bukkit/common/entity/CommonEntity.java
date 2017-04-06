@@ -23,6 +23,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftInventory;
 
+import net.minecraft.server.v1_11_R1.Chunk;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityTrackerEntry;
 import net.minecraft.server.v1_11_R1.TileEntity;
@@ -376,11 +377,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final int chunkX = NMSEntity.chunkX.get(newInstance);
         final int chunkY = NMSEntity.chunkY.get(newInstance);
         final int chunkZ = NMSEntity.chunkZ.get(newInstance);
-        final List<Entity>[] entitySlices = newInstance.world.getChunkAt(chunkX, chunkZ).entitySlices;
-        if (!replaceInList(entitySlices[chunkY], newInstance)) {
-            for (int y = 0; y < entitySlices.length; y++) {
-                if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
-                    break;
+        Chunk chunk = CommonNMS.getNative(WorldUtil.getChunk(newInstance.world.getWorld(), chunkX, chunkZ));
+        if (chunk != null) {
+            final List<Entity>[] entitySlices = chunk.entitySlices;
+            if (!replaceInList(entitySlices[chunkY], newInstance)) {
+                for (int y = 0; y < entitySlices.length; y++) {
+                    if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
+                        break;
+                    }
                 }
             }
         }

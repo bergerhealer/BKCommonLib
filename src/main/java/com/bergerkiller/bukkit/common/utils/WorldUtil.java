@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
@@ -38,69 +39,106 @@ public class WorldUtil extends ChunkUtil {
     private static final Object findSpawnDummyEntity = NMSEntityPlayer.T.newInstanceNull();
 
     /**
-     * Gets the block type Id
-     *
-     * @param world the block is in
-     * @param blockPos of the block
-     * @return block type Id
+     * Gets BlockData for a particular Block
+     * 
+     * @param block to query
+     * @return BlockData
      */
-    public static int getBlockTypeId(org.bukkit.World world, IntVector3 blockPos) {
-        return getBlockTypeId(world, blockPos.x, blockPos.y, blockPos.z);
+    public static BlockData getBlockData(org.bukkit.block.Block block) {
+        return getBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ());
     }
 
     /**
-     * Gets the block data
-     *
-     * @param world the block is in
-     * @param blockPos of the block
-     * @return block data
+     * Gets BlockData for a particular Block
+     * 
+     * @param world of the block
+     * @param coordinates of the block
+     * @return BlockData
      */
-    public static int getBlockData(org.bukkit.World world, IntVector3 blockPos) {
-        return getBlockData(world, blockPos.x, blockPos.y, blockPos.z);
+    public static BlockData getBlockData(org.bukkit.World world, IntVector3 coordinates) {
+        return getBlockData(world, coordinates.x, coordinates.y, coordinates.z);
     }
 
     /**
-     * Gets the block data
-     *
-     * @param world the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @return block data
+     * Gets BlockData for a particular Block
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @return BlockData
      */
-    @SuppressWarnings("deprecation")
-	public static int getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return world.getBlockAt(x, y, z).getData();
-        //return CommonNMS.getNative(world).chunkProviderServer.getChunkAt(new BlockPosition(x, y, z)).getBlockData(new BlockPosition(x, y, z));
+    public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
+        return BlockData.fromBlockData(CommonNMS.getNative(world).getType(new BlockPosition(x, y, z)));
     }
 
     /**
-     * Gets the block type Id
-     *
-     * @param world the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @return block type Id
+     * Gets Block Material Type for a particular Block.
+     * 
+     * @param block to query
+     * @return Block Material Type
      */
-    @Deprecated
-    public static int getBlockTypeId(org.bukkit.World world, int x, int y, int z) {
-        return world.getBlockAt(x, y, z).getTypeId();
-        //return CommonNMS.getNative(world).getTypeId(x, y, z);
+    public static org.bukkit.Material getBlockType(org.bukkit.block.Block block) {
+        return getBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ()).getType();
     }
 
     /**
-     * Gets the block type
-     *
-     * @param world the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @return block type
+     * Gets Block Material Type for a particular Block.
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @return Block Material Type
      */
     public static org.bukkit.Material getBlockType(org.bukkit.World world, int x, int y, int z) {
-        return world.getBlockAt(x, y, z).getType();
-        //return MaterialUtil.getType(CommonNMS.getNative(world).getTypeId(x, y, z));
+        return getBlockData(world, x, y, z).getType();
+    }
+
+    /**
+     * Sets Block Data for a particular Block and performs physics updates
+     * 
+     * @param block to set
+     * @param data to set to
+     */
+    public static void setBlockData(org.bukkit.block.Block block, BlockData data) {
+        setBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
+    }
+
+    /**
+     * Sets Block Data for a particular Block and performs physics updates
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @param data to set to
+     */
+    public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
+        CommonNMS.getNative(world).setTypeUpdate(new BlockPosition(x, y, z), (IBlockData) data.getData());
+    }
+
+    /**
+     * Sets Block Material Type for a particular Block and performs physics updates
+     * 
+     * @param block to set
+     * @param type to set to
+     */
+    public static void setBlockType(org.bukkit.block.Block block, org.bukkit.Material type) {
+        setBlockData(block, BlockData.fromMaterial(type));
+    }
+
+    /**
+     * Sets Block Material Type for a particular Block and performs physics updates
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @param type to set to
+     */
+    public static void setBlockType(org.bukkit.World world, int x, int y, int z, org.bukkit.Material type) {
+        setBlockData(world, x, y, z, BlockData.fromMaterial(type));
     }
 
     /**
@@ -469,25 +507,38 @@ public class WorldUtil extends ChunkUtil {
         return CommonNMS.getNative(world).areChunksLoaded(new BlockPosition(blockCenterX, 0, blockCenterZ), distance);
     }
 
-    public static void queueChunkSend(org.bukkit.Chunk chunk) {
-        queueChunkSend(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    /**
+     * Queue a chunk for resending to all players that are in range of it.
+     * This will resend the chunk block data, but not any changes to tile entities in them.
+     * Use this method to update chunk data after doing changes to its raw structure.
+     *
+     * @param chunk to resent
+     * @return True if players were nearby, False if not
+     */
+    public static boolean queueChunkSend(org.bukkit.Chunk chunk) {
+        return queueChunkSend(chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
     /**
-     * Queues a chunk for sending to all players in view
+     * Queue a chunk for resending to all players that are in range of it.
+     * This will resend the chunk block data, but not any changes to tile entities in them.
+     * Use this method to update chunk data after doing changes to its raw structure.
      *
-     * @param world the chunk is in
-     * @param chunkX of the chunk
-     * @param chunkZ of the chunk
+     * @param player to send chunk data for
+     * @param chunkX - coordinate of the chunk
+     * @param chunkZ - coordinate of the chunk
+     * @return True if players were nearby, False if not
      */
-    public static void queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
-        Object playerChunkMap = NMSWorldServer.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
-        Object playerChunk = NMSPlayerChunkMap.getPlayerChunk(playerChunkMap, chunkX, chunkZ);
-        if (playerChunk == null) {
-            return;
-        }
-        for (Player player : NMSPlayerChunk.players.get(playerChunk)) {
-            PlayerUtil.queueChunkSend(player, chunkX, chunkZ);
+    public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
+        Object playerChunkMap = CommonNMS.getNative(world).getPlayerChunkMap();
+        Object chunk = NMSPlayerChunkMap.getChunk.invoke(playerChunkMap, chunkX, chunkZ);
+        if (chunk != null && !NMSPlayerChunk.players.get(chunk).isEmpty()) {
+            NMSPlayerChunk.dirtySectionMask.set(chunk, 65535); // all chunk sections
+            NMSPlayerChunk.dirtyCount.set(chunk, 64); // 64 triggers a full chunk re-send
+            NMSPlayerChunkMap.markForUpdate.invoke(playerChunkMap, chunk); // tell main chunk map to update
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -708,4 +759,5 @@ public class WorldUtil extends ChunkUtil {
             }
         }
     }
+
 }

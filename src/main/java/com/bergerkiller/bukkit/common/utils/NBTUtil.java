@@ -192,6 +192,9 @@ public class NBTUtil {
      * @param data to load from
      */
     public static void loadAttributes(LivingEntity livingEntity, CommonTagList data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Data can not be null");
+        }
         AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
         GenericAttributes.a(map, (NBTTagList) data.getHandle());
     }

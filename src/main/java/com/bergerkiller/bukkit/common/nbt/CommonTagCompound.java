@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.nbt;
 import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.*;
@@ -74,7 +75,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
-        return create(getRawData().remove(key.toString()));
+        return CommonTag.create(getRawData().remove(key.toString()));
     }
 
     /**
@@ -286,7 +287,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             elementHandle = NMSNBT.Compound.T.newInstance();
             getRawData().put(key.toString(), elementHandle);
         }
-        return (CommonTagCompound) create(elementHandle);
+        return CommonTagCompound.create(elementHandle);
     }
 
     /**
@@ -305,7 +306,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             elementHandle = NMSNBT.List.T.newInstance();
             getRawData().put(key.toString(), elementHandle);
         }
-        return (CommonTagList) create(elementHandle);
+        return CommonTagList.create(elementHandle);
     }
 
     /**
@@ -324,7 +325,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         if (key == null) {
             return null;
         }
-        return create(NMSNBT.Compound.get.invoke(handle, key.toString()));
+        return CommonTag.create(NMSNBT.Compound.get.invoke(handle, key.toString()));
     }
 
     @Override
@@ -471,7 +472,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     		}
     		handle = NMSNBT.StreamTools.Uncompressed.readTagCompound.invoke(null, in);
     	}
-        return (CommonTagCompound) create(handle);
+        return CommonTagCompound.create(handle);
     }
 
     /**
@@ -490,5 +491,16 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         } finally {
             stream.close();
         }
+    }
+
+    /**
+     * Creates a CommonTagCompound from the handle specified<br>
+     * If the handle is null or not a compound, null is returned
+     *
+     * @param handle to create a compound wrapper class for
+     * @return Wrapper class suitable for the given handle
+     */
+    public static CommonTagCompound create(Object handle) {
+        return CommonUtil.tryCast(CommonTag.create(handle), CommonTagCompound.class);
     }
 }

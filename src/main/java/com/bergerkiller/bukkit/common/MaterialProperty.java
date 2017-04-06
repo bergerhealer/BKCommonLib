@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.reflection.SafeMethod;
 
 import org.bukkit.Chunk;
@@ -29,6 +30,16 @@ public abstract class MaterialProperty<T> {
         if (!getMethodA.isOverridedIn(this.getClass()) && !getMethodB.isOverridedIn(this.getClass())) {
             throw new RuntimeException("Either get(int typeId) or get(Material type) needs to be implemented!");
         }
+    }
+
+    /**
+     * Gets this property for the Block Data specified
+     * 
+     * @param blockData to get this property of
+     * @return The property of the Block Data
+     */
+    public T get(BlockData blockData) {
+        return get(blockData.getType());
     }
 
     /**
@@ -74,7 +85,7 @@ public abstract class MaterialProperty<T> {
      * @return The property of the material
      */
     public T get(org.bukkit.World world, int x, int y, int z) {
-        return get(WorldUtil.getBlockType(world, x, y, z));
+        return get(WorldUtil.getBlockData(world, x, y, z).getType());
     }
 
     /**

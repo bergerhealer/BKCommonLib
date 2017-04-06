@@ -108,18 +108,11 @@ public class ItemParser {
         if (stack == null) {
             return false;
         }
-        return this.match(MaterialUtil.getTypeId(stack), MaterialUtil.getRawData(stack));
+        return this.match(stack.getType(), MaterialUtil.getRawData(stack));
     }
 
     public boolean match(Material type, int data) {
-        if (type == null) {
-            return false;
-        }
-        return this.match(MaterialUtil.getTypeId(type), data);
-    }
-
-    public boolean match(int typeid, int data) {
-        if (this.hasType() && typeid != this.getTypeId()) {
+        if (this.hasType() && type != this.getType()) {
             return false;
         }
         if (!this.hasData() || data == this.getData()) {
@@ -187,15 +180,6 @@ public class ItemParser {
         return this.type;
     }
 
-    /**
-     * Gets the type Id to match against, -1 for any item
-     *
-     * @return Matched type Id
-     */
-    public int getTypeId() {
-        return this.type == null ? -1 : MaterialUtil.getTypeId(this.type);
-    }
-
     public ItemStack getItemStack() {
         return this.getItemStack(this.amount);
     }
@@ -205,7 +189,7 @@ public class ItemParser {
     }
 
     public int getMaxStackSize() {
-        return ItemUtil.getMaxSize(this.getTypeId(), 64);
+        return ItemUtil.getMaxSize(this.getType(), 64);
     }
 
     /**

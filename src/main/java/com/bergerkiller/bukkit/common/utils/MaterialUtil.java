@@ -4,15 +4,12 @@ import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.wrappers.BlockInfo;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;
 import org.bukkit.TreeSpecies;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
 /**
@@ -32,32 +29,32 @@ public class MaterialUtil {
      * That said, for future compatibility, redirect all method calls to these
      * methods.
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static Material getType(int typeId) {
         return Material.getMaterial(typeId);
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getTypeId(ItemStack item) {
         return item.getTypeId();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getTypeId(org.bukkit.block.Block block) {
         return block.getTypeId();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getTypeId(Material material) {
         return material == null ? 0 : material.getId();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getRawData(TreeSpecies treeSpecies) {
         return treeSpecies.getData();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getRawData(org.bukkit.block.Block block) {
         return block.getData();
     }
@@ -66,7 +63,7 @@ public class MaterialUtil {
         return item.getDurability();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int getRawData(MaterialData materialData) {
         return materialData.getData();
     }
@@ -111,29 +108,9 @@ public class MaterialUtil {
      * @param rawData for the material
      * @return new MaterialData instance for this type of material and data
      */
+    @Deprecated
     public static MaterialData getData(Material type, int rawData) {
-        // Null: return AIR
-        if (type == null) {
-            return new MaterialData(0, (byte) rawData);
-        }
-
-        // Create new MaterialData + some fixes.
-        final MaterialData mdata;
-        if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
-            // Bukkit bugfix.
-            mdata = new org.bukkit.material.PressurePlate(type, (byte) rawData);
-        } else {
-            mdata = type.getNewData((byte) rawData);
-        }
-
-        // Fix attachable face returning NULL sometimes
-        if (mdata instanceof Attachable) {
-            Attachable att = (Attachable) mdata;
-            if (att.getAttachedFace() == null) {
-                att.setFacingDirection(BlockFace.NORTH);
-            }
-        }
-        return mdata;
+        return BlockData.fromMaterialData(type, rawData).newMaterialData();
     }
 
     /**
@@ -205,18 +182,6 @@ public class MaterialUtil {
      */
     public static boolean isType(org.bukkit.block.Block block, int... types) {
         return isType(getTypeId(block), types);
-    }
-
-    /**
-     * Gets the damage resilience of a block to damage dealt by a certain entity
-     *
-     * @param blockId of the block
-     * @param source of the damage
-     * @return resilience
-     */
-    @Deprecated
-    public static float getDamageResilience(int blockId, Entity source) {
-        return BlockInfo.get(blockId).getDamageResilience(source);
     }
 
     /**
@@ -328,7 +293,7 @@ public class MaterialUtil {
     public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBooleanProperty() {
         @Override
         public Boolean get(Material type) {
-            return BlockInfo.get(type).isSuffocating();
+            return BlockData.fromMaterial(type).isSuffocating();
         }
     };
 
@@ -360,7 +325,7 @@ public class MaterialUtil {
     public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
         @Override
         public Boolean get(Material type) {
-            return BlockInfo.get(type).isSolid();
+            return BlockData.fromMaterial(type).isOccluding();
         }
     };
 
@@ -370,7 +335,7 @@ public class MaterialUtil {
     public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBooleanProperty() {
         @Override
         public Boolean get(Material type) {
-            return BlockInfo.get(type).isPowerSource();
+            return BlockData.fromMaterial(type).isPowerSource();
         }
     };
 
@@ -393,7 +358,7 @@ public class MaterialUtil {
     public static final MaterialProperty<Integer> EMISSION = new MaterialProperty<Integer>() {
         @Override
         public Integer get(Material type) {
-            return BlockInfo.get(type).getLightEmission();
+            return BlockData.fromMaterial(type).getEmission();
         }
     };
 
@@ -403,7 +368,7 @@ public class MaterialUtil {
     public static final MaterialProperty<Integer> OPACITY = new MaterialProperty<Integer>() {
         @Override
         public Integer get(Material type) {
-            return BlockInfo.get(type).getOpacity();
+            return BlockData.fromMaterial(type).getOpacity();
         }
     };
 }

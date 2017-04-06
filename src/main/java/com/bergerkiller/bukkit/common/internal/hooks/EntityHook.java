@@ -1,15 +1,26 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.reflection.ClassHook;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
+    public Throwable stack;
+
+    public EntityHook() {
+        this.stack = new Throwable();
+    }
 
     public EntityController<?> getController() {
         if (this.controller == null) {
@@ -34,6 +45,9 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public void A_()")
     public void onTick() {
+        if (controller == null) {
+            Logging.LOGGER.once(Level.SEVERE , "Incorrect state: no controller assigned! Creator:", stack);
+        }
         controller.onTick();
     }
 
@@ -65,6 +79,44 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public net.minecraft.server.Entity teleportTo(org.bukkit.Location exit, boolean portal)")
     public Object teleportTo(Location exit, boolean portal) {
         return base.teleportTo(exit, portal);
+    }
+
+    @HookMethod("public NBTTagCompound e(NBTTagCompound nbttagcompound)")
+    public Object saveEntity(Object nbtTag) {
+        return base.saveEntity(nbtTag);
+    }
+
+    @HookMethod("public boolean c(NBTTagCompound nbttagcompound)")
+    public boolean c(Object tag) {
+        Object handle = this.instance();
+        if (NMSEntity.dead.get(handle)) {
+            return false;
+        }
+
+        CommonTagCompound.create(tag).putValue("id", getSavedName());
+        saveEntity(tag);
+        return true;
+    }
+
+    @HookMethod("public boolean d(NBTTagCompound nbttagcompound)")
+    public boolean d(Object tag) {
+        Object handle = this.instance();
+        if (NMSEntity.dead.get(handle)) {
+            return false;
+        }
+        if (NMSEntity.vehicleField.get(handle) != null) {
+            return false;
+        }
+
+        CommonTagCompound.create(tag).putValue("id", getSavedName());
+        saveEntity(tag);
+        return true;
+    }
+
+    /* This key is used for later de-serializing the entity */
+    private final String getSavedName() {
+        Object key = NMSEntityTypes.getName(this.instanceBaseType());
+        return key == null ? null : key.toString();
     }
 
     @HookMethod("public void collide(Entity entity)")

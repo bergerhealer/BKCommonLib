@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.type.CollectionConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingIterator;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingListIterator;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
@@ -190,7 +191,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public CommonTag remove(int index) {
-        return create(getRawData().remove(index));
+        return CommonTag.create(getRawData().remove(index));
     }
 
     @Override
@@ -213,7 +214,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public CommonTag get(int index) {
-        return create(NMSNBT.List.get.invoke(handle, index));
+        return CommonTag.create(NMSNBT.List.get.invoke(handle, index));
     }
 
     /**
@@ -406,5 +407,16 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     		throw new IOException("Tag read is not a list!");
     	}
     	return (CommonTagList) tag;
+    }
+
+    /**
+     * Creates a CommonTagList from the handle specified<br>
+     * If the handle is null or not a list, null is returned
+     *
+     * @param handle to create a list wrapper class for
+     * @return Wrapper class suitable for the given handle
+     */
+    public static CommonTagList create(Object handle) {
+        return CommonUtil.tryCast(CommonTag.create(handle), CommonTagList.class);
     }
 }

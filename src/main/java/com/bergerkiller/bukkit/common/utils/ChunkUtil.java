@@ -246,7 +246,9 @@ public class ChunkUtil {
     }
 
     /**
-     * Gets a chunk from a world without loading or generating it
+     * Gets a chunk from a world without loading or generating it.
+     * This method guarantees no event will be generated at all trying to get this chunk.
+     * If the chunk is not loaded, null is returned.
      *
      * @param world to obtain the chunk from
      * @param x - coordinate of the chunk

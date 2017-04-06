@@ -20,7 +20,6 @@ public class CommonPlayerMeta {
     private final WeakReference<Player> playerRef;
     private final List<Integer> removeQueue;
 
-    @SuppressWarnings("unchecked")
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
         if (Common.SERVER instanceof SportBukkitServer) {

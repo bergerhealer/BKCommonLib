@@ -7,13 +7,11 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.WorldServer;
@@ -26,10 +24,6 @@ import java.util.List;
  * Player - specific operations and tools
  */
 public class PlayerUtil extends EntityUtil {
-
-    private static final ClassTemplate<?> CRAFTPLAYER = ClassTemplate.createCB("entity.CraftPlayer");
-    private static final MethodAccessor<Void> setFirstPlayed = CRAFTPLAYER.getMethod("setFirstPlayed", long.class);
-    private static final FieldAccessor<Boolean> hasPlayedBefore = CRAFTPLAYER.getField("hasPlayedBefore");
 
     /**
      * Gets whether a player is disconnected from the server
@@ -75,17 +69,22 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * Adds the chunk coordinates to the player chunk sending queue
+     * Adds the chunk coordinates to the player chunk sending queue.<br><br>
+     * 
+     * BROKEN
      *
      * @param player
      * @param coordinates
      */
+    @Deprecated
     public static void queueChunkSend(Player player, IntVector2 coordinates) {
         queueChunkSend(player, coordinates.x, coordinates.z);
     }
 
     /**
-     * Adds the chunk coordinates to the player chunk sending queue
+     * Adds the chunk coordinates to the player chunk sending queue<br><br>
+     * 
+     * BROKEN
      *
      * @param player
      * @param chunkX - coordinate
@@ -93,8 +92,7 @@ public class PlayerUtil extends EntityUtil {
      */
     @Deprecated
     public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
-    	throw new RuntimeException("METHOD IS BROKEN!!");
-//        CommonNMS.getNative(player).chunkCoordIntPairQueue.add((ChunkCoordIntPair) VectorRef.newPair(chunkX, chunkZ));
+        throw new RuntimeException("Queueing a chunk send for individual players is broken. Use WorldUtil.queueChunkSend instead.");
     }
 
     /**
@@ -136,7 +134,7 @@ public class PlayerUtil extends EntityUtil {
      * @param firstPlayed time
      */
     public static void setFirstPlayed(org.bukkit.entity.Player player, long firstPlayed) {
-        setFirstPlayed.invoke(player, firstPlayed);
+        CBCraftPlayer.setFirstPlayed.invoke(player, firstPlayed);
     }
 
     /**
@@ -146,7 +144,7 @@ public class PlayerUtil extends EntityUtil {
      * @param playedBefore state
      */
     public static void setHasPlayedBefore(Player player, boolean playedBefore) {
-        hasPlayedBefore.set(player, playedBefore);
+        CBCraftPlayer.hasPlayedBefore.set(player, playedBefore);
     }
 
     /**

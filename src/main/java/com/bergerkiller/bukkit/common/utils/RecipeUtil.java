@@ -21,7 +21,7 @@ import java.util.*;
 
 public class RecipeUtil {
 
-    private static final Map<Integer, Integer> fuelTimes = new HashMap<Integer, Integer>();
+    private static final EnumMap<Material, Integer> fuelTimes = new EnumMap<Material, Integer>(Material.class);
 
     static {
         net.minecraft.server.v1_11_R1.ItemStack item;
@@ -29,24 +29,17 @@ public class RecipeUtil {
             item = (net.minecraft.server.v1_11_R1.ItemStack) NMSItemStack.newInstance(material, 0, 1);
             int fuel = TileEntityFurnace.fuelTime(item);
             if (fuel > 0) {
-                fuelTimes.put(MaterialUtil.getTypeId(material), fuel);
+                fuelTimes.put(material, fuel);
             }
         }
     }
 
-    @Deprecated
-    public static Set<Integer> getFuelItems() {
+    public static Set<Material> getFuelItems() {
         return fuelTimes.keySet();
     }
 
-    @Deprecated
-    public static Map<Integer, Integer> getFuelTimes() {
+    public static Map<Material, Integer> getFuelTimes() {
         return fuelTimes;
-    }
-
-    @Deprecated
-    public static int getFuelTime(int itemid) {
-        return getFuelTime(new ItemStack(itemid, 1));
     }
 
     public static int getFuelTime(Material material) {
@@ -61,16 +54,12 @@ public class RecipeUtil {
         }
     }
 
-    public static boolean isFuelItem(int itemid) {
-        return fuelTimes.containsKey(itemid);
-    }
-
     public static boolean isFuelItem(Material material) {
-        return isFuelItem(MaterialUtil.getTypeId(material));
+        return fuelTimes.containsKey(material);
     }
 
     public static boolean isFuelItem(org.bukkit.inventory.ItemStack item) {
-        return isFuelItem(MaterialUtil.getTypeId(item));
+        return item != null && isFuelItem(item.getType());
     }
 
     @Deprecated
@@ -112,15 +101,15 @@ public class RecipeUtil {
     /**
      * Gets all Crafting Recipes able to produce the ItemStack specified
      *
-     * @param itemid of the item to craft
+     * @param type of the item to craft (NULL for any type)
      * @param data of the item to craft (-1 for any data)
      * @return the Crafting Recipes that can craft the item specified
      */
-    public static CraftRecipe[] getCraftingRequirements(int itemid, int data) {
+    public static CraftRecipe[] getCraftingRequirements(Material type, int data) {
         List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
         for (Object rec : getCraftRecipes()) {
             ItemStack item = NMSRecipe.getOutput(rec);
-            if (item != null && MaterialUtil.getTypeId(item) == itemid && (data == -1 || MaterialUtil.getRawData(item) == data)) {
+            if (item != null && (type == null || item.getType() == type) && (data == -1 || MaterialUtil.getRawData(item) == data)) {
                 CraftRecipe crec = CraftRecipe.create(rec);
                 if (crec != null) {
                     poss.add(crec);
@@ -144,7 +133,7 @@ public class RecipeUtil {
             } else {
                 limit = Integer.MAX_VALUE;
             }
-            craftItems(parser.getTypeId(), parser.getData(), source, limit);
+            craftItems(parser.getType(), parser.getData(), source, limit);
         }
     }
 
@@ -156,8 +145,8 @@ public class RecipeUtil {
      * @param source inventory to craft in
      * @param limit amount of items to craft
      */
-    public static void craftItems(int itemid, int data, Inventory source, int limit) {
-        for (CraftRecipe rec : getCraftingRequirements(itemid, data)) {
+    public static void craftItems(Material type, int data, Inventory source, int limit) {
+        for (CraftRecipe rec : getCraftingRequirements(type, data)) {
             limit -= rec.craftItems(source, limit);
         }
     }

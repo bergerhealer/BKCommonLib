@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
@@ -23,6 +24,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
+import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
 import net.minecraft.server.v1_11_R1.EnumHand;
@@ -303,6 +305,23 @@ public abstract class HandleConverter extends BasicConverter<Object> {
                 return ((UseAction) value).getHandle();
             } else {
                 return def;
+            }
+        }
+    };
+    public static final HandleConverter toBlockDataHandle = new HandleConverter("IBlockData") {
+        @Override
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof BlockData) {
+                return ((BlockData) value).getData();
+            } else if (value instanceof Block) {
+                return ((Block) value).getBlockData();
+            } else {
+                org.bukkit.Material type = WrapperConverter.toMaterial.convert(value);
+                if (type != null) {
+                    return BlockData.fromMaterial(type).getData();
+                } else {
+                    return def;
+                }
             }
         }
     };

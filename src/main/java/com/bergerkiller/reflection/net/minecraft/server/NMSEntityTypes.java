@@ -11,11 +11,23 @@ public class NMSEntityTypes {
 
     private static final MethodAccessor<Void> register = T.selectMethod("private static void a(int entityId, String name1, Class<? extends Entity> entityClass, String name2)");
 
+    private static final MethodAccessor<Object> getName = T.selectMethod("public static MinecraftKey getName(Class<? extends Entity> paramClass)");
+
     /**
      * Registers a new entity
      */
     public static void register(int entityId, String entityKey, Class<?> entityClass, String entityName) {
         register.invoke(null, entityId, entityKey, entityClass, entityName);
+    }
+
+    /**
+     * Gets the Minecraft key associated with an Entity Class Type
+     * 
+     * @param type of Entity
+     * @return Minecraft key
+     */
+    public static Object getName(Class<?> type) {
+        return getName.invoke(null, type);
     }
 
     /**

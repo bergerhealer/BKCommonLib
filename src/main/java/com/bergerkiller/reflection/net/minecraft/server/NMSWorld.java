@@ -35,6 +35,12 @@ public class NMSWorld {
 
     public static final MethodAccessor<List<?>> getEntities = T.selectMethod("public List<Entity> getEntities(Entity entity, AxisAlignedBB axisalignedbb)");
 
+    private static final MethodAccessor<Boolean> isChunkLoaded = T.selectMethod("protected boolean isChunkLoaded(int paramInt1, int paramInt2, boolean paramBoolean)");
+
+    public static boolean isChunkLoaded(Object worldHandle, int chunkX, int chunkZ) {
+        return isChunkLoaded.invoke(worldHandle, chunkX, chunkZ, true);
+    }
+
     public static Server getServer(Object worldHandle) {
         return getServer.invoke(worldHandle);
     }

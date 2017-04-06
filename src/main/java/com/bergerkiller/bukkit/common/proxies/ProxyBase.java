@@ -1,9 +1,6 @@
 package com.bergerkiller.bukkit.common.proxies;
 
-import org.bukkit.Bukkit;
-
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import java.lang.reflect.Method;
 import java.util.logging.Level;

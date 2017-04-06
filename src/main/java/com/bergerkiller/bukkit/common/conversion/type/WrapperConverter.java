@@ -396,6 +396,23 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
             return def;
         }
     };
+    public static final WrapperConverter<BlockData> toBlockData = new WrapperConverter<BlockData>(BlockData.class) {
+        @Override
+        protected BlockData convertSpecial(Object value, Class<?> valueType, BlockData def) {
+            if (value instanceof IBlockData) {
+                return BlockData.fromBlockData(value);
+            } else if (value instanceof Block) {
+                return BlockData.fromBlock(value);
+            } else {
+                Material type = toMaterial.convert(value);
+                if (type != null) {
+                    return BlockData.fromMaterial(type);
+                } else {
+                    return def;
+                }
+            }
+        }
+    };
 
     @SuppressWarnings("unchecked")
     public WrapperConverter(Class<?> outputType) {

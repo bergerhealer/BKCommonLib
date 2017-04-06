@@ -30,6 +30,7 @@ public class NMSPlayerChunkMap {
     
     public static final FieldAccessor<Integer> radius = T.nextFieldSignature("private int j");
 
+    public static final MethodAccessor<Void> markForUpdate = T.selectMethod("public void a(PlayerChunk playerchunk)");
     public static final MethodAccessor<Boolean> shouldUnload = T.selectMethod("private boolean a(int i, int j, int k, int l, int i1)");
     public static final MethodAccessor<Object> getChunk = T.selectMethod("public PlayerChunk getChunk(int i, int j)");
     private static final MethodAccessor<Void> flagDirty = T.selectMethod("public void flagDirty(BlockPosition blockposition)");

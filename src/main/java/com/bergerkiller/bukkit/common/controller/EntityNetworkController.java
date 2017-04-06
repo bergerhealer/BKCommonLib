@@ -1087,7 +1087,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Converts position information into a protocol long value.
      * Taken from EntityTracker MC source
      */
-    private static long protLoc(double loc) {
+    public static long protLoc(double loc) {
         return MathHelper.d(loc * 4096.0D);
     }
 
@@ -1097,7 +1097,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param prot protocol value
      * @return absolute world coordinate value
      */
-    private static double locProt(long prot) {
+    public static double locProt(long prot) {
         return prot / 4096.0D;
     }
 

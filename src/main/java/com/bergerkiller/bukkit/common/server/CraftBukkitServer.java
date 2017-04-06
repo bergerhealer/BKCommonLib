@@ -92,7 +92,6 @@ public class CraftBukkitServer extends CommonServerBase {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Integer> getEntityRemoveQueue(Player player) {
         return CommonNMS.getNative(player).removeQueue;
     }

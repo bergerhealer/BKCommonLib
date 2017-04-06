@@ -63,6 +63,7 @@ public class ConversionPairs {
     public static final ConverterPair<Object, UUID> gameProfileId = toGameProfileFromId.formPair(toGameProfileId);
     public static final ConverterPair<Object, ScoreboardAction> scoreboardAction = toScoreboardActionHandle.formPair(toScoreboardAction);
     public static final ConverterPair<Object, MainHand> mainHand = toMainHandHandle.formPair(toMainHand);
+    public static final ConverterPair<Object, BlockData> blockData = toBlockDataHandle.formPair(toBlockData);
     // Text format conversion <>
     public static final ConverterPair<Object, String> jsonChatComponent = jsonToChatComponent.formPair(chatComponentToJson);
     public static final ConverterPair<Object, String> textChatComponent = textToChatComponent.formPair(chatComponentToText);

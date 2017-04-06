@@ -123,7 +123,7 @@ public class CraftRecipe {
      */
     public boolean containsInput(Inventory inventory) {
         for (ItemStack item : this.input) {
-            if (ItemUtil.getItemCount(inventory, MaterialUtil.getTypeId(item), MaterialUtil.getRawData(item)) < item.getAmount()) {
+            if (ItemUtil.getItemCount(inventory, item.getType(), MaterialUtil.getRawData(item)) < item.getAmount()) {
                 return false;
             }
         }
@@ -241,7 +241,7 @@ public class CraftRecipe {
             // Check that input and output are not causing a loop
             // For example Sandstone has an infinite crafting loop going on
             // (You can craft 4 Sandstone using 4 Sandstone...yeah)
-            if (rval.input.length == 1 && rval.output.length == 1 && MaterialUtil.getTypeId(rval.input[0]) == MaterialUtil.getTypeId(rval.output[0])) {
+            if (rval.input.length == 1 && rval.output.length == 1 && rval.input[0].getType() == rval.output[0].getType()) {
                 return null;
             }
             return rval;

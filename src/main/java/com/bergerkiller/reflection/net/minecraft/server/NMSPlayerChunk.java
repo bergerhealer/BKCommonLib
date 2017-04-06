@@ -16,6 +16,8 @@ public class NMSPlayerChunk {
     public static final FieldAccessor<Object> playerChunkMap = T.nextField("private final PlayerChunkMap playerChunkMap");
     public static final FieldAccessor<List<Player>> players = T.nextFieldSignature("public final List<EntityPlayer> c").translate(ConversionPairs.playerList);
     public static final FieldAccessor<IntVector2> location = T.nextField("private final ChunkCoordIntPair location").translate(ConversionPairs.chunkIntPair);
+    public static final FieldAccessor<Integer> dirtyCount = T.nextField("private int dirtyCount");
+    public static final FieldAccessor<Integer> dirtySectionMask = T.nextFieldSignature("private int h");
     public static final FieldAccessor<Boolean> done = T.nextField("private boolean done");
     public static final FieldAccessor<Boolean> loaded = done; //TODO: Maybe private boolean loadInProgress?
 

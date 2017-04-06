@@ -282,7 +282,10 @@ public class ItemUtil {
      * False if not
      */
     public static boolean equalsIgnoreAmount(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
-        if (MaterialUtil.getTypeId(item1) != MaterialUtil.getTypeId(item2) || MaterialUtil.getRawData(item1) != MaterialUtil.getRawData(item2)) {
+        if (item1 == null || item2 == null) {
+            return false;
+        }
+        if (item1.getType() != item2.getType() || MaterialUtil.getRawData(item1) != MaterialUtil.getRawData(item2)) {
             return false;
         }
         // Metadata checks
@@ -310,7 +313,7 @@ public class ItemUtil {
      * @param item signature of the items to remove
      */
     public static void removeItems(Inventory inventory, org.bukkit.inventory.ItemStack item) {
-        removeItems(inventory, MaterialUtil.getTypeId(item), MaterialUtil.getRawData(item), item.getAmount());
+        removeItems(inventory, item.getType(), MaterialUtil.getRawData(item), item.getAmount());
     }
 
     /**
@@ -321,11 +324,11 @@ public class ItemUtil {
      * @param data of the items to remove, -1 for any data
      * @param amount of items to remove, -1 for infinite amount
      */
-    public static void removeItems(Inventory inventory, int itemid, int data, int amount) {
+    public static void removeItems(Inventory inventory, Material type, int data, int amount) {
         int countToRemove = amount < 0 ? Integer.MAX_VALUE : amount;
         for (int i = 0; i < inventory.getSize(); i++) {
             org.bukkit.inventory.ItemStack item = inventory.getItem(i);
-            if (LogicUtil.nullOrEmpty(item) || MaterialUtil.getTypeId(item) != itemid || (data != -1 && MaterialUtil.getRawData(item) != data)) {
+            if (LogicUtil.nullOrEmpty(item) || (item.getType() != type) || (data != -1 && MaterialUtil.getRawData(item) != data)) {
                 continue;
             }
             if (item.getAmount() <= countToRemove) {
@@ -444,22 +447,22 @@ public class ItemUtil {
      * added together
      *
      * @param inventory to look in
-     * @param typeId of the items to look for, -1 for any item
+     * @param type of the items to look for, null for any item type
      * @param data of the items to look for, -1 for any data
      * @return Amount of items in the inventory
      */
-    public static org.bukkit.inventory.ItemStack findItem(Inventory inventory, int typeId, int data) {
+    public static org.bukkit.inventory.ItemStack findItem(Inventory inventory, Material type, int data) {
         org.bukkit.inventory.ItemStack rval = null;
         int itemData = data;
-        int itemTypeId = typeId;
+        Material itemType = type;
         for (org.bukkit.inventory.ItemStack item : inventory.getContents()) {
             if (LogicUtil.nullOrEmpty(item)) {
                 continue;
             }
             // Compare type Id
-            if (itemTypeId == -1) {
-                itemTypeId = MaterialUtil.getTypeId(item);
-            } else if (itemTypeId != MaterialUtil.getTypeId(item)) {
+            if (itemType == null) {
+                itemType = item.getType();
+            } else if (itemType != item.getType()) {
                 continue;
             }
             // Compare data
@@ -482,12 +485,12 @@ public class ItemUtil {
      * Gets the total item count of a given type and data
      *
      * @param inventory to look in
-     * @param typeid of the items to look for, -1 for any item
+     * @param typeid of the items to look for, null for any item
      * @param data of the items to look for, -1 for any data
      * @return Amount of items in the inventory
      */
-    public static int getItemCount(Inventory inventory, int typeid, int data) {
-        if (typeid < 0) {
+    public static int getItemCount(Inventory inventory, Material type, int data) {
+        if (type == null) {
             int count = 0;
             for (org.bukkit.inventory.ItemStack item : inventory.getContents()) {
                 if (!LogicUtil.nullOrEmpty(item)) {
@@ -496,20 +499,9 @@ public class ItemUtil {
             }
             return count;
         } else {
-            org.bukkit.inventory.ItemStack rval = findItem(inventory, typeid, data);
+            org.bukkit.inventory.ItemStack rval = findItem(inventory, type, data);
             return rval == null ? 0 : rval.getAmount();
         }
-    }
-
-    /**
-     * Gets the max stacking size for a given item
-     *
-     * @param itemId of the item
-     * @param def to return for invalid items
-     * @return max stacking size
-     */
-    public static int getMaxSize(int itemId, int def) {
-        return getMaxSize(MaterialUtil.getType(itemId), def);
     }
 
     /**
@@ -534,7 +526,7 @@ public class ItemUtil {
         if (LogicUtil.nullOrEmpty(stack)) {
             return 0;
         } else {
-            return getMaxSize(MaterialUtil.getTypeId(stack), 0);
+            return getMaxSize(stack.getType(), 0);
         }
     }
 

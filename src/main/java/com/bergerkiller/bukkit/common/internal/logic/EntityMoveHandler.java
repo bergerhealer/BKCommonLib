@@ -14,14 +14,11 @@ import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
-import com.google.common.collect.Lists;
 
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.Block;
@@ -42,7 +39,6 @@ import net.minecraft.server.v1_11_R1.ReportedException;
 import net.minecraft.server.v1_11_R1.SoundEffect;
 import net.minecraft.server.v1_11_R1.SoundEffects;
 import net.minecraft.server.v1_11_R1.World;
-import net.minecraft.server.v1_11_R1.WorldBorder;
 
 /**
  * Handles the full Entity move() physics function. It should be kept completely in sync with what is used on the server,

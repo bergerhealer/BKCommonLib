@@ -31,6 +31,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -346,7 +347,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutBlockChange extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
-        public final FieldAccessor<Object> blockData = nextFieldSignature("public IBlockData block");
+        public final TranslatorFieldAccessor<BlockData> blockData = nextFieldSignature("public IBlockData block").translate(ConversionPairs.blockData);
     }
 
     public static class NMSPacketPlayOutBoss extends NMSPacket {

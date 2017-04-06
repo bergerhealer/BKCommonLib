@@ -256,7 +256,7 @@ public class PacketUtil {
         if (packet instanceof CommonPacket) {
             packet = ((CommonPacket) packet).getHandle();
         }
-        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), (Packet) packet);
+        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), (Packet<?>) packet);
     }
 
     /**

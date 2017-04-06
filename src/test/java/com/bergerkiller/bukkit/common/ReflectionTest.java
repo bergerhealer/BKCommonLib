@@ -91,6 +91,7 @@ public class ReflectionTest {
 
             loadClass(CBChunkIOExecutor.class);
             loadClass(CBCraftEntity.class);
+            loadClass(CBCraftPlayer.class);
             loadClass(CBCraftMagicNumbers.class);
             loadClass(CBCraftItemStack.class);
             loadClass(CBCraftBlockState.class);

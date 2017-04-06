@@ -54,7 +54,6 @@ public class BlockUtil extends MaterialUtil {
      * @param isBuildable - Initial allow state
      * @return True if permitted, False if not
      */
-    @SuppressWarnings("deprecation")
     public static boolean canBuildBlock(org.bukkit.block.Block block, Material type, boolean isBuildable) {
         return CommonUtil.callEvent(new BlockCanBuildEvent(block, type.getId(), true)).isBuildable();
     }
@@ -78,7 +77,6 @@ public class BlockUtil extends MaterialUtil {
      * @param data to set to
      * @param update - whether to perform physics afterwards
      */
-    @SuppressWarnings("deprecation")
     public static void setTypeAndData(org.bukkit.block.Block block, Material type, MaterialData data, boolean update) {
         block.setTypeIdAndData(type.getId(), data.getData(), update);
     }
@@ -102,7 +100,6 @@ public class BlockUtil extends MaterialUtil {
      * @param data to set to
      * @param update - whether to perform physics afterwards
      */
-    @SuppressWarnings("deprecation")
     public static void setTypeAndRawData(org.bukkit.block.Block block, Material type, int data, boolean update) {
         block.setTypeIdAndData(type.getId(), (byte) data, update);
     }
@@ -113,7 +110,6 @@ public class BlockUtil extends MaterialUtil {
      * @param block to set it for
      * @param materialData to set to
      */
-    @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData) {
         block.setData(materialData.getData());
     }
@@ -125,7 +121,6 @@ public class BlockUtil extends MaterialUtil {
      * @param materialData to set to
      * @param doPhysics - True to perform physics, False for 'silent'
      */
-    @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData, boolean doPhysics) {
         block.setData(materialData.getData(), doPhysics);
     }
@@ -136,7 +131,7 @@ public class BlockUtil extends MaterialUtil {
      * only need material data
      */
     public static MaterialData getData(org.bukkit.block.Block block) {
-        return getData(MaterialUtil.getTypeId(block), MaterialUtil.getRawData(block));
+        return WorldUtil.getBlockData(block).newMaterialData();
     }
 
     /**
