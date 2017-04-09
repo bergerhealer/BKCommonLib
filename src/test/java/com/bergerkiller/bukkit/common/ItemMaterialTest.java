@@ -12,6 +12,7 @@ import org.bukkit.material.MaterialData;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
@@ -193,6 +194,29 @@ public class ItemMaterialTest {
         //TODO: Make this test better!
         ItemStack item = new ItemStack(Material.IRON_DOOR);
         testEQIgnoreAmount(item);
+    }
+
+    @Test
+    public void testDisplayName() {
+        ItemStack item = ItemUtil.createItem(Material.WOOD, 1);
+        String old_name = ItemUtil.getDisplayName(item);
+        ItemUtil.setDisplayName(item, "COOLNAME");
+        assertEquals("COOLNAME", ItemUtil.getDisplayName(item));
+        ItemUtil.setDisplayName(item, null);
+        assertEquals(old_name, ItemUtil.getDisplayName(item));
+    }
+
+    @Test
+    public void testItemTag() {
+        ItemStack item = ItemUtil.createItem(Material.WOOD, 1);
+        assertNull(ItemUtil.getMetaTag(item));
+        CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
+        assertNotNull(tag);
+        tag.putValue("test", "awesome!");
+        tag = ItemUtil.getMetaTag(item);
+        assertNotNull(tag);
+        assertTrue(tag.containsKey("test"));
+        assertEquals("awesome!", tag.getValue("test"));
     }
 
     private static void testEQIgnoreAmount(ItemStack item) {

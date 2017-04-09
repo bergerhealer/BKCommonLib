@@ -116,7 +116,7 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
-        CommonNMS.getNative(world).setTypeUpdate(new BlockPosition(x, y, z), (IBlockData) data.getData());
+        NMSWorld.updateBlock(Conversion.toWorldHandle.convert(world), x, y, z, data, NMSWorld.UPDATE_DEFAULT);
     }
 
     /**
@@ -140,6 +140,52 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setBlockType(org.bukkit.World world, int x, int y, int z, org.bukkit.Material type) {
         setBlockData(world, x, y, z, BlockData.fromMaterial(type));
+    }
+
+    /**
+     * Sets Block Data for a particular Block without performing physics updates
+     * 
+     * @param block to set
+     * @param data to set to
+     */
+    public static void setBlockDataFast(org.bukkit.block.Block block, BlockData data) {
+        setBlockDataFast(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
+    }
+
+    /**
+     * Sets Block Data for a particular Block without performing physics updates
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @param data to set to
+     */
+    public static void setBlockDataFast(org.bukkit.World world, int x, int y, int z, BlockData data) {
+        NMSWorld.updateBlock(Conversion.toWorldHandle.convert(world), x, y, z, data, NMSWorld.UPDATE_NOTIFY);
+    }
+
+    /**
+     * Sets Block Material Type for a particular Block without performing physics updates
+     * 
+     * @param block to set
+     * @param type to set to
+     */
+    public static void setBlockTypeFast(org.bukkit.block.Block block, org.bukkit.Material type) {
+        setBlockDataFast(block, BlockData.fromMaterial(type));
+    }
+
+    /**
+     * Sets Block Material Type for a particular Block without performing physics updates
+     * 
+     * @param world of the block
+     * @param x - coordinate
+     * @param y - coordinate
+     * @param z - coordinate
+     * @param type to set to
+     */
+    public static void setBlockTypeFast(org.bukkit.World world, int x, int y, int z, org.bukkit.Material type) {
+        setBlockDataFast(world, x, y, z, BlockData.fromMaterial(type));
     }
 
     /**

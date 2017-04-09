@@ -142,43 +142,6 @@ public class ChunkUtil {
     }
 
     /**
-     * Sets a block type id and data, causing physics and lighting updates
-     *
-     * @param chunk the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @param typeId to set to
-     * @param data to set to
-     * @return True if a block got changed, False if not
-     */
-    @Deprecated
-    public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
-        Logging.LOGGER_DEBUG.warnOnce("setBlock has not been tested and defaults back to using Bukkit's methods");
-        
-        return chunk.getBlock(x & NMSChunk.XZ_MASK, y & NMSChunk.Y_MASK, z & NMSChunk.XZ_MASK).setTypeIdAndData(typeId, (byte) data, true);
-        
-        // This method is so old and depends on so many calls to NMS Ive decided to deprecate it
-        //return Methods.setBlock(chunk, x, y, z, type, data);
-    }
-
-    /**
-     * Sets a block type id and data, causing physics and lighting updates
-     *
-     * @param chunk the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @param type to set to
-     * @param data to set to
-     * @return True if a block got changed, False if not
-     */
-    @SuppressWarnings("deprecation")
-    public static boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, Material type, int data) {
-        return setBlock(chunk, x, y, z, type.getId(), data);
-    }
-
-    /**
      * Gets a live collection of all the entities in a chunk<br>
      * Changes to this collection are reflected back in the chunk
      *

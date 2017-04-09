@@ -13,7 +13,9 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Contains item stack, item and inventory utilities
@@ -350,7 +352,40 @@ public class ItemUtil {
      * @return Empty item stack
      */
     public static org.bukkit.inventory.ItemStack emptyItem() {
-        return CBCraftItemStack.newInstanceFromHandle(NMSItemStack.newInstance(Material.AIR, 0, 0));
+        return createItem(Material.AIR, 0, 0);
+    }
+
+    /**
+     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle.
+     * If the original item is a CraftItemStack, the handle is re-used.
+     * 
+     * @param item to use as input
+     */
+    public static org.bukkit.inventory.ItemStack createItem(ItemStack item) {
+        return CraftItemStack.asCraftCopy(item);
+    }
+
+    /**
+     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle
+     * 
+     * @param type of item
+     * @param amount of the item
+     * @return ItemStack
+     */
+    public static org.bukkit.inventory.ItemStack createItem(Material type, int amount) {
+        return createItem(type, 0, amount);
+    }
+
+    /**
+     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle
+     * 
+     * @param type of item
+     * @param data of the item
+     * @param amount of the item
+     * @return ItemStack
+     */
+    public static org.bukkit.inventory.ItemStack createItem(Material type, int data, int amount) {
+        return CBCraftItemStack.newInstanceFromHandle(NMSItemStack.newInstance(type, data, amount));
     }
 
     /**
@@ -541,17 +576,6 @@ public class ItemUtil {
     }
 
     /**
-     * Obtains the Metadata tag stored in an item. If no metadata is stored,
-     * null is returned instead.
-     *
-     * @param stack to get the metadata tag of
-     * @return metadata tag
-     */
-    public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
-        return NMSItemStack.tag.get(Conversion.toItemStackHandle.convert(stack));
-    }
-
-    /**
      * Sets the Metadata tag stored in an item. If tag is null, all metadata is
      * cleared.
      *
@@ -559,7 +583,43 @@ public class ItemUtil {
      * @param tag to set to
      */
     public static void setMetaTag(org.bukkit.inventory.ItemStack stack, CommonTagCompound tag) {
-        NMSItemStack.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
+        if (CBCraftItemStack.T.isInstance(stack)) {
+            NMSItemStack.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
+        } else {
+            throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+        }
+    }
+
+    /**
+     * Obtains the CommonTagCompound storing metadata for an item. If the item has
+     * no metadata tag yet, null is returned instead.
+     * 
+     * @param stack to get the tag compound for
+     * @return Tag Compound, or null if none exist.
+     */
+    public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack) {
+        return getMetaTag(stack, false);
+    }
+
+    /**
+     * Obtains the CommonTagCompound storing metadata for an item
+     * 
+     * @param stack to get the tag compound for
+     * @param create whether to create a new tag if one does not exist
+     * @return Tag Compound, or null if none exist and create is false
+     */
+    public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack, boolean create) {
+        if (CBCraftItemStack.T.isInstance(stack)) {
+            Object handle = Conversion.toItemStackHandle.convert(stack);
+            CommonTagCompound tag = NMSItemStack.tag.get(handle);
+            if (tag == null && create) {
+                tag = new CommonTagCompound();
+                NMSItemStack.tag.set(handle, tag);
+            }
+            return tag;
+        } else {
+            throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+        }
     }
 
     /**
@@ -611,7 +671,11 @@ public class ItemUtil {
      */
     public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
         if (displayName != null) {
-            CommonNMS.getNative(stack).c(displayName);
+            if (CBCraftItemStack.T.isInstance(stack)) {
+                CommonNMS.getNative(stack).g(displayName);
+            } else {
+                throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+            }
         } else if (hasDisplayName(stack)) {
             CommonNMS.getNative(stack).getTag().remove("display");
         }

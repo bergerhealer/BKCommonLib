@@ -2,6 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
@@ -95,19 +96,13 @@ public class NMSChunk {
         return ((Chunk) chunkHandle).getBrightness(mode, new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
     }
 
-    @SuppressWarnings("deprecation")
-	public static boolean setBlock(Object chunkHandle, int x, int y, int z, Object type, int data) {
-        return ((Chunk) chunkHandle).a(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK), ((Block) type).fromLegacyData(data)) != null;
+	public static boolean setBlockData(Object chunkHandle, int x, int y, int z, BlockData data) {
+        return ((Chunk) chunkHandle).a(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK), (IBlockData) data.getData()) != null;
     }
 
-    @Deprecated
-    public static boolean setBlock(Object chunkHandle, int x, int y, int z, int typeId, int data) {
-        return setBlock(chunkHandle, x, y, z, CraftMagicNumbers.getBlock(typeId), data);
-    }
-
-    public static IBlockData getData(Object chunkHandle, int x, int y, int z) {
+    public static BlockData getBlockData(Object chunkHandle, int x, int y, int z) {
         BlockPosition pos = new BlockPosition(x & XZ_MASK, y, z & XZ_MASK);
-        return ((Chunk) chunkHandle).getBlockData(pos);
+        return  BlockData.fromBlockData(((Chunk) chunkHandle).getBlockData(pos));
     }
 
     public static Object getType(Object chunkHandle, int x, int y, int z) {

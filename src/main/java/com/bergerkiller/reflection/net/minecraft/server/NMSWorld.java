@@ -1,6 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
@@ -37,11 +38,21 @@ public class NMSWorld {
 
     private static final MethodAccessor<Boolean> isChunkLoaded = T.selectMethod("protected boolean isChunkLoaded(int paramInt1, int paramInt2, boolean paramBoolean)");
 
+    public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
+    public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
+    public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
+
     public static boolean isChunkLoaded(Object worldHandle, int chunkX, int chunkZ) {
         return isChunkLoaded.invoke(worldHandle, chunkX, chunkZ, true);
     }
 
     public static Server getServer(Object worldHandle) {
         return getServer.invoke(worldHandle);
+    }
+
+    private static final MethodAccessor<Boolean> setType = T.selectMethod("public boolean setTypeAndData(BlockPosition blockposition, IBlockData iblockdata, int i)");
+
+    public static boolean updateBlock(Object worldHandle, int x, int y, int z, BlockData data, int updateFlags) {
+        return setType.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
     }
 }
