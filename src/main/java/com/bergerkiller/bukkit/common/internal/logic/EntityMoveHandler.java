@@ -155,6 +155,9 @@ public class EntityMoveHandler {
      */
     public void move(MoveType movetype, double d0, double d1, double d2) {
         entity = controller.getEntity();
+        if (entity == null) {
+            throw new IllegalStateException("Entity Controller is not attached to an Entity");
+        }
         that = (Entity) entity.getHandle();
         final Random this_random = NMSEntity.random.get(that);
         final double[] that_aI = NMSEntity.move_SomeArray.get(that);

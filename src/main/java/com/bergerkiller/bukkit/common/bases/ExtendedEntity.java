@@ -582,13 +582,22 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return CommonUtil.tryCast(getPassenger(), Player.class);
     }
 
+    private static boolean has_passengers_field = true;
+
     /**
      * Retrieves a list of passenger entities
      * 
      * @return passenger entity list
      */
     public List<org.bukkit.entity.Entity> getPassengers() {
-        return entity.getPassengers();
+        if (has_passengers_field) {
+            try {
+                return entity.getPassengers();
+            } catch (Throwable t) {
+                has_passengers_field = false;
+            }
+        }
+        return Arrays.asList(entity.getPassenger());
     }
 
     /**

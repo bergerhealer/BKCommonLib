@@ -35,45 +35,74 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public boolean b(EntityHuman entityhuman, EnumHand enumhand)")
     public boolean onInteractBy(Object entityHuman, Object enumHand) {
-        return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
+        if (checkController()) {
+            return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
+        } else {
+            return base.onInteractBy(entityHuman, enumHand);
+        }
     }
 
     @HookMethod("public boolean damageEntity(DamageSource damagesource, float f)")
     public boolean onDamageEntity(Object damageSource, float damage) {
-        return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
+        if (checkController()) {
+            return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
+        } else {
+            return base.onDamageEntity(damageSource, damage);
+        }
     }
 
     @HookMethod("public void A_()")
     public void onTick() {
-        if (controller == null) {
-            Logging.LOGGER.once(Level.SEVERE , "Incorrect state: no controller assigned! Creator:", stack);
+        if (checkController()) {
+            controller.onTick();
+        } else {
+            base.onTick();
         }
-        controller.onTick();
     }
 
     @HookMethod("protected void burn(float i)")
     public void onBurn(float damage) {
-        controller.onBurnDamage((double) damage);
+        if (checkController()) {
+            controller.onBurnDamage((double) damage);
+        } else {
+            base.onBurn(damage);
+        }
     }
 
     @HookMethod("public void f(double d0, double d1, double d2)")
     public void onPush(double dx, double dy, double dz) {
-        controller.onPush(dx, dy, dz);
+        if (checkController()) {
+            controller.onPush(dx, dy, dz);
+        } else {
+            base.onPush(dx, dy, dz);
+        }
     }
 
     @HookMethod("public void move(EnumMoveType enummovetype, double d0, double d1, double d2)")
     public void onMove(Object enumMoveType, double dx, double dy, double dz) {
-        controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
+        if (checkController()) {
+            controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
+        } else {
+            base.onMove(enumMoveType, dx, dy, dz);
+        }
     }
 
     @HookMethod("public void die()")
     public void die() {
-        controller.onDie();
+        if (checkController()) {
+            controller.onDie();
+        } else {
+            base.die();
+        }
     }
 
     @HookMethod("public String getName()")
     public String getName() {
-        return controller.getLocalizedName();
+        if (checkController()) {
+            return controller.getLocalizedName();
+        } else {
+            return base.getName();
+        }
     }
 
     @HookMethod("public net.minecraft.server.Entity teleportTo(org.bukkit.Location exit, boolean portal)")
@@ -121,13 +150,33 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public void collide(Entity entity)")
     public void collide(Object entity) {
-        if (controller.onEntityCollision(Conversion.toEntity.convert(entity))) {
+        if (checkController()) {
+            if (controller.onEntityCollision(Conversion.toEntity.convert(entity))) {
+                base.collide(entity);
+            }
+        } else {
             base.collide(entity);
         }
     }
 
     @HookMethod("public void setItem(int i, ItemStack itemstack)")
     public void setInventoryItem(int i, Object itemstack) {
-        controller.onItemSet(i, Conversion.toItemStack.convert(itemstack));
+        if (checkController()) {
+            controller.onItemSet(i, Conversion.toItemStack.convert(itemstack));
+        } else {
+            base.setInventoryItem(i, itemstack);
+        }
+    }
+
+    private boolean checkController() {
+        if (controller == null) {
+            Logging.LOGGER.once(Level.SEVERE , "Incorrect state: no controller assigned! Creator:", stack);
+            return false;
+        } else if (controller.getEntity() == null) {
+            Logging.LOGGER.once(Level.SEVERE, "Incorrect state: controller " + controller.getClass().getName() + " has no entity bound to it! Creator:", stack);
+            return false;
+        } else {
+            return true;
+        }
     }
 }

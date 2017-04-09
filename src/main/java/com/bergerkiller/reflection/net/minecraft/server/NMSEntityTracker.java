@@ -1,6 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -126,7 +127,7 @@ public class NMSEntityTracker {
 
         // Bugfix: Add all current passengers to the passengers field right now
         // We must do this so that the next updatePlayer() update is properly synchronized
-        NMSEntityTrackerEntry.passengers.set(createdEntry, entity.getPassengers());
+        NMSEntityTrackerEntry.passengers.set(createdEntry, (new ExtendedEntity<Entity>(entity)).getPassengers());
 
         return createdEntry;
     }
