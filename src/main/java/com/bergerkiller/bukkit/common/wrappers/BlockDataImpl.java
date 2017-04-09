@@ -57,6 +57,8 @@ public class BlockDataImpl extends BlockData {
             BY_BLOCK_DATA.put(blockData, block_const);
             BY_ID_AND_DATA[Block.REGISTRY_ID.getId(blockData)] = block_const;
         }
+
+        BY_BLOCK_DATA.put(null, AIR);
     }
 
     /**

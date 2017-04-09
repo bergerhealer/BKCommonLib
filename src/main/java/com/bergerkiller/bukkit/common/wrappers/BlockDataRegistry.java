@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import net.minecraft.server.v1_11_R1.Block;
+import net.minecraft.server.v1_11_R1.IBlockData;
 
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
@@ -34,7 +35,15 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlockData(Object iBlockData) {
-        return BlockDataImpl.BY_BLOCK_DATA.get(iBlockData);
+        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(iBlockData);
+        if (data != null) {
+            return data;
+        }
+
+        IBlockData b = (IBlockData) iBlockData;
+        BlockDataImpl.BlockDataConstant c = new BlockDataImpl.BlockDataConstant(b);
+        BlockDataImpl.BY_BLOCK_DATA.put(b, c);
+        return c;
     }
 
     /**

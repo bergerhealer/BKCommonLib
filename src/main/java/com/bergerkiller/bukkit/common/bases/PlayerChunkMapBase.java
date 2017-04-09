@@ -107,7 +107,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
                             Object playerchunk = getPlayerChunk(NMSPlayerChunkMap.getChunk.invoke(this, l1 - j1, i2 - k1, false));
 
                             if (playerchunk != null) {
-                                NMSPlayerChunk.unload.invoke(playerchunk, entityplayer);
+                                NMSPlayerChunk.removePlayer.invoke(playerchunk, entityplayer);
                             }
                         }
                     }
@@ -120,7 +120,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
                 Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
                 for (ChunkCoordIntPair pair : chunksToLoad) {
                     Object playerchunk = NMSPlayerChunkMap.getChunk.invoke(this, pair.x, pair.z, true);
-                    NMSPlayerChunk.load.invoke(playerchunk, entityplayer);
+                    NMSPlayerChunk.addPlayer.invoke(playerchunk, entityplayer);
                 }
 
                 if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1)) {
@@ -155,7 +155,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
                 Object playerchunk = getPlayerChunk(NMSPlayerChunkMap.getChunk.invoke(this, k, l, false));
 
                 if (playerchunk != null) {
-                    NMSPlayerChunk.unload.invoke(playerchunk, entityplayer);
+                    NMSPlayerChunk.removePlayer.invoke(playerchunk, entityplayer);
                 }
             }
         }

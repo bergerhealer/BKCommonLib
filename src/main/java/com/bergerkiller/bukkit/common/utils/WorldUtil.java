@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -521,7 +522,6 @@ public class WorldUtil extends ChunkUtil {
 
     /**
      * Queue a chunk for resending to all players that are in range of it.
-     * This will resend the chunk block data, but not any changes to tile entities in them.
      * Use this method to update chunk data after doing changes to its raw structure.
      *
      * @param player to send chunk data for
@@ -533,9 +533,20 @@ public class WorldUtil extends ChunkUtil {
         Object playerChunkMap = CommonNMS.getNative(world).getPlayerChunkMap();
         Object chunk = NMSPlayerChunkMap.getChunk.invoke(playerChunkMap, chunkX, chunkZ);
         if (chunk != null && !NMSPlayerChunk.players.get(chunk).isEmpty()) {
-            NMSPlayerChunk.dirtySectionMask.set(chunk, 65535); // all chunk sections
-            NMSPlayerChunk.dirtyCount.set(chunk, 64); // 64 triggers a full chunk re-send
-            NMSPlayerChunkMap.markForUpdate.invoke(playerChunkMap, chunk); // tell main chunk map to update
+            // Simply remove and re-add the players to the chunk. Does an instant chunk resend, though.
+            List<Player> old_players = new ArrayList<Player>(NMSPlayerChunk.players.get(chunk));
+            for (Player player : old_players) {
+                NMSPlayerChunk.removePlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
+            }
+            for (Player player : old_players) {
+                NMSPlayerChunk.addPlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
+            }
+
+            // This method sends 64 block changes to trigger a chunk resend
+            // It doesn't really work because entities don't get refreshed.
+            // NMSPlayerChunk.dirtySectionMask.set(chunk, 65535); // all chunk sections
+            // NMSPlayerChunk.dirtyCount.set(chunk, 64); // 64 triggers a full chunk re-send
+            // NMSPlayerChunkMap.markForUpdate.invoke(playerChunkMap, chunk); // tell main chunk map to update
             return true;
         } else {
             return false;

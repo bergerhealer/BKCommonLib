@@ -82,6 +82,7 @@ public class ConversionTypes {
     public static final HandleConverter toScoreboardActionHandle = HandleConverter.toScoreboardActionHandle;
     public static final HandleConverter toMainHandHandle = HandleConverter.toMainHandHandle;
     public static final HandleConverter toBlockDataHandle = HandleConverter.toBlockDataHandle;
+    public static final HandleConverter toChunkSectionHandle = HandleConverter.toChunkSectionHandle;
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
     public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
@@ -112,6 +113,7 @@ public class ConversionTypes {
     public static final WrapperConverter<UseAction> toUseAction = WrapperConverter.toUseAction;
     public static final WrapperConverter<org.bukkit.inventory.MainHand> toMainHand = WrapperConverter.toMainHand;
     public static final WrapperConverter<BlockData> toBlockData = WrapperConverter.toBlockData;
+    public static final WrapperConverter<ChunkSection> toChunkSection = WrapperConverter.toChunkSection;
     // Text Format Conversion
     public static final TextFormatConverter<String> chatComponentToText = TextFormatConverter.chatComponentToText;
     public static final TextFormatConverter<Object> textToChatComponent = TextFormatConverter.textToChatComponent;

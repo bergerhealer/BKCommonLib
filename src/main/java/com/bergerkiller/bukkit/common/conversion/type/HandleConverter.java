@@ -325,6 +325,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
             }
         }
     };
+    public static final HandleConverter toChunkSectionHandle = new WrapperHandleConverter("ChunkSection");
 
     public HandleConverter(String outputTypeName) {
         this(CommonUtil.getNMSClass(outputTypeName));

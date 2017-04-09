@@ -9,13 +9,17 @@ import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.Chunk;
+import net.minecraft.server.v1_11_R1.Entity;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
@@ -36,6 +40,16 @@ public class ChunkUtil {
 
     private static boolean canUseLongObjectHashMap = CommonUtil.getCBClass("util.LongObjectHashMap") != null;
     private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
+
+    /**
+     * Gets an array of vertical Chunk Sections that make up the data of a chunk
+     * 
+     * @param chunk to get the sections of
+     * @return chunk sections
+     */
+    public static ChunkSection[] getSections(org.bukkit.Chunk chunk) {
+        return NMSChunk.sections.get(Conversion.toChunkHandle.convert(chunk));
+    }
 
     /**
      * Gets the height of a given column in a chunk
@@ -110,21 +124,21 @@ public class ChunkUtil {
      * @param x - coordinate of the block
      * @param y - coordinate of the block
      * @param z - coordinate of the block
-     * @param typeId to set to
      * @param data to set to
      */
-    public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, int typeId, int data) {
+    public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, BlockData data) {
         if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
             return;
         }
-        Object[] sections = NMSChunk.getSections(CommonNMS.getNative(chunk));
+
+        Object[] sections = (Object[]) NMSChunk.sections.getInternal(CommonNMS.getNative(chunk));
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
             section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y);
         }
-        NMSChunkSection.setTypeId(section, x, y, z, typeId);
-        NMSChunkSection.setData(section, x, y, z, data);
+
+        NMSChunkSection.setBlockData(section, x, y, z, data);
     }
 
     /**

@@ -8,11 +8,13 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
@@ -410,6 +412,16 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
                 } else {
                     return def;
                 }
+            }
+        }
+    };
+    public static final WrapperConverter<ChunkSection> toChunkSection = new WrapperConverter<ChunkSection>(ChunkSection.class) {
+        @Override
+        protected ChunkSection convertSpecial(Object value, Class<?> valueType, ChunkSection def) {
+            if (NMSChunkSection.T.isInstance(value)) {
+                return new ChunkSection(value);
+            } else {
+                return def;
             }
         }
     };

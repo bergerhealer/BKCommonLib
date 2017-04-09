@@ -64,6 +64,7 @@ public class ConversionPairs {
     public static final ConverterPair<Object, ScoreboardAction> scoreboardAction = toScoreboardActionHandle.formPair(toScoreboardAction);
     public static final ConverterPair<Object, MainHand> mainHand = toMainHandHandle.formPair(toMainHand);
     public static final ConverterPair<Object, BlockData> blockData = toBlockDataHandle.formPair(toBlockData);
+    public static final ConverterPair<Object, ChunkSection> chunkSection = toChunkSectionHandle.formPair(toChunkSection);
     // Text format conversion <>
     public static final ConverterPair<Object, String> jsonChatComponent = jsonToChatComponent.formPair(chatComponentToJson);
     public static final ConverterPair<Object, String> textChatComponent = textToChatComponent.formPair(chatComponentToText);
@@ -77,5 +78,6 @@ public class ConversionPairs {
     public static final ConverterPair<List<Object>, List<ItemStack>> itemStackList = itemStack.toList();
     public static final ConverterPair<List<Object>, List<DataWatcher>> dataWatcherList = dataWatcher.toList();
     public static final ConverterPair<Object[], String[]> textChatComponentArray = textChatComponent.toArray();
+    public static final ConverterPair<Object[], ChunkSection[]> chunkSectionArray = chunkSection.toArray();
 
 }

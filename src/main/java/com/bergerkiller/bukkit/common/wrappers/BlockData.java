@@ -55,7 +55,7 @@ public abstract class BlockData extends BlockDataRegistry {
 
     @Override
     public String toString() {
-        Object b = getBlock();
+        Object b = getData();
         return (b == null) ? "[null]" : b.toString();
     }
 

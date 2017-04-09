@@ -2,6 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
@@ -24,10 +25,9 @@ public class NMSChunk {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
     public static final FieldAccessor<Integer> x = T.selectField("public final int locX");
     public static final FieldAccessor<Integer> z = T.selectField("public final int locZ");
+    public static final TranslatorFieldAccessor<ChunkSection[]> sections = T.selectField("private final ChunkSection[] sections").translate(ConversionPairs.chunkSectionArray);
 
-    
     public static final MethodAccessor<byte[]> biomeData = T.selectMethod("public byte[] getBiomeIndex()");
-    public static final MethodAccessor<Object[]> sections = T.selectMethod("public ChunkSection[] getSections()");
     private static final MethodAccessor<Void> addEntities = T.selectMethod("public void addEntities()");
     private static final MethodAccessor<Void> loadNeighbours = T.selectMethod("public void loadNearby(IChunkProvider provider, ChunkGenerator generator, boolean newChunk)");
     private static final MethodAccessor<Boolean> needsSaving = T.selectMethod("public boolean a(boolean)");
@@ -62,13 +62,6 @@ public class NMSChunk {
      */
     public static boolean needsSaving(Object chunkHandle) {
         return needsSaving.invoke(chunkHandle, false);
-    }
-
-    /**
-     * Gets all chunk sections contained in a chunk
-     */
-    public static Object[] getSections(Object chunkHandle) {
-        return sections.invoke(chunkHandle);
     }
 
     /**

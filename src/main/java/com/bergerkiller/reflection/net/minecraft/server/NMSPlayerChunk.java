@@ -21,6 +21,6 @@ public class NMSPlayerChunk {
     public static final FieldAccessor<Boolean> done = T.nextField("private boolean done");
     public static final FieldAccessor<Boolean> loaded = done; //TODO: Maybe private boolean loadInProgress?
 
-    public static final MethodAccessor<Void> load = T.selectMethod("public void a(EntityPlayer entityplayer)");
-    public static final MethodAccessor<Void> unload = T.selectMethod("public void b(EntityPlayer entityplayer)");
+    public static final MethodAccessor<Void> addPlayer = T.selectMethod("public void a(EntityPlayer entityplayer)");
+    public static final MethodAccessor<Void> removePlayer = T.selectMethod("public void b(EntityPlayer entityplayer)");
 }
