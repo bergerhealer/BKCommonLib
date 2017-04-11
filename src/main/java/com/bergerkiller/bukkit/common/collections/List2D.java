@@ -13,10 +13,19 @@ public class List2D<E> implements List<E> {
     private final Collection<List<E>> lists;
 
     public List2D(List<E>[] lists) {
-        this(Arrays.asList(lists));
+        if (lists == null) {
+            throw new IllegalArgumentException("Array of lists can not be null");
+        }
+        if (lists.length == 0) {
+            throw new IllegalArgumentException("Can not use an empty array of lists");
+        }
+        this.lists = Arrays.asList(lists);
     }
 
     public List2D(Collection<List<E>> lists) {
+        if (lists == null) {
+            throw new IllegalArgumentException("Collection of lists can not be null");
+        }
         if (lists.isEmpty()) {
             throw new IllegalArgumentException("Can not use an empty collection of lists");
         }

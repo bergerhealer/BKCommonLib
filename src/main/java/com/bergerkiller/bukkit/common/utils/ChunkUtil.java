@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -150,6 +151,9 @@ public class ChunkUtil {
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
         List<Object>[] entitySlices = NMSChunk.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
+        if (entitySlices == null || entitySlices.length == 0) {
+            return Collections.emptyList();
+        }
         return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
     }
 
