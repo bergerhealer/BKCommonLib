@@ -357,6 +357,7 @@ public abstract class ClassInterceptor {
         final Callback[] callbacks = new Callback[] {
                 new EnhancedObjectProperty("CI_getInterceptor", interceptor),
                 new EnhancedObjectProperty("CI_getBaseType", objectType),
+                new EnhancedObjectProperty("CI_getBaseTypeTemplate", ClassTemplate.create(objectType)),
                 new EnhancedObjectProperty("CI_getEnhancedClass", null),
                 new CallbackMethodInterceptor(interceptor),
                 NoOp.INSTANCE
@@ -412,7 +413,14 @@ public abstract class ClassInterceptor {
         }
 
         // Update EnhancedClass property
-        callbacks[2] = new EnhancedObjectProperty("CI_getEnhancedClass", enhanced);
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof EnhancedObjectProperty) {
+                EnhancedObjectProperty prop = (EnhancedObjectProperty) callbacks[i];
+                if (prop.name.equals("CI_getEnhancedClass")) {
+                    callbacks[i] = new EnhancedObjectProperty(prop.name, enhanced);
+                }
+            }
+        }
 
         // Register the method callbacks, and then create the enhanced object instance using Objenesis
         // Note that since we don't call any constructors, CGLib does not update the object callback list
@@ -664,6 +672,7 @@ public abstract class ClassInterceptor {
     protected static interface EnhancedObject {
         public ClassInterceptor CI_getInterceptor();
         public Class<?> CI_getBaseType();
+        public ClassTemplate<?> CI_getBaseTypeTemplate();
         public EnhancedClass CI_getEnhancedClass();
     }
 }

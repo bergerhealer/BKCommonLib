@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.declarations.FieldDeclaration;
+import com.bergerkiller.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
 
 import net.sf.cglib.asm.Type;
@@ -533,7 +535,7 @@ public class ClassTemplate<T> {
      * @param type to resolve
      * @return class name
      */
-    private String resolveClassName(Class<?> type) {
+    public String resolveClassName(Class<?> type) {
         // Null types shouldn't happen, but security and all
         if (type == null) {
             return "NULL";
@@ -575,12 +577,7 @@ public class ClassTemplate<T> {
 
     private void addMethods(Class<?> type, HashSet<Signature> addedSignatures) {
         // Get sorted array of methods
-        Method[] declMethods;
-        if (type.equals(this.getType())) {
-            declMethods = type.getDeclaredMethods();
-        } else {
-            declMethods = type.getMethods();
-        }
+        Method[] declMethods = type.getDeclaredMethods();
 
         // = type.getDeclaredMethods();
         Arrays.sort(declMethods, new Comparator<Method>() {
@@ -658,7 +655,7 @@ public class ClassTemplate<T> {
         }
 
         // Parse the declaration
-        FieldDeclare declare = new FieldDeclare(declaration);
+        FieldDeclaration declare = new FieldDeclaration(this, declaration);
         if (!declare.isValid()) {
             logFieldWarning(declaration, "could not be parsed");
             return new SafeField<F>(null);
@@ -702,7 +699,7 @@ public class ClassTemplate<T> {
             // Log the close matches
             logFieldWarning(declaration, "not found; there are " + similar.size() + " close matches:");
             for (Field field : similar) {
-                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclare(field).toString());
+                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, field).toString());
             }
         }
 
@@ -733,7 +730,7 @@ public class ClassTemplate<T> {
             }
 
             // Parse the declaration
-            FieldDeclare declare = new FieldDeclare(declaration);
+            FieldDeclaration declare = new FieldDeclaration(this, declaration);
             if (!declare.isValid()) {
                 logFieldWarning(declaration, "could not be parsed");
                 return new SafeField<F>(null);
@@ -764,7 +761,7 @@ public class ClassTemplate<T> {
                 if (skipped.size() > 0) {
                     logFieldWarning(declaration, "skipped " + skipped.size() + " fields during lookup:");
                     for (Field f : skipped) {
-                        Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclare(f).toString());
+                        Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, f).toString());
                     }
                 }
             }
@@ -798,7 +795,7 @@ public class ClassTemplate<T> {
      */
     public <F> FieldAccessor<F> selectField(String declaration) {
         // Parse the declaration
-        FieldDeclare declare = new FieldDeclare(declaration);
+        FieldDeclaration declare = new FieldDeclaration(this, declaration);
         if (!declare.isValid()) {
             logFieldWarning(declaration, "could not be parsed");
             return new SafeField<F>(null);
@@ -852,7 +849,7 @@ public class ClassTemplate<T> {
             // Log the close matches
             logFieldWarning(declaration, "not found; there are " + similar.size() + " close matches:");
             for (Field field : similar) {
-                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclare(field).toString());
+                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, field).toString());
             }
         }
 
@@ -865,14 +862,17 @@ public class ClassTemplate<T> {
 
     public Method selectRawMethod(String declaration, boolean logErrors) {
         // Parse the declaration
-        MethodDeclare declare = new MethodDeclare(declaration, logErrors);
+        MethodDeclaration declare = new MethodDeclaration(this, declaration, logErrors);
         if (!declare.isValid()) {
             if (logErrors) {
                 logMethodWarning(declaration, "could not be parsed");
             }
             return null;
         }
+        return selectRawMethod(declare, logErrors);
+    }
 
+    public Method selectRawMethod(MethodDeclaration declare, boolean logErrors) {
         loadMethods();
 
         // Find the exact method
@@ -898,256 +898,16 @@ public class ClassTemplate<T> {
         if (logErrors) {
             if (similar.size() == 0) {
                 // No alternative found, uh oh!
-                logMethodWarning(declaration, "not found; no alternatives available. (Removed?)");
+                logMethodWarning(declare.toString(), "not found; no alternatives available. (Removed?)");
             } else {
                 // Log the close matches
-                logMethodWarning(declaration, "not found; there are " + similar.size() + " close matches:");
+                logMethodWarning(declare.toString(), "not found; there are " + similar.size() + " close matches:");
                 for (Method method : similar) {
-                    Logging.LOGGER_REFLECTION.warning("  - " + new MethodDeclare(method).toString());
+                    Logging.LOGGER_REFLECTION.warning("  - " + new MethodDeclaration(this, method).toString());
                 }
             }
         }
         return null;
     }
 
-    private class FieldDeclare {
-        final String name;
-        final Class<?> type;
-        final int modifiers;
-        final String declaration;
-
-        public FieldDeclare(Field f) {
-            this.type = f.getType();
-            this.name = f.getName();
-            this.modifiers = f.getModifiers();
-
-            String declaration = "";
-
-            declaration += Modifier.toString(f.getModifiers()) + " ";
-            declaration += resolveClassName(f.getType()) + " ";
-            declaration += f.getName() + ";";
-            this.declaration = declaration;
-        }
-
-        public FieldDeclare(String declaration) {
-            if (declaration.endsWith(";")) {
-                declaration = declaration.substring(0, declaration.length() - 1);
-            }
-
-            String declarationF = ReflectionUtil.filterGenerics(declaration);
-
-            String[] parts = declarationF.split(" ");
-
-            // Figure out what the field type is from the name
-            String fieldName = null;
-            Class<?> fieldType = null;
-            int fieldModifiers = 0;
-            if (parts.length >= 2) {
-                fieldName = parts[parts.length - 1];
-                fieldType = resolveClass(parts[parts.length - 2], true);
-                fieldModifiers = ReflectionUtil.parseModifiers(parts, parts.length - 2);
-            }
-
-            if (fieldName == null || fieldType == null)
-            {
-                this.name = null;
-                this.type = null;
-                this.modifiers = 0;
-                this.declaration = null;
-            } else {
-                this.name = fieldName;
-                this.type = fieldType;
-                this.modifiers = fieldModifiers;
-                this.declaration = declaration + ";";
-            }
-        }
-
-        /**
-         * Checks whether this declaration was properly parsed
-         * 
-         * @return True if valid, False if not
-         */
-        public boolean isValid() {
-            return name != null && type != null;
-        }
-
-        /**
-         * Matches the full field signature and field name
-         * 
-         * @param f field to match
-         * @return True if the field matches, False if not
-         */
-        public boolean match(Field f) {
-            return f.getName().equals(name) && matchSignature(f);
-        }
-
-        /**
-         * Matches only the signature of the method (modifiers, field type)
-         * This is used to find alternative candidates for a field name
-         * 
-         * @param f field to match
-         * @return True if the signature matches, False if not
-         */
-        public boolean matchSignature(Field f) {
-            return (f.getType() == type) && ReflectionUtil.compareModifiers(f.getModifiers(), modifiers);
-        }
-
-        @Override
-        public String toString() {
-            return declaration;
-        }
-    }
-
-    private class MethodDeclare {
-        final String name;
-        final Class<?> returnType;
-        final Class<?>[] parameterTypes;
-        final int modifiers;
-        final String declaration;
-
-        public MethodDeclare(Method m) {
-            this.returnType = m.getReturnType();
-            this.parameterTypes = m.getParameterTypes();
-            this.name = m.getName();
-            this.modifiers = m.getModifiers();
-
-            String declaration = "";
-            declaration += Modifier.toString(m.getModifiers()) + " ";
-            declaration += resolveClassName(m.getReturnType()) + " ";
-            declaration += m.getName();
-
-            declaration += "(";
-            for (int i = 0; i < parameterTypes.length; i++) {
-                if (i > 0) {
-                    declaration += ", ";
-                }
-                declaration += resolveClassName(parameterTypes[i]);
-            }
-            declaration += ");";
-            this.declaration = declaration;
-        }
-
-        public MethodDeclare(String declaration, boolean logErrors) {
-            if (declaration.endsWith(";")) {
-                declaration = declaration.substring(0, declaration.length() - 1);
-            }
-
-            String declarationF = ReflectionUtil.filterGenerics(declaration);
-
-            String methodName = null;
-            Class<?> returnType = null;
-            Class<?>[] parameterTypes = null;
-            int methodModifiers = 0;
-
-            // Find method body start
-            int method_start = declarationF.indexOf('(');
-            if (method_start != -1) {
-                int method_end = declarationF.indexOf(')', method_start);
-                if (method_end == -1) {
-                    method_end = declarationF.length();
-                }
-
-                String method_header = declarationF.substring(0, method_start).trim();
-                String[] method_params = declarationF.substring(method_start+1, method_end).split(",");
-                String[] parts = method_header.split(" ");
-
-                // Figure out what the field type is from the name
-                if (parts.length >= 2) {
-                    methodName = parts[parts.length - 1];
-                    returnType = resolveClass(parts[parts.length - 2], logErrors);
-                    methodModifiers = ReflectionUtil.parseModifiers(parts, parts.length - 2);
-
-                    List<Class<?>> paramTypes = new ArrayList<Class<?>>();
-                    boolean paramFail = false;
-                    for (String param : method_params) {
-                        param = param.trim();
-                        if (param.length() == 0)
-                            continue;
-
-                        // Ignore name of the parameter
-                        int paramTypeEnd = param.indexOf(' ');
-                        if (paramTypeEnd != -1) {
-                            param = param.substring(0, paramTypeEnd).trim();
-                        }
-
-                        Class<?> paramType = resolveClass(param, logErrors);
-                        if (paramType == null) {
-                            paramFail = true;
-                            break;
-                        }
-                        paramTypes.add(paramType);
-                    }
-                    if (!paramFail) {
-                        parameterTypes = paramTypes.toArray(new Class<?>[0]);
-                    }
-                }
-            }
-
-            if (methodName == null || returnType == null || parameterTypes == null)
-            {
-                this.name = null;
-                this.returnType = null;
-                this.parameterTypes = null;
-                this.modifiers = 0;
-                this.declaration = null;
-            } else {
-                this.name = methodName;
-                this.returnType = returnType;
-                this.parameterTypes = parameterTypes;
-                this.modifiers = methodModifiers;
-                this.declaration = declaration + ";";
-            }
-        }
-
-        /**
-         * Checks whether this declaration was properly parsed
-         * 
-         * @return True if valid, False if not
-         */
-        public boolean isValid() {
-            return name != null && returnType != null;
-        }
-
-        /**
-         * Matches the full method signature and method name
-         * 
-         * @param m method to match
-         * @return True if the method matches, False if not
-         */
-        public boolean match(Method m) {
-            return m.getName().equals(name) && matchSignature(m);
-        }
-
-        /**
-         * Matches only the signature of the method (modifiers, field type)
-         * This is used to find alternative candidates for a method name
-         * 
-         * @param m method to match
-         * @return True if the signature matches, False if not
-         */
-        public boolean matchSignature(Method m) {
-            if (m.getReturnType() != returnType)
-                return false;
-
-            if (!ReflectionUtil.compareModifiers(m.getModifiers(), modifiers)) {
-                return false;
-            }
-
-            Class<?>[] m_params = m.getParameterTypes();
-            if (m_params.length != parameterTypes.length) {
-                return false;
-            }
-            for (int i = 0; i < m_params.length; i++) {
-                if (m_params[i] != parameterTypes[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return declaration;
-        }
-    }
 }

@@ -125,33 +125,10 @@ public class SafeMethod<T> implements MethodAccessor<T> {
     @SuppressWarnings("unchecked")
     public T invoke(Object instance, Object... args) {
         if (this.method != null) {
-            if (!this.isStatic && instance == null) {
-                throw new IllegalArgumentException("Non-static methods require a valid instance passed in - the instance was null");
-            }
-            if (args.length != parameterTypes.length) {
-                throw new IllegalArgumentException("Illegal amount of arguments provided (" + args.length + "), " + 
-                                                   "expected " + parameterTypes.length + " - check method signature");
-            }
             try {
                 return (T) this.method.invoke(instance, args);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalArgumentException e) {
-                // First find a more understandable message for this
-                if (args.length == parameterTypes.length) {
-                    for (int i = 0; i < parameterTypes.length; i++) {
-                        Object arg = args[i];
-                        if (parameterTypes[i].isPrimitive() && arg == null) {
-                            throw new IllegalArgumentException("Passed in null for primitive type parameter #" + i);
-                        } else if (arg != null && !parameterTypes[i].isAssignableFrom(arg.getClass())) {
-                            throw new IllegalArgumentException("Passed in wrong type for parameter #" + i + " (" + parameterTypes[i].getName() + " expected)");
-                        }
-                    }
-                }
-                // Nothing detected yet...resort to the obtained exception
-                throw e;
+            } catch (Throwable ex) {
+                throw ReflectionUtil.fixMethodInvokeException(method, instance, args, ex);
             }
         }
         return null;

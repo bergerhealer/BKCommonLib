@@ -116,6 +116,18 @@ public class LogicUtil {
     }
 
     /**
+     * Obtains the boxed type (Integer) from an unboxed type (int)<br>
+     * If the input type has no boxed type, it is returned as-is.
+     * 
+     * @param type to get the boxed type for
+     * @return boxed type, or the type if it has no boxed type
+     */
+    public static Class<?> tryBoxType(Class<?> type) {
+        Class<?> boxed = unboxedToBoxed.get(type);
+        return boxed == null ? type : boxed;
+    }
+
+    /**
      * Checks if both values are null or the values equal each other
      *
      * @param value1 to use

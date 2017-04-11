@@ -6,14 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.reflection.declarations.MethodDeclaration;
 
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -31,8 +30,11 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
     @Override
     protected Invokable getCallback(Method method) {
         Class<?> method_class = method.getDeclaringClass();
+        ClassTemplate<?> typeTemplate = ClassTemplate.create(method_class);
         for (HookMethodEntry entry : methods.entries) {
-            if (method.equals(entry.findMethodIn(method_class))) {
+            // Check if signatue matches with method
+            MethodDeclaration m = new MethodDeclaration(typeTemplate, entry.name, false);
+            if (m.match(method) && method.equals(entry.findMethodIn(typeTemplate))) {
                 //Logging.LOGGER_REFLECTION.info("[" + method.getDeclaringClass().getSimpleName() + "] Hooked " + getMethodName(method) + " to " + getMethodName(entry.method));
                 return entry;
             }
@@ -95,10 +97,10 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
                             // Find a method proxy to use for calling the super method, and cache it
                             MethodProxy proxy = entry.superMethodProxyMap.get(enhancedType);
                             if (proxy == null) {
-                                Class<?> baseType = ((EnhancedObject) enhancedInstance).CI_getBaseType();
-                                Method m = entry.findMethodIn(baseType);
+                                ClassTemplate<?> baseTypeTemplate = ((EnhancedObject) enhancedInstance).CI_getBaseTypeTemplate();
+                                Method m = entry.findMethodIn(baseTypeTemplate);
                                 if (m == null) {
-                                    throw new UnsupportedOperationException("Class " + baseType.getName() + 
+                                    throw new UnsupportedOperationException("Class " + baseTypeTemplate.getType().getName() + 
                                             " does not contain method " + entry.toString());
                                 }
 
@@ -114,7 +116,8 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
                             }
                         } else {
                             // Not an enhanced instance, find the method in the class and invoke
-                            Method m = entry.findMethodIn(enhancedType);
+                            ClassTemplate<?> enhancedTypeTemplate = ClassTemplate.create(enhancedType);
+                            Method m = entry.findMethodIn(enhancedTypeTemplate);
                             if (m == null) {
                                 throw new UnsupportedOperationException("Class " + enhancedType.getName() + 
                                         " does not contain method " + entry.toString());
@@ -133,65 +136,30 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
         };
     }
 
-    private static String getMethodName(Method method) {
-        String result = "";
-        result += Modifier.toString(method.getModifiers()) + " ";
-        result += method.getReturnType().getSimpleName() + " ";
-        result += method.getName();
-        result += "(";
-        boolean firstParam = true;
-        for (Class<?> p : method.getParameterTypes()) {
-            if (firstParam) {
-                firstParam = false;
-            } else {
-                result += ", ";
-            }
-            result += p.getSimpleName();
-        }
-        result += ")";
-        return result;
-    }
-
     private static class HookMethodEntry extends MethodInvokable {
         private final Map<Class<?>, Method> superMethodMap = new HashMap<Class<?>, Method>();
         public final Map<Class<?>, MethodProxy> superMethodProxyMap = new HashMap<Class<?>, MethodProxy>();
-        public final Class<?> parameters[];
-        public final Class<?> returnType;
         public final String name;
 
         public HookMethodEntry(Method method, String name) {
             super(method);
             this.name = name;
-            this.parameters = method.getParameterTypes();
-            this.returnType = method.getReturnType();
         }
 
         @Override
         public String toString() {
-            String result =  returnType.getSimpleName() + " " + name + "(";
-            boolean first = true;
-            for (Class<?> param : parameters) {
-                if (first) {
-                    first = false;
-                } else {
-                    result += ", ";
-                }
-                result += param.getSimpleName();
-            }
-            return result + ")";
+            return name;
         }
 
-        public Method findMethodIn(Class<?> type) {
-            if (type == null) {
+        public Method findMethodIn(ClassTemplate<?> typeTemplate) {
+            if (typeTemplate == null || !typeTemplate.isValid()) {
                 return null;
             }
-            Method m = superMethodMap.get(type);
+            Method m = superMethodMap.get(typeTemplate.getType());
             if (m == null) {
-                //TODO: Use something other than ClassTemplate for this shit!
-                ClassTemplate<?> template = ClassTemplate.create(type);
-                m =  template.selectRawMethod(name, false);
+                m = typeTemplate.selectRawMethod(name, false);
                 if (m != null) {
-                    superMethodMap.put(type, m);
+                    superMethodMap.put(typeTemplate.getType(), m);
                 }
             }
             return m;

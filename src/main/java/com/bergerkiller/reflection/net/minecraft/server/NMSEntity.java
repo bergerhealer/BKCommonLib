@@ -196,8 +196,8 @@ public class NMSEntity {
      *     }
      * }
      */
-    private static final MethodAccessor<Void> burn = T.selectMethod("protected void burn(float dmg)");
-    
+    public static final MethodAccessor<Void> burn = T.selectMethod("protected void burn(float dmg)");
+
     /*
      * void move(...) {
      *     ...
@@ -349,10 +349,6 @@ public class NMSEntity {
 
     public static void setRotation(Object entityHandle, float yaw, float pitch) {
         setRotation.invoke(entityHandle, yaw, pitch);
-    }
-
-    public static void burn(Object entityHandle, float damage) {
-        burn.invoke(entityHandle, damage);
     }
 
     public static Entity createEntity(Object entityHandle) {

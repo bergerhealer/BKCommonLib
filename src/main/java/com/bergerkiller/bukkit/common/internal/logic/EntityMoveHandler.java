@@ -541,7 +541,7 @@ public class EntityMoveHandler {
             boolean flag1 = that.ai();
 
             if (that.world.e(that.getBoundingBox().shrink(0.001D))) {
-                NMSEntity.burn(that, 1);
+                NMSEntity.burn.invoke(that, 1.0f);
                 if (!flag1) {
                     ++that.fireTicks;
                     if (that.fireTicks == 0) {
