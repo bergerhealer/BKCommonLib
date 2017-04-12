@@ -5,7 +5,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.11.2-v1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -34,10 +34,10 @@
             <id>mvnrepository</id>
             <url>https://mvnrepository.com/artifact/</url>
         </repository>
-        
+
         <repository>
-        	<id>vault-repo</id>
-        	<url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <id>vault-repo</id>
+            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
 
     </repositories>
@@ -47,13 +47,14 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>${project.bversion}-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
             <version>${project.cbversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot-1.11.2.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
@@ -130,7 +131,7 @@
         </resources>
         <!-- Plugins -->
         <plugins>
-            <!-- Needed for shading in CGLib -->
+            <!-- Needed for shading in CGLib and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

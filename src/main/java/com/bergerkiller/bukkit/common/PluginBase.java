@@ -101,24 +101,38 @@ public abstract class PluginBase extends JavaPlugin {
      * - v1.0 = 100<br>
      * - v8.6 = 860<br>
      * - v8.06 = 806<br>
-     * - v1.0.0 = 100<br>
-     * - v1.81.65 = 181
+     * - v1.0.0 = 10000<br>
+     * - v1.81.65 = 18165
      *
      * @return version parsed to an Integer
      */
     public int getVersionNumber() {
-        String ver = this.getVersion();
-        // Get first dot index
-        int dotIndex = ver.indexOf('.');
-        if (dotIndex != -1) {
-            // Get second dot index from first dot index
-            dotIndex = ver.indexOf('.', dotIndex + 1);
-            if (dotIndex != -1) {
-                // Trim this trailing part
-                ver = ver.substring(0, dotIndex);
+        // Split by dots
+        int versionNumber = 0;
+        for (String part : this.getVersion().split("\\.")) {
+            // Trim non-digits from the start of the version part
+            int part_start = 0;
+            while (part_start < part.length() && !Character.isDigit(part.charAt(part_start))) {
+                part_start++;
             }
+            if (part_start >= part.length()) {
+                continue;
+            }
+
+            // Trim everything after the first non-digit
+            int part_end = part_start;
+            while (part_end < part.length() && Character.isDigit(part.charAt(part_end))) {
+                part_end++;
+            }
+
+            // Try and parse it; append to global version value and shift multiplier
+            try {
+                versionNumber *= 100;
+                versionNumber += Integer.parseInt(part.substring(part_start, part_end));
+            } catch (NumberFormatException ex) {}
         }
-        return (int) (100.0 * ParseUtil.parseDouble(ver, 1.0));
+
+        return versionNumber;
     }
 
     /**
@@ -786,7 +800,7 @@ public abstract class PluginBase extends JavaPlugin {
         if (this.enableMessage != null) {
             log(Level.INFO, this.enableMessage);
         }
-        Common.LOGGER.log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
+        log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
     }
 
     @Override
