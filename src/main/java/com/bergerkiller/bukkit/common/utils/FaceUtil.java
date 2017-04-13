@@ -119,6 +119,17 @@ public class FaceUtil {
     }
 
     /**
+     * Adds a certain amount of notches (n of 45-degree angles) to a BlockFace
+     * 
+     * @param face input
+     * @param notchOffset to offset the input by
+     * @return face input offset by notchOffset notches
+     */
+    public static BlockFace notchFaceOffset(BlockFace face, int notchOffset) {
+        return notchToFace(faceToNotch(face) + notchOffset);
+    }
+
+    /**
      * Rotates a given Block Face horizontally
      *
      * @param from face
@@ -165,28 +176,6 @@ public class FaceUtil {
             }
         }
         return from;
-    }
-
-    /**
-     * Subtracts two faces
-     *
-     * @param face1
-     * @param face2 to subtract from face1
-     * @return Block Face result ofthe subtraction
-     */
-    public static BlockFace subtract(BlockFace face1, BlockFace face2) {
-        return notchToFace(faceToNotch(face1) - faceToNotch(face2));
-    }
-
-    /**
-     * Adds two faces together
-     *
-     * @param face1
-     * @param face2 to add to face1
-     * @return Block Face result of the addition
-     */
-    public static BlockFace add(BlockFace face1, BlockFace face2) {
-        return notchToFace(faceToNotch(face1) + faceToNotch(face2));
     }
 
     /**
