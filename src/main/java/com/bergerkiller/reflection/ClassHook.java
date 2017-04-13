@@ -30,11 +30,17 @@ public class ClassHook<T extends ClassHook<?>> extends ClassInterceptor {
     @Override
     protected Invokable getCallback(Method method) {
         Class<?> method_class = method.getDeclaringClass();
+        
         ClassTemplate<?> typeTemplate = ClassTemplate.create(method_class);
+        MethodDeclaration methodDec = new MethodDeclaration(typeTemplate.getResolver(), method);
+
         for (HookMethodEntry entry : methods.entries) {
-            // Check if signatue matches with method
-            MethodDeclaration m = new MethodDeclaration(typeTemplate, entry.name, false);
-            if (m.match(method) && method.equals(entry.findMethodIn(typeTemplate))) {
+            // Check if signature matches with method
+            MethodDeclaration m = new MethodDeclaration(typeTemplate.getResolver(), entry.name);
+            if (!m.isValid() || !m.isResolved()) {
+                continue;
+            }
+            if (m.match(methodDec) && method.equals(entry.findMethodIn(typeTemplate))) {
                 //Logging.LOGGER_REFLECTION.info("[" + method.getDeclaringClass().getSimpleName() + "] Hooked " + getMethodName(method) + " to " + getMethodName(entry.method));
                 return entry;
             }

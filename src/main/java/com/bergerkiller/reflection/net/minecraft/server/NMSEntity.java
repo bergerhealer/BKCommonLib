@@ -104,12 +104,12 @@ public class NMSEntity {
     public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(ConversionPairs.dataWatcher);
 
     static { 
-    	T.skipFieldSignature("protected static final DataWatcherObject Z");
-    	T.skipFieldSignature("private static final DataWatcherObject az");
-    	T.skipFieldSignature("private static final DataWatcherObject aA");
-    	T.skipFieldSignature("private static final DataWatcherObject aB");
-    	T.skipFieldSignature("private static final DataWatcherObject aC");
-    	T.skipFieldSignature("private static final DataWatcherObject aD");
+    	T.skipFieldSignature("protected static final DataWatcherObject<Byte> Z");
+    	T.skipFieldSignature("private static final DataWatcherObject<Integer> az");
+    	T.skipFieldSignature("private static final DataWatcherObject<String> aA");
+    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aB");
+    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aC");
+    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aD");
     }
 
     public static final FieldAccessor<Boolean> isLoaded = T.nextFieldSignature("public boolean aa");

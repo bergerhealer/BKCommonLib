@@ -2,15 +2,18 @@ package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
 
 public class CBChunkIOExecutor {
-	public static final ClassTemplate<?> T = ClassTemplate.createCB("chunkio.ChunkIOExecutor");
+	public static final ClassTemplate<?> T = ClassTemplate.createCB("chunkio.ChunkIOExecutor")
+	        .addImport("org.bukkit.craftbukkit.util.AsynchronousExecutor")
+	        .addImport(Common.NMS_ROOT + ".Chunk");
 	
-    public static final FieldAccessor<Object> asynchronousExecutor = T.selectField("private static final org.bukkit.craftbukkit.util.AsynchronousExecutor<QueuedChunk, Chunk, Runnable, RuntimeException> instance");
+    public static final FieldAccessor<Object> asynchronousExecutor = T.selectField("private static final AsynchronousExecutor<QueuedChunk, Chunk, Runnable, RuntimeException> instance");
 	
 	private static final MethodAccessor<Void> queueChunkLoad = T.selectMethod(
 			"public static void queueChunkLoad(net.minecraft.server.World world," +

@@ -34,7 +34,7 @@ import com.mojang.authlib.GameProfile;
 
 public class CBCraftBlockState {
     public static final ClassTemplate<?> T = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
-    
+
     private static final ClassMap<TileInstantiator> tileToInst = new ClassMap<TileInstantiator>();
     private static final ClassMap<TileInstantiator> stateToInst = new ClassMap<TileInstantiator>();
     public static final FieldAccessor<World> world  = T.selectField("private final org.bukkit.craftbukkit.CraftWorld world");
@@ -52,37 +52,37 @@ public class CBCraftBlockState {
 
     // Initialize some instantiators
     static {
-    	registerInst(new TileInstantiator("Banner") {
-    		private final FieldAccessor<DyeColor> base = STATE.selectField("private org.bukkit.DyeColor base");
-    		private final FieldAccessor<List<Pattern>> state_patterns = STATE.selectField("private List<Pattern> patterns");
-    		private final FieldAccessor<CommonTagList> tile_patterns = TILE.selectField("public NBTTagList patterns").translate(ConversionPairs.commonTagList);
-    		private final FieldAccessor<Object> tile_color = TILE.selectField("public EnumColor color");
+        registerInst(new TileInstantiator("Banner") {
+            private final FieldAccessor<DyeColor> base = STATE.selectField("private org.bukkit.DyeColor base");
+            private final FieldAccessor<List<Pattern>> state_patterns = STATE.addImport("org.bukkit.block.banner.Pattern").selectField("private List<Pattern> patterns");
+            private final FieldAccessor<CommonTagList> tile_patterns = TILE.selectField("public NBTTagList patterns").translate(ConversionPairs.commonTagList);
+            private final FieldAccessor<Object> tile_color = TILE.selectField("public EnumColor color");
 
-    		private final MethodAccessor<Integer> dyecolor_getIdx = ClassTemplate.createNMS("EnumColor").selectMethod("public int getInvColorIndex()");
-    		private final int getDyeColorIndex(Object tile) {
-    			return dyecolor_getIdx.invoke(tile_color.get(tile)).intValue();
-    		}
+            private final MethodAccessor<Integer> dyecolor_getIdx = ClassTemplate.createNMS("EnumColor").selectMethod("public int getInvColorIndex()");
+            private final int getDyeColorIndex(Object tile) {
+                return dyecolor_getIdx.invoke(tile_color.get(tile)).intValue();
+            }
 
-			@Override
+            @Override
             @SuppressWarnings("deprecation")
             protected void apply(BlockState state, Object tile) {
-            	base.set(state, DyeColor.getByDyeData((byte) getDyeColorIndex(tile)));
+                base.set(state, DyeColor.getByDyeData((byte) getDyeColorIndex(tile)));
 
-            	List<Pattern> newPatterns = new ArrayList<Pattern>();
-            	CommonTagList patterns = tile_patterns.get(tile);
-            	if (patterns != null) {
+                List<Pattern> newPatterns = new ArrayList<Pattern>();
+                CommonTagList patterns = tile_patterns.get(tile);
+                if (patterns != null) {
                     for (int i = 0; i < patterns.size(); i++) {
-                    	CommonTagCompound comp = (CommonTagCompound) patterns.get(i);
+                        CommonTagCompound comp = (CommonTagCompound) patterns.get(i);
                         PatternType type = PatternType.getByIdentifier(comp.getValue("Pattern", ""));
                         byte colorB = comp.getValue("Color", 0).byteValue();
                         newPatterns.add(new Pattern(DyeColor.getByDyeData(colorB), type));
                     }
-            	}
+                }
                 state_patterns.set(state, newPatterns);
             }
-    	});
+        });
         registerInst(new TileInstantiator("Beacon"));
-    	registerInst(new TileInstantiator("BrewingStand", "BrewingStand", "brewingStand"));
+        registerInst(new TileInstantiator("BrewingStand", "BrewingStand", "brewingStand"));
         registerInst(new TileInstantiator("Chest"));
         registerInst(new TileInstantiator("Command", "CommandBlock", "commandBlock") {
             private final FieldAccessor<Object> listener = TILE.selectField("private final CommandBlockListenerAbstract i");
@@ -97,7 +97,7 @@ public class CBCraftBlockState {
             }
         });
         registerInst(new TileInstantiator("Comparator"));
-    	registerInst(new TileInstantiator(CommonUtil.getNMSClass("ITileInventory"), "Container", "container"));
+        registerInst(new TileInstantiator(CommonUtil.getNMSClass("ITileInventory"), "Container", "container"));
         registerInst(new TileInstantiator("MobSpawner", "CreatureSpawner", "spawner"));
         registerInst(new TileInstantiator("LightDetector", "DaylightDetector", "detector"));
         registerInst(new TileInstantiator("Dispenser"));
@@ -174,16 +174,16 @@ public class CBCraftBlockState {
     }
 
     public static BlockState toBlockState(Block block) {
-		Object tileEntity = NMSTileEntity.getFromWorld(block);
-		if (tileEntity != null) {
-			TileInstantiator inst = tileToInst.get(tileEntity);
-			if (inst != null) {
-				return inst.newInstance(block, tileEntity);
-			}
-		}
-		// All BlockState types REQUIRE a tile entity; fall back to a default method using Block
-		// Note that this one has several glitches!
-		return block.getState();
+        Object tileEntity = NMSTileEntity.getFromWorld(block);
+        if (tileEntity != null) {
+            TileInstantiator inst = tileToInst.get(tileEntity);
+            if (inst != null) {
+                return inst.newInstance(block, tileEntity);
+            }
+        }
+        // All BlockState types REQUIRE a tile entity; fall back to a default method using Block
+        // Note that this one has several glitches!
+        return block.getState();
     }
 
     public static BlockState toBlockState(Object tileEntity) {
@@ -203,7 +203,7 @@ public class CBCraftBlockState {
             super(tileName, "BlockState", null);
         }
     }
-    
+
     private static class TileInstantiator {
 
         private final FieldAccessor<Object> tileField;
@@ -214,9 +214,9 @@ public class CBCraftBlockState {
         public TileInstantiator(String name) {
             this(name, name, name.toLowerCase(Locale.ENGLISH));
         }
-        
+
         public TileInstantiator(String tileName, String stateName, String tileFieldName) {
-        	this(CommonUtil.getNMSClass("TileEntity" + tileName), stateName, tileFieldName);
+            this(CommonUtil.getNMSClass("TileEntity" + tileName), stateName, tileFieldName);
         }
 
         public TileInstantiator(Class<?> tileType, String stateName, String tileFieldName) {

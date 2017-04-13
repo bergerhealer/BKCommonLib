@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.declarations.ClassResolver;
 import com.bergerkiller.reflection.declarations.FieldDeclaration;
 import com.bergerkiller.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
@@ -16,7 +17,6 @@ import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,16 +33,17 @@ public class ClassTemplate<T> {
     private Class<T> type;
     private List<SafeField<?>> fields;
     private ObjectInstantiator<T> instantiator;
-    private List<Field> typeFields;
-    private List<Method> typeMethods;
-    private Queue<Field> nextFieldQueue;
-    private HashSet<String> imports;
+    private List<FieldDeclaration> typeFields;
+    private LinkedList<MethodDeclaration> typeMethods;
+    private Queue<FieldDeclaration> nextFieldQueue;
+    private ClassResolver resolver;
 
     /**
      * Initializes a new ClassTemplate not pointing to any Class<br>
      * Call setClass before use.
      */
     protected ClassTemplate() {
+        this.resolver = new ClassResolver();
     }
 
     /**
@@ -57,28 +58,9 @@ public class ClassTemplate<T> {
         this.fields = null;
         this.instantiator = null;
         this.typeFields = null;
-        this.imports = new HashSet<String>(4);
-        if (type != null) {
-            addClassImports(type);
-            for (Class<?> i : type.getInterfaces()) {
-                addClassImports(i);
-            }
-        }
-        this.imports.add("java.lang.*");
-        this.imports.add("java.util.*");
+        this.resolver = new ClassResolver();
+        this.resolver.addClassImports(type);
         return this;
-    }
-
-    private void addClassImports(Class<?> type) {
-        if (type == null) {
-            return;
-        }
-        Package pkg = type.getPackage();
-        if (pkg != null) {
-            this.imports.add(pkg.getName() + ".*");
-        }
-        this.imports.add(type.getName() + ".*");
-        addClassImports(type.getSuperclass());
     }
 
     @SuppressWarnings("unchecked")
@@ -126,13 +108,21 @@ public class ClassTemplate<T> {
     }
 
     /**
+     * TODO: Gotta get rid of this!!!
+     */
+    @Deprecated
+    public ClassResolver getResolver() {
+        return this.resolver;
+    }
+
+    /**
      * Adds a new import package or class path used during class lookup
      * 
      * @param importPath to add
      * @return this class template
      */
     public ClassTemplate<T> addImport(String importPath) {
-        this.imports.add(importPath);
+        this.resolver.addImport(importPath);
         return this;
     }
 
@@ -500,33 +490,11 @@ public class ClassTemplate<T> {
      * @return resolved Class name, or null if not found
      */
     public Class<?> resolveClass(String className, boolean logErrors) {
-        // Return Object for generic typings (T, K, etc.)
-        if (className.length() == 1) {
-            return Object.class;
-        }
-
-        Class<?> fieldType = CommonUtil.getClass(className);
-
-        if (fieldType == null) {
-            for (String imp : this.imports) {
-                if (imp.endsWith(".*")) {
-                    fieldType = CommonUtil.getClass(imp.substring(0, imp.length() - 1) + className);
-                } else if (imp.endsWith(className)) {
-                    fieldType = CommonUtil.getClass(imp);
-                } else {
-                    continue;
-                }
-                if (fieldType != null) {
-                    break;
-                }
-            }
-        }
-
-        if (fieldType == null && logErrors) {
+        Class<?> type = this.resolver.resolveClass(className);
+        if (type == null && logErrors) {
             Logging.LOGGER_REFLECTION.warning("Could not find type: " + className);
         }
-
-        return fieldType;
+        return type;
     }
 
     /**
@@ -536,42 +504,21 @@ public class ClassTemplate<T> {
      * @return class name
      */
     public String resolveClassName(Class<?> type) {
-        // Null types shouldn't happen, but security and all
-        if (type == null) {
-            return "NULL";
-        }
-
-        // Handle arrays elegantly
-        if (type.isArray()) {
-            return resolveClassName(type.getComponentType()) + "[]";
-        }
-
-        // See if the class type was imported
-        String name = type.getName();
-        for (String imp : this.imports) {
-            if (imp.equals(name)) {
-                return type.getSimpleName();
-            }
-            if (imp.endsWith(".*")) {
-                String imp_p = imp.substring(0, imp.length() - 1);
-                if (name.startsWith(imp_p)) {
-                    return name.substring(imp_p.length());
-                }
-            }
-        }
-        return name;
+        return this.resolver.resolveName(type);
     }
 
     private void loadFields(boolean initNextQueue) {
         // Initialize field queue with fields if needed
         if (typeFields == null) {
-            typeFields = new LinkedList<Field>();
+            typeFields = new LinkedList<FieldDeclaration>();
             if (this.type != null) {
-                Collections.addAll(typeFields, this.type.getDeclaredFields());
+                for (Field f :  this.type.getDeclaredFields()) {
+                    typeFields.add(new FieldDeclaration(resolver, f));
+                }
             }
         }
         if (initNextQueue || nextFieldQueue == null) {
-            nextFieldQueue = new LinkedList<Field>(typeFields);
+            nextFieldQueue = new LinkedList<FieldDeclaration>(typeFields);
         }
     }
 
@@ -614,7 +561,7 @@ public class ClassTemplate<T> {
         for (Method m : declMethods) {
             Signature sig = new Signature(m.getName(), Type.getReturnType(m), Type.getArgumentTypes(m));
             if (addedSignatures.add(sig)) {
-                typeMethods.add(m);
+                typeMethods.add(new MethodDeclaration(resolver, m));
             }
         }
     }
@@ -622,7 +569,7 @@ public class ClassTemplate<T> {
     private void loadMethods() {
         // Initialize field queue with fields if needed
         if (typeMethods == null) {
-            typeMethods = new LinkedList<Method>();
+            typeMethods = new LinkedList<MethodDeclaration>();
 
             // Load all methods top-down and then all abstract methods from the interfaces
             Class<?> currentType = this.getType();
@@ -655,29 +602,33 @@ public class ClassTemplate<T> {
         }
 
         // Parse the declaration
-        FieldDeclaration declare = new FieldDeclaration(this, declaration);
+        FieldDeclaration declare = new FieldDeclaration(resolver, declaration);
         if (!declare.isValid()) {
             logFieldWarning(declaration, "could not be parsed");
+            return new SafeField<F>(null);
+        }
+        if (!declare.isResolved()) {
+            logFieldWarning(declare.toString(), "has some unresolved types");
             return new SafeField<F>(null);
         }
 
         loadFields(true);
 
         // Find the field exactly
-        for (Field field : nextFieldQueue) {
+        for (FieldDeclaration field : nextFieldQueue) {
             if (declare.match(field)) {
 
                 // Skip until this field
                 while (nextFieldQueue.remove() != field);
 
                 // Done!
-                return new SafeField<F>(field);
+                return new SafeField<F>(field.field);
             }
         }
 
         // List close matches
-        List<Field> similar = new ArrayList<Field>();
-        for (Field field : typeFields) {
+        List<FieldDeclaration> similar = new ArrayList<FieldDeclaration>();
+        for (FieldDeclaration field : typeFields) {
             if (declare.matchSignature(field)) {
                 similar.add(field);
             }
@@ -685,8 +636,8 @@ public class ClassTemplate<T> {
 
         // Maybe a field with this same name exists?
         if (similar.size() == 0) {
-            for (Field field : typeFields) {
-                if (declare.name.equals(field.getName())) {
+            for (FieldDeclaration field : typeFields) {
+                if (declare.name.match(field.name)) {
                     similar.add(field);
                 }
             }
@@ -698,8 +649,8 @@ public class ClassTemplate<T> {
         } else {
             // Log the close matches
             logFieldWarning(declaration, "not found; there are " + similar.size() + " close matches:");
-            for (Field field : similar) {
-                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, field).toString());
+            for (FieldDeclaration field : similar) {
+                Logging.LOGGER_REFLECTION.warning("  - " + field.toString());
             }
         }
 
@@ -730,22 +681,26 @@ public class ClassTemplate<T> {
             }
 
             // Parse the declaration
-            FieldDeclaration declare = new FieldDeclaration(this, declaration);
+            FieldDeclaration declare = new FieldDeclaration(resolver, declaration);
             if (!declare.isValid()) {
                 logFieldWarning(declaration, "could not be parsed");
                 return new SafeField<F>(null);
             }
+            if (!declare.isResolved()) {
+                logFieldWarning(declare.toString(), "has some unresolved types");
+                return new SafeField<F>(null);
+            }
 
             // Check if the field matches the very next item
-            Field next = nextFieldQueue.peek();
+            FieldDeclaration next = nextFieldQueue.peek();
             if (declare.match(next)) {
                 nextFieldQueue.remove();
             } else {
                 // Find similar matches until the field is found
                 next = null;
-                List<Field> skipped = new ArrayList<Field>();
+                List<FieldDeclaration> skipped = new ArrayList<FieldDeclaration>();
                 while (!nextFieldQueue.isEmpty()) {
-                    Field ff = nextFieldQueue.remove();
+                    FieldDeclaration ff = nextFieldQueue.remove();
                     if (declare.matchSignature(ff)) {
                         next = ff;
                         break;
@@ -760,19 +715,18 @@ public class ClassTemplate<T> {
 
                 if (skipped.size() > 0) {
                     logFieldWarning(declaration, "skipped " + skipped.size() + " fields during lookup:");
-                    for (Field f : skipped) {
-                        Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, f).toString());
+                    for (FieldDeclaration f : skipped) {
+                        Logging.LOGGER_REFLECTION.warning("  - " + f.toString());
                     }
                 }
             }
 
             // Warn about field name changes
             if (!declare.match(next)) {
-                logFieldWarning(declaration, "has an incorrect name. New name: " + next.getName());                
+                logFieldWarning(declaration, "has an incorrect name. New name: " + next.name.toString());
             }
 
-
-            return new SafeField<F>(next);
+            return new SafeField<F>(next.field);
     }
 
     /**
@@ -795,24 +749,28 @@ public class ClassTemplate<T> {
      */
     public <F> FieldAccessor<F> selectField(String declaration) {
         // Parse the declaration
-        FieldDeclaration declare = new FieldDeclaration(this, declaration);
+        FieldDeclaration declare = new FieldDeclaration(resolver, declaration);
         if (!declare.isValid()) {
             logFieldWarning(declaration, "could not be parsed");
+            return new SafeField<F>(null);
+        }
+        if (!declare.isResolved()) {
+            logFieldWarning(declare.toString(), "has some unresolved types");
             return new SafeField<F>(null);
         }
 
         loadFields(false);
 
         // Find the field exactly
-        for (Field field : typeFields) {
+        for (FieldDeclaration field : typeFields) {
             if (declare.match(field)) {
-                return new SafeField<F>(field);
+                return new SafeField<F>(field.field);
             }
         }
 
         // List close matches
-        List<Field> similar = new ArrayList<Field>();
-        for (Field field : typeFields) {
+        List<FieldDeclaration> similar = new ArrayList<FieldDeclaration>();
+        for (FieldDeclaration field : typeFields) {
             if (declare.matchSignature(field)) {
                 similar.add(field);
             }
@@ -820,11 +778,11 @@ public class ClassTemplate<T> {
 
         // Maybe a field with this same name and type exists?
         if (similar.size() == 0) {
-            for (Field field : typeFields) {
-                if (Modifier.isStatic(field.getModifiers()) != Modifier.isStatic(declare.modifiers))
+            for (FieldDeclaration field : typeFields) {
+                if (field.modifiers.isStatic() != declare.modifiers.isStatic())
                     continue;
 
-                if (declare.name.equals(field.getName()) && declare.type.equals(field.getType())) {
+                if (declare.name.match(field.name) && declare.type.match(field.type)) {
                     similar.add(field);
                 }
             }
@@ -832,11 +790,11 @@ public class ClassTemplate<T> {
 
         // Maybe the name changed?
         if (similar.size() == 0) {
-            for (Field field : typeFields) {
-                if (Modifier.isStatic(field.getModifiers()) != Modifier.isStatic(declare.modifiers))
+            for (FieldDeclaration field : typeFields) {
+                if (field.modifiers.isStatic() != declare.modifiers.isStatic())
                     continue;
 
-                if (declare.type.equals(field.getType())) {
+                if (declare.type.match(field.type)) {
                     similar.add(field);
                 }
             }
@@ -848,8 +806,8 @@ public class ClassTemplate<T> {
         } else {
             // Log the close matches
             logFieldWarning(declaration, "not found; there are " + similar.size() + " close matches:");
-            for (Field field : similar) {
-                Logging.LOGGER_REFLECTION.warning("  - " + new FieldDeclaration(this, field).toString());
+            for (FieldDeclaration field : similar) {
+                Logging.LOGGER_REFLECTION.warning("  - " + field.toString());
             }
         }
 
@@ -862,10 +820,16 @@ public class ClassTemplate<T> {
 
     public Method selectRawMethod(String declaration, boolean logErrors) {
         // Parse the declaration
-        MethodDeclaration declare = new MethodDeclaration(this, declaration, logErrors);
+        MethodDeclaration declare = new MethodDeclaration(this.resolver, declaration);
         if (!declare.isValid()) {
             if (logErrors) {
                 logMethodWarning(declaration, "could not be parsed");
+            }
+            return null;
+        }
+        if (!declare.isResolved()) {
+            if (logErrors) {
+                logMethodWarning(declare.toString(), "has some unresolved types");
             }
             return null;
         }
@@ -876,11 +840,11 @@ public class ClassTemplate<T> {
         loadMethods();
 
         // Find the exact method
-        for (Method method : typeMethods) {
+        for (MethodDeclaration method : typeMethods) {
             if (declare.match(method)) {
                 try {
-                    method.setAccessible(true);
-                    return method;
+                    method.method.setAccessible(true);
+                    return method.method;
                 } catch (SecurityException ex) {
                     ex.printStackTrace();
                 }
@@ -888,8 +852,8 @@ public class ClassTemplate<T> {
         }
 
         // Log the close matches
-        List<Method> similar = new ArrayList<Method>();
-        for (Method method : typeMethods) {
+        List<MethodDeclaration> similar = new ArrayList<MethodDeclaration>();
+        for (MethodDeclaration method : typeMethods) {
             if (declare.matchSignature(method)) {
                 similar.add(method);
             }
@@ -902,8 +866,8 @@ public class ClassTemplate<T> {
             } else {
                 // Log the close matches
                 logMethodWarning(declare.toString(), "not found; there are " + similar.size() + " close matches:");
-                for (Method method : similar) {
-                    Logging.LOGGER_REFLECTION.warning("  - " + new MethodDeclaration(this, method).toString());
+                for (MethodDeclaration method : similar) {
+                    Logging.LOGGER_REFLECTION.warning("  - " + method.toString());
                 }
             }
         }

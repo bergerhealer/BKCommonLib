@@ -18,7 +18,7 @@ public class NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("World");
 
     private static final MethodAccessor<Server> getServer  = T.selectMethod("public org.bukkit.craftbukkit.CraftServer getServer()");
-    public static final FieldAccessor<List> tileEntityList =  T.selectField("public final List tileEntityList");
+    public static final FieldAccessor<List> tileEntityList =  T.selectField("public final List<TileEntity> tileEntityList");
     public static final FieldAccessor<World> bukkitWorld   =  T.selectField("private final org.bukkit.craftbukkit.CraftWorld world");
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(ConversionPairs.intHashMap);
 

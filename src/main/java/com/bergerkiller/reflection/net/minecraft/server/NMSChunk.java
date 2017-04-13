@@ -36,10 +36,10 @@ public class NMSChunk {
     
     public static final TranslatorFieldAccessor<World> world = T.selectField("public final World world").translate(ConversionPairs.world);
     
-    public static final FieldAccessor<Map<?, ?>> tileEntities = T.selectField("public final Map tileEntities");
+    public static final FieldAccessor<Map<?, ?>> tileEntities = T.selectField("public final Map<BlockPosition, TileEntity> tileEntities");
     
     // Note: on Spigot it is a List[], on CraftBukkit it is a EntitySlice[]!!!
-    public static final FieldAccessor<List<Object>[]> entitySlices = T.selectField("public final List[] entitySlices");
+    public static final FieldAccessor<List<Object>[]> entitySlices = T.selectField("public final List<Entity>[] entitySlices");
     
     public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider",CommonUtil.getNMSClass("WorldProvider"));
     public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "e", boolean.class);

@@ -7,17 +7,19 @@ import com.google.common.collect.BiMap;
 import java.util.Map;
 
 public class NMSEnumProtocol {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol");
+    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol")
+            .addImport("com.google.common.collect.BiMap");
+
     private static final Object PLAY = T.selectStaticValue("public static final EnumProtocol PLAY");
 
     static class Direction {
-    	public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocolDirection");
-    	public static final Object CLIENTBOUND = T.selectStaticValue("public static final EnumProtocolDirection CLIENTBOUND");
-    	public static final Object SERVERBOUND = T.selectStaticValue("public static final EnumProtocolDirection SERVERBOUND");
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocolDirection");
+        public static final Object CLIENTBOUND = T.selectStaticValue("public static final EnumProtocolDirection CLIENTBOUND");
+        public static final Object SERVERBOUND = T.selectStaticValue("public static final EnumProtocolDirection SERVERBOUND");
     }
-    
+
     public static final FieldAccessor<Map<Object, BiMap<Integer, Class<?>>>> packetMap = 
-    		T.selectField("private final Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> h");
+            T.selectField("private final Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> h");
 
     public static Class<?> getPacketClassIn(Integer id) {
         return packetMap.get(PLAY).get(Direction.CLIENTBOUND).get(id);

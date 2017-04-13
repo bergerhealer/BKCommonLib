@@ -332,11 +332,29 @@ public class LogicUtil {
             return Array.newInstance(componentType, 0).getClass();
         } else {
             try {
-				return Class.forName("[L" + componentType.getName() + ";");
-			} catch (ClassNotFoundException e) {
-				return Object[].class;
-			}
+                return Class.forName("[L" + componentType.getName() + ";");
+            } catch (ClassNotFoundException e) {
+                return Object[].class;
+            }
         }
+    }
+
+    /**
+     * Obtains the Class instance representing an array of the component type
+     * specified. For example:<br>
+     * - Integer.class -> Integer[].class<br>
+     * - int.class -> int[].class
+     *
+     * @param componentType to convert
+     * @param levels the amount of levels to create the array (e.g. 2=[][])
+     * @return array type
+     */
+    public static Class<?> getArrayType(Class<?> componentType, int levels) {
+        Class<?> type = componentType;
+        while (levels-- > 0) {
+            type = getArrayType(type);
+        }
+        return type;
     }
 
     /**

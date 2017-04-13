@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NMSRegionFileCache {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegionFileCache");
+    public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegionFileCache")
+            .addImport("java.io.File");
+
     public static final FieldAccessor<Map<File, Object>> filesField = T.selectField("public static final Map<File, RegionFile> a");
     public static final Map<File, Object> FILES;
 

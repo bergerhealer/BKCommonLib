@@ -1,95 +1,83 @@
 package com.bergerkiller.reflection.declarations;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.ReflectionUtil;
+public class FieldDeclaration extends Declaration {
+    public final ModifierDeclaration modifiers;
+    public final NameDeclaration name;
+    public final TypeDeclaration type;
+    public final Field field;
 
-public class FieldDeclaration {
-    public final String name;
-    public final Class<?> type;
-    public final int modifiers;
-    private final String declaration;
-
-    public FieldDeclaration(ClassTemplate<?> template, Field f) {
-        this.type = f.getType();
-        this.name = f.getName();
-        this.modifiers = f.getModifiers();
-
-        String declaration = "";
-
-        declaration += Modifier.toString(f.getModifiers()) + " ";
-        declaration += template.resolveClassName(f.getType()) + " ";
-        declaration += f.getName() + ";";
-        this.declaration = declaration;
+    public FieldDeclaration(ClassResolver resolver, Field field) {
+        super(resolver);
+        this.field = field;
+        this.modifiers = new ModifierDeclaration(resolver, field.getModifiers());
+        this.type = new TypeDeclaration(resolver, field.getGenericType());
+        this.name = new NameDeclaration(resolver, field.getName(), null);
     }
 
-    public FieldDeclaration(ClassTemplate<?> template, String declaration) {
-        if (declaration.endsWith(";")) {
-            declaration = declaration.substring(0, declaration.length() - 1);
+    public FieldDeclaration(ClassResolver resolver, String declaration) {
+        super(resolver, declaration);
+        this.field = null;
+        this.modifiers = nextModifier();
+        this.type = nextType();
+        this.name = nextName();
+    }
+
+    @Override
+    public boolean match(Declaration declaration) {
+        if (declaration instanceof FieldDeclaration) {
+            FieldDeclaration field = (FieldDeclaration) declaration;
+            return modifiers.match(field.modifiers) &&
+                    name.match(field.name) &&
+                    type.match(field.type);
         }
-
-        String declarationF = ReflectionUtil.filterGenerics(declaration);
-
-        String[] parts = declarationF.split(" ");
-
-        // Figure out what the field type is from the name
-        String fieldName = null;
-        Class<?> fieldType = null;
-        int fieldModifiers = 0;
-        if (parts.length >= 2) {
-            fieldName = parts[parts.length - 1];
-            fieldType = template.resolveClass(parts[parts.length - 2], true);
-            fieldModifiers = ReflectionUtil.parseModifiers(parts, parts.length - 2);
-        }
-
-        if (fieldName == null || fieldType == null)
-        {
-            this.name = null;
-            this.type = null;
-            this.modifiers = 0;
-            this.declaration = null;
-        } else {
-            this.name = fieldName;
-            this.type = fieldType;
-            this.modifiers = fieldModifiers;
-            this.declaration = declaration + ";";
-        }
+        return false;
     }
 
     /**
-     * Checks whether this declaration was properly parsed
+     * Matches this declaration with another declaration, ignoring the name of the field
      * 
-     * @return True if valid, False if not
+     * @param declaration to check against
+     * @return True if the signatures match (except for name), False if not
      */
-    public boolean isValid() {
-        return name != null && type != null;
-    }
-
-    /**
-     * Matches the full field signature and field name
-     * 
-     * @param f field to match
-     * @return True if the field matches, False if not
-     */
-    public boolean match(Field f) {
-        return f.getName().equals(name) && matchSignature(f);
-    }
-
-    /**
-     * Matches only the signature of the method (modifiers, field type)
-     * This is used to find alternative candidates for a field name
-     * 
-     * @param f field to match
-     * @return True if the signature matches, False if not
-     */
-    public boolean matchSignature(Field f) {
-        return (f.getType() == type) && ReflectionUtil.compareModifiers(f.getModifiers(), modifiers);
+    public boolean matchSignature(Declaration declaration) {
+        if (declaration instanceof FieldDeclaration) {
+            FieldDeclaration field = (FieldDeclaration) declaration;
+            return modifiers.match(field.modifiers) &&
+                    type.match(field.type);
+        }
+        return false;
     }
 
     @Override
     public String toString() {
-        return declaration;
+        if (!isValid()) {
+            return "??[" + _initialDeclaration + "]??";
+        }
+        String m = modifiers.toString();
+        String t = type.toString();
+        String n = name.toString();
+        if (m.length() > 0) {
+            return m + " " + t + " " + n;
+        } else {
+            return t + " " + n;
+        }
+    }
+
+    @Override
+    public boolean isResolved() {
+        return this.modifiers.isResolved() && this.type.isResolved() && this.name.isResolved();
+    }
+
+    @Override
+    protected void debugString(StringBuilder str, String indent) {
+        str.append(indent).append("Field {\n");
+        str.append(indent).append("  declaration=").append(this._initialDeclaration).append('\n');
+        str.append(indent).append("  postfix=").append(this.getPostfix()).append('\n');
+        this.modifiers.debugString(str, indent + "  ");
+        this.type.debugString(str, indent + "  ");
+        this.name.debugString(str, indent + "  ");
+        str.append(indent).append("}\n");
     }
 }
