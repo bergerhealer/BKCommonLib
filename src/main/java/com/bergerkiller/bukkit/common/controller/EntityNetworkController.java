@@ -1040,7 +1040,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public CommonPacket getSpawnPacket() {
         final CommonPacket packet = NMSEntityTrackerEntry.getSpawnPacket(handle);
-        if (packet.getType() == PacketType.OUT_ENTITY_SPAWN) {
+        if (packet != null && packet.getType() == PacketType.OUT_ENTITY_SPAWN) {
             // NMS error: They are not using the position, but the live position
             // This has some big issues when new players join...
 
