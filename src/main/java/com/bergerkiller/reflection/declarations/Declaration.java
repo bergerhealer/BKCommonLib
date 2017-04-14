@@ -1,17 +1,23 @@
 package com.bergerkiller.reflection.declarations;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+
 /**
  * Base class for Declaration implementations
  */
 public abstract class Declaration {
     protected static final char[] invalid_name_chars;
+    protected static final char[] space_chars;
     private String _postfix;
     protected final String _initialDeclaration;
     private final ClassResolver _resolver;
 
     static {
         invalid_name_chars = new char[] {
-                ' ', '<', '>', ',', '(', ')', '{', '}', ';', '='
+                ' ', '\n', '\r', '<', '>', ',', '(', ')', '{', '}', ';', '='
+        };
+        space_chars = new char[] {
+                ' ', '\n', '\r'
         };
     }
 
@@ -60,6 +66,10 @@ public abstract class Declaration {
         return updatePostfix(new ParameterListDeclaration(this._resolver, this._postfix));
     }
 
+    protected final ClassDeclaration nextClass() {
+        return updatePostfix(new ClassDeclaration(this._resolver, this._postfix));
+    }
+
     /**
      * Updates the text that exists after this declaration, by taking
      * over the information from the last child declaration.
@@ -106,6 +116,48 @@ public abstract class Declaration {
      */
     protected final void setInvalid() {
         this._postfix = null;
+    }
+
+    /**
+     * Removes all whitespace characters from the start of the current postfix
+     * 
+     * @param start index
+     */
+    protected final void trimWhitespace(int start) {
+        if (this._postfix == null) {
+            return;
+        }
+        for (int cidx = start; cidx < this._postfix.length(); cidx++) {
+            char c = this._postfix.charAt(cidx);
+            if (LogicUtil.containsChar(c, space_chars)) {
+                continue;
+            }
+            this._postfix = this._postfix.substring(cidx);
+            return;
+        }
+        this._postfix = "";
+    }
+
+    /**
+     * Removes everything up until the next newline
+     */
+    protected final void trimLine() {
+        if (this._postfix == null) {
+            return;
+        }
+        boolean foundNewline = false;
+        for (int cidx = 0; cidx < this._postfix.length(); cidx++) {
+            char c = this._postfix.charAt(cidx);
+            if (c == '\r' || c == '\n') {
+                foundNewline = true;
+                continue;
+            }
+            if (c != ' ' && foundNewline) {
+                this._postfix = this._postfix.substring(cidx);
+                return;
+            }
+        }
+        this._postfix = "";
     }
 
     /**

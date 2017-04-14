@@ -1,0 +1,13 @@
+package net.minecraft.server;
+import java.io.File;
+
+class Entity {
+
+    public double locX;
+    public double locY;
+    public double locZ;
+    private AxisAlignedBB boundingBox;
+    protected boolean justLanded:E;
+    private int stepCounter:ax
+
+}

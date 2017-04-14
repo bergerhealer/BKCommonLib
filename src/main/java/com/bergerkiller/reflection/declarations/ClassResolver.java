@@ -1,6 +1,10 @@
 package com.bergerkiller.reflection.declarations;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -8,12 +12,29 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
  * Resolves class names into Class Types based on package and import paths.
  */
 public class ClassResolver {
+    private static final List<String> default_imports = Arrays.asList("java.lang.*", "java.util.*");
     private final HashSet<String> imports;
+    private final List<String> manualImports;
+    private String packagePath;
 
+    private ClassResolver(ClassResolver src) {
+        this.imports = new HashSet<String>(src.imports);
+        this.manualImports = new ArrayList<String>(src.manualImports);
+        this.packagePath = src.packagePath;
+    }
+    
     public ClassResolver() {
-        this.imports = new HashSet<String>();
-        this.imports.add("java.lang.*");
-        this.imports.add("java.util.*");
+        this.imports = new HashSet<String>(default_imports);
+        this.manualImports = new ArrayList<String>();
+        this.packagePath = "";
+    }
+
+    /**
+     * Clones this ClassResolver so that independent Class imports can be included
+     */
+    @Override
+    public ClassResolver clone() {
+        return new ClassResolver(this);
     }
 
     /**
@@ -34,12 +55,45 @@ public class ClassResolver {
     }
 
     /**
+     * Adds a package path, making all Classes within visible
+     * 
+     * @param path to the package to add
+     */
+    public void setPackage(String path) {
+        this.packagePath = path;
+        this.manualImports.clear();
+        this.imports.clear();
+        this.imports.addAll(default_imports);
+        this.imports.add(path + ".*");
+    }
+
+    /**
+     * Gets the package path last set using {@link #setPackage(String)}.
+     * Is empty if no package path was set
+     * 
+     * @return package path
+     */
+    public String getPackage() {
+        return this.packagePath;
+    }
+
+    /**
+     * Gets the list of imports added to this resolver using {@link #addImport(String)}
+     * 
+     * @return List of imports
+     */
+    public List<String> getImports() {
+        return Collections.unmodifiableList(this.manualImports);
+    }
+
+    /**
      * Adds an import declaration. This method supports wildcard imports.
      * 
      * @param path to import
      */
     public void addImport(String path) {
         this.imports.add(path);
+        this.manualImports.add(path);
     }
 
     /**

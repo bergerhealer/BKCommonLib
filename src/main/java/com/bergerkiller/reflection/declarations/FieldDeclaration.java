@@ -59,9 +59,9 @@ public class FieldDeclaration extends Declaration {
         String t = type.toString();
         String n = name.toString();
         if (m.length() > 0) {
-            return m + " " + t + " " + n;
+            return m + " " + t + " " + n + ";";
         } else {
-            return t + " " + n;
+            return t + " " + n + ";";
         }
     }
 

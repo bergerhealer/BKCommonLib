@@ -139,7 +139,7 @@ public class NameDeclaration extends Declaration {
         if (_alias == null) {
             return _name;
         } else {
-            return _name + ":" + _alias;
+            return _alias + ":" + _name;
         }
     }
 

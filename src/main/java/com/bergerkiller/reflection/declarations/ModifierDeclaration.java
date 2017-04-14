@@ -14,7 +14,7 @@ public class ModifierDeclaration extends Declaration {
 
     static {
         int[] modifiers = new int[] {
-                Modifier.ABSTRACT, Modifier.FINAL, Modifier.INTERFACE, Modifier.NATIVE,
+                Modifier.ABSTRACT, Modifier.FINAL, Modifier.NATIVE,
                 Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC, Modifier.STATIC,
                 Modifier.STRICT, Modifier.SYNCHRONIZED, Modifier.TRANSIENT, Modifier.VOLATILE
         };

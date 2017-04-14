@@ -128,6 +128,12 @@
                     <include>plugin.yml</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.txt</include>
+                </includes>
+            </resource>
         </resources>
         <!-- Plugins -->
         <plugins>

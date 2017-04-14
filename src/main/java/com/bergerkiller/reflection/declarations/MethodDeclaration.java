@@ -84,9 +84,9 @@ public class MethodDeclaration extends Declaration {
         String n = name.toString();
         String p = parameters.toString();
         if (m.length() > 0) {
-            return m + " " + t + " " + n + p;
+            return m + " " + t + " " + n + p + ";";
         } else {
-            return t + " " + n + p;
+            return t + " " + n + p + ";";
         }
     }
 

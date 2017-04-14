@@ -1,10 +1,15 @@
 package com.bergerkiller.bukkit.common;
 
+import java.io.InputStream;
+import java.lang.reflect.Modifier;
+
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
+import com.bergerkiller.reflection.declarations.ClassResolver;
+import com.bergerkiller.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.reflection.net.minecraft.server.*;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BPluginDescriptionFile;
@@ -20,6 +25,20 @@ public class ReflectionTest {
     static {
         CommonUtil.bootstrap();
     }
+
+    /*
+    @Test
+    public void asdf() {
+        InputStream is = ReflectionTest.class.getClassLoader().getResourceAsStream("com/bergerkiller/reflection/lookup/MC1_11_2.txt");
+
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        String text = s.hasNext() ? s.next() : "";
+
+        SourceDeclaration source = new SourceDeclaration(text);
+
+        System.out.println(source);
+    }
+    */
 
     @Test
     public void loadReflectionClasses() {

@@ -40,9 +40,9 @@ public class ConstructorDeclaration extends Declaration {
         }
         String m = modifiers.toString();
         if (m.length() > 0) {
-            return m + " " + type.toString() + parameters.toString();
+            return m + " " + type.toString() + parameters.toString() + ";";
         } else {
-            return type.toString() + parameters.toString();
+            return type.toString() + parameters.toString() + ";";
         }
     }
 

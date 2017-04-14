@@ -21,12 +21,12 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         this.controller = controller;
     }
 
-    @HookMethod("public void scanPlayers(List list)")
+    @HookMethod("public void scanPlayers(List<EntityHuman> list)")
     public void scanPlayers(List<?> list) {
         base.scanPlayers(list);
     }
 
-    @HookMethod("public void track(List list)")
+    @HookMethod("public void track(List<EntityHuman> list)")
     public void track(List<?> list) {
         Object handle = instance();
         updateTrackers(list);
