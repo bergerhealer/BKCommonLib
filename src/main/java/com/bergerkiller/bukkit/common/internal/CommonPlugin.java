@@ -10,8 +10,10 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
+import com.bergerkiller.bukkit.common.map.VirtualMapGlobal;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -285,6 +287,7 @@ public class CommonPlugin extends PluginBase {
             WorldListenerHook.unhook(world);
         }
         HandlerList.unregisterAll(listener);
+        this.unregister((PacketListener) listener);
 
         // Clear running tasks
         for (Task task : startedTasks) {
@@ -390,10 +393,12 @@ public class CommonPlugin extends PluginBase {
 
         // Register events and tasks, initialize
         register(listener = new CommonListener());
+        register((PacketListener) listener, PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE);
         register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
         register(tabController = new CommonTabController());
         PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
         startedTasks.add(new NextTickHandler(this).start(1, 1));
+        startedTasks.add(new MapUpdateHandler(this).start(1, 1));
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
@@ -511,6 +516,18 @@ public class CommonPlugin extends PluginBase {
                 // Clear for next run
                 removed.clear();
             }
+        }
+    }
+
+    private static class MapUpdateHandler extends Task { //TODO: Remove this. Should be the plugin itself.
+
+        public MapUpdateHandler(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            VirtualMapGlobal.updateAll();
         }
     }
 

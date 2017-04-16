@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityLiving;
@@ -140,5 +141,16 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static boolean teleport(final org.bukkit.entity.Entity entity, final Location to) {
         return CommonEntity.get(entity).teleport(to);
+    }
+
+    /**
+     * Gets a new Entity Id that will be unique during the current server session run
+     * 
+     * @return entity Id
+     */
+    public static int getUniqueEntityId() {
+        int id = NMSEntity.globalEntityCount.get(null);
+        NMSEntity.globalEntityCount.set(null, id + 1);
+        return id;
     }
 }

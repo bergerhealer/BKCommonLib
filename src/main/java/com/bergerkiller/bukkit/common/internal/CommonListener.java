@@ -1,7 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
+import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
+import com.bergerkiller.bukkit.common.map.VirtualMapSingle;
+import com.bergerkiller.bukkit.common.protocol.PacketListener;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -25,7 +30,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 @SuppressWarnings("unused")
-class CommonListener implements Listener {
+class CommonListener implements Listener, PacketListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPluginEnable(final PluginEnableEvent event) {
@@ -110,5 +115,15 @@ class CommonListener implements Listener {
             final Vehicle vehicle = (Vehicle) event.getRightClicked();
             event.setCancelled(CommonUtil.callEvent(new VehicleExitEvent(vehicle, event.getPlayer())).isCancelled());
         }
+    }
+
+    @Override
+    public void onPacketReceive(PacketReceiveEvent event) {
+        VirtualMapSingle.handlePacket(event);
+    }
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        VirtualMapSingle.handlePacket(event);
     }
 }
