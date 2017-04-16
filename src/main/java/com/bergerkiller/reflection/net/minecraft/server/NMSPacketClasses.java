@@ -20,6 +20,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -521,7 +523,11 @@ public class NMSPacketClasses {
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, NMSMobEffect.T.getType());
 
         public CommonPacket newInstance(int entityId, Object mobEffect) {
-            return constructor1.newInstance(entityId, mobEffect);
+            return constructor1.newInstance(entityId,  Conversion.toMobEffect.convert(mobEffect));
+        }
+
+        public CommonPacket newInstance(int entityId, PotionEffect effect) {
+            return constructor1.newInstance(entityId, Conversion.toMobEffect.convert(effect));
         }
     }
 
@@ -696,11 +702,9 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> itemId = nextField("private int a");
         public final FieldAccessor<Byte> scale = nextFieldSignature("private byte b");
         public final FieldAccessor<Boolean> track = nextFieldSignature("private boolean c");
-        public final FieldAccessor<Object[]> mapIcons = nextFieldSignature("private MapIcon[] d");
-        //TODO: Converter <> org.bukkit.map.MapCursor
-        // > new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection()))
+        public final FieldAccessor<MapCursor[]> cursors = nextFieldSignature("private MapIcon[] d").translate(ConversionPairs.mapCursorArray);
         public final FieldAccessor<Integer> xmin = nextFieldSignature("private int e");
-        public final FieldAccessor<Integer> zmin = nextFieldSignature("private int f");
+        public final FieldAccessor<Integer> ymin = nextFieldSignature("private int f");
         public final FieldAccessor<Integer> width = nextFieldSignature("private int g");
         public final FieldAccessor<Integer> height = nextFieldSignature("private int h");
         public final FieldAccessor<byte[]> pixels = nextFieldSignature("private byte[] i");
@@ -831,11 +835,11 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Object> effectId = nextFieldSignature("private MobEffectList b");
+        public final FieldAccessor<Object> effectList = nextFieldSignature("private MobEffectList b");
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("MobEffectList"));
 
-        public CommonPacket newInstance(int entityId, Object mobEffect) {
-            return constructor1.newInstance(entityId, mobEffect);
+        public CommonPacket newInstance(int entityId, Object mobEffectList) {
+            return constructor1.newInstance(entityId, mobEffectList);
         }
     }
 
@@ -947,7 +951,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> pitch = nextFieldSignature("private byte k");
         public final FieldAccessor<Byte> headYaw = nextFieldSignature("private byte l");
         public final TranslatorFieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher m").translate(ConversionPairs.dataWatcher);
-        public final FieldAccessor<List<?>> dataWatcherItems = nextFieldSignature("private List<DataWatcher.Item<?>> n");
+        private final FieldAccessor<List<?>> dataWatcherItems = nextFieldSignature("private List<DataWatcher.Item<?>> n"); // unused!
         
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("EntityLiving"));
 

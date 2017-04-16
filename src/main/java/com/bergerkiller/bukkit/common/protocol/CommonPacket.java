@@ -213,6 +213,11 @@ public class CommonPacket {
     }
 
     @Override
+    public CommonPacket clone() {
+        return new CommonPacket(this.getType().cloneInstance(getHandle()));
+    }
+
+    @Override
     public String toString() {
         final Object handle = getHandle();
         if (handle == null) {

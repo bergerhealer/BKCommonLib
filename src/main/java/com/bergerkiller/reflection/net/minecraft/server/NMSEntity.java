@@ -32,6 +32,7 @@ public class NMSEntity {
     /* ================================================================================================================ */
 
     public static final FieldAccessor<Entity> bukkitEntity  = T.nextField("protected CraftEntity bukkitEntity");
+    public static final FieldAccessor<Integer> globalEntityCount = T.nextField("private static int entityCount");
 
     public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextField("public final List<Entity> passengers").translate(ConversionPairs.entityList);
 
@@ -103,16 +104,23 @@ public class NMSEntity {
 
     public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(ConversionPairs.dataWatcher);
 
-    static { 
-    	T.skipFieldSignature("protected static final DataWatcherObject<Byte> Z");
-    	T.skipFieldSignature("private static final DataWatcherObject<Integer> az");
-    	T.skipFieldSignature("private static final DataWatcherObject<String> aA");
-    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aB");
-    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aC");
-    	T.skipFieldSignature("private static final DataWatcherObject<Boolean> aD");
-    }
+    public static final DataWatcher.Key<Byte> DATA_FLAGS = T.getDataWatcherKey("Z");
+    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = T.getDataWatcherKey("az");
+    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = T.getDataWatcherKey("aA");
+    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = T.getDataWatcherKey("aB");
+    public static final DataWatcher.Key<Boolean> DATA_SILENT = T.getDataWatcherKey("aC");
+    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = T.getDataWatcherKey("aD");
 
-    public static final FieldAccessor<Boolean> isLoaded = T.nextFieldSignature("public boolean aa");
+    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
+    public static final int DATA_FLAG_SNEAKING = (1 << 1);
+    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
+    public static final int DATA_FLAG_SPRINTING = (1 << 3);
+    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
+    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
+    public static final int DATA_FLAG_GLOWING = (1 << 6);
+    public static final int DATA_FLAG_FLYING = (1 << 7);
+
+    public static final FieldAccessor<Boolean> isLoaded = T.nextField("public boolean aa");
     public static final FieldAccessor<Integer> chunkX = T.nextFieldSignature("public int ab");
     public static final FieldAccessor<Integer> chunkY = T.nextFieldSignature("public int ac");
     public static final FieldAccessor<Integer> chunkZ = T.nextFieldSignature("public int ad");

@@ -17,6 +17,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -64,6 +67,8 @@ public class ConversionTypes {
     public static final HandleConverter toTileEntityHandle = HandleConverter.toTileEntityHandle;
     public static final HandleConverter toInventoryHandle = HandleConverter.toInventoryHandle;
     public static final HandleConverter toDataWatcherHandle = HandleConverter.toDataWatcherHandle;
+    public static final HandleConverter toDataWatcherObjectHandle = HandleConverter.toDataWatcherObjectHandle;
+    public static final HandleConverter toDataWatcherItemHandle = HandleConverter.toDataWatcherItemHandle;
     public static final HandleConverter toNBTTagHandle = HandleConverter.toNBTTagHandle;
     public static final HandleConverter toBlockHandle = HandleConverter.toBlockHandle;
     public static final HandleConverter toGameModeHandle = HandleConverter.toGameModeHandle;
@@ -83,6 +88,9 @@ public class ConversionTypes {
     public static final HandleConverter toMainHandHandle = HandleConverter.toMainHandHandle;
     public static final HandleConverter toBlockDataHandle = HandleConverter.toBlockDataHandle;
     public static final HandleConverter toChunkSectionHandle = HandleConverter.toChunkSectionHandle;
+    public static final HandleConverter toMobEffectList = HandleConverter.toMobEffectList;
+    public static final HandleConverter toMobEffect = HandleConverter.toMobEffect;
+    public static final HandleConverter toMapIconHandle = HandleConverter.toMapIconHandle;
     // Wrappers
     public static final WrapperConverter<Entity> toEntity = WrapperConverter.toEntity;
     public static final Converter<Player> toPlayer = WrapperConverter.toEntity.cast(Player.class);
@@ -94,6 +102,8 @@ public class ConversionTypes {
     public static final WrapperConverter<BlockState> toBlockState = WrapperConverter.toBlockState;
     public static final WrapperConverter<CommonTag> toCommonTag = WrapperConverter.toCommonTag;
     public static final WrapperConverter<DataWatcher> toDataWatcher = WrapperConverter.toDataWatcher;
+    public static final WrapperConverter<DataWatcher.Key<?>> toDataWatcherKey = WrapperConverter.toDataWatcherKey;
+    public static final WrapperConverter<DataWatcher.Item<?>> toDataWatcherItem = WrapperConverter.toDataWatcherItem;
     public static final WrapperConverter<ItemStack> toItemStack = WrapperConverter.toItemStack;
     public static final WrapperConverter<Material> toMaterial = WrapperConverter.toMaterial;
     public static final WrapperConverter<Inventory> toInventory = WrapperConverter.toInventory;
@@ -114,6 +124,9 @@ public class ConversionTypes {
     public static final WrapperConverter<org.bukkit.inventory.MainHand> toMainHand = WrapperConverter.toMainHand;
     public static final WrapperConverter<BlockData> toBlockData = WrapperConverter.toBlockData;
     public static final WrapperConverter<ChunkSection> toChunkSection = WrapperConverter.toChunkSection;
+    public static final WrapperConverter<PotionEffectType> toPotionEffectType = WrapperConverter.toPotionEffectType;
+    public static final WrapperConverter<PotionEffect> toPotionEffect = WrapperConverter.toPotionEffect;
+    public static final WrapperConverter<MapCursor> toMapCursor = WrapperConverter.toMapCursor;
     // Text Format Conversion
     public static final TextFormatConverter<String> chatComponentToText = TextFormatConverter.chatComponentToText;
     public static final TextFormatConverter<Object> textToChatComponent = TextFormatConverter.textToChatComponent;

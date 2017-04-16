@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> {
 
-    public final DataWatcher.Item<String> metaCommand = getDataItem(NMSEntityMinecart.CommandBlock.DATA_COMMAND);
-    public final DataWatcher.Item<String> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT).translate(ConversionPairs.textChatComponent);
+    public final DataWatcher.EntityItem<String> metaCommand = getDataItem(NMSEntityMinecart.CommandBlock.DATA_COMMAND);
+    public final DataWatcher.EntityItem<String> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT).translate(ConversionPairs.textChatComponent);
 
     public CommonMinecartCommandBlock(CommandMinecart base) {
         super(base);

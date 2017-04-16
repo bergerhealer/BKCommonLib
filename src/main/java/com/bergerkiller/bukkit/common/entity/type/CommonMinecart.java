@@ -22,12 +22,12 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
  */
 public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
-    public final DataWatcher.Item<Integer> metaShakingDirection = getDataItem(NMSEntityMinecart.DATA_SHAKING_DIRECTION);
-    public final DataWatcher.Item<Float>   metaShakingDamage    = getDataItem(NMSEntityMinecart.DATA_SHAKING_DAMAGE);
-    public final DataWatcher.Item<Integer> metaShakingFactor    = getDataItem(NMSEntityMinecart.DATA_SHAKING_FACTOR);
-    public final DataWatcher.Item<Integer> metaBlockOffset      = getDataItem(NMSEntityMinecart.DATA_BLOCK_OFFSET);
-    public final DataWatcher.Item<Integer> metaBlockType        = getDataItem(NMSEntityMinecart.DATA_BLOCK_TYPE);
-    public final DataWatcher.Item<Boolean> metaBlockVisible     = getDataItem(NMSEntityMinecart.DATA_BLOCK_VISIBLE);
+    public final DataWatcher.EntityItem<Integer> metaShakingDirection = getDataItem(NMSEntityMinecart.DATA_SHAKING_DIRECTION);
+    public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(NMSEntityMinecart.DATA_SHAKING_DAMAGE);
+    public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(NMSEntityMinecart.DATA_SHAKING_FACTOR);
+    public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(NMSEntityMinecart.DATA_BLOCK_OFFSET);
+    public final DataWatcher.EntityItem<Integer> metaBlockType        = getDataItem(NMSEntityMinecart.DATA_BLOCK_TYPE);
+    public final DataWatcher.EntityItem<Boolean> metaBlockVisible     = getDataItem(NMSEntityMinecart.DATA_BLOCK_VISIBLE);
 
     public CommonMinecart(T base) {
         super(base);

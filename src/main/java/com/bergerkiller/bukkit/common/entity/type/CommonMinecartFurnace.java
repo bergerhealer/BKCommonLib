@@ -21,7 +21,7 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     public static final int COAL_FUEL = 3600;
 
-    public final DataWatcher.Item<Boolean> metaSmoking = getDataItem(NMSEntityMinecart.Furnace.DATA_SMOKING);
+    public final DataWatcher.EntityItem<Boolean> metaSmoking = getDataItem(NMSEntityMinecart.Furnace.DATA_SMOKING);
 
     public CommonMinecartFurnace(PoweredMinecart base) {
         super(base);

@@ -1,7 +1,9 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
 import com.bergerkiller.reflection.SafeConstructor;
 import com.bergerkiller.reflection.TranslatorFieldAccessor;
@@ -74,5 +76,23 @@ public class NMSDataWatcher {
     @Deprecated
     public static Object create() {
         return T.newInstance();
+    }
+
+    public static class Object2 {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcherObject");
+        public static final MethodAccessor<Integer> getId = T.selectMethod("public int a()");
+        public static final MethodAccessor<Object> getSerializer = T.selectMethod("public DataWatcherSerializer<T> b()");
+    }
+
+    public static class Registry {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcherRegistry");
+        public static final MethodAccessor<Integer> getSerializerId = T.selectMethod("public static int b(DataWatcherSerializer<?> paramDataWatcherSerializer)");
+    }
+
+    public static class Item {
+        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher.Item");
+        public static final TranslatorFieldAccessor<DataWatcher.Key<?>> key = T.nextField("private final DataWatcherObject<T> a").translate(ConversionPairs.dataWatcherKey);
+        public static final FieldAccessor<Object> value = T.nextFieldSignature("private T b");
+        public static final FieldAccessor<Boolean> changed = T.nextFieldSignature("private boolean c");
     }
 }

@@ -13,10 +13,12 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
+import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
@@ -28,6 +30,7 @@ import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
 import net.minecraft.server.v1_11_R1.EnumHand;
+import net.minecraft.server.v1_11_R1.MapIcon;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
@@ -38,8 +41,12 @@ import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 /**
@@ -326,6 +333,43 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         }
     };
     public static final HandleConverter toChunkSectionHandle = new WrapperHandleConverter("ChunkSection");
+    public static final HandleConverter toMobEffectList = new HandleConverter("MobEffectList") {
+        @Override
+        @SuppressWarnings("deprecation")
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof PotionEffectType) {
+                Object list = NMSMobEffect.List.fromId.invoke(null, ((PotionEffectType) value).getId());
+                if (list != null) {
+                    return list;
+                }
+            }
+            return def;
+        }
+    };
+    public static final HandleConverter toMobEffect = new HandleConverter("MobEffect") {
+        @Override
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof PotionEffect) {
+                return CraftPotionUtil.fromBukkit((PotionEffect) value);
+            }
+            return def;
+        }
+    };
+    public static final HandleConverter toDataWatcherObjectHandle = new WrapperHandleConverter("DataWatcherObject");
+    public static final HandleConverter toDataWatcherItemHandle = new WrapperHandleConverter("DataWatcher.Item");
+    public static final HandleConverter toMapIconHandle = new HandleConverter("MapIcon") {
+        @Override
+        protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
+            if (value instanceof MapCursor) {
+                // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
+                // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
+                MapCursor cursor = (MapCursor) value;
+                return new MapIcon(MapIcon.Type.a(cursor.getRawType()),
+                        cursor.getX(), cursor.getY(), cursor.getDirection());
+            }
+            return def;
+        }
+    };
 
     public HandleConverter(String outputTypeName) {
         this(CommonUtil.getNMSClass(outputTypeName));

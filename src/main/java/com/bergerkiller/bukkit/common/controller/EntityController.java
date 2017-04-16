@@ -31,6 +31,9 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
         if (entity == null && this.hook == null) {
             throw new RuntimeException("WTF");
         }
+        if (entity != null && entity.getWorld() == null) {
+            throw new RuntimeException("Can not bind to an Entity that has no world set");
+        }
         if (this.entity != null) {
             this.onDetached();
         }
@@ -42,9 +45,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
                 this.hook.mock(this.entity.getHandle());
             }
             this.hook.setController(this);
-            if (entity.isSpawned()) {
-                this.onAttached();
-            }
+            this.onAttached();
         }
     }
 

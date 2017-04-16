@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.declarations.ClassResolver;
 import com.bergerkiller.reflection.declarations.FieldDeclaration;
 import com.bergerkiller.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcherObject;
+import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 
 import net.sf.cglib.asm.Type;
 import net.sf.cglib.core.Signature;
@@ -215,6 +215,18 @@ public class ClassTemplate<T> {
     }
 
     /**
+     * Creates a clone of an object by null-constructing and copying all fields over
+     * 
+     * @param input object to clone
+     * @return cloned object
+     */
+    public T cloneInstance(Object input) {
+        T output = this.newInstanceNull();
+        this.transfer(input, output);
+        return output;
+    }
+
+    /**
      * Checks whether a given object is an instance of the class represented by
      * this Template
      *
@@ -401,7 +413,7 @@ public class ClassTemplate<T> {
      * @return DataWatcher Key
      */
     public <K> DataWatcher.Key<K> getDataWatcherKey(String fieldName) {
-        Object keyHandle = getStaticFieldValue(fieldName, NMSDataWatcherObject.T.getType());
+        Object keyHandle = getStaticFieldValue(fieldName, NMSDataWatcher.Object2.T.getType());
         return new DataWatcher.Key<K>(keyHandle);
     }
 

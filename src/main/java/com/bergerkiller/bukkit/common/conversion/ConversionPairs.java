@@ -16,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -44,6 +47,8 @@ public class ConversionPairs {
     public static final ConverterPair<Object, GameMode> gameMode = toGameModeHandle.formPair(toGameMode);
     public static final ConverterPair<Object, WorldType> worldType = toWorldTypeHandle.formPair(toWorldType);
     public static final ConverterPair<Object, DataWatcher> dataWatcher = toDataWatcherHandle.formPair(toDataWatcher);
+    public static final ConverterPair<Object, DataWatcher.Key<?>> dataWatcherKey = toDataWatcherObjectHandle.formPair(toDataWatcherKey);
+    public static final ConverterPair<Object, DataWatcher.Item<?>> dataWatcherItem = toDataWatcherItemHandle.formPair(toDataWatcherItem);
     public static final ConverterPair<Object, CommonTag> commonTag = toNBTTagHandle.formPair(toCommonTag);
     public static final ConverterPair<Object, CommonTagCompound> commonTagCompound = CommonUtil.unsafeCast(commonTag);
     public static final ConverterPair<Object, CommonTagList> commonTagList = CommonUtil.unsafeCast(commonTag);
@@ -65,6 +70,9 @@ public class ConversionPairs {
     public static final ConverterPair<Object, MainHand> mainHand = toMainHandHandle.formPair(toMainHand);
     public static final ConverterPair<Object, BlockData> blockData = toBlockDataHandle.formPair(toBlockData);
     public static final ConverterPair<Object, ChunkSection> chunkSection = toChunkSectionHandle.formPair(toChunkSection);
+    public static final ConverterPair<Object, PotionEffectType> potionEffectType = toMobEffectList.formPair(toPotionEffectType);
+    public static final ConverterPair<Object, PotionEffect> potionEffect = toMobEffect.formPair(toPotionEffect);
+    public static final ConverterPair<Object, MapCursor> mapCursor = toMapIconHandle.formPair(toMapCursor);
     // Text format conversion <>
     public static final ConverterPair<Object, String> jsonChatComponent = jsonToChatComponent.formPair(chatComponentToJson);
     public static final ConverterPair<Object, String> textChatComponent = textToChatComponent.formPair(chatComponentToText);
@@ -79,5 +87,7 @@ public class ConversionPairs {
     public static final ConverterPair<List<Object>, List<DataWatcher>> dataWatcherList = dataWatcher.toList();
     public static final ConverterPair<Object[], String[]> textChatComponentArray = textChatComponent.toArray();
     public static final ConverterPair<Object[], ChunkSection[]> chunkSectionArray = chunkSection.toArray();
+    public static final ConverterPair<List<Object>, List<DataWatcher.Item<?>>> dataWatcherItemList = dataWatcherItem.toList();
+    public static final ConverterPair<Object[], MapCursor[]> mapCursorArray = mapCursor.toArray();
 
 }

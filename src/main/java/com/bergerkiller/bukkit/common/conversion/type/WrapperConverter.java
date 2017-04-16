@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.*;
@@ -19,6 +20,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
 import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
+import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerAbilities;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
@@ -35,9 +37,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.*;
+import org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.map.MapCursor;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 /**
@@ -423,6 +429,61 @@ public abstract class WrapperConverter<T> extends BasicConverter<T> {
             } else {
                 return def;
             }
+        }
+    };
+    public static final WrapperConverter<PotionEffectType> toPotionEffectType = new WrapperConverter<PotionEffectType>(PotionEffectType.class) {
+        @Override
+        @SuppressWarnings("deprecation")
+        protected PotionEffectType convertSpecial(Object value, Class<?> valueType, PotionEffectType def) {
+            if (NMSMobEffect.List.T.isInstance(value)) {
+                int id = NMSMobEffect.List.getId.invoke(null, value);
+                PotionEffectType type = PotionEffectType.getById(id);
+                if (type != null) {
+                    return type;
+                }
+            }
+            return def;
+        }
+    };
+    public static final WrapperConverter<PotionEffect> toPotionEffect = new WrapperConverter<PotionEffect>(PotionEffect.class) {
+        @Override
+        protected PotionEffect convertSpecial(Object value, Class<?> valueType, PotionEffect def) {
+            if (NMSMobEffect.T.isInstance(value)) {
+                return CraftPotionUtil.toBukkit((MobEffect) value);
+            }
+            return def;
+        }
+    };
+    public static final WrapperConverter<DataWatcher.Key<?>> toDataWatcherKey = new WrapperConverter<DataWatcher.Key<?>>(DataWatcher.Key.class) {
+        @Override
+        protected Key<?> convertSpecial(Object value, Class<?> valueType, Key<?> def) {
+            if (NMSDataWatcher.Object2.T.isInstance(value)) {
+                return new DataWatcher.Key<Object>(value);
+            }
+            return def;
+        }
+    };
+    public static final WrapperConverter<DataWatcher.Item<?>> toDataWatcherItem = new WrapperConverter<DataWatcher.Item<?>>(DataWatcher.Item.class) {
+        @Override
+        protected com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> convertSpecial(
+                Object value, Class<?> valueType, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> def)
+        {
+            if (NMSDataWatcher.Item.T.isInstance(value)) {
+                return new DataWatcher.Item<Object>(value);
+            }
+            return def;
+        }
+    };
+    public static final WrapperConverter<MapCursor> toMapCursor = new WrapperConverter<MapCursor>(MapCursor.class) {
+        @Override
+        protected MapCursor convertSpecial(Object value, Class<?> valueType, MapCursor def) {
+            if (value instanceof MapIcon) {
+                // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
+                // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
+                MapIcon icon = (MapIcon) value;
+                return new MapCursor(icon.getX(), icon.getY(), icon.getRotation(), icon.getType(), true);
+            }
+            return def;
         }
     };
 

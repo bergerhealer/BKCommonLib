@@ -2,12 +2,19 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
 
 public class NMSEntityLiving extends NMSEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityLiving");
+
+    public static final DataWatcher.Key<Byte> DATA_LIVING_FLAGS = T.getDataWatcherKey("at");
+    public static final DataWatcher.Key<Float> DATA_HEALTH = T.getDataWatcherKey("HEALTH");
+    public static final DataWatcher.Key<Integer> DATA_PARTICLES_TIMER = T.getDataWatcherKey("g");
+    public static final DataWatcher.Key<Boolean> DATA_PARTICLES_HIDDEN = T.getDataWatcherKey("h");
+    public static final DataWatcher.Key<Integer> DATA_UNKNOWN1 = T.getDataWatcherKey("bq");
 
     public static final FieldAccessor<Object> attributeMap = T.nextField("private AttributeMapBase attributeMap");
     public static final FieldAccessor<Map<Object, Object>> mobEffects = T.nextField("public final Map<MobEffectList, MobEffect> effects");

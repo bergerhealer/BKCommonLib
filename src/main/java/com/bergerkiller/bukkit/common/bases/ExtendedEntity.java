@@ -989,8 +989,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param key for the metadata
      * @return DataWatcher Item
      */
-    public <V> DataWatcher.Item<V> getDataItem(DataWatcher.Key<V> key) {
-        return new DataWatcher.Item<V>(this, key);
+    public <V> DataWatcher.EntityItem<V> getDataItem(DataWatcher.Key<V> key) {
+        return new DataWatcher.EntityItem<V>(this, key);
     }
 
     /**

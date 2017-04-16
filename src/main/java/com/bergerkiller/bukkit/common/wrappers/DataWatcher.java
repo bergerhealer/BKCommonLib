@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
@@ -34,13 +35,18 @@ public class DataWatcher extends BasicWrapper {
     }
 
     /**
-     * Write a new value to the watched objects
+     * Write a new value to the watched objects.
+     * If the key does not yet exist, the key is added with the default value specified.
      *
      * @param key Object key
      * @param value Value to set to
      */
     public <V> void set(Key<V> key, V value) {
-        NMSDataWatcher.set.invoke(handle, key.handle, value);
+        if (isWatched(key)) {
+            NMSDataWatcher.set.invoke(handle, key.handle, value);
+        } else {
+            watch(key, value);
+        }
     }
 
     /**
@@ -51,17 +57,31 @@ public class DataWatcher extends BasicWrapper {
      */
     @SuppressWarnings("unchecked")
     public <V> V get(Key<V> key) {
-        return (V) NMSDataWatcher.get.invoke(handle, key.handle);
+        Object item = NMSDataWatcher.read.invoke(handle, key.handle);
+        if (item == null) {
+            throw new IllegalArgumentException("This key is not watched in this DataWatcher");
+        }
+        return (V) NMSDataWatcher.Item.value.get(item);
     }
 
     /**
      * Watch an object
      *
-     * @param index Object index
-     * @param value Value
+     * @param key of the watched item
+     * @param defaultValue of the watched item
      */
-    public void watch(Key<?> key, Object value) {
-        NMSDataWatcher.watch.invoke(handle, key.handle, value);
+    public <T> void watch(Key<T> key, T defaultValue) {
+        NMSDataWatcher.watch.invoke(handle, key.handle, defaultValue);
+    }
+
+    /**
+     * Checks whether a particular key is registered for watching
+     * 
+     * @param key to check
+     * @return True if watched, False if not
+     */
+    public boolean isWatched(Key<?> key) {
+        return NMSDataWatcher.read.invoke(handle, key.handle) != null;
     }
 
     /**
@@ -69,17 +89,24 @@ public class DataWatcher extends BasicWrapper {
      *
      * @return Watched objects
      */
-    public List<Object> getAllWatched() {
-        return NMSDataWatcher.returnAllWatched.invoke(handle);
+    public List<Item<?>> getWatchedItems() {
+        return getWatchedItems(false);
     }
 
     /**
-     * Get all watched objects and unwatch them
+     * Get all watched objects
      *
+     * @param unwatch to unwatch all the items before returning them
      * @return Watched objects
      */
-    public List<Object> unwatchAndGetAllWatched() {
-        return NMSDataWatcher.unwatchAndReturnAllWatched.invoke(handle);
+    public List<Item<?>> getWatchedItems(boolean unwatch) {
+        List<Object> itemHandles;
+        if (unwatch) {
+            itemHandles = NMSDataWatcher.unwatchAndReturnAllWatched.invoke(handle);
+        } else {
+            itemHandles = NMSDataWatcher.returnAllWatched.invoke(handle);
+        }
+        return ConversionPairs.dataWatcherItem.convertAll(itemHandles);
     }
 
     /**
@@ -101,29 +128,100 @@ public class DataWatcher extends BasicWrapper {
         return NMSDataWatcher.isEmpty.invoke(handle);
     }
 
+    @Override
+    public String toString() {
+        String str = "DataWatcher Items[";
+        boolean first = true;
+        for (Item<?> item : getWatchedItems()) {
+            if (first) {
+                first = false;
+            } else {
+                str += ", ";
+            }
+            str += item.toString();
+        }
+        str += "]";
+        return str;
+    }
+
     /**
      * Wrapper around a raw DataWatcher key object
      * 
      * @param <V> value type bound to the key
      */
-    public static class Key<V> {
-        private final Object handle;
+    public static class Key<V> extends BasicWrapper {
 
         public Key(Object handle) {
-            this.handle = handle;
+            setHandle(handle);
+        }
+
+        /**
+         * Gets the unique global serializer Id of this key.
+         * This id is unique for this data value type.
+         * 
+         * @return Serializer Id
+         */
+        public int getSerializerId() {
+            Object s = NMSDataWatcher.Object2.getSerializer.invoke(this.handle);
+            return NMSDataWatcher.Registry.getSerializerId.invoke(null, s);
+        }
+
+        /**
+         * Gets the datawatcher object Id of this key
+         * 
+         * @return Id
+         */
+        public int getId() {
+            return NMSDataWatcher.Object2.getId.invoke(this.handle);
         }
     }
 
+    /**
+     * References a single watched item, containing the key, value, and changed state
+     * 
+     * @param <V> value type of the item
+     */
+    public static class Item<V> extends BasicWrapper {
+
+        public Item(Object handle) {
+            setHandle(handle);
+        }
+
+        @SuppressWarnings("unchecked")
+        public Key<V> getKey() {
+            return (Key<V>) NMSDataWatcher.Item.key.get(this.handle);
+        }
+
+        public boolean isChanged() {
+            return NMSDataWatcher.Item.changed.get(this.handle);
+        }
+
+        @SuppressWarnings("unchecked")
+        public V getValue() {
+            return (V) NMSDataWatcher.Item.value.get(this.handle);
+        }
+
+        public void setValue(V value, boolean changed) {
+            NMSDataWatcher.Item.value.set(this.handle, value);
+            NMSDataWatcher.Item.changed.set(this.handle, changed);
+        }
+
+        @Override
+        public String toString() {
+            return "{id=" + getKey().getId() + ",changed=" + isChanged() + ",value=" + getValue() + "}";
+        }
+    }
+    
     /**
      * References the value bound to a DataWatcher Key for a particular Entity
      *
      * @param <V> value type bound to the key
      */
-    public static class Item<V> {
+    public static class EntityItem<V> {
         private final ExtendedEntity<?> owner;
         private final Object keyHandle;
 
-        public Item(ExtendedEntity<?> owner, Key<V> key) {
+        public EntityItem(ExtendedEntity<?> owner, Key<V> key) {
             this.owner = owner;
             this.keyHandle = (key == null) ? null : key.handle;
         }
@@ -155,16 +253,16 @@ public class DataWatcher extends BasicWrapper {
          * @param converterPair to use for translation
          * @return translated item
          */
-        public <C> Item<C> translate(ConverterPair<V, C> converterPair) {
-            return new ConvertingItem<V, C>(this, converterPair);
+        public <C> EntityItem<C> translate(ConverterPair<V, C> converterPair) {
+            return new ConvertingEntityItem<V, C>(this, converterPair);
         }
     }
 
-    private static class ConvertingItem<A, B> extends Item<B> {
-        private final Item<A> item;
+    private static class ConvertingEntityItem<A, B> extends EntityItem<B> {
+        private final EntityItem<A> item;
         private final ConverterPair<A, B> pair;
 
-        public ConvertingItem(Item<A> item, ConverterPair<A, B> pair) {
+        public ConvertingEntityItem(EntityItem<A> item, ConverterPair<A, B> pair) {
             super(null, null);
             this.item = item;
             this.pair = pair;
@@ -179,6 +277,6 @@ public class DataWatcher extends BasicWrapper {
         public void set(B value) {
             this.item.set(pair.convertA(value));
         }
-        
+
     }
 }

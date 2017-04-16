@@ -95,7 +95,6 @@ public class ReflectionTest {
             loadClass(NMSMinecraftKey.class);
             loadClass(NMSMobSpawnerAbstract.class);
             loadClass(NMSVector.class);
-            loadClass(NMSDataWatcherObject.class);
             loadClass(NMSWorldType.class);
             loadClass(NMSEntityMinecart.class);
             loadClass(NMSEnumGamemode.class);
