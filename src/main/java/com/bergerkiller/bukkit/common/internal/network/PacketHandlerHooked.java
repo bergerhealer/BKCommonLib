@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -42,6 +41,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
     private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
     private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
+    private final LinkedList<SilentPacket> silentQueue = new LinkedList<SilentPacket>();
 
     @Override
     public boolean onEnable() {
@@ -189,8 +189,6 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         }
     }
 
-    public abstract void sendSilentPacket(Player player, Object packet);
-
     @Override
     public void sendPacket(Player player, Object packet, boolean throughListeners) {
         Object handle = Conversion.toEntityHandle.convert(player);
@@ -200,13 +198,15 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (!PacketType.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
             return;
         }
-        if (throughListeners) {
-            final Object connection = NMSEntityPlayer.playerConnection.get(handle);
-            NMSPlayerConnection.sendPacket(connection, packet);
-        } else {
-            handlePacketSendMonitor(player, PacketType.getType(packet), packet);
-            sendSilentPacket(player, packet);
+
+        if (!throughListeners) {
+            synchronized (silentQueue) {
+                silentQueue.addLast(new SilentPacket(player, packet));
+            }
         }
+
+        final Object connection = NMSEntityPlayer.playerConnection.get(handle);
+        NMSPlayerConnection.sendPacket(connection, packet);
     }
 
     @Override
@@ -277,20 +277,42 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (player == null || packet == null) {
             return true;
         }
-        // Handle listeners
-        PacketType type = PacketType.getType(packet);
-        List<PacketListener> listenerList = listeners.get(type);
-        if (listenerList != null) {
-            CommonPacket cp = new CommonPacket(packet, type);
-            PacketSendEvent ev = new PacketSendEvent(player, cp);
-            ev.setCancelled(wasCancelled);
-            for (PacketListener listener : listenerList) {
-                listener.onPacketSend(ev);
-            }
-            if (ev.isCancelled()) {
-                return false;
+
+        // Check if silent
+        boolean is_silent = false;
+        if (!silentQueue.isEmpty()) {
+            long time = System.currentTimeMillis();
+            synchronized (silentQueue) {
+                ListIterator<SilentPacket> iter = silentQueue.listIterator();
+                while (iter.hasNext()) {
+                    SilentPacket sp = iter.next();
+                    if (time >= sp.timeout) {
+                        iter.remove();
+                    } else if (sp.player == player && sp.packet == packet) {
+                        is_silent = true;
+                        iter.remove();
+                    }
+                }
             }
         }
+
+        // Handle listeners
+        PacketType type = PacketType.getType(packet);
+        if (!is_silent) {
+            List<PacketListener> listenerList = listeners.get(type);
+            if (listenerList != null) {
+                CommonPacket cp = new CommonPacket(packet, type);
+                PacketSendEvent ev = new PacketSendEvent(player, cp);
+                ev.setCancelled(wasCancelled);
+                for (PacketListener listener : listenerList) {
+                    listener.onPacketSend(ev);
+                }
+                if (ev.isCancelled()) {
+                    return false;
+                }
+            }
+        }
+
         // Handle monitors
         handlePacketSendMonitor(player, type, packet);
         return true;
@@ -365,5 +387,17 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
         }
         return queuedsize;
+    }
+
+    private static class SilentPacket {
+        public final Player player;
+        public final Object packet;
+        public final long timeout;
+
+        public SilentPacket(Player player, Object packet) {
+            this.player = player;
+            this.packet = packet;
+            this.timeout = System.currentTimeMillis() + 5000; // remove after 5s
+        }
     }
 }

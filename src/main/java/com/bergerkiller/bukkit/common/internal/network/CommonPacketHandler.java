@@ -98,14 +98,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
     }
 
     @Override
-    public void sendSilentPacket(Player player, Object packet) {
-        // Instead of using sendPacket, we sneakily insert the packet into the queue
-        Object networkManager = NMSEntityPlayer.getNetworkManager(player);
-        Queue<Object> pollQueue = NMSNetworkManager.queue.get(networkManager);
-        pollQueue.add(this.queuedPacketConstructor.newInstance(packet, this.emptyGenericFutureListener));
-    }
-
-    @Override
     public long getPendingBytes(Player player) {
         return calculatePendingBytes(player);
     }
