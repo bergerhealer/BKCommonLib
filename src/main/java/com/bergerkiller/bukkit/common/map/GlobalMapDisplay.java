@@ -4,8 +4,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
-public class VirtualMapGlobal extends VirtualMap {
-    private static final IntHashMap<VirtualMapGlobal> ALL_MAPS = new IntHashMap<VirtualMapGlobal>();
+/**
+ * A map display shown to all players that can see it. Also works in item frames.
+ * No user input is available.
+ * This is a work in progress.
+ */
+public class GlobalMapDisplay extends MapDisplay {
+    private static final IntHashMap<GlobalMapDisplay> ALL_MAPS = new IntHashMap<GlobalMapDisplay>();
 
     /**
      * Called right after the virtual map becomes registered on the server
@@ -26,12 +31,12 @@ public class VirtualMapGlobal extends VirtualMap {
      * @param mapItem to register for
      * @param map to register
      */
-    public static void registerMap(ItemStack mapItem, VirtualMapGlobal map) {
+    public static void registerMap(ItemStack mapItem, GlobalMapDisplay map) {
         int itemId = getMapId(mapItem);
         if (itemId == -1) {
             return;
         }
-        VirtualMapGlobal old_map = ALL_MAPS.get(itemId);
+        GlobalMapDisplay old_map = ALL_MAPS.get(itemId);
         if (old_map != null) {
             old_map.onDetached();
         }
@@ -50,7 +55,7 @@ public class VirtualMapGlobal extends VirtualMap {
         if (itemId == -1) {
             return;
         }
-        VirtualMapGlobal map = ALL_MAPS.get(itemId);
+        GlobalMapDisplay map = ALL_MAPS.get(itemId);
         if (map != null) {
             map.onDetached();
             ALL_MAPS.remove(itemId);
@@ -61,7 +66,7 @@ public class VirtualMapGlobal extends VirtualMap {
      * Updates all global maps
      */
     public static void updateAll() {
-        for (IntHashMap.Entry<VirtualMapGlobal> entry : ALL_MAPS.values()) {
+        for (IntHashMap.Entry<GlobalMapDisplay> entry : ALL_MAPS.values()) {
             entry.getValue().update();
         }
     }

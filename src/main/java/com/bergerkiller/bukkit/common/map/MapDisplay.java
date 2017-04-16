@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
@@ -14,13 +15,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 /**
- * This is a Virtual Map view that is synchronized to individual players, but is never actually saved on the server.
- * It boasts an efficient synchronization system that attempts to minimize the amount of data sent over during drawing.
+ * Base implementation for a MapDisplay. This class stores the pixel data buffers and render layers, as well
+ * managing the display synchronization with one or more player viewers.
  */
-public class VirtualMap {
+public class MapDisplay {
     private static final int RESOLUTION = 128;
     private static final int BUFFER_SIZE = (RESOLUTION * RESOLUTION);
     private final ArrayList<Viewer> viewers = new ArrayList<Viewer>();
@@ -44,7 +46,7 @@ public class VirtualMap {
      */
     protected void start(JavaPlugin plugin, ItemStack mapItem) {
         if (this.updateTaskId != -1) {
-            throw new IllegalStateException("This virtual map was already started");
+            throw new IllegalStateException("This map display was already started");
         }
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin can not be null");
@@ -76,6 +78,11 @@ public class VirtualMap {
         }
     }
 
+    /**
+     * Performs all the updates required to display this Map Display to its viewers.
+     * This is called automatically after having called start() on one of the implementations.
+     * It should only be called when manually managing the map is required.
+     */
     public final void update() {
         if (itemId == -1) {
             return;
@@ -143,6 +150,63 @@ public class VirtualMap {
     }
 
     /**
+     * Updates what players can view this Map Display.
+     * Viewer sessions are automatically added or removed based on the viewers specified.
+     * 
+     * @param playerViewers to set to
+     */
+    protected void setViewers(List<Player> playerViewers) {
+        LogicUtil.synchronizeList(this.viewers, playerViewers, new LogicUtil.ItemSynchronizer<Player, Viewer>() {
+            @Override
+            public boolean isItem(Viewer item, Player value) {
+                return item.player == value;
+            }
+
+            @Override
+            public Viewer onAdded(Player player) {
+                Viewer viewer = new Viewer(player, MapDisplay.this);
+                viewer.send(createPacket(null));
+                return viewer;
+            }
+
+            @Override
+            public void onRemoved(Viewer item) {
+                //TODO: Do something special with the viewer when removed?
+            }
+        });
+    }
+
+    /**
+     * Gets a list of Players that are viewing this Map Display and are eligible for updates.
+     * This list includes viewers that own the map, but are not currently viewing it.
+     * 
+     * @return viewers
+     */
+    public List<Player> getViewers() {
+        List<Player> result = new ArrayList<Player>(this.viewers.size());
+        for (Viewer viewer : this.viewers) {
+            result.add(viewer.player);
+        }
+        return result;
+    }
+
+    /**
+     * Checks whether a certain Player is viewing this Map Display.
+     * Players that own the map, but are not currently viewing it, are also included.
+     * 
+     * @param player to check
+     * @return True if viewing, False if not
+     */
+    public boolean isViewing(Player player) {
+        for (Viewer viewer : this.viewers) {
+            if (viewer.player == player) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Executes {@link #onTick()}, with optional other map-specific tasks that occur every tick.
      * This should not be called by anyone, not overridden!
      */
@@ -153,6 +217,18 @@ public class VirtualMap {
             this.onTick();
             //StopWatch.instance.stop().log("VirtualMap onTick()");
         }
+    }
+
+    /**
+     * Loads a texture from the plugin resources of the owner of this MapDisplay.
+     * The MapDisplay must have been attached by a plugin before it can be used.
+     * Throws an exception if the resource could not be loaded.
+     * 
+     * @param filename of the resource
+     * @return texture
+     */
+    public final MapTexture loadTexture(String filename) {
+        return MapTexture.loadPluginResource(this.plugin, filename);
     }
 
     /**
@@ -209,46 +285,6 @@ public class VirtualMap {
      * To optimize performance, only draw things in the map when they change.
      */
     public void onTick() {
-    }
-
-    /**
-     * Adds a new player that can view the updated VirtualMap.
-     * Their map will be instantly updated to show the current virtual view.
-     * 
-     * @param player to add as viewer
-     * @param item of the map that this VirtualMap should be shown on
-     */
-    public void addViewer(Player player) {
-        Viewer viewer = new Viewer(player, this);
-        for (Viewer oldViewer : this.viewers) {
-            if (oldViewer.equals(viewer)) {
-                return;
-            }
-        }
-        this.viewers.add(viewer);
-        viewer.send(createPacket(null));
-    }
-
-    /**
-     * Removes a player from the viewer list, they will no longer see the updated VirtualMap.
-     * If they are still online, their map will be updated to the default map.
-     * 
-     * @param player to remove as viewer
-     * @param item associated with the map
-     */
-    public void removeViewer(Player player) {
-        this.viewers.remove(new Viewer(player, this));
-    }
-
-    /**
-     * Gets whether this Virtual Map is viewed by a player
-     * 
-     * @param player to check as viewer
-     * @param item of the map
-     * @return True if viewed, False if not
-     */
-    public boolean containsViewer(Player player) {
-        return this.viewers.contains(new Viewer(player, this));
     }
 
     private CommonPacket createPacket(MapClip clip) {
@@ -319,11 +355,11 @@ public class VirtualMap {
     public static class Layer extends MapCanvas {
         private Layer previous, next;
         private byte z_index;
-        private final VirtualMap map;
+        private final MapDisplay map;
         private final byte[] buffer;
         private final MapClip clip = new MapClip();
 
-        private Layer(VirtualMap map) {
+        private Layer(MapDisplay map) {
             this.buffer = new byte[BUFFER_SIZE];
             this.map = map;
             this.z_index = 0;
@@ -447,7 +483,7 @@ public class VirtualMap {
             // Update the z-buffer and live buffer
             if (color == 0) {
                 // Go down the layers, fixing up the z-index as needed
-                final VirtualMap map = this.map;
+                final MapDisplay map = this.map;
                 Layer layer = this;
                 boolean hasFaultyZ;
                 do {
@@ -650,11 +686,14 @@ public class VirtualMap {
     private static class Viewer {
         public final Player player;
         public final MapClip clip = new MapClip();
-        private final VirtualMap map;
+        private final MapDisplay map;
         public boolean viewing;
         public boolean owning;
 
-        public Viewer(Player player, VirtualMap map) {
+        public Viewer(Player player, MapDisplay map) {
+            if (player == null) {
+                throw new IllegalArgumentException("Player can not be null!");
+            }
             this.player = player;
             this.map = map;
             this.viewing = false;
@@ -685,6 +724,13 @@ public class VirtualMap {
         }
     }
 
+    /**
+     * Internal use only! Obtains the unique Id of a map item. Returns -1 when the item is not a valid map.
+     * This function may be subject to change and should not be depended on.
+     * 
+     * @param item to get the Map Id for
+     * @return map id
+     */
     protected static int getMapId(ItemStack item) {
         return (item == null || item.getType() != Material.MAP) ? -1 : item.getDurability(); 
     }

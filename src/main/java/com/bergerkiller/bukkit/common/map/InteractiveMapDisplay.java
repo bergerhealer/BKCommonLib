@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,17 +23,31 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 
 /**
- * A virtual player map is only updated for a single player, enabling an interactive personal session.
- * Only a single player can ever control the map. When a new player is attached to an player map, the old
- * player loses control.
+ * This map display is only visible to a single player. This single player can use intercepted input to
+ * control the map. A {@link InteractiveMapDisplay} can be used to display interactive user interfaces
+ * to a player, personalized to what the player is currently doing. Interactive map displays can not be controlled
+ * by nor displayed to other players. A single map can have multiple InteractiveMapDisplay instances for different
+ * players.<br>
+ * <br>
+ * To use this class, it should be extended to add custom functionality in {@link #onTick()}. User input can be handled
+ * in the {@link #onKey(Key)}, {@link #onKeyReleased(Key)}, and {@link #onKeyPressed(Key)} callback functions. In addition
+ * the input state can be queried using {@link #getInput()}.<br>
+ * <br>
+ * To intercept user input, the player is temporarily placed in an invisible vehicle. Note that this vehicle does not actually
+ * exist on the server and is not even spawned for players not holding the map. Input can not be intercepted while the user is falling.
+ * Only when the player is standing on the ground, or is flying in creative, can user input be intercepted.<br>
+ * <br>
+ * The interactive map display session is automatically terminated when the player leaves the server.
+ * If a more persistent session is required, loading/unloading of state should be handled in the
+ * {@link #onAttached()} and {@link #onDetached()} callback functions.
  */
-public class VirtualMapSingle extends VirtualMap {
-    private static final HashMap<Player, ArrayList<VirtualMapSingle>> ALL_MAPS = new HashMap<Player, ArrayList<VirtualMapSingle>>();
+public class InteractiveMapDisplay extends MapDisplay {
+    private static final HashMap<Player, ArrayList<InteractiveMapDisplay>> ALL_MAPS = new HashMap<Player, ArrayList<InteractiveMapDisplay>>();
     private Player _player = null;
     private boolean _interceptInput = true;
     private int _fakeMountId = -1;
     private boolean _fakeMountShown = false;
-    protected final VirtualMapInput input = new VirtualMapInput();
+    private final MapInput input = new MapInput();
 
     /**
      * Called right after the player and map item become known
@@ -55,7 +71,7 @@ public class VirtualMapSingle extends VirtualMap {
      * 
      * @param key that is pressing down
      */
-    public void onKey(VirtualMapInput.Key key) {}
+    public void onKey(MapInput.Key key) {}
 
     /**
      * Callback function called when a key changed from not-pressed to pressed down
@@ -63,7 +79,7 @@ public class VirtualMapSingle extends VirtualMap {
      * 
      * @param key that was pressed down
      */
-    public void onKeyPressed(VirtualMapInput.Key key) {}
+    public void onKeyPressed(MapInput.Key key) {}
 
     /**
      * Callback function called when a key changed from pressed to not pressed down
@@ -71,7 +87,7 @@ public class VirtualMapSingle extends VirtualMap {
      * 
      * @param key that was released
      */
-    public void onKeyReleased(VirtualMapInput.Key key) {}
+    public void onKeyReleased(MapInput.Key key) {}
 
     /**
      * Gets the player associated with this map
@@ -87,13 +103,14 @@ public class VirtualMapSingle extends VirtualMap {
      * 
      * @return input control
      */
-    public VirtualMapInput getInput() {
+    public MapInput getInput() {
         return input;
     }
 
     /**
      * Gets whether player input is intercepted for controlling this map.
-     * If intercepted, the player can not move around.
+     * If intercepted, the player can not move around and map input is available.
+     * By default this is set to True.
      * 
      * @return True if input is intercepted, False if not.
      */
@@ -103,7 +120,8 @@ public class VirtualMapSingle extends VirtualMap {
 
     /**
      * Sets whether player input is intercepted for controlling this map.
-     * If intercepted, the player can not move around.
+     * If intercepted, the player can not move around and map input is available.
+     * By default this is set to True.
      * 
      * @param interceptInput option
      */
@@ -142,14 +160,14 @@ public class VirtualMapSingle extends VirtualMap {
         }
 
         // Prepare global mapping
-        ArrayList<VirtualMapSingle> list = ALL_MAPS.get(player);
+        ArrayList<InteractiveMapDisplay> list = ALL_MAPS.get(player);
         if (list == null) {
-            list = new ArrayList<VirtualMapSingle>();
+            list = new ArrayList<InteractiveMapDisplay>();
             ALL_MAPS.put(player, list);
         } else {
             // Stop old virtual maps for this map
             int itemId = getMapId(mapItem);
-            for (VirtualMapSingle old_map : list) {
+            for (InteractiveMapDisplay old_map : list) {
                 if (old_map.itemId == itemId) {
                     old_map.stop();
                     break;
@@ -159,8 +177,8 @@ public class VirtualMapSingle extends VirtualMap {
 
         // Start self
         super.start(plugin, mapItem);
-        this.addViewer(player);
         this._player = player;
+        this.setViewers(Arrays.asList(this._player));
 
         // Add to mapping
         list.add(this);
@@ -174,11 +192,11 @@ public class VirtualMapSingle extends VirtualMap {
         this.onDetached();
         this.updateInputInterception(false);
         super.stop();
-        this.removeViewer(this._player);
+        this.setViewers(Collections.<Player>emptyList());
         this._player = null;
 
         // Remove from global mapping
-        ArrayList<VirtualMapSingle> list = ALL_MAPS.get(player);
+        ArrayList<InteractiveMapDisplay> list = ALL_MAPS.get(player);
         if (list != null) {
             list.remove(this);
             if (list.isEmpty()) {
@@ -193,7 +211,7 @@ public class VirtualMapSingle extends VirtualMap {
         }
         input.doTick();
         if (input.isRepeating()) {
-            for (VirtualMapInput.Key key : VirtualMapInput.Key.values()) {
+            for (MapInput.Key key : MapInput.Key.values()) {
                 boolean press_a = input.wasPressed(key);
                 boolean press_b = input.isPressed(key);
                 if (press_b) {
@@ -204,7 +222,7 @@ public class VirtualMapSingle extends VirtualMap {
                 }
             }
         } if (input.hasChanges()) {
-            for (VirtualMapInput.Key key : VirtualMapInput.Key.values()) {
+            for (MapInput.Key key : MapInput.Key.values()) {
                 boolean press_a = input.wasPressed(key);
                 boolean press_b = input.isPressed(key);
                 if (!press_a && press_b) {
@@ -217,7 +235,7 @@ public class VirtualMapSingle extends VirtualMap {
                 }
             }
         } else {
-            for (VirtualMapInput.Key key : VirtualMapInput.Key.values()) {
+            for (MapInput.Key key : MapInput.Key.values()) {
                 if (input.isPressed(key)) {
                     this.onKey(key);
                 }
@@ -304,9 +322,9 @@ public class VirtualMapSingle extends VirtualMap {
     public static boolean canAttach(Player player, ItemStack mapItem) {
         int id = getMapId(mapItem);
         if (id != -1) {
-            ArrayList<VirtualMapSingle> maps = ALL_MAPS.get(player);
+            ArrayList<InteractiveMapDisplay> maps = ALL_MAPS.get(player);
             if (maps != null) {
-                for (VirtualMapSingle map : maps) {
+                for (InteractiveMapDisplay map : maps) {
                     if (map.itemId == id) {
                         return false;
                     }
@@ -324,12 +342,12 @@ public class VirtualMapSingle extends VirtualMap {
      * @param mapItem to find the virtual map for
      * @return Virtual Map, or null if not found
      */
-    public static VirtualMapSingle findMap(Player player, ItemStack mapItem) {
+    public static InteractiveMapDisplay findMap(Player player, ItemStack mapItem) {
         int id = getMapId(mapItem);
         if (id != -1) {
-            ArrayList<VirtualMapSingle> maps = ALL_MAPS.get(player);
+            ArrayList<InteractiveMapDisplay> maps = ALL_MAPS.get(player);
             if (maps != null) {
-                for (VirtualMapSingle map : maps) {
+                for (InteractiveMapDisplay map : maps) {
                     if (map.itemId == id) {
                         return map;
                     }
@@ -345,10 +363,10 @@ public class VirtualMapSingle extends VirtualMap {
      * @param player to detach all maps from
      */
     public static void detachAll(Player player) {
-        ArrayList<VirtualMapSingle> list = ALL_MAPS.get(player);
+        ArrayList<InteractiveMapDisplay> list = ALL_MAPS.get(player);
         if (list != null) {
             while (!list.isEmpty()) {
-                VirtualMapSingle map = list.get(0);
+                InteractiveMapDisplay map = list.get(0);
                 map.stop();
                 if (!list.isEmpty() && list.get(0) == map) {
                     list.remove(0); // guarantee removal from mapping
@@ -367,15 +385,15 @@ public class VirtualMapSingle extends VirtualMap {
         if (mapItemId == -1) {
             return;
         }
-        ArrayList<VirtualMapSingle> maps = new ArrayList<VirtualMapSingle>();
-        for (ArrayList<VirtualMapSingle> list : ALL_MAPS.values()) {
-            for (VirtualMapSingle map : list) {
+        ArrayList<InteractiveMapDisplay> maps = new ArrayList<InteractiveMapDisplay>();
+        for (ArrayList<InteractiveMapDisplay> list : ALL_MAPS.values()) {
+            for (InteractiveMapDisplay map : list) {
                 if (map.itemId == mapItemId) {
                     maps.add(map);
                 }
             }
         }
-        for (VirtualMapSingle map : maps) {
+        for (InteractiveMapDisplay map : maps) {
             map.stop();
         }
     }
@@ -388,10 +406,10 @@ public class VirtualMapSingle extends VirtualMap {
     public static void handlePacket(PacketEvent event) {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {
-            ArrayList<VirtualMapSingle> maps = ALL_MAPS.get(event.getPlayer());
+            ArrayList<InteractiveMapDisplay> maps = ALL_MAPS.get(event.getPlayer());
             if (maps != null) {
                 int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
-                for (VirtualMapSingle map : maps) {
+                for (InteractiveMapDisplay map : maps) {
                     if (map.itemId == itemid) {
                         event.setCancelled(true);
                         return;
@@ -409,9 +427,9 @@ public class VirtualMapSingle extends VirtualMap {
             }
 
             CommonPacket packet = event.getPacket();
-            ArrayList<VirtualMapSingle> list = ALL_MAPS.get(p);
+            ArrayList<InteractiveMapDisplay> list = ALL_MAPS.get(p);
             if (list != null) {
-                for (VirtualMapSingle map : list) {
+                for (InteractiveMapDisplay map : list) {
                     if (map.itemId == mapItemId) {
                         int dx = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.sideways));
                         int dy = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.forwards));

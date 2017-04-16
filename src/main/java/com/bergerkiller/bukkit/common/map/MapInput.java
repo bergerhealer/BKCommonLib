@@ -3,14 +3,14 @@ package com.bergerkiller.bukkit.common.map;
 /**
  * Input controller for virtual map navigation and UI
  */
-public class VirtualMapInput {
+public class MapInput {
     private int last_dx, last_dy, last_dz;
     private int curr_dx, curr_dy, curr_dz;
     private int recv_dx, recv_dy, recv_dz;
     private int key_repeat_timer;
     private boolean has_input;
 
-    public VirtualMapInput() {
+    public MapInput() {
         reset();
     }
 

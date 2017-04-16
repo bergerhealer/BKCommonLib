@@ -1,26 +1,37 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.events.MapViewEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
-import com.bergerkiller.bukkit.common.map.VirtualMapSingle;
+import com.bergerkiller.bukkit.common.map.InteractiveMapDisplay;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -28,6 +39,8 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 
 @SuppressWarnings("unused")
 class CommonListener implements Listener, PacketListener {
@@ -119,11 +132,11 @@ class CommonListener implements Listener, PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        VirtualMapSingle.handlePacket(event);
+        InteractiveMapDisplay.handlePacket(event);
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        VirtualMapSingle.handlePacket(event);
+        InteractiveMapDisplay.handlePacket(event);
     }
 }

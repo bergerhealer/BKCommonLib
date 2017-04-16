@@ -650,4 +650,101 @@ public class LogicUtil {
         }
         return result;
     }
+
+    /**
+     * Synchronizes the items from one type to another, handling comparison, adding, and removal
+     * 
+     * @param <V> value type bound to the element
+     * @param <E> element item type
+     */
+    public static interface ItemSynchronizer<V, E> {
+        /**
+         * Checks whether a given value belong to a certain item
+         * 
+         * @param item to check
+         * @param value to compare
+         * @return True if the item belongs to the value, False if not
+         */
+        public boolean isItem(E item, V value);
+
+        /**
+         * Called when a new item needs to be added to the synchronized list
+         * 
+         * @param value to add
+         * @return result entry to be added to the synchronized list
+         */
+        public E onAdded(V value);
+
+        /**
+         * Called when an item is about to be removed from the synchronized list
+         * 
+         * @param item to be removed
+         */
+        public void onRemoved(E item);
+    }
+
+    /**
+     * Synchronizes the contents of a list by taking over the items in a collection of values.
+     * The items will be inserted into the list in the same order as the collection.
+     * 
+     * @param list to synchronize
+     * @param values to synchronize in the list
+     * @param synchronizer to use when synchronizing the collection with the list
+     * @return True if the synchronized list changed, False if not
+     */
+    public static <V, E> boolean synchronizeList(List<E> list, Collection<V> values, ItemSynchronizer<V, E> synchronizer) {
+        boolean has_changes = false;
+        Iterator<V> value_iter = values.iterator();
+        ListIterator<E> item_iter = list.listIterator();
+        while (value_iter.hasNext()) {
+            V value = value_iter.next();
+
+            // Add a new item at the end of the list
+            if (!item_iter.hasNext()) {
+                item_iter.add(synchronizer.onAdded(value));
+                has_changes = true;
+                continue;
+            }
+
+            // Verify the next item matches the value
+            E item = item_iter.next();
+            if (synchronizer.isItem(item, value)) {
+                continue;
+            }
+
+            // Remember the current iterating position when restoring
+            // Find the item in the list. If it exists, remove it and add it to the front
+            // If not found, create a new item at that index
+            int old_index = item_iter.previousIndex();
+            while (true) {
+                if (item_iter.hasNext()) {
+                    item = item_iter.next();
+                    if (synchronizer.isItem(item, value)) {
+                        item_iter.remove();
+                        break;
+                    }
+                } else {
+                    item = null;
+                    break;
+                }
+            }
+            item_iter = list.listIterator(old_index);
+            if (item == null) {
+                item_iter.add(synchronizer.onAdded(value));
+            } else {
+                item_iter.add(item);
+            }
+            has_changes = true;
+        }
+
+        // Remove all items that are past the items list
+        while (item_iter.hasNext()) {
+            E item = item_iter.next();
+            synchronizer.onRemoved(item);
+            item_iter.remove();
+            has_changes = true;
+        }
+
+        return has_changes;
+    }
 }

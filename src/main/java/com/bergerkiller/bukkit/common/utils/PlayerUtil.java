@@ -17,6 +17,8 @@ import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.WorldServer;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 
 import java.util.List;
 
@@ -241,5 +243,20 @@ public class PlayerUtil extends EntityUtil {
      */
     public static List<Integer> getEntityRemoveQueue(Player player) {
         return Common.SERVER.getEntityRemoveQueue(player);
+    }
+
+    /**
+     * Gets the item that a player is currently holding in the hand specified
+     * 
+     * @param player to get the hand item
+     * @param hand which hand
+     * @return item the player is holding in the hand
+     */
+    public static ItemStack getItemInHand(Player player, MainHand hand) {
+        if (hand == player.getMainHand()) {
+            return player.getInventory().getItemInMainHand();
+        } else {
+            return player.getInventory().getItemInOffHand();
+        }
     }
 }
