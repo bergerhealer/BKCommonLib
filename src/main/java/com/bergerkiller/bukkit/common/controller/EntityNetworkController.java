@@ -648,7 +648,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public void onSync() {
         if (entity.isDead()) {
-            System.out.println("ITS DEAD JIM");
             return;
         }
 

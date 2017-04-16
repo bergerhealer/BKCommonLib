@@ -6,6 +6,8 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.util.ConvertingList;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
@@ -581,6 +583,8 @@ public class WorldUtil extends ChunkUtil {
         Object chunk = NMSPlayerChunkMap.getChunk.invoke(playerChunkMap, chunkX, chunkZ);
         if (chunk != null && !NMSPlayerChunk.players.get(chunk).isEmpty()) {
             // Simply remove and re-add the players to the chunk. Does an instant chunk resend, though.
+            // This doesn't work because block updates disable in the chunk permanently
+            /*
             List<Player> old_players = new ArrayList<Player>(NMSPlayerChunk.players.get(chunk));
             for (Player player : old_players) {
                 NMSPlayerChunk.removePlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
@@ -588,12 +592,25 @@ public class WorldUtil extends ChunkUtil {
             for (Player player : old_players) {
                 NMSPlayerChunk.addPlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
             }
+            */
 
             // This method sends 64 block changes to trigger a chunk resend
-            // It doesn't really work because entities don't get refreshed.
+            // It doesn't really work because entities disappear
             // NMSPlayerChunk.dirtySectionMask.set(chunk, 65535); // all chunk sections
             // NMSPlayerChunk.dirtyCount.set(chunk, 64); // 64 triggers a full chunk re-send
             // NMSPlayerChunkMap.markForUpdate.invoke(playerChunkMap, chunk); // tell main chunk map to update
+
+            // Manual resend because none of the above work without bugs
+            // We use 0x1FFFF instead of 0xFFFF to avoid sending biome data, as that despawns the entities
+            // The 0x10000 is an ignored mask as it is outside of the range of chunk slices.
+            Object chunkHandle = NMSPlayerChunk.chunk.getInternal(chunk);
+            if (chunkHandle != null) {
+                List<Player> old_players = new ArrayList<Player>(NMSPlayerChunk.players.get(chunk));
+                CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunkHandle, 0x1FFFF);
+                for (Player player : old_players) {
+                    PacketUtil.sendPacket(player, packet);
+                }
+            }
             return true;
         } else {
             return false;
