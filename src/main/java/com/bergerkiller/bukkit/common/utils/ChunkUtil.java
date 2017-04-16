@@ -368,7 +368,7 @@ public class ChunkUtil {
      * Obtains all the Block State tile entities available in a Chunk
      *
      * @param chunk to get the Block States for
-     * @return collection of Block States (mutual)
+     * @return collection of Block States (mutable)
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
         return ConversionPairs.blockState.convertAll(CommonNMS.getNative(chunk).tileEntities.values());

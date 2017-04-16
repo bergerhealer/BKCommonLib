@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_11_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -660,6 +661,16 @@ public class WorldUtil extends ChunkUtil {
      */
     public static Block rayTraceBlock(Location startLocation, double maxLength) {
         return rayTraceBlock(startLocation, startLocation.getDirection(), maxLength);
+    }
+
+    /**
+     * Obtains all the Block State tile entities available in a World
+     *
+     * @param world to get the Block States for
+     * @return collection of Block States (mutable)
+     */
+    public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
+        return ConversionPairs.blockState.convertAll(CommonNMS.getNative(world).tileEntityList);
     }
 
     /**
