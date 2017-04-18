@@ -76,6 +76,14 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract int getRawData();
 
     /**
+     * Gets a combined Id, combining type id and data into a single value
+     * 
+     * @return combined id
+     */
+    @Deprecated
+    public abstract int getCombinedId();
+
+    /**
      * Gets the Material Type of the Block
      * 
      * @return Block Material Type

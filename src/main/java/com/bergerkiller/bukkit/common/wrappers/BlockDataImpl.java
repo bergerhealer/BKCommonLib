@@ -146,6 +146,11 @@ public class BlockDataImpl extends BlockData {
         return this.block.toLegacyData(this.data);
     }
 
+    @Override
+    public final int getCombinedId() {
+        return Block.getCombinedId(this.data);
+    }
+
     /* ====================================================================== */
     /* ========================= Block Properties =========================== */
     /* ====================================================================== */

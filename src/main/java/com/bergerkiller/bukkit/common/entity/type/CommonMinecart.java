@@ -10,8 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
@@ -132,35 +131,87 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     /**
-     * Gets the block type id for this Minecart
+     * Gets the block type id for this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #getBlock()} instead
      *
      * @return block type id
      */
     @Deprecated
     public int getBlockId() {
-        Material mat = getBlockType();
-        return mat == null ? 0 : mat.getId();
+        return getBlock().getTypeId();
     }
 
     /**
-     * Sets the Block displayed in this Minecart
+     * Sets the Block displayed in this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
      *
      * @param blockId of the Block
      */
     @Deprecated
     public void setBlock(int blockId) {
-        setBlock(blockId, 0);
+        setBlock(BlockData.fromTypeIdAndData(blockId, 0));
     }
 
     /**
-     * Sets the Block displayed in this Minecart
+     * Sets the Block displayed in this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
      *
      * @param blockId of the Block
      * @param blockData of the Block
      */
     @Deprecated
     public void setBlock(int blockId, int blockData) {
-        setBlock(Material.getMaterial(blockId), blockData);
+        setBlock(BlockData.fromTypeIdAndData(blockId, blockData));
+    }
+
+    /**
+     * Gets the block type for this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #getBlock()} instead
+     *
+     * @return block type
+     */
+    @Deprecated
+    public Material getBlockType() {
+        return getBlock().getType();
+    }
+
+    /**
+     * Gets the block data for this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #getBlock()} instead
+     *
+     * @return block data
+     */
+    @Deprecated
+    public int getBlockData() {
+        return metaBlockType.get() >> 16;
+    }
+
+    /**
+     * Sets the Block displayed in this Minecart<br>
+     * <br>
+     * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
+     *
+     * @param blockType of the Block
+     * @param blockData of the Block
+     */
+    @Deprecated
+    public void setBlock(Material blockType, int blockData) {
+        setBlock(BlockData.fromMaterialData(blockType, blockData));
+    }
+
+    /**
+     * Gets the Block displayed in this Minecart
+     * 
+     * @return block
+     */
+    @SuppressWarnings("deprecation")
+    public BlockData getBlock() {
+        return BlockData.fromCombinedId(metaBlockType.get());
     }
 
     /**
@@ -169,46 +220,24 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param blockType of the Block
      */
     public void setBlock(Material blockType) {
-        setBlock(blockType, 0);
-    }
-
-    /**
-     * Gets the block type for this Minecart
-     *
-     * @return block type
-     */
-    public Material getBlockType() {
-        int value = metaBlockType.get() & 0xFFFF;
-        return MaterialUtil.getType(value);
-    }
-
-    /**
-     * Gets the block data for this Minecart
-     *
-     * @return block data
-     */
-    public int getBlockData() {
-        return metaBlockType.get() >> 16;
+        setBlock(BlockData.fromMaterial(blockType));
     }
 
     /**
      * Sets the Block displayed in this Minecart
-     *
-     * @param blockType of the Block
-     * @param blockData of the Block
+     * 
+     * @param block
      */
-    public void setBlock(Material blockType, int blockData) {
-        if (blockType == Material.AIR) {
+    @SuppressWarnings("deprecation")
+    public void setBlock(BlockData block) {
+        if (block.getType() == Material.AIR) {
+            metaBlockType.set(0);
             metaBlockVisible.set(false);
             return;
+        } else {
+            metaBlockType.set(block.getCombinedId());
+            metaBlockVisible.set(true);
         }
-        // Compile the new Block ID and Block Data into a single Integer entry (combining two short values)
-        int entryId = MathUtil.clamp(blockType == null ? 0 : MaterialUtil.getTypeId(blockType), 0, Short.MAX_VALUE);
-        int entryData = MathUtil.clamp(blockData, 0, Short.MAX_VALUE);
-        int entryTotal = (entryId & 0xFFFF) | (entryData << 16);
-        // Set the entry in the Entity data watcher, plus set INDEX=22 to 1 indicating there's a Block
-        metaBlockType.set(entryTotal);
-        metaBlockVisible.set(true);
     }
 
     @Override

@@ -93,4 +93,15 @@ public class BlockDataRegistry {
     public static BlockData fromTypeIdAndData(int typeId, int data) {
         return BlockDataImpl.BY_ID_AND_DATA[((typeId << BlockDataImpl.DATA_BITS) | (data & BlockDataImpl.DATA_MASK)) & BlockDataImpl.REGISTRY_MASK];
     }
+
+    /**
+     * Obtains immutable BlockData information by combined block id and data
+     * 
+     * @param combinedId of the block
+     * @return Immutable BlockData
+     */
+    @Deprecated
+    public static BlockData fromCombinedId(int combinedId) {
+        return fromBlockData(Block.getByCombinedId(combinedId));
+    }
 }

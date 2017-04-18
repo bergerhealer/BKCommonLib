@@ -86,7 +86,6 @@ public class ItemParser {
     }
 
     public static ItemParser parse(String name, String dataname, String amount) {
-
         ItemParser parser = new ItemParser();
         // parse amount
         parser.amount = ParseUtil.parseInt(amount, -1);
