@@ -684,10 +684,10 @@ public class WorldUtil extends ChunkUtil {
      * Obtains all the Block State tile entities available in a World
      *
      * @param world to get the Block States for
-     * @return collection of Block States (mutable)
+     * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        return ConversionPairs.blockState.convertAll(CommonNMS.getNative(world).tileEntityList);
+        return ConversionPairs.blockState.convertAll(new ArrayList<TileEntity>(CommonNMS.getNative(world).tileEntityList));
     }
 
     /**

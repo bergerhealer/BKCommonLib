@@ -20,9 +20,9 @@ import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.reflection.ClassTemplate;
 import com.bergerkiller.reflection.FieldAccessor;
 import com.bergerkiller.reflection.MethodAccessor;
@@ -249,16 +249,16 @@ public class CBCraftBlockState {
 
         public BlockState newInstance(Block block, Object tileEntity) {
             final BlockState state = (BlockState) STATE.newInstanceNull();
-            final int typeId = MaterialUtil.getTypeId(block);
+            final BlockData bdata = WorldUtil.getBlockData(block);
             tileField.set(state, tileEntity);
             world.set(state, block.getWorld());
             secondWorld.set(state, block.getWorld());
             chunk.set(state, block.getChunk());
-            type.set(state, typeId);
+            type.set(state, bdata.getTypeId());
             x.set(state, block.getX());
             y.set(state, block.getY());
             z.set(state, block.getZ());
-            data.set(state, BlockUtil.getData(typeId, MaterialUtil.getRawData(block)));
+            data.set(state, bdata.newMaterialData());
             this.apply(state, tileEntity);
             return state;
         }
