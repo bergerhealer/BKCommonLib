@@ -420,7 +420,7 @@ public class MapDisplay {
         }
 
         @Override
-        public MapCanvas fillPixels(int x, int y, int w, int h, byte color) {
+        public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
             // Out of bounds
             if (x >= RESOLUTION || y >= RESOLUTION) {
                 return this;

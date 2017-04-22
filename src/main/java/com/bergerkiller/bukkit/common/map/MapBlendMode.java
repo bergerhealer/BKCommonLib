@@ -6,7 +6,7 @@ import java.util.Arrays;
  * A blend mode used when drawing on a canvas
  */
 public enum MapBlendMode {
-    NONE, OVERLAY, AVERAGE, ADD, SUBTRACT;
+    NONE, OVERLAY, AVERAGE, ADD, SUBTRACT, MULTIPLY;
 
     public void process(byte input, byte[] output) {
         switch (this) {
@@ -26,6 +26,9 @@ public enum MapBlendMode {
             break;
         case SUBTRACT:
             MapColorPalette.remapColors(input, output, MapColorPalette.COLOR_MAP_SUBTRACT);
+            break;
+        case MULTIPLY:
+            MapColorPalette.remapColors(input, output, MapColorPalette.COLOR_MAP_MULTIPLY);
             break;
         }
     }
@@ -50,6 +53,9 @@ public enum MapBlendMode {
             break;
         case SUBTRACT:
             MapColorPalette.remapColors(input, output, MapColorPalette.COLOR_MAP_SUBTRACT);
+            break;
+        case MULTIPLY:
+            MapColorPalette.remapColors(input, output, MapColorPalette.COLOR_MAP_MULTIPLY);
             break;
         }
     }

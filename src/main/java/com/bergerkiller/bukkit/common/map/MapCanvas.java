@@ -1,5 +1,10 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.bergerkiller.bukkit.common.collections.CharacterIterable;
+
 /**
  * A base implementation canvas for performing drawing operations on.
  * Implementations of this canvas should implement the following methods:
@@ -11,10 +16,13 @@ package com.bergerkiller.bukkit.common.map;
  * <li>{@link #readPixels(int, int, int, int, byte[])} - read an area of pixels</li>
  * <li>{@link #writePixel(int, int, byte)} - write a single pixel</li>
  * <li>{@link #writePixels(int, int, int, int, byte[])} - write an area of pixels</li>
- * <li>{@link #fillPixels(int, int, int, int, byte)} - fill an area of pixels</li>
+ * <li>{@link #writePixelsFill(int, int, int, int, byte)} - fill an area of pixels</li>
  * </ul>
  */
 public abstract class MapCanvas {
+    private int fontSpacing = 0;
+    private MapFontAlignment fontAlignment = MapFontAlignment.LEFT;
+    private MapBlendMode blendMode = MapBlendMode.NONE;
 
     /**
      * Gets the width of this canvas
@@ -120,7 +128,6 @@ public abstract class MapCanvas {
      * @param w - width of the area
      * @param h - height of the area
      * @param colorData to write
-     * @param blendMode to use
      */
     public MapCanvas writePixels(int x, int y, int w, int h, byte[] colorData) {
         // Note: this function should be implemented to enhance performance, if possible
@@ -138,7 +145,8 @@ public abstract class MapCanvas {
     }
 
     /**
-     * Fills a rectangular area in this canvas with a single color
+     * Fills a rectangular area in this canvas with a single color.
+     * No color blending is performed and any original pixels are replaced.
      * 
      * @param x - coordinate of the top-left corner of the area
      * @param y - coordinate of the top-left corner of the area
@@ -147,7 +155,7 @@ public abstract class MapCanvas {
      * @param color to fill
      * @return this canvas
      */
-    public MapCanvas fillPixels(int x, int y, int w, int h, byte color) {
+    public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
         // Note: this function should be implemented to enhance performance, if possible
         for (int dx = 0; dx < w; dx++) {
             for (int dy = 0; dy < h; dy++) {
@@ -163,7 +171,7 @@ public abstract class MapCanvas {
 
     /**
      * Writes raw pixel color data to a rectangular area in this canvas.
-     * A blend mode can be specified to perform pixel color blending.
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
      * This data must be formatted in such a way that:
      * <ul>
      * <li>The first color in the array is pixel (0, 0)</li>
@@ -176,49 +184,41 @@ public abstract class MapCanvas {
      * @param w - width of the area
      * @param h - height of the area
      * @param colorData to write
-     * @param blendMode to use
      */
-    public final MapCanvas writePixels(int x, int y, int w, int h, byte[] colorData, MapBlendMode blendMode) {
-        if (blendMode == MapBlendMode.NONE) {
+    public final MapCanvas drawRawData(int x, int y, int w, int h, byte[] colorData) {
+        return this.drawRawData(x, y, w, h, colorData, (byte) 0);
+    }
+
+    /**
+     * Writes raw pixel color data to a rectangular area in this canvas.
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
+     * A color factor can be specified. All the color data is multiplied with that factor.
+     * This data must be formatted in such a way that:
+     * <ul>
+     * <li>The first color in the array is pixel (0, 0)</li>
+     * <li>Satisfies condition <b>index = x + y * width</b></li>
+     * <li>The size of the buffer is at least (width * height)</li>
+     * </ul>
+     * 
+     * @param x - coordinate of the top-left corner of the area
+     * @param y - coordinate of the top-left corner of the area
+     * @param w - width of the area
+     * @param h - height of the area
+     * @param colorData to write
+     * @param colorFactor to apply, 0 for no factor
+     */
+    public final MapCanvas drawRawData(int x, int y, int w, int h, byte[] colorData, byte colorFactor) {
+        if (colorFactor != 0) {
+            colorData = colorData.clone();
+            MapBlendMode.MULTIPLY.process(colorFactor, colorData);
+        }
+        if (this.blendMode == MapBlendMode.NONE) {
             return this.writePixels(x, y, w, h, colorData);
         } else {
             byte[] pixels = this.readPixels(x, y, w, h);
-            blendMode.process(colorData, pixels);
+            this.blendMode.process(colorData, pixels);
             return this.writePixels(x, y, w, h, pixels);
         }
-    }
-
-    /**
-     * Writes raw pixel color data to this entire canvas.
-     * A blend mode can be specified to perform pixel color blending.
-     * This data must be formatted in such a way that:
-     * <ul>
-     * <li>The first color in the array is pixel (0, 0)</li>
-     * <li>Satisfies condition <b>index = x + y * width</b></li>
-     * <li>The size of the buffer is at least (width * height)</li>
-     * </ul>
-     * 
-     * @param colorData to write
-     * @param blendMode to use
-     */
-    public final MapCanvas writePixels(byte[] colorData, MapBlendMode blendMode) {
-        return this.writePixels(0, 0, getWidth(), getHeight(), colorData, blendMode);
-    }
-
-    /**
-     * Writes raw pixel color data to this entire canvas.
-     * No color blending is performed and any original pixels are replaced.
-     * This data must be formatted in such a way that:
-     * <ul>
-     * <li>The first color in the array is pixel (0, 0)</li>
-     * <li>Satisfies condition <b>index = x + y * width</b></li>
-     * <li>The size of the buffer is at least (width * height)</li>
-     * </ul>
-     * 
-     * @param colorData to write
-     */
-    public final MapCanvas writePixels(byte[] colorData) {
-        return this.writePixels(0, 0, getWidth(), getHeight(), colorData, MapBlendMode.NONE);
     }
 
     /**
@@ -268,22 +268,36 @@ public abstract class MapCanvas {
      * @param y - position of the top-left corner of the sprite
      * @return this canvas
      */
-    public final MapCanvas draw(MapCanvas canvas, int x, int y) {
+    public final MapCanvas drawCopy(MapCanvas canvas, int x, int y) {
         return writePixels(x, y, canvas.getWidth(), canvas.getHeight(), canvas.getBuffer());
     }
 
     /**
      * Draws the contents of another canvas or texture onto this canvas.
-     * A blend mode can be specified to perform pixel color blending.
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
      * 
      * @param canvas with the pixel data to draw
      * @param x - position of the top-left corner of the sprite
      * @param y - position of the top-left corner of the sprite
-     * @param blendMode to use
      * @return this canvas
      */
-    public final MapCanvas draw(MapCanvas canvas, int x, int y, MapBlendMode blendMode) {
-        return writePixels(x, y, canvas.getWidth(), canvas.getHeight(), canvas.getBuffer(), blendMode);
+    public final MapCanvas draw(MapCanvas canvas, int x, int y) {
+        return this.drawRawData(x, y, canvas.getWidth(), canvas.getHeight(), canvas.getBuffer());
+    }
+
+    /**
+     * Draws the contents of another canvas or texture onto this canvas.
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
+     * A color factor can be specified. All color data will be pre-multiplied with that factor.
+     * 
+     * @param canvas with the pixel data to draw
+     * @param x - position of the top-left corner of the sprite
+     * @param y - position of the top-left corner of the sprite
+     * @param colorFactor to use
+     * @return this canvas
+     */
+    public final MapCanvas draw(MapCanvas canvas, int x, int y, byte colorFactor) {
+        return this.drawRawData(x, y, canvas.getWidth(), canvas.getHeight(), canvas.getBuffer(), colorFactor);
     }
 
     /**
@@ -298,7 +312,7 @@ public abstract class MapCanvas {
         for (int i = 0; i < pixels.length; i++) {
             pixels[i] = remappingColors[(int) pixels[i]];
         }
-        return this.writePixels(pixels);
+        return this.writePixels(0, 0, this.getWidth(), this.getHeight(), pixels);
     }
 
     /**
@@ -330,12 +344,12 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas clearRectangle(int x, int y, int w, int h) {
-        return this.fillPixels(x, y, w, h, (byte) 0);
+        return this.writePixelsFill(x, y, w, h, (byte) 0);
     }
 
     /**
-     * Fills a rectangular area with a single color.
-     * No color blending is performed and any original pixels are replaced.
+     * Fills a rectangular area with a single color
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
      * 
      * @param x - coordinate of the top-left corner of the rectangle
      * @param y - coordinate of the top-left corner of the rectangle
@@ -345,27 +359,11 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas fillRectangle(int x, int y, int w, int h, byte color) {
-        return this.fillPixels(x, y, w, h, color);
-    }
-
-    /**
-     * Fills a rectangular area with a single color
-     * A blend mode can be specified to perform pixel color blending.
-     * 
-     * @param x - coordinate of the top-left corner of the rectangle
-     * @param y - coordinate of the top-left corner of the rectangle
-     * @param w - width of the rectangle
-     * @param h - height of the rectangle
-     * @param color to draw
-     * @param blendMode to use
-     * @return this canvas
-     */
-    public final MapCanvas fillRectangle(int x, int y, int w, int h, byte color, MapBlendMode blendMode) {
-        if (blendMode == MapBlendMode.NONE) {
-            return this.fillPixels(x, y, w, h, color);
+        if (this.blendMode == MapBlendMode.NONE) {
+            return this.writePixelsFill(x, y, w, h, color);
         } else {
             byte[] pixels = this.readPixels(x, y, w, h);
-            blendMode.process(color, pixels);
+            this.blendMode.process(color, pixels);
             return this.writePixels(x, y, w, h, pixels);
         }
     }
@@ -377,31 +375,155 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas clear() {
-        return this.fillPixels(0, 0, getWidth(), getHeight(), (byte) 0);
+        return this.writePixelsFill(0, 0, getWidth(), getHeight(), (byte) 0);
     }
 
     /**
      * Fills this entire canvas area with a single color.
-     * No color blending is performed and any original pixels are replaced.
+     * If a blend mode is set for this canvas, it is used to perform pixel color blending.
      * 
      * @param color to fill
      * @return this canvas
      * @return this canvas
      */
     public final MapCanvas fill(byte color) {
-        return this.fillPixels(0, 0, getWidth(), getHeight(), color);
+        return this.fillRectangle(0, 0, getWidth(), getHeight(), color);
     }
 
     /**
-     * Fills this entire canvas area with a single color.
-     * A blend mode can be specified to perform pixel color blending.
+     * Sets the amount of pixels between each drawn character of a font.
+     * By default a spacing of 0 is used. Text fonts will have a default spacing set.
+     * Negative values are allowed to make spacing smaller.
      * 
-     * @param color to fill
-     * @param blendMode to use
+     * @param spacing to use, 0 for none
      * @return this canvas
      */
-    public final MapCanvas fill(byte color, MapBlendMode blendMode) {
-        return this.fillRectangle(0, 0, getWidth(), getHeight(), color, blendMode);
+    public MapCanvas setSpacing(int spacing) {
+        this.fontSpacing = spacing;
+        return this;
+    }
+
+    /**
+     * Sets the alignment at which font is drawn on this canvas.
+     * By default it is set to LEFT.
+     * 
+     * <ul>
+     * <li>LEFT - Draws from left to right. x/y specify left/middle</li>
+     * <li>RIGHT - Draws from right to left. x/y specify right/middle</li>
+     * <li>MIDDLE - Draws the contents centered. x/y specify middle/middle</li>
+     * </ul>
+     * 
+     * @param alignment to set
+     * @return this canvas
+     */
+    public MapCanvas setAlignment(MapFontAlignment alignment) {
+        this.fontAlignment = alignment;
+        return this;
+    }
+
+    /**
+     * Sets the color blending mode to use, applied when drawing contents on this canvas.
+     * <ul>
+     * <li>NONE - overwrites pixels already there, no transparency</li>
+     * <li>OVERLAY - overwrites pixels with opaque pixels, transparent pixels do nothing</li>
+     * <li>AVERAGE - takes the color average of the current pixels and the pixels drawn</li>
+     * <li>ADD - adds the color values of the pixels drawn to the current pixels</li>
+     * <li>SUBTRACT - subtracts the color values of the pixels drawn from the current pixels</li>
+     * <li>MULTIPLY - multiplies the color values of the pixels drawn with the current pixels</li>
+     * </ul>
+     * @param blendMode
+     * @return this canvas
+     */
+    public MapCanvas setBlendMode(MapBlendMode blendMode) {
+        this.blendMode = blendMode;
+        return this;
+    }
+
+    /**
+     * Gets the color blending mode currently in use by this canvas.
+     * See also: {@link #setBlendMode(MapBlendMode)}
+     * 
+     * @return color blending mode
+     */
+    public MapBlendMode getBlendMode() {
+        return this.blendMode;
+    }
+
+    /**
+     * Draws a font in its natural colors. If this is a binary font, it will be drawn in white.
+     * 
+     * @param font to draw
+     * @param x - coordinate of the top-left corner of the first character drawn
+     * @param y - coordinate of the top-left corner of the first character drawn
+     * @param characters to draw
+     * @return this canvas
+     */
+    @SafeVarargs
+    public final <T> MapCanvas draw(MapFont<T> font, int x, int y, T... characters) {
+        return this.draw(font, x, y, (byte) 0, Arrays.asList(characters));
+    }
+
+    /**
+     * Draws a text-based Character font using a solid color. If the font is a binary font, the color or
+     * transparent is drawn. For multicolor fonts, the color will be used as a multiplier.
+     * 
+     * @param font to draw
+     * @param x - coordinate of the top-left corner of the first character drawn
+     * @param y - coordinate of the top-left corner of the first character drawn
+     * @param color - color text
+     * @param characters to draw
+     * @return this canvas
+     */
+    public final MapCanvas draw(MapFont<Character> font, int x, int y, byte color, CharSequence characters) {
+        return this.draw(font, x, y, color, new CharacterIterable(characters));
+    }
+
+    /**
+     * Draws a series of character sprites using a font and color.
+     * A transparent color will result in no color being applied to the font.
+     * For text fonts, this will result in white text. For colorful fonts, the colors will be preserved.
+     * 
+     * @param font to draw
+     * @param x - coordinate to start drawing
+     * @param y - coordinate to start drawing
+     * @param color - color to use when drawing the font
+     * @param characters to draw
+     * @return this canvas
+     */
+    public final <T> MapCanvas draw(MapFont<T> font, int x, int y, byte color, Iterable<T> characters) {
+        if (fontAlignment == MapFontAlignment.LEFT) {
+            // Left-to-right is easy as it is the natural ordering of the iterable
+            for (T character : characters) {
+                MapTexture sprite = font.getSprite(character);
+                this.draw(sprite, x, y, color);
+                x += sprite.getWidth() + fontSpacing;
+            }
+            return this;
+        }
+
+        // Other modes require knowing all the textures to draw up-front
+        ArrayList<MapTexture> sprites = new ArrayList<MapTexture>();
+        int total_width = 0;
+        for (T character : characters) {
+            MapTexture sprite = font.getSprite(character);
+            sprites.add(sprite);
+            total_width += sprite.getWidth();
+        }
+        if (sprites.isEmpty()) {
+            return this; // nothing to draw
+        }
+        total_width += fontSpacing * (sprites.size() - 1);
+
+        if (fontAlignment == MapFontAlignment.RIGHT) {
+            x -= total_width;
+        } else if (fontAlignment == MapFontAlignment.MIDDLE) {
+            x -= total_width / 2;
+        }
+        for (MapTexture sprite : sprites) {
+            this.draw(sprite, x, y, color);
+            x += sprite.getWidth() + fontSpacing;
+        }
+        return this;
     }
 
     /**
@@ -503,11 +625,11 @@ public abstract class MapCanvas {
         }
 
         @Override
-        public MapCanvas fillPixels(int x, int y, int w, int h, byte color) {
+        public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
             if (x >= 0 && y >= 0 && (x + w) <= this.w && (y + h) <= this.h) {
-                return this.parent.fillPixels(x + this.x, y + this.y, w, h, color);
+                return this.parent.writePixelsFill(x + this.x, y + this.y, w, h, color);
             } else {
-                return super.fillPixels(x, y, w, h, color);
+                return super.writePixelsFill(x, y, w, h, color);
             }
         }
 

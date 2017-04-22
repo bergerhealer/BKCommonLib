@@ -36,7 +36,7 @@ public final class MapTexture extends MapCanvas {
 
     @Override
     public byte readPixel(int x, int y) {
-        if (x > 0 && x < width) {
+        if (x >= 0 && x < width) {
             int index = (x + (y * width));
             if (index >= 0 && index < buffer.length) {
                 return buffer[index];
@@ -47,7 +47,7 @@ public final class MapTexture extends MapCanvas {
 
     @Override
     public void writePixel(int x, int y, byte color) {
-        if (x > 0 && x < width) {
+        if (x >= 0 && x < width) {
             int index = (x + (y * width));
             if (index >= 0 && index < buffer.length) {
                 buffer[index] = color;
@@ -63,6 +63,14 @@ public final class MapTexture extends MapCanvas {
         } else {
             return super.writePixels(x, y, w, h, colorData);
         }
+    }
+
+    public static MapTexture createEmpty(int width, int height) {
+        return new MapTexture(width, height, new byte[width * height]);
+    }
+
+    public static MapTexture createEmpty() {
+        return new MapTexture(0, 0, new byte[0]);
     }
 
     public static MapTexture loadPluginResource(JavaPlugin plugin, String filename) {
@@ -91,6 +99,20 @@ public final class MapTexture extends MapCanvas {
 
     public static MapTexture fromRawData(int width, int height, byte[] buffer) {
         return new MapTexture(width, height, buffer);
+    }
+
+    public static MapTexture fromBukkitSprite(org.bukkit.map.MapFont.CharacterSprite sprite) {
+        if (sprite == null) {
+            return createEmpty();
+        }
+        MapTexture texture = createEmpty(sprite.getWidth() + 1, sprite.getHeight());
+        for (int dx = 0; dx < sprite.getWidth(); dx++) {
+            for (int dy = 0; dy < sprite.getHeight(); dy++) {
+                texture.writePixel(dx, dy, sprite.get(dy, dx) ? 
+                        MapColorPalette.COLOR_WHITE : MapColorPalette.COLOR_TRANSPARENT);
+            }
+        }
+        return texture;
     }
 
 }
