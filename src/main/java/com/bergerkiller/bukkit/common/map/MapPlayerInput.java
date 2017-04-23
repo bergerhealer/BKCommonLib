@@ -1,16 +1,38 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.util.UUID;
+
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
+
 /**
- * Input controller for virtual map navigation and UI
+ * Input controller for virtual map navigation and UI.
+ * A single instance manages the input coming from a single player.
  */
-public class MapInput {
+public class MapPlayerInput {
     private int last_dx, last_dy, last_dz;
     private int curr_dx, curr_dy, curr_dz;
     private int recv_dx, recv_dy, recv_dz;
     private int key_repeat_timer;
     private boolean has_input;
+    private int _fakeMountId = -1;
+    private boolean _fakeMountShown = false;
+    private boolean _isIntercepting = false;
+    public final Player player;
 
-    public MapInput() {
+    public MapPlayerInput(Player player) {
+        this.player = player;
         reset();
     }
 
@@ -274,6 +296,7 @@ public class MapInput {
      * Resets the input to the default state of 'no input'
      */
     public void reset() {
+        updateInputInterception(false);
         curr_dx = curr_dy = curr_dz = 0;
         last_dx = last_dy = last_dz = 0;
         recv_dx = recv_dy = recv_dz = 0;
@@ -282,25 +305,74 @@ public class MapInput {
     }
 
     /**
-     * Performs a tick update on the input, shifting states around
+     * Performs a tick update on the input interception and event handling
      */
-    public void doTick() {
-        last_dx = curr_dx;
-        last_dy = curr_dy;
-        last_dz = curr_dz;
-        curr_dx = recv_dx;
-        curr_dy = recv_dy;
-        curr_dz = recv_dz;
+    public void doTick(MapDisplay display, boolean interceptInput) {
+        this._isIntercepting = interceptInput;
+        if (this.player.isOnline()) {
+            updateInterception(interceptInput);
+            if (!player.isInsideVehicle() && !_fakeMountShown) {
+                receiveInput(0, 0, 0);
+            }
+            last_dx = curr_dx;
+            last_dy = curr_dy;
+            last_dz = curr_dz;
+            curr_dx = recv_dx;
+            curr_dy = recv_dy;
+            curr_dz = recv_dz;
+        } else {
+            reset();
+        }
+
+        // Check if there are any receiving displays at all
+        if (!interceptInput) {
+            return;
+        }
+
+        // Send input events to the MapDisplay
+        if (isRepeating()) {
+            for (MapPlayerInput.Key key : MapPlayerInput.Key.values()) {
+                boolean press_a = wasPressed(key);
+                boolean press_b = isPressed(key);
+                if (press_b) {
+                    display.onKeyPressed(new MapKeyEvent(display, this.player, key)); // Repeat!
+                    display.onKey(new MapKeyEvent(display, this.player, key));
+                } else if (press_a) {
+                    display.onKeyReleased(new MapKeyEvent(display, this.player, key));
+                }
+            }
+        } if (hasChanges()) {
+            for (MapPlayerInput.Key key : MapPlayerInput.Key.values()) {
+                boolean press_a = wasPressed(key);
+                boolean press_b = isPressed(key);
+                if (!press_a && press_b) {
+                    display.onKeyPressed(new MapKeyEvent(display, this.player, key));
+                } else if (press_a && !press_b) {
+                    display.onKeyReleased(new MapKeyEvent(display, this.player, key));
+                }
+                if (press_b) {
+                    display.onKey(new MapKeyEvent(display, this.player, key));
+                }
+            }
+        } else {
+            for (MapPlayerInput.Key key : MapPlayerInput.Key.values()) {
+                if (isPressed(key)) {
+                    display.onKey(new MapKeyEvent(display, this.player, key));
+                }
+            }
+        }
     }
 
     /**
-     * Updates the received input state
+     * Updates the received input state, receiving input information.
+     * If no receivers are interested in this input, False is returned.
      * 
      * @param dx - left/right
      * @param dy - up/down
      * @param dz - enter/back
+     * @return whether input will be handled by a map display
      */
-    public void update(int dx, int dy, int dz) {
+    public boolean receiveInput(int dx, int dy, int dz) {
         recv_dx = dx;
         recv_dy = dy;
         recv_dz = dz;
@@ -309,6 +381,75 @@ public class MapInput {
             key_repeat_timer++;
         } else {
             key_repeat_timer = 0;
+        }
+        return this._isIntercepting;
+    }
+
+    private void updateInterception(boolean intercept) {
+        // No receivers, do not do input interception
+        if (!intercept) {
+            updateInputInterception(false);
+            return;
+        }
+
+        // If the player is already inside a vehicle, we can not fake-mount him
+        if (player.isInsideVehicle()) {
+            updateInputInterception(false);
+            return;
+        }
+
+        // Verify the player isn't flying, it results in a kick
+        if (!player.isFlying() && !NMSEntity.onGround.get(Conversion.toEntityHandle.convert(player))) {
+            updateInputInterception(false);
+            return;
+        }
+
+        // Allowed
+        this.updateInputInterception(true);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void updateInputInterception(boolean intercept) {
+        if (!intercept && _fakeMountShown) {
+            _fakeMountShown = false;
+
+            // Despawn the mount
+            PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(this._fakeMountId));
+            return;
+        }
+
+        if (intercept && !_fakeMountShown) {
+            _fakeMountShown = true;
+
+            // Generate unique mount Id (we can re-use it)
+            if (this._fakeMountId == -1) {
+                this._fakeMountId = EntityUtil.getUniqueEntityId();
+            }
+
+            // Spawn the mount
+            Location loc = player.getLocation();
+            {
+                DataWatcher data = new DataWatcher();
+                data.set(NMSEntity.DATA_FLAGS, (byte) (NMSEntity.DATA_FLAG_INVISIBLE));
+                data.set(NMSEntityLiving.DATA_HEALTH, 10.0F);
+
+                CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId, this._fakeMountId);
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityType, (int) EntityType.PIG.getTypeId());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.x, loc.getX());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.y, loc.getY() - 0.28);
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.z, loc.getZ());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.UUID, UUID.randomUUID());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.dataWatcher, data);
+                PacketUtil.sendPacket(player, packet);
+            }
+            {
+                CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
+                packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
+                packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
+                PacketUtil.sendPacket(player, packet);
+            }
+            return;
         }
     }
 

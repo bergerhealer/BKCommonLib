@@ -3,79 +3,156 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapCursor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
+import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 
 /**
- * Base implementation for a MapDisplay. This class stores the pixel data buffers and render layers, as well
- * managing the display synchronization with one or more player viewers.
+ * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
+ * Owners can also be set to provide input to the map using steering controls. All owners will receiver
+ * map updates when they can see the map, and only when contents change. Non-owners will never see these updates.
+ * The display is purely <u>virtual</u>, meaning that the map contents are never saved on the server.<br>
+ * <br>
+ * Owner input can be <u>intercepted</u>, allowing the owner of the map to control it directly using steering controls.
+ * The easiest way to enable this, is to set {@link #setReceiveInputWhenHolding(opt)} to true. Alternatively it can be
+ * set for individual owners using {@link #setReceiveInput(owner, opt)}. Please note that the player can not move
+ * around while input is intercepted.<br>
+ * <br>
+ * To use this class, it should be further implemented to add custom functionality:
+ * <li>{@link #onAttached()} is called after the map display is initialized</li>
+ * <li>{@link #onDetached()} is called right before the map display is de-initialized</li>
+ * <li>{@link #onTick()} is called every tick, do logic updates and drawing here</li>
+ * <li>{@link #onKeyPressed(Event)} is called whenever an owner presses a key (down)</li>
+ * <li>{@link #onKeyReleased(Event)} is called whenever an owner releases a key (up)</li>
+ * <li>{@link #onKey(event)} is called every tick while the owner is holding down a key</li>
+ * <li>{@link #onLeftClick(event)} is called when a player left-clicks on the map</li>
+ * <li>{@link #onRightClick(event)} is called when a player right-clicks on the map</li>
+ * </ul>
  */
 public class MapDisplay {
     private static final int RESOLUTION = 128;
     private static final int BUFFER_SIZE = (RESOLUTION * RESOLUTION);
-    private final ArrayList<Viewer> viewers = new ArrayList<Viewer>();
+    private final MapSession session = new MapSession(this);
     private final byte[] zbuffer = new byte[BUFFER_SIZE];
     private final byte[] livebuffer = new byte[BUFFER_SIZE];
     private Layer layerStack = new Layer(this);
     private final MapClip clip = new MapClip();
-    private boolean _stopWithoutOwners = true;
-    private boolean _isBeingViewed = false;
     private boolean _updateWhenNotViewing = false;
+    private boolean _receiveInputWhenHolding = false;
     private int updateTaskId = -1;
     private ItemStack _item = null;
-    protected int itemId = -1;
+    protected MapDisplayInfo info = null;
     protected JavaPlugin plugin = null;
 
     /**
-     * Starts updating this map
+     * Initializes this Map Display, setting the owner plugin and what map it represents.
+     * If this display is already initialized for this plugin and map, this method does nothing.
      * 
-     * @param plugin that owns this map
-     * @param mapItem associated with the map to update
+     * @param plugin owner
+     * @param mapItem on which map is displayed
      */
-    protected void start(JavaPlugin plugin, ItemStack mapItem) {
-        if (this.updateTaskId != -1) {
-            throw new IllegalStateException("This map display was already started");
-        }
+    public void initialize(JavaPlugin plugin, ItemStack mapItem) {
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin can not be null");
         }
-        int itemId = getMapId(mapItem);
-        if (itemId == -1) {
-            throw new IllegalArgumentException("Item is not of a valid map");
+        MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
+        if (mapInfo == null) {
+            throw new IllegalArgumentException("Map Item is not of a valid map");
         }
-        this.plugin = plugin;
-        this._item = mapItem.clone();
-        this.itemId = getMapId(mapItem);
-        this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
-            @Override
-            public void run() {
-                update();
+
+        if (this.plugin != null) {
+            if (this.plugin != plugin) {
+                throw new IllegalArgumentException("This Map Display was already initialized for another plugin");
             }
-        }, 1, 1);
+            if (this.info != mapInfo) {
+                throw new IllegalArgumentException("This Map Display was already initialized for a different map");
+            }
+        } else {
+            this.plugin = plugin;
+            this.info = mapInfo;
+            this._item = mapItem.clone();
+        }
+        this.setRunning(true);
     }
 
     /**
-     * Stops updating this virtual map.
+     * Gets whether this Map Display is initialized or not
+     * 
+     * @return True if initialized, False if not
      */
-    protected void stop() {
-        if (this.updateTaskId != -1) {
-            Bukkit.getScheduler().cancelTask(this.updateTaskId);
-            this.updateTaskId = -1;
-            this._item = null;
-            this.itemId = -1;
-        }
+    public boolean isInitialized() {
+        return this.plugin != null;
+    }
+
+    /**
+     * Sets the Session Mode used to decide when this Map Display should be automatically removed.
+     * By default this is set to ONLINE, meaning the session will be removed once all owners are offline.
+     * 
+     * @param mode to set to
+     */
+    public void setSessionMode(MapSessionMode mode) {
+        this.session.mode = mode;
+    }
+
+    /**
+     * Gets the plugin owner of this Map Display. If this display has not yet been initialized,
+     * this function returns null.
+     * 
+     * @return plugin owner
+     */
+    public JavaPlugin getPlugin() {
+        return this.plugin;
+    }
+
+    /**
+     * Adds an owner to this Map Display that will receive map updates and can perform key input.
+     * If this is the first owner being added, and {@link #initialize(plugin, mapItem)} has been called,
+     * the display will start updating automatically. If there is an existing Map Display for this map,
+     * that also is owned by this player, this player is removed as owner and re-added once this Map Display
+     * stops.
+     * 
+     * @param owner to add
+     */
+    public void addOwner(Player owner) {
+        this.session.addOwner(owner);
+        this.setRunning(true);
+    }
+
+    /**
+     * Removes an owner from this Map Display that will no longer receive map updates.
+     * 
+     * @param owner to remove
+     */
+    public void removeOwner(Player owner) {
+        this.session.removeOwner(owner);
+    }
+
+    /**
+     * Gets the internally used map display information
+     * 
+     * @return map display information
+     */
+    public MapDisplayInfo getMapInfo() {
+        return this.info;
+    }
+
+    /**
+     * Gets whether this Map Display has started updating
+     * 
+     * @return True if started, False if not
+     */
+    public boolean isRunning() {
+        return updateTaskId != -1;
     }
 
     /**
@@ -84,138 +161,70 @@ public class MapDisplay {
      * It should only be called when manually managing the map is required.
      */
     public final void update() {
-        if (itemId == -1) {
+        if (this.info == null) {
             return;
         }
 
-        // Check for all viewers whether they are holding the map
-        // If they are, perform continuous updates
-        boolean hasDirtyViewers = false;
-        this._isBeingViewed = false;
-        ListIterator<Viewer> iter = this.viewers.listIterator();
-        while (iter.hasNext()) {
-            Viewer viewer = iter.next();
-            viewer.update();
-            if (viewer.viewing) {
-                this._isBeingViewed = true;
-                hasDirtyViewers |= viewer.clip.dirty;
-            } else if (!viewer.owning) {
-                iter.remove();
-            }
-        }
-
-        // If no more owners remain, remove (option)
-        if (this.viewers.isEmpty() && this._stopWithoutOwners) {
-            this.stop();
+        // Update session. This will update the viewers, and update interception modes.
+        if (!this.session.update()) {
+            this.setRunning(false);
             return;
         }
 
+        // Intercept player input when set
+        if (this._receiveInputWhenHolding) {
+            for (MapSession.Owner owner : this.session.onlineOwners) {
+                owner.interceptInput = owner.controlling;
+            }
+        }
+
         // Perform the actual updates to the map
-        doTick(this._updateWhenNotViewing || this._isBeingViewed);
-
-        // Synchronize the map information to the clients
-        if (this.clip.dirty) {
-            this.clip.dirty = false;
-
-            // For all viewers watching, send map texture updates
-            // For players that are in-sync, we can re-use the same packet
-            CommonPacket syncPacket = null;
-            for (Viewer viewer : this.viewers) {
-                if (!viewer.viewing) {
-                    viewer.clip.markDirty(clip);
-                } else if (viewer.clip.dirty) {
-                    viewer.clip.markDirty(clip);
-                    viewer.clip.dirty = false;
-                    viewer.send(createPacket(viewer.clip));
-                } else {
-                    if (syncPacket == null) {
-                        syncPacket = createPacket(this.clip);
-                    } else {
-                        syncPacket = syncPacket.clone();
-                    }
-                    viewer.send(syncPacket);
-                }
-            }
-
-        } else if (hasDirtyViewers) {
-
-            // Send full changes to the dirty viewers
-            for (Viewer viewer : this.viewers) {
-                if (viewer.viewing && viewer.clip.dirty) {
-                    viewer.clip.dirty = false;
-                    viewer.send(createPacket(viewer.clip));
-                }
-            }
-        }
-    }
-
-    /**
-     * Updates what players can view this Map Display.
-     * Viewer sessions are automatically added or removed based on the viewers specified.
-     * 
-     * @param playerViewers to set to
-     */
-    protected void setViewers(List<Player> playerViewers) {
-        LogicUtil.synchronizeList(this.viewers, playerViewers, new LogicUtil.ItemSynchronizer<Player, Viewer>() {
-            @Override
-            public boolean isItem(Viewer item, Player value) {
-                return item.player == value;
-            }
-
-            @Override
-            public Viewer onAdded(Player player) {
-                Viewer viewer = new Viewer(player, MapDisplay.this);
-                viewer.send(createPacket(null));
-                return viewer;
-            }
-
-            @Override
-            public void onRemoved(Viewer item) {
-                //TODO: Do something special with the viewer when removed?
-            }
-        });
-    }
-
-    /**
-     * Gets a list of Players that are viewing this Map Display and are eligible for updates.
-     * This list includes viewers that own the map, but are not currently viewing it.
-     * 
-     * @return viewers
-     */
-    public List<Player> getViewers() {
-        List<Player> result = new ArrayList<Player>(this.viewers.size());
-        for (Viewer viewer : this.viewers) {
-            result.add(viewer.player);
-        }
-        return result;
-    }
-
-    /**
-     * Checks whether a certain Player is viewing this Map Display.
-     * Players that own the map, but are not currently viewing it, are also included.
-     * 
-     * @param player to check
-     * @return True if viewing, False if not
-     */
-    public boolean isViewing(Player player) {
-        for (Viewer viewer : this.viewers) {
-            if (viewer.player == player) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Executes {@link #onTick()}, with optional other map-specific tasks that occur every tick.
-     * This should not be called by anyone, not overridden!
-     */
-    protected void doTick(boolean mapVisible) {
-        // Perform the actual updates to the map
-        if (mapVisible) {
+        if (this._updateWhenNotViewing || this.session.hasViewers) {
             //StopWatch.instance.start();
             this.onTick();
             //StopWatch.instance.stop().log("VirtualMap onTick()");
+        }
+
+        // Synchronize the map information to the clients
+        if (this.clip.dirty) {
+            // For all viewers watching, send map texture updates
+            // For players that are in-sync, we can re-use the same packet
+            CommonPacket syncPacket = null;
+            for (MapSession.Owner owner : this.session.onlineOwners) {
+                if (!owner.viewing) {
+                    // Update dirty clip only
+                    owner.clip.markDirty(this.clip);
+                    continue;
+                }
+
+                // When viewers have individual dirty areas, they need their own update packets
+                if (owner.clip.dirty) {
+                    owner.clip.markDirty(this.clip);
+                    owner.updateMap(createPacket(owner.clip));
+                    continue;
+                }
+
+                // Viewers viewing for a while only need to have our own clip updated
+                // We can re-use the same update packet for all viewers
+                if (syncPacket == null) {
+                    syncPacket = createPacket(this.clip);
+                } else {
+                    syncPacket = syncPacket.clone();
+                }
+                owner.updateMap(syncPacket);
+            }
+
+            // Done updating, reset the dirty state
+            this.clip.clearDirty();
+
+        } else if (session.hasNewViewers) {
+
+            // Send full changes to the dirty viewers
+            for (MapSession.Owner owner : session.onlineOwners) {
+                if (owner.isNewViewer()) {
+                    owner.updateMap(createPacket(owner.clip));
+                }
+            }
         }
     }
 
@@ -241,59 +250,179 @@ public class MapDisplay {
     }
 
     /**
-     * Gets whether this virtual map has any player viewers at all
+     * Gets the input controller for an owner of this display. If the player is not an owner,
+     * null is returned instead.
+     * 
+     * @param player to get the input from
+     * @return input, or null if the player is not an owner
+     */
+    public MapPlayerInput getInput(Player player) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                return owner.input;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets a list of players currently owning this Map Display.
+     * These players are still tracked, and make sure the map display is not reset.
+     * 
+     * @return list of owners
+     */
+    public List<Player> getOwners() {
+        ArrayList<Player> owners = new ArrayList<Player>(this.session.onlineOwners.size());
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            owners.add(owner.player);
+        }
+        return owners;
+    }
+
+    /**
+     * Gets a list of players currently viewing this Map Display
+     * 
+     * @return list of viewers
+     */
+    public List<Player> getViewers() {
+        ArrayList<Player> viewers = new ArrayList<Player>(this.session.onlineOwners.size());
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.viewing) {
+                viewers.add(owner.player);
+            }
+        }
+        return viewers;
+    }
+
+    /**
+     * Checks whether a certain Player is currently viewing this map
+     * 
+     * @param player to check
+     * @return True if viewing, False if not
+     */
+    public boolean isViewing(Player player) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                return owner.viewing;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a certain Player is currently holding this map
+     * in either of his hands.
+     * 
+     * @param player to check
+     * @return True if holding, False if not
+     */
+    public boolean isHolding(Player player) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                return owner.holding;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a certain Player is currently holding this map
+     * in his main hand, enabling control
+     * 
+     * @param player to check
+     * @return True if controlling, False if not
+     */
+    public boolean isControlling(Player player) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                return owner.controlling;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Gets whether this virtual map has any viewers at all
      * 
      * @return True if there are viewers, False if not
      */
     public boolean hasViewers() {
-        return !this.viewers.isEmpty();
-    }
-
-    /**
-     * Checks whether this map is currently being viewed by any players.
-     * This is when they are holding the map in either of their hands.
-     * 
-     * @return True if this map is being viewed by anyone, False if not
-     */
-    public boolean isBeingViewed() {
-        return this._isBeingViewed;
+        return this.session.hasViewers;
     }
 
     /**
      * Sets whether this Virtual Map's {@link #onTick()} method is called when no players
-     * are currently viewing this map.
+     * are currently viewing this map. By default this is set to false.
      * 
      * @param updateWithoutViewers option
      */
-    public void setUpdateWhenNotViewing(boolean updateWhenNotViewing) {
+    public void setUpdateWithoutViewers(boolean updateWhenNotViewing) {
         this._updateWhenNotViewing = updateWhenNotViewing;
     }
 
     /**
-     * Sets whether {@link #stop()} is called when no more players own this map, or all owners
-     * are offline.
+     * Sets whether player input is received when players are holding the map in their main hand.
+     * Input is intercepted, which means they can no longer move around while holding the map.
+     * They need to switch to a different item slot to be able to walk again.<br>
+     * <br>
+     * By default this is set to <b>false</b>
      * 
-     * @param stopWithoutOwners option
+     * @param inputWhenHolding to set to
      */
-    public void setStopWithoutOwners(boolean stopWithoutOwners) {
-        this._stopWithoutOwners = stopWithoutOwners;
+    public void setReceiveInputWhenHolding(boolean inputWhenHolding) {
+        if (this._receiveInputWhenHolding != inputWhenHolding) {
+            this._receiveInputWhenHolding = inputWhenHolding;
+            if (!inputWhenHolding) {
+                // Release everyone we may have set as holding before
+                for (MapSession.Owner owner : this.session.onlineOwners) {
+                    owner.input.doTick(this, false);
+                }
+            }
+        }
     }
 
     /**
-     * Fired every tick to update this Virtual Map.
-     * This method can be overridden to dynamically update the map continuously.
-     * To optimize performance, only draw things in the map when they change.
+     * Gets whether player input is received and used for controlling this map.
+     * If received, the player can not move around and map input is available.
+     * By default this is set to False.
+     * 
+     * @param player viewer to get the option for
+     * @return True if input is intercepted, False if not.
      */
-    public void onTick() {
+    public boolean isReceivingInput(Player player) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                return owner.interceptInput;
+            }
+        }
+        throw new IllegalArgumentException("Player is not an owner of this display");
+    }
+
+    /**
+     * Sets whether player input is received and used for controlling this map.
+     * If received, the player can not move around and map input is available.
+     * By default this is set to False.
+     *
+     * @param player viewer to set the option for
+     * @param interceptInput option
+     */
+    public void setReceiveInput(Player player, boolean interceptInput) {
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            if (owner.player == player) {
+                owner.interceptInput = interceptInput;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Player is not an owner of this display");
     }
 
     private CommonPacket createPacket(MapClip clip) {
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
         mapUpdate.write(PacketType.OUT_MAP.cursors, new MapCursor[0]);
-        mapUpdate.write(PacketType.OUT_MAP.itemId, this.itemId);
+        mapUpdate.write(PacketType.OUT_MAP.itemId, this.info.id);
         mapUpdate.write(PacketType.OUT_MAP.scale, (byte) 1);
         mapUpdate.write(PacketType.OUT_MAP.track, false);
-        if (clip == null) {
+        if (clip == null || clip.everything) {
             mapUpdate.write(PacketType.OUT_MAP.xmin, 0);
             mapUpdate.write(PacketType.OUT_MAP.ymin, 0);
             mapUpdate.write(PacketType.OUT_MAP.width, RESOLUTION);
@@ -347,6 +476,53 @@ public class MapDisplay {
             z--;
         }
         return currentLayer;
+    }
+
+    private void setRunning(boolean updating) {
+        if (updating) {
+            if (this.plugin != null && this.updateTaskId == -1) {
+                this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        update();
+                    }
+                }, 1, 1);
+
+                if (this.info != null) {
+                    this.info.sessions.add(this.session);
+                }
+
+                this.session.initOwners();
+
+                this.onAttached();
+            }
+        } else {
+            if (this.updateTaskId != -1) {
+                // Disable input interception for owners still lingering
+                for (MapSession.Owner owner : this.session.onlineOwners) {
+                    owner.input.doTick(this, false);
+                }
+
+                // Handle onDetached
+                this.onDetached();
+
+                // Clean up
+                Bukkit.getScheduler().cancelTask(this.updateTaskId);
+                this.updateTaskId = -1;
+                if (this.info != null) {
+                    this.info.sessions.remove(this.session);
+                }
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        if (this.plugin == null) {
+            return "{UNREGISTERED " + this.getClass().getSimpleName() + "}";
+        } else {
+            return "{" + this.plugin.getName() + " " + this.getClass().getSimpleName() + "}";
+        }
     }
 
     /**
@@ -680,58 +856,62 @@ public class MapDisplay {
             }
             return dst_buffer;
         }
-
-    }
-
-    private static class Viewer {
-        public final Player player;
-        public final MapClip clip = new MapClip();
-        private final MapDisplay map;
-        public boolean viewing;
-        public boolean owning;
-
-        public Viewer(Player player, MapDisplay map) {
-            if (player == null) {
-                throw new IllegalArgumentException("Player can not be null!");
-            }
-            this.player = player;
-            this.map = map;
-            this.viewing = false;
-            this.owning = true;
-        }
-
-        public void update() {
-            this.owning = this.player.isOnline();
-            if (this.owning) {
-                PlayerInventory inv = this.player.getInventory();
-                this.viewing = (getMapId(inv.getItemInMainHand()) == map.itemId) || 
-                        (getMapId(inv.getItemInOffHand()) == map.itemId);
-            } else {
-                this.viewing = false;
-            }
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Viewer) {
-                return player == ((Viewer) obj).player;
-            }
-            return false;
-        }
-
-        public void send(CommonPacket mapUpdatePacket) {
-            PacketUtil.sendPacket(this.player, mapUpdatePacket, false);
-        }
     }
 
     /**
-     * Internal use only! Obtains the unique Id of a map item. Returns -1 when the item is not a valid map.
-     * This function may be subject to change and should not be depended on.
-     * 
-     * @param item to get the Map Id for
-     * @return map id
+     * Called right after this Map Display is bound to a plugin and map
      */
-    protected static int getMapId(ItemStack item) {
-        return (item == null || item.getType() != Material.MAP) ? -1 : item.getDurability(); 
-    }
+    public void onAttached() {}
+
+    /**
+     * Called right before the map display is removed after the session ends
+     */
+    public void onDetached() {}
+
+    /**
+     * Fired every tick to update this Virtual Map.
+     * This method can be overridden to dynamically update the map continuously.
+     * To optimize performance, only draw things in the map when they change.
+     */
+    public void onTick() {}
+
+    /**
+     * Callback function called every tick while a key is pressed down.
+     * These callbacks are called before {@link #onTick()}.
+     * 
+     * @param event
+     */
+    public void onKey(MapKeyEvent event) {}
+
+    /**
+     * Callback function called when a key changed from not-pressed to pressed down
+     * These callbacks are called before {@link #onTick()}.
+     * 
+     * @param event
+     */
+    public void onKeyPressed(MapKeyEvent event) {}
+
+    /**
+     * Callback function called when a key changed from pressed to not pressed down
+     * These callbacks are called before {@link #onTick()}.
+     * 
+     * @param event
+     */
+    public void onKeyReleased(MapKeyEvent event) {}
+
+    /**
+     * Callback function called when a player left-clicks the map held in an item frame
+     * showing this Map Display.
+     * 
+     * @param event
+     */
+    public void onLeftClick(MapClickEvent event) {}
+
+    /**
+     * Callback function called when a player right-clicks the map held in an item frame
+     * showing this Map Display.
+     * 
+     * @param event
+     */
+    public void onRightClick(MapClickEvent event) {}
 }

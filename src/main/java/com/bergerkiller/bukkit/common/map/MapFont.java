@@ -160,4 +160,12 @@ public abstract class MapFont<K> {
         }
 
     }
+
+    /**
+     * The alignment of the characters when drawn on a canvas
+     */
+    public static enum Alignment {
+        LEFT, MIDDLE, RIGHT;
+    }
+
 }

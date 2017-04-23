@@ -21,7 +21,7 @@ import com.bergerkiller.bukkit.common.collections.CharacterIterable;
  */
 public abstract class MapCanvas {
     private int fontSpacing = 0;
-    private MapFontAlignment fontAlignment = MapFontAlignment.LEFT;
+    private MapFont.Alignment fontAlignment = MapFont.Alignment.LEFT;
     private MapBlendMode blendMode = MapBlendMode.NONE;
 
     /**
@@ -416,7 +416,7 @@ public abstract class MapCanvas {
      * @param alignment to set
      * @return this canvas
      */
-    public MapCanvas setAlignment(MapFontAlignment alignment) {
+    public MapCanvas setAlignment(MapFont.Alignment alignment) {
         this.fontAlignment = alignment;
         return this;
     }
@@ -491,7 +491,7 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final <T> MapCanvas draw(MapFont<T> font, int x, int y, byte color, Iterable<T> characters) {
-        if (fontAlignment == MapFontAlignment.LEFT) {
+        if (fontAlignment == MapFont.Alignment.LEFT) {
             // Left-to-right is easy as it is the natural ordering of the iterable
             for (T character : characters) {
                 MapTexture sprite = font.getSprite(character);
@@ -514,9 +514,9 @@ public abstract class MapCanvas {
         }
         total_width += fontSpacing * (sprites.size() - 1);
 
-        if (fontAlignment == MapFontAlignment.RIGHT) {
+        if (fontAlignment == MapFont.Alignment.RIGHT) {
             x -= total_width;
-        } else if (fontAlignment == MapFontAlignment.MIDDLE) {
+        } else if (fontAlignment == MapFont.Alignment.MIDDLE) {
             x -= total_width / 2;
         }
         for (MapTexture sprite : sprites) {

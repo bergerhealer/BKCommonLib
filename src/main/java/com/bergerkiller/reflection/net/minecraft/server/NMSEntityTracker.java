@@ -112,7 +112,7 @@ public class NMSEntityTracker {
             track.invoke(dummyTracker, Conversion.toEntityHandle.convert(entity));
 
             // Retrieve it from the mapping
-            List<IntHashMap.Entry<Object>> entries = tracked.values();
+            List<IntHashMap.Entry<Object>> entries = tracked.entries();
             if (!entries.isEmpty()) {
                 createdEntry = entries.get(0).getValue();
             } else {

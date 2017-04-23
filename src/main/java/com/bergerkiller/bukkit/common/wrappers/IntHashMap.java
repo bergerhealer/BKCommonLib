@@ -92,12 +92,30 @@ public class IntHashMap<T> extends BasicWrapper {
      * 
      * @return list of hashmap entries
      */
-    public List<Entry<T>> values() {
+    public List<Entry<T>> entries() {
         Object[] handles = NMSIntHashMap.entries.get(handle);
         ArrayList<Entry<T>> result = new ArrayList<Entry<T>>(handles.length);
         for (Object entryHandle : handles) {
             if (entryHandle != null) {
                 result.add(new Entry<T>(entryHandle));
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    /**
+     * Gets a list of all the values stored in the hash map.
+     * The values can not be modified.
+     * 
+     * @return list of values
+     */
+    @SuppressWarnings("unchecked")
+    public List<T> values() {
+        Object[] handles = NMSIntHashMap.entries.get(handle);
+        ArrayList<T> result = new ArrayList<T>(handles.length);
+        for (Object entryHandle : handles) {
+            if (entryHandle != null) {
+                result.add((T) NMSIntHashMap.Entry.value.get(entryHandle));
             }
         }
         return Collections.unmodifiableList(result);

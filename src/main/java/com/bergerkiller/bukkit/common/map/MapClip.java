@@ -6,6 +6,7 @@ package com.bergerkiller.bukkit.common.map;
 public class MapClip {
     public int dirty_x1, dirty_y1, dirty_x2, dirty_y2;
     public boolean dirty;
+    public boolean everything;
 
     public MapClip() {
         this.dirty_x1 = 0;
@@ -13,6 +14,7 @@ public class MapClip {
         this.dirty_y1 = 0;
         this.dirty_y2 = 0;
         this.dirty = false;
+        this.everything = false;
     }
 
     /**
@@ -62,7 +64,7 @@ public class MapClip {
             this.dirty = true;
             this.dirty_x1 = this.dirty_x2 = x;
             this.dirty_y1 = this.dirty_y2 = y;
-        } else {
+        } else if (!this.everything) {
             if (x < this.dirty_x1) 
                 this.dirty_x1 = x;
             else if (x > this.dirty_x2)
@@ -91,7 +93,7 @@ public class MapClip {
             this.dirty_x2 = x2;
             this.dirty_y1 = y;
             this.dirty_y2 = y2;
-        } else {
+        } else if (!this.everything) {
             if (x < this.dirty_x1)
                 this.dirty_x1 = x;
             if (y < this.dirty_y1)
@@ -115,7 +117,7 @@ public class MapClip {
             this.dirty_x2 = clip.dirty_x2;
             this.dirty_y1 = clip.dirty_y1;
             this.dirty_y2 = clip.dirty_y2;
-        } else {
+        } else if (!this.everything) {
             if (clip.dirty_x1 < this.dirty_x1)
                 this.dirty_x1 = clip.dirty_x1;
             if (clip.dirty_y1 < this.dirty_y1)
@@ -125,5 +127,21 @@ public class MapClip {
             if (clip.dirty_y2 > this.dirty_y2)
                 this.dirty_y2 = clip.dirty_y2;
         }
+    }
+
+    /**
+     * Marks everything dirty, requiring all contents to be updated
+     */
+    public final void markEverythingDirty() {
+        this.dirty = true;
+        this.everything = true;
+    }
+
+    /**
+     * Clears the dirty state, nothing is dirty anymore
+     */
+    public final void clearDirty() {
+        this.dirty = false;
+        this.everything = false;
     }
 }

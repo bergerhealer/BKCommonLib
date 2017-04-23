@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.events.MapViewEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
@@ -16,24 +15,19 @@ import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -66,6 +60,7 @@ public class CommonPlugin extends PluginBase {
     private PacketHandler packetHandler = null;
     private PermissionHandler permissionHandler = null;
     private CommonTabController tabController = null;
+    private CommonMapController mapController = null;
     private CommonEntityBlacklist entityBlacklist = null;
 
     public static boolean hasInstance() {
@@ -181,6 +176,16 @@ public class CommonPlugin extends PluginBase {
     }
 
     /**
+     * Obtains the Map Controller that is responsible for maintaining the
+     * maps and their associated Map Displays.
+     * 
+     * @return map controller
+     */
+    public CommonMapController getMapController() {
+        return mapController;
+    }
+
+    /**
      * Obtains the Permission Handler used for handling player and console
      * permissions
      *
@@ -292,7 +297,7 @@ public class CommonPlugin extends PluginBase {
             WorldListenerHook.unhook(world);
         }
         HandlerList.unregisterAll(listener);
-        this.unregister((PacketListener) listener);
+        this.unregister((PacketListener) this.mapController);
 
         // Clear running tasks
         for (Task task : startedTasks) {
@@ -398,12 +403,17 @@ public class CommonPlugin extends PluginBase {
 
         // Register events and tasks, initialize
         register(listener = new CommonListener());
-        register((PacketListener) listener, PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE);
         register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
-        register(tabController = new CommonTabController());
+
+        tabController = new CommonTabController();
+        register(tabController);
         PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
+
+        register(mapController = new CommonMapController());
+        PacketUtil.addPacketListener(this, mapController, PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE);
+        mapController.startTasks(this, startedTasks);
+
         startedTasks.add(new NextTickHandler(this).start(1, 1));
-        startedTasks.add(new MapViewEventHandler(this).start(1, 1));
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
@@ -568,76 +578,6 @@ public class CommonPlugin extends PluginBase {
                 }
             }
             nextSync.clear();
-        }
-    }
-
-    private static class MapViewEventHandler extends Task implements LogicUtil.ItemSynchronizer<Player, MapViewEventHandler.MapViewEntry> {
-        private final List<MapViewEntry> entries = new LinkedList<MapViewEntry>();
-
-        public MapViewEventHandler(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            LogicUtil.synchronizeList(entries, CommonUtil.getOnlinePlayers(), this);
-            for (MapViewEntry entry : entries) {
-                entry.update();
-            }
-        }
-
-        @Override
-        public boolean isItem(MapViewEntry entry, Player player) {
-            return entry.player == player;
-        }
-
-        @Override
-        public MapViewEntry onAdded(Player player) {
-            return new MapViewEntry(player);
-        }
-
-        @Override
-        public void onRemoved(MapViewEntry entry) {
-        }
-
-        private static class MapViewEntry {
-            public final Player player;
-            public ItemStack lastLeftHand = null;
-            public ItemStack lastRightHand = null;
-
-            public MapViewEntry(Player player) {
-                this.player = player;
-            }
-
-            public void update() {
-                ItemStack currLeftHand = PlayerUtil.getItemInHand(this.player, MainHand.LEFT);
-                ItemStack currRightHand = PlayerUtil.getItemInHand(this.player, MainHand.RIGHT);
-
-                if (isMap(currLeftHand) 
-                        && !mapEquals(currLeftHand, lastLeftHand) 
-                        && !mapEquals(currLeftHand, lastRightHand)) {
-                    // Left hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapViewEvent(this.player, MainHand.LEFT, currLeftHand));
-                }
-                if (isMap(currRightHand) 
-                        && !mapEquals(currRightHand, lastRightHand) 
-                        && !mapEquals(currRightHand, lastLeftHand)) {
-                    // Right hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapViewEvent(this.player, MainHand.RIGHT, currRightHand));
-                }
-
-                lastLeftHand = currLeftHand;
-                lastRightHand = currRightHand;
-            }
-
-            private static boolean isMap(ItemStack item) {
-                return item != null && item.getType() == Material.MAP;
-            }
-
-            private static boolean mapEquals(ItemStack item1, ItemStack item2) {
-                return item1 != null && item2 != null && item1.getType() == item2.getType() &&
-                        item1.getDurability() == item2.getDurability();
-            }
         }
     }
 
