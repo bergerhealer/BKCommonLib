@@ -18,14 +18,16 @@ public class MapClickEvent extends Event implements Cancellable {
     private final Player player;
     private final ItemFrame itemFrame;
     private final MapDisplay display;
+    private final MapAction action;
     private final int px;
     private final int py;
     private boolean cancelled;
 
-    public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, int px, int py) {
+    public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, MapAction action, int px, int py) {
         this.player = player;
         this.itemFrame = itemFrame;
         this.display = display;
+        this.action = action;
         this.px = px;
         this.py = py;
         this.cancelled = false;
@@ -56,6 +58,15 @@ public class MapClickEvent extends Event implements Cancellable {
      */
     public ItemFrame getItemFrame() {
         return this.itemFrame;
+    }
+
+    /**
+     * Gets the type of click action
+     * 
+     * @return map click action
+     */
+    public MapAction getAction() {
+        return this.action;
     }
 
     /**

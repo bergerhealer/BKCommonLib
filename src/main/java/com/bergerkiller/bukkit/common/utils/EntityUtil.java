@@ -1,14 +1,19 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHanging;
 
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityLiving;
 import net.minecraft.server.v1_11_R1.GenericAttributes;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.UUID;
@@ -152,5 +157,16 @@ public class EntityUtil extends EntityPropertyUtil {
         int id = NMSEntity.globalEntityCount.get(null);
         NMSEntity.globalEntityCount.set(null, id + 1);
         return id;
+    }
+
+    /**
+     * Gets the Block a hanging entity is attached to
+     * 
+     * @param entityHanging
+     * @return block
+     */
+    public static Block getHangingBlock(Hanging entityHanging) {
+        IntVector3 pos = NMSEntityHanging.blockPosition.get(Conversion.toEntityHandle.convert(entityHanging));
+        return pos.toBlock(entityHanging.getWorld());
     }
 }

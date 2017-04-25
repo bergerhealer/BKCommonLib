@@ -107,6 +107,7 @@ public class ReflectionTest {
             loadClass(NMSWorldManager.class);
             loadClass(NMSItem.class);
             loadClass(NMSMaterial.class);
+            loadClass(NMSEntityHanging.class);
 
             loadClass(BPluginDescriptionFile.class);
             loadClass(BSimplePluginManager.class);

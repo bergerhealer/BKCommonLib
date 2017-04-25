@@ -9,23 +9,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.events.map.MapAction;
+import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapSession;
@@ -34,6 +47,8 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -115,6 +130,29 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
+    /**
+     * Starts all continuous background update tasks for maps
+     * 
+     * @param plugin
+     * @param startedTasks
+     */
+    public void startTasks(JavaPlugin plugin, List<Task> startedTasks) {
+        startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
+        startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
+    }
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        // Check if any virtual single maps are attached to this map
+        if (event.getType() == PacketType.OUT_MAP) {
+            int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
+            MapDisplayInfo info = maps.get(itemid);
+            if (info != null && !info.sessions.isEmpty()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         // Handle input coming from the player for the map
@@ -135,29 +173,6 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Receive input. If it will be handled, it will cancel further handling of this packet
                 event.setCancelled(input.receiveInput(dx, dy, dz));
-            }
-        }
-    }
-
-    /**
-     * Starts all continuous background update tasks for maps
-     * 
-     * @param plugin
-     * @param startedTasks
-     */
-    public void startTasks(JavaPlugin plugin, List<Task> startedTasks) {
-        startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
-        startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
-    }
-
-    @Override
-    public void onPacketSend(PacketSendEvent event) {
-        // Check if any virtual single maps are attached to this map
-        if (event.getType() == PacketType.OUT_MAP) {
-            int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
-            MapDisplayInfo info = maps.get(itemid);
-            if (info != null && !info.sessions.isEmpty()) {
-                event.setCancelled(true);
             }
         }
     }
@@ -189,6 +204,163 @@ public class CommonMapController implements PacketListener, Listener {
             if (info != null) {
                 info.removed = true;
             }
+        }
+    }
+
+    private boolean dispatchClickAction(Player player, ItemFrame itemFrame, double dx, double dy, MapAction action) {
+        if (player.isSneaking()) {
+            return false; // do not click while sneaking to allow for normal block interaction
+        }
+        int px = (int) (dx * 127.0);
+        int py = (int) (dy * 127.0);
+        if (px < 0 || py < 0 || px >= 128 || py >= 128) {
+            return false; // not within map canvas
+        }
+
+        MapDisplayInfo info = getInfo(itemFrame);
+        if (info == null) {
+            return false; // no map here
+        }
+
+        // Find the Display this player is sees on this map
+        ViewStack stack = info.views.get(player);
+        if (stack == null || stack.stack.isEmpty()) {
+            return false; // no visible display for this player
+        }
+
+        MapClickEvent event = new MapClickEvent(player, itemFrame, stack.stack.getLast(), action, px, py);
+        CommonUtil.callEvent(event);
+        if (!event.isCancelled()) {
+            if (action == MapAction.LEFT_CLICK) {
+                event.getDisplay().onLeftClick(event);
+            } else {
+                event.getDisplay().onRightClick(event);
+            }
+        }
+        return event.isCancelled();
+    }
+
+    private boolean dispatchClickActionApprox(Player player, ItemFrame itemFrame, MapAction action) {
+        // Calculate the vector position on the map that was clicked
+        BlockFace attachedFace = itemFrame.getAttachedFace();
+        Location playerPos = player.getEyeLocation();
+        Vector dir = playerPos.getDirection();
+        Block itemBlock = EntityUtil.getHangingBlock(itemFrame);
+        double target_x = (double) itemBlock.getX() + 1.0;
+        double target_y = (double) itemBlock.getY() + 1.0;
+        double target_z = (double) itemBlock.getZ() + 1.0;
+
+        final double FRAME_OFFSET = 0.0625; // offset from wall
+        double dx, dy;
+
+        if (FaceUtil.isAlongZ(attachedFace)) {
+            if (attachedFace == BlockFace.NORTH) {
+                target_z -= 1.0;
+            }
+            target_z -= attachedFace.getModZ() * FRAME_OFFSET;
+            dir.multiply((target_z - playerPos.getZ()) / dir.getZ());
+            dx = target_x - (playerPos.getX() + dir.getX());
+            dy = target_y - (playerPos.getY() + dir.getY());
+            if (attachedFace == BlockFace.NORTH) {
+                dx = 1.0 - dx;
+            }
+        } else {
+            if (attachedFace == BlockFace.WEST) {
+                target_x -= 1.0;
+            }
+            target_x -= attachedFace.getModX() * FRAME_OFFSET;
+            dir.multiply((target_x - playerPos.getX()) / dir.getX());
+            dx = target_z - (playerPos.getZ() + dir.getZ());
+            dy = target_y - (playerPos.getY() + dir.getY());
+            if (attachedFace == BlockFace.EAST) {
+                dx = 1.0 - dx;
+            }
+        }
+        return dispatchClickAction(player, itemFrame, dx, dy, action);
+    }
+
+    private boolean dispatchClickActionFromBlock(Player player, Block clickedBlock, BlockFace clickedFace, MapAction action) {
+        double x = clickedBlock.getX() + 0.5 + (double) clickedFace.getModX() * 0.5;
+        double y = clickedBlock.getY() + 0.5 + (double) clickedFace.getModY() * 0.5;
+        double z = clickedBlock.getZ() + 0.5 + (double) clickedFace.getModZ() * 0.5;
+        for (Entity e : WorldUtil.getEntities(clickedBlock.getWorld(), null, 
+                x - 0.01, y - 0.01, z - 0.01,
+                x + 0.01, y + 0.01, z + 0.01))
+        {
+            if (e instanceof ItemFrame) {
+                return dispatchClickActionApprox(player, (ItemFrame) e, action);
+            }
+        }
+        return false;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    protected void onEntityLeftClick(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ItemFrame) || !(event.getDamager() instanceof Player)) {
+            return;
+        }
+        event.setCancelled(dispatchClickActionApprox(
+                (Player) event.getDamager(),
+                (ItemFrame) event.getEntity(),
+                MapAction.LEFT_CLICK));
+    }
+
+    private Vector lastClickOffset = null;
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected void onEntityRightClickAt(PlayerInteractAtEntityEvent event) {
+        if (event.getRightClicked() instanceof ItemFrame) {
+            lastClickOffset = event.getClickedPosition();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    protected void onEntityRightClick(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof ItemFrame)) {
+            return;
+        }
+        ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
+        if (lastClickOffset != null) {
+            Vector pos = lastClickOffset;
+            lastClickOffset = null;
+            BlockFace attachedFace = itemFrame.getAttachedFace();
+            double dx, dy;
+            if (FaceUtil.isAlongZ(attachedFace)) {
+                dx = pos.getX() + 0.5;
+                dy = 1.0 - (pos.getY() + 0.5);
+                if (attachedFace == BlockFace.SOUTH) {
+                    dx = 1.0 - dx;
+                }
+            } else {
+                dx = pos.getZ() + 0.5;
+                dy = 1.0 - (pos.getY() + 0.5);
+                if (attachedFace == BlockFace.WEST) {
+                    dx = 1.0 - dx;
+                }
+            }
+            event.setCancelled(dispatchClickAction(event.getPlayer(), itemFrame, dx, dy, MapAction.RIGHT_CLICK));
+        } else {
+            event.setCancelled(dispatchClickActionApprox(event.getPlayer(), itemFrame, MapAction.RIGHT_CLICK));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    protected void onBlockInteract(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) {
+            return;
+        }
+        MapAction action;
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            action = MapAction.LEFT_CLICK;
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            action = MapAction.RIGHT_CLICK;
+        } else {
+            return;
+        }
+        if (dispatchClickActionFromBlock(event.getPlayer(), event.getClickedBlock(), event.getBlockFace(), action)) {
+            event.setUseInteractedBlock(Result.DENY);
+            event.setCancelled(true);
+            event.setUseItemInHand(Result.DENY);
         }
     }
 

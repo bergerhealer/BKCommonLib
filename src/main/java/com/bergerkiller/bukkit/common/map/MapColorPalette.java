@@ -30,12 +30,17 @@ public class MapColorPalette {
             throw new RuntimeException("Color count is incorrect! Should be " + COLOR_MAP.length + ", but was " + COLOR_COUNT);
         }
 
+        // Transparent colors at (a==0)
+        for (int b = 1; b < COLOR_COUNT; b++) {
+            initTransparent(b, (byte) b, false);
+        }
+
         // Generate the blend map
         for (int a = 1; a < COLOR_COUNT; a++) {
             int index = (a * 256);
             Color color_a = MapPalette.getColor((byte) a);
-            COLOR_MAP_AVERAGE[index++] = 0; // transparent = 0
-            for (int b = 1; b < COLOR_COUNT; b++) {
+            initTransparent(index++, (byte) a, true);
+            for (int b = 0; b < COLOR_COUNT; b++) {
                 Color color_b = MapPalette.getColor((byte) b);
                 initTable(index++,
                         color_a.getRed(), color_a.getGreen(), color_a.getBlue(),
@@ -45,6 +50,13 @@ public class MapColorPalette {
 
         // Verify color constants (debug)
         verifyColor("COLOR_WHITE", new Color(255, 255, 255));
+    }
+
+    private static void initTransparent(int index, byte color, boolean is_second) {
+        COLOR_MAP_AVERAGE[index] = color;
+        COLOR_MAP_ADD[index] = color;
+        COLOR_MAP_SUBTRACT[index] = color;
+        COLOR_MAP_MULTIPLY[index] = (byte) 0;
     }
 
     private static void initTable(int index, int r1, int g1, int b1, int r2, int g2, int b2) {
