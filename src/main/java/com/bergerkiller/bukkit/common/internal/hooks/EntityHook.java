@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
-import com.bergerkiller.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 

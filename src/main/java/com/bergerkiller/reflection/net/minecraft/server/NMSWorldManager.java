@@ -3,8 +3,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 public class NMSWorldManager {
 	public static final ClassTemplate<?> T = ClassTemplate.createNMS("WorldManager");

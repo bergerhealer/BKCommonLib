@@ -8,8 +8,8 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.reflection.ClassHook;
-import com.bergerkiller.reflection.Invokable;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**

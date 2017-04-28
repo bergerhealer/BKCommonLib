@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;

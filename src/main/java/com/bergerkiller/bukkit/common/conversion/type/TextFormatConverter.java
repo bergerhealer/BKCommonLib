@@ -4,7 +4,7 @@ import net.minecraft.server.v1_11_R1.IChatBaseComponent;
 
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftChatMessage;
 
-import com.bergerkiller.bukkit.common.conversion.Converter;
+import com.bergerkiller.mountiplex.conversion.Converter;
 
 /**
  * Deals with the IChatComponent messy-ness in Minecraft, doing translations between:

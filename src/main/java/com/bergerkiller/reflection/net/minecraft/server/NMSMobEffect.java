@@ -3,10 +3,10 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import org.bukkit.potion.PotionEffectType;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 public class NMSMobEffect {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobEffect");

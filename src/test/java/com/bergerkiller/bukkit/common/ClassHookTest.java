@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.bergerkiller.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 public class ClassHookTest {
 

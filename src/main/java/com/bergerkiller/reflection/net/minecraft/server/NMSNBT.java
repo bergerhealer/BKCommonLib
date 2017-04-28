@@ -7,11 +7,11 @@ import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.SafeDirectMethod;
-import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

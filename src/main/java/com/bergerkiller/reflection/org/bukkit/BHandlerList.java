@@ -7,8 +7,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class BHandlerList {
 	public static final ClassTemplate<HandlerList> T = ClassTemplate.create(HandlerList.class);

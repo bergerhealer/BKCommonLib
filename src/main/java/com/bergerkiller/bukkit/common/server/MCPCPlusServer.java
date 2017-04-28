@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 
 import org.bukkit.Bukkit;
 

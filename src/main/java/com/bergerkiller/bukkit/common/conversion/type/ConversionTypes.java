@@ -2,10 +2,12 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Converter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.*;
+import com.bergerkiller.mountiplex.conversion.CollectionConverter;
+import com.bergerkiller.mountiplex.conversion.Converter;
+
 import net.minecraft.server.v1_11_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.Block;

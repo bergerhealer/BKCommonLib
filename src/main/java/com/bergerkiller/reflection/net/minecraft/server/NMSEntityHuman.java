@@ -4,9 +4,9 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.HumanEntity;
 

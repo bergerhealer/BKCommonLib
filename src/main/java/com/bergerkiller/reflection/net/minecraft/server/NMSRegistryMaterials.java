@@ -2,8 +2,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import java.util.Set;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class NMSRegistryMaterials {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegistryMaterials");

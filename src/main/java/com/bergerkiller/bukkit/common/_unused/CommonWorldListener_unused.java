@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;

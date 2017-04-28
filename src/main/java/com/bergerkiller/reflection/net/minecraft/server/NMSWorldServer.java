@@ -2,9 +2,9 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.SafeDirectField;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 
 import java.util.Map;
 import java.util.UUID;

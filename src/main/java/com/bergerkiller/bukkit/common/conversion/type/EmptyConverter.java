@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.mountiplex.conversion.BasicConverter;
 
 /**
  * An empty converter that does nothing but casting the values to the output

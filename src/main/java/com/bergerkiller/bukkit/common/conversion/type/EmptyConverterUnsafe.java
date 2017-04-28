@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import com.bergerkiller.bukkit.common.conversion.CastingConverter;
-import com.bergerkiller.bukkit.common.conversion.Converter;
-import com.bergerkiller.bukkit.common.conversion.ConverterPair;
+import com.bergerkiller.mountiplex.conversion.CastingConverter;
+import com.bergerkiller.mountiplex.conversion.Converter;
+import com.bergerkiller.mountiplex.conversion.ConverterPair;
 
 /**
  * An empty casting converter that casts to an unknown type, unsafe. Casting

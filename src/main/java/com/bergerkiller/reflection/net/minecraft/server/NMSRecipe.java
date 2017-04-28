@@ -2,9 +2,9 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.inventory.ItemStack;
 

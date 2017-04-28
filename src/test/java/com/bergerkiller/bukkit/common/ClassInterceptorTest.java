@@ -4,8 +4,8 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import com.bergerkiller.reflection.ClassInterceptor;
-import com.bergerkiller.reflection.Invokable;
+import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
+import com.bergerkiller.mountiplex.reflection.Invokable;
 
 import static org.junit.Assert.*;
 

@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class CBCraftInventory {
 	public static final ClassTemplate<?> T = ClassTemplate.createCB("inventory.CraftInventory")

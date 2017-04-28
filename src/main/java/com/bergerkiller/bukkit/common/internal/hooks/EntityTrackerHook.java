@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 

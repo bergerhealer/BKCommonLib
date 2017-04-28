@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.SafeDirectMethod;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
 import com.google.common.collect.BiMap;
 
 import org.bukkit.Material;

@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -15,6 +14,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.mountiplex.conversion.BasicConverter;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;

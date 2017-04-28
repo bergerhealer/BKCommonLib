@@ -38,7 +38,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 

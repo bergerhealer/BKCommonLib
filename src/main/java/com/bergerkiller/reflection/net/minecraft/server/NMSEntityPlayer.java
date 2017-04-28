@@ -1,8 +1,8 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 import org.bukkit.entity.Player;
 

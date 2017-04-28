@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.Converter;
-import com.bergerkiller.bukkit.common.conversion.ConverterPair;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingEntrySet;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
+import com.bergerkiller.mountiplex.conversion.BasicConverter;
+import com.bergerkiller.mountiplex.conversion.Converter;
+import com.bergerkiller.mountiplex.conversion.ConverterPair;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingEntrySet;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 
 import java.util.Collection;
 import java.util.HashMap;

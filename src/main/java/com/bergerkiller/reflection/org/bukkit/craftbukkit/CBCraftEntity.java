@@ -2,8 +2,8 @@ package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
 import org.bukkit.entity.Entity;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class CBCraftEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createCB("entity.CraftEntity");

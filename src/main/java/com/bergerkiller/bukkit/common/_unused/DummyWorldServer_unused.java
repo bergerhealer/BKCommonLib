@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common._unused;
 
-import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 import net.minecraft.server.v1_11_R1.MinecraftServer;

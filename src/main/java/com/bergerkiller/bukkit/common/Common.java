@@ -2,6 +2,10 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 
 import org.bukkit.Bukkit;
 
@@ -100,6 +104,27 @@ public class Common {
         IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
         MC_VERSION = SERVER.getMinecraftVersion();
+
+        // Register server to handle field, method and class resolving
+        //TODO! Implement these functions in SERVER directly
+        Resolver.registerClassResolver(new ClassPathResolver() {
+            @Override
+            public String resolveClassPath(String classPath) {
+                return SERVER.getClassName(classPath);
+            }
+        });
+        Resolver.registerFieldResolver(new FieldNameResolver() {
+            @Override
+            public String resolveFieldName(Class<?> declaredClass, String fieldName) {
+                return SERVER.getFieldName(declaredClass, fieldName);
+            }
+        });
+        Resolver.registerMethodResolver(new MethodNameResolver() {
+            @Override
+            public String resolveMethodName(Class<?> declaredClass, String methodName, Class<?>[] parameterTypes) {
+                return SERVER.getMethodName(declaredClass, methodName, parameterTypes);
+            }
+        });
     }
 
     /**

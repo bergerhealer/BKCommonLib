@@ -2,10 +2,10 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.util.ConvertingSet;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 

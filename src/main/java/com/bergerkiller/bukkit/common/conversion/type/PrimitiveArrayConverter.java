@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
+import com.bergerkiller.mountiplex.conversion.BasicConverter;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;

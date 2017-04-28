@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class CBCraftMagicNumbers {
 	public static ClassTemplate<?> T = ClassTemplate.createCB("util.CraftMagicNumbers");

@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class NMSPlayerAbilities {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("PlayerAbilities");

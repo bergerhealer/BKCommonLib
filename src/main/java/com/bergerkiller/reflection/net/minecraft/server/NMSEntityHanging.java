@@ -2,8 +2,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 public class NMSEntityHanging extends NMSEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityHanging");

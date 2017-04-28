@@ -3,10 +3,10 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.SafeConstructor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.Material;
 

@@ -4,9 +4,9 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class CBChunkIOExecutor {
 	public static final ClassTemplate<?> T = ClassTemplate.createCB("chunkio.ChunkIOExecutor")

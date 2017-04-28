@@ -3,8 +3,8 @@ package com.bergerkiller.reflection.org.bukkit;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class BRegisteredListener {
     public static final ClassTemplate<RegisteredListener> T = ClassTemplate.create(RegisteredListener.class);

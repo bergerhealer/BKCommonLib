@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common._unused.reflection;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import net.sf.cglib.asm.Type;
 import net.sf.cglib.core.Signature;

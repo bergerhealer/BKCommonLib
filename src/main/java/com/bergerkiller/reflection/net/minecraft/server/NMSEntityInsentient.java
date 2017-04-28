@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class NMSEntityInsentient extends NMSEntityLiving {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityInsentient");

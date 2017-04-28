@@ -62,14 +62,21 @@
             <version>2.2.2</version>
             <scope>compile</scope>
         </dependency>
-        
+
         <!-- https://mvnrepository.com/artifact/org.objenesis/objenesis -->
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
             <version>2.5</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.bergerkiller</groupId>
+            <artifactId>Mountiplex</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
@@ -155,6 +162,14 @@
                                 <relocation>
                                     <pattern>net.sf</pattern>
                                     <shadedPattern>com.bergerkiller.bukkit.common.sf</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.bergerkiller.mountiplex.reflection</pattern>
+                                    <shadedPattern>com.bergerkiller.reflection</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.bergerkiller.mountiplex</pattern>
+                                    <shadedPattern>com.bergerkiller.bukkit.common</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.objenesis</pattern>

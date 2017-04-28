@@ -6,7 +6,7 @@ import java.awt.Image;
 import org.bukkit.map.MapPalette;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 
 /**
  * Additional functionality on top of Bukkit's MapPalette

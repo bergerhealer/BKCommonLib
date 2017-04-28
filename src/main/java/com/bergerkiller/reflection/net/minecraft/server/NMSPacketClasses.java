@@ -38,10 +38,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.SafeConstructor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 public class NMSPacketClasses {
 

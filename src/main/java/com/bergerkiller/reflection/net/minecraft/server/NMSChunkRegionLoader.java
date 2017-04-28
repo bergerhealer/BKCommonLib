@@ -1,8 +1,8 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 import org.bukkit.World;
 

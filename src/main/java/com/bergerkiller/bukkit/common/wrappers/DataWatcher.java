@@ -3,8 +3,9 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.ConverterPair;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
+import com.bergerkiller.mountiplex.conversion.ConverterPair;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 
@@ -174,6 +175,17 @@ public class DataWatcher extends BasicWrapper {
         public int getId() {
             return NMSDataWatcher.Object2.getId.invoke(this.handle);
         }
+
+        /**
+         * Reads a datawatcher key from a static field value declared in a (net.minecraft.server) class
+         * 
+         * @param template for the class where the field is defined
+         * @param fieldname of the datawatcher key
+         * @return datawatcher key
+         */
+        public static <T> Key<T> fromStaticField(ClassTemplate<?> template, String fieldname) {
+            return new DataWatcher.Key<T>(template.getStaticFieldValue(fieldname, NMSDataWatcher.Object2.T.getType()));
+        }
     }
 
     /**
@@ -279,4 +291,5 @@ public class DataWatcher extends BasicWrapper {
         }
 
     }
+
 }

@@ -1,8 +1,8 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 
 public class NMSMinecraftKey {
 	public static final ClassTemplate<?> T = ClassTemplate.createNMS("MinecraftKey");

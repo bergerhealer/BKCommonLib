@@ -1,19 +1,19 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class NMSEntityMinecart {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartAbstract");
 
-    public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = T.getDataWatcherKey("a");
-    public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = T.getDataWatcherKey("b");
-    public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = T.getDataWatcherKey("c");
-    public static DataWatcher.Key<Integer> DATA_BLOCK_TYPE = T.getDataWatcherKey("d");
-    public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = T.getDataWatcherKey("e");
-    public static DataWatcher.Key<Boolean> DATA_BLOCK_VISIBLE = T.getDataWatcherKey("f");
+    public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = DataWatcher.Key.fromStaticField(T, "a");
+    public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = DataWatcher.Key.fromStaticField(T, "b");
+    public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = DataWatcher.Key.fromStaticField(T, "c");
+    public static DataWatcher.Key<Integer> DATA_BLOCK_TYPE = DataWatcher.Key.fromStaticField(T, "d");
+    public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = DataWatcher.Key.fromStaticField(T, "e");
+    public static DataWatcher.Key<Boolean> DATA_BLOCK_VISIBLE = DataWatcher.Key.fromStaticField(T, "f");
 
     public static final MethodAccessor<Void> activate = T.selectMethod("public void a(int x, int y, int z, boolean active)");
 
@@ -24,7 +24,7 @@ public class NMSEntityMinecart {
     public static class Furnace {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartFurnace");
 
-        public static DataWatcher.Key<Boolean> DATA_SMOKING = T.getDataWatcherKey("c");
+        public static DataWatcher.Key<Boolean> DATA_SMOKING = DataWatcher.Key.fromStaticField(T, "c");
 
         public static final FieldAccessor<Integer> fuel = T.nextField("private int d");
         public static final FieldAccessor<Double> pushForceX = T.nextFieldSignature("public double a");
@@ -51,7 +51,7 @@ public class NMSEntityMinecart {
     public static class CommandBlock {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartCommandBlock");
 
-        public static final DataWatcher.Key<String> DATA_COMMAND = T.getDataWatcherKey("COMMAND");
-        public static final DataWatcher.Key<Object> DATA_PREVIOUS_OUTPUT = T.getDataWatcherKey("b");
+        public static final DataWatcher.Key<String> DATA_COMMAND = DataWatcher.Key.fromStaticField(T, "COMMAND");
+        public static final DataWatcher.Key<Object> DATA_PREVIOUS_OUTPUT = DataWatcher.Key.fromStaticField(T, "b");
     }
 }

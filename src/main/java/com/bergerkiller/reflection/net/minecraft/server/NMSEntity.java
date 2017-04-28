@@ -13,11 +13,11 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.MethodAccessor;
-import com.bergerkiller.reflection.SafeConstructor;
-import com.bergerkiller.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.MethodAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 import net.minecraft.server.v1_11_R1.BlockPosition;
@@ -104,12 +104,12 @@ public class NMSEntity {
 
     public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(ConversionPairs.dataWatcher);
 
-    public static final DataWatcher.Key<Byte> DATA_FLAGS = T.getDataWatcherKey("Z");
-    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = T.getDataWatcherKey("az");
-    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = T.getDataWatcherKey("aA");
-    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = T.getDataWatcherKey("aB");
-    public static final DataWatcher.Key<Boolean> DATA_SILENT = T.getDataWatcherKey("aC");
-    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = T.getDataWatcherKey("aD");
+    public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromStaticField(T, "Z");
+    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromStaticField(T, "az");
+    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.fromStaticField(T, "aA");
+    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.fromStaticField(T, "aB");
+    public static final DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.fromStaticField(T, "aC");
+    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.fromStaticField(T, "aD");
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);

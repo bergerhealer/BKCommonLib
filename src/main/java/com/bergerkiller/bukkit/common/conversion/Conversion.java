@@ -7,6 +7,8 @@ import com.bergerkiller.bukkit.common.conversion.type.EnumConverter;
 import com.bergerkiller.bukkit.common.conversion.type.ObjectArrayConverter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.mountiplex.conversion.CastingConverter;
+import com.bergerkiller.mountiplex.conversion.Converter;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common._unused.reflection;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 /**
  * A Class Template meant for pointing to a Class in the net.minecraft.server

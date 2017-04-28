@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
@@ -69,6 +69,7 @@ public class CommonUtil {
      * This function makes sure the server registers are initialized.
      */
     public static void bootstrap() {
+        Common.getVersion(); // this initializes the SERVER
         DispenserRegistry.c();
     }
 

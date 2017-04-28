@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 
 import org.bukkit.Bukkit;

@@ -8,8 +8,8 @@ import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
-import com.bergerkiller.reflection.declarations.ClassResolver;
-import com.bergerkiller.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.reflection.net.minecraft.server.*;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BPluginDescriptionFile;

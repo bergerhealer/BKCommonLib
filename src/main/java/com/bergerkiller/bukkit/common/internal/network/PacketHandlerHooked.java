@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
-import com.bergerkiller.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;

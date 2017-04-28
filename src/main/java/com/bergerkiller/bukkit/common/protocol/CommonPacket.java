@@ -3,9 +3,9 @@ package com.bergerkiller.bukkit.common.protocol;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.ClassTemplate;
-import com.bergerkiller.reflection.FieldAccessor;
-import com.bergerkiller.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.FieldAccessor;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 
 public class CommonPacket {
 

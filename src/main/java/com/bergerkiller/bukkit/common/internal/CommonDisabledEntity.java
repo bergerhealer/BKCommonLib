@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import com.bergerkiller.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.MinecraftServer;

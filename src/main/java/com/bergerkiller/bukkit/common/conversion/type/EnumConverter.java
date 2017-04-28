@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import com.bergerkiller.bukkit.common.conversion.BasicConverter;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
+import com.bergerkiller.mountiplex.conversion.BasicConverter;
 
 /**
  * Converter implementation for converting to enum Class types<br>
