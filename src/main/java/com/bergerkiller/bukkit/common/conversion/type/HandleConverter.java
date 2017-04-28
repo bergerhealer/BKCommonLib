@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common._unused.EntityProxy_unused;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -15,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.mountiplex.conversion.BasicConverter;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
@@ -54,6 +56,7 @@ import org.bukkit.util.Vector;
  * reflection classes)</b>
  */
 public abstract class HandleConverter extends BasicConverter<Object> {
+    private static final ClassResolver NMS_RESOLVER = new ClassResolver(Common.NMS_ROOT);
 
     public static final HandleConverter toEntityHandle = new HandleConverter("Entity") {
         @Override
@@ -287,7 +290,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toLongHashMapHandle = new WrapperHandleConverter(Long2ObjectMap.class);
     public static final HandleConverter toLongHashSetHandle = new WrapperHandleConverter(CommonUtil.getCBClass("util.LongHashSet"));
     public static final HandleConverter toIntHashMapHandle = new WrapperHandleConverter("IntHashMap");
-    public static final HandleConverter toUseActionHandle = new WrapperHandleConverter("EnumEntityUseAction");
+    public static final HandleConverter toUseActionHandle = new WrapperHandleConverter("PacketPlayInUseEntity.EnumEntityUseAction");
     public static final HandleConverter toDifficultyHandle = new HandleConverter("EnumDifficulty") {
         @Override
         @SuppressWarnings("deprecation")
@@ -304,7 +307,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
         }
     };
 
-    public static final HandleConverter toScoreboardActionHandle = new HandleConverter("EnumScoreboardAction") {
+    public static final HandleConverter toScoreboardActionHandle = new HandleConverter("PacketPlayOutScoreboardScore.EnumScoreboardAction") {
         @Override
         protected Object convertSpecial(Object value, Class<?> valueType, Object def) {
             if (value instanceof ScoreboardAction) {
@@ -371,7 +374,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     };
 
     public HandleConverter(String outputTypeName) {
-        this(CommonUtil.getNMSClass(outputTypeName));
+        super(NMS_RESOLVER, outputTypeName);
     }
 
     @SuppressWarnings("unchecked")

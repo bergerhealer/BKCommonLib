@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
@@ -727,49 +728,7 @@ public class CommonUtil {
      * @return the class, or null if not found
      */
     public static Class<?> getClass(String path, boolean initialize) {
-    	// There is a strange glitch where the class loader fails to find primitive types
-    	// This is a workaround, or something. Also handles basic types like String and such.
-    	Class<?> prim = LogicUtil.getBasicType(path);
-    	if (prim != null) {
-    		return prim;
-    	}
-
-    	// Handle arrays here
-    	if (path.endsWith("[]")) {
-    		Class<?> componentType = getClass(path.substring(0, path.length() - 2), initialize);
-    		if (componentType == null) {
-    			return null;
-    		} else {
-    			return java.lang.reflect.Array.newInstance(componentType, 0).getClass();
-    		}
-    	}
-
-    	/* ===================== */
-    	String alterPath = (Common.SERVER == null) ? path : Common.SERVER.getClassName(path);
-        try {
-        	if (initialize) {
-        		return Class.forName(alterPath);
-        	} else {
-        		return Class.forName(alterPath, false, CommonUtil.class.getClassLoader());
-        	}
-        } catch (ExceptionInInitializerError e) {
-        	Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize class '" + alterPath + "':", e.getCause());
-        	return null;
-        } catch (ClassNotFoundException e) {
-        	// This handles paths like these:
-        	//   net.minecraft.server.DataWatcher.Item
-        	// Which should be translated to:
-        	//   net.minecraft.server.DataWatcher$Item
-        	int last_dot = path.lastIndexOf('.');
-        	if (last_dot != -1) {
-        		int dot_before_last = path.lastIndexOf('.', last_dot-1);
-        		if (Character.isUpperCase(path.charAt(dot_before_last+1))) {
-        			String path_new = path.substring(0, last_dot) + "$" + path.substring(last_dot+1);
-        			return getClass(path_new, initialize);
-        		}
-        	}
-        	return null;
-        }
+        return Resolver.loadClass(path, initialize);
     }
 
     /**
