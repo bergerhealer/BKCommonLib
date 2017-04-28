@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.conversion;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
@@ -36,7 +36,7 @@ import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
 public class ConversionPairs {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static final ConverterPair NONE = ConversionTypes.NONE.formPair(ConversionTypes.NONE);
+    public static final ConverterPair NONE = Conversion.NONE.formPair(Conversion.NONE);
     
     public static final ConverterPair<Object, Entity> entity = toEntityHandle.formPair(toEntity);
     public static final ConverterPair<Object, Player> player = toEntityHandle.formPair(toPlayer);

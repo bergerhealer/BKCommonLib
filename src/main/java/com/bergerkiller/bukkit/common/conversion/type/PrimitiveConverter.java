@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.mountiplex.conversion.BasicConverter;
-import com.bergerkiller.mountiplex.conversion.CollectionConverter;
+import com.bergerkiller.mountiplex.conversion.type.CollectionConverter;
 
 import net.minecraft.server.v1_11_R1.WorldType;
 

@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.server.*;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
@@ -125,6 +128,14 @@ public class Common {
                 return SERVER.getMethodName(declaredClass, methodName, parameterTypes);
             }
         });
+
+        // Conversion types registration
+        try {
+            CommonUtil.loadClass(Conversion.class);
+            CommonUtil.loadClass(ConversionPairs.class);
+        } catch (Throwable t) {
+            Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+        }
     }
 
     /**

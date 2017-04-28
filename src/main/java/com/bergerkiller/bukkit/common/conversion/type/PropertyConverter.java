@@ -52,7 +52,7 @@ public abstract class PropertyConverter<T> extends BasicConverter<T> {
             if (value instanceof ItemStack) value = ((ItemStack) value).getItem();
 
             // First convert to a material directly
-            Material mat = ConversionTypes.toMaterial.convert(value);
+            Material mat = Conversion.toMaterial.convert(value);
             if (mat != null) {
                 return mat;
             }

@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.mountiplex.conversion.CollectionConverter;
+import com.bergerkiller.mountiplex.conversion.type.CollectionConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;

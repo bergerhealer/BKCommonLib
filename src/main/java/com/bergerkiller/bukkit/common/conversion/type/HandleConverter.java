@@ -12,7 +12,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.mountiplex.conversion.BasicConverter;
@@ -185,7 +184,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toItemHandle = new HandleConverter("Item") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            org.bukkit.Material material = ConversionTypes.toMaterial.convert(value);
+            org.bukkit.Material material = Conversion.toMaterial.convert(value);
             if (material != null) {
                 return CraftMagicNumbers.getItem(material);
             }
@@ -200,7 +199,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toBlockHandle = new HandleConverter("Block") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            org.bukkit.Material material = ConversionTypes.toMaterial.convert(value);
+            org.bukkit.Material material = Conversion.toMaterial.convert(value);
             if (material != null) {
                 return CraftMagicNumbers.getBlock(material);
             }
