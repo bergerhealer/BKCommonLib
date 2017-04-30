@@ -56,22 +56,9 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/spigot.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.2.2</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.objenesis/objenesis -->
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.5</version>
-        </dependency>
 
         <dependency>
-            <groupId>com.bergerkiller</groupId>
+            <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
@@ -144,7 +131,7 @@
         </resources>
         <!-- Plugins -->
         <plugins>
-            <!-- Needed for shading in CGLib and Objenesis -->
+            <!-- Needed for shading in Mountiplex, CGLib and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -160,10 +147,6 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.sf</pattern>
-                                    <shadedPattern>com.bergerkiller.bukkit.common.sf</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.bergerkiller.mountiplex.reflection</pattern>
                                     <shadedPattern>com.bergerkiller.reflection</shadedPattern>
                                 </relocation>
@@ -171,25 +154,11 @@
                                     <pattern>com.bergerkiller.mountiplex</pattern>
                                     <shadedPattern>com.bergerkiller.bukkit.common</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>org.objenesis</pattern>
-                                    <shadedPattern>com.bergerkiller.bukkit.common.org.objenesis</shadedPattern>
-                                </relocation>
                             </relocations>
                             <artifactSet>
-                                <excludes>
-                                    <exclude>org.bukkit:craftbukkit</exclude>
-                                    <exclude>org.bukkit:bukkit</exclude>
-                                    <exclude>org.yaml:snakeyaml</exclude>
-                                    <exclude>net.milkbowl.vault:VaultAPI</exclude>
-                                    <exclude>junit:junit</exclude>
-                                    <exclude>javax.persistence:persistence-api</exclude>
-                                    <exclude>org.avaje:ebean</exclude>
-                                    <exclude>com.google.guava:guava</exclude>
-                                    <exclude>org.hamcrest:hamcrest-core</exclude>
-                                    <exclude>commons-lang:commons-lang</exclude>
-                                    <exclude>com.googlecode.json-simple:json-simple</exclude>
-                                </excludes>
+                                <includes>
+                                    <include>com.bergerkiller.mountiplex</include>
+                                </includes>
                             </artifactSet>
                         </configuration>
                     </execution>
