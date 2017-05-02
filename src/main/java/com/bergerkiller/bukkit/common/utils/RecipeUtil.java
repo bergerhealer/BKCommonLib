@@ -5,7 +5,8 @@ import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
+import com.bergerkiller.mountiplex.conversion2.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingSet;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
@@ -94,8 +95,8 @@ public class RecipeUtil {
 
     @Deprecated
     public static Set<Integer> getHeatableItems() {
-        return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(),
-                Conversion.toItemStackHandle, Conversion.toItemId);
+        DuplexConverter<?, Integer> conv = Conversion.toItemStackHandle.formPair(Conversion.toItemId).toNew();
+        return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(), conv);
     }
 
     /**

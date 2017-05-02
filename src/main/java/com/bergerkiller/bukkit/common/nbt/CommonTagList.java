@@ -7,8 +7,8 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.conversion.type.CollectionConverter;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingIterator;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingListIterator;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.IOException;
@@ -376,17 +376,17 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public Iterator<CommonTag> iterator() {
-        return new ConvertingIterator<CommonTag>(getRawData().iterator(), WrapperConverter.toCommonTag);
+        return new ConvertingIterator<CommonTag>(getRawData().iterator(), WrapperConverter.toCommonTag.toNew());
     }
 
     @Override
     public ListIterator<CommonTag> listIterator() {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), ConversionPairs.commonTag);
+        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), ConversionPairs.commonTag.toNew());
     }
 
     @Override
     public ListIterator<CommonTag> listIterator(int index) {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), ConversionPairs.commonTag);
+        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), ConversionPairs.commonTag.toNew());
     }
 
     @Override

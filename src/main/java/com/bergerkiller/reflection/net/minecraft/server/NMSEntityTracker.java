@@ -3,7 +3,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -24,9 +24,9 @@ public class NMSEntityTracker {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTracker");
     private static Object dummyTracker = null;
 
-    public static final FieldAccessor<World> world = T.nextField("private final WorldServer world").translate(ConversionPairs.world);
+    public static final FieldAccessor<World> world = T.nextField("private final WorldServer world").translate(DuplexConversion.world);
     public static final FieldAccessor<Set<Object>> trackerSet = T.nextFieldSignature("private final Set<EntityTrackerEntry> c");
-    public static final FieldAccessor<IntHashMap<Object>> trackedEntities = T.nextField("public final IntHashMap<EntityTrackerEntry> trackedEntities").translate(ConversionPairs.intHashMap);
+    public static final FieldAccessor<IntHashMap<Object>> trackedEntities = T.nextField("public final IntHashMap<EntityTrackerEntry> trackedEntities").translate(DuplexConversion.intHashMap);
     public static final FieldAccessor<Integer> trackerViewDistance = T.nextFieldSignature("private int e");
 
     private static final MethodAccessor<Void> track = T.selectMethod("public void track(Entity entity)");

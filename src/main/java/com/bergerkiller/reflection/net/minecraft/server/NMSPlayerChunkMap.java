@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -18,7 +18,7 @@ public class NMSPlayerChunkMap {
     
     public static final FieldAccessor<List<?>> managedPlayers = T.nextField("private final List<EntityPlayer> managedPlayers");
     public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = 
-    		T.nextFieldSignature("private final Long2ObjectMap<PlayerChunk> e").translate(ConversionPairs.longHashMap);
+    		T.nextFieldSignature("private final Long2ObjectMap<PlayerChunk> e").translate(DuplexConversion.longHashMap);
     
     public static final FieldAccessor<Set<?>> dirtyBlockChunks = T.nextField("private final Set<PlayerChunk> f");
     

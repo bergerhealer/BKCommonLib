@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -14,7 +14,7 @@ public class NMSWorldServer extends NMSWorld {
     
     public static final FieldAccessor<Object> playerChunkMap = T.nextField("private final PlayerChunkMap manager");
     public static final FieldAccessor<Object> server = T.nextField("private final MinecraftServer server");
-    public static final FieldAccessor<EntityTracker> entityTracker = T.nextField("public EntityTracker tracker").translate(ConversionPairs.entityTracker);
+    public static final FieldAccessor<EntityTracker> entityTracker = T.nextField("public EntityTracker tracker").translate(DuplexConversion.entityTracker);
     
     static {
     	T.nextField("protected final VillageSiege siegeManager");

@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -26,7 +26,7 @@ public class NMSChunk {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
     public static final FieldAccessor<Integer> x = T.selectField("public final int locX");
     public static final FieldAccessor<Integer> z = T.selectField("public final int locZ");
-    public static final TranslatorFieldAccessor<ChunkSection[]> sections = T.selectField("private final ChunkSection[] sections").translate(ConversionPairs.chunkSectionArray);
+    public static final TranslatorFieldAccessor<ChunkSection[]> sections = T.selectField("private final ChunkSection[] sections").translate(DuplexConversion.chunkSectionArray);
 
     public static final MethodAccessor<byte[]> biomeData = T.selectMethod("public byte[] getBiomeIndex()");
     private static final MethodAccessor<Void> addEntities = T.selectMethod("public void addEntities()");
@@ -34,7 +34,7 @@ public class NMSChunk {
     private static final MethodAccessor<Boolean> needsSaving = T.selectMethod("public boolean a(boolean)");
     
     
-    public static final TranslatorFieldAccessor<World> world = T.selectField("public final World world").translate(ConversionPairs.world);
+    public static final TranslatorFieldAccessor<World> world = T.selectField("public final World world").translate(DuplexConversion.world);
     
     public static final FieldAccessor<Map<?, ?>> tileEntities = T.selectField("public final Map<BlockPosition, TileEntity> tileEntities");
     

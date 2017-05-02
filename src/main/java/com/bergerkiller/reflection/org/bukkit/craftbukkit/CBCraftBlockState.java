@@ -17,7 +17,7 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -55,7 +55,7 @@ public class CBCraftBlockState {
         registerInst(new TileInstantiator("Banner") {
             private final FieldAccessor<DyeColor> base = STATE.selectField("private org.bukkit.DyeColor base");
             private final FieldAccessor<List<Pattern>> state_patterns = STATE.addImport("org.bukkit.block.banner.Pattern").selectField("private List<Pattern> patterns");
-            private final FieldAccessor<CommonTagList> tile_patterns = TILE.selectField("public NBTTagList patterns").translate(ConversionPairs.commonTagList);
+            private final FieldAccessor<CommonTagList> tile_patterns = TILE.selectField("public NBTTagList patterns").translate(DuplexConversion.commonTagList);
             private final FieldAccessor<Object> tile_color = TILE.selectField("public EnumColor color");
 
             private final MethodAccessor<Integer> dyecolor_getIdx = ClassTemplate.createNMS("EnumColor").selectMethod("public int getInvColorIndex()");
@@ -121,7 +121,7 @@ public class CBCraftBlockState {
 
             @Override
             protected void apply(BlockState state, Object tile) {
-                String[] lines = ConversionPairs.textChatComponentArray.convertB(tile_lines.get(tile));
+                String[] lines = DuplexConversion.textChatComponentArray.convert(tile_lines.get(tile));
                 if (lines == null) {
                     throw new RuntimeException("Failed to read lines field into a text lines array");
                 }

@@ -28,7 +28,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -901,7 +901,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             }
         }
 
-        CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, ConversionPairs.entityList.convertB(handle.passengers));
+        CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, DuplexConversion.entityList.convert(handle.passengers));
         PacketUtil.broadcastEntityPacket(entity, packet);
 
         // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time

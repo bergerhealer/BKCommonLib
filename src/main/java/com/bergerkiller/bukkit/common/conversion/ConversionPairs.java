@@ -33,6 +33,7 @@ import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
 /**
  * Stores all Converter pairs available
  */
+@Deprecated
 public class ConversionPairs {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -91,5 +92,6 @@ public class ConversionPairs {
     public static final ConverterPair<Object[], ChunkSection[]> chunkSectionArray = chunkSection.toArray();
     public static final ConverterPair<List<Object>, List<DataWatcher.Item<?>>> dataWatcherItemList = dataWatcherItem.toList();
     public static final ConverterPair<Object[], MapCursor[]> mapCursorArray = mapCursor.toArray();
+    public static final ConverterPair<Collection<Object>, Collection<BlockState>> blockStateCollection = blockState.toCollection();
 
 }

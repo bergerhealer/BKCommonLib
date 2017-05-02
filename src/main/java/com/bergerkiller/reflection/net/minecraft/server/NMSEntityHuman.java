@@ -1,8 +1,8 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -24,7 +24,7 @@ public class NMSEntityHuman extends NMSEntityLiving {
     public static final FieldAccessor<Object> foodData = T.nextField("protected FoodMetaData foodData");
 
     public static final FieldAccessor<Boolean> sleeping = T.nextField("public boolean sleeping");
-    public static final FieldAccessor<IntVector3> bedPosition = T.nextField("public BlockPosition bedPosition").translate(ConversionPairs.blockPosition);
+    public static final FieldAccessor<IntVector3> bedPosition = T.nextField("public BlockPosition bedPosition").translate(DuplexConversion.blockPosition);
     public static final FieldAccessor<Integer> sleepTicks = T.nextField("public int sleepTicks");
     
     static {
@@ -32,14 +32,14 @@ public class NMSEntityHuman extends NMSEntityLiving {
     	T.skipFieldSignature("public float bJ");
     }
 
-    public static final TranslatorFieldAccessor<IntVector3> spawnCoord = T.nextFieldSignature("private BlockPosition e").translate(ConversionPairs.blockPosition);
+    public static final TranslatorFieldAccessor<IntVector3> spawnCoord = T.nextFieldSignature("private BlockPosition e").translate(DuplexConversion.blockPosition);
     public static final FieldAccessor<Boolean> spawnForced = T.nextFieldSignature("private boolean f");
 
     static {
     	T.skipFieldSignature("private BlockPosition g");
     }
 
-    public static final TranslatorFieldAccessor<PlayerAbilities> abilities = T.nextField("public PlayerAbilities abilities").translate(ConversionPairs.playerAbilities);
+    public static final TranslatorFieldAccessor<PlayerAbilities> abilities = T.nextField("public PlayerAbilities abilities").translate(DuplexConversion.playerAbilities);
     public static final FieldAccessor<Integer> expLevel = T.nextField("public int expLevel");
     public static final FieldAccessor<Integer> expTotal = T.nextField("public int expTotal");
     public static final FieldAccessor<Float> exp = T.nextField("public float exp");

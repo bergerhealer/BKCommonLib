@@ -2,7 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -16,8 +16,8 @@ import org.bukkit.block.Block;
 
 public class NMSTileEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("TileEntity");
-    public static final TranslatorFieldAccessor<World> world = T.selectField("protected World world").translate(ConversionPairs.world);
-    public static final TranslatorFieldAccessor<IntVector3> position = T.selectField("protected BlockPosition position").translate(ConversionPairs.blockPosition);
+    public static final TranslatorFieldAccessor<World> world = T.selectField("protected World world").translate(DuplexConversion.world);
+    public static final TranslatorFieldAccessor<IntVector3> position = T.selectField("protected BlockPosition position").translate(DuplexConversion.blockPosition);
     private static final MethodAccessor<Object> getUpdatePacket = T.selectMethod("public PacketPlayOutTileEntityData getUpdatePacket()");
 
     public static final MethodAccessor<Void> load = T.selectMethod("public void a(NBTTagCompound nbttagcompound)");

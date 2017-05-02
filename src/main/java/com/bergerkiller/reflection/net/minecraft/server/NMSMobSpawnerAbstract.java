@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -21,7 +21,7 @@ public class NMSMobSpawnerAbstract {
     public static final FieldAccessor<Integer> maxSpawnDelay = T.nextField("private int maxSpawnDelay");
     public static final FieldAccessor<Integer> spawnCount = T.nextField("private int spawnCount");
 
-    public static final FieldAccessor<Entity> entity = T.nextFieldSignature("private Entity i").translate(ConversionPairs.entity);
+    public static final FieldAccessor<Entity> entity = T.nextFieldSignature("private Entity i").translate(DuplexConversion.entity);
 
     public static final FieldAccessor<Integer> maxNearbyEntities = T.selectField("private int maxNearbyEntities");
     public static final FieldAccessor<Integer> requiredPlayerRange = T.selectField("private int requiredPlayerRange");

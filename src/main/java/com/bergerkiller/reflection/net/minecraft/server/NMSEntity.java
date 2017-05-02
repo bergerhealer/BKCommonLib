@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -34,15 +34,15 @@ public class NMSEntity {
     public static final FieldAccessor<Entity> bukkitEntity  = T.nextField("protected CraftEntity bukkitEntity");
     public static final FieldAccessor<Integer> globalEntityCount = T.nextField("private static int entityCount");
 
-    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextField("public final List<Entity> passengers").translate(ConversionPairs.entityList);
+    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextField("public final List<Entity> passengers").translate(DuplexConversion.entityList);
 
     static {
         T.skipFieldSignature("protected int j");
     }
 
-    public static final TranslatorFieldAccessor<Entity> vehicleField = T.nextFieldSignature("private net.minecraft.server.Entity au").translate(ConversionPairs.entity);
+    public static final TranslatorFieldAccessor<Entity> vehicleField = T.nextFieldSignature("private net.minecraft.server.Entity au").translate(DuplexConversion.entity);
     public static final FieldAccessor<Boolean> ignoreChunkCheck = T.nextField("public boolean attachedToPlayer");
-    public static final TranslatorFieldAccessor<World>  world = T.nextField("public World world").translate(ConversionPairs.world);
+    public static final TranslatorFieldAccessor<World>  world = T.nextField("public World world").translate(DuplexConversion.world);
     public static final FieldAccessor<Double> lastX = T.nextField("public double lastX");
     public static final FieldAccessor<Double> lastY = T.nextField("public double lastY");
     public static final FieldAccessor<Double> lastZ = T.nextField("public double lastZ");
@@ -102,7 +102,7 @@ public class NMSEntity {
 
     public static final FieldAccessor<Random>  random = T.nextField("protected Random random");
 
-    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(ConversionPairs.dataWatcher);
+    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(DuplexConversion.dataWatcher);
 
     public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromStaticField(T, "Z");
     public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromStaticField(T, "az");

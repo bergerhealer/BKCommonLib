@@ -27,7 +27,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -56,7 +56,7 @@ public class NMSPacketClasses {
         }
 
         protected SafeConstructor<CommonPacket> getPacketConstructor(Class<?>... args) {
-            return getConstructor(args).translateOutput(Conversion.toCommonPacket);
+            return getConstructor(args).translateOutput(Conversion.toCommonPacket.toNew());
         }
 
         @Override
@@ -89,19 +89,19 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
 
-        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(ConversionPairs.mainHand);
+        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(DuplexConversion.mainHand);
     }
     
     public static class NMSPacketPlayInBlockDig extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Object> face = nextFieldSignature("private EnumDirection b");
         public final FieldAccessor<Object> status = nextFieldSignature("private EnumPlayerDigType c");
     }
     
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
 
-        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(ConversionPairs.mainHand);
+        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(DuplexConversion.mainHand);
         public final FieldAccessor<Long> timestamp = nextField("public long timestamp");
     }
     
@@ -210,7 +210,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<String> message = nextField("private String a");
         public final FieldAccessor<Boolean> unknown1 = nextFieldSignature("private boolean b");
-        public final FieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition c").translate(ConversionPairs.blockPosition);
+        public final FieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition c").translate(DuplexConversion.blockPosition);
     }
 
     public static class NMSPacketPlayInTeleportAccept extends NMSPacket {
@@ -227,7 +227,7 @@ public class NMSPacketClasses {
     
     public static class NMSPacketPlayInUpdateSign extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<String[]> lines = nextFieldSignature("private String[] b");
 
         public Block getBlock(CommonPacket packet, World world) {
@@ -242,16 +242,16 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayInUseEntity extends NMSPacket {
 
         public final FieldAccessor<Integer> clickedEntityId = nextFieldSignature("private int a");
-        public final TranslatorFieldAccessor<UseAction> useAction = nextFieldSignature("private EnumEntityUseAction action").translate(ConversionPairs.useAction);
-        public final TranslatorFieldAccessor<Vector> offset = nextFieldSignature("private Vec3D c").translate(ConversionPairs.vector);
-        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand d").translate(ConversionPairs.mainHand);
+        public final TranslatorFieldAccessor<UseAction> useAction = nextFieldSignature("private EnumEntityUseAction action").translate(DuplexConversion.useAction);
+        public final TranslatorFieldAccessor<Vector> offset = nextFieldSignature("private Vec3D c").translate(DuplexConversion.vector);
+        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand d").translate(DuplexConversion.mainHand);
     }
 
     public static class NMSPacketPlayInUseItem extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Object> direction = nextFieldSignature("private EnumDirection b");
-        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand c").translate(ConversionPairs.mainHand);
+        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand c").translate(DuplexConversion.mainHand);
         public final FieldAccessor<Float> unknown1 = nextFieldSignature("private float d");
         public final FieldAccessor<Float> unknown2 = nextFieldSignature("private float e");
         public final FieldAccessor<Float> unknown3 = nextFieldSignature("private float f");
@@ -273,7 +273,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> slot = nextField("private int slot");
         public final FieldAccessor<Integer> button = nextField("private int button");
         public final FieldAccessor<Short> action = nextFieldSignature("private short d");
-        public final FieldAccessor<ItemStack> item = nextField("private ItemStack item").translate(ConversionPairs.itemStack);
+        public final FieldAccessor<ItemStack> item = nextField("private ItemStack item").translate(DuplexConversion.itemStack);
         public final FieldAccessor<Object> shift = nextFieldSignature("private InventoryClickType shift");
     }
 
@@ -323,7 +323,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutBed extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> bedPosition = nextFieldSignature("private BlockPosition b").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> bedPosition = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntityHuman.T.getType(), BlockPosition.class);
 
         public CommonPacket newInstance(HumanEntity entity, IntVector3 bedPosition) {
@@ -333,23 +333,23 @@ public class NMSPacketClasses {
     
     public static class NMSPacketPlayOutBlockAction extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Integer> unknown1 = nextFieldSignature("private int b");
         public final FieldAccessor<Integer> unknown2 = nextFieldSignature("private int c");
-        public final FieldAccessor<Material> type = nextFieldSignature("private Block d").translate(ConversionPairs.block);
+        public final FieldAccessor<Material> type = nextFieldSignature("private Block d").translate(DuplexConversion.block);
     }
 
     public static class NMSPacketPlayOutBlockBreakAnimation extends NMSPacket {
 
         public final FieldAccessor<Integer> unknown1 = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Integer> unknown2 = nextFieldSignature("private int c");
     }
 
     public static class NMSPacketPlayOutBlockChange extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
-        public final TranslatorFieldAccessor<BlockData> blockData = nextFieldSignature("public IBlockData block").translate(ConversionPairs.blockData);
+        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
+        public final TranslatorFieldAccessor<BlockData> blockData = nextFieldSignature("public IBlockData block").translate(DuplexConversion.blockData);
     }
 
     public static class NMSPacketPlayOutBoss extends NMSPacket {
@@ -535,7 +535,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final FieldAccessor<EnumItemSlot> slot = nextFieldSignature("private EnumItemSlot b");
-        public final TranslatorFieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(ConversionPairs.itemStack);
+        public final TranslatorFieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(DuplexConversion.itemStack);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("EnumItemSlot"), NMSItemStack.T.getType());
 
         public CommonPacket newInstance(int entityId, Object enumItemSlot, ItemStack item) {
@@ -689,11 +689,11 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> playerId = nextField("private int a");
         public final FieldAccessor<Boolean> hardcore = nextFieldSignature("private boolean b");
-        public final TranslatorFieldAccessor<GameMode> gameMode = nextFieldSignature("private EnumGamemode c").translate(ConversionPairs.gameMode);
+        public final TranslatorFieldAccessor<GameMode> gameMode = nextFieldSignature("private EnumGamemode c").translate(DuplexConversion.gameMode);
         public final FieldAccessor<Integer> dimension = nextFieldSignature("private int d");
-        public final TranslatorFieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty e").translate(ConversionPairs.difficulty);
+        public final TranslatorFieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty e").translate(DuplexConversion.difficulty);
         public final FieldAccessor<Integer> maxPlayers = nextFieldSignature("private int f");
-        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType g").translate(ConversionPairs.worldType);
+        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType g").translate(DuplexConversion.worldType);
         public final FieldAccessor<Boolean> unknown1 = nextFieldSignature("private boolean h"); // Unknown field
     }
 
@@ -702,7 +702,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> itemId = nextField("private int a");
         public final FieldAccessor<Byte> scale = nextFieldSignature("private byte b");
         public final FieldAccessor<Boolean> track = nextFieldSignature("private boolean c");
-        public final FieldAccessor<MapCursor[]> cursors = nextFieldSignature("private MapIcon[] d").translate(ConversionPairs.mapCursorArray);
+        public final FieldAccessor<MapCursor[]> cursors = nextFieldSignature("private MapIcon[] d").translate(DuplexConversion.mapCursorArray);
         public final FieldAccessor<Integer> xmin = nextFieldSignature("private int e");
         public final FieldAccessor<Integer> ymin = nextFieldSignature("private int f");
         public final FieldAccessor<Integer> width = nextFieldSignature("private int g");
@@ -753,7 +753,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
 
-        public final FieldAccessor<IntVector2> chunk = nextField("private ChunkCoordIntPair a").translate(ConversionPairs.chunkIntPair);
+        public final FieldAccessor<IntVector2> chunk = nextField("private ChunkCoordIntPair a").translate(DuplexConversion.chunkIntPair);
         public final FieldAccessor<Object[]> blockChangeInfoArray = nextFieldSignature("private MultiBlockChangeInfo[] b");
 
         public ChangeInfo CHANGE_INFO = new ChangeInfo(resolveClass("MultiBlockChangeInfo"));
@@ -780,7 +780,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> z = nextFieldSignature("private double e");
         public final FieldAccessor<Byte> yaw = nextFieldSignature("private byte f");
         public final FieldAccessor<Byte> pitch = nextFieldSignature("private byte g");
-        public final FieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher h").translate(ConversionPairs.dataWatcher);
+        public final FieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher h").translate(DuplexConversion.dataWatcher);
         public final FieldAccessor<List<Object>> watchedObjects = nextFieldSignature("private List<DataWatcher.Item<?>> i");
     }
    
@@ -797,7 +797,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutOpenSignEditor extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> signPosition = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final FieldAccessor<IntVector3> signPosition = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
     }
 
     public static class NMSPacketPlayOutOpenWindow extends NMSPacket {
@@ -852,9 +852,9 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
         public final FieldAccessor<Integer> dimension = nextField("private int a");
-        public final FieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty b").translate(ConversionPairs.difficulty);
-        public final TranslatorFieldAccessor<GameMode> gamemode = nextFieldSignature("private EnumGamemode c").translate(ConversionPairs.gameMode);
-        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType d").translate(ConversionPairs.worldType);
+        public final FieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty b").translate(DuplexConversion.difficulty);
+        public final TranslatorFieldAccessor<GameMode> gamemode = nextFieldSignature("private EnumGamemode c").translate(DuplexConversion.gameMode);
+        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType d").translate(DuplexConversion.worldType);
     }
 
     public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {
@@ -876,7 +876,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<String> name = nextField("private String a");
         public final FieldAccessor<String> objName = nextFieldSignature("private String b");
         public final FieldAccessor<Integer> value = nextFieldSignature("private int c");
-        public final FieldAccessor<ScoreboardAction> action = nextFieldSignature("private EnumScoreboardAction d").translate(ConversionPairs.scoreboardAction);
+        public final FieldAccessor<ScoreboardAction> action = nextFieldSignature("private EnumScoreboardAction d").translate(DuplexConversion.scoreboardAction);
     }
     
     public static class NMSPacketPlayOutScoreboardTeam extends NMSPacket {
@@ -895,13 +895,13 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
         
-        public final FieldAccessor<Difficulty> difficulty = nextField("private EnumDifficulty a").translate(ConversionPairs.difficulty);
+        public final FieldAccessor<Difficulty> difficulty = nextField("private EnumDifficulty a").translate(DuplexConversion.difficulty);
         public final FieldAccessor<Boolean> hardcore = nextFieldSignature("private boolean b");
     }
 
     public static class NMSPacketPlayOutSetCooldown extends NMSPacket {
         
-        public final FieldAccessor<Material> material = nextField("private Item a").translate(ConversionPairs.item);
+        public final FieldAccessor<Material> material = nextField("private Item a").translate(DuplexConversion.item);
         public final FieldAccessor<Integer> cooldown = nextFieldSignature("private int b");
     }
 
@@ -909,7 +909,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> windowId = nextField("private int a");
         public final FieldAccessor<Integer> slot = nextField("private int b");
-        public final FieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(ConversionPairs.itemStack);
+        public final FieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(DuplexConversion.itemStack);
     }
 
     public static class NMSPacketPlayOutSpawnEntity extends NMSPacket {
@@ -950,7 +950,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> yaw = nextFieldSignature("private byte j");
         public final FieldAccessor<Byte> pitch = nextFieldSignature("private byte k");
         public final FieldAccessor<Byte> headYaw = nextFieldSignature("private byte l");
-        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher m").translate(ConversionPairs.dataWatcher);
+        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher m").translate(DuplexConversion.dataWatcher);
         private final FieldAccessor<List<?>> dataWatcherItems = nextFieldSignature("private List<DataWatcher.Item<?>> n"); // unused!
         
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("EntityLiving"));
@@ -964,7 +964,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final FieldAccessor<UUID> UUID = nextFieldSignature("private UUID b");
-        public final TranslatorFieldAccessor<IntVector3> blockPostion = nextFieldSignature("private BlockPosition c").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> blockPostion = nextFieldSignature("private BlockPosition c").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Object> facing = nextFieldSignature("private EnumDirection d");
         public final FieldAccessor<String> art = nextFieldSignature("private String e");
     }
@@ -980,7 +980,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = getField("position").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = getField("position").translate(DuplexConversion.blockPosition);
     }
 
     public static class NMSPacketPlayOutStatistic extends NMSPacket {
@@ -995,9 +995,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutTileEntityData extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Integer> action = nextFieldSignature("private int b");
-        public final FieldAccessor<CommonTagCompound> data = nextFieldSignature("private NBTTagCompound c").translate(ConversionPairs.commonTagCompound);
+        public final FieldAccessor<CommonTagCompound> data = nextFieldSignature("private NBTTagCompound c").translate(DuplexConversion.commonTagCompound);
 
         public CommonPacket newInstance(IntVector3 blockPosition, int action, CommonTagCompound data) {
             CommonPacket packet = this.newInstance();
@@ -1090,7 +1090,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutWindowItems extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<List<ItemStack>> items = nextFieldSignature("private List<ItemStack> b").translate(ConversionPairs.itemStackList);
+        public final FieldAccessor<List<ItemStack>> items = nextFieldSignature("private List<ItemStack> b").translate(DuplexConversion.itemStackList);
     }
 
     public static class NMSPacketPlayOutWorldBorder extends NMSPacket {
@@ -1114,7 +1114,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutWorldEvent extends NMSPacket {
 
         public final FieldAccessor<Integer> effectId = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(ConversionPairs.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Integer> data = nextFieldSignature("private int c");
         public final FieldAccessor<Boolean> noRelativeVolume = nextFieldSignature("private boolean d");
     }

@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -18,7 +18,7 @@ import java.util.Set;
 public class NMSEntityTrackerEntry {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTrackerEntry");
 
-    public static final TranslatorFieldAccessor<Entity> tracker = T.nextField("private final Entity tracker").translate(ConversionPairs.entity);
+    public static final TranslatorFieldAccessor<Entity> tracker = T.nextField("private final Entity tracker").translate(DuplexConversion.entity);
 
     public static final FieldAccessor<Integer> viewDistance = T.nextFieldSignature("private final int e");
     public static final FieldAccessor<Integer> playerViewDistance = T.nextFieldSignature("private int f");
@@ -44,9 +44,9 @@ public class NMSEntityTrackerEntry {
     public static final FieldAccessor<Boolean> synched = T.nextField("private boolean isMoving");
     public static final FieldAccessor<Boolean> isMobile = T.nextFieldSignature("private final boolean u");
     public static final FieldAccessor<Integer> timeSinceLocationSync = T.nextFieldSignature("private int v");
-    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextFieldSignature("private List<Entity> w").translate(ConversionPairs.entityList);
+    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextFieldSignature("private List<Entity> w").translate(DuplexConversion.entityList);
 
-    public static final TranslatorFieldAccessor<Set<Player>> viewers = T.nextField("public final Set<EntityPlayer> trackedPlayers").translate(ConversionPairs.playerSet);
+    public static final TranslatorFieldAccessor<Set<Player>> viewers = T.nextField("public final Set<EntityPlayer> trackedPlayers").translate(DuplexConversion.playerSet);
 
     /*
      # private Packet<?> ##METHODNAME##() {
@@ -77,7 +77,7 @@ public class NMSEntityTrackerEntry {
     }
 
     public static void scanPlayers(Object instance, List<Player> players) {
-        scanPlayers.invoke(instance, ConversionPairs.playerList.convertA(players));
+        scanPlayers.invoke(instance, DuplexConversion.playerList.convertReverse(players));
     }
 
     public static void updatePlayer(Object instance, Player player) {

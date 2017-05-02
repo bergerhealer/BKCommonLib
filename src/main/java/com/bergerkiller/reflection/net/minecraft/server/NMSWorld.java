@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -20,7 +20,7 @@ public class NMSWorld {
     private static final MethodAccessor<Server> getServer  = T.selectMethod("public org.bukkit.craftbukkit.CraftServer getServer()");
     public static final FieldAccessor<List> tileEntityList =  T.selectField("public final List<TileEntity> tileEntityList");
     public static final FieldAccessor<World> bukkitWorld   =  T.selectField("private final org.bukkit.craftbukkit.CraftWorld world");
-    public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(ConversionPairs.intHashMap);
+    public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(DuplexConversion.intHashMap);
 
     public static final FieldAccessor<Object> worldProvider = T.nextField("public WorldProvider worldProvider");
     public static final FieldAccessor<Object> navigationListener = T.nextFieldSignature("protected NavigationListener t");

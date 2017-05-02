@@ -4,13 +4,13 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
@@ -154,7 +154,7 @@ public class ChunkUtil {
         if (entitySlices == null || entitySlices.length == 0) {
             return Collections.emptyList();
         }
-        return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), ConversionPairs.entity);
+        return new ConvertingList<org.bukkit.entity.Entity>(new List2D<Object>(entitySlices), DuplexConversion.entity);
     }
 
     /**
@@ -212,7 +212,7 @@ public class ChunkUtil {
                 try {
                     if (canUseLongObjectHashMap && chunks instanceof LongObjectHashMap) {
                         Object hashmap_values = ((LongObjectHashMap) chunks).values();
-                        Collection<org.bukkit.Chunk> chunk_collection = ConversionPairs.chunkCollection.convertB(hashmap_values);
+                        Collection<org.bukkit.Chunk> chunk_collection = DuplexConversion.chunkCollection.convert(hashmap_values);
                         return FilteredCollection.createNullFilter(chunk_collection);
                     }
                 } catch (Throwable t) {
@@ -371,7 +371,7 @@ public class ChunkUtil {
      * @return collection of Block States (mutable)
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
-        return ConversionPairs.blockState.convertAll(CommonNMS.getNative(chunk).tileEntities.values());
+        return DuplexConversion.blockStateCollection.convert(CommonNMS.getNative(chunk).tileEntities.values());
     }
 
     /**

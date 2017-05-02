@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
@@ -447,7 +447,7 @@ public class WorldUtil extends ChunkUtil {
         Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
         Object axisAlignedBB = NMSVector.newAxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
         List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, ignoreHandle, axisAlignedBB);
-        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity);
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity.toNew());
     }
 
     /**
@@ -465,7 +465,7 @@ public class WorldUtil extends ChunkUtil {
         Object entityBounds = NMSEntity.getBoundingBox.invoke(entityHandle);
         Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
         List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, entityHandle, axisAlignedBB);
-        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity);
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity.toNew());
     }
 
     /**

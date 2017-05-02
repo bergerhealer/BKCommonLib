@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Entity;
 public class NMSDataWatcher {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher");
 
-    public static final TranslatorFieldAccessor<Entity> owner = T.selectField("private final Entity c").translate(ConversionPairs.entity);
+    public static final TranslatorFieldAccessor<Entity> owner = T.selectField("private final Entity c").translate(DuplexConversion.entity);
 
     public static final MethodAccessor<Void> watch = T.selectMethod("private <T> void registerObject(DataWatcherObject<T> datawatcherobject, Object t0)");
 
@@ -91,7 +91,7 @@ public class NMSDataWatcher {
 
     public static class Item {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher.Item");
-        public static final TranslatorFieldAccessor<DataWatcher.Key<?>> key = T.nextField("private final DataWatcherObject<T> a").translate(ConversionPairs.dataWatcherKey);
+        public static final TranslatorFieldAccessor<DataWatcher.Key<?>> key = T.nextField("private final DataWatcherObject<T> a").translate(DuplexConversion.dataWatcherKey);
         public static final FieldAccessor<Object> value = T.nextFieldSignature("private T b");
         public static final FieldAccessor<Boolean> changed = T.nextFieldSignature("private boolean c");
     }

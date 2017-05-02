@@ -199,7 +199,7 @@ public class PacketType extends ClassTemplate<Object> {
         FieldAccessor<DataWatcher> dataWatcherField = null;
         for (SafeField<?> field : this.getFields()) {
             if (NMSDataWatcher.T.isType(field.getType())) {
-                dataWatcherField = field.translate(ConversionPairs.dataWatcher);
+                dataWatcherField = field.translate(ConversionPairs.dataWatcher.toNew());
                 break;
             }
         }

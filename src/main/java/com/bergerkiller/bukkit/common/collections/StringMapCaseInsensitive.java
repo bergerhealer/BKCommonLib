@@ -1,11 +1,9 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.mountiplex.conversion.BasicConverter;
-import com.bergerkiller.mountiplex.conversion.Converter;
-import com.bergerkiller.mountiplex.conversion.ConverterPair;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingEntrySet;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
+import com.bergerkiller.mountiplex.conversion2.builtin.EntryConverter;
+import com.bergerkiller.mountiplex.conversion2.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion2.util.ConvertingSet;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,33 +18,18 @@ import java.util.Set;
  * @param <V> - Value type to map to String keys
  */
 public class StringMapCaseInsensitive<V> implements Map<String, V> {
-
-    private static final Converter<StringWrap> toStringWrap = new BasicConverter<StringWrap>(StringWrap.class) {
+    private static final DuplexConverter<StringWrap, String> pair = new DuplexConverter<StringWrap, String>(StringWrap.class, String.class) {
         @Override
-        protected StringWrap convertSpecial(Object value, Class<?> valueType, StringWrap def) {
-            if (value instanceof String) {
-                return new StringWrap((String) value);
-            } else {
-                return def;
-            }
-        }
-    };
-    private static final Converter<String> toString = new BasicConverter<String>(String.class) {
-        @Override
-        protected String convertSpecial(Object value, Class<?> valueType, String def) {
-            if (value instanceof StringWrap) {
-                return ((StringWrap) value).key;
-            } else {
-                return def;
-            }
+        public String convertInput(StringWrap value) {
+            return value.key;
         }
 
         @Override
-        public boolean isRegisterSupported() {
-            return false;
+        public StringWrap convertOutput(String value) {
+            return new StringWrap(value);
         }
     };
-    private static final ConverterPair<StringWrap, String> pair = toStringWrap.formPair(toString);
+
     private final HashMap<StringWrap, V> base = new HashMap<StringWrap, V>();
     private final StringWrap tmpWrap = new StringWrap("");
 
@@ -128,7 +111,8 @@ public class StringMapCaseInsensitive<V> implements Map<String, V> {
     @Override
     @SuppressWarnings("unchecked")
     public Set<Entry<String, V>> entrySet() {
-        return new ConvertingEntrySet<String, V>(base.entrySet(), pair, ConversionPairs.NONE);
+        EntryConverter<String, V> converter = EntryConverter.create(pair, DuplexConversion.NONE);
+        return new ConvertingSet<Entry<String, V>>(base.entrySet(), converter);
     }
 
     private static class StringWrap {
