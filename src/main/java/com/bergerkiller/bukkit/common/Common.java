@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.CommonConverters;
 import com.bergerkiller.bukkit.common.internal.templates.TemplateResolver;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -133,6 +134,7 @@ public class Common {
 
         // Conversion types registration
         try {
+            CommonUtil.loadClass(CommonConverters.class);
             CommonUtil.loadClass(Conversion.class);
             CommonUtil.loadClass(ConversionPairs.class);
         } catch (Throwable t) {

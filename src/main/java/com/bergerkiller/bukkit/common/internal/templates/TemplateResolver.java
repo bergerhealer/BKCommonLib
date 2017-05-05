@@ -10,7 +10,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private final HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
 
     public TemplateResolver() {
-        SourceDeclaration sourceDec = SourceDeclaration.parseFromResources("com/bergerkiller/bukkit/common/internal/templates/mc1_11_2/v1_11_2.txt");
+        SourceDeclaration sourceDec = SourceDeclaration.parseFromResources("com/bergerkiller/bukkit/common/internal/templates/versions/v1_11_R1.txt");
         for (ClassDeclaration cdec : sourceDec.classes) {
             classes.put(cdec.type.type, cdec);
         }

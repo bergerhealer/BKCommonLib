@@ -70,8 +70,8 @@ public class CommonUtil {
      * This function makes sure the server registers are initialized.
      */
     public static void bootstrap() {
-        Common.getVersion(); // this initializes the SERVER
         DispenserRegistry.c();
+        Common.getVersion(); // this initializes the SERVER
     }
 
     /**
