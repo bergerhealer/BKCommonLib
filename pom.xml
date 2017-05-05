@@ -129,8 +129,32 @@
                 </includes>
             </resource>
         </resources>
+
         <!-- Plugins -->
         <plugins>
+            <!-- Turns the reflection template files into Java source code -->
+            <plugin>
+                <groupId>com.bergerkiller.mountiplex</groupId>
+                <artifactId>Mountiplex</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>Generate reflection templates</id>
+                        <goals>
+                            <goal>create-reflection</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+
+                        <configuration>
+                            <source_root>src/main/java</source_root>
+                            <target_root>src/main/java</target_root>
+                            <source>com/bergerkiller/bukkit/common/internal/templates/versions/${project.mcversion}.txt</source>
+                            <target>com/bergerkiller/reflection/gen</target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Needed for shading in Mountiplex, CGLib and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -146,6 +170,14 @@
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
+                                <relocation>
+                                    <pattern>com.bergerkiller.mountiplex.reflection.declarations</pattern>
+                                    <shadedPattern>com.bergerkiller.mountiplex.reflection.declarations</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.bergerkiller.mountiplex.reflection.resolver</pattern>
+                                    <shadedPattern>com.bergerkiller.mountiplex.reflection.resolver</shadedPattern>
+                                </relocation>
                                 <relocation>
                                     <pattern>com.bergerkiller.mountiplex.reflection</pattern>
                                     <shadedPattern>com.bergerkiller.reflection</shadedPattern>
@@ -237,5 +269,43 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									com.bergerkiller.mountiplex
+        								</groupId>
+        								<artifactId>
+        									Mountiplex
+        								</artifactId>
+        								<versionRange>
+        									[1.0,)
+        								</versionRange>
+        								<goals>
+        									<goal>
+        										create-reflection
+        									</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>

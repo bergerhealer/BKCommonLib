@@ -1,0 +1,71 @@
+package net.minecraft.server;
+
+import org.bukkit.craftbukkit.entity.CraftEntity;
+
+public class Entity {
+    protected CraftEntity bukkitEntity;
+    private static int entityCount;
+    public final List<Entity> passengers;
+    protected int unknown1:j;
+    private net.minecraft.server.Entity vehicle:au
+    public boolean ignoreChunkCheck:attachedToPlayer;
+    public World world;
+    public double lastX;
+    public double lastY;
+    public double lastZ;
+    public double locX;
+    public double locY;
+    public double locZ;
+    public double motX;
+    public double motY;
+    public double motZ;
+    public float yaw;
+    public float pitch;
+    public float lastYaw;
+    public float lastPitch;
+    private AxisAlignedBB boundingBox;
+    public boolean onGround;
+    public boolean unknown2:positionChanged;
+    public boolean unknown3:B;
+    public boolean unknown4:C;
+    public boolean velocityChanged;
+    protected boolean justLanded:E;
+    private boolean unknown5:aw;
+    public boolean dead;
+    public float width;
+    public float length;
+    public float unknown6:I;
+    public float unknown7:J;
+    public float unknown8:K;
+    public float fallDistance;
+    private int stepCounter:ax;
+    public double unknown9:M;
+    public double unknown10:N;
+    public double unknown11:O;
+    public float unknown12:P;
+    public boolean noclip;
+    public float unknown13:R;
+    protected Random random;
+    protected DataWatcher datawatcher;
+
+    protected static final DataWatcherObject<Byte> DATA_FLAGS:Z;
+    private static final DataWatcherObject<Integer> DATA_AIR_TICKS:az;
+    private static final DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
+    private static final DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+    private static final DataWatcherObject<Boolean> DATA_SILENT:aC;
+    private static final DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+
+    public boolean isLoaded:aa;
+    public int chunkX:ab;
+    public int chunkY:ac;
+    public int chunkZ:ad;
+
+    public boolean unknown14:ah;
+
+    public boolean positionChanged:impulse;
+    public int portalCooldown;
+    protected boolean allowTeleportation:ak;
+    
+    private double[] move_SomeArray:aI;
+    private long move_SomeState:aJ;
+}
