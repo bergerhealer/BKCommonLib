@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.mountiplex.conversion2.annotations.ConverterMethod;
+import com.bergerkiller.reflection.gen.EntityHandle;
 
 public class WorldConverter {
 
@@ -31,7 +32,7 @@ public class WorldConverter {
 
     @ConverterMethod(input="net.minecraft.server.Entity")
     public static Entity toEntity(Object nmsEntityHandle) {
-        return ((net.minecraft.server.v1_11_R1.Entity) nmsEntityHandle).getBukkitEntity();
+        return EntityHandle.T.bukkitEntity.get(nmsEntityHandle);
     }
 
     @ConverterMethod(output="net.minecraft.server.Entity")

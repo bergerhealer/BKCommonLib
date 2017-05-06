@@ -67,7 +67,9 @@ public class Entity {
     public boolean positionChanged:impulse;
     public int portalCooldown;
     protected boolean allowTeleportation:ak;
-    
+
     private double[] move_SomeArray:aI;
     private long move_SomeState:aJ;
+
+    public double calculateDistance:e(double d0, double d1, double d2);
 }
