@@ -79,7 +79,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toWorldHandle = new HandleConverter("World") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            org.bukkit.World world = WrapperConverter.toWorld.convert(value);
+            org.bukkit.World world = Conversion.toWorld.convert(value);
             if (world instanceof CraftWorld) {
                 return ((CraftWorld) world).getHandle();
             } else {
@@ -95,7 +95,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toChunkHandle = new HandleConverter("Chunk") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            org.bukkit.Chunk chunk = WrapperConverter.toChunk.convert(value);
+            org.bukkit.Chunk chunk = Conversion.toChunk.convert(value);
             if (chunk instanceof CraftChunk) {
                 return ((CraftChunk) value).getHandle();
             } else {
@@ -277,7 +277,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
     public static final HandleConverter toVec3DHandle = new HandleConverter("Vec3D") {
         @Override
         public Object convertSpecial(Object value, Class<?> valueType, Object def) {
-            Vector vec = WrapperConverter.toVector.convert(value);
+            Vector vec = Conversion.toVector.convert(value);
             if (vec != null) {
                 return NMSVector.newVec(vec.getX(), vec.getY(), vec.getZ());
             } else {
@@ -325,7 +325,7 @@ public abstract class HandleConverter extends BasicConverter<Object> {
             } else if (value instanceof Block) {
                 return ((Block) value).getBlockData();
             } else {
-                org.bukkit.Material type = WrapperConverter.toMaterial.convert(value);
+                org.bukkit.Material type = Conversion.toMaterial.convert(value);
                 if (type != null) {
                     return BlockData.fromMaterial(type).getData();
                 } else {

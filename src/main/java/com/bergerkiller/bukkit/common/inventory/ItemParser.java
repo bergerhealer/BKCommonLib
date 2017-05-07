@@ -184,7 +184,17 @@ public class ItemParser {
     }
 
     public ItemStack getItemStack(int amount) {
-        return new ItemStack(this.type, this.amount, (short) this.data);
+        if (!this.hasType()) {
+            return null;
+        }
+        if (amount <= 0) {
+            amount = this.getMaxStackSize();
+        }
+        if (this.hasData()) {
+            return new ItemStack(this.type, amount, (short) this.data);
+        } else {
+            return new ItemStack(this.type, amount);
+        }
     }
 
     public int getMaxStackSize() {

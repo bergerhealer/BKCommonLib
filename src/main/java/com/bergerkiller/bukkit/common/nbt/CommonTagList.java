@@ -376,7 +376,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public Iterator<CommonTag> iterator() {
-        return new ConvertingIterator<CommonTag>(getRawData().iterator(), WrapperConverter.toCommonTag.toNew());
+        return new ConvertingIterator<CommonTag>(getRawData().iterator(), Conversion.toCommonTag.toNew());
     }
 
     @Override
