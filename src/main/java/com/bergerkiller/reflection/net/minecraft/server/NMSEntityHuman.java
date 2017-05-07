@@ -1,6 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
@@ -56,6 +57,6 @@ public class NMSEntityHuman extends NMSEntityLiving {
     public static final FieldAccessor<String> spawnWorld = T.nextField("public String spawnWorld");
 
     public static boolean canInstaBuild(HumanEntity human) {
-        return abilities.get(HandleConverter.toEntityHandle.convert(human)).canInstantlyBuild();
+        return abilities.get(Conversion.toEntityHandle.convert(human)).canInstantlyBuild();
     }
 }

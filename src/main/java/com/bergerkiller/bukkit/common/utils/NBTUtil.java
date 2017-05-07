@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -64,7 +63,7 @@ public class NBTUtil {
      * @param compound TagCompound
      */
     public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
-        ItemStack stack = (ItemStack) HandleConverter.toItemStackHandle.convert(item);
+        ItemStack stack = (ItemStack) Conversion.toItemStackHandle.convert(item);
         stack.save((NBTTagCompound) compound.getHandle());
     }
 

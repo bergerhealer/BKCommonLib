@@ -11,8 +11,8 @@ class CommonClasses {
 
     public static void init() {
         // Converter types
-        loadConverter("Collection", "Empty", "Entry", "Enum", "Handle", "Number", "ObjectArray");
-        loadConverter("PrimitiveArray", "Primitive", "Property", "Wrapper", "WrapperHandle");
+        loadConverter("Collection", "Empty", "Entry", "Enum", "Handle", "ObjectArray");
+        loadConverter("PrimitiveArray", "Primitive", "Property", "Wrapper");
         loadCommon("conversion.type.EmptyConverterUnsafe");
         // Conversion
         loadCommon("conversion.Conversion");

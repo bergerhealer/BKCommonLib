@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.type.NumberConverter;
 
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
@@ -164,7 +163,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Float parseFloat(String text, Float def) {
-        return NumberConverter.toFloat.convert(text, def);
+        return Conversion.toFloat.convert(text, def);
     }
 
     /**
@@ -186,7 +185,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Double parseDouble(String text, Double def) {
-        return NumberConverter.toDouble.convert(text, def);
+        return Conversion.toDouble.convert(text, def);
     }
 
     /**
@@ -208,7 +207,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Long parseLong(String text, Long def) {
-        return NumberConverter.toLong.convert(text, def);
+        return Conversion.toLong.convert(text, def);
     }
 
     /**
@@ -230,7 +229,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Integer parseInt(String text, Integer def) {
-        return NumberConverter.toInt.convert(text, def);
+        return Conversion.toInt.convert(text, def);
     }
 
     /**
@@ -252,7 +251,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Short parseShort(String text, Short def) {
-        return NumberConverter.toShort.convert(text, def);
+        return Conversion.toShort.convert(text, def);
     }
 
     /**
@@ -274,7 +273,7 @@ public class ParseUtil {
      * @return Parsed or default value
      */
     public static Byte parseByte(String text, Byte def) {
-        return NumberConverter.toByte.convert(text, def);
+        return Conversion.toByte.convert(text, def);
     }
 
     /**

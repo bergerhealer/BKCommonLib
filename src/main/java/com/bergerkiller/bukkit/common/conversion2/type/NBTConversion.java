@@ -10,12 +10,23 @@ import com.bergerkiller.mountiplex.conversion2.annotations.ConverterMethod;
 
 public class NBTConversion {
 
+    @SuppressWarnings("unchecked")
     @ConverterMethod(input="net.minecraft.server.NBTBase")
-    public static CommonTag toCommonTag(Object nmsNBTTagHandle) {
-        return CommonTag.create(nmsNBTTagHandle);
+    public static <T extends CommonTag> T toCommonTag(Object nmsNBTTagHandle) {
+        return (T) CommonTag.create(nmsNBTTagHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.server.NBTBase")
+    @ConverterMethod(input="net.minecraft.server.NBTTagList")
+    public static CommonTagList toCommonTagList(Object nmsNBTTagListHandle) {
+        return CommonTagList.create(nmsNBTTagListHandle);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.NBTTagCompound")
+    public static CommonTagCompound toCommonTagCompound(Object nmsNBTTagCompoundHandle) {
+        return CommonTagCompound.create(nmsNBTTagCompoundHandle);
+    }
+
+    @ConverterMethod(output="T extends net.minecraft.server.NBTBase")
     public static Object toNBTTagHandle(CommonTag commonTag) {
         return commonTag.getHandle();
     }
