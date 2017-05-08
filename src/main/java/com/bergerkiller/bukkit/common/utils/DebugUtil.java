@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.mountiplex.reflection.util.SecureField;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -162,11 +163,9 @@ public class DebugUtil {
                 if (f_type.isPrimitive()) continue;
                 if (Class.class.isAssignableFrom(f_type)) continue;
 
-                try {
-                    f.setAccessible(true);
-                } catch (Throwable tt) {
-                    continue;
-                }
+                SecureField sf = new SecureField();
+                sf.init(f);
+                sf.read();
 
                 if (Modifier.isStatic(f.getModifiers())) {
                     staticFields.add(f);
