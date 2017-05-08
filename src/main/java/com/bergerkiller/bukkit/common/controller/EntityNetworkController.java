@@ -438,7 +438,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         if (!viewable) {
             for (Entity passenger : entity.getPassengers()) {
                 EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
-                if (network.getViewers().contains(viewer)) {
+                if (network != null && network.getViewers().contains(viewer)) {
                     viewable = true;
                     break;
                 }
