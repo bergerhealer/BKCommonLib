@@ -1,8 +1,8 @@
-package com.bergerkiller.bukkit.common.conversion2;
+package com.bergerkiller.bukkit.common.conversion;
 
-import com.bergerkiller.bukkit.common.conversion2.type.HandleConversion;
-import com.bergerkiller.bukkit.common.conversion2.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.conversion2.type.NBTConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 
 public class CommonConverters extends Conversion {

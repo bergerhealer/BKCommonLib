@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion2;
+package com.bergerkiller.bukkit.common.conversion;
 
 import java.util.Collection;
 import java.util.List;

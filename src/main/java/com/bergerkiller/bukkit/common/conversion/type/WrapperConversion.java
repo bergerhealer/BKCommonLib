@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion2.type;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Chunk;

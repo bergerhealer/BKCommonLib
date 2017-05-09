@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion2.type;
+package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
 import java.util.Map;
