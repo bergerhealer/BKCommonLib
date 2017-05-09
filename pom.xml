@@ -169,24 +169,6 @@
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.bergerkiller.mountiplex.reflection.declarations</pattern>
-                                    <shadedPattern>com.bergerkiller.mountiplex.reflection.declarations</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.bergerkiller.mountiplex.reflection.resolver</pattern>
-                                    <shadedPattern>com.bergerkiller.mountiplex.reflection.resolver</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.bergerkiller.mountiplex.reflection</pattern>
-                                    <shadedPattern>com.bergerkiller.reflection</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.bergerkiller.mountiplex</pattern>
-                                    <shadedPattern>com.bergerkiller.bukkit.common</shadedPattern>
-                                </relocation>
-                            </relocations>
                             <artifactSet>
                                 <includes>
                                     <include>com.bergerkiller.mountiplex</include>

@@ -2,20 +2,15 @@ package com.bergerkiller.bukkit.common.conversion;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConverter;
-import com.bergerkiller.bukkit.common.conversion.type.PrimitiveArrayConverter;
-import com.bergerkiller.bukkit.common.conversion.type.PrimitiveConverter;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
-import com.bergerkiller.bukkit.common.conversion.type.TextFormatConverter;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.*;
 import com.bergerkiller.mountiplex.conversion.Converter;
-import com.bergerkiller.mountiplex.conversion.ConverterRegistry;
-import com.bergerkiller.mountiplex.conversion.type.CollectionConverter;
-import com.bergerkiller.mountiplex.conversion.type.EmptyConverterUnsafe;
-import com.bergerkiller.mountiplex.conversion.type.ObjectArrayConverter;
+import com.bergerkiller.mountiplex.conversion.type.InputConverter;
+import com.bergerkiller.mountiplex.conversion.type.NullConverter;
+import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 import net.minecraft.server.v1_11_R1.EnumDirection;
 import org.bukkit.*;
@@ -35,119 +30,108 @@ import org.bukkit.util.Vector;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-public class Conversion extends ConverterRegistry {
+public class Conversion {
 
     // Misc
     @SuppressWarnings("rawtypes")
-    public static final EmptyConverterUnsafe NONE = EmptyConverterUnsafe.INSTANCE;
+    public static final Converter NONE = new NullConverter(Object.class, Object.class);
     // Primitives
-    public static final PrimitiveConverter<String> toString = PrimitiveConverter.create(String.class, "");
-    public static final PrimitiveConverter<Byte> toByte = PrimitiveConverter.create(Byte.class, (byte) 0);
-    public static final PrimitiveConverter<Short> toShort = PrimitiveConverter.create(Short.class, (short) 0);
-    public static final PrimitiveConverter<Integer> toInt = PrimitiveConverter.create(Integer.class, (int) 0);
-    public static final PrimitiveConverter<Long> toLong = PrimitiveConverter.create(Long.class, (long) 0L);
-    public static final PrimitiveConverter<Float> toFloat = PrimitiveConverter.create(Float.class, (float) 0.0F);
-    public static final PrimitiveConverter<Double> toDouble = PrimitiveConverter.create(Double.class, (double) 0.0);
-    public static final PrimitiveConverter<Boolean> toBool = PrimitiveConverter.create(Boolean.class, (boolean) false);
-    public static final PrimitiveConverter<Character> toChar = PrimitiveConverter.create(Character.class, (char) '\0');
+    public static final InputConverter<String> toString = getConverterTo(String.class);
+    public static final InputConverter<Byte> toByte = getConverterTo(byte.class);
+    public static final InputConverter<Short> toShort = getConverterTo(short.class);
+    public static final InputConverter<Integer> toInt = getConverterTo(int.class);
+    public static final InputConverter<Long> toLong = getConverterTo(long.class);
+    public static final InputConverter<Float> toFloat = getConverterTo(float.class);
+    public static final InputConverter<Double> toDouble = getConverterTo(double.class);
+    public static final InputConverter<Boolean> toBool = getConverterTo(boolean.class);
+    public static final InputConverter<Character> toChar = getConverterTo(char.class);
     // Handles
-    public static final HandleConverter toEntityHandle = HandleConverter.create("Entity", true);
-    public static final HandleConverter toWorldHandle = HandleConverter.create("World", true);
-    public static final HandleConverter toChunkHandle = HandleConverter.create("Chunk");
-    public static final HandleConverter toItemStackHandle = HandleConverter.create("ItemStack");
-    public static final HandleConverter toItemHandle = HandleConverter.create("Item", true);
-    public static final HandleConverter toTileEntityHandle = HandleConverter.create("TileEntity", true);
-    public static final HandleConverter toInventoryHandle = HandleConverter.create("IInventory");
-    public static final HandleConverter toDataWatcherHandle = HandleConverter.create("DataWatcher");
-    public static final HandleConverter toDataWatcherObjectHandle = HandleConverter.create("DataWatcherObject");
-    public static final HandleConverter toDataWatcherItemHandle = HandleConverter.create("DataWatcher.Item");
-    public static final HandleConverter toNBTTagHandle = HandleConverter.create("NBTBase", true);
-    public static final HandleConverter toBlockHandle = HandleConverter.create("Block", true);
-    public static final HandleConverter toGameModeHandle = HandleConverter.create("EnumGamemode");
-    public static final HandleConverter toWorldTypeHandle = HandleConverter.create("WorldType");
-    public static final HandleConverter toDifficultyHandle = HandleConverter.create("EnumDifficulty");
-    public static final HandleConverter toPacketHandle = HandleConverter.create("Packet", true);
-    public static final HandleConverter toVec3DHandle = HandleConverter.create("Vec3D");
-    public static final HandleConverter toChunkCoordIntPairHandle = HandleConverter.create("ChunkCoordIntPair");
-    public static final HandleConverter toBlockPositionHandle = HandleConverter.create("BlockPosition");
-    public static final HandleConverter toPlayerAbilitiesHandle = HandleConverter.create("PlayerAbilities");
-    public static final HandleConverter toEntityTrackerHandle = HandleConverter.create("EntityTracker");
-    public static final HandleConverter toLongHashMapHandle = HandleConverter.create(Long2ObjectMap.class.getName());
-    public static final HandleConverter toLongHashSetHandle = HandleConverter.create("org.bukkit.craftbukkit.util.LongHashSet");
-    public static final HandleConverter toIntHashMapHandle = HandleConverter.create("IntHashMap");
-    public static final HandleConverter toUseActionHandle = HandleConverter.create("PacketPlayInUseEntity.EnumEntityUseAction");
-    public static final HandleConverter toScoreboardActionHandle = HandleConverter.create("PacketPlayOutScoreboardScore.EnumScoreboardAction");
-    public static final HandleConverter toMainHandHandle = HandleConverter.create("EnumHand");
-    public static final HandleConverter toBlockDataHandle = HandleConverter.create("IBlockData");
-    public static final HandleConverter toChunkSectionHandle = HandleConverter.create("ChunkSection");
-    public static final HandleConverter toMobEffectList = HandleConverter.create("MobEffectList");
-    public static final HandleConverter toMobEffect = HandleConverter.create("MobEffect");
-    public static final HandleConverter toMapIconHandle = HandleConverter.create("MapIcon");
+    public static final InputConverter<Object> toEntityHandle = getConverterToHandle("net.minecraft.server.Entity");
+    public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.EntityPlayer");
+    public static final InputConverter<Object> toWorldHandle = getConverterToHandle("net.minecraft.server.World");
+    public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.server.Chunk");
+    public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.server.ItemStack");
+    public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.server.Item");
+    public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.server.TileEntity");
+    public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.server.IInventory");
+    public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.server.DataWatcher");
+    public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.server.DataWatcherObject");
+    public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.server.DataWatcher.Item");
+    public static final InputConverter<Object> toNBTTagHandle = getConverterToHandle("net.minecraft.server.NBTBase");
+    public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.server.Block");
+    public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.server.EnumGamemode");
+    public static final InputConverter<Object> toWorldTypeHandle = getConverterToHandle("net.minecraft.server.WorldType");
+    public static final InputConverter<Object> toDifficultyHandle = getConverterToHandle("net.minecraft.server.EnumDifficulty");
+    public static final InputConverter<Object> toPacketHandle = getConverterToHandle("net.minecraft.server.Packet");
+    public static final InputConverter<Object> toVec3DHandle = getConverterToHandle("net.minecraft.server.Vec3D");
+    public static final InputConverter<Object> toChunkCoordIntPairHandle = getConverterToHandle("net.minecraft.server.ChunkCoordIntPair");
+    public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.server.BlockPosition");
+    public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.server.PlayerAbilities");
+    public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
+    public static final InputConverter<Object> toLongHashMapHandle = getConverterToHandle(Long2ObjectMap.class.getName());
+    public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("org.bukkit.craftbukkit.util.LongHashSet");
+    public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.server.IntHashMap");
+    public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
+    public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
+    public static final InputConverter<Object> toMainHandHandle = getConverterToHandle("net.minecraft.server.EnumHand");
+    public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.server.IBlockData");
+    public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.server.ChunkSection");
+    public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.server.MobEffectList");
+    public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.server.MobEffect");
+    public static final InputConverter<Object> toMapIconHandle = getConverterToHandle("net.minecraft.server.MapIcon");
+    public static final InputConverter<Object> toChatComponentHandle = getConverterToHandle("net.minecraft.server.IChatBaseComponent");
     // Wrappers
-    public static final WrapperConverter<Entity> toEntity = WrapperConverter.create(Entity.class);
-    public static final Converter<Player> toPlayer = WrapperConverter.create(Player.class);
-    public static final Converter<HumanEntity> toHumanEntity = WrapperConverter.create(HumanEntity.class);
-    public static final Converter<Item> toItem = toEntity.cast(Item.class);
-    public static final WrapperConverter<World> toWorld = WrapperConverter.create(World.class);
-    public static final WrapperConverter<Chunk> toChunk = WrapperConverter.create(Chunk.class);
-    public static final WrapperConverter<Block> toBlock = WrapperConverter.create(Block.class);
-    public static final WrapperConverter<BlockState> toBlockState = WrapperConverter.create(BlockState.class);
-    public static final WrapperConverter<CommonTag> toCommonTag = WrapperConverter.create(CommonTag.class);
-    public static final WrapperConverter<DataWatcher> toDataWatcher = WrapperConverter.create(DataWatcher.class);
-    public static final WrapperConverter<DataWatcher.Key<?>> toDataWatcherKey = WrapperConverter.create(DataWatcher.Key.class);
-    public static final WrapperConverter<DataWatcher.Item<?>> toDataWatcherItem = WrapperConverter.create(DataWatcher.Item.class);
-    public static final WrapperConverter<ItemStack> toItemStack = WrapperConverter.create(ItemStack.class);
-    public static final WrapperConverter<Material> toMaterial = WrapperConverter.create(Material.class);
-    public static final WrapperConverter<Inventory> toInventory = WrapperConverter.create(Inventory.class);
-    public static final WrapperConverter<Difficulty> toDifficulty = WrapperConverter.create(Difficulty.class);
-    public static final WrapperConverter<WorldType> toWorldType = WrapperConverter.create(WorldType.class);
-    public static final WrapperConverter<GameMode> toGameMode = WrapperConverter.create(GameMode.class);
-    public static final WrapperConverter<CommonPacket> toCommonPacket = WrapperConverter.create(CommonPacket.class);
-    public static final WrapperConverter<IntVector2> toIntVector2 = WrapperConverter.create(IntVector2.class);
-    public static final WrapperConverter<IntVector3> toIntVector3 = WrapperConverter.create(IntVector3.class);
-    public static final WrapperConverter<Vector> toVector = WrapperConverter.create(Vector.class);
-    public static final WrapperConverter<PlayerAbilities> toPlayerAbilities = WrapperConverter.create(PlayerAbilities.class);
-    public static final WrapperConverter<EntityTracker> toEntityTracker = WrapperConverter.create(EntityTracker.class);
-    public static final WrapperConverter<LongHashSet> toLongHashSet = WrapperConverter.create(LongHashSet.class);
-    public static final WrapperConverter<LongHashMap<Object>> toLongHashMap = WrapperConverter.create(LongHashMap.class);
-    public static final WrapperConverter<IntHashMap<Object>> toIntHashMap = WrapperConverter.create(IntHashMap.class);
-    public static final WrapperConverter<ScoreboardAction> toScoreboardAction = WrapperConverter.create(ScoreboardAction.class);
-    public static final WrapperConverter<UseAction> toUseAction = WrapperConverter.create(UseAction.class);
-    public static final WrapperConverter<org.bukkit.inventory.MainHand> toMainHand = WrapperConverter.create(org.bukkit.inventory.MainHand.class);
-    public static final WrapperConverter<BlockData> toBlockData = WrapperConverter.create(BlockData.class);
-    public static final WrapperConverter<ChunkSection> toChunkSection = WrapperConverter.create(ChunkSection.class);
-    public static final WrapperConverter<PotionEffectType> toPotionEffectType = WrapperConverter.create(PotionEffectType.class);
-    public static final WrapperConverter<PotionEffect> toPotionEffect = WrapperConverter.create(PotionEffect.class);
-    public static final WrapperConverter<MapCursor> toMapCursor = WrapperConverter.create(MapCursor.class);
-    // Text Format Conversion
-    public static final TextFormatConverter<String> chatComponentToText = TextFormatConverter.chatComponentToText;
-    public static final TextFormatConverter<Object> textToChatComponent = TextFormatConverter.textToChatComponent;
-    public static final TextFormatConverter<String> chatComponentToJson = TextFormatConverter.chatComponentToJson;
-    public static final TextFormatConverter<Object> jsonToChatComponent = TextFormatConverter.jsonToChatComponent;
-    public static final TextFormatConverter<String> chatJsonToText = TextFormatConverter.jsonToText;
-    public static final TextFormatConverter<String> chatTextToJson = TextFormatConverter.textToJson;
+    public static final InputConverter<Entity> toEntity = getConverterTo(Entity.class);
+    public static final InputConverter<Player> toPlayer = getConverterTo(Player.class);
+    public static final InputConverter<HumanEntity> toHumanEntity = getConverterTo(HumanEntity.class);
+    public static final InputConverter<Item> toItem = getConverterTo(Item.class);
+    public static final InputConverter<World> toWorld = getConverterTo(World.class);
+    public static final InputConverter<Chunk> toChunk = getConverterTo(Chunk.class);
+    public static final InputConverter<Block> toBlock = getConverterTo(Block.class);
+    public static final InputConverter<BlockState> toBlockState = getConverterTo(BlockState.class);
+    public static final InputConverter<CommonTag> toCommonTag = getConverterTo(CommonTag.class);
+    public static final InputConverter<DataWatcher> toDataWatcher = getConverterTo(DataWatcher.class);
+    public static final InputConverter<DataWatcher.Key<?>> toDataWatcherKey = CommonUtil.unsafeCast(getConverterTo(DataWatcher.Key.class));
+    public static final InputConverter<DataWatcher.Item<?>> toDataWatcherItem = CommonUtil.unsafeCast(getConverterTo(DataWatcher.Item.class));
+    public static final InputConverter<ItemStack> toItemStack = getConverterTo(ItemStack.class);
+    public static final InputConverter<Material> toMaterial = getConverterTo(Material.class);
+    public static final InputConverter<Inventory> toInventory = getConverterTo(Inventory.class);
+    public static final InputConverter<Difficulty> toDifficulty = getConverterTo(Difficulty.class);
+    public static final InputConverter<WorldType> toWorldType = getConverterTo(WorldType.class);
+    public static final InputConverter<GameMode> toGameMode = getConverterTo(GameMode.class);
+    public static final InputConverter<CommonPacket> toCommonPacket = getConverterTo(CommonPacket.class);
+    public static final InputConverter<IntVector2> toIntVector2 = getConverterTo(IntVector2.class);
+    public static final InputConverter<IntVector3> toIntVector3 = getConverterTo(IntVector3.class);
+    public static final InputConverter<Vector> toVector = getConverterTo(Vector.class);
+    public static final InputConverter<PlayerAbilities> toPlayerAbilities = getConverterTo(PlayerAbilities.class);
+    public static final InputConverter<EntityTracker> toEntityTracker = getConverterTo(EntityTracker.class);
+    public static final InputConverter<LongHashSet> toLongHashSet = getConverterTo(LongHashSet.class);
+    public static final InputConverter<LongHashMap<Object>> toLongHashMap = CommonUtil.unsafeCast(getConverterTo(LongHashMap.class));
+    public static final InputConverter<IntHashMap<Object>> toIntHashMap = CommonUtil.unsafeCast(getConverterTo(IntHashMap.class));
+    public static final InputConverter<ScoreboardAction> toScoreboardAction = getConverterTo(ScoreboardAction.class);
+    public static final InputConverter<UseAction> toUseAction = getConverterTo(UseAction.class);
+    public static final InputConverter<org.bukkit.inventory.MainHand> toMainHand = getConverterTo(org.bukkit.inventory.MainHand.class);
+    public static final InputConverter<BlockData> toBlockData = getConverterTo(BlockData.class);
+    public static final InputConverter<ChunkSection> toChunkSection = getConverterTo(ChunkSection.class);
+    public static final InputConverter<PotionEffectType> toPotionEffectType = getConverterTo(PotionEffectType.class);
+    public static final InputConverter<PotionEffect> toPotionEffect = getConverterTo(PotionEffect.class);
+    public static final InputConverter<MapCursor> toMapCursor = getConverterTo(MapCursor.class);
+    public static final InputConverter<ChatText> toChatText = getConverterTo(ChatText.class);
     // Arrays
-    public static final Converter<ItemStack[]> toItemStackArr = toItemStack.toArray();
-    public static final Converter<Object[]> toItemStackHandleArr = toItemStackHandle.toArray();
-    public static final ObjectArrayConverter<Object[]> toObjectArr = ObjectArrayConverter.toObjectArr;
-    public static final PrimitiveArrayConverter<boolean[]> toBoolArr = PrimitiveArrayConverter.create(boolean[].class);
-    public static final PrimitiveArrayConverter<char[]> toCharArr = PrimitiveArrayConverter.create(char[].class);
-    public static final PrimitiveArrayConverter<byte[]> toByteArr = PrimitiveArrayConverter.create(byte[].class);
-    public static final PrimitiveArrayConverter<short[]> toShortArr = PrimitiveArrayConverter.create(short[].class);
-    public static final PrimitiveArrayConverter<int[]> toIntArr = PrimitiveArrayConverter.create(int[].class);
-    public static final PrimitiveArrayConverter<long[]> toLongArr = PrimitiveArrayConverter.create(long[].class);
-    public static final PrimitiveArrayConverter<float[]> toFloatArr = PrimitiveArrayConverter.create(float[].class);
-    public static final PrimitiveArrayConverter<double[]> toDoubleArr = PrimitiveArrayConverter.create(double[].class);;
-    // Collections
-    public static final CollectionConverter<List<?>> toList = CollectionConverter.toList;
-    public static final CollectionConverter<Set<?>> toSet = CollectionConverter.toSet;
-    public static final CollectionConverter<Collection<?>> toCollection = CollectionConverter.toCollection;
-    // Properties
+    public static final InputConverter<ItemStack[]> toItemStackArr = getConverterTo(ItemStack[].class);
+    public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getNMSClass("ItemStack")));
+    public static final InputConverter<Object[]> toObjectArr = getConverterTo(Object[].class);
+    public static final InputConverter<boolean[]> toBoolArr = getConverterTo(boolean[].class);
+    public static final InputConverter<char[]> toCharArr = getConverterTo(char[].class);
+    public static final InputConverter<byte[]> toByteArr = getConverterTo(byte[].class);
+    public static final InputConverter<short[]> toShortArr = getConverterTo(short[].class);
+    public static final InputConverter<int[]> toIntArr = getConverterTo(int[].class);
+    public static final InputConverter<long[]> toLongArr = getConverterTo(long[].class);
+    public static final InputConverter<float[]> toFloatArr = getConverterTo(float[].class);
+    public static final InputConverter<double[]> toDoubleArr = getConverterTo(double[].class);;
+    // Properties (these are not actually registered.)
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
     public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
@@ -157,7 +141,26 @@ public class Conversion extends ConverterRegistry {
     public static final PropertyConverter<Object> toGameProfileFromId = PropertyConverter.toGameProfileFromId;
     public static final PropertyConverter<UUID> toGameProfileId = PropertyConverter.toGameProfileId;
 
-    static {
-        registerAll(Conversion.class);
+    @SuppressWarnings("unchecked")
+    private static InputConverter<Object> getConverterToHandle(String className) {
+        return (InputConverter<Object>) getConverterTo(CommonUtil.getClass(className));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> InputConverter<T> getConverterTo(TypeDeclaration type) {
+        return (InputConverter<T>) com.bergerkiller.mountiplex.conversion.Conversion.find(type);
+    }
+
+    private static <T> InputConverter<T> getConverterTo(Class<T> type) {
+        return com.bergerkiller.mountiplex.conversion.Conversion.find(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T convert(Object input, T defaultValue) {
+        return convert(input, (Class<T>) defaultValue.getClass(), defaultValue);
+    }
+
+    public static <T> T convert(Object input, Class<T> type, T defaultValue) {
+        return com.bergerkiller.mountiplex.conversion.Conversion.find(type).convert(input, defaultValue);
     }
 }

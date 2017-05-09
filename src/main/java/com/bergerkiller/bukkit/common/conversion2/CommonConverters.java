@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.conversion2;
 import com.bergerkiller.bukkit.common.conversion2.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion2.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.conversion2.type.NBTConversion;
-import com.bergerkiller.mountiplex.conversion2.Conversion;
+import com.bergerkiller.mountiplex.conversion.Conversion;
 
 public class CommonConverters extends Conversion {
 

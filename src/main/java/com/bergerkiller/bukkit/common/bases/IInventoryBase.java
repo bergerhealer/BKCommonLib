@@ -13,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import java.util.Collections;
 import java.util.List;
@@ -161,7 +162,7 @@ public class IInventoryBase implements IInventory {
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return (IChatBaseComponent) Conversion.textToChatComponent.convert(getInventoryName());
+        return (IChatBaseComponent) ChatText.fromMessage(getInventoryName()).getHandle();
     }
 
     @Override

@@ -1,12 +1,13 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
-import com.bergerkiller.mountiplex.conversion2.type.DuplexConverter;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingSet;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingCollection;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
@@ -90,12 +91,12 @@ public class RecipeUtil {
     }
 
     public static Collection<ItemStack> getHeatableItemStacks() {
-        return ConversionPairs.itemStack.convertAll(RecipesFurnace.getInstance().recipes.keySet());
+        return new ConvertingCollection<ItemStack>(RecipesFurnace.getInstance().recipes.keySet(), DuplexConversion.itemStack);
     }
 
     @Deprecated
     public static Set<Integer> getHeatableItems() {
-        DuplexConverter<?, Integer> conv = Conversion.toItemStackHandle.formPair(Conversion.toItemId).toNew();
+        DuplexConverter<?, Integer> conv = DuplexConverter.pair(Conversion.toItemId, Conversion.toItemStackHandle);
         return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(), conv);
     }
 

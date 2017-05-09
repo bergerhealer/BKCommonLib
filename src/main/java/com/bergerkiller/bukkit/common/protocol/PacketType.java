@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.protocol;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -199,7 +199,7 @@ public class PacketType extends ClassTemplate<Object> {
         FieldAccessor<DataWatcher> dataWatcherField = null;
         for (SafeField<?> field : this.getFields()) {
             if (NMSDataWatcher.T.isType(field.getType())) {
-                dataWatcherField = field.translate(ConversionPairs.dataWatcher.toNew());
+                dataWatcherField = field.translate(DuplexConversion.dataWatcher);
                 break;
             }
         }

@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -117,13 +118,17 @@ public class CBCraftBlockState {
         registerInst(new TileInstantiator("Sign") {
             // Sign lines are IChatBaseComponent in n.m.s. but String in Craftbukkit
             private final FieldAccessor<String[]> state_lines = STATE.selectField("private final String[] lines");
-            private final FieldAccessor<Object[]> tile_lines = TILE.selectField("public final IChatBaseComponent[] lines");
+            private final FieldAccessor<ChatText[]> tile_lines = TILE.selectField("public final IChatBaseComponent[] lines").translate(DuplexConversion.chatTextArray);
 
             @Override
             protected void apply(BlockState state, Object tile) {
-                String[] lines = DuplexConversion.textChatComponentArray.convert(tile_lines.get(tile));
-                if (lines == null) {
+                ChatText[] linesText = tile_lines.get(tile);
+                if (linesText == null) {
                     throw new RuntimeException("Failed to read lines field into a text lines array");
+                }
+                String[] lines = new String[linesText.length];
+                for (int i = 0; i < lines.length; i++) {
+                    lines[i] = linesText[i].getMessage();
                 }
                 state_lines.set(state, lines);
             }

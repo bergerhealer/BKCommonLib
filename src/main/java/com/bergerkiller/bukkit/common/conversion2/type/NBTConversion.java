@@ -6,7 +6,7 @@ import java.util.Map;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.mountiplex.conversion2.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class NBTConversion {
 

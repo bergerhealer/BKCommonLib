@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
@@ -67,7 +67,7 @@ public class PlayerUtil extends EntityUtil {
     public static List<Player> getNearbyPlayers(Player player, double radius) {
         EntityPlayer handle = CommonNMS.getNative(player);
         List<?> nearbyPlayerHandles = handle.world.a(EntityPlayer.class, handle.getBoundingBox().grow(radius, radius, radius));
-        return new ConvertingList<Player>(nearbyPlayerHandles, ConversionPairs.player.toNew());
+        return new ConvertingList<Player>(nearbyPlayerHandles, DuplexConversion.player);
     }
 
     /**

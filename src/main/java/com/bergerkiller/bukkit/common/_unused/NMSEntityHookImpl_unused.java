@@ -7,7 +7,6 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.type.ConversionTypes;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 
@@ -40,7 +39,7 @@ public class NMSEntityHookImpl_unused implements NMSEntityHook_unused {
     @Override
     public boolean a(EntityHuman human, ItemStack is, EnumHand hand) {
         return controller.onInteractBy(Conversion.toHumanEntity.convert(human),
-                ConversionTypes.toMainHand.convert(hand));
+                Conversion.toMainHand.convert(hand));
     }
 
     @Override

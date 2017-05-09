@@ -2,13 +2,11 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConverter;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.mountiplex.conversion.type.CollectionConverter;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingIterator;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingListIterator;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     public CommonTagList(Object... values) {
-        this(CollectionConverter.toList.convert(values));
+        this(new ArrayList<Object>(Arrays.asList(values)));
     }
 
     public CommonTagList(List<?> data) {
@@ -124,7 +122,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value, or null if type conversion fails
      */
     public <T> T getValue(int index, Class<T> type) {
-        return Conversion.convert(getValue(index), type);
+        return Conversion.convert(getValue(index), type, null);
     }
 
     /**
@@ -226,7 +224,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return all data contained
      */
     public <T> T getAllValues(Class<T> type) {
-        T values = Conversion.convert(this, type);
+        T values = Conversion.convert(this, type, null);
         if (values == null) {
             throw new IllegalArgumentException("Unsupported type: " + type.getName());
         } else {
@@ -376,17 +374,17 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public Iterator<CommonTag> iterator() {
-        return new ConvertingIterator<CommonTag>(getRawData().iterator(), Conversion.toCommonTag.toNew());
+        return new ConvertingIterator<CommonTag>(getRawData().iterator(), Conversion.toCommonTag);
     }
 
     @Override
     public ListIterator<CommonTag> listIterator() {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), ConversionPairs.commonTag.toNew());
+        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(), DuplexConversion.commonTag);
     }
 
     @Override
     public ListIterator<CommonTag> listIterator(int index) {
-        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), ConversionPairs.commonTag.toNew());
+        return new ConvertingListIterator<CommonTag>(getRawData().listIterator(index), DuplexConversion.commonTag);
     }
 
     @Override

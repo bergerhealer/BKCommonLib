@@ -252,7 +252,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
                 list.add(entry.getKey());
             }
         }
-        return Conversion.toObjectArr.convert(list, PacketType.class);
+        return list.toArray(new PacketType[list.size()]);
     }
 
     private PacketType[] getMonitorTypes(PacketMonitor listener) {
@@ -262,7 +262,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
                 list.add(entry.getKey());
             }
         }
-        return Conversion.toObjectArr.convert(list, PacketType.class);
+        return list.toArray(new PacketType[list.size()]);
     }
 
     /**

@@ -68,7 +68,7 @@ public class CommonTag extends BasicWrapper {
      * @return Tag data
      */
     public <T> T getData(Class<T> type) {
-        return Conversion.convert(getData(), type);
+        return Conversion.convert(getData(), type, null);
     }
 
     /**

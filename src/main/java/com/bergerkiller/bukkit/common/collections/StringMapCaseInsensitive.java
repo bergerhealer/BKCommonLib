@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.collections;
 
 import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
-import com.bergerkiller.mountiplex.conversion2.builtin.EntryConverter;
-import com.bergerkiller.mountiplex.conversion2.type.DuplexConverter;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingSet;
+import com.bergerkiller.mountiplex.conversion.builtin.EntryConverter;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 
 import java.util.Collection;
 import java.util.HashMap;

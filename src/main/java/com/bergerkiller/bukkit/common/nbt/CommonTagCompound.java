@@ -154,7 +154,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public <T> T getValue(String key, Class<T> type) {
-        return Conversion.convert(getValue(key), type);
+        return Conversion.convert(getValue(key), type, null);
     }
 
     /**
@@ -182,7 +182,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return all data contained
      */
     public <T> T getAllValues(Class<T> type) {
-        T values = Conversion.convert(this.values(), type);
+        T values = Conversion.convert(this.values(), type, null);
         if (values == null) {
             throw new IllegalArgumentException("Unsupported type: " + type.getName());
         } else {
@@ -317,7 +317,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return the tag, or null if this was not possible
      */
     public <T extends CommonTag> T get(Object key, Class<T> type) {
-        return Conversion.convert(get(key), type);
+        return Conversion.convert(get(key), type, null);
     }
 
     @Override

@@ -4,7 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.CommandMinecart;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> {
 
     public final DataWatcher.EntityItem<String> metaCommand = getDataItem(NMSEntityMinecart.CommandBlock.DATA_COMMAND);
-    public final DataWatcher.EntityItem<String> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT).translate(ConversionPairs.textChatComponent);
+    public final DataWatcher.EntityItem<ChatText> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT).translate(DuplexConversion.chatText);
 
     public CommonMinecartCommandBlock(CommandMinecart base) {
         super(base);

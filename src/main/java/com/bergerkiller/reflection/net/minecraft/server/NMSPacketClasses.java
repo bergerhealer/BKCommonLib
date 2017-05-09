@@ -56,7 +56,7 @@ public class NMSPacketClasses {
         }
 
         protected SafeConstructor<CommonPacket> getPacketConstructor(Class<?>... args) {
-            return getConstructor(args).translateOutput(Conversion.toCommonPacket.toNew());
+            return getConstructor(args).translateOutput(Conversion.toCommonPacket);
         }
 
         @Override

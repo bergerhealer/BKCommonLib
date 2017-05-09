@@ -3,14 +3,14 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
-import com.bergerkiller.mountiplex.conversion2.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
@@ -257,7 +257,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return ConversionPairs.entityList.convertB(CommonNMS.getNative(world).entityList);
+        return DuplexConversion.entityList.convert(CommonNMS.getNative(world).entityList);
     }
 
     /**
@@ -268,7 +268,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of players on the world
      */
     public static Collection<Player> getPlayers(org.bukkit.World world) {
-        return ConversionPairs.playerList.convertB(CommonNMS.getNative(world).players);
+        return DuplexConversion.playerList.convert(CommonNMS.getNative(world).players);
     }
 
     /**
@@ -447,7 +447,7 @@ public class WorldUtil extends ChunkUtil {
         Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
         Object axisAlignedBB = NMSVector.newAxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
         List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, ignoreHandle, axisAlignedBB);
-        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity.toNew());
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
     /**
@@ -465,7 +465,7 @@ public class WorldUtil extends ChunkUtil {
         Object entityBounds = NMSEntity.getBoundingBox.invoke(entityHandle);
         Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
         List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, entityHandle, axisAlignedBB);
-        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, ConversionPairs.entity.toNew());
+        return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
     /**
@@ -687,7 +687,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        return ConversionPairs.blockState.convertAll(new ArrayList<TileEntity>(CommonNMS.getNative(world).tileEntityList));
+        return new ConvertingList<BlockState>(new ArrayList<TileEntity>(CommonNMS.getNative(world).tileEntityList), DuplexConversion.blockState);
     }
 
     /**

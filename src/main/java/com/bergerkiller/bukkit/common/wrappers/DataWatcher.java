@@ -2,9 +2,10 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.ConversionPairs;
+import com.bergerkiller.bukkit.common.conversion2.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
-import com.bergerkiller.mountiplex.conversion.ConverterPair;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
@@ -107,7 +108,7 @@ public class DataWatcher extends BasicWrapper {
         } else {
             itemHandles = NMSDataWatcher.returnAllWatched.invoke(handle);
         }
-        return ConversionPairs.dataWatcherItem.convertAll(itemHandles);
+        return new ConvertingList<Item<?>>(itemHandles, DuplexConversion.dataWatcherItem);
     }
 
     /**
@@ -265,16 +266,16 @@ public class DataWatcher extends BasicWrapper {
          * @param converterPair to use for translation
          * @return translated item
          */
-        public <C> EntityItem<C> translate(ConverterPair<V, C> converterPair) {
+        public <C> EntityItem<C> translate(DuplexConverter<V, C> converterPair) {
             return new ConvertingEntityItem<V, C>(this, converterPair);
         }
     }
 
     private static class ConvertingEntityItem<A, B> extends EntityItem<B> {
         private final EntityItem<A> item;
-        private final ConverterPair<A, B> pair;
+        private final DuplexConverter<A, B> pair;
 
-        public ConvertingEntityItem(EntityItem<A> item, ConverterPair<A, B> pair) {
+        public ConvertingEntityItem(EntityItem<A> item, DuplexConverter<A, B> pair) {
             super(null, null);
             this.item = item;
             this.pair = pair;
@@ -282,12 +283,12 @@ public class DataWatcher extends BasicWrapper {
 
         @Override
         public B get() {
-            return pair.convertB(item.get());
+            return pair.convert(item.get());
         }
 
         @Override
         public void set(B value) {
-            this.item.set(pair.convertA(value));
+            this.item.set(pair.convertReverse(value));
         }
 
     }
