@@ -1,5 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -26,8 +28,60 @@ public class EntityHandle extends Template.Handle {
         T.entityCount.setInteger(value);
     }
 
-    public double calculateDistance(double d0, double d1, double d2) {
-        return T.calculateDistance.invoke(instance, d0, d1, d2);
+    public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
+        T.updateFalling.invoke(instance, d0, flag, blockData, position);
+    }
+
+    public void updateBlockCollision() {
+        T.updateBlockCollision.invoke(instance);
+    }
+
+    public void playStepSound(IntVector3 position, BlockData blockData) {
+        T.playStepSound.invoke(instance, position, blockData);
+    }
+
+    public void burn(float dmg) {
+        T.burn.invoke(instance, dmg);
+    }
+
+    public Object getSwimSound() {
+        return T.getSwimSound.invoke(instance);
+    }
+
+    public void makeSound(Object soundeffect, float volume, float pitch) {
+        T.makeSound.invoke(instance, soundeffect, volume, pitch);
+    }
+
+    public boolean isInWaterUpdate() {
+        return T.isInWaterUpdate.invoke(instance);
+    }
+
+    public boolean isInWaterNoUpdate() {
+        return T.isInWaterNoUpdate.invoke(instance);
+    }
+
+    public boolean hasMovementSound() {
+        return T.hasMovementSound.invoke(instance);
+    }
+
+    public void doFallUpdate(double d0, boolean flag, BlockData blockData, IntVector3 blockposition) {
+        T.doFallUpdate.invoke(instance, d0, flag, blockData, blockposition);
+    }
+
+    public void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData) {
+        T.doStepSoundUpdate.invoke(instance, blockposition, blockData);
+    }
+
+    public void checkBlockCollisions() {
+        T.checkBlockCollisions.invoke(instance);
+    }
+
+    public double calculateDistance(double x, double y, double z) {
+        return T.calculateDistance.invoke(instance, x, y, z);
+    }
+
+    public Object getBoundingBox() {
+        return T.getBoundingBox.invoke(instance);
     }
 
     public Entity getBukkitEntity() {
@@ -174,12 +228,12 @@ public class EntityHandle extends Template.Handle {
         T.lastPitch.setFloat(instance, value);
     }
 
-    public Object getBoundingBox() {
-        return T.boundingBox.get(instance);
+    public Object getBoundingBoxField() {
+        return T.boundingBoxField.get(instance);
     }
 
-    public void setBoundingBox(Object value) {
-        T.boundingBox.set(instance, value);
+    public void setBoundingBoxField(Object value) {
+        T.boundingBoxField.set(instance, value);
     }
 
     public boolean getOnGround() {
@@ -374,7 +428,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Float pitch = new Template.Field.Float();
         public final Template.Field.Float lastYaw = new Template.Field.Float();
         public final Template.Field.Float lastPitch = new Template.Field.Float();
-        public final Template.Field.Converted<Object> boundingBox = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<Object> boundingBoxField = new Template.Field.Converted<Object>();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
         public final Template.Field.Boolean justLanded = new Template.Field.Boolean();
@@ -396,7 +450,20 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
 
+        public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> burn = new Template.Method<Void>();
+        public final Template.Method.Converted<Object> getSwimSound = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isInWaterNoUpdate = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> hasMovementSound = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Void> doFallUpdate = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
+        public final Template.Method.Converted<Object> getBoundingBox = new Template.Method.Converted<Object>();
 
     }
 }

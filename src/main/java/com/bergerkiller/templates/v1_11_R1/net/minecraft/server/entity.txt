@@ -3,6 +3,8 @@ package net.minecraft.server;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
@@ -25,7 +27,7 @@ class Entity {
     public float pitch;
     public float lastYaw;
     public float lastPitch;
-    private (Object) AxisAlignedBB boundingBox;
+    private (Object) AxisAlignedBB boundingBoxField:boundingBox;
     public boolean onGround;
     public unknown boolean positionChanged;
     public unknown boolean B;
@@ -71,5 +73,181 @@ class Entity {
     private double[] move_SomeArray:aI;
     private long move_SomeState:aJ;
 
-    public double calculateDistance:e(double d0, double d1, double d2);
+    /*
+     * protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
+     *     if (flag) {
+     *         if (this.fallDistance > 0.0F) {
+     *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
+     *         }
+     *         ...
+     *     }
+     *     ...
+     * }
+     */
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+
+    /*
+     # protected void ##METHODNAME##() {
+     *     AxisAlignedBB axisalignedbb = this.getBoundingBox();
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
+     *     ...
+     * }
+     */
+    protected void updateBlockCollision:checkBlockCollisions();
+
+    /*
+     # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
+     *     SoundEffectType soundeffecttype = block.getStepSound();
+     *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
+     *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
+     *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     } else if (!block.getBlockData().getMaterial().isLiquid()) {
+     *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     }
+     * }
+     */
+    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) Block blockData);
+
+    /*
+     # protected void ##METHODNAME##(float f, float f1) {
+     *     // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
+     *     if (Float.isNaN(f)) {
+     *         f = 0;
+     *     }
+     *     if (f == Float.POSITIVE_INFINITY || f == Float.NEGATIVE_INFINITY) {
+     *         if (this instanceof EntityPlayer) {
+     *             this.world.getServer().getLogger().warning(this.getName() + " was caught trying to crash the server with an invalid yaw");
+     *             ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite yaw (Hacking?)"); //Spigot "Nope" -> Descriptive reason
+     *         }
+     *         f = 0;
+     *     }
+     *     ...
+     * }
+     */
+    setRotation:setYawPitch(float yaw, float pitch);
+    
+    /*
+     # protected void ##METHODNAME##(float i) { // CraftBukkit - int -> float
+     *     if (!this.fireProof) {
+     *         this.damageEntity(DamageSource.FIRE, (float) i);
+     *     }
+     * }
+     */
+    protected void burn(float dmg);
+
+    /*
+     * void move(...) {
+     *     ...
+     #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+     * }
+     */
+    protected (Object) SoundEffect getSwimSound:aa();
+
+    /*
+     * void move(...) {
+     *     ...
+     *     this.##METHODNAME##(this.aa(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+     * }
+     * 
+     # public void ##METHODNAME##(SoundEffect soundeffect, float f, float f1) {
+     *     if (!this.isSilent()) {
+     *         this.world.a((EntityHuman) null, this.locX, this.locY, this.locZ, soundeffect, this.bC(), f, f1);
+     *     }
+     * }
+     */
+    public void makeSound:a((Object) SoundEffect soundeffect, float volume, float pitch);
+
+    /*
+     # public boolean ###METHODNAME###() {
+     *     if (this.world.a(this.boundingBox.grow(0.0D, -0.4000000059604645D, 0.0D).shrink(0.001D, 0.001D, 0.001D), Material.WATER, this)) {
+     *         if (!this.inWater && !this.justCreated) {
+     *             ...
+     *         }
+     *     }
+     * }
+     */
+    public boolean isInWaterUpdate:ak();
+
+    /*
+     # public boolean ###METHODNAME###() {
+     *     return this.inWater;
+     * }
+     */
+    public boolean isInWaterNoUpdate:isInWater();
+
+    /*
+     * public void move(double d0, double d1, double d2) {
+     *     ....
+     *     {
+     *         if (bl.getType() != org.bukkit.Material.AIR) {
+     *             VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, bl);
+     *             world.getServer().getPluginManager().callEvent(event);
+     *         }
+     *     }
+     *     
+     *     // CraftBukkit end
+     *
+     #     if (this.###METHODNAME###() && (!this.onGround || !this.isSneaking() || !(this instanceof EntityHuman)) && !this.isPassenger()) {
+     *         double d22 = this.locX - d4;
+     *         double d23 = this.locY - d5;
+     *         ...
+     *     }
+     * }
+     */
+    protected boolean hasMovementSound:playStepSound();
+
+    /*
+     # protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
+     *     if (flag) {
+     *         if (this.fallDistance > 0.0F) {
+     *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
+     *         }
+     *
+     *         this.fallDistance = 0.0F;
+     *     } else if (d0 < 0.0D) {
+     *         this.fallDistance = ((float)(this.fallDistance - d0));
+     *     }
+     * }
+     */
+    protected void doFallUpdate:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition blockposition);
+
+    /*
+     * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
+     *     SoundEffectType soundeffecttype = block.getStepSound();
+     *
+     *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
+     *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
+     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     } else if (!block.getBlockData().getMaterial().isLiquid()) {
+     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     }
+     * }
+     */
+    protected void doStepSoundUpdate:a((IntVector3) BlockPosition blockposition, (BlockData) Block blockData);
+
+    /*
+     * protected void checkBlockCollisions() {
+     *     AxisAlignedBB axisalignedbb = getBoundingBox();
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
+     *     ...
+     * }
+     */
+    protected void checkBlockCollisions();
+
+    /*
+     * public double ##METHODNAME##(double d0, double d1, double d2) {
+     *     double d3 = this.locX - d0;
+     *     double d4 = this.locY - d1;
+     *     double d5 = this.locZ - d2;
+     *
+     *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
+     * }
+     */
+    public double calculateDistance:e(double x, double y, double z);
+
+    public (Object) AxisAlignedBB getBoundingBox();
 }
