@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 class CommonClasses {
     /*
@@ -10,12 +11,9 @@ class CommonClasses {
      */
 
     public static void init() {
-        // Converter types
-        loadConverter("Collection", "Empty", "Entry", "Enum", "Handle", "ObjectArray");
-        loadConverter("PrimitiveArray", "Primitive", "Property", "Wrapper");
-        loadCommon("conversion.type.EmptyConverterUnsafe");
         // Conversion
-        loadCommon("conversion.Conversion");
+        CommonUtil.loadClass(Common.class);
+
         // Reflection classes
         /*
         loadRef("BlockState", "ChunkProviderServer", "CraftScheduler", "CraftServer", "CraftTask", "EntityMinecart", "EntityPlayer");

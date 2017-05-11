@@ -1,0 +1,3 @@
+include /org/bukkit/plugin.txt
+include /org/bukkit/craftbukkit/entity.txt
+include /net/minecraft/server/entity.txt

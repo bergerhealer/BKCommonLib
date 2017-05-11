@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.conversion.CommonConverters;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.internal.templates.TemplateResolver;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -11,6 +10,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.templates.TemplateResolver;
 
 import org.bukkit.Bukkit;
 
@@ -56,6 +56,10 @@ public class Common {
      * provides server-specific implementations.
      */
     public static final CommonServer SERVER;
+    /**
+     * Resolves template Class Declarations at runtime
+     */
+    public static final TemplateResolver TEMPLATE_RESOLVER;
     /**
      * Gets whether the current server software used is the Spigot
      * implementation
@@ -130,7 +134,7 @@ public class Common {
                 return SERVER.getMethodName(declaredClass, methodName, parameterTypes);
             }
         });
-        Resolver.registerClassDeclarationResolver(new TemplateResolver());
+        Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER = new TemplateResolver());
 
         // Conversion types registration
         try {

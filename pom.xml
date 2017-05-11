@@ -148,8 +148,12 @@
                         <configuration>
                             <source_root>src/main/java</source_root>
                             <target_root>src/main/java</target_root>
-                            <source>com/bergerkiller/bukkit/common/internal/templates/versions/${project.mcversion}.txt</source>
-                            <target>com/bergerkiller/reflection/gen</target>
+                            <generatorActions>
+                                <generatorAction>
+                                    <source>com/bergerkiller/templates/${project.mcversion}/init.txt</source>
+                                    <target>com/bergerkiller/generated</target>
+                                </generatorAction>
+                            </generatorActions>
                         </configuration>
                     </execution>
                 </executions>
@@ -252,42 +256,43 @@
             </plugin>
         </plugins>
 
+        <!-- This section here is purely to stop lifecycle errors from happening in Eclipse IDE -->
         <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									com.bergerkiller.mountiplex
-        								</groupId>
-        								<artifactId>
-        									Mountiplex
-        								</artifactId>
-        								<versionRange>
-        									[1.0,)
-        								</versionRange>
-        								<goals>
-        									<goal>
-        										create-reflection
-        									</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore></ignore>
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            com.bergerkiller.mountiplex
+                                        </groupId>
+                                        <artifactId>
+                                            Mountiplex
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>
+                                                create-reflection
+                                            </goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 </project>

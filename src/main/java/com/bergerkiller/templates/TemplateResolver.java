@@ -1,8 +1,8 @@
-package com.bergerkiller.bukkit.common.internal.templates;
+package com.bergerkiller.templates;
 
+import java.util.Collection;
 import java.util.HashMap;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassDeclarationResolver;
@@ -11,7 +11,10 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private final HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
 
     public TemplateResolver() {
-        SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(Common.class.getClassLoader(), "com/bergerkiller/bukkit/common/internal/templates/versions/v1_11_R1.txt");
+        String templatePath = "com/bergerkiller/templates/v1_11_R1/init.txt";
+
+        ClassLoader classLoader = TemplateResolver.class.getClassLoader();
+        SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath);
         for (ClassDeclaration cdec : sourceDec.classes) {
             classes.put(cdec.type.type, cdec);
         }
@@ -22,4 +25,12 @@ public class TemplateResolver implements ClassDeclarationResolver {
         return classes.get(type);
     }
 
+    /**
+     * Gets all Class Declarations that are available at runtime
+     * 
+     * @return all class declarations
+     */
+    public Collection<ClassDeclaration> all() {
+        return classes.values();
+    }
 }

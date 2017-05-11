@@ -1,0 +1,13 @@
+package org.bukkit.plugin
+
+class RegisteredListener {
+    private final EventExecutor executor
+}
+
+class SimplePluginManager {
+    private final List<Plugin> plugins;
+}
+
+class PluginDescriptionFile {
+    private Map<String, Map<String, Object>> commands;
+}

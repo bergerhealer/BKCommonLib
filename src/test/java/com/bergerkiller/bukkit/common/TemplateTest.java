@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.reflection.gen.EntityHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 public class TemplateTest {
 
@@ -13,6 +16,46 @@ public class TemplateTest {
 
     @Test
     public void testTemplate() {
-        EntityHandle handle = new EntityHandle();
+        boolean fullySuccessful = true;
+        for (ClassDeclaration dec : Common.TEMPLATE_RESOLVER.all()) {
+            String genClassPath = "com.bergerkiller.generated." + dec.type.typePath + "Handle";
+            genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
+            genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
+            Class<?> genClass = CommonUtil.getClass(genClassPath, true);
+            if (genClass == null) {
+                fail("Failed to find generated class at " + genClassPath);
+            }
+            try {
+                java.lang.reflect.Field f = genClass.getField("T");
+                if (f == null) {
+                    fail("Failed to find template field in type " + genClassPath);
+                }
+                Template.Class c = (Template.Class) f.get(null);
+                if (c == null) {
+                    fail("Failed to initialize template class " + genClassPath);
+                }
+                if (!c.isSuccessfullyLoaded()) {
+                    System.err.println("Failed to fully load template class " + genClassPath);
+                    fullySuccessful = false;
+                }
+            } catch (Throwable t) {
+                throw new RuntimeException("Failed to test class "+  genClassPath, t);
+            }
+        }
+        if (!fullySuccessful) {
+            fail("Some generated reflection template classes could not be loaded");
+        }
+    }
+
+    private String trimAfter(String path, String prefix) {
+        int idx = path.indexOf(prefix);
+        if (idx != -1) {
+            idx += prefix.length();
+            int endIdx = path.indexOf('.', idx);
+            if (endIdx != -1) {
+                path = path.substring(0, idx) + path.substring(endIdx + 1);
+            }
+        }
+        return path;
     }
 }

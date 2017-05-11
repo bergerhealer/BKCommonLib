@@ -1,0 +1,8 @@
+package org.bukkit.craftbukkit.entity;
+
+import org.bukkit.craftbukkit.CraftServer;
+
+class CraftEntity {
+    public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (Object) net.minecraft.server.Entity entity);
+    protected (Object) net.minecraft.server.Entity entityHandle:entity;
+}

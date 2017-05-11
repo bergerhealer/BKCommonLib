@@ -4,7 +4,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
-public class Entity {
+class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
     private static int entityCount;
     public final (List<org.bukkit.entity.Entity>) List<Entity> passengers;
