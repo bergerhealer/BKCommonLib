@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -18,7 +19,16 @@ public class TemplateTest {
     public void testTemplate() {
         boolean fullySuccessful = true;
         for (ClassDeclaration dec : Common.TEMPLATE_RESOLVER.all()) {
-            String genClassPath = "com.bergerkiller.generated." + dec.type.typePath + "Handle";
+            String genClassPath = "com.bergerkiller.generated";
+
+            for (String part : dec.type.typePath.split("\\.")) {
+                if (Character.isUpperCase(part.charAt(0))) {
+                    genClassPath += "." + part + "Handle";
+                } else {
+                    genClassPath += "." + part;
+                }
+            }
+
             genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
             genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
             Class<?> genClass = CommonUtil.getClass(genClassPath, true);
@@ -34,7 +44,7 @@ public class TemplateTest {
                 if (c == null) {
                     fail("Failed to initialize template class " + genClassPath);
                 }
-                if (!c.isSuccessfullyLoaded()) {
+                if (!c.isValid()) {
                     System.err.println("Failed to fully load template class " + genClassPath);
                     fullySuccessful = false;
                 }
@@ -45,6 +55,13 @@ public class TemplateTest {
         if (!fullySuccessful) {
             fail("Some generated reflection template classes could not be loaded");
         }
+    }
+
+    @Test
+    public void testEnum() {
+        assertNotNull(EnumAxisHandle.T.X.raw.get());
+        assertNotNull(EnumAxisHandle.T.X.get());
+        assertNotNull(EnumAxisHandle.X);
     }
 
     private String trimAfter(String path, String prefix) {

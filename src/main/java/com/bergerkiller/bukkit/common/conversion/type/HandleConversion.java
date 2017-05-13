@@ -135,7 +135,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="T extends net.minecraft.server.Block")
     public static Object toBlockHandle(com.bergerkiller.bukkit.common.wrappers.BlockData blockData) {
-        return blockData.getBlock();
+        return blockData.getBlockRaw();
     }
 
     @ConverterMethod(output="T extends net.minecraft.server.IBlockData")

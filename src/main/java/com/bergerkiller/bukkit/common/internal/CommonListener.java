@@ -72,7 +72,7 @@ class CommonListener implements Listener {
             if (realVehicle != null && realVehicle != event.getVehicle()) {
                 // Perform the event again for the right Bukkit entity/Handle
                 event.setCancelled(true);
-                realVehicle.setPassenger(event.getEntered());
+                realVehicle.addPassenger(event.getEntered());
             }
         }
     }

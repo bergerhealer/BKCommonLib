@@ -1,0 +1,10 @@
+package net.minecraft.server;
+
+class BlockCobbleWall {
+}
+
+class BlockFence {
+}
+
+class BlockFenceGate {
+}

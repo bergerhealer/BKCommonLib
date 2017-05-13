@@ -1,0 +1,21 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
+import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+
+class MethodProfiler {
+
+    public void begin:a(String label);
+
+    public void end:b();
+}
+
+class CrashReport {
+    public static (CrashReportHandle) CrashReport create:a(Throwable throwable, String message);
+
+    public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:a(String message);
+}
+
+class CrashReportSystemDetails {
+
+}

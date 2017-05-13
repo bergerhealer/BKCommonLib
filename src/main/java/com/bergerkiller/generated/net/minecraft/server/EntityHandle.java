@@ -1,17 +1,22 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import org.bukkit.World;
-import java.util.Random;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import java.util.List;
+import java.util.Random;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import org.bukkit.entity.Entity;
 
 public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity");
 
     public static final Key<Byte> DATA_FLAGS = T.DATA_FLAGS.getSafe();
     public static final Key<Integer> DATA_AIR_TICKS = T.DATA_AIR_TICKS.getSafe();
@@ -19,6 +24,17 @@ public class EntityHandle extends Template.Handle {
     public static final Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = T.DATA_CUSTOM_NAME_VISIBLE.getSafe();
     public static final Key<Boolean> DATA_SILENT = T.DATA_SILENT.getSafe();
     public static final Key<Boolean> DATA_NO_GRAVITY = T.DATA_NO_GRAVITY.getSafe();
+
+    /* ============================================================================== */
+
+    public static final EntityHandle createHandle(Object handleInstance) {
+        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        EntityHandle handle = new EntityHandle();
+        handle.instance = handleInstance;
+        return handle;
+    }
+
+    /* ============================================================================== */
 
     public static int entityCount() {
         return T.entityCount.getInteger();
@@ -40,6 +56,10 @@ public class EntityHandle extends Template.Handle {
         T.playStepSound.invoke(instance, position, blockData);
     }
 
+    public void setRotation(float yaw, float pitch) {
+        T.setRotation.invoke(instance, yaw, pitch);
+    }
+
     public void burn(float dmg) {
         T.burn.invoke(instance, dmg);
     }
@@ -56,8 +76,8 @@ public class EntityHandle extends Template.Handle {
         return T.isInWaterUpdate.invoke(instance);
     }
 
-    public boolean isInWaterNoUpdate() {
-        return T.isInWaterNoUpdate.invoke(instance);
+    public boolean isInWater() {
+        return T.isInWater.invoke(instance);
     }
 
     public boolean hasMovementSound() {
@@ -80,8 +100,68 @@ public class EntityHandle extends Template.Handle {
         return T.calculateDistance.invoke(instance, x, y, z);
     }
 
-    public Object getBoundingBox() {
+    public float getHeadRotation() {
+        return T.getHeadRotation.invoke(instance);
+    }
+
+    public AxisAlignedBBHandle getBoundingBox() {
         return T.getBoundingBox.invoke(instance);
+    }
+
+    public void setBoundingBox(AxisAlignedBBHandle axisalignedbb) {
+        T.setBoundingBox.invoke(instance, axisalignedbb);
+    }
+
+    public AxisAlignedBBHandle getOtherBoundingBox() {
+        return T.getOtherBoundingBox.invoke(instance);
+    }
+
+    public AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity) {
+        return T.getEntityBoundingBox.invoke(instance, entity);
+    }
+
+    public void recalcPosition() {
+        T.recalcPosition.invoke(instance);
+    }
+
+    public boolean isBurning() {
+        return T.isBurning.invoke(instance);
+    }
+
+    public boolean isPassenger() {
+        return T.isPassenger.invoke(instance);
+    }
+
+    public boolean isVehicle() {
+        return T.isVehicle.invoke(instance);
+    }
+
+    public void setOnFire(int numSeconds) {
+        T.setOnFire.invoke(instance, numSeconds);
+    }
+
+    public int getMaxFireTicks() {
+        return T.getMaxFireTicks.invoke(instance);
+    }
+
+    public boolean isWet() {
+        return T.isWet.invoke(instance);
+    }
+
+    public EntityHandle getDriverEntity() {
+        return T.getDriverEntity.invoke(instance);
+    }
+
+    public boolean isSneaking() {
+        return T.isSneaking.invoke(instance);
+    }
+
+    public boolean isInSameVehicle(EntityHandle entity) {
+        return T.isInSameVehicle.invoke(instance, entity);
+    }
+
+    public void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails) {
+        T.appendEntityCrashDetails.invoke(instance, crashreportsystemdetails);
     }
 
     public Entity getBukkitEntity() {
@@ -108,7 +188,7 @@ public class EntityHandle extends Template.Handle {
         T.vehicle.set(instance, value);
     }
 
-    public boolean getIgnoreChunkCheck() {
+    public boolean isIgnoreChunkCheck() {
         return T.ignoreChunkCheck.getBoolean(instance);
     }
 
@@ -116,11 +196,11 @@ public class EntityHandle extends Template.Handle {
         T.ignoreChunkCheck.setBoolean(instance, value);
     }
 
-    public World getWorld() {
+    public WorldHandle getWorld() {
         return T.world.get(instance);
     }
 
-    public void setWorld(World value) {
+    public void setWorld(WorldHandle value) {
         T.world.set(instance, value);
     }
 
@@ -228,15 +308,15 @@ public class EntityHandle extends Template.Handle {
         T.lastPitch.setFloat(instance, value);
     }
 
-    public Object getBoundingBoxField() {
+    public AxisAlignedBBHandle getBoundingBoxField() {
         return T.boundingBoxField.get(instance);
     }
 
-    public void setBoundingBoxField(Object value) {
+    public void setBoundingBoxField(AxisAlignedBBHandle value) {
         T.boundingBoxField.set(instance, value);
     }
 
-    public boolean getOnGround() {
+    public boolean isOnGround() {
         return T.onGround.getBoolean(instance);
     }
 
@@ -244,7 +324,31 @@ public class EntityHandle extends Template.Handle {
         T.onGround.setBoolean(instance, value);
     }
 
-    public boolean getVelocityChanged() {
+    public boolean isHorizontalMovementImpaired() {
+        return T.horizontalMovementImpaired.getBoolean(instance);
+    }
+
+    public void setHorizontalMovementImpaired(boolean value) {
+        T.horizontalMovementImpaired.setBoolean(instance, value);
+    }
+
+    public boolean isVerticalMovementImpaired() {
+        return T.verticalMovementImpaired.getBoolean(instance);
+    }
+
+    public void setVerticalMovementImpaired(boolean value) {
+        T.verticalMovementImpaired.setBoolean(instance, value);
+    }
+
+    public boolean isMovementImpaired() {
+        return T.movementImpaired.getBoolean(instance);
+    }
+
+    public void setMovementImpaired(boolean value) {
+        T.movementImpaired.setBoolean(instance, value);
+    }
+
+    public boolean isVelocityChanged() {
         return T.velocityChanged.getBoolean(instance);
     }
 
@@ -252,7 +356,7 @@ public class EntityHandle extends Template.Handle {
         T.velocityChanged.setBoolean(instance, value);
     }
 
-    public boolean getJustLanded() {
+    public boolean isJustLanded() {
         return T.justLanded.getBoolean(instance);
     }
 
@@ -260,7 +364,7 @@ public class EntityHandle extends Template.Handle {
         T.justLanded.setBoolean(instance, value);
     }
 
-    public boolean getDead() {
+    public boolean isDead() {
         return T.dead.getBoolean(instance);
     }
 
@@ -284,6 +388,22 @@ public class EntityHandle extends Template.Handle {
         T.length.setFloat(instance, value);
     }
 
+    public float getWalkedDistanceXZ() {
+        return T.walkedDistanceXZ.getFloat(instance);
+    }
+
+    public void setWalkedDistanceXZ(float value) {
+        T.walkedDistanceXZ.setFloat(instance, value);
+    }
+
+    public float getWalkedDistanceXYZ() {
+        return T.walkedDistanceXYZ.getFloat(instance);
+    }
+
+    public void setWalkedDistanceXYZ(float value) {
+        T.walkedDistanceXYZ.setFloat(instance, value);
+    }
+
     public float getFallDistance() {
         return T.fallDistance.getFloat(instance);
     }
@@ -300,7 +420,15 @@ public class EntityHandle extends Template.Handle {
         T.stepCounter.setInteger(instance, value);
     }
 
-    public boolean getNoclip() {
+    public float getHeightOffset() {
+        return T.heightOffset.getFloat(instance);
+    }
+
+    public void setHeightOffset(float value) {
+        T.heightOffset.setFloat(instance, value);
+    }
+
+    public boolean isNoclip() {
         return T.noclip.getBoolean(instance);
     }
 
@@ -316,6 +444,22 @@ public class EntityHandle extends Template.Handle {
         T.random.set(instance, value);
     }
 
+    public int getTicksLived() {
+        return T.ticksLived.getInteger(instance);
+    }
+
+    public void setTicksLived(int value) {
+        T.ticksLived.setInteger(instance, value);
+    }
+
+    public int getFireTicks() {
+        return T.fireTicks.getInteger(instance);
+    }
+
+    public void setFireTicks(int value) {
+        T.fireTicks.setInteger(instance, value);
+    }
+
     public DataWatcher getDatawatcher() {
         return T.datawatcher.get(instance);
     }
@@ -324,7 +468,7 @@ public class EntityHandle extends Template.Handle {
         T.datawatcher.set(instance, value);
     }
 
-    public boolean getIsLoaded() {
+    public boolean isLoaded() {
         return T.isLoaded.getBoolean(instance);
     }
 
@@ -356,7 +500,7 @@ public class EntityHandle extends Template.Handle {
         T.chunkZ.setInteger(instance, value);
     }
 
-    public boolean getPositionChanged() {
+    public boolean isPositionChanged() {
         return T.positionChanged.getBoolean(instance);
     }
 
@@ -372,12 +516,20 @@ public class EntityHandle extends Template.Handle {
         T.portalCooldown.setInteger(instance, value);
     }
 
-    public boolean getAllowTeleportation() {
+    public boolean isAllowTeleportation() {
         return T.allowTeleportation.getBoolean(instance);
     }
 
     public void setAllowTeleportation(boolean value) {
         T.allowTeleportation.setBoolean(instance, value);
+    }
+
+    public int getDimension() {
+        return T.dimension.getInteger(instance);
+    }
+
+    public void setDimension(int value) {
+        T.dimension.setInteger(instance, value);
     }
 
     public double[] getMove_SomeArray() {
@@ -396,12 +548,7 @@ public class EntityHandle extends Template.Handle {
         T.move_SomeState.setLong(instance, value);
     }
 
-    public static class EntityClass extends Template.Class {
-
-        protected EntityClass() {
-            init(EntityClass.class, "net.minecraft.server.Entity");
-        }
-
+    public static final class EntityClass extends Template.Class {
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         public final Template.StaticField.Converted<Key<Integer>> DATA_AIR_TICKS = new Template.StaticField.Converted<Key<Integer>>();
@@ -414,7 +561,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Converted<List<Entity>> passengers = new Template.Field.Converted<List<Entity>>();
         public final Template.Field.Converted<Entity> vehicle = new Template.Field.Converted<Entity>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
-        public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
+        public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
         public final Template.Field.Double lastX = new Template.Field.Double();
         public final Template.Field.Double lastY = new Template.Field.Double();
         public final Template.Field.Double lastZ = new Template.Field.Double();
@@ -428,17 +575,25 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Float pitch = new Template.Field.Float();
         public final Template.Field.Float lastYaw = new Template.Field.Float();
         public final Template.Field.Float lastPitch = new Template.Field.Float();
-        public final Template.Field.Converted<Object> boundingBoxField = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<AxisAlignedBBHandle> boundingBoxField = new Template.Field.Converted<AxisAlignedBBHandle>();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
+        public final Template.Field.Boolean horizontalMovementImpaired = new Template.Field.Boolean();
+        public final Template.Field.Boolean verticalMovementImpaired = new Template.Field.Boolean();
+        public final Template.Field.Boolean movementImpaired = new Template.Field.Boolean();
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
         public final Template.Field.Boolean justLanded = new Template.Field.Boolean();
         public final Template.Field.Boolean dead = new Template.Field.Boolean();
         public final Template.Field.Float width = new Template.Field.Float();
         public final Template.Field.Float length = new Template.Field.Float();
+        public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
+        public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
         public final Template.Field.Integer stepCounter = new Template.Field.Integer();
+        public final Template.Field.Float heightOffset = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field<Random> random = new Template.Field<Random>();
+        public final Template.Field.Integer ticksLived = new Template.Field.Integer();
+        public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcher = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
         public final Template.Field.Integer chunkX = new Template.Field.Integer();
@@ -447,23 +602,40 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
+        public final Template.Field.Integer dimension = new Template.Field.Integer();
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
 
         public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> setRotation = new Template.Method<Void>();
         public final Template.Method<Void> burn = new Template.Method<Void>();
         public final Template.Method.Converted<Object> getSwimSound = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
-        public final Template.Method<Boolean> isInWaterNoUpdate = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasMovementSound = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> doFallUpdate = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
-        public final Template.Method.Converted<Object> getBoundingBox = new Template.Method.Converted<Object>();
+        public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method<Void> recalcPosition = new Template.Method<Void>();
+        public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
+        public final Template.Method<Void> setOnFire = new Template.Method<Void>();
+        public final Template.Method<Integer> getMaxFireTicks = new Template.Method<Integer>();
+        public final Template.Method<Boolean> isWet = new Template.Method<Boolean>();
+        public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
+        public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
 
     }
 }

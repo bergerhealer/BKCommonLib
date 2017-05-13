@@ -15,6 +15,8 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
@@ -30,6 +32,7 @@ import net.minecraft.server.v1_11_R1.TileEntity;
 import net.minecraft.server.v1_11_R1.World;
 import net.minecraft.server.v1_11_R1.IInventory;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
@@ -67,7 +70,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public EntityNetworkController<CommonEntity<T>> getNetworkController() {
-        if (NMSEntity.world.get(getHandle()) == null) {
+        if (this.handle.getWorld() == null) {
             return null;
         }
         final EntityNetworkController result;
@@ -300,7 +303,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // *** Give the old entity a new Bukkit Entity ***
-        NMSEntity.bukkitEntity.set(oldInstance, NMSEntity.createEntity(oldInstance));
+        this.handle.setBukkitEntity(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), this.handle));
+        this.handle = EntityHandle.createHandle(newInstance);
 
         // *** Replace entity in passenger and vehicle fields ***
         Entity vehicle = (Entity) NMSEntity.vehicleField.getInternal(newInstance);

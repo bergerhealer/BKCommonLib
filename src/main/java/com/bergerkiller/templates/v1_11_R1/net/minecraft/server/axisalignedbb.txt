@@ -1,0 +1,30 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+
+class AxisAlignedBB {
+    public final double minX:a;
+    public final double minY:b;
+    public final double minZ:c;
+    public final double maxX:d;
+    public final double maxY:e;
+    public final double maxZ:f;
+
+    public AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB transformA:a(double lx, double ly, double lz);
+    public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB grow(double sx, double sy, double sz);
+    public (AxisAlignedBBHandle) AxisAlignedBB growUniform:g(double size);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB shrinkUniform:shrink(double size);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB translate:d(double dx, double dy, double dz);
+
+    public boolean bbTransformA:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+
+    public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
+    public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
+    public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
+}

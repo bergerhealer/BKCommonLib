@@ -33,20 +33,6 @@ class CommonClasses {
         loadCommon("protocol.PacketType");
     }
 
-    private static void loadConverter(String... classNames) {
-        for (int i = 0; i < classNames.length; i++) {
-            classNames[i] = "conversion.type." + classNames[i] + "Converter";
-        }
-        loadCommon(classNames);
-    }
-
-    private static void loadRef(String... classNames) {
-        for (int i = 0; i < classNames.length; i++) {
-            classNames[i] = "reflection.classes." + classNames[i] + "Ref";
-        }
-        loadCommon(classNames);
-    }
-
     private static void loadUtil(String... classNames) {
         for (int i = 0; i < classNames.length; i++) {
             classNames[i] = "utils." + classNames[i] + "Util";

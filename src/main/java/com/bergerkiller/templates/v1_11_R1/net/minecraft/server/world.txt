@@ -1,0 +1,38 @@
+package net.minecraft.server;
+
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
+
+class World {
+    public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
+
+    public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
+
+    public long getTime();
+
+    public final (MethodProfilerHandle) MethodProfiler methodProfiler;
+
+    private boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+
+    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+
+    public (List<EntityHandle>) List<Entity> getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+
+    public (WorldDataHandle) WorldData getWorldData();
+
+    public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
+}
+
+class WorldData {
+    public (WorldTypeHandle) WorldType getType();
+}
+
+class WorldType {
+    public int getDimension:g();
+}

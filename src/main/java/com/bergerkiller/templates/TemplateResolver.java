@@ -16,7 +16,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
         ClassLoader classLoader = TemplateResolver.class.getClassLoader();
         SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath);
         for (ClassDeclaration cdec : sourceDec.classes) {
-            classes.put(cdec.type.type, cdec);
+            register(cdec);
+        }
+    }
+
+    private final void register(ClassDeclaration cdec) {
+        classes.put(cdec.type.type, cdec);
+        for (ClassDeclaration subcdec : cdec.subclasses) {
+            register(subcdec);
         }
     }
 

@@ -6,6 +6,11 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+
 class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
     private static int entityCount;
@@ -13,7 +18,7 @@ class Entity {
     protected unknown int j;
     private (org.bukkit.entity.Entity) net.minecraft.server.Entity vehicle:au
     public boolean ignoreChunkCheck:attachedToPlayer;
-    public (org.bukkit.World) World world;
+    public (WorldHandle) World world;
     public double lastX;
     public double lastY;
     public double lastZ;
@@ -27,11 +32,11 @@ class Entity {
     public float pitch;
     public float lastYaw;
     public float lastPitch;
-    private (Object) AxisAlignedBB boundingBoxField:boundingBox;
+    private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
     public boolean onGround;
-    public unknown boolean positionChanged;
-    public unknown boolean B;
-    public unknown boolean C;
+    public boolean horizontalMovementImpaired:positionChanged;
+    public boolean verticalMovementImpaired:B;
+    public boolean movementImpaired:C;
     public boolean velocityChanged;
     protected boolean justLanded:E;
     private unknown boolean aw;
@@ -39,17 +44,19 @@ class Entity {
     public float width;
     public float length;
     public unknown float I;
-    public unknown float J;
-    public unknown float K;
+    public float walkedDistanceXZ:J;
+    public float walkedDistanceXYZ:K;
     public float fallDistance;
     private int stepCounter:ax;
     public unknown double M;
     public unknown double N;
     public unknown double O;
-    public unknown float P;
+    public float heightOffset:P;
     public boolean noclip;
     public unknown float R;
     protected Random random;
+    public int ticksLived;
+    public int fireTicks;
     protected (DataWatcher) net.minecraft.server.DataWatcher datawatcher;
 
     protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
@@ -69,6 +76,10 @@ class Entity {
     public boolean positionChanged:impulse;
     public int portalCooldown;
     protected boolean allowTeleportation:ak;
+
+    protected unknown int al;
+
+    public int dimension;
 
     private double[] move_SomeArray:aI;
     private long move_SomeState:aJ;
@@ -126,8 +137,8 @@ class Entity {
      *     ...
      * }
      */
-    setRotation:setYawPitch(float yaw, float pitch);
-    
+    protected void setRotation:setYawPitch(float yaw, float pitch);
+
     /*
      # protected void ##METHODNAME##(float i) { // CraftBukkit - int -> float
      *     if (!this.fireProof) {
@@ -175,7 +186,7 @@ class Entity {
      *     return this.inWater;
      * }
      */
-    public boolean isInWaterNoUpdate:isInWater();
+    public boolean isInWater();
 
     /*
      * public void move(double d0, double d1, double d2) {
@@ -249,5 +260,35 @@ class Entity {
      */
     public double calculateDistance:e(double x, double y, double z);
 
-    public (Object) AxisAlignedBB getBoundingBox();
+    public float getHeadRotation();
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+
+    public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
+    
+    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
+
+    public void recalcPosition();
+
+    public boolean isBurning();
+
+    public boolean isPassenger();
+
+    public boolean isVehicle();
+
+    public void setOnFire(int numSeconds);
+
+    public int getMaxFireTicks();
+
+    public boolean isWet:ai();
+
+    public (EntityHandle) Entity getDriverEntity:bw();
+
+    public boolean isSneaking();
+
+    public boolean isInSameVehicle:x((EntityHandle) Entity entity);
+
+    public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
 }

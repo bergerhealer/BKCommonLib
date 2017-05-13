@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -23,6 +24,7 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.IBlockData;
 
+@Deprecated
 public class NMSEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Entity")
     		.addImport("org.bukkit.craftbukkit.entity.CraftEntity");
@@ -31,85 +33,44 @@ public class NMSEntity {
     /* ================================================== FIELDS ====================================================== */
     /* ================================================================================================================ */
 
-    public static final FieldAccessor<Entity> bukkitEntity  = T.nextField("protected CraftEntity bukkitEntity");
-    public static final FieldAccessor<Integer> globalEntityCount = T.nextField("private static int entityCount");
+    public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntity.toFieldAccessor();
+    public static final FieldAccessor<Integer> globalEntityCount = EntityHandle.T.entityCount.toFieldAccessor();
+    public static final TranslatorFieldAccessor<List<Entity>> passengers = EntityHandle.T.passengers.toFieldAccessor();
+    public static final TranslatorFieldAccessor<Entity> vehicleField = EntityHandle.T.vehicle.toFieldAccessor();
+    public static final FieldAccessor<Boolean> ignoreChunkCheck = EntityHandle.T.ignoreChunkCheck.toFieldAccessor();
+    public static final TranslatorFieldAccessor<World>  world = EntityHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
+    public static final FieldAccessor<Double> lastX = EntityHandle.T.lastX.toFieldAccessor();
+    public static final FieldAccessor<Double> lastY = EntityHandle.T.lastY.toFieldAccessor();
+    public static final FieldAccessor<Double> lastZ = EntityHandle.T.lastZ.toFieldAccessor();
+    public static final FieldAccessor<Double> locX  = EntityHandle.T.locX.toFieldAccessor();
+    public static final FieldAccessor<Double> locY  = EntityHandle.T.locY.toFieldAccessor();
+    public static final FieldAccessor<Double> locZ  = EntityHandle.T.locZ.toFieldAccessor();
+    public static final FieldAccessor<Double> motX  = EntityHandle.T.motX.toFieldAccessor();
+    public static final FieldAccessor<Double> motY  = EntityHandle.T.motY.toFieldAccessor();
+    public static final FieldAccessor<Double> motZ  = EntityHandle.T.motZ.toFieldAccessor();
+    public static final FieldAccessor<Float>  yaw   = EntityHandle.T.yaw.toFieldAccessor();
+    public static final FieldAccessor<Float>  pitch = EntityHandle.T.pitch.toFieldAccessor();
+    public static final FieldAccessor<Float>   lastYaw     = EntityHandle.T.lastYaw.toFieldAccessor();
+    public static final FieldAccessor<Float>   lastPitch   = EntityHandle.T.lastPitch.toFieldAccessor();
+    public static final FieldAccessor<Object>  boundingBox = EntityHandle.T.boundingBoxField.raw.toFieldAccessor();
+    public static final FieldAccessor<Boolean> onGround    = EntityHandle.T.onGround.toFieldAccessor();
+    public static final FieldAccessor<Boolean> velocityChanged = EntityHandle.T.velocityChanged.toFieldAccessor();
+    public static final FieldAccessor<Boolean> justLanded = EntityHandle.T.justLanded.toFieldAccessor();
+    public static final FieldAccessor<Boolean> dead = EntityHandle.T.dead.toFieldAccessor();
+    public static final FieldAccessor<Float> width = EntityHandle.T.width.toFieldAccessor();
+    public static final FieldAccessor<Float> length = EntityHandle.T.length.toFieldAccessor();
+    public static final FieldAccessor<Float> fallDistance = EntityHandle.T.fallDistance.toFieldAccessor();
+    public static final FieldAccessor<Integer> stepCounter = EntityHandle.T.stepCounter.toFieldAccessor();
+    public static final FieldAccessor<Boolean> noclip = EntityHandle.T.noclip.toFieldAccessor();
+    public static final FieldAccessor<Random>  random = EntityHandle.T.random.toFieldAccessor();
+    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = EntityHandle.T.datawatcher.toFieldAccessor();
 
-    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextField("public final List<Entity> passengers").translate(DuplexConversion.entityList);
-
-    static {
-        T.skipFieldSignature("protected int j");
-    }
-
-    public static final TranslatorFieldAccessor<Entity> vehicleField = T.nextFieldSignature("private net.minecraft.server.Entity au").translate(DuplexConversion.entity);
-    public static final FieldAccessor<Boolean> ignoreChunkCheck = T.nextField("public boolean attachedToPlayer");
-    public static final TranslatorFieldAccessor<World>  world = T.nextField("public World world").translate(DuplexConversion.world);
-    public static final FieldAccessor<Double> lastX = T.nextField("public double lastX");
-    public static final FieldAccessor<Double> lastY = T.nextField("public double lastY");
-    public static final FieldAccessor<Double> lastZ = T.nextField("public double lastZ");
-    public static final FieldAccessor<Double> locX  = T.nextField("public double locX");
-    public static final FieldAccessor<Double> locY  = T.nextField("public double locY");
-    public static final FieldAccessor<Double> locZ  = T.nextField("public double locZ");
-    public static final FieldAccessor<Double> motX  = T.nextField("public double motX");
-    public static final FieldAccessor<Double> motY  = T.nextField("public double motY");
-    public static final FieldAccessor<Double> motZ  = T.nextField("public double motZ");
-    public static final FieldAccessor<Float>  yaw   = T.nextField("public float yaw");
-    public static final FieldAccessor<Float>  pitch = T.nextField("public float pitch");
-
-    public static final FieldAccessor<Float>   lastYaw     = T.nextField("public float lastYaw");
-    public static final FieldAccessor<Float>   lastPitch   = T.nextField("public float lastPitch");
-    public static final FieldAccessor<Object>  boundingBox = T.nextField("private AxisAlignedBB boundingBox");
-    public static final FieldAccessor<Boolean> onGround    = T.nextField("public boolean onGround");
-
-    public static final FieldAccessor<Boolean> positionChanged_tmp = T.nextField("public boolean positionChanged");
-
-    static { 
-    	T.skipFieldSignature("public boolean B");
-    	T.skipFieldSignature("public boolean C");
-    }
-
-    public static final FieldAccessor<Boolean> velocityChanged = T.nextField("public boolean velocityChanged");
-    public static final FieldAccessor<Boolean> justLanded = T.nextFieldSignature("protected boolean E");
-
-    static {
-    	T.skipFieldSignature("private boolean aw");
-    }
-    
-    public static final FieldAccessor<Boolean> dead = T.nextField("public boolean dead");
-    public static final FieldAccessor<Float> width = T.nextField("public float width");
-    public static final FieldAccessor<Float> length = T.nextField("public float length");
-
-    static {
-    	T.skipFieldSignature("public float I");
-    	T.skipFieldSignature("public float J");
-    	T.skipFieldSignature("public float K");
-    }
-    
-    public static final FieldAccessor<Float> fallDistance = T.nextField("public float fallDistance");
-    public static final FieldAccessor<Integer> stepCounter = T.nextFieldSignature("private int ax");
-    
-    static {
-    	T.skipFieldSignature("public double M");
-    	T.skipFieldSignature("public double N");
-    	T.skipFieldSignature("public double O");
-    	T.skipFieldSignature("public float P");
-    }
-    
-    public static final FieldAccessor<Boolean> noclip = T.nextField("public boolean noclip");
-
-    static {
-    	T.skipFieldSignature("public float R");
-    }
-
-    public static final FieldAccessor<Random>  random = T.nextField("protected Random random");
-
-    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = T.nextField("protected DataWatcher datawatcher").translate(DuplexConversion.dataWatcher);
-
-    public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromStaticField(T, "Z");
-    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromStaticField(T, "az");
-    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.fromStaticField(T, "aA");
-    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.fromStaticField(T, "aB");
-    public static final DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.fromStaticField(T, "aC");
-    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.fromStaticField(T, "aD");
+    public static final DataWatcher.Key<Byte> DATA_FLAGS = EntityHandle.DATA_FLAGS;
+    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = EntityHandle.DATA_AIR_TICKS;
+    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = EntityHandle.DATA_CUSTOM_NAME;
+    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = EntityHandle.DATA_CUSTOM_NAME_VISIBLE;
+    public static final DataWatcher.Key<Boolean> DATA_SILENT = EntityHandle.DATA_SILENT;
+    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = EntityHandle.DATA_NO_GRAVITY;
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
@@ -120,23 +81,19 @@ public class NMSEntity {
     public static final int DATA_FLAG_GLOWING = (1 << 6);
     public static final int DATA_FLAG_FLYING = (1 << 7);
 
-    public static final FieldAccessor<Boolean> isLoaded = T.nextField("public boolean aa");
-    public static final FieldAccessor<Integer> chunkX = T.nextFieldSignature("public int ab");
-    public static final FieldAccessor<Integer> chunkY = T.nextFieldSignature("public int ac");
-    public static final FieldAccessor<Integer> chunkZ = T.nextFieldSignature("public int ad");
+    public static final FieldAccessor<Boolean> isLoaded = EntityHandle.T.isLoaded.toFieldAccessor();
+    public static final FieldAccessor<Integer> chunkX = EntityHandle.T.chunkX.toFieldAccessor();
+    public static final FieldAccessor<Integer> chunkY = EntityHandle.T.chunkY.toFieldAccessor();
+    public static final FieldAccessor<Integer> chunkZ = EntityHandle.T.chunkZ.toFieldAccessor();
 
-    static {
-        T.skipFieldSignature("public boolean ah");
-    }
+    public static final FieldAccessor<Boolean> positionChanged = EntityHandle.T.positionChanged.toFieldAccessor();
 
-    public static final FieldAccessor<Boolean> positionChanged = T.nextFieldSignature("public boolean impulse");
-
-    public static final FieldAccessor<Integer> portalCooldown = T.nextField("public int portalCooldown");
-    public static final FieldAccessor<Boolean> allowTeleportation = T.nextFieldSignature("protected boolean ak");
+    public static final FieldAccessor<Integer> portalCooldown = EntityHandle.T.portalCooldown.toFieldAccessor();
+    public static final FieldAccessor<Boolean> allowTeleportation = EntityHandle.T.allowTeleportation.toFieldAccessor();
 
     /* Used in the move() function; unknown function. */
-    public static final FieldAccessor<double[]> move_SomeArray = T.nextField("private double[] aI");
-    public static final FieldAccessor<Long> move_SomeState = T.nextField("private long aJ");
+    public static final FieldAccessor<double[]> move_SomeArray = EntityHandle.T.move_SomeArray.toFieldAccessor();
+    public static final FieldAccessor<Long> move_SomeState = EntityHandle.T.move_SomeState.toFieldAccessor();
 
     /* ================================================================================================================ */
     /* ================================================== METHODS ===================================================== */
@@ -153,7 +110,7 @@ public class NMSEntity {
      *     ...
      * }
      */
-    private static final MethodAccessor<Void> updateFalling        = T.selectMethod("protected void a(double, boolean, IBlockData, BlockPosition)");
+    private static final MethodAccessor<Void> updateFalling = EntityHandle.T.updateFalling.raw.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##() {
@@ -164,7 +121,7 @@ public class NMSEntity {
      *     ...
      * }
      */
-    private static final MethodAccessor<Void> updateBlockCollision = T.selectMethod("protected void checkBlockCollisions()");
+    private static final MethodAccessor<Void> updateBlockCollision = EntityHandle.T.updateBlockCollision.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
@@ -177,7 +134,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    private static final MethodAccessor<Void> playStepSound = T.selectMethod("protected void a(BlockPosition, Block)");
+    private static final MethodAccessor<Void> playStepSound = EntityHandle.T.playStepSound.raw.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##(float f, float f1) {
@@ -195,8 +152,8 @@ public class NMSEntity {
      *     ...
      * }
      */
-    private static final MethodAccessor<Void> setRotation = T.selectMethod("protected void setYawPitch(float, float)");
-    
+    private static final MethodAccessor<Void> setRotation = EntityHandle.T.setRotation.toMethodAccessor();
+
     /*
      # protected void ##METHODNAME##(float i) { // CraftBukkit - int -> float
      *     if (!this.fireProof) {
@@ -204,7 +161,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    public static final MethodAccessor<Void> burn = T.selectMethod("protected void burn(float dmg)");
+    public static final MethodAccessor<Void> burn = EntityHandle.T.burn.toMethodAccessor();
 
     /*
      * void move(...) {
@@ -212,7 +169,7 @@ public class NMSEntity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-    public static final MethodAccessor<Object> getSwimSound = T.selectMethod("protected SoundEffect aa()");
+    public static final MethodAccessor<Object> getSwimSound = EntityHandle.T.getSwimSound.raw.toMethodAccessor();
 
     /*
      * void move(...) {
@@ -226,7 +183,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    public static final MethodAccessor<Void> makeSound = T.selectMethod("public void a(SoundEffect soundeffect, float volume, float pitch)");
+    public static final MethodAccessor<Void> makeSound = EntityHandle.T.makeSound.raw.toMethodAccessor();
 
     /*
      # public boolean ###METHODNAME###() {
@@ -237,14 +194,14 @@ public class NMSEntity {
      *     }
      * }
      */
-    private static final MethodAccessor<Boolean> isInWaterUpdate   = T.selectMethod("public boolean ak()");
+    private static final MethodAccessor<Boolean> isInWaterUpdate   = EntityHandle.T.isInWaterUpdate.toMethodAccessor();
     
     /*
      # public boolean ###METHODNAME###() {
      *     return this.inWater;
      * }
      */
-    private static final MethodAccessor<Boolean> isInWaterNoUpdate = T.selectMethod("public boolean isInWater()");
+    private static final MethodAccessor<Boolean> isInWaterNoUpdate = EntityHandle.T.isInWater.toMethodAccessor();
 
     /*
      * public void move(double d0, double d1, double d2) {
@@ -265,7 +222,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    private static final MethodAccessor<Boolean> hasMovementSound = T.selectMethod("protected boolean playStepSound()");
+    private static final MethodAccessor<Boolean> hasMovementSound = EntityHandle.T.hasMovementSound.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
@@ -280,7 +237,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    public static final MethodAccessor<Void> doFallUpdate = T.selectMethod("protected void a(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition)");
+    public static final MethodAccessor<Void> doFallUpdate = EntityHandle.T.doFallUpdate.raw.toMethodAccessor();
 
     /*
      * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
@@ -294,7 +251,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    public static final MethodAccessor<Void> doStepSoundUpdate = T.selectMethod("protected void a(BlockPosition blockposition, Block block)");
+    public static final MethodAccessor<Void> doStepSoundUpdate = EntityHandle.T.doStepSoundUpdate.raw.toMethodAccessor();
 
     /*
      * protected void checkBlockCollisions() {
@@ -305,7 +262,7 @@ public class NMSEntity {
      *     ...
      * }
      */
-    public static final MethodAccessor<Void> checkBlockCollisions = T.selectMethod("protected void checkBlockCollisions()");
+    public static final MethodAccessor<Void> checkBlockCollisions = EntityHandle.T.checkBlockCollisions.toMethodAccessor();
 
     /*
      * public double ##METHODNAME##(double d0, double d1, double d2) {
@@ -316,9 +273,9 @@ public class NMSEntity {
      *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
      * }
      */
-    public static final MethodAccessor<Double> calculateDistance = T.selectMethod("public double e(double d0, double d1, double d2)");
+    public static final MethodAccessor<Double> calculateDistance = EntityHandle.T.calculateDistance.toMethodAccessor();
 
-    public static final MethodAccessor<Object> getBoundingBox = T.selectMethod("public AxisAlignedBB getBoundingBox()");
+    public static final MethodAccessor<Object> getBoundingBox = EntityHandle.T.getBoundingBox.raw.toMethodAccessor();
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static final SafeConstructor entityItemConstr = new SafeConstructor(CommonUtil.getNMSClass("EntityItem"),

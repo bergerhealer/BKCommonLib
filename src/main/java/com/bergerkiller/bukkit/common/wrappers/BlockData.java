@@ -8,7 +8,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 
 /**
  * Stores a reference to net.minecraft.server.Block and IBlockData objects,
@@ -40,11 +42,21 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract void loadMaterialData(Material material, int data);
 
     /**
+     * Obtains the RAW internal Block handle this BlockData represents.
+     * Should not be used.
+     * 
+     * @return Block
+     */
+    public final Object getBlockRaw() {
+        return getBlock().getRaw();
+    }
+
+    /**
      * Obtains the internal Block handle this BlockData represents
      * 
      * @return Block
      */
-    public abstract Object getBlock();
+    public abstract BlockHandle getBlock();
 
     /**
      * Obtains the internal IBlockData handle this BlockData represents
@@ -278,4 +290,27 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param yield (e.g. 20.0f)
      */
     public abstract void destroy(World world, int x, int y, int z, float yield);
+
+    /**
+     * Handles an Entity stepping on a Block
+     * 
+     * @param world the block is in
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
+     * @param entity that stepped on the block
+     */
+    public final void stepOn(World world, int x, int y, int z, Entity entity) {
+        stepOn(world, new IntVector3(x, y, z), entity);
+    }
+
+    /**
+     * Handles an Entity stepping on a Block
+     * 
+     * @param world the block is in
+     * @param blockPosition of the block
+     * @param entity that stepped on the block
+     */
+    public abstract void stepOn(World world, IntVector3 blockPosition, Entity entity);
+
 }

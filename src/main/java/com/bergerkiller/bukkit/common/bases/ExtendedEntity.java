@@ -37,9 +37,12 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 import net.minecraft.server.v1_11_R1.Entity;
@@ -200,6 +203,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * The internally-stored Bukkit Entity instance
      */
     protected T entity;
+    /**
+     * A reference to the internel net.minecraft.server.Entity (or its extension)
+     */
+    protected EntityHandle handle = new EntityHandle();
 
     /**
      * Constructs a new Extended Entity with the initial entity specified
@@ -217,6 +224,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     protected void setEntity(T entity) {
         this.entity = entity;
+        this.handle = CraftEntityHandle.T.entityHandle.get(entity);
     }
 
     /**
@@ -266,27 +274,27 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public int getChunkX() {
-        return NMSEntity.chunkX.get(getHandle());
+        return this.handle.getChunkX();
     }
 
     public void setChunkX(int value) {
-        NMSEntity.chunkX.set(getHandle(), value);
+        this.handle.setChunkX(value);
     }
 
     public int getChunkY() {
-        return NMSEntity.chunkY.get(getHandle());
+        return this.handle.getChunkY();
     }
 
     public void setChunkY(int value) {
-        NMSEntity.chunkY.set(getHandle(), value);
+        this.handle.setChunkY(value);
     }
 
     public int getChunkZ() {
-        return NMSEntity.chunkZ.get(getHandle());
+        return this.handle.getChunkZ();
     }
 
     public void setChunkZ(int value) {
-        NMSEntity.chunkZ.set(getHandle(), value);
+        this.handle.setChunkZ(value);
     }
 
     /**
@@ -296,19 +304,19 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return Head rotation, if available
      */
     public float getHeadRotation() {
-        return getHandle(Entity.class).getHeadRotation();
+        return this.handle.getHeadRotation();
     }
 
     public double getMovedX() {
-        return loc.getX() - last.getX();
+        return this.handle.getLocX() - this.handle.getLastX();
     }
 
     public double getMovedY() {
-        return loc.getY() - last.getY();
+        return this.handle.getLocY() - this.handle.getLastY();
     }
 
     public double getMovedZ() {
-        return loc.getZ() - last.getZ();
+        return this.handle.getLocZ() - this.handle.getLastZ();
     }
 
     public boolean hasMovedHorizontally() {
@@ -352,53 +360,52 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setWorld(World world) {
-        final Entity handle = getHandle(Entity.class);
-        handle.world = CommonNMS.getNative(world);
-        handle.dimension = WorldUtil.getDimension(world);
+        this.handle.setWorld(WorldHandle.createHandle(Conversion.toWorldHandle.convert(world)));
+        this.handle.setDimension(this.handle.getWorld().getWorldData().getType().getDimension());
     }
 
     public void setDead(boolean dead) {
-        getHandle(Entity.class).dead = dead;
+        this.handle.setDead(dead);
     }
 
     public float getHeight() {
-        return getHandle(Entity.class).length;
+        return this.handle.getLength();
     }
 
     public void setHeight(float height) {
-        getHandle(Entity.class).length = height;
+        this.handle.setLength(height);
     }
 
     public float getLength() {
-        return getHandle(Entity.class).length;
+        return this.handle.getLength();
     }
 
     public void setLength(float length) {
-        getHandle(Entity.class).length = length;
+        this.handle.setLength(length);
     }
 
     public boolean isOnGround() {
-        return getHandle(Entity.class).onGround;
+        return this.handle.isOnGround();
     }
 
     public void setOnGround(boolean onGround) {
-        getHandle(Entity.class).onGround = onGround;
+        this.handle.setOnGround(onGround);
     }
 
     public boolean isPositionChanged() {
-        return NMSEntity.positionChanged.get(getHandle());
+        return this.handle.isPositionChanged();
     }
 
     public void setPositionChanged(boolean changed) {
-        NMSEntity.positionChanged.set(getHandle(), changed);
+        this.handle.setPositionChanged(changed);
     }
 
     public boolean isVelocityChanged() {
-        return NMSEntity.velocityChanged.get(getHandle());
+        return this.handle.isVelocityChanged();
     }
 
     public void setVelocityChanged(boolean changed) {
-        NMSEntity.velocityChanged.set(getHandle(), changed);
+        this.handle.setVelocityChanged(changed);
     }
 
     /**
@@ -407,7 +414,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if loaded, False if not
      */
     public boolean isInLoadedChunk() {
-        return NMSEntity.isLoaded.get(getHandle());
+        return this.handle.isLoaded();
     }
 
     /**
@@ -417,8 +424,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if movement is impaired, False if not
      */
     public boolean isMovementImpaired() {
-        // Note: this variable is simply wrongly deobfuscated!
-        return getHandle(Entity.class).positionChanged;
+        return this.handle.isHorizontalMovementImpaired();
     }
 
     /**
@@ -428,12 +434,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param impaired state to set to
      */
     public void setMovementImpaired(boolean impaired) {
-        // Note: this variable is simply wrongly deobfuscated!
-        getHandle(Entity.class).positionChanged = impaired;
+        this.handle.setHorizontalMovementImpaired(impaired);
     }
 
     public Random getRandom() {
-        return NMSEntity.random.get(getHandle());
+        return this.handle.getRandom();
     }
 
     /**
@@ -475,12 +480,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeStepSound(int blockX, int blockY, int blockZ, Material type) {
-        NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, CommonNMS.getBlock(type));
+        this.handle.playStepSound(new IntVector3(blockX, blockY, blockZ), BlockData.fromMaterial(type));
     }
 
     @Deprecated
     public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
-        NMSEntity.playStepSound(getHandle(), blockX, blockY, blockZ, typeId);
+        makeStepSound(blockX, blockY, blockZ, Material.getMaterial(typeId));
     }
 
     public List<MetadataValue> getMetadata(String arg0) {
@@ -551,7 +556,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch to set to
      */
     public void setRotation(float yaw, float pitch) {
-        NMSEntity.setRotation(getHandle(), yaw, pitch);
+        this.handle.setRotation(yaw, pitch);
     }
 
     public void setPosition(double x, double y, double z) {
@@ -720,7 +725,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if this Entity is in water, False if not
      */
     public boolean isInWater(boolean update) {
-        return NMSEntity.isInWater(getHandle(), update);
+        if (update) {
+            return this.handle.isInWaterUpdate();
+        } else {
+            return this.handle.isInWater();
+        }
     }
 
     /**
@@ -884,7 +893,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
         // Remove vehicle information and passenger information for all removed passengers
         for (Entity passenger : removedPassengers) {
-            NMSEntity.vehicleField.setInternal(passenger, null);
+            EntityHandle.T.vehicle.raw.set(passenger, null);
             handle.passengers.remove(passenger);
         }
 
@@ -893,7 +902,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             Entity passengerHandle = (Entity) Conversion.toEntityHandle.convert(p);
             if (!handle.passengers.contains(passengerHandle)) {
                 handle.passengers.add(passengerHandle);
-                NMSEntity.vehicleField.setInternal(passengerHandle, handle);
+                EntityHandle.T.vehicle.raw.set(passengerHandle, handle);
 
                 // Send mount packet
                 CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, keptPassengers);

@@ -1,0 +1,12 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+
+class Block {
+    public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity)
+}
+
+class Blocks {
+    public static final (Object) Block LADDER;
+}

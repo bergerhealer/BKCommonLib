@@ -2,10 +2,23 @@ package com.bergerkiller.generated.org.bukkit.plugin;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class PluginDescriptionFileHandle extends Template.Handle {
     public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile");
 
+
+    /* ============================================================================== */
+
+    public static final PluginDescriptionFileHandle createHandle(Object handleInstance) {
+        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        PluginDescriptionFileHandle handle = new PluginDescriptionFileHandle();
+        handle.instance = handleInstance;
+        return handle;
+    }
+
+    /* ============================================================================== */
 
     public Map<String, Map<String, Object>> getCommands() {
         return T.commands.get(instance);
@@ -15,12 +28,7 @@ public class PluginDescriptionFileHandle extends Template.Handle {
         T.commands.set(instance, value);
     }
 
-    public static class PluginDescriptionFileClass extends Template.Class {
-
-        protected PluginDescriptionFileClass() {
-            init(PluginDescriptionFileClass.class, "org.bukkit.plugin.PluginDescriptionFile");
-        }
-
+    public static final class PluginDescriptionFileClass extends Template.Class {
         public final Template.Field<Map<String, Map<String, Object>>> commands = new Template.Field<Map<String, Map<String, Object>>>();
 
     }

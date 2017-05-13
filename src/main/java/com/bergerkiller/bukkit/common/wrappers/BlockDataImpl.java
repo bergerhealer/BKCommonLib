@@ -5,8 +5,10 @@ import java.util.IdentityHashMap;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMinecraftKey;
 import com.bergerkiller.reflection.net.minecraft.server.NMSSoundEffect;
 
@@ -17,7 +19,8 @@ import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.World;
 
 public class BlockDataImpl extends BlockData {
-    private Block block;
+    private Block block; //TODO: Remove
+    private BlockHandle blockHandle;
     private IBlockData data;
 
     public static final int ID_BITS = 8;
@@ -105,12 +108,14 @@ public class BlockDataImpl extends BlockData {
 
     public BlockDataImpl(Block block, IBlockData data) {
         this.block = block;
+        this.blockHandle = BlockHandle.createHandle(block);
         this.data = data;
     }
 
     @Override
     public void loadBlock(Object block) {
         this.block = (Block) block;
+        this.blockHandle = BlockHandle.createHandle(block);
         this.data = this.block.getBlockData();
     }
 
@@ -118,17 +123,19 @@ public class BlockDataImpl extends BlockData {
     public void loadBlockData(Object iBlockData) {
         this.data = (IBlockData) iBlockData;
         this.block = this.data.getBlock();
+        this.blockHandle = BlockHandle.createHandle(this.block);
     }
 
     @Override
     public void loadMaterialData(Material material, int data) {
         this.block = Block.getById(material.getId());
+        this.blockHandle = BlockHandle.createHandle(this.block);
         this.data = this.block.fromLegacyData(data);
     }
 
     @Override
-    public final Object getBlock() {
-        return this.block;
+    public final BlockHandle getBlock() {
+        return this.blockHandle;
     }
 
     @Override
@@ -206,5 +213,10 @@ public class BlockDataImpl extends BlockData {
     public void destroy(org.bukkit.World world, int x, int y, int z, float yield) {
         dropNaturally(world, x, y, z, yield);
         WorldUtil.setBlockData(world, x, y, z, AIR);
+    }
+
+    @Override
+    public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
+        block.stepOn(CommonNMS.getNative(world), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), CommonNMS.getNative(entity));
     }
 }

@@ -1,32 +1,41 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.Server;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import org.bukkit.entity.Entity;
 
 public class CraftEntityHandle extends Template.Handle {
     public static final CraftEntityClass T = new CraftEntityClass();
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftEntityHandle.class, "org.bukkit.craftbukkit.entity.CraftEntity");
 
 
-    public static Entity createCraftEntity(Server server, Object entity) {
+    /* ============================================================================== */
+
+    public static final CraftEntityHandle createHandle(Object handleInstance) {
+        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        CraftEntityHandle handle = new CraftEntityHandle();
+        handle.instance = handleInstance;
+        return handle;
+    }
+
+    /* ============================================================================== */
+
+    public static Entity createCraftEntity(Server server, EntityHandle entity) {
         return T.createCraftEntity.invoke(server, entity);
     }
 
-    public Object getEntityHandle() {
+    public EntityHandle getEntityHandle() {
         return T.entityHandle.get(instance);
     }
 
-    public void setEntityHandle(Object value) {
+    public void setEntityHandle(EntityHandle value) {
         T.entityHandle.set(instance, value);
     }
 
-    public static class CraftEntityClass extends Template.Class {
-
-        protected CraftEntityClass() {
-            init(CraftEntityClass.class, "org.bukkit.craftbukkit.entity.CraftEntity");
-        }
-
-        public final Template.Field.Converted<Object> entityHandle = new Template.Field.Converted<Object>();
+    public static final class CraftEntityClass extends Template.Class {
+        public final Template.Field.Converted<EntityHandle> entityHandle = new Template.Field.Converted<EntityHandle>();
 
         public final Template.StaticMethod.Converted<Entity> createCraftEntity = new Template.StaticMethod.Converted<Entity>();
 
