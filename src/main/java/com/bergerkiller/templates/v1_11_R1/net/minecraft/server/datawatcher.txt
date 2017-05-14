@@ -1,0 +1,8 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+
+class DataWatcher {
+    private final (EntityHandle) Entity owner:c
+
+}

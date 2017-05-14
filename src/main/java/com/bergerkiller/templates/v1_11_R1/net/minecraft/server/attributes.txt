@@ -1,0 +1,5 @@
+package net.minecraft.server;
+
+class AttributeMapServer {
+    public (Collection<Object>) Collection<AttributeInstance> attributes:c();
+}

@@ -12,7 +12,7 @@ public class RegisteredListenerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final RegisteredListenerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         RegisteredListenerHandle handle = new RegisteredListenerHandle();
         handle.instance = handleInstance;
         return handle;

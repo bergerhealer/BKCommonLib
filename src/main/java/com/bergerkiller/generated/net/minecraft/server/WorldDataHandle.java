@@ -12,7 +12,7 @@ public class WorldDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final WorldDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         WorldDataHandle handle = new WorldDataHandle();
         handle.instance = handleInstance;
         return handle;

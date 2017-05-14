@@ -19,7 +19,7 @@ public class WorldHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final WorldHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         WorldHandle handle = new WorldHandle();
         handle.instance = handleInstance;
         return handle;
@@ -59,6 +59,22 @@ public class WorldHandle extends Template.Handle {
         return T.isBurnArea.invoke(instance, bounds);
     }
 
+    public void removeEntity(EntityHandle entity) {
+        T.removeEntity.invoke(instance, entity);
+    }
+
+    public boolean addEntity(EntityHandle entity) {
+        return T.addEntity.invoke(instance, entity);
+    }
+
+    public List<EntityHandle> getEntityList() {
+        return T.entityList.get(instance);
+    }
+
+    public void setEntityList(List<EntityHandle> value) {
+        T.entityList.set(instance, value);
+    }
+
     public MethodProfilerHandle getMethodProfiler() {
         return T.methodProfiler.get(instance);
     }
@@ -68,6 +84,7 @@ public class WorldHandle extends Template.Handle {
     }
 
     public static final class WorldClass extends Template.Class {
+        public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
 
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
@@ -78,6 +95,8 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
 
     }
 }

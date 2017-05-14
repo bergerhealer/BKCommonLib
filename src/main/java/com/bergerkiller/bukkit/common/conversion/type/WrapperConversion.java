@@ -6,6 +6,7 @@ import net.minecraft.server.v1_11_R1.Container;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
 import net.minecraft.server.v1_11_R1.EnumHand;
+import net.minecraft.server.v1_11_R1.EnumItemSlot;
 import net.minecraft.server.v1_11_R1.IInventory;
 import net.minecraft.server.v1_11_R1.InventoryCrafting;
 import net.minecraft.server.v1_11_R1.InventoryMerchant;
@@ -33,6 +34,7 @@ import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
 import org.bukkit.material.MaterialData;
@@ -448,5 +450,18 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.IChatBaseComponent")
     public static ChatText toChatText(Object iChatBaseComponentHandle) {
         return ChatText.fromComponent(iChatBaseComponentHandle);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
+    public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
+        switch ((EnumItemSlot) enumItemSlotHandle) {
+        case CHEST: return EquipmentSlot.CHEST;
+        case FEET: return EquipmentSlot.FEET;
+        case MAINHAND: return EquipmentSlot.HAND;
+        case OFFHAND: return EquipmentSlot.OFF_HAND;
+        case HEAD: return EquipmentSlot.HEAD;
+        case LEGS: return EquipmentSlot.LEGS;
+        }
+        return null;
     }
 }

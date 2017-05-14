@@ -16,12 +16,9 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.GenericFutureListener;
-import net.minecraft.server.v1_11_R1.NetworkManager;
-import net.minecraft.server.v1_11_R1.Packet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
@@ -34,10 +31,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
      * Known plugins that malfunction with the default packet handler
      */
     private static final String[] incompatibilities = {"Spout"};
-    /*
-     * Used for silent packet sending
-     */
-    private Object[] emptyGenericFutureListener;
     private SafeConstructor<?> queuedPacketConstructor;
 
     @Override
@@ -59,15 +52,14 @@ public class CommonPacketHandler extends PacketHandlerHooked {
         }
 
         // Initialize queued packet logic for silent sending
-        Class[] possible = NetworkManager.class.getDeclaredClasses();
-        Class qp = null;
-        for (Class p : possible) {
+        Class<?>[] possible = NMSNetworkManager.T.getType().getDeclaredClasses();
+        Class<?> qp = null;
+        for (Class<?> p : possible) {
             if (p.getName().endsWith("QueuedPacket")) {
                 qp = p;
             }
         }
         ClassTemplate<?> queuedPacketTemplate = ClassTemplate.create(qp);
-        this.emptyGenericFutureListener = new GenericFutureListener[0];
         this.queuedPacketConstructor = queuedPacketTemplate.getConstructor(PacketType.DEFAULT.getType(), GenericFutureListener[].class);
         if (!this.queuedPacketConstructor.isValid()) {
             return false;
@@ -148,16 +140,14 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            Packet packet = (Packet) msg;
-            if (handler.handlePacketSend(player, packet, false)) {
+            if (handler.handlePacketSend(player, msg, false)) {
                 super.write(ctx, msg, promise);
             }
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            Packet packet = (Packet) msg;
-            if (handler.handlePacketReceive(player, packet, false)) {
+            if (handler.handlePacketReceive(player, msg, false)) {
                 super.channelRead(ctx, msg);
             }
         }

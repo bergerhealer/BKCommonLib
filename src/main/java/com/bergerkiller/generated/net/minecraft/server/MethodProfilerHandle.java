@@ -11,7 +11,7 @@ public class MethodProfilerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final MethodProfilerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         MethodProfilerHandle handle = new MethodProfilerHandle();
         handle.instance = handleInstance;
         return handle;

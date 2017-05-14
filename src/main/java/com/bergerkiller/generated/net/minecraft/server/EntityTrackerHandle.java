@@ -3,22 +3,22 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
-public class BlockFenceGateHandle extends Template.Handle {
-    public static final BlockFenceGateClass T = new BlockFenceGateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockFenceGateHandle.class, "net.minecraft.server.BlockFenceGate");
+public class EntityTrackerHandle extends Template.Handle {
+    public static final EntityTrackerClass T = new EntityTrackerClass();
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerHandle.class, "net.minecraft.server.EntityTracker");
 
 
     /* ============================================================================== */
 
-    public static final BlockFenceGateHandle createHandle(Object handleInstance) {
+    public static final EntityTrackerHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
-        BlockFenceGateHandle handle = new BlockFenceGateHandle();
+        EntityTrackerHandle handle = new EntityTrackerHandle();
         handle.instance = handleInstance;
         return handle;
     }
 
     /* ============================================================================== */
 
-    public static final class BlockFenceGateClass extends Template.Class {
+    public static final class EntityTrackerClass extends Template.Class {
     }
 }

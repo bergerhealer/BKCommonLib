@@ -11,7 +11,7 @@ public class BlockFenceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final BlockFenceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         BlockFenceHandle handle = new BlockFenceHandle();
         handle.instance = handleInstance;
         return handle;

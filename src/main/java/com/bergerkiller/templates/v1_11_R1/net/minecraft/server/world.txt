@@ -10,6 +10,10 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 
 class World {
+    /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
+
+    public final (List<EntityHandle>) List<Entity> entityList;
+
     public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
 
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
@@ -27,6 +31,14 @@ class World {
     public (WorldDataHandle) WorldData getWorldData();
 
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
+
+    public void removeEntity((EntityHandle) Entity entity);
+
+    public boolean addEntity((EntityHandle) Entity entity);
+}
+
+class WorldServer {
+    private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 }
 
 class WorldData {

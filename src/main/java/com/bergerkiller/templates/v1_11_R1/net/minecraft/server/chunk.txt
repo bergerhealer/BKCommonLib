@@ -1,0 +1,8 @@
+package net.minecraft.server;
+
+/* import com.bergerkiller.generated.net.minecraft.server.ChunkHandle; */
+/* import com.bergerkiller.generated.net.minecraft.server.EntityHandle; */
+
+class Chunk {
+    public final (Object) List<Entity>[] entitySlices;
+}

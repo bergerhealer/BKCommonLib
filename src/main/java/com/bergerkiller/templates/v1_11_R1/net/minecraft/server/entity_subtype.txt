@@ -1,5 +1,15 @@
 package net.minecraft.server;
 
-class EntityHuman {
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 
+class EntityHuman {
+}
+
+class EntityLiving {
+    public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
+
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot)
+
+    public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
 }

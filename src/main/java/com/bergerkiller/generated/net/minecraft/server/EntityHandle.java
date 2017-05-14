@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.UUID;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
@@ -29,7 +30,7 @@ public class EntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final EntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         EntityHandle handle = new EntityHandle();
         handle.instance = handleInstance;
         return handle;
@@ -101,6 +102,10 @@ public class EntityHandle extends Template.Handle {
         return T.calculateDistance.invoke(instance, x, y, z);
     }
 
+    public void setLocation(double x, double y, double z, float yaw, float pitch) {
+        T.setLocation.invoke(instance, x, y, z, yaw, pitch);
+    }
+
     public float getHeadRotation() {
         return T.getHeadRotation.invoke(instance);
     }
@@ -165,6 +170,14 @@ public class EntityHandle extends Template.Handle {
         T.appendEntityCrashDetails.invoke(instance, crashreportsystemdetails);
     }
 
+    public int getId() {
+        return T.getId.invoke(instance);
+    }
+
+    public UUID getUniqueID() {
+        return T.getUniqueID.invoke(instance);
+    }
+
     public Entity getBukkitEntity() {
         return T.bukkitEntity.get(instance);
     }
@@ -173,19 +186,19 @@ public class EntityHandle extends Template.Handle {
         T.bukkitEntity.set(instance, value);
     }
 
-    public List<Entity> getPassengers() {
+    public List<EntityHandle> getPassengers() {
         return T.passengers.get(instance);
     }
 
-    public void setPassengers(List<Entity> value) {
+    public void setPassengers(List<EntityHandle> value) {
         T.passengers.set(instance, value);
     }
 
-    public Entity getVehicle() {
+    public EntityHandle getVehicle() {
         return T.vehicle.get(instance);
     }
 
-    public void setVehicle(Entity value) {
+    public void setVehicle(EntityHandle value) {
         T.vehicle.set(instance, value);
     }
 
@@ -549,6 +562,14 @@ public class EntityHandle extends Template.Handle {
         T.move_SomeState.setLong(instance, value);
     }
 
+    public boolean isValid() {
+        return T.valid.getBoolean(instance);
+    }
+
+    public void setValid(boolean value) {
+        T.valid.setBoolean(instance, value);
+    }
+
     public static final class EntityClass extends Template.Class {
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
@@ -559,8 +580,8 @@ public class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Converted<Entity> bukkitEntity = new Template.Field.Converted<Entity>();
-        public final Template.Field.Converted<List<Entity>> passengers = new Template.Field.Converted<List<Entity>>();
-        public final Template.Field.Converted<Entity> vehicle = new Template.Field.Converted<Entity>();
+        public final Template.Field.Converted<List<EntityHandle>> passengers = new Template.Field.Converted<List<EntityHandle>>();
+        public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
         public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
         public final Template.Field.Double lastX = new Template.Field.Double();
@@ -606,6 +627,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Integer dimension = new Template.Field.Integer();
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
+        public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
         public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
@@ -621,6 +643,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
+        public final Template.Method<Void> setLocation = new Template.Method<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
@@ -637,6 +660,8 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
         public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
+        public final Template.Method<Integer> getId = new Template.Method<Integer>();
+        public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
 
     }
 }

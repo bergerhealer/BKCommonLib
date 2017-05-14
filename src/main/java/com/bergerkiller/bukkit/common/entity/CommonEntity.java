@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -15,27 +14,21 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftInventory;
-
-import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.EntityTrackerEntry;
-import net.minecraft.server.v1_11_R1.TileEntity;
-import net.minecraft.server.v1_11_R1.World;
-import net.minecraft.server.v1_11_R1.IInventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
@@ -82,7 +75,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (hook != null) {
             return CommonUtil.unsafeCast(hook.getController());
         }
-        if (EntityTrackerEntry.class.equals(entityTrackerEntry.getClass())) {
+        if (EntityTrackerEntryHandle.T.isType(entityTrackerEntry)) {
             result = new DefaultEntityNetworkController();
             result.bind(this, entityTrackerEntry);
         } else {
@@ -261,7 +254,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             return;
         }
 
-        final Entity oldInstance = getHandle(Entity.class);
+        final Object oldInstance = this.getHandle();
 
         // Check whether conversion is allowed
         final String oldInstanceName = oldInstance.getClass().getName();
@@ -273,7 +266,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // Respawn the entity and attach the controller
         try {
             // Create a new entity instance and perform data/property transfer
-            replaceEntity((Entity) type.createNMSHookFromEntity(this));
+            replaceEntity(EntityHandle.createHandle(type.createNMSHookFromEntity(this)));
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException("Failed to set controller:", t);
@@ -281,48 +274,53 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     }
 
     @SuppressWarnings("unchecked")
-    private void replaceEntity(final Entity newInstance) {
-        final Entity oldInstance = getHandle(Entity.class);
+    private void replaceEntity(final EntityHandle newInstance) {
+        final EntityHandle oldInstance = this.handle;
         if (oldInstance == newInstance) {
             throw new RuntimeException("Can not replace an entity with itself!");
         }
 
         // Reset entity state
-        oldInstance.dead = true;
-        newInstance.dead = false;
-        oldInstance.valid = false;
-        newInstance.valid = true;
+        oldInstance.setDead(true);
+        newInstance.setDead(false);
+        oldInstance.setValid(false);
+        newInstance.setValid(true);
 
         // *** Bukkit Entity ***
-        ((CraftEntity) entity).setHandle(newInstance);
+        CraftEntityHandle craftEntity = CraftEntityHandle.createHandle(this.entity);
+        craftEntity.setHandle(newInstance);
         if (entity instanceof InventoryHolder) {
             Inventory inv = ((InventoryHolder) entity).getInventory();
-            if (inv instanceof CraftInventory && newInstance instanceof IInventory) {
-            	CBCraftInventory.handle.set(inv, newInstance);
+            if (CraftInventoryHandle.T.isAssignableFrom(inv)) {
+                CraftInventoryHandle cInv = CraftInventoryHandle.createHandle(inv);
+                if (IInventoryHandle.T.isAssignableFrom(newInstance.getRaw())) {
+                    IInventoryHandle iinvHandle = IInventoryHandle.createHandle(newInstance.getRaw());
+                    cInv.setHandleField(iinvHandle);
+                }
             }
         }
 
         // *** Give the old entity a new Bukkit Entity ***
-        this.handle.setBukkitEntity(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), this.handle));
-        this.handle = EntityHandle.createHandle(newInstance);
+        oldInstance.setBukkitEntity(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
+        this.handle = newInstance;
 
         // *** Replace entity in passenger and vehicle fields ***
-        Entity vehicle = (Entity) NMSEntity.vehicleField.getInternal(newInstance);
+        EntityHandle vehicle = newInstance.getVehicle();
         if (vehicle != null) {
-            replaceInList(vehicle.passengers, newInstance);
+            replaceInList(vehicle.getPassengers(), newInstance);
         }
-        if (newInstance.passengers != null) {
-            for (Entity passenger : newInstance.passengers) {
-                if (NMSEntity.vehicleField.getInternal(passenger) == oldInstance) {
-                    NMSEntity.vehicleField.setInternal(passenger, newInstance);
+        if (newInstance.getPassengers() != null) {
+            for (EntityHandle passenger : newInstance.getPassengers()) {
+                if (oldInstance.equals(passenger.getVehicle())) {
+                    passenger.setVehicle(newInstance);
                 }
             }
         }
 
         // *** DataWatcher field of the old Entity ***
-        Object dataWatcher = NMSEntity.datawatcher.getInternal(newInstance);
+        Object dataWatcher = EntityHandle.T.datawatcher.raw.get(newInstance.getRaw());
         if (dataWatcher != null) {
-            NMSDataWatcher.owner.setInternal(dataWatcher, newInstance);
+            DataWatcherHandle.T.owner.set(dataWatcher, newInstance);
         }
 
         // *** Perform further replacement all over the place in the server ***
@@ -350,40 +348,40 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * @param oldInstance to replace
      * @param newInstance to replace with
      */
-    private static void replaceEntityInServer(final Entity oldInstance, final Entity newInstance) {
+    private static void replaceEntityInServer(final EntityHandle oldInstance, final EntityHandle newInstance) {
         // *** Entities By UUID Map ***
-        final Map<UUID, Object> entitiesByUUID = NMSWorldServer.entitiesByUUID.get(oldInstance.world);
+        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(oldInstance.getWorld().getRaw());
         entitiesByUUID.put(newInstance.getUniqueID(), newInstance);
 
         // *** Entities by Id Map ***
-        final IntHashMap<Object> entitiesById = NMSWorld.entitiesById.get(oldInstance.world);
-        entitiesById.put(newInstance.getId(), newInstance);
+        final IntHashMap<Object> entitiesById = NMSWorld.entitiesById.get(oldInstance.getWorld().getRaw());
+        entitiesById.put(newInstance.getId(), newInstance.getRaw());
 
         // *** EntityTrackerEntry ***
         replaceInEntityTracker(newInstance.getId(), newInstance);
         if (newInstance.getVehicle() != null) {
             replaceInEntityTracker(newInstance.getVehicle().getId(), newInstance);
         }
-        if (newInstance.passengers != null) {
-            for (Entity passenger : newInstance.passengers) {
+        if (newInstance.getPassengers() != null) {
+            for (EntityHandle passenger : newInstance.getPassengers()) {
                 replaceInEntityTracker(passenger.getId(), newInstance);
             }
         }
 
         // *** World ***
-        replaceInList(newInstance.world.entityList, newInstance);
+        replaceInList(newInstance.getWorld().getEntityList(), newInstance);
         // Fixes for PaperSpigot
         // if (!Common.IS_PAPERSPIGOT_SERVER) {
         //     replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
         // }
 
         // *** Entity Current Chunk ***
-        final int chunkX = NMSEntity.chunkX.get(newInstance);
-        final int chunkY = NMSEntity.chunkY.get(newInstance);
-        final int chunkZ = NMSEntity.chunkZ.get(newInstance);
-        Chunk chunk = CommonNMS.getNative(WorldUtil.getChunk(newInstance.world.getWorld(), chunkX, chunkZ));
-        if (chunk != null) {
-            final List<Entity>[] entitySlices = chunk.entitySlices;
+        final int chunkX = newInstance.getChunkX();
+        final int chunkY = newInstance.getChunkY();
+        final int chunkZ = newInstance.getChunkZ();
+        Object chunkHandle = Conversion.toChunkHandle.convert(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
+        if (chunkHandle != null) {
+            final List<?>[] entitySlices = (List<?>[]) ChunkHandle.T.entitySlices.raw.get(chunkHandle);
             if (!replaceInList(entitySlices[chunkY], newInstance)) {
                 for (int y = 0; y < entitySlices.length; y++) {
                     if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
@@ -398,37 +396,36 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         //DebugUtil.logInstances(oldInstance);
     }
 
-    @SuppressWarnings("unchecked")
-    private static void replaceInEntityTracker(int entityId, Entity newInstance) {
-        final EntityTracker trackerMap = WorldUtil.getTracker(newInstance.world.getWorld());
+    private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {
+        final EntityTracker trackerMap = WorldUtil.getTracker(newInstance.getWorld().getWorld());
         Object entry = trackerMap.getEntry(entityId);
         if (entry != null) {
-            Entity tracker = (Entity) NMSEntityTrackerEntry.tracker.getInternal(entry);
+            EntityHandle tracker = EntityHandle.createHandle(NMSEntityTrackerEntry.tracker.getInternal(entry));
             if (tracker != null && tracker.getId() == newInstance.getId()) {
-                NMSEntityTrackerEntry.tracker.setInternal(entry, newInstance);
+                NMSEntityTrackerEntry.tracker.setInternal(entry, newInstance.getRaw());
             }
-            List<Entity> passengers = (List<Entity>) NMSEntityTrackerEntry.passengers.getInternal(entry);
-            replaceInList(passengers, newInstance);
+            replaceInList((List<?>) NMSEntityTrackerEntry.passengers.getInternal(entry), newInstance);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static boolean replaceInList(List list, Entity entity) {
+    private static boolean replaceInList(List list, EntityHandle entity) {
         if (list == null) {
             return false;
         }
         ListIterator<Object> iter = list.listIterator();
         while (iter.hasNext()) {
             Object obj = iter.next();
-            if (obj instanceof Entity) {
-                if (((Entity) obj).getId() == entity.getId()) {
+            if (obj instanceof EntityHandle) {
+                EntityHandle obj_e = (EntityHandle) obj;
+                if (obj_e.getId() == entity.getId()) {
                     iter.set(entity);
-                    return true;
                 }
-            } else if (obj instanceof TileEntity) {
-               // CommonPlugin.LOGGER.log(Level.WARNING, "TileEntity is in Entity List!");
-            } else {
-               // CommonPlugin.LOGGER.log(Level.WARNING, "Invalid Object is in Entity List!");
+            } else if (EntityHandle.T.isAssignableFrom(obj)) {
+                int obj_id = EntityHandle.T.getId.invoke(obj);
+                if (obj_id == entity.getId()) {
+                    iter.set(entity.getRaw());
+                }
             }
         }
         return false;
@@ -465,7 +462,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             if (isLoaded = chunk != null) {
                 WorldUtil.addEntity(chunk, entity);
             }
-            NMSEntity.isLoaded.set(getHandle(), isLoaded);
+            this.handle.setIsLoaded(isLoaded);
         }
 
         // Tick the passenger
@@ -505,10 +502,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
         // Preparations prior to teleportation
         final Location oldLocation = entity.getLocation();
-        final Entity entityHandle = CommonNMS.getNative(entity);
+        final EntityHandle entityHandle = EntityHandle.createHandle(Conversion.toEntityHandle.convert(this.entity));
         final List<org.bukkit.entity.Entity> passengers = getPassengers();
-        final World newworld = CommonNMS.getNative(location.getWorld());
-        final boolean isWorldChange = entityHandle.world != newworld;
+        final WorldHandle newworld = WorldHandle.createHandle(Conversion.toWorldHandle.convert(location.getWorld()));
+        final boolean isWorldChange = !entityHandle.getWorld().equals(newworld);
         final EntityNetworkController<?> oldNetworkController = getNetworkController();
         final boolean hasNetworkController = !(oldNetworkController instanceof DefaultEntityNetworkController);
         WorldUtil.loadChunks(location, 3);
@@ -547,11 +544,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         } else {
             // Remove from one world and add to the other
-            entityHandle.world.removeEntity(entityHandle);
-            entityHandle.dead = false;
-            entityHandle.world = newworld;
+            entityHandle.getWorld().removeEntity(entityHandle);
+            entityHandle.setDead(false);
+            entityHandle.setWorld(newworld);
             entityHandle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-            entityHandle.world.addEntity(entityHandle);
+            entityHandle.getWorld().addEntity(entityHandle);
             succ = true;
         }
         if (hasNetworkController) {
@@ -565,7 +562,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (passengers.size() > 0) {
             // Teleport the passenger, but ignore the chunk send check so vehicle is properly spawned to all players
             List<org.bukkit.entity.Entity> teleportedPassengers = new ArrayList<org.bukkit.entity.Entity>();
-            NMSEntity.ignoreChunkCheck.set(entityHandle, true);
+            entityHandle.setIgnoreChunkCheck(true);
 
             float yawChange = location.getYaw() - oldLocation.getYaw();
             float pitchChange = location.getPitch() - oldLocation.getPitch();
@@ -583,7 +580,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 }
             };
 
-            NMSEntity.ignoreChunkCheck.set(entityHandle, false);
+            entityHandle.setIgnoreChunkCheck(false);
 
             if (teleportedPassengers.size() > 0) {
                 setPassengersSilent(teleportedPassengers);
@@ -777,7 +774,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             try {
                 // Transfer data and replace
                 Object newInstance = EntityHook.unhook(oldInstance);
-                commonEntity.replaceEntity((Entity) newInstance);
+                commonEntity.replaceEntity(EntityHandle.createHandle(newInstance));
             } catch (Throwable t) {
                 Logging.LOGGER.log(Level.SEVERE, "Failed to unhook Common Entity Controller:");
                 t.printStackTrace();

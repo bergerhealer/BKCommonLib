@@ -13,7 +13,7 @@ public class SimplePluginManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final SimplePluginManagerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         SimplePluginManagerHandle handle = new SimplePluginManagerHandle();
         handle.instance = handleInstance;
         return handle;

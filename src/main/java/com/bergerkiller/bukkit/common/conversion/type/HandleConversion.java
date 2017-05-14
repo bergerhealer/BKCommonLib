@@ -4,6 +4,7 @@ import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EnumDifficulty;
 import net.minecraft.server.v1_11_R1.EnumHand;
+import net.minecraft.server.v1_11_R1.EnumItemSlot;
 import net.minecraft.server.v1_11_R1.MapIcon;
 
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
@@ -36,6 +38,7 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
@@ -279,5 +282,27 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.IChatBaseComponent")
     public static Object toChatBaseComponent(ChatText text) {
         return text.getHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
+    public static Object toEnumItemSlotHandle(EquipmentSlot equipmentSlot) {
+        switch (equipmentSlot) {
+        case CHEST: return EnumItemSlot.CHEST;
+        case FEET: return EnumItemSlot.FEET;
+        case HAND: return EnumItemSlot.MAINHAND;
+        case OFF_HAND: return EnumItemSlot.OFFHAND;
+        case HEAD: return EnumItemSlot.HEAD;
+        case LEGS: return EnumItemSlot.LEGS;
+        }
+        return null;
+    }
+
+    @ConverterMethod(input="net.minecraft.server.AttributeMapBase")
+    public static AttributeMapServerHandle toAttributeMapServer(Object attributeMapBaseHandle) {
+        if (AttributeMapServerHandle.T.isAssignableFrom(attributeMapBaseHandle)) {
+            return AttributeMapServerHandle.createHandle(attributeMapBaseHandle);
+        } else {
+            return null;
+        }
     }
 }

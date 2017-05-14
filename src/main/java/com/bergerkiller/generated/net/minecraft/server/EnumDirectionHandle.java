@@ -12,7 +12,7 @@ public class EnumDirectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final EnumDirectionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         EnumDirectionHandle handle = new EnumDirectionHandle();
         handle.instance = handleInstance;
         return handle;
@@ -34,7 +34,7 @@ public class EnumDirectionHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static final EnumAxisHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+            if (handleInstance == null) return null;
             EnumAxisHandle handle = new EnumAxisHandle();
             handle.instance = handleInstance;
             return handle;

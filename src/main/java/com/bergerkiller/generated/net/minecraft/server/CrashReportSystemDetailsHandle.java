@@ -11,7 +11,7 @@ public class CrashReportSystemDetailsHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final CrashReportSystemDetailsHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         CrashReportSystemDetailsHandle handle = new CrashReportSystemDetailsHandle();
         handle.instance = handleInstance;
         return handle;

@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
@@ -28,6 +29,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -540,6 +542,10 @@ public class NMSPacketClasses {
 
         public CommonPacket newInstance(int entityId, Object enumItemSlot, ItemStack item) {
             return constructor1.newInstance(entityId, enumItemSlot, Conversion.toItemStackHandle.convert(item));
+        }
+
+        public CommonPacket newInstance(int entityId, EquipmentSlot equipmentSlot, ItemStack item) {
+            return constructor1.newInstance(entityId, HandleConversion.toEnumItemSlotHandle(equipmentSlot), Conversion.toItemStackHandle.convert(item));
         }
     }
 

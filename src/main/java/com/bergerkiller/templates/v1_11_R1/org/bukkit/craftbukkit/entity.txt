@@ -5,6 +5,9 @@ import org.bukkit.craftbukkit.CraftServer;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 class CraftEntity {
-    public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (EntityHandle) net.minecraft.server.Entity entity);
     protected (EntityHandle) net.minecraft.server.Entity entityHandle:entity;
+
+    public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (EntityHandle) net.minecraft.server.Entity entity);
+
+    public void setHandle((EntityHandle) net.minecraft.server.Entity entity)
 }

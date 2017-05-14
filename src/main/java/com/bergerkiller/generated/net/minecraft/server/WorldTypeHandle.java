@@ -11,7 +11,7 @@ public class WorldTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final WorldTypeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         WorldTypeHandle handle = new WorldTypeHandle();
         handle.instance = handleInstance;
         return handle;

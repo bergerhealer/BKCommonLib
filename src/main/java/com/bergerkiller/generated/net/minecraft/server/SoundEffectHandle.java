@@ -11,7 +11,7 @@ public class SoundEffectHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final SoundEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         SoundEffectHandle handle = new SoundEffectHandle();
         handle.instance = handleInstance;
         return handle;

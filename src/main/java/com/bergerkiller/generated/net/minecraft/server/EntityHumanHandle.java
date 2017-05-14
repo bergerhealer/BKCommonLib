@@ -11,7 +11,7 @@ public class EntityHumanHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final EntityHumanHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         EntityHumanHandle handle = new EntityHumanHandle();
         handle.instance = handleInstance;
         return handle;

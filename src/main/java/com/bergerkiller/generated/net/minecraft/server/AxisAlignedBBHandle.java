@@ -12,7 +12,7 @@ public class AxisAlignedBBHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final AxisAlignedBBHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         AxisAlignedBBHandle handle = new AxisAlignedBBHandle();
         handle.instance = handleInstance;
         return handle;

@@ -214,6 +214,17 @@ public class MathUtil {
     }
 
     /**
+     * Gets the floor long value from a double value
+     * 
+     * @param value to get the floor of
+     * @return floor value
+     */
+    public static long longFloor(double value) {
+        long l = (long) value;
+        return value < l ? l - 1L : l;
+    }
+
+    /**
      * Gets the floor integer value from a double value
      *
      * @param value to get the floor of

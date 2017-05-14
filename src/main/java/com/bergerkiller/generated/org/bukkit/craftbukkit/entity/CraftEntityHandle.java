@@ -14,7 +14,7 @@ public class CraftEntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final CraftEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         CraftEntityHandle handle = new CraftEntityHandle();
         handle.instance = handleInstance;
         return handle;
@@ -24,6 +24,10 @@ public class CraftEntityHandle extends Template.Handle {
 
     public static Entity createCraftEntity(Server server, EntityHandle entity) {
         return T.createCraftEntity.invoke(server, entity);
+    }
+
+    public void setHandle(EntityHandle entity) {
+        T.setHandle.invoke(instance, entity);
     }
 
     public EntityHandle getEntityHandle() {
@@ -38,6 +42,8 @@ public class CraftEntityHandle extends Template.Handle {
         public final Template.Field.Converted<EntityHandle> entityHandle = new Template.Field.Converted<EntityHandle>();
 
         public final Template.StaticMethod.Converted<Entity> createCraftEntity = new Template.StaticMethod.Converted<Entity>();
+
+        public final Template.Method.Converted<Void> setHandle = new Template.Method.Converted<Void>();
 
     }
 }

@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.LongLocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.ObjectAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
@@ -14,17 +13,18 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
-import com.google.common.primitives.Ints;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 
-import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public static final int ABSOLUTE_UPDATE_INTERVAL = 400;
 
-    private Object handle;
+    private EntityTrackerEntryHandle handle;
 
     /**
      * Obtains the velocity as the clients know it, allowing it to be read from
@@ -68,29 +68,29 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public VectorAbstract velSynched = new VectorAbstract() {
         public double getX() {
-            return NMSEntityTrackerEntry.xVel.get(handle);
+            return handle.getXVel();
         }
 
         public double getY() {
-            return NMSEntityTrackerEntry.yVel.get(handle);
+            return handle.getYVel();
         }
 
         public double getZ() {
-            return NMSEntityTrackerEntry.zVel.get(handle);
+            return handle.getZVel();
         }
 
         public VectorAbstract setX(double x) {
-        	NMSEntityTrackerEntry.xVel.set(handle, x);
+            handle.setXVel(x);
             return this;
         }
 
         public VectorAbstract setY(double y) {
-        	NMSEntityTrackerEntry.yVel.set(handle, y);
+            handle.setYVel(y);
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-        	NMSEntityTrackerEntry.zVel.set(handle, z);
+            handle.setZVel(z);
             return this;
         }
     };
@@ -141,47 +141,47 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         public long getX() {
-        	return Ints.checkedCast(NMSEntityTrackerEntry.xLoc.get(handle));
+            return handle.getXLoc();
         }
 
         public long getY() {
-        	return Ints.checkedCast(NMSEntityTrackerEntry.yLoc.get(handle));
+            return handle.getYLoc();
         }
 
         public long getZ() {
-        	return Ints.checkedCast(NMSEntityTrackerEntry.zLoc.get(handle));
+            return handle.getZLoc();
         }
 
         public LongLocationAbstract setX(long x) {
-        	NMSEntityTrackerEntry.xLoc.set(handle, x);
+            handle.setXLoc(x);
             return this;
         }
 
         public LongLocationAbstract setY(long y) {
-        	NMSEntityTrackerEntry.yLoc.set(handle, y);
+            handle.setYLoc(y);
             return this;
         }
 
         public LongLocationAbstract setZ(long z) {
-        	NMSEntityTrackerEntry.zLoc.set(handle, z);
+            handle.setZLoc(z);
             return this;
         }
 
         public int getYaw() {
-        	return NMSEntityTrackerEntry.yRot.get(handle);
+            return handle.getYRot();
         }
 
         public int getPitch() {
-        	return NMSEntityTrackerEntry.xRot.get(handle);
+            return handle.getXRot();
         }
 
         public LongLocationAbstract setYaw(int yaw) {
-        	NMSEntityTrackerEntry.yRot.set(handle, yaw);
+            handle.setYRot(yaw);
             return this;
         }
 
         public LongLocationAbstract setPitch(int pitch) {
-        	NMSEntityTrackerEntry.xRot.set(handle, pitch);
+            handle.setXRot(pitch);
             return this;
         }
     };
@@ -256,11 +256,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract headRotSynched = new IntegerAbstract() {
         public int get() {
-        	return NMSEntityTrackerEntry.headYaw.get(handle);
+        	return handle.getHeadYaw();
         }
 
         public IntegerAbstract set(int value) {
-        	NMSEntityTrackerEntry.headYaw.set(handle, value);
+        	handle.setHeadYaw(value);
             return this;
         }
     };
@@ -285,11 +285,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public IntegerAbstract ticks = new IntegerAbstract() {
         public int get() {
-            return NMSEntityTrackerEntry.tickCounter.get(handle);
+            return handle.getTickCounter();
         }
 
         public IntegerAbstract set(int value) {
-            NMSEntityTrackerEntry.tickCounter.set(handle, value);
+            handle.setTickCounter(value);
             return this;
         }
     };
@@ -299,37 +299,37 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public ObjectAbstract<List<Entity>> passengersSynched = new ObjectAbstract<List<Entity>>() {
         public List<Entity> get() {
-            return NMSEntityTrackerEntry.passengers.get(handle);
+            return handle.getPassengers();
         }
 
         public ObjectAbstract<List<Entity>> set(List<Entity> value) {
-            NMSEntityTrackerEntry.passengers.set(handle, value);
+            handle.setPassengers(value);
             return this;
         }
     };
 
     public int getViewDistance() {
-        return NMSEntityTrackerEntry.viewDistance.get(handle);
+        return handle.getViewDistance();
     }
 
     public void setViewDistance(int blockDistance) {
-        NMSEntityTrackerEntry.viewDistance.set(handle, blockDistance);
+        handle.setViewDistance(blockDistance);
     }
 
     public int getUpdateInterval() {
-        return NMSEntityTrackerEntry.updateInterval.get(handle);
+        return handle.getUpdateInterval();
     }
 
     public void setUpdateInterval(int tickInterval) {
-        NMSEntityTrackerEntry.updateInterval.set(handle, tickInterval);
+        handle.setUpdateInterval(tickInterval);
     }
 
     public boolean isMobile() {
-        return NMSEntityTrackerEntry.isMobile.get(handle);
+        return handle.isMobile();
     }
 
     public void setMobile(boolean mobile) {
-        NMSEntityTrackerEntry.isMobile.set(handle, mobile);
+        handle.setIsMobile(mobile);
     }
 
     /**
@@ -340,7 +340,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return ticks since last location synchronization
      */
     public int getTicksSinceLocationSync() {
-        return NMSEntityTrackerEntry.timeSinceLocationSync.get(handle);
+        return handle.getTimeSinceLocationSync();
     }
 
     /**
@@ -364,9 +364,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             this.onDetached();
         }
         this.entity = entity;
-        this.handle = entityTrackerEntry;
+        this.handle = EntityTrackerEntryHandle.createHandle(entityTrackerEntry);
 
-        EntityTrackerHook hook = EntityTrackerHook.get(this.handle, EntityTrackerHook.class);
+        EntityTrackerHook hook = EntityTrackerHook.get(this.handle.getRaw(), EntityTrackerHook.class);
         if (hook != null) {
             hook.setController(this);
         }
@@ -381,7 +381,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return entry handle
      */
     public Object getHandle() {
-        return handle;
+        return handle.getRaw();
     }
 
     /**
@@ -390,7 +390,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return viewing players
      */
     public final Collection<Player> getViewers() {
-        return Collections.unmodifiableCollection(NMSEntityTrackerEntry.viewers.get(handle));
+        return Collections.unmodifiableCollection(handle.getViewers());
     }
 
     /**
@@ -403,7 +403,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * added
      */
     public boolean addViewer(Player viewer) {
-        if (!((EntityTrackerEntry) handle).trackedPlayers.add((EntityPlayer) Conversion.toEntityHandle.convert(viewer))) {
+        if (!handle.getViewers().add(viewer)) {
             return false;
         }
         this.makeVisible(viewer);
@@ -420,7 +420,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * contained
      */
     public boolean removeViewer(Player viewer) {
-        if (!((EntityTrackerEntry) handle).trackedPlayers.remove(Conversion.toEntityHandle.convert(viewer))) {
+        if (!handle.getViewers().remove(viewer)) {
             return false;
         }
         this.makeHidden(viewer);
@@ -455,14 +455,14 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     private boolean isViewable(Player viewer) {
         // View range check
-        final int dx = MathHelper.floor(Math.abs(EntityUtil.getLocX(viewer) - (double) locProt(this.locSynched.getX())));
-        final int dz = MathHelper.floor(Math.abs(EntityUtil.getLocZ(viewer) - (double) locProt(this.locSynched.getZ())));
+        final int dx = MathUtil.floor(Math.abs(EntityUtil.getLocX(viewer) - (double) locProt(this.locSynched.getX())));
+        final int dz = MathUtil.floor(Math.abs(EntityUtil.getLocZ(viewer) - (double) locProt(this.locSynched.getZ())));
         final int view = this.getViewDistance();
         if (dx > view || dz > view) {
             return false;
         }
         // The entity is in a chunk not seen by the viewer
-        if (!NMSEntity.ignoreChunkCheck.get(entity.getHandle())
+        if (!EntityHandle.T.ignoreChunkCheck.getBoolean(entity.getHandle())
                 && !PlayerUtil.isChunkEntered(viewer, entity.getChunkX(), entity.getChunkZ())) {
             return false;
         }
@@ -598,26 +598,28 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_METADATA.newInstance(entity.getEntityId(), metaData, true));
         }
         // Living Entity - only data
-        if (handle instanceof EntityLiving) {
+        Object entityHandle = this.entity.getHandle();
+        if (EntityLivingHandle.T.isAssignableFrom(entityHandle)) {
+            EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
+
             // Entity Attributes
-            AttributeMapServer attributeMap = (AttributeMapServer) NMSEntityLiving.getAttributesMap.invoke(handle);
-            Collection<?> attributes = attributeMap.c();
+            AttributeMapServerHandle attributeMap = living.getAttributeMap();
+            Collection<?> attributes = attributeMap.attributes();
             if (!attributes.isEmpty()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
             }
 
             // Entity Equipment
-            EntityLiving living = (EntityLiving) handle;
-            for (EnumItemSlot slot : EnumItemSlot.values()) {
-                org.bukkit.inventory.ItemStack itemstack = Conversion.toItemStack.convert(living.getEquipment(slot));
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                org.bukkit.inventory.ItemStack itemstack = living.getEquipment(slot);
                 if (itemstack != null) {
                     PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EQUIPMENT.newInstance(entity.getEntityId(), slot, itemstack));
                 }
             }
 
             // Entity Mob Effects
-            for (MobEffect effect : (Collection<MobEffect>) living.getEffects()) {
-                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect));
+            for (MobEffectHandle effect : living.getEffects()) {
+                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect.getRaw()));
             }
         }
     }
@@ -759,10 +761,13 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             broadcast(PacketType.OUT_ENTITY_METADATA.newInstance(entity.getEntityId(), meta, false), true);
         }
         // Living Entity - only data
-        if (handle instanceof EntityLiving) {
+        Object entityHandle = this.entity.getHandle();
+        if (EntityLivingHandle.T.isAssignableFrom(entityHandle)) {
+            EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
+
             // Entity Attributes
-            AttributeMapServer attributeMap = (AttributeMapServer) NMSEntityLiving.getAttributesMap.invoke(handle);
-            Collection<?> attributes = attributeMap.c();
+            AttributeMapServerHandle attributeMap = living.getAttributeMap();
+            Collection<?> attributes = attributeMap.attributes();;
             if (!attributes.isEmpty()) {
                 this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
             }
@@ -903,7 +908,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         locSynched.set(posX, posY, posZ, yaw, pitch);
 
         // Update last synchronization time
-        NMSEntityTrackerEntry.timeSinceLocationSync.set(handle, 0);
+        handle.setTimeSinceLocationSync(0);
 
         // Send synchronization messages
         broadcast(getLocationPacket(posX, posY, posZ, yaw, pitch));
@@ -1038,7 +1043,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return spawn packet
      */
     public CommonPacket getSpawnPacket() {
-        final CommonPacket packet = NMSEntityTrackerEntry.getSpawnPacket(handle);
+        final CommonPacket packet = handle.getSpawnPacket();
         if (packet != null && packet.getType() == PacketType.OUT_ENTITY_SPAWN) {
             // NMS error: They are not using the position, but the live position
             // This has some big issues when new players join...
@@ -1087,7 +1092,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Taken from EntityTracker MC source
      */
     public static long protLoc(double loc) {
-        return MathHelper.d(loc * 4096.0D);
+        return MathUtil.longFloor(loc * 4096.0D);
     }
 
     /**
@@ -1107,6 +1112,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return protocol value
      */
     private static int protMot(double mot) {
-        return ((int)(MathHelper.a(mot, -3.9D, 3.9D) * 8000.0D));
+        return ((int)(MathUtil.clamp(mot, -3.9, 3.9) * 8000.0D));
     }
 }

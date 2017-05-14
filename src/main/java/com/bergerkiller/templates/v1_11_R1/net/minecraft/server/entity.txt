@@ -15,9 +15,9 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
     private static int entityCount;
-    public final (List<org.bukkit.entity.Entity>) List<Entity> passengers;
+    public final (List<EntityHandle>) List<Entity> passengers;
     protected unknown int j;
-    private (org.bukkit.entity.Entity) net.minecraft.server.Entity vehicle:au
+    private (EntityHandle) net.minecraft.server.Entity vehicle:au
     public boolean ignoreChunkCheck:attachedToPlayer;
     public (WorldHandle) World world;
     public double lastX;
@@ -84,6 +84,7 @@ class Entity {
 
     private double[] move_SomeArray:aI;
     private long move_SomeState:aJ;
+    public boolean valid;
 
     /*
      * protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
@@ -261,6 +262,8 @@ class Entity {
      */
     public double calculateDistance:e(double x, double y, double z);
 
+    public void setLocation(double x, double y, double z, float yaw, float pitch);
+
     public float getHeadRotation();
 
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
@@ -292,4 +295,8 @@ class Entity {
     public boolean isInSameVehicle:x((EntityHandle) Entity entity);
 
     public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+
+    public int getId();
+
+    public UUID getUniqueID();
 }

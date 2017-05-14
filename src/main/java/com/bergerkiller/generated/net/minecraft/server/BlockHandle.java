@@ -13,7 +13,7 @@ public class BlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final BlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         BlockHandle handle = new BlockHandle();
         handle.instance = handleInstance;
         return handle;

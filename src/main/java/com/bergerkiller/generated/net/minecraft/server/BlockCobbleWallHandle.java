@@ -11,7 +11,7 @@ public class BlockCobbleWallHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final BlockCobbleWallHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+        if (handleInstance == null) return null;
         BlockCobbleWallHandle handle = new BlockCobbleWallHandle();
         handle.instance = handleInstance;
         return handle;

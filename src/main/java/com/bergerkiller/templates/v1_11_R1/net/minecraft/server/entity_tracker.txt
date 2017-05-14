@@ -1,0 +1,45 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+
+class EntityTracker {
+
+}
+
+class EntityTrackerEntry {
+    private final (EntityHandle) Entity tracker;
+
+    private final int viewDistance:e;
+    private int playerViewDistance:f;
+    private final int updateInterval:g;
+
+    private long xLoc;
+    private long yLoc;
+    private long zLoc;
+
+    private int yRot;
+    private int xRot;
+    private int headYaw;
+
+    private double xVel:n;
+    private double yVel:o;
+    private double zVel:p;
+
+    public int tickCounter:a;
+
+    private double prevX:q;
+    private double prevY:r;
+    private double prevZ:s;
+
+    private boolean synched:isMoving;
+    private final boolean isMobile:u;
+    private int timeSinceLocationSync:v;
+
+    private (List<org.bukkit.entity.Entity>) List<Entity> passengers:w;
+
+    public final (Set<org.bukkit.entity.Player>) Set<EntityPlayer> viewers:trackedPlayers;
+
+
+    private (CommonPacket) Packet<?> getSpawnPacket:e();
+}
