@@ -10,8 +10,8 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 
 public class EntityHook extends ClassHook<EntityHook> {
@@ -118,7 +118,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public boolean c(NBTTagCompound nbttagcompound)")
     public boolean c(Object tag) {
         Object handle = this.instance();
-        if (NMSEntity.dead.get(handle)) {
+        if (EntityHandle.T.dead.getBoolean(handle)) {
             return false;
         }
 
@@ -130,10 +130,10 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public boolean d(NBTTagCompound nbttagcompound)")
     public boolean d(Object tag) {
         Object handle = this.instance();
-        if (NMSEntity.dead.get(handle)) {
+        if (EntityHandle.T.dead.getBoolean(handle)) {
             return false;
         }
-        if (NMSEntity.vehicleField.get(handle) != null) {
+        if (EntityHandle.T.vehicle.raw.get(handle) != null) {
             return false;
         }
 

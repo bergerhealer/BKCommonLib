@@ -1,14 +1,10 @@
 package com.bergerkiller.bukkit.common.controller;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.nbt.CommonTag;
+import com.bergerkiller.bukkit.common.internal.hooks.PlayerFileDataHook;
+import com.bergerkiller.bukkit.common.internal.hooks.PlayerFileDataHook.HookAction;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import net.minecraft.server.v1_11_R1.DedicatedPlayerList;
-import net.minecraft.server.v1_11_R1.EntityHuman;
-import net.minecraft.server.v1_11_R1.IPlayerFileData;
-import net.minecraft.server.v1_11_R1.NBTTagCompound;
 import org.bukkit.entity.HumanEntity;
 
 /**
@@ -16,11 +12,10 @@ import org.bukkit.entity.HumanEntity;
  * to the server, call {@link #assign()}.
  */
 public class PlayerDataController {
-
-    private IPlayerFileData base;
+    private PlayerFileDataHook hook = null;
 
     public String[] getSeenPlayers() {
-        return base.getSeenPlayers();
+        return hook.base.getSeenPlayers();
     }
 
     /**
@@ -31,7 +26,7 @@ public class PlayerDataController {
      * @return the loaded data
      */
     public CommonTagCompound onLoad(HumanEntity humanEntity) {
-        return (CommonTagCompound) CommonTag.create(base.load(CommonNMS.getNative(humanEntity)));
+        return CommonTagCompound.create(hook.base.load(Conversion.toEntityHandle.convert(humanEntity)));
     }
 
     /**
@@ -41,60 +36,42 @@ public class PlayerDataController {
      * @param humanEntity to save
      */
     public void onSave(HumanEntity humanEntity) {
-        base.save(CommonNMS.getNative(humanEntity));
+        hook.base.save(Conversion.toEntityHandle.convert(humanEntity));
     }
 
     /**
      * Assigns this PlayerDataController to the server
      */
     public void assign() {
-        if (this.base != null) {
-            // Already assigned - ignore
-            return;
-        }
-        DedicatedPlayerList playerList = CommonNMS.getPlayerList();
-        this.base = playerList.playerFileData;
-        playerList.playerFileData = new Translator(this);
+        this.hook = PlayerFileDataHook.update(HookAction.HOOK);
+        this.hook.controller = this;
     }
 
     /**
-     * Obtains the Player Data Controller currently assigned to the server
+     * Detaches this PlayerDataController from the server; it will no longer be used
+     */
+    public void detach() {
+        if (this.hook != null && this.hook.controller == this) {
+            this.hook = PlayerFileDataHook.update(HookAction.UNHOOK);
+        }
+    }
+
+    /**
+     * Obtains the Player Data Controller currently assigned to the server.
+     * If no custom controller is assigned, a default instance is returned that allows
+     * interaction with the default controller.
      *
      * @return the currently assigned Player Data Controller
      */
     public static PlayerDataController get() {
-        final IPlayerFileData base = CommonNMS.getPlayerList().playerFileData;
-        final PlayerDataController controller;
-        if (base instanceof Translator) {
-            controller = ((Translator) base).controller;
+        PlayerFileDataHook hook =  PlayerFileDataHook.update(HookAction.MOCK);
+        if (hook.controller == null) {
+            PlayerDataController controller = new PlayerDataController();
+            controller.hook = hook;
+            return controller;
         } else {
-            controller = new PlayerDataController();
-            controller.base = base;
-        }
-        return controller;
-    }
-
-    private static final class Translator implements IPlayerFileData {
-
-        private final PlayerDataController controller;
-
-        public Translator(PlayerDataController controller) {
-            this.controller = controller;
-        }
-
-        @Override
-        public String[] getSeenPlayers() {
-            return this.controller.getSeenPlayers();
-        }
-
-        @Override
-        public NBTTagCompound load(EntityHuman arg0) {
-            return (NBTTagCompound) this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(arg0)).getHandle();
-        }
-
-        @Override
-        public void save(EntityHuman arg0) {
-            this.controller.onSave((HumanEntity) Conversion.toEntity.convert(arg0));
+            return hook.controller;
         }
     }
+
 }

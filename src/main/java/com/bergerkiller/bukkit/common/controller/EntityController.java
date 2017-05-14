@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +69,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @return True if interaction occurred, False if not
      */
     public boolean onInteractBy(HumanEntity interacter, MainHand hand) {
-        return this.hook.base.onInteractBy(CommonNMS.getNative(interacter), (EnumHand) Conversion.toMainHandHandle.convert(hand));
+        return this.hook.base.onInteractBy(CommonNMS.getNative(interacter), Conversion.toMainHandHandle.convert(hand));
     }
 
     /**

@@ -6,8 +6,9 @@ import java.util.logging.Level;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
@@ -83,22 +84,24 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
     }
 
     private void updateTrackers(List<?> list) {
-        Object entityHandle = controller.getEntity().getHandle();
-        Object handle = instance();
-        if (NMSEntityTrackerEntry.synched.get(handle)) {
-            double lastSyncX = NMSEntityTrackerEntry.prevX.get(handle);
-            double lastSyncY = NMSEntityTrackerEntry.prevY.get(handle);
-            double lastSyncZ = NMSEntityTrackerEntry.prevZ.get(handle);
-            double distance = NMSEntity.calculateDistance.invoke(entityHandle, lastSyncX, lastSyncY, lastSyncZ);
+        EntityHandle entityHandle = EntityHandle.createHandle(controller.getEntity().getHandle());
+        EntityTrackerEntryHandle handle = EntityTrackerEntryHandle.createHandle(instance());
+
+        if (handle.isSynched()) {
+            double lastSyncX = handle.getPrevX();
+            double lastSyncY = handle.getPrevY();
+            double lastSyncZ = handle.getPrevZ();
+            double distance = entityHandle.calculateDistance(lastSyncX, lastSyncY, lastSyncZ);
             if (distance <= 16.0) {
                 return;
             }
         }
+
         // Update tracking data
-        NMSEntityTrackerEntry.prevX.set(handle, NMSEntity.locX.get(entityHandle));
-        NMSEntityTrackerEntry.prevY.set(handle, NMSEntity.locY.get(entityHandle));
-        NMSEntityTrackerEntry.prevZ.set(handle, NMSEntity.locZ.get(entityHandle));
-        NMSEntityTrackerEntry.synched.set(handle, true);
+        handle.setPrevX(entityHandle.getLocX());
+        handle.setPrevY(entityHandle.getLocY());
+        handle.setPrevZ(entityHandle.getLocZ());
+        handle.setSynched(true);
         scanPlayers(list);
     }
 }

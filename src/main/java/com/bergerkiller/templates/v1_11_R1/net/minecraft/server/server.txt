@@ -1,0 +1,6 @@
+package net.minecraft.server;
+
+class PlayerList {
+    public (Object) IPlayerFileData playerFileData;
+    protected int maxPlayers;
+}
