@@ -4,6 +4,10 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
+/**
+ * Not cross-version supported. Please don't use.
+ */
+@Deprecated
 public class LongHashSetBase extends org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet {
 
     public void addAllChunks(World world) {

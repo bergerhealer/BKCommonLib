@@ -17,6 +17,10 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This stuff will no longer work in the near future. Please stop using it.
+ */
+@Deprecated
 public class PlayerChunkMapBase extends PlayerChunkMap {
 
     public PlayerChunkMapBase(World world, int viewDistance) {

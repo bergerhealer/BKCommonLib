@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 class EntityHuman {
 }
@@ -12,4 +13,12 @@ class EntityLiving {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot)
 
     public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
+}
+
+class EntityPlayer {
+
+}
+
+class EntityInsentient {
+    public (EntityHandle) Entity getLeashHolder();
 }

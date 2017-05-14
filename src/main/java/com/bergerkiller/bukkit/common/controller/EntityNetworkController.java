@@ -658,7 +658,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         this.syncPassengers();
 
         // Position / Rotation
-        if (this.isUpdateTick() || entity.isPositionChanged() || ((net.minecraft.server.v1_11_R1.Entity) entity.getHandle()).getDataWatcher().a()) {
+        if (this.isUpdateTick() || entity.isPositionChanged() || entity.getDataWatcher().isChanged()) {
             entity.setPositionChanged(false);
             // Update location
             if (this.getTicksSinceLocationSync() > ABSOLUTE_UPDATE_INTERVAL) {

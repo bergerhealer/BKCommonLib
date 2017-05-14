@@ -14,7 +14,6 @@ import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_11_R1.CraftSound;
-import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -28,26 +27,23 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
-
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.EntityInsentient;
-import net.minecraft.server.v1_11_R1.EntityPlayer;
 
 /**
  * Extends the methods provided by the Entity Bukkit class.
@@ -67,47 +63,47 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
 
         public double getX() {
-            return ExtendedEntity.this.h().locX;
+            return ExtendedEntity.this.handle.getLocX();
         }
 
         public double getY() {
-            return ExtendedEntity.this.h().locY;
+            return ExtendedEntity.this.handle.getLocY();
         }
 
         public double getZ() {
-            return ExtendedEntity.this.h().locZ;
+            return ExtendedEntity.this.handle.getLocZ();
         }
 
         public LocationAbstract setX(double x) {
-            ExtendedEntity.this.h().locX = x;
+            ExtendedEntity.this.handle.setLocX(x);
             return this;
         }
 
         public LocationAbstract setY(double y) {
-            ExtendedEntity.this.h().locY = y;
+            ExtendedEntity.this.handle.setLocY(y);
             return this;
         }
 
         public LocationAbstract setZ(double z) {
-            ExtendedEntity.this.h().locZ = z;
+            ExtendedEntity.this.handle.setLocZ(z);
             return this;
         }
 
         public float getYaw() {
-            return ExtendedEntity.this.h().yaw;
+            return ExtendedEntity.this.handle.getYaw();
         }
 
         public float getPitch() {
-            return ExtendedEntity.this.h().pitch;
+            return ExtendedEntity.this.handle.getPitch();
         }
 
         public LocationAbstract setYaw(float yaw) {
-            ExtendedEntity.this.h().yaw = yaw;
+            ExtendedEntity.this.handle.setYaw(yaw);
             return this;
         }
 
         public LocationAbstract setPitch(float pitch) {
-            ExtendedEntity.this.h().pitch = pitch;
+            ExtendedEntity.this.handle.setPitch(pitch);
             return this;
         }
     };
@@ -121,75 +117,75 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
 
         public double getX() {
-            return ExtendedEntity.this.h().lastX;
+            return ExtendedEntity.this.handle.getLastX();
         }
 
         public double getY() {
-            return ExtendedEntity.this.h().lastY;
+            return ExtendedEntity.this.handle.getLastY();
         }
 
         public double getZ() {
-            return ExtendedEntity.this.h().lastZ;
+            return ExtendedEntity.this.handle.getLastZ();
         }
 
         public LocationAbstract setX(double x) {
-            ExtendedEntity.this.h().lastX = x;
+            ExtendedEntity.this.handle.setLastX(x);
             return this;
         }
 
         public LocationAbstract setY(double y) {
-            ExtendedEntity.this.h().lastY = y;
+            ExtendedEntity.this.handle.setLastY(y);
             return this;
         }
 
         public LocationAbstract setZ(double z) {
-            ExtendedEntity.this.h().lastZ = z;
+            ExtendedEntity.this.handle.setLastZ(z);
             return this;
         }
 
         public float getYaw() {
-            return ExtendedEntity.this.h().lastYaw;
+            return ExtendedEntity.this.handle.getLastYaw();
         }
 
         public float getPitch() {
-            return ExtendedEntity.this.h().lastPitch;
+            return ExtendedEntity.this.handle.getLastPitch();
         }
 
         public LocationAbstract setYaw(float yaw) {
-            ExtendedEntity.this.h().lastYaw = yaw;
+            ExtendedEntity.this.handle.setLastYaw(yaw);
             return this;
         }
 
         public LocationAbstract setPitch(float pitch) {
-            ExtendedEntity.this.h().lastPitch = pitch;
+            ExtendedEntity.this.handle.setLastPitch(pitch);
             return this;
         }
     };
     public final VectorAbstract vel = new VectorAbstract() {
         public double getX() {
-            return ExtendedEntity.this.h().motX;
+            return ExtendedEntity.this.handle.getMotX();
         }
 
         public double getY() {
-            return ExtendedEntity.this.h().motY;
+            return ExtendedEntity.this.handle.getMotY();
         }
 
         public double getZ() {
-            return ExtendedEntity.this.h().motZ;
+            return ExtendedEntity.this.handle.getMotZ();
         }
 
         public VectorAbstract setX(double x) {
-            ExtendedEntity.this.h().motX = x;
+            ExtendedEntity.this.handle.setMotX(x);
             return this;
         }
 
         public VectorAbstract setY(double y) {
-            ExtendedEntity.this.h().motY = y;
+            ExtendedEntity.this.handle.setMotY(y);
             return this;
         }
 
         public VectorAbstract setZ(double z) {
-            ExtendedEntity.this.h().motZ = z;
+            ExtendedEntity.this.handle.setMotZ(z);
             return this;
         }
     };
@@ -224,7 +220,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     protected void setEntity(T entity) {
         this.entity = entity;
-        this.handle = CraftEntityHandle.T.entityHandle.get(entity);
+        this.handle = EntityHandle.createBukkit(entity);
     }
 
     /**
@@ -237,21 +233,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Private method for access the NMS Entity handle
-     *
-     * @return Entity handle
-     */
-    private Entity h() {
-        return getHandle(Entity.class);
-    }
-
-    /**
      * Gets the Entity handle
      *
      * @return the Entity handle
      */
     public Object getHandle() {
-        return Conversion.toEntityHandle.convert(entity);
+        return handle.getRaw();
     }
 
     /**
@@ -261,16 +248,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the NMS entity handle, cast to the given type
      */
     public <H> H getHandle(Class<H> type) {
-        return CommonUtil.tryCast(getHandle(), type);
-    }
-
-    /**
-     * Obtains the DataWatcher to update and keep track of Entity metadata
-     *
-     * @return Entity meta data watcher
-     */
-    public DataWatcher getMetaData() {
-        return new DataWatcher(getHandle(Entity.class).getDataWatcher());
+        return CommonUtil.tryCast(handle.getRaw(), type);
     }
 
     public int getChunkX() {
@@ -470,9 +448,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     @SuppressWarnings("unused")
 	public void makeSound(String soundName, float volume, float pitch) {
-        final Entity handle = getHandle(Entity.class);
-        //TODO Find method again
-//        handle.world.makeSound(handle, soundName, volume, pitch);
+       // handle.makeSound(soundeffect, volume, pitch)
     }
 
     public void makeStepSound(org.bukkit.block.Block block) {
@@ -541,11 +517,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setFootLocation(double x, double y, double z, float yaw, float pitch) {
-        getHandle(Entity.class).setPositionRotation(x, y, z, yaw, pitch);
+        handle.setPositionRotation(x, y, z, yaw, pitch);
     }
 
     public void setLocation(double x, double y, double z, float yaw, float pitch) {
-        getHandle(Entity.class).setLocation(x, y, z, yaw, pitch);
+        handle.setLocation(x, y, z, yaw, pitch);
     }
 
     /**
@@ -560,7 +536,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setPosition(double x, double y, double z) {
-        getHandle(Entity.class).setPosition(x, y, z);
+        handle.setPosition(x, y, z);
     }
 
     public List<org.bukkit.entity.Entity> getNearbyEntities(double radius) {
@@ -622,11 +598,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public boolean hasPassenger() {
-        return getHandle(Entity.class).passengers != null && getHandle(Entity.class).passengers.size()>0;
+        return !LogicUtil.nullOrEmpty(handle.getPassengers());
     }
 
     public boolean hasPlayerPassenger() {
-        for(Entity passenger : getHandle(Entity.class).passengers)if(passenger instanceof EntityPlayer)return true;
+        List<EntityHandle> passengers = handle.getPassengers();
+        if (passengers != null) {
+            for (EntityHandle handle : passengers) {
+                if (EntityPlayerHandle.T.isAssignableFrom(handle.getRaw())) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -670,12 +653,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if the Entity is spawned, False if not
      */
     public boolean isSpawned() {
-        final Entity handle = h();
-        return handle != null && handle.world != null && handle.world.entityList.contains(handle);
+        return handle != null && handle.getWorld() != null && handle.getWorld().getEntityList().contains(handle);
     }
 
     public World getWorld() {
-        return Conversion.toWorld.convert(h().world);
+        WorldHandle wHandle = handle.getWorld();
+        return wHandle != null ? wHandle.getWorld() : null;
     }
 
     public boolean isDead() {
@@ -698,8 +681,14 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return Leash holder
      */
     public org.bukkit.entity.Entity getLeashHolder() {
-        EntityInsentient handle = getHandle(EntityInsentient.class);
-        return handle == null ? null : Conversion.toEntity.convert(handle.getLeashHolder());
+        if (handle.isInstanceOf(EntityInsentientHandle.T)) {
+            EntityInsentientHandle insHandle = EntityInsentientHandle.createHandle(handle.getRaw());
+            EntityHandle holder = insHandle.getLeashHolder();
+            if (holder != null) {
+                return holder.toEntity();
+            }
+        }
+        return null;
     }
 
     public boolean isValid() {
@@ -864,15 +853,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param newPassenger to set to
      */
     public void setPassengersSilent(List<org.bukkit.entity.Entity> newPassengers) {
-        final Entity handle = getHandle(Entity.class);
+        final EntityHandle handle = this.handle;
 
         // Generate a difference view between the expected list of passengers, and the current
-        List<Entity> removedPassengers = new ArrayList<Entity>(handle.passengers.size());
+        List<EntityHandle> removedPassengers = new ArrayList<EntityHandle>(handle.getPassengers().size());
         List<org.bukkit.entity.Entity> keptPassengers = new ArrayList<org.bukkit.entity.Entity>(newPassengers.size());
-        for (Entity oldPassenger : handle.passengers) {
+        for (EntityHandle oldPassenger : handle.getPassengers()) {
             boolean found = false;
             for (org.bukkit.entity.Entity p : newPassengers) {
-                if (oldPassenger == Conversion.toEntityHandle.convert(p)) {
+                if (oldPassenger.getRaw() == Conversion.toEntityHandle.convert(p)) {
                     found = true;
                     keptPassengers.add(p);
                     break;
@@ -892,17 +881,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         */
 
         // Remove vehicle information and passenger information for all removed passengers
-        for (Entity passenger : removedPassengers) {
-            EntityHandle.T.vehicle.raw.set(passenger, null);
-            handle.passengers.remove(passenger);
+        for (EntityHandle passenger : removedPassengers) {
+            passenger.setVehicle(null);
+            handle.getPassengers().remove(passenger);
         }
 
         // Add new passengers as required
+        List<EntityHandle> currPassengers = handle.getPassengers();
         for (org.bukkit.entity.Entity p : newPassengers) {
-            Entity passengerHandle = (Entity) Conversion.toEntityHandle.convert(p);
-            if (!handle.passengers.contains(passengerHandle)) {
-                handle.passengers.add(passengerHandle);
-                EntityHandle.T.vehicle.raw.set(passengerHandle, handle);
+            EntityHandle passengerHandle = EntityHandle.createBukkit(p);
+            if (!currPassengers.contains(passengerHandle)) {
+                currPassengers.add(passengerHandle);
+                passengerHandle.setVehicle(handle);
 
                 // Send mount packet
                 CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, keptPassengers);
@@ -910,7 +900,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             }
         }
 
-        CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, DuplexConversion.entityList.convert(handle.passengers));
+        CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, currPassengers);
         PacketUtil.broadcastEntityPacket(entity, packet);
 
         // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
@@ -938,10 +928,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setVelocity(double motX, double motY, double motZ) {
-        final Entity handle = getHandle(Entity.class);
-        handle.motX = motX;
-        handle.motY = motY;
-        handle.motZ = motZ;
+        handle.setMotX(motX);
+        handle.setMotY(motY);
+        handle.setMotZ(motZ);
     }
 
     public boolean teleport(Location location) {
@@ -969,7 +958,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the dropped Item
      */
     public Item spawnItemDrop(Material material, int amount, float force) {
-        return Conversion.toItem.convert(getHandle(Entity.class).a(CraftMagicNumbers.getItem(material), amount, force));
+        return handle.dropItem(material, amount, force);
     }
 
     /**
@@ -980,7 +969,16 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return the dropped Item
      */
     public Item spawnItemDrop(org.bukkit.inventory.ItemStack item, float force) {
-        return Conversion.toItem.convert(getHandle(Entity.class).a(CommonNMS.getNative(item), force));
+        return handle.dropItemStack(item, force);
+    }
+
+    /**
+     * Obtains the DataWatcher to update and keep track of Entity metadata
+     *
+     * @return Entity meta data watcher
+     */
+    public DataWatcher getMetaData() {
+        return handle.getDataWatcher();
     }
 
     /**
@@ -989,7 +987,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return datawatcher
      */
     public DataWatcher getDataWatcher() {
-        return new DataWatcher(this.h().getDataWatcher());
+        return handle.getDataWatcher();
     }
 
     /**

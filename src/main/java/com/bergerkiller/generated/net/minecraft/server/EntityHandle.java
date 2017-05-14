@@ -5,16 +5,19 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.UUID;
+import org.bukkit.Material;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Item;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import java.util.Random;
 import java.util.List;
+import org.bukkit.entity.Entity;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import org.bukkit.entity.Entity;
 
 public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();
@@ -66,6 +69,14 @@ public class EntityHandle extends Template.Handle {
         T.burn.invoke(instance, dmg);
     }
 
+    public Item dropItem(Material material, int amount, float force) {
+        return T.dropItem.invoke(instance, material, amount, force);
+    }
+
+    public Item dropItemStack(ItemStack itemstack, float force) {
+        return T.dropItemStack.invoke(instance, itemstack, force);
+    }
+
     public SoundEffectHandle getSwimSound() {
         return T.getSwimSound.invoke(instance);
     }
@@ -100,6 +111,14 @@ public class EntityHandle extends Template.Handle {
 
     public double calculateDistance(double x, double y, double z) {
         return T.calculateDistance.invoke(instance, x, y, z);
+    }
+
+    public void setPosition(double x, double y, double z) {
+        T.setPosition.invoke(instance, x, y, z);
+    }
+
+    public void setPositionRotation(double x, double y, double z, float yaw, float pitch) {
+        T.setPositionRotation.invoke(instance, x, y, z, yaw, pitch);
     }
 
     public void setLocation(double x, double y, double z, float yaw, float pitch) {
@@ -176,6 +195,18 @@ public class EntityHandle extends Template.Handle {
 
     public UUID getUniqueID() {
         return T.getUniqueID.invoke(instance);
+    }
+
+    public DataWatcher getDataWatcher() {
+        return T.getDataWatcher.invoke(instance);
+    }
+
+    public org.bukkit.entity.Entity toEntity() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
+    }
+
+    public static EntityHandle createBukkit(org.bukkit.entity.Entity entity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
 
     public Entity getBukkitEntity() {
@@ -474,12 +505,12 @@ public class EntityHandle extends Template.Handle {
         T.fireTicks.setInteger(instance, value);
     }
 
-    public DataWatcher getDatawatcher() {
-        return T.datawatcher.get(instance);
+    public DataWatcher getDatawatcherField() {
+        return T.datawatcherField.get(instance);
     }
 
-    public void setDatawatcher(DataWatcher value) {
-        T.datawatcher.set(instance, value);
+    public void setDatawatcherField(DataWatcher value) {
+        T.datawatcherField.set(instance, value);
     }
 
     public boolean isLoaded() {
@@ -616,7 +647,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Integer ticksLived = new Template.Field.Integer();
         public final Template.Field.Integer fireTicks = new Template.Field.Integer();
-        public final Template.Field.Converted<DataWatcher> datawatcher = new Template.Field.Converted<DataWatcher>();
+        public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
         public final Template.Field.Integer chunkX = new Template.Field.Integer();
         public final Template.Field.Integer chunkY = new Template.Field.Integer();
@@ -634,6 +665,8 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
         public final Template.Method<Void> burn = new Template.Method<Void>();
+        public final Template.Method.Converted<Item> dropItem = new Template.Method.Converted<Item>();
+        public final Template.Method.Converted<Item> dropItemStack = new Template.Method.Converted<Item>();
         public final Template.Method.Converted<SoundEffectHandle> getSwimSound = new Template.Method.Converted<SoundEffectHandle>();
         public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
@@ -643,6 +676,8 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
+        public final Template.Method<Void> setPosition = new Template.Method<Void>();
+        public final Template.Method<Void> setPositionRotation = new Template.Method<Void>();
         public final Template.Method<Void> setLocation = new Template.Method<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
@@ -662,6 +697,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
+        public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
 
     }
 }

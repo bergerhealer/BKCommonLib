@@ -5,5 +5,9 @@ package com.bergerkiller.bukkit.common.bases;
  * <p/>
  * All credits go to CraftBukkit
  */
+/**
+ * Not cross-version supported. Please don't use.
+ */
+@Deprecated
 public class LongHash extends org.bukkit.craftbukkit.v1_11_R1.util.LongHash {
 }

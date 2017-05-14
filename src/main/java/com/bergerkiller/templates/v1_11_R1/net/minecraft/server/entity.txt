@@ -58,7 +58,7 @@ class Entity {
     protected Random random;
     public int ticksLived;
     public int fireTicks;
-    protected (DataWatcher) net.minecraft.server.DataWatcher datawatcher;
+    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
     protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
@@ -149,6 +149,10 @@ class Entity {
      * }
      */
     protected void burn(float dmg);
+
+    public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
+
+    public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
 
     /*
      * void move(...) {
@@ -262,6 +266,10 @@ class Entity {
      */
     public double calculateDistance:e(double x, double y, double z);
 
+    public void setPosition(double x, double y, double z);
+
+    public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
+
     public void setLocation(double x, double y, double z, float yaw, float pitch);
 
     public float getHeadRotation();
@@ -271,7 +279,7 @@ class Entity {
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
-    
+
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
 
     public void recalcPosition();
@@ -299,4 +307,16 @@ class Entity {
     public int getId();
 
     public UUID getUniqueID();
+
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
+
+    <code>
+    public org.bukkit.entity.Entity toEntity() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
+    }
+
+    public static EntityHandle createBukkit(org.bukkit.entity.Entity entity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
+    }
+    </code>
 }

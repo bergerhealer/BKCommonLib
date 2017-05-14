@@ -276,7 +276,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     @SuppressWarnings("unchecked")
     private void replaceEntity(final EntityHandle newInstance) {
         final EntityHandle oldInstance = this.handle;
-        if (oldInstance == newInstance) {
+        if (oldInstance.getRaw() == newInstance.getRaw()) {
             throw new RuntimeException("Can not replace an entity with itself!");
         }
 
@@ -311,14 +311,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
         if (newInstance.getPassengers() != null) {
             for (EntityHandle passenger : newInstance.getPassengers()) {
-                if (oldInstance.equals(passenger.getVehicle())) {
+                if (oldInstance.getRaw() == passenger.getVehicle().getRaw()) {
                     passenger.setVehicle(newInstance);
                 }
             }
         }
 
         // *** DataWatcher field of the old Entity ***
-        Object dataWatcher = EntityHandle.T.datawatcher.raw.get(newInstance.getRaw());
+        Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(newInstance.getRaw());
         if (dataWatcher != null) {
             DataWatcherHandle.T.owner.set(dataWatcher, newInstance);
         }
@@ -393,7 +393,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        //DebugUtil.logInstances(oldInstance);
+        // DebugUtil.logInstances(oldInstance.getRaw());
     }
 
     private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {

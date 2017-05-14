@@ -40,6 +40,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -743,6 +744,18 @@ public class NMSPacketClasses {
         
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final FieldAccessor<int[]> mountedEntityIds = nextFieldSignature("private int[] b");
+
+        public CommonPacket newInstanceHandles(org.bukkit.entity.Entity entity, List<EntityHandle> passengers) {
+            int[] passengerIds = new int[passengers.size()];
+            for (int i = 0; i < passengerIds.length; i++) {
+                passengerIds[i] = passengers.get(i).getId();
+            }
+
+            CommonPacket packet = this.newInstance();
+            packet.write(entityId, entity.getEntityId());
+            packet.write(mountedEntityIds, passengerIds);
+            return packet;
+        }
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity, List<org.bukkit.entity.Entity> passengers) {
             int[] passengerIds = new int[passengers.size()];

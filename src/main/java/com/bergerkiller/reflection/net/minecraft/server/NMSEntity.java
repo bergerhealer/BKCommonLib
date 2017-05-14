@@ -63,7 +63,7 @@ public class NMSEntity {
     public static final FieldAccessor<Integer> stepCounter = EntityHandle.T.stepCounter.toFieldAccessor();
     public static final FieldAccessor<Boolean> noclip = EntityHandle.T.noclip.toFieldAccessor();
     public static final FieldAccessor<Random>  random = EntityHandle.T.random.toFieldAccessor();
-    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = EntityHandle.T.datawatcher.toFieldAccessor();
+    public static final TranslatorFieldAccessor<DataWatcher> datawatcher = EntityHandle.T.datawatcherField.toFieldAccessor();
 
     public static final DataWatcher.Key<Byte> DATA_FLAGS = EntityHandle.DATA_FLAGS;
     public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = EntityHandle.DATA_AIR_TICKS;

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.bases.LongHash;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -583,19 +582,19 @@ public class MathUtil {
      * @return merged long value
      */
     public static long toLong(int msw, int lsw) {
-        return longHashToLong(msw, lsw);
+        return ((long) msw << 32) + lsw - Integer.MIN_VALUE;
     }
 
     public static long longHashToLong(int msw, int lsw) {
-        return LongHash.toLong(msw, lsw);
+        return ((long) msw << 32) + lsw - Integer.MIN_VALUE;
     }
 
     public static int longHashMsw(long key) {
-        return LongHash.msw(key);
+        return (int) (key >> 32);
     }
 
     public static int longHashLsw(long key) {
-        return LongHash.lsw(key);
+        return (int) (key & 0xFFFFFFFF) + Integer.MIN_VALUE;
     }
 
     public static void setVectorLength(Vector vector, double length) {
