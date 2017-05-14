@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
 
 class MethodProfiler {
 
@@ -18,4 +19,8 @@ class CrashReport {
 
 class CrashReportSystemDetails {
 
+}
+
+class ReportedException {
+    public (ReportedExceptionHandle) ReportedException((CrashReportHandle) CrashReport paramCrashReport);
 }

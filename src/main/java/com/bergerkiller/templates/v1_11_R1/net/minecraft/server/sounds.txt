@@ -1,0 +1,10 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+
+class SoundEffect {
+}
+
+class SoundEffects {
+    public static final (SoundEffectHandle) SoundEffect EXTINGUISH_FIRE:bQ;
+}

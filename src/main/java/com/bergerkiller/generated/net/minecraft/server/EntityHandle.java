@@ -9,8 +9,9 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
-import java.util.List;
 import java.util.Random;
+import java.util.List;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import org.bukkit.entity.Entity;
 
@@ -64,11 +65,11 @@ public class EntityHandle extends Template.Handle {
         T.burn.invoke(instance, dmg);
     }
 
-    public Object getSwimSound() {
+    public SoundEffectHandle getSwimSound() {
         return T.getSwimSound.invoke(instance);
     }
 
-    public void makeSound(Object soundeffect, float volume, float pitch) {
+    public void makeSound(SoundEffectHandle soundeffect, float volume, float pitch) {
         T.makeSound.invoke(instance, soundeffect, volume, pitch);
     }
 
@@ -611,7 +612,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
         public final Template.Method<Void> burn = new Template.Method<Void>();
-        public final Template.Method.Converted<Object> getSwimSound = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<SoundEffectHandle> getSwimSound = new Template.Method.Converted<SoundEffectHandle>();
         public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();

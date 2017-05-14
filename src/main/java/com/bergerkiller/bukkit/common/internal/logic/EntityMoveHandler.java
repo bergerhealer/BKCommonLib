@@ -29,14 +29,12 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectsHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-
-import net.minecraft.server.v1_11_R1.CrashReport;
-import net.minecraft.server.v1_11_R1.ReportedException;
-import net.minecraft.server.v1_11_R1.SoundEffects;
 
 /**
  * Handles the full Entity move() physics function. It should be kept completely in sync with what is used on the server,
@@ -183,7 +181,7 @@ public class EntityMoveHandler {
                 CrashReportSystemDetailsHandle crashreportsystemdetails = crashreport.getSystemDetails("Entity being checked for collision");
 
                 that.appendEntityCrashDetails(crashreportsystemdetails);
-                throw new ReportedException((CrashReport) crashreport.getRaw());
+                throw (RuntimeException) ReportedExceptionHandle.createNew(crashreport).getRaw();
             }
             // Check if we're moving
             if (d0 == 0 && d1 == 0 && d2 == 0 && that.isVehicle() && that.isPassenger()) {
@@ -571,7 +569,7 @@ public class EntityMoveHandler {
             }
 
             if (flag1 && that.isBurning()) {
-                that.makeSound(SoundEffects.bQ, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
+                that.makeSound(SoundEffectsHandle.EXTINGUISH_FIRE, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
                 that.setFireTicks(-that.getMaxFireTicks());
             }
 

@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -154,7 +155,7 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-    protected (Object) SoundEffect getSwimSound:aa();
+    protected (SoundEffectHandle) SoundEffect getSwimSound:aa();
 
     /*
      * void move(...) {
@@ -168,7 +169,7 @@ class Entity {
      *     }
      * }
      */
-    public void makeSound:a((Object) SoundEffect soundeffect, float volume, float pitch);
+    public void makeSound:a((SoundEffectHandle) SoundEffect soundeffect, float volume, float pitch);
 
     /*
      # public boolean ###METHODNAME###() {

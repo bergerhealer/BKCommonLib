@@ -18,6 +18,10 @@ public class AxisAlignedBBHandle extends Template.Handle {
         return handle;
     }
 
+    public static final AxisAlignedBBHandle createNew(double x1, double y1, double z1, double x2, double y2, double z2) {
+        return T.constr_x1_y1_z1_x2_y2_z2.newInstance(x1, y1, z1, x2, y2, z2);
+    }
+
     /* ============================================================================== */
 
     public AxisAlignedBBHandle transformA(double lx, double ly, double lz) {
@@ -109,6 +113,8 @@ public class AxisAlignedBBHandle extends Template.Handle {
     }
 
     public static final class AxisAlignedBBClass extends Template.Class {
+        public final Template.Constructor.Converted<AxisAlignedBBHandle> constr_x1_y1_z1_x2_y2_z2 = new Template.Constructor.Converted<AxisAlignedBBHandle>();
+
         public final Template.Field.Double minX = new Template.Field.Double();
         public final Template.Field.Double minY = new Template.Field.Double();
         public final Template.Field.Double minZ = new Template.Field.Double();

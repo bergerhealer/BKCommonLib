@@ -1,6 +1,7 @@
 include /org/bukkit/plugin.txt
 include /org/bukkit/craftbukkit/entity.txt
 include /net/minecraft/server/methodprofiler.txt
+include /net/minecraft/server/sounds.txt
 include /net/minecraft/server/entity.txt
 include /net/minecraft/server/entity_subtype.txt
 include /net/minecraft/server/axisalignedbb.txt

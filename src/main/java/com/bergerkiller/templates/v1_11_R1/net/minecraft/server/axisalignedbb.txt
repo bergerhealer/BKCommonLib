@@ -10,7 +10,7 @@ class AxisAlignedBB {
     public final double maxY:e;
     public final double maxZ:f;
 
-    public AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
+    public (AxisAlignedBBHandle) AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
 
     public (AxisAlignedBBHandle) AxisAlignedBB transformA:a(double lx, double ly, double lz);
     public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
