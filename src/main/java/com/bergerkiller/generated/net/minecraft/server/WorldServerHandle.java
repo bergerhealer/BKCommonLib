@@ -13,7 +13,7 @@ public class WorldServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final WorldServerHandle createHandle(Object handleInstance) {
+    public static WorldServerHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         WorldServerHandle handle = new WorldServerHandle();
         handle.instance = handleInstance;

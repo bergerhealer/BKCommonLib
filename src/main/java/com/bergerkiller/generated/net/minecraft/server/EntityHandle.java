@@ -32,7 +32,7 @@ public class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityHandle createHandle(Object handleInstance) {
+    public static EntityHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityHandle handle = new EntityHandle();
         handle.instance = handleInstance;

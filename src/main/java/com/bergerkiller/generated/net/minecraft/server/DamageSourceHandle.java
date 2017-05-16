@@ -17,7 +17,7 @@ public class DamageSourceHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final DamageSourceHandle createHandle(Object handleInstance) {
+    public static DamageSourceHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         DamageSourceHandle handle = new DamageSourceHandle();
         handle.instance = handleInstance;

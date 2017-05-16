@@ -12,7 +12,7 @@ public class ReportedExceptionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final ReportedExceptionHandle createHandle(Object handleInstance) {
+    public static ReportedExceptionHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         ReportedExceptionHandle handle = new ReportedExceptionHandle();
         handle.instance = handleInstance;

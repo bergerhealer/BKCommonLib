@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -299,7 +300,8 @@ public class NMSEntity {
 
     @Deprecated
     public static void playStepSound(Object entityHandle, int x, int y, int z, int typeId) {
-        playStepSound(entityHandle, x, y, z, CommonNMS.getBlock(typeId));
+        Material mat = Material.getMaterial(typeId);
+        playStepSound(entityHandle, x, y, z, mat == null ? null : HandleConversion.toBlockHandle(mat));
     }
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {

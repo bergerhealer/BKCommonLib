@@ -5,6 +5,8 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingCollection;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
@@ -52,7 +54,7 @@ public class RecipeUtil {
         if (item == null) {
             return 0;
         } else {
-            return item.getAmount() * TileEntityFurnace.fuelTime(CommonNMS.getNative(item));
+            return item.getAmount() * TileEntityFurnaceHandle.fuelTime(CommonNMS.getNative(item));
         }
     }
 
@@ -87,7 +89,7 @@ public class RecipeUtil {
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-        return Conversion.toItemStack.convert(RecipesFurnace.getInstance().getResult(CommonNMS.getNative(cooked)));
+        return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getNative(cooked)));
     }
 
     public static Collection<ItemStack> getHeatableItemStacks() {

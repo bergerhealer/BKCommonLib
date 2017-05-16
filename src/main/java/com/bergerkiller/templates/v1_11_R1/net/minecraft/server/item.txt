@@ -1,0 +1,7 @@
+package net.minecraft.server;
+
+class Item {
+    public int getMaxStackSize();
+
+    public boolean usesDurability();
+}

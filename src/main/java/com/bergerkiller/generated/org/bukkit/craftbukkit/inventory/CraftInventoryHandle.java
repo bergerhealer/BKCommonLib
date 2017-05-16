@@ -11,7 +11,7 @@ public class CraftInventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final CraftInventoryHandle createHandle(Object handleInstance) {
+    public static CraftInventoryHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         CraftInventoryHandle handle = new CraftInventoryHandle();
         handle.instance = handleInstance;

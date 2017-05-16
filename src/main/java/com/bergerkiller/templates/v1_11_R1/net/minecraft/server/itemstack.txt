@@ -1,0 +1,31 @@
+package net.minecraft.server;
+
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
+
+class ItemStack {
+
+    public String getName();
+
+    public (ItemStackHandle) ItemStack setName:g(String s);
+
+    public int getRepairCost();
+
+    public void setRepairCost(int cost);
+
+    public boolean hasName();
+
+    public boolean hasTag();
+
+    public (CommonTagCompound) NBTTagCompound getTag();
+
+}
+
+class RecipesFurnace {
+
+    public static (RecipesFurnaceHandle) RecipesFurnace getInstance();
+
+    public (ItemStackHandle) ItemStack getResult((ItemStackHandle) ItemStack itemstack);
+
+}

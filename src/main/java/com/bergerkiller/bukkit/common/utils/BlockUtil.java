@@ -20,6 +20,7 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
@@ -363,7 +364,7 @@ public class BlockUtil extends MaterialUtil {
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType, boolean updateSelf) {
         NMSWorld.applyPhysics.invoke(Conversion.toWorldHandle.convert(block.getWorld()),
                     NMSVector.newPosition(block.getX(), block.getY(), block.getZ()),
-                    CommonNMS.getBlock(callerType), updateSelf);
+                    HandleConversion.toBlockHandle(callerType), updateSelf);
     }
 
     /**

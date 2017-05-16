@@ -1,14 +1,18 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -25,12 +29,12 @@ import org.bukkit.entity.Player;
  */
 public class CommonNMS {
  
-    public static ItemStack getNative(org.bukkit.inventory.ItemStack stack) {
-        return (ItemStack) Conversion.toItemStackHandle.convert(stack);
+    public static ItemStackHandle getNative(org.bukkit.inventory.ItemStack stack) {
+        return ItemStackHandle.createHandle(Conversion.toItemStackHandle.convert(stack));
     }
 
-    public static EntityItem getNative(org.bukkit.entity.Item item) {
-        return getNative(item, EntityItem.class);
+    public static EntityItemHandle getNative(org.bukkit.entity.Item item) {
+        return EntityItemHandle.createHandle(getRawHandle(item, EntityItemHandle.T));
     }
 
     public static EntityLiving getNative(LivingEntity l) {
@@ -43,6 +47,10 @@ public class CommonNMS {
 
     public static EntityPlayer getNative(Player p) {
         return getNative(p, EntityPlayer.class);
+    }
+
+    public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class type) {
+        return CommonUtil.tryCast(Conversion.toEntityHandle.convert(e), type.getType());
     }
 
     public static <T extends Entity> T getNative(org.bukkit.entity.Entity e, Class<T> type) {
@@ -61,21 +69,8 @@ public class CommonNMS {
         return (Chunk) Conversion.toChunkHandle.convert(chunk);
     }
 
-    @SuppressWarnings("deprecation")
-    public static Block getBlock(int id) {
-        return getBlock(org.bukkit.Material.getMaterial(id));
-    }
-
-    public static Item getItem(int id) {
-        return Item.getById(id);
-    }
-
-    public static Block getBlock(org.bukkit.Material material) {
-        return material == null ? null : CraftMagicNumbers.getBlock(material);
-    }
-
-    public static Item getItem(org.bukkit.Material material) {
-        return material == null ? null : CraftMagicNumbers.getItem(material);
+    public static ItemHandle getItem(org.bukkit.Material material) {
+        return material == null ? null : ItemHandle.createHandle(HandleConversion.toItemHandle(material));
     }
 
     /**

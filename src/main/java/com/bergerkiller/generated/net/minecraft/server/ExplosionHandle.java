@@ -13,7 +13,7 @@ public class ExplosionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final ExplosionHandle createHandle(Object handleInstance) {
+    public static ExplosionHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         ExplosionHandle handle = new ExplosionHandle();
         handle.instance = handleInstance;

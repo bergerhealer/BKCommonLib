@@ -10,7 +10,7 @@ public class ChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final ChunkHandle createHandle(Object handleInstance) {
+    public static ChunkHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         ChunkHandle handle = new ChunkHandle();
         handle.instance = handleInstance;

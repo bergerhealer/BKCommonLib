@@ -10,7 +10,7 @@ public class EntityPlayerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityPlayerHandle createHandle(Object handleInstance) {
+    public static EntityPlayerHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityPlayerHandle handle = new EntityPlayerHandle();
         handle.instance = handleInstance;

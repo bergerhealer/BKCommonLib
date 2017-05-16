@@ -11,7 +11,7 @@ public class EnumDirectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EnumDirectionHandle createHandle(Object handleInstance) {
+    public static EnumDirectionHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EnumDirectionHandle handle = new EnumDirectionHandle();
         handle.instance = handleInstance;
@@ -33,7 +33,7 @@ public class EnumDirectionHandle extends Template.Handle {
 
         /* ============================================================================== */
 
-        public static final EnumAxisHandle createHandle(Object handleInstance) {
+        public static EnumAxisHandle createHandle(Object handleInstance) {
             if (handleInstance == null) return null;
             EnumAxisHandle handle = new EnumAxisHandle();
             handle.instance = handleInstance;

@@ -10,7 +10,7 @@ public class MobEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final MobEffectHandle createHandle(Object handleInstance) {
+    public static MobEffectHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         MobEffectHandle handle = new MobEffectHandle();
         handle.instance = handleInstance;

@@ -16,7 +16,7 @@ public class EntityTrackerEntryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityTrackerEntryHandle createHandle(Object handleInstance) {
+    public static EntityTrackerEntryHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityTrackerEntryHandle handle = new EntityTrackerEntryHandle();
         handle.instance = handleInstance;

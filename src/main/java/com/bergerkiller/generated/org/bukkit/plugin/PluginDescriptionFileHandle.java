@@ -11,7 +11,7 @@ public class PluginDescriptionFileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final PluginDescriptionFileHandle createHandle(Object handleInstance) {
+    public static PluginDescriptionFileHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         PluginDescriptionFileHandle handle = new PluginDescriptionFileHandle();
         handle.instance = handleInstance;

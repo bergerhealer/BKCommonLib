@@ -12,7 +12,7 @@ public class CrashReportHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final CrashReportHandle createHandle(Object handleInstance) {
+    public static CrashReportHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         CrashReportHandle handle = new CrashReportHandle();
         handle.instance = handleInstance;

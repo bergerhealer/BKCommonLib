@@ -10,7 +10,7 @@ public class IInventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final IInventoryHandle createHandle(Object handleInstance) {
+    public static IInventoryHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         IInventoryHandle handle = new IInventoryHandle();
         handle.instance = handleInstance;

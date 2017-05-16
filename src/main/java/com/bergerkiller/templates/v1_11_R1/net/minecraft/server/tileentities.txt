@@ -1,0 +1,7 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+
+class TileEntityFurnace {
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack);
+}

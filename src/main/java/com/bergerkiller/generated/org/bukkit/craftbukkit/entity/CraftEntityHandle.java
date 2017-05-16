@@ -13,7 +13,7 @@ public class CraftEntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final CraftEntityHandle createHandle(Object handleInstance) {
+    public static CraftEntityHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         CraftEntityHandle handle = new CraftEntityHandle();
         handle.instance = handleInstance;

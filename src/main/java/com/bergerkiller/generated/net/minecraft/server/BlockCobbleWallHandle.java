@@ -10,7 +10,7 @@ public class BlockCobbleWallHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final BlockCobbleWallHandle createHandle(Object handleInstance) {
+    public static BlockCobbleWallHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         BlockCobbleWallHandle handle = new BlockCobbleWallHandle();
         handle.instance = handleInstance;

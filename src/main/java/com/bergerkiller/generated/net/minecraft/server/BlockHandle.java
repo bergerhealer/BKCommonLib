@@ -12,7 +12,7 @@ public class BlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final BlockHandle createHandle(Object handleInstance) {
+    public static BlockHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         BlockHandle handle = new BlockHandle();
         handle.instance = handleInstance;

@@ -11,7 +11,7 @@ public class AttributeMapServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final AttributeMapServerHandle createHandle(Object handleInstance) {
+    public static AttributeMapServerHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         AttributeMapServerHandle handle = new AttributeMapServerHandle();
         handle.instance = handleInstance;

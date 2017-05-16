@@ -10,7 +10,7 @@ public class BlockFenceGateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final BlockFenceGateHandle createHandle(Object handleInstance) {
+    public static BlockFenceGateHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         BlockFenceGateHandle handle = new BlockFenceGateHandle();
         handle.instance = handleInstance;

@@ -3,6 +3,9 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 class EntityHuman {
 }
@@ -21,4 +24,15 @@ class EntityPlayer {
 
 class EntityInsentient {
     public (EntityHandle) Entity getLeashHolder();
+}
+
+class EntityItem extends Entity {
+    private int age;
+    public int pickupDelay;
+
+    public (EntityItemHandle) EntityItem((WorldHandle) World world, double x, double y, double z, (ItemStackHandle) ItemStack itemstack);
+
+    public (ItemStackHandle) ItemStack getItemStack();
+
+    public void setItemStack((ItemStackHandle) ItemStack itemstack);
 }

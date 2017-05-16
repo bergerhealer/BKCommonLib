@@ -10,7 +10,7 @@ public class SoundEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final SoundEffectHandle createHandle(Object handleInstance) {
+    public static SoundEffectHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         SoundEffectHandle handle = new SoundEffectHandle();
         handle.instance = handleInstance;

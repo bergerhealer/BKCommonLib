@@ -15,7 +15,7 @@ public class EntityLivingHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityLivingHandle createHandle(Object handleInstance) {
+    public static EntityLivingHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityLivingHandle handle = new EntityLivingHandle();
         handle.instance = handleInstance;

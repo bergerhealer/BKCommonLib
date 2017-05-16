@@ -6,12 +6,12 @@ import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityItem;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
-import net.minecraft.server.v1_11_R1.EntityItem;
-import net.minecraft.server.v1_11_R1.Item;
+//import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
@@ -407,17 +407,18 @@ public class ItemUtil {
      */
     public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item item) {
         item.remove();
-        EntityItem oldItemHandle = CommonNMS.getNative(item);
-        EntityItem newItemHandle = new EntityItem(oldItemHandle.world, oldItemHandle.locX, oldItemHandle.locY, oldItemHandle.locZ, oldItemHandle.getItemStack());
-        newItemHandle.fallDistance = oldItemHandle.fallDistance;
-        newItemHandle.fireTicks = oldItemHandle.fireTicks;
-        newItemHandle.pickupDelay = oldItemHandle.pickupDelay;
-        newItemHandle.motX = oldItemHandle.motX;
-        newItemHandle.motY = oldItemHandle.motY;
-        newItemHandle.motZ = oldItemHandle.motZ;
-        NMSEntityItem.age.transfer(oldItemHandle, newItemHandle);
-        newItemHandle.world.addEntity(newItemHandle);
-        return Conversion.toItem.convert(newItemHandle);
+        EntityItemHandle oldItemHandle = CommonNMS.getNative(item);
+        EntityItemHandle newItemHandle = EntityItemHandle.createNew(oldItemHandle.getWorld(), oldItemHandle.getLocX(), oldItemHandle.getLocY(), oldItemHandle.getLocZ(), oldItemHandle.getItemStack());
+
+        newItemHandle.setFallDistance(oldItemHandle.getFallDistance());
+        newItemHandle.setFireTicks(oldItemHandle.getFireTicks());
+        newItemHandle.setPickupDelay(oldItemHandle.getPickupDelay());
+        newItemHandle.setMotX(oldItemHandle.getMotX());
+        newItemHandle.setMotY(oldItemHandle.getMotY());
+        newItemHandle.setMotZ(oldItemHandle.getMotZ());
+        newItemHandle.setAge(oldItemHandle.getAge());
+        newItemHandle.getWorld().addEntity(newItemHandle);
+        return Conversion.toItem.convert(newItemHandle.getRaw());
     }
 
     /**
@@ -547,7 +548,7 @@ public class ItemUtil {
      * @return max stacking size
      */
     public static int getMaxSize(Material itemType, int def) {
-        Item item = CommonNMS.getItem(itemType);
+        ItemHandle item = CommonNMS.getItem(itemType);
         return item == null ? def : item.getMaxStackSize();
     }
 
@@ -672,7 +673,7 @@ public class ItemUtil {
     public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
         if (displayName != null) {
             if (CBCraftItemStack.T.isInstance(stack)) {
-                CommonNMS.getNative(stack).g(displayName);
+                CommonNMS.getNative(stack).setName(displayName);
             } else {
                 throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
             }

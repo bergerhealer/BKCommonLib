@@ -11,7 +11,7 @@ public class WorldDataHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final WorldDataHandle createHandle(Object handleInstance) {
+    public static WorldDataHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         WorldDataHandle handle = new WorldDataHandle();
         handle.instance = handleInstance;

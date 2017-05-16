@@ -11,7 +11,7 @@ public class EntityInsentientHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityInsentientHandle createHandle(Object handleInstance) {
+    public static EntityInsentientHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityInsentientHandle handle = new EntityInsentientHandle();
         handle.instance = handleInstance;

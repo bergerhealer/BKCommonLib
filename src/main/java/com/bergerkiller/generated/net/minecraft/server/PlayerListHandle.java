@@ -10,7 +10,7 @@ public class PlayerListHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final PlayerListHandle createHandle(Object handleInstance) {
+    public static PlayerListHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         PlayerListHandle handle = new PlayerListHandle();
         handle.instance = handleInstance;

@@ -11,7 +11,7 @@ public class DataWatcherHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final DataWatcherHandle createHandle(Object handleInstance) {
+    public static DataWatcherHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         DataWatcherHandle handle = new DataWatcherHandle();
         handle.instance = handleInstance;

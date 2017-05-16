@@ -10,7 +10,7 @@ public class MethodProfilerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final MethodProfilerHandle createHandle(Object handleInstance) {
+    public static MethodProfilerHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         MethodProfilerHandle handle = new MethodProfilerHandle();
         handle.instance = handleInstance;

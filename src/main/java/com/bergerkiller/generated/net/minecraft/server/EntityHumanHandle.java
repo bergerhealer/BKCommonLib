@@ -10,7 +10,7 @@ public class EntityHumanHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final EntityHumanHandle createHandle(Object handleInstance) {
+    public static EntityHumanHandle createHandle(Object handleInstance) {
         if (handleInstance == null) return null;
         EntityHumanHandle handle = new EntityHumanHandle();
         handle.instance = handleInstance;
