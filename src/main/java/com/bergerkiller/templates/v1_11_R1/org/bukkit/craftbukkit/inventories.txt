@@ -3,6 +3,10 @@ package org.bukkit.craftbukkit.inventory;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import net.minecraft.server.IInventory;
 
+class CraftItemStack {
+    public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftCopy(org.bukkit.inventory.ItemStack original);
+}
+
 class CraftInventory {
     protected final (IInventoryHandle) IInventory handleField:inventory;
 

@@ -8,12 +8,11 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
-//import net.minecraft.server.v1_11_R1.Item;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -362,7 +361,7 @@ public class ItemUtil {
      * @param item to use as input
      */
     public static org.bukkit.inventory.ItemStack createItem(ItemStack item) {
-        return CraftItemStack.asCraftCopy(item);
+        return CraftItemStackHandle.asCraftCopy(item);
     }
 
     /**
