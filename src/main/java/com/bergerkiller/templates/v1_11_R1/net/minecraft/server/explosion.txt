@@ -1,0 +1,7 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
+
+class Explosion {
+    public (ExplosionHandle) Explosion((org.bukkit.World) World world, (org.bukkit.entity.Entity) Entity entity, double x, double y, double z, float yield, boolean fire, boolean destroyBlocks);
+}

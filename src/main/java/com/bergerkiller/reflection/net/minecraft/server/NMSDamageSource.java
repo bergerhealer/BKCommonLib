@@ -1,77 +1,76 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
 
-import net.minecraft.server.v1_11_R1.DamageSource;
-import net.minecraft.server.v1_11_R1.EntityArrow;
-import net.minecraft.server.v1_11_R1.EntityFireball;
-import net.minecraft.server.v1_11_R1.Explosion;
-import org.bukkit.entity.*;
+import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
+/**
+ * Use DamageSourceHandle instead
+ */
+@Deprecated
 public class NMSDamageSource {
 
-    public static final Object FIRE = DamageSource.FIRE;
-    public static final Object LIGHTNING = DamageSource.LIGHTNING;
-    public static final Object BURN = DamageSource.BURN;
-    public static final Object LAVA = DamageSource.LAVA;
-    public static final Object STUCK = DamageSource.STUCK;
-    public static final Object DROWN = DamageSource.DROWN;
-    public static final Object STARVE = DamageSource.STARVE;
-    public static final Object CACTUS = DamageSource.CACTUS;
-    public static final Object FALL = DamageSource.FALL;
-    public static final Object OUT_OF_WORLD = DamageSource.OUT_OF_WORLD;
-    public static final Object GENERIC = DamageSource.GENERIC;
-    public static final Object MAGIC = DamageSource.MAGIC;
-    public static final Object WITHER = DamageSource.WITHER;
-    public static final Object ANVIL = DamageSource.ANVIL;
-    public static final Object FALLING_BLOCK = DamageSource.FALLING_BLOCK;
+    public static final Object FIRE = DamageSourceHandle.byName("inFire").getRaw();
+    public static final Object LIGHTNING = DamageSourceHandle.byName("lightningBolt").getRaw();
+    public static final Object BURN = DamageSourceHandle.byName("onFire").getRaw();
+    public static final Object LAVA = DamageSourceHandle.byName("lava").getRaw();
+    public static final Object STUCK = DamageSourceHandle.byName("inWall").getRaw();
+    public static final Object DROWN = DamageSourceHandle.byName("drown").getRaw();
+    public static final Object STARVE = DamageSourceHandle.byName("starve").getRaw();
+    public static final Object CACTUS = DamageSourceHandle.byName("cactus").getRaw();
+    public static final Object FALL = DamageSourceHandle.byName("fall").getRaw();
+    public static final Object OUT_OF_WORLD = DamageSourceHandle.byName("outOfWorld").getRaw();
+    public static final Object GENERIC = DamageSourceHandle.byName("generic").getRaw();
+    public static final Object MAGIC = DamageSourceHandle.byName("magic").getRaw();
+    public static final Object WITHER = DamageSourceHandle.byName("wither").getRaw();
+    public static final Object ANVIL = DamageSourceHandle.byName("anvil").getRaw();
+    public static final Object FALLING_BLOCK = DamageSourceHandle.byName("fallingBlock").getRaw();
 
     public static Object forMobAttack(LivingEntity damager) {
-        return DamageSource.mobAttack(CommonNMS.getNative(damager));
+        return DamageSourceHandle.mobAttack(damager).getRaw();
     }
 
     public static Object forPlayerAttack(HumanEntity damager) {
-        return DamageSource.playerAttack(CommonNMS.getNative(damager));
+        return DamageSourceHandle.playerAttack(damager).getRaw();
     }
 
     public static Object forArrowHit(Arrow arrowEntity, Entity hitEntity) {
-        return DamageSource.arrow(CommonNMS.getNative(arrowEntity, EntityArrow.class), CommonNMS.getNative(hitEntity));
+        return DamageSourceHandle.arrowHit(arrowEntity, hitEntity).getRaw();
     }
 
     public static Object forFireballHit(Fireball fireballEntity, Entity hitEntity) {
-        return DamageSource.fireball(CommonNMS.getNative(fireballEntity, EntityFireball.class), CommonNMS.getNative(hitEntity));
+        return DamageSourceHandle.fireballHit(fireballEntity, hitEntity).getRaw();
     }
 
     public static Object forThrownHit(Entity projectile, Entity hitEntity) {
-        return DamageSource.projectile(CommonNMS.getNative(projectile), CommonNMS.getNative(hitEntity));
+        return DamageSourceHandle.thrownHit(projectile, hitEntity).getRaw();
     }
 
     public static Object forMagicHit(Entity source, Entity hitEntity) {
-        return DamageSource.b(CommonNMS.getNative(source), CommonNMS.getNative(hitEntity));
+        return DamageSourceHandle.magicHit(source, hitEntity).getRaw();
     }
 
     public static Object forThornsDamage(Entity damagedEntity) {
-        return DamageSource.a(CommonNMS.getNative(damagedEntity));
+        return DamageSourceHandle.thorns(damagedEntity).getRaw();
     }
 
     public static Object forExplosion(Entity explodableEntity) {
-        Explosion expl = null;
-        if (explodableEntity != null) {
-            expl = new Explosion(null, CommonNMS.getNative(explodableEntity), 0.0, 0.0, 0.0, 0.0f, true, true);
-        }
-        return DamageSource.explosion(expl);
+        return DamageSourceHandle.entityExplosion(explodableEntity).getRaw();
     }
 
     public static Entity getEntity(Object damageSource) {
-        return Conversion.toEntity.convert(((DamageSource) damageSource).getEntity());
+        return DamageSourceHandle.createHandle(damageSource).getEntity();
     }
 
     public static boolean isExplosive(Object damageSource) {
-        return ((DamageSource) damageSource).isExplosion();
+        return DamageSourceHandle.createHandle(damageSource).isExplosion();
     }
 
     public static boolean isFireDamage(Object damageSource) {
-        return ((DamageSource) damageSource).o();
+        return DamageSourceHandle.createHandle(damageSource).isFireDamage();
     }
 }

@@ -5,6 +5,8 @@ include /net/minecraft/server/server.txt
 include /net/minecraft/server/methodprofiler.txt
 include /net/minecraft/server/sounds.txt
 include /net/minecraft/server/mobeffect.txt
+include /net/minecraft/server/damagesource.txt
+include /net/minecraft/server/explosion.txt
 include /net/minecraft/server/attributes.txt
 include /net/minecraft/server/entity.txt
 include /net/minecraft/server/entity_tracker.txt
