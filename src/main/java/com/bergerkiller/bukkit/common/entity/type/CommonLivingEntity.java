@@ -8,13 +8,10 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
-
-import net.minecraft.server.v1_11_R1.EntityLiving;
-import net.minecraft.server.v1_11_R1.GenericAttributes;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
 
 /**
  * A Common Entity implementation for Living Entities
@@ -95,7 +92,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return max health
      */
     public double getMaxHealth() {
-        return getHandle(EntityLiving.class).getMaxHealth();
+        return handle.cast(EntityLivingHandle.T).getMaxHealth();
     }
 
     /**
@@ -104,7 +101,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return health
      */
     public double getHealth() {
-        EntityLiving handle = getHandle(EntityLiving.class);
+        EntityLivingHandle handle = this.handle.cast(EntityLivingHandle.T);
         return MathUtil.clamp(handle.getHealth(), 0, handle.getMaxHealth());
     }
 
@@ -154,7 +151,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return Forward movement
      */
     public double getForwardMovement() {
-        return NMSEntityLiving.forwardMovement.get(getHandle(EntityLiving.class));
+        return (double) EntityLivingHandle.T.forwardMovement.getFloat(this.handle.getRaw());
     }
 
     /**
@@ -163,8 +160,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @param range of path finding
      */
     public void setPathfindingRange(double range) {
-        EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        nmsEntity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).setValue(range);
+        EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
+        nmsEntity.getAttributeInstance(GenericAttributesHandle.FOLLOW_RANGE).setValue(range);
     }
 
     /**
@@ -173,8 +170,8 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      * @return range of path finding
      */
     public double getPathfindingRange() {
-        EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        return nmsEntity.getAttributeInstance(GenericAttributes.FOLLOW_RANGE).getValue();
+        EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
+        return nmsEntity.getAttributeInstance(GenericAttributesHandle.FOLLOW_RANGE).getValue();
     }
 
 //	/**

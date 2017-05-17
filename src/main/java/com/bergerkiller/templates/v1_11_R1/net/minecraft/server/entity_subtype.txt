@@ -6,23 +6,37 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 
-class EntityHuman {
+class EntityHuman extends EntityLiving {
 }
 
-class EntityLiving {
+class EntityLiving extends Entity {
+    public float lastDamage;
+    protected unknown boolean bd;
+    public unknown float be;
+    public float forwardMovement:bf;
+    public unknown float bg;
+    public boolean updateEffects;
+
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
 
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot)
 
     public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
+
+    public (AttributeInstanceHandle) AttributeInstance getAttributeInstance((Object) IAttribute iattribute);
+
+    public final float getHealth();
+
+    public final float getMaxHealth();
 }
 
-class EntityPlayer {
+class EntityPlayer extends EntityHuman {
 
 }
 
-class EntityInsentient {
+class EntityInsentient extends EntityLiving {
     public (EntityHandle) Entity getLeashHolder();
 }
 

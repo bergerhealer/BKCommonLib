@@ -3,3 +3,13 @@ package net.minecraft.server;
 class AttributeMapServer {
     public (Collection<Object>) Collection<AttributeInstance> attributes:c();
 }
+
+class AttributeInstance {
+    public abstract void setValue(double value);
+
+    public abstract double getValue();
+}
+
+class GenericAttributes {
+    public static final (Object) IAttribute FOLLOW_RANGE;
+}
