@@ -3,7 +3,11 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -29,32 +33,41 @@ import org.bukkit.entity.Player;
  */
 public class CommonNMS {
  
-    public static ItemStackHandle getNative(org.bukkit.inventory.ItemStack stack) {
+    public static ItemStackHandle getHandle(org.bukkit.inventory.ItemStack stack) {
         return ItemStackHandle.createHandle(Conversion.toItemStackHandle.convert(stack));
     }
 
-    public static EntityItemHandle getNative(org.bukkit.entity.Item item) {
-        return EntityItemHandle.createHandle(getRawHandle(item, EntityItemHandle.T));
+    public static EntityHandle getHandle(org.bukkit.entity.Entity entity) {
+        return getHandle(entity, EntityHandle.T);
     }
 
-    public static EntityLiving getNative(LivingEntity l) {
-        return getNative(l, EntityLiving.class);
+    public static EntityItemHandle getHandle(org.bukkit.entity.Item item) {
+        return getHandle(item, EntityItemHandle.T);
     }
 
-    public static EntityHuman getNative(HumanEntity h) {
-        return getNative(h, EntityHuman.class);
+    public static EntityLivingHandle getHandle(LivingEntity l) {
+        return getHandle(l, EntityLivingHandle.T);
     }
 
-    public static EntityPlayer getNative(Player p) {
-        return getNative(p, EntityPlayer.class);
+    public static EntityHumanHandle getHandle(HumanEntity h) {
+        return getHandle(h, EntityHumanHandle.T);
     }
 
-    public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class type) {
+    public static EntityPlayerHandle getHandle(Player p) {
+        return getHandle(p, EntityPlayerHandle.T);
+    }
+
+    public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class<?> type) {
         return CommonUtil.tryCast(Conversion.toEntityHandle.convert(e), type.getType());
     }
 
-    public static <T extends Entity> T getNative(org.bukkit.entity.Entity e, Class<T> type) {
-        return CommonUtil.tryCast(getNative(e), type);
+    public static <T extends Template.Handle> T getHandle(org.bukkit.entity.Entity e, Template.Class<T> type) {
+        Object rawInstance = HandleConversion.toEntityHandle(e);
+        if (type.isAssignableFrom(rawInstance)) {
+            return type.createHandle(rawInstance);
+        } else {
+            return null;
+        }
     }
 
     public static Entity getNative(org.bukkit.entity.Entity entity) {

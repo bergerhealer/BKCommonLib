@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
@@ -13,8 +14,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.WorldServer;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -65,8 +64,10 @@ public class PlayerUtil extends EntityUtil {
      * @return list of nearby players
      */
     public static List<Player> getNearbyPlayers(Player player, double radius) {
-        EntityPlayer handle = CommonNMS.getNative(player);
-        List<?> nearbyPlayerHandles = handle.world.a(EntityPlayer.class, handle.getBoundingBox().grow(radius, radius, radius));
+        EntityPlayerHandle handle = CommonNMS.getHandle(player);
+        List<?> nearbyPlayerHandles = handle.getWorld().getRawEntitiesOfType(
+                EntityPlayerHandle.T.getType(),
+                handle.getBoundingBox().grow(radius, radius, radius));
         return new ConvertingList<Player>(nearbyPlayerHandles, DuplexConversion.player);
     }
 
@@ -156,7 +157,7 @@ public class PlayerUtil extends EntityUtil {
      * @return Ping (in ms)
      */
     public static int getPing(Player player) {
-        return CommonNMS.getNative(player).ping;
+        return CommonNMS.getHandle(player).getPing();
     }
 
     /**
@@ -166,7 +167,7 @@ public class PlayerUtil extends EntityUtil {
      * @param ping to replace with (in ms)
      */
     public static void setPing(Player player, int ping) {
-        CommonNMS.getNative(player).ping = ping;
+        CommonNMS.getHandle(player).setPing(ping);
     }
 
     /**
@@ -217,8 +218,8 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the player entered the chunk, False if not
      */
     public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
-        final EntityPlayer ep = CommonNMS.getNative(player);
-        return ((WorldServer) ep.world).getPlayerChunkMap().a(ep, chunkX, chunkZ);
+        final EntityPlayerHandle ep = CommonNMS.getHandle(player);
+        return ep.getWorldServer().getPlayerChunkMap().isChunkEntered(ep, chunkX, chunkZ);
     }
 
     /**

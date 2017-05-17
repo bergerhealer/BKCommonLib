@@ -5,12 +5,12 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHanging;
 
 import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.EntityLiving;
-import net.minecraft.server.v1_11_R1.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Hanging;
@@ -71,8 +71,8 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param speed New entity speed
      */
     public static void setSpeed(LivingEntity entity, double speed) {
-        EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        nmsEntity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
+        EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
+        nmsEntity.getAttributeInstance(GenericAttributesHandle.MOVEMENT_SPEED).setValue(speed);
     }
 
     /**
@@ -82,8 +82,8 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return entity speed
      */
     public static double getSpeed(LivingEntity entity) {
-        EntityLiving nmsEntity = CommonNMS.getNative(entity);
-        return nmsEntity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).getValue();
+        EntityLivingHandle nmsEntity = CommonNMS.getHandle(entity);
+        return nmsEntity.getAttributeInstance(GenericAttributesHandle.MOVEMENT_SPEED).getValue();
     }
 
     /**
@@ -154,8 +154,8 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return entity Id
      */
     public static int getUniqueEntityId() {
-        int id = NMSEntity.globalEntityCount.get(null);
-        NMSEntity.globalEntityCount.set(null, id + 1);
+        int id = EntityHandle.entityCount();
+        EntityHandle.entityCount_set(id + 1);
         return id;
     }
 

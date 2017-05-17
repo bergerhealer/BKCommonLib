@@ -93,7 +93,7 @@ public class CraftBukkitServer extends CommonServerBase {
 
     @Override
     public List<Integer> getEntityRemoveQueue(Player player) {
-        return CommonNMS.getNative(player).removeQueue;
+        return CommonNMS.getHandle(player).getRemoveQueue();
     }
 
     @Override

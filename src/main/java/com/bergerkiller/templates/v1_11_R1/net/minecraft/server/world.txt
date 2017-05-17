@@ -6,7 +6,9 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 
@@ -24,6 +26,8 @@ class World {
     public final (MethodProfilerHandle) MethodProfiler methodProfiler;
 
     private boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+
+    public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
     public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
@@ -50,6 +54,12 @@ class World {
 
 class WorldServer extends World {
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
+
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+}
+
+class PlayerChunkMap {
+    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
 }
 
 class WorldData {
@@ -68,3 +78,4 @@ class BiomeBase {
         public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
     }
 }
+

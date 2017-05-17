@@ -25,7 +25,7 @@ public class CommonPlayerMeta {
         if (Common.SERVER instanceof SportBukkitServer) {
             removeQueue = new ArrayList<Integer>();
         } else {
-            removeQueue = CommonNMS.getNative(player).removeQueue;
+            removeQueue = CommonNMS.getHandle(player).getRemoveQueue();
         }
     }
 

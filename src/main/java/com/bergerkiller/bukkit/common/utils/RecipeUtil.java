@@ -54,7 +54,7 @@ public class RecipeUtil {
         if (item == null) {
             return 0;
         } else {
-            return item.getAmount() * TileEntityFurnaceHandle.fuelTime(CommonNMS.getNative(item));
+            return item.getAmount() * TileEntityFurnaceHandle.fuelTime(CommonNMS.getHandle(item));
         }
     }
 
@@ -89,7 +89,7 @@ public class RecipeUtil {
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-        return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getNative(cooked)));
+        return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getHandle(cooked)));
     }
 
     public static Collection<ItemStack> getHeatableItemStacks() {

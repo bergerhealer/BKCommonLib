@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.bases;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
 
@@ -85,16 +86,16 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @param player to update
      */
     public void movePlayer(Player player) {
-        EntityPlayer entityplayer = CommonNMS.getNative(player);
-        int i = (int) entityplayer.locX >> 4;
-        int j = (int) entityplayer.locZ >> 4;
-        double d0 = entityplayer.d - entityplayer.locX;
-        double d1 = entityplayer.e - entityplayer.locZ;
+        EntityPlayerHandle entityplayer = CommonNMS.getHandle(player);
+        int i = (int) entityplayer.getLocX() >> 4;
+        int j = (int) entityplayer.getLocZ() >> 4;
+        double d0 = entityplayer.getChunkSyncX() - entityplayer.getLocX();
+        double d1 = entityplayer.getChunkSyncZ() - entityplayer.getLocZ();
         double d2 = d0 * d0 + d1 * d1;
 
         if (d2 >= 64.0D) {
-            int k = (int) entityplayer.d >> 4;
-            int l = (int) entityplayer.e >> 4;
+            int k = (int) entityplayer.getChunkSyncX() >> 4;
+            int l = (int) entityplayer.getChunkSyncZ() >> 4;
             int i1 = NMSPlayerChunkMap.radius.get(this);
             int j1 = i - k;
             int k1 = j - l;
@@ -117,18 +118,18 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
                     }
                 }
 
-                b(entityplayer);
-                entityplayer.d = entityplayer.locX;
-                entityplayer.e = entityplayer.locZ;
+                b((EntityPlayer) entityplayer.getRaw());
+                entityplayer.setChunkSyncX(entityplayer.getLocX());
+                entityplayer.setChunkSyncZ(entityplayer.getLocZ());
 
-                Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
+                Collections.sort(chunksToLoad, new ChunkCoordComparator((EntityPlayer) entityplayer.getRaw()));
                 for (ChunkCoordIntPair pair : chunksToLoad) {
                     Object playerchunk = NMSPlayerChunkMap.getChunk.invoke(this, pair.x, pair.z, true);
                     NMSPlayerChunk.addPlayer.invoke(playerchunk, entityplayer);
                 }
 
                 if ((j1 > 1) || (j1 < -1) || (k1 > 1) || (k1 < -1)) {
-                    Collections.sort(chunksToLoad, new ChunkCoordComparator(entityplayer));
+                    Collections.sort(chunksToLoad, new ChunkCoordComparator((EntityPlayer) entityplayer.getRaw()));
                 }
             }
         }
@@ -140,7 +141,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @param player to add
      */
     public void addPlayer(Player player) {
-        super.addPlayer(CommonNMS.getNative(player));
+        super.addPlayer((EntityPlayer) CommonNMS.getHandle(player).getRaw());
     }
 
     /**
@@ -149,9 +150,9 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @param player to remove
      */
     public void removePlayer(Player player) {
-        EntityPlayer entityplayer = CommonNMS.getNative(player);
-        int i = (int) entityplayer.d >> 4;
-        int j = (int) entityplayer.e >> 4;
+        EntityPlayerHandle entityplayer = CommonNMS.getHandle(player);
+        int i = (int) entityplayer.getChunkSyncX() >> 4;
+        int j = (int) entityplayer.getChunkSyncZ() >> 4;
         int radius = NMSPlayerChunkMap.radius.get(this);
 
         for (int k = i - radius; k <= i + radius; k++) {
@@ -173,7 +174,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @param player to add the chunks to send to
      */
     public void addChunksToSend(Player player) {
-        super.addPlayer(CommonNMS.getNative(player));
+        super.addPlayer((EntityPlayer) CommonNMS.getHandle(player).getRaw());
     }
 
     /**
@@ -187,7 +188,7 @@ public class PlayerChunkMapBase extends PlayerChunkMap {
      * @return True if the player is contained, False if not
      */
     public boolean containsPlayer(Player player, int chunkX, int chunkZ) {
-        return super.a(CommonNMS.getNative(player), chunkX, chunkZ);
+        return super.a((EntityPlayer) CommonNMS.getHandle(player).getRaw(), chunkX, chunkZ);
     }
 
     /**

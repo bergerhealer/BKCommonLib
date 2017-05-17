@@ -12,4 +12,5 @@ class AttributeInstance {
 
 class GenericAttributes {
     public static final (Object) IAttribute FOLLOW_RANGE;
+    public static final (Object) IAttribute MOVEMENT_SPEED;
 }

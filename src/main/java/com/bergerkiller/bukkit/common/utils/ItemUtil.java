@@ -406,7 +406,7 @@ public class ItemUtil {
      */
     public static org.bukkit.entity.Item respawnItem(org.bukkit.entity.Item item) {
         item.remove();
-        EntityItemHandle oldItemHandle = CommonNMS.getNative(item);
+        EntityItemHandle oldItemHandle = CommonNMS.getHandle(item);
         EntityItemHandle newItemHandle = EntityItemHandle.createNew(oldItemHandle.getWorld(), oldItemHandle.getLocX(), oldItemHandle.getLocY(), oldItemHandle.getLocZ(), oldItemHandle.getItemStack());
 
         newItemHandle.setFallDistance(oldItemHandle.getFallDistance());
@@ -572,7 +572,7 @@ public class ItemUtil {
      * @return True if a metadata tag is stored, False if not
      */
     public static boolean hasMetaTag(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getNative(stack).hasTag();
+        return CommonNMS.getHandle(stack).hasTag();
     }
 
     /**
@@ -629,7 +629,7 @@ public class ItemUtil {
      * @param repairCost to set to
      */
     public static void setRepairCost(org.bukkit.inventory.ItemStack stack, int repairCost) {
-        CommonNMS.getNative(stack).setRepairCost(repairCost);
+        CommonNMS.getHandle(stack).setRepairCost(repairCost);
     }
 
     /**
@@ -639,7 +639,7 @@ public class ItemUtil {
      * @return repair cost
      */
     public static int getRepairCost(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getNative(stack).getRepairCost();
+        return CommonNMS.getHandle(stack).getRepairCost();
     }
 
     /**
@@ -649,7 +649,7 @@ public class ItemUtil {
      * @return True if a custom name is set, False if not
      */
     public static boolean hasDisplayName(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getNative(stack).hasName();
+        return CommonNMS.getHandle(stack).hasName();
     }
 
     /**
@@ -660,7 +660,7 @@ public class ItemUtil {
      * @return display name
      */
     public static String getDisplayName(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getNative(stack).getName();
+        return CommonNMS.getHandle(stack).getName();
     }
 
     /**
@@ -672,12 +672,12 @@ public class ItemUtil {
     public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
         if (displayName != null) {
             if (CBCraftItemStack.T.isInstance(stack)) {
-                CommonNMS.getNative(stack).setName(displayName);
+                CommonNMS.getHandle(stack).setName(displayName);
             } else {
                 throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
             }
         } else if (hasDisplayName(stack)) {
-            CommonNMS.getNative(stack).getTag().remove("display");
+            CommonNMS.getHandle(stack).getTag().remove("display");
         }
     }
 }

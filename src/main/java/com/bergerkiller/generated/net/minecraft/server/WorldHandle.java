@@ -43,6 +43,10 @@ public class WorldHandle extends Template.Handle {
         return T.getBlockCollisions.invoke(instance, entity, bounds, flag, list);
     }
 
+    public List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds) {
+        return T.getRawEntitiesOfType.invoke(instance, rawType, bounds);
+    }
+
     public List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
         return T.getCubes.invoke(instance, entity, axisalignedbb);
     }
@@ -99,6 +103,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();

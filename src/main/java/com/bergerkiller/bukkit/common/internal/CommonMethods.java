@@ -14,9 +14,12 @@ import org.bukkit.craftbukkit.v1_11_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_11_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_11_R1.block.CraftBlockState;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 public class CommonMethods {
 
@@ -70,15 +73,15 @@ public class CommonMethods {
     }
 
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
-        DamageSource source;
+        DamageSourceHandle source;
         if (damager instanceof Player) {
-            source = DamageSource.playerAttack(CommonNMS.getNative((Player) damager));
+            source = DamageSourceHandle.playerAttack((HumanEntity) damager);
         } else if (damager instanceof LivingEntity) {
-            source = DamageSource.mobAttack(CommonNMS.getNative((LivingEntity) damager));
+            source = DamageSourceHandle.mobAttack((LivingEntity) damager);
         } else {
-            source = DamageSource.GENERIC;
+            source = DamageSourceHandle.byName("generic");
         }
-        CommonNMS.getNative(entity).damageEntity(source, (float) damage);
+        CommonNMS.getHandle(entity).damageEntity(source, (float) damage);
     }
 
     public static DamageSource DamageSource_from_damagecause(DamageCause cause) {

@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.UUID;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
@@ -23,6 +24,10 @@ public class WorldServerHandle extends WorldHandle {
 
     /* ============================================================================== */
 
+    public PlayerChunkMapHandle getPlayerChunkMap() {
+        return T.getPlayerChunkMap.invoke(instance);
+    }
+
     public Map<UUID, EntityHandle> getEntitiesByUUID() {
         return T.entitiesByUUID.get(instance);
     }
@@ -33,6 +38,8 @@ public class WorldServerHandle extends WorldHandle {
 
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
+
+        public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
 
     }
 }

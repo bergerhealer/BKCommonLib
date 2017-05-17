@@ -17,6 +17,7 @@ import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.server.v1_11_R1.DispenserRegistry;
+import net.minecraft.server.v1_11_R1.EntityHuman;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -174,7 +175,7 @@ public class CommonUtil {
      * @param human to save
      */
     public static void savePlayer(HumanEntity human) {
-        CommonNMS.getPlayerList().playerFileData.save(CommonNMS.getNative(human));
+        CommonNMS.getPlayerList().playerFileData.save((EntityHuman) CommonNMS.getHandle(human).getRaw());
     }
 
     /**

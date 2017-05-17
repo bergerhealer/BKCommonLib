@@ -33,7 +33,10 @@ class EntityLiving extends Entity {
 }
 
 class EntityPlayer extends EntityHuman {
-
+    public double chunkSyncX:d;
+    public double chunkSyncZ:e;
+    public final List<Integer> removeQueue;
+    public int ping;
 }
 
 class EntityInsentient extends EntityLiving {

@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.UUID;
@@ -10,6 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Item;
+import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -112,6 +113,10 @@ public class EntityHandle extends Template.Handle {
         return T.calculateDistance.invoke(instance, x, y, z);
     }
 
+    public boolean damageEntity(DamageSourceHandle damagesource, float damage) {
+        return T.damageEntity.invoke(instance, damagesource, damage);
+    }
+
     public void setPosition(double x, double y, double z) {
         T.setPosition.invoke(instance, x, y, z);
     }
@@ -198,6 +203,10 @@ public class EntityHandle extends Template.Handle {
 
     public DataWatcher getDataWatcher() {
         return T.getDataWatcher.invoke(instance);
+    }
+
+    public WorldServerHandle getWorldServer() {
+        return WorldServerHandle.createHandle(T.world.raw.get(instance));
     }
 
     public org.bukkit.entity.Entity toBukkit() {
@@ -675,6 +684,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
+        public final Template.Method.Converted<Boolean> damageEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Void> setPosition = new Template.Method<Void>();
         public final Template.Method<Void> setPositionRotation = new Template.Method<Void>();
         public final Template.Method<Void> setLocation = new Template.Method<Void>();

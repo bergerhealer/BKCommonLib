@@ -8,9 +8,11 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
@@ -266,6 +268,8 @@ class Entity {
      */
     public double calculateDistance:e(double x, double y, double z);
 
+    public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
+
     public void setPosition(double x, double y, double z);
 
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
@@ -311,6 +315,10 @@ class Entity {
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
     <code>
+    public WorldServerHandle getWorldServer() {
+        return WorldServerHandle.createHandle(T.world.raw.get(instance));
+    }
+
     public org.bukkit.entity.Entity toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
     }
