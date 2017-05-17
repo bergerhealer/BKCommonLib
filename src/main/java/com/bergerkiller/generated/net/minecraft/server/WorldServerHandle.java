@@ -4,9 +4,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.UUID;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
-public class WorldServerHandle extends Template.Handle {
+public class WorldServerHandle extends WorldHandle {
     public static final WorldServerClass T = new WorldServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer");
 

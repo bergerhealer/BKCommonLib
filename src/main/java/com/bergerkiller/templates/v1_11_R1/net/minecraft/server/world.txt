@@ -8,6 +8,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
+import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 
 class World {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
@@ -35,9 +36,19 @@ class World {
     public void removeEntity((EntityHandle) Entity entity);
 
     public boolean addEntity((EntityHandle) Entity entity);
+
+    <code>
+    public org.bukkit.World toBukkit() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
+    }
+
+    public static WorldHandle fromBukkit(org.bukkit.World world) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+    </code>
 }
 
-class WorldServer {
+class WorldServer extends World {
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 }
 
@@ -47,4 +58,13 @@ class WorldData {
 
 class WorldType {
     public int getDimension:g();
+}
+
+class BiomeBase {
+
+    class BiomeBase.BiomeMeta {
+        public (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass:b;
+
+        public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
+    }
 }

@@ -41,7 +41,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
@@ -220,7 +219,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     protected void setEntity(T entity) {
         this.entity = entity;
-        this.handle = EntityHandle.createBukkit(entity);
+        this.handle = EntityHandle.fromBukkit(entity);
     }
 
     /**
@@ -685,7 +684,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             EntityInsentientHandle insHandle = EntityInsentientHandle.createHandle(handle.getRaw());
             EntityHandle holder = insHandle.getLeashHolder();
             if (holder != null) {
-                return holder.toEntity();
+                return holder.toBukkit();
             }
         }
         return null;
@@ -889,7 +888,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         // Add new passengers as required
         List<EntityHandle> currPassengers = handle.getPassengers();
         for (org.bukkit.entity.Entity p : newPassengers) {
-            EntityHandle passengerHandle = EntityHandle.createBukkit(p);
+            EntityHandle passengerHandle = EntityHandle.fromBukkit(p);
             if (!currPassengers.contains(passengerHandle)) {
                 currPassengers.add(passengerHandle);
                 passengerHandle.setVehicle(handle);

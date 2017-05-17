@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.events;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
-import net.minecraft.server.v1_11_R1.Entity;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
@@ -13,7 +12,7 @@ import org.bukkit.event.entity.EntityEvent;
 public class EntityMoveEvent extends EntityEvent {
 
     private static final HandlerList handlers = new HandlerList();
-    private Entity nativeEntity;
+    private EntityHandle entityHandle;
 
     public EntityMoveEvent() {
         super(null);
@@ -25,9 +24,9 @@ public class EntityMoveEvent extends EntityEvent {
      *
      * @param entity to set to
      */
-    public void setEntity(Entity entity) {
-        this.nativeEntity = entity;
-        this.entity = Conversion.toEntity.convert(entity);
+    public void setEntity(EntityHandle entityHandle) {
+        this.entityHandle = entityHandle;
+        this.entity = this.entityHandle.toBukkit();
     }
 
     /**
@@ -45,7 +44,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Last X-coordinate
      */
     public double getFromX() {
-        return nativeEntity.lastX;
+        return entityHandle.getLastX();
     }
 
     /**
@@ -54,7 +53,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Last Y-coordinate
      */
     public double getFromY() {
-        return nativeEntity.lastY;
+        return entityHandle.getLastY();
     }
 
     /**
@@ -63,7 +62,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Last Z-coordinate
      */
     public double getFromZ() {
-        return nativeEntity.lastZ;
+        return entityHandle.getLastZ();
     }
 
     /**
@@ -72,7 +71,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Last yaw angle in degrees
      */
     public float getFromYaw() {
-        return nativeEntity.lastYaw;
+        return entityHandle.getLastYaw();
     }
 
     /**
@@ -81,7 +80,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Last pitch angle in degrees
      */
     public float getFromPitch() {
-        return nativeEntity.lastPitch;
+        return entityHandle.getLastPitch();
     }
 
     /**
@@ -90,7 +89,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Current X-coordinate
      */
     public double getToX() {
-        return nativeEntity.locX;
+        return entityHandle.getLocX();
     }
 
     /**
@@ -99,7 +98,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Current Y-coordinate
      */
     public double getToY() {
-        return nativeEntity.locY;
+        return entityHandle.getLocY();
     }
 
     /**
@@ -108,7 +107,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Current Z-coordinate
      */
     public double getToZ() {
-        return nativeEntity.locZ;
+        return entityHandle.getLocZ();
     }
 
     /**
@@ -117,7 +116,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Current yaw angle in degrees
      */
     public float getToYaw() {
-        return nativeEntity.yaw;
+        return entityHandle.getYaw();
     }
 
     /**
@@ -126,7 +125,7 @@ public class EntityMoveEvent extends EntityEvent {
      * @return Current pitch angle in degrees
      */
     public float getToPitch() {
-        return nativeEntity.pitch;
+        return entityHandle.getPitch();
     }
 
     public HandlerList getHandlers() {

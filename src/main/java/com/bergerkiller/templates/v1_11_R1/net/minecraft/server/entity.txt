@@ -311,11 +311,11 @@ class Entity {
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
     <code>
-    public org.bukkit.entity.Entity toEntity() {
+    public org.bukkit.entity.Entity toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
     }
 
-    public static EntityHandle createBukkit(org.bukkit.entity.Entity entity) {
+    public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
     </code>

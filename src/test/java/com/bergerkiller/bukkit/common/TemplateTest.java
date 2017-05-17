@@ -40,7 +40,7 @@ public class TemplateTest {
                 if (f == null) {
                     fail("Failed to find template field in type " + genClassPath);
                 }
-                Template.Class c = (Template.Class) f.get(null);
+                Template.Class<?> c = (Template.Class<?>) f.get(null);
                 if (c == null) {
                     fail("Failed to initialize template class " + genClassPath);
                 }

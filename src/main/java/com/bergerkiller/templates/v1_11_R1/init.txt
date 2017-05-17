@@ -21,4 +21,5 @@ include /net/minecraft/server/enumdirection.txt
 include /net/minecraft/server/datawatcher.txt
 include /net/minecraft/server/inventories.txt
 include /net/minecraft/server/itemstack.txt
-include /net/minecraft/server/tileentities.txt
+include /net/minecraft/server/tileentity.txt
+include /net/minecraft/server/tileentity_subtype.txt

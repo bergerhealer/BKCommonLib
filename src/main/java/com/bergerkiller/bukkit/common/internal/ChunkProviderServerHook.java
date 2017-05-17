@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
@@ -38,7 +40,11 @@ public class ChunkProviderServerHook extends ChunkProviderServer {
         List<BiomeMeta> mobs = super.chunkGenerator.getMobsFor(enumcreaturetype, pos);
         if (CommonPlugin.hasInstance()) {
             org.bukkit.World world = this.world.getWorld();
-            return CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), mobs);
+            List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+            mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(world, 
+                    pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
+
+            return CommonUtil.unsafeCast(new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse()));
         } else {
             return mobs;
         }

@@ -2,9 +2,10 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
-public class TileEntityFurnaceHandle extends Template.Handle {
+public class TileEntityFurnaceHandle extends TileEntityHandle {
     public static final TileEntityFurnaceClass T = new TileEntityFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityFurnaceHandle.class, "net.minecraft.server.TileEntityFurnace");
 

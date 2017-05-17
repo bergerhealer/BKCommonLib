@@ -67,6 +67,14 @@ public class WorldHandle extends Template.Handle {
         return T.addEntity.invoke(instance, entity);
     }
 
+    public org.bukkit.World toBukkit() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
+    }
+
+    public static WorldHandle fromBukkit(org.bukkit.World world) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+
     public List<EntityHandle> getEntityList() {
         return T.entityList.get(instance);
     }

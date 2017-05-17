@@ -17,7 +17,6 @@ import java.util.Random;
 import java.util.List;
 import org.bukkit.entity.Entity;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();
@@ -201,11 +200,11 @@ public class EntityHandle extends Template.Handle {
         return T.getDataWatcher.invoke(instance);
     }
 
-    public org.bukkit.entity.Entity toEntity() {
+    public org.bukkit.entity.Entity toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
     }
 
-    public static EntityHandle createBukkit(org.bukkit.entity.Entity entity) {
+    public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
 

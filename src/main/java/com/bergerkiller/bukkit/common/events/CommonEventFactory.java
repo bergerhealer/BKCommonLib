@@ -2,14 +2,14 @@ package com.bergerkiller.bukkit.common.events;
 
 import com.bergerkiller.bukkit.common.collections.InstanceBuffer;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSBiomeMeta;
 
-import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_11_R1.Entity;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
@@ -22,13 +22,13 @@ import java.util.List;
 public class CommonEventFactory {
 
     private final EntityMoveEvent entityMoveEvent = new EntityMoveEvent();
-    private final List<Entity> entityMoveEntities = new ArrayList<Entity>();
+    private final List<EntityHandle> entityMoveEntities = new ArrayList<EntityHandle>();
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
 
-    private final InstanceBuffer<BiomeMeta> creaturePreSpawnMobs = new InstanceBuffer<BiomeMeta>() {
+    private final InstanceBuffer<BiomeMetaHandle> creaturePreSpawnMobs = new InstanceBuffer<BiomeMetaHandle>() {
         @Override
-        public BiomeMeta createElement() {
-            return new BiomeMeta(null, 0, 0, 0);
+        public BiomeMetaHandle createElement() {
+            return BiomeMetaHandle.createNew(null, 0, 0, 0);
         }
     };
 
@@ -40,11 +40,11 @@ public class CommonEventFactory {
             return;
         }
         for (World world : WorldUtil.getWorlds()) {
-            entityMoveEntities.addAll(CommonNMS.getNative(world).entityList);
+            entityMoveEntities.addAll(WorldHandle.fromBukkit(world).getEntityList());
         }
-        for (Entity entity : entityMoveEntities) {
-            if (entity.locX != entity.lastX || entity.locY != entity.lastY || entity.locZ != entity.lastZ
-                    || entity.yaw != entity.lastYaw || entity.pitch != entity.lastPitch) {
+        for (EntityHandle entity : entityMoveEntities) {
+            if (entity.getLocX() != entity.getLastX() || entity.getLocY() != entity.getLastY() || entity.getLocZ() != entity.getLastZ()
+                    || entity.getYaw() != entity.getLastYaw() || entity.getPitch() != entity.getLastPitch()) {
 
                 entityMoveEvent.setEntity(entity);
                 CommonUtil.callEvent(entityMoveEvent);
@@ -63,7 +63,7 @@ public class CommonEventFactory {
      * @param inputTypes to process and fire events for
      * @return a list of mobs to spawn
      */
-    public List<BiomeMeta> handleCreaturePreSpawn(World world, int x, int y, int z, List<BiomeMeta> inputTypes) {
+    public List<BiomeMetaHandle> handleCreaturePreSpawn(World world, int x, int y, int z, List<BiomeMetaHandle> inputTypes) {
         // Shortcuts
         if (LogicUtil.nullOrEmpty(inputTypes) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
             return inputTypes;
@@ -71,8 +71,8 @@ public class CommonEventFactory {
 
         // Start processing the elements
         creaturePreSpawnMobs.clear();
-        for (BiomeMeta inputMeta : inputTypes) {
-            final EntityType oldEntityType = CommonEntityType.byNMSEntityClass(inputMeta.b).entityType;
+        for (BiomeMetaHandle inputMeta : inputTypes) {
+            final EntityType oldEntityType = CommonEntityType.byNMSEntityClass(inputMeta.getEntityClass()).entityType;
 
             // Set up the event
             creaturePreSpawnEvent.cancelled = false;

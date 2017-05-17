@@ -2,6 +2,10 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
-class TileEntityFurnace {
+class TileEntityFurnace extends TileEntity {
     public static int fuelTime((ItemStackHandle) ItemStack itemstack);
+}
+
+class TileEntityHopper extends TileEntity {
+    public static boolean suckItems:a((Object) IHopper ihopper);
 }
