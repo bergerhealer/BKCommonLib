@@ -20,7 +20,7 @@ public class BlocksHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class BlocksClass extends Template.Class {
+    public static final class BlocksClass extends Template.Class<BlocksHandle> {
         public final Template.StaticField.Converted<Object> LADDER = new Template.StaticField.Converted<Object>();
 
     }

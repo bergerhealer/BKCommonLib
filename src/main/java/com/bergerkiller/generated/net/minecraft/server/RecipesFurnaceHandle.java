@@ -29,7 +29,7 @@ public class RecipesFurnaceHandle extends Template.Handle {
         return T.getResult.invoke(instance, itemstack);
     }
 
-    public static final class RecipesFurnaceClass extends Template.Class {
+    public static final class RecipesFurnaceClass extends Template.Class<RecipesFurnaceHandle> {
         public final Template.StaticMethod.Converted<RecipesFurnaceHandle> getInstance = new Template.StaticMethod.Converted<RecipesFurnaceHandle>();
 
         public final Template.Method.Converted<ItemStackHandle> getResult = new Template.Method.Converted<ItemStackHandle>();

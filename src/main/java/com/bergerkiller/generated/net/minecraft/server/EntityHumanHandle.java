@@ -19,6 +19,6 @@ public class EntityHumanHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class EntityHumanClass extends Template.Class {
+    public static final class EntityHumanClass extends Template.Class<EntityHumanHandle> {
     }
 }

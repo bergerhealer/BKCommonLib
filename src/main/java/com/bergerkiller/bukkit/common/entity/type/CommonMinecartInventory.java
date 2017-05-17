@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import net.minecraft.server.v1_11_R1.IInventory;
 import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+
+import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 
 /**
  * Base class for Minecart entities with an Inventory
@@ -21,7 +22,7 @@ public abstract class CommonMinecartInventory<T extends Minecart & InventoryHold
     }
 
     public void update() {
-        getHandle(IInventory.class).update();
+        this.handle.cast(IInventoryHandle.T).update(); 
     }
 
 }

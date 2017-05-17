@@ -112,7 +112,7 @@ public class AxisAlignedBBHandle extends Template.Handle {
         T.maxZ.setDouble(instance, value);
     }
 
-    public static final class AxisAlignedBBClass extends Template.Class {
+    public static final class AxisAlignedBBClass extends Template.Class<AxisAlignedBBHandle> {
         public final Template.Constructor.Converted<AxisAlignedBBHandle> constr_x1_y1_z1_x2_y2_z2 = new Template.Constructor.Converted<AxisAlignedBBHandle>();
 
         public final Template.Field.Double minX = new Template.Field.Double();

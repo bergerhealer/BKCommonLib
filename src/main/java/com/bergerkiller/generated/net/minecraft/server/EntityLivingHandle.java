@@ -36,7 +36,7 @@ public class EntityLivingHandle extends Template.Handle {
         return T.getAttributeMap.invoke(instance);
     }
 
-    public static final class EntityLivingClass extends Template.Class {
+    public static final class EntityLivingClass extends Template.Class<EntityLivingHandle> {
         public final Template.Method.Converted<Collection<MobEffectHandle>> getEffects = new Template.Method.Converted<Collection<MobEffectHandle>>();
         public final Template.Method.Converted<ItemStack> getEquipment = new Template.Method.Converted<ItemStack>();
         public final Template.Method.Converted<AttributeMapServerHandle> getAttributeMap = new Template.Method.Converted<AttributeMapServerHandle>();

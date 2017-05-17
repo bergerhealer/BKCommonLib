@@ -19,6 +19,6 @@ public class CrashReportSystemDetailsHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class CrashReportSystemDetailsClass extends Template.Class {
+    public static final class CrashReportSystemDetailsClass extends Template.Class<CrashReportSystemDetailsHandle> {
     }
 }

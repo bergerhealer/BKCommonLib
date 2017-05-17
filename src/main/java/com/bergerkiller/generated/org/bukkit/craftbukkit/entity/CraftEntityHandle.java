@@ -38,7 +38,7 @@ public class CraftEntityHandle extends Template.Handle {
         T.entityHandle.set(instance, value);
     }
 
-    public static final class CraftEntityClass extends Template.Class {
+    public static final class CraftEntityClass extends Template.Class<CraftEntityHandle> {
         public final Template.Field.Converted<EntityHandle> entityHandle = new Template.Field.Converted<EntityHandle>();
 
         public final Template.StaticMethod.Converted<Entity> createCraftEntity = new Template.StaticMethod.Converted<Entity>();

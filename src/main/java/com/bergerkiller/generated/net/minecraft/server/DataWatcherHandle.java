@@ -28,7 +28,7 @@ public class DataWatcherHandle extends Template.Handle {
         T.owner.set(instance, value);
     }
 
-    public static final class DataWatcherClass extends Template.Class {
+    public static final class DataWatcherClass extends Template.Class<DataWatcherHandle> {
         public final Template.Field.Converted<EntityHandle> owner = new Template.Field.Converted<EntityHandle>();
 
     }

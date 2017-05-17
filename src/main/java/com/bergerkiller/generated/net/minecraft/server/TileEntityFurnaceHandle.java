@@ -24,7 +24,7 @@ public class TileEntityFurnaceHandle extends Template.Handle {
         return T.fuelTime.invoke(itemstack);
     }
 
-    public static final class TileEntityFurnaceClass extends Template.Class {
+    public static final class TileEntityFurnaceClass extends Template.Class<TileEntityFurnaceHandle> {
         public final Template.StaticMethod.Converted<Integer> fuelTime = new Template.StaticMethod.Converted<Integer>();
 
     }

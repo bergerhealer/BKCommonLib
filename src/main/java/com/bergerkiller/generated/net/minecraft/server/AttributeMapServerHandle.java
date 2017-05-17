@@ -24,7 +24,7 @@ public class AttributeMapServerHandle extends Template.Handle {
         return T.attributes.invoke(instance);
     }
 
-    public static final class AttributeMapServerClass extends Template.Class {
+    public static final class AttributeMapServerClass extends Template.Class<AttributeMapServerHandle> {
         public final Template.Method.Converted<Collection<Object>> attributes = new Template.Method.Converted<Collection<Object>>();
 
     }

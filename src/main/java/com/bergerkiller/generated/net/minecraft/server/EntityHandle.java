@@ -601,7 +601,7 @@ public class EntityHandle extends Template.Handle {
         T.valid.setBoolean(instance, value);
     }
 
-    public static final class EntityClass extends Template.Class {
+    public static final class EntityClass extends Template.Class<EntityHandle> {
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         public final Template.StaticField.Converted<Key<Integer>> DATA_AIR_TICKS = new Template.StaticField.Converted<Key<Integer>>();

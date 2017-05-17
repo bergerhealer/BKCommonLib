@@ -29,7 +29,7 @@ public class SimplePluginManagerHandle extends Template.Handle {
         T.plugins.set(instance, value);
     }
 
-    public static final class SimplePluginManagerClass extends Template.Class {
+    public static final class SimplePluginManagerClass extends Template.Class<SimplePluginManagerHandle> {
         public final Template.Field<List<Plugin>> plugins = new Template.Field<List<Plugin>>();
 
     }

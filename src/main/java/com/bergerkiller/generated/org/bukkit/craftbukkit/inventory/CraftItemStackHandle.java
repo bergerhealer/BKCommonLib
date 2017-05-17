@@ -24,7 +24,7 @@ public class CraftItemStackHandle extends Template.Handle {
         return T.asCraftCopy.invoke(original);
     }
 
-    public static final class CraftItemStackClass extends Template.Class {
+    public static final class CraftItemStackClass extends Template.Class<CraftItemStackHandle> {
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
 
     }

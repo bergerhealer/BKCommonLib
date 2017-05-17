@@ -19,6 +19,6 @@ public class EntityPlayerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class EntityPlayerClass extends Template.Class {
+    public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
     }
 }

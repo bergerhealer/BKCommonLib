@@ -83,7 +83,7 @@ public class WorldHandle extends Template.Handle {
         T.methodProfiler.set(instance, value);
     }
 
-    public static final class WorldClass extends Template.Class {
+    public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
 

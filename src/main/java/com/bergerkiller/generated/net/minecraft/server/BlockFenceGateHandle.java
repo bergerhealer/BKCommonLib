@@ -19,6 +19,6 @@ public class BlockFenceGateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class BlockFenceGateClass extends Template.Class {
+    public static final class BlockFenceGateClass extends Template.Class<BlockFenceGateHandle> {
     }
 }

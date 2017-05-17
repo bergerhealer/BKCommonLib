@@ -19,6 +19,6 @@ public class BlockCobbleWallHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class BlockCobbleWallClass extends Template.Class {
+    public static final class BlockCobbleWallClass extends Template.Class<BlockCobbleWallHandle> {
     }
 }

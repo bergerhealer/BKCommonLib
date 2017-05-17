@@ -1,5 +1,5 @@
 package net.minecraft.server;
 
 interface IInventory {
-
+    public abstract void update();
 }

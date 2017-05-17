@@ -51,7 +51,7 @@ public class EntityItemHandle extends EntityHandle {
         T.pickupDelay.setInteger(instance, value);
     }
 
-    public static final class EntityItemClass extends Template.Class {
+    public static final class EntityItemClass extends Template.Class<EntityItemHandle> {
         public final Template.Constructor.Converted<EntityItemHandle> constr_world_x_y_z_itemstack = new Template.Constructor.Converted<EntityItemHandle>();
 
         public final Template.Field.Integer age = new Template.Field.Integer();

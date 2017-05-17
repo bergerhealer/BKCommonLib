@@ -20,7 +20,7 @@ public class EnumDirectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class EnumDirectionClass extends Template.Class {
+    public static final class EnumDirectionClass extends Template.Class<EnumDirectionHandle> {
     }
 
     public static class EnumAxisHandle extends Template.Handle {
@@ -46,7 +46,7 @@ public class EnumDirectionHandle extends Template.Handle {
             return ((Enum<?>) instance).ordinal();
         }
 
-        public static final class EnumAxisClass extends Template.Class {
+        public static final class EnumAxisClass extends Template.Class<EnumAxisHandle> {
             public final Template.EnumConstant.Converted<EnumAxisHandle> X = new Template.EnumConstant.Converted<EnumAxisHandle>();
             public final Template.EnumConstant.Converted<EnumAxisHandle> Y = new Template.EnumConstant.Converted<EnumAxisHandle>();
             public final Template.EnumConstant.Converted<EnumAxisHandle> Z = new Template.EnumConstant.Converted<EnumAxisHandle>();

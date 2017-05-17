@@ -19,6 +19,6 @@ public class SoundEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class SoundEffectClass extends Template.Class {
+    public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
     }
 }

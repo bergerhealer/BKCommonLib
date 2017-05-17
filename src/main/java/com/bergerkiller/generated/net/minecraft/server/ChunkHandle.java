@@ -27,7 +27,7 @@ public class ChunkHandle extends Template.Handle {
         T.entitySlices.set(instance, value);
     }
 
-    public static final class ChunkClass extends Template.Class {
+    public static final class ChunkClass extends Template.Class<ChunkHandle> {
         public final Template.Field.Converted<Object> entitySlices = new Template.Field.Converted<Object>();
 
     }

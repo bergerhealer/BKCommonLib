@@ -49,7 +49,7 @@ public class ItemStackHandle extends Template.Handle {
         return T.getTag.invoke(instance);
     }
 
-    public static final class ItemStackClass extends Template.Class {
+    public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<Integer> getRepairCost = new Template.Method<Integer>();

@@ -25,7 +25,7 @@ public class ReportedExceptionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class ReportedExceptionClass extends Template.Class {
+    public static final class ReportedExceptionClass extends Template.Class<ReportedExceptionHandle> {
         public final Template.Constructor.Converted<ReportedExceptionHandle> constr_paramCrashReport = new Template.Constructor.Converted<ReportedExceptionHandle>();
 
     }

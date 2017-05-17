@@ -27,7 +27,7 @@ public class ItemHandle extends Template.Handle {
         return T.usesDurability.invoke(instance);
     }
 
-    public static final class ItemClass extends Template.Class {
+    public static final class ItemClass extends Template.Class<ItemHandle> {
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
 

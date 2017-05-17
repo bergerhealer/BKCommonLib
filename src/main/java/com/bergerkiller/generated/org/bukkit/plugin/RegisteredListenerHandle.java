@@ -28,7 +28,7 @@ public class RegisteredListenerHandle extends Template.Handle {
         T.executor.set(instance, value);
     }
 
-    public static final class RegisteredListenerClass extends Template.Class {
+    public static final class RegisteredListenerClass extends Template.Class<RegisteredListenerHandle> {
         public final Template.Field<EventExecutor> executor = new Template.Field<EventExecutor>();
 
     }

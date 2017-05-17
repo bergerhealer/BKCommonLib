@@ -205,7 +205,7 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.viewers.set(instance, value);
     }
 
-    public static final class EntityTrackerEntryClass extends Template.Class {
+    public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
         public final Template.Field.Converted<EntityHandle> tracker = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         public final Template.Field.Integer playerViewDistance = new Template.Field.Integer();

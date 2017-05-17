@@ -19,6 +19,12 @@ public class IInventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class IInventoryClass extends Template.Class {
+    public void update() {
+        T.update.invoke(instance);
+    }
+
+    public static final class IInventoryClass extends Template.Class<IInventoryHandle> {
+        public final Template.Method<Void> update = new Template.Method<Void>();
+
     }
 }

@@ -29,7 +29,7 @@ public class CrashReportHandle extends Template.Handle {
         return T.getSystemDetails.invoke(instance, message);
     }
 
-    public static final class CrashReportClass extends Template.Class {
+    public static final class CrashReportClass extends Template.Class<CrashReportHandle> {
         public final Template.StaticMethod.Converted<CrashReportHandle> create = new Template.StaticMethod.Converted<CrashReportHandle>();
 
         public final Template.Method.Converted<CrashReportSystemDetailsHandle> getSystemDetails = new Template.Method.Converted<CrashReportSystemDetailsHandle>();

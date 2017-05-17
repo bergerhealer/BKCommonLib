@@ -26,7 +26,7 @@ public class ExplosionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class ExplosionClass extends Template.Class {
+    public static final class ExplosionClass extends Template.Class<ExplosionHandle> {
         public final Template.Constructor.Converted<ExplosionHandle> constr_world_entity_x_y_z_yield_fire_destroyBlocks = new Template.Constructor.Converted<ExplosionHandle>();
 
     }

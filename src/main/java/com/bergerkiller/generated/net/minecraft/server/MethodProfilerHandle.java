@@ -27,7 +27,7 @@ public class MethodProfilerHandle extends Template.Handle {
         T.end.invoke(instance);
     }
 
-    public static final class MethodProfilerClass extends Template.Class {
+    public static final class MethodProfilerClass extends Template.Class<MethodProfilerHandle> {
         public final Template.Method<Void> begin = new Template.Method<Void>();
         public final Template.Method<Void> end = new Template.Method<Void>();
 

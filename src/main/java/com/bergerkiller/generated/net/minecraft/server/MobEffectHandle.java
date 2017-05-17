@@ -19,6 +19,6 @@ public class MobEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class MobEffectClass extends Template.Class {
+    public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
     }
 }

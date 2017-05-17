@@ -25,7 +25,7 @@ public class BlockHandle extends Template.Handle {
         T.entityHitVertical.invoke(instance, world, entity);
     }
 
-    public static final class BlockClass extends Template.Class {
+    public static final class BlockClass extends Template.Class<BlockHandle> {
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
 
     }

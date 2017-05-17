@@ -30,7 +30,7 @@ public class WorldServerHandle extends Template.Handle {
         T.entitiesByUUID.set(instance, value);
     }
 
-    public static final class WorldServerClass extends Template.Class {
+    public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
 
     }

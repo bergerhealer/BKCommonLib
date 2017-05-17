@@ -21,7 +21,7 @@ public class SoundEffectsHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class SoundEffectsClass extends Template.Class {
+    public static final class SoundEffectsClass extends Template.Class<SoundEffectsHandle> {
         public final Template.StaticField.Converted<SoundEffectHandle> EXTINGUISH_FIRE = new Template.StaticField.Converted<SoundEffectHandle>();
 
     }

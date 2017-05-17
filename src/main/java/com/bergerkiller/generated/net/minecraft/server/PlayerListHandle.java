@@ -35,7 +35,7 @@ public class PlayerListHandle extends Template.Handle {
         T.maxPlayers.setInteger(instance, value);
     }
 
-    public static final class PlayerListClass extends Template.Class {
+    public static final class PlayerListClass extends Template.Class<PlayerListHandle> {
         public final Template.Field.Converted<Object> playerFileData = new Template.Field.Converted<Object>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
 

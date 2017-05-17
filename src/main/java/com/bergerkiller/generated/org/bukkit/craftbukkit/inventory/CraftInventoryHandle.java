@@ -32,7 +32,7 @@ public class CraftInventoryHandle extends Template.Handle {
         T.handleField.set(instance, value);
     }
 
-    public static final class CraftInventoryClass extends Template.Class {
+    public static final class CraftInventoryClass extends Template.Class<CraftInventoryHandle> {
         public final Template.Field.Converted<IInventoryHandle> handleField = new Template.Field.Converted<IInventoryHandle>();
 
         public final Template.Method.Converted<IInventoryHandle> getHandle = new Template.Method.Converted<IInventoryHandle>();

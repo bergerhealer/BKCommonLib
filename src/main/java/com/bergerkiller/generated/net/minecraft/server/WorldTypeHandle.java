@@ -23,7 +23,7 @@ public class WorldTypeHandle extends Template.Handle {
         return T.getDimension.invoke(instance);
     }
 
-    public static final class WorldTypeClass extends Template.Class {
+    public static final class WorldTypeClass extends Template.Class<WorldTypeHandle> {
         public final Template.Method<Integer> getDimension = new Template.Method<Integer>();
 
     }

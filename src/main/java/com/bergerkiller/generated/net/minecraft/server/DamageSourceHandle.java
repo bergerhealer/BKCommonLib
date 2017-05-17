@@ -103,7 +103,7 @@ public class DamageSourceHandle extends Template.Handle {
         T.translationIndex.set(instance, value);
     }
 
-    public static final class DamageSourceClass extends Template.Class {
+    public static final class DamageSourceClass extends Template.Class<DamageSourceHandle> {
         public final Template.Field<String> translationIndex = new Template.Field<String>();
 
         public final Template.StaticMethod.Converted<DamageSourceHandle> mobAttack = new Template.StaticMethod.Converted<DamageSourceHandle>();

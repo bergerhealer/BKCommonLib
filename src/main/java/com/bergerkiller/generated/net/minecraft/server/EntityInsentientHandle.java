@@ -24,7 +24,7 @@ public class EntityInsentientHandle extends Template.Handle {
         return T.getLeashHolder.invoke(instance);
     }
 
-    public static final class EntityInsentientClass extends Template.Class {
+    public static final class EntityInsentientClass extends Template.Class<EntityInsentientHandle> {
         public final Template.Method.Converted<EntityHandle> getLeashHolder = new Template.Method.Converted<EntityHandle>();
 
     }

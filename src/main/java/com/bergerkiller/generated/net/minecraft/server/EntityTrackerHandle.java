@@ -19,6 +19,6 @@ public class EntityTrackerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class EntityTrackerClass extends Template.Class {
+    public static final class EntityTrackerClass extends Template.Class<EntityTrackerHandle> {
     }
 }

@@ -28,7 +28,7 @@ public class PluginDescriptionFileHandle extends Template.Handle {
         T.commands.set(instance, value);
     }
 
-    public static final class PluginDescriptionFileClass extends Template.Class {
+    public static final class PluginDescriptionFileClass extends Template.Class<PluginDescriptionFileHandle> {
         public final Template.Field<Map<String, Map<String, Object>>> commands = new Template.Field<Map<String, Map<String, Object>>>();
 
     }
