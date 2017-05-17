@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 
 public class CommonMethods {
 
@@ -32,11 +33,11 @@ public class CommonMethods {
     }
 
     public static ChunkSection ChunkSection_new(org.bukkit.World world, int y) {
-        return new ChunkSection(y >> 4 << 4, !CommonNMS.getNative(world).worldProvider.m());
+        return new ChunkSection(y >> 4 << 4, !CommonNMS.getHandle(world).getWorldProvider().isDarkWorld());
     }
 
     public static Explosion Explosion_new(org.bukkit.World world, double x, double y, double z) {
-        return new Explosion(CommonNMS.getNative(world), null, x, y, z, (float) 4.0, true, true);
+        return (Explosion) ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true).getRaw();
     }
 
     public static CraftServer CraftServer_instance() {

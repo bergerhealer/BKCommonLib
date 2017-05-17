@@ -24,8 +24,13 @@ public class WorldDataHandle extends Template.Handle {
         return T.getType.invoke(instance);
     }
 
+    public void setClearTimer(int ticks) {
+        T.setClearTimer.invoke(instance, ticks);
+    }
+
     public static final class WorldDataClass extends Template.Class<WorldDataHandle> {
         public final Template.Method.Converted<WorldTypeHandle> getType = new Template.Method.Converted<WorldTypeHandle>();
+        public final Template.Method<Void> setClearTimer = new Template.Method<Void>();
 
     }
 }

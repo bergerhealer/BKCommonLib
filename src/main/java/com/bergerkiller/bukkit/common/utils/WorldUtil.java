@@ -4,12 +4,15 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
@@ -73,7 +76,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return BlockData.fromBlockData(CommonNMS.getNative(world).getType(new BlockPosition(x, y, z)));
+        return CommonNMS.getHandle(world).getBlockData(new IntVector3(x, y, z));
     }
 
     /**
@@ -198,7 +201,7 @@ public class WorldUtil extends ChunkUtil {
      * @return Random generator of a world
      */
     public static Random getRandom(org.bukkit.World world) {
-        return CommonNMS.getNative(world).random;
+        return CommonNMS.getHandle(world).getRandom();
     }
 
     /**
@@ -208,7 +211,7 @@ public class WorldUtil extends ChunkUtil {
      * @param value Keep in memory or not?
      */
     public static void setKeepSpawnInMemory(org.bukkit.World world, boolean value) {
-        CommonNMS.getNative(world).keepSpawnInMemory = value;
+        CommonNMS.getHandle(world).setKeepSpawnInMemory(value);
     }
 
     /**
@@ -257,7 +260,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return DuplexConversion.entityList.convert(CommonNMS.getNative(world).entityList);
+        return DuplexConversion.entityList.convert(WorldHandle.T.entityList.raw.get(HandleConversion.toWorldHandle(world)));
     }
 
     /**
@@ -268,7 +271,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of players on the world
      */
     public static Collection<Player> getPlayers(org.bukkit.World world) {
-        return DuplexConversion.playerList.convert(CommonNMS.getNative(world).players);
+        return DuplexConversion.playerList.convert(WorldHandle.T.players.raw.get(HandleConversion.toWorldHandle(world)));
     }
 
     /**
@@ -345,9 +348,9 @@ public class WorldUtil extends ChunkUtil {
      * failed
      */
     public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
-        WorldServer ws = CommonNMS.getNative(startLocation.getWorld());
+        WorldServerHandle ws = CommonNMS.getHandle(startLocation.getWorld());
         // Use a new travel agent to designate a proper position
-        CraftTravelAgent travelAgent = new CraftTravelAgent(ws);
+        CraftTravelAgent travelAgent = new CraftTravelAgent((WorldServer) ws.getRaw());
         travelAgent.setCanCreatePortal(createPortals);
         Location exit = travelAgent.findOrCreate(startLocation);
         // Adjust the exit to make it suitable for players
@@ -368,7 +371,7 @@ public class WorldUtil extends ChunkUtil {
      * @return players folder
      */
     public static File getPlayersFolder(org.bukkit.World world) {
-        IDataManager man = CommonNMS.getNative(world).getDataManager();
+        IDataManager man = (IDataManager) CommonNMS.getHandle(world).getDataManager();
         if (man instanceof WorldNBTStorage) {
             return ((WorldNBTStorage) man).getPlayerDir();
         }
@@ -495,8 +498,8 @@ public class WorldUtil extends ChunkUtil {
      * @return damage factor
      */
     public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
-        final Vec3D vec = (Vec3D) Conversion.toVec3DHandle.convert(explosionPosition);
-        return CommonNMS.getNative(explosionPosition.getWorld()).a(vec, CommonNMS.getNative(entity).getBoundingBox());
+        final WorldHandle world = CommonNMS.getHandle(explosionPosition.getWorld());
+        return world.getExplosionFactor(explosionPosition.toVector(), CommonNMS.getHandle(entity).getBoundingBox());
     }
 
     /**
@@ -507,7 +510,7 @@ public class WorldUtil extends ChunkUtil {
      * @param world to be saved
      */
     public static synchronized void saveToDisk(org.bukkit.World world) {
-        CommonNMS.getNative(world).saveLevel();
+        CommonNMS.getHandle(world).saveLevel();
     }
 
     public static void loadChunks(Location location, final int radius) {
@@ -554,7 +557,7 @@ public class WorldUtil extends ChunkUtil {
     }
 
     public static boolean areBlocksLoaded(org.bukkit.World world, int blockCenterX, int blockCenterZ, int distance) {
-        return CommonNMS.getNative(world).areChunksLoaded(new BlockPosition(blockCenterX, 0, blockCenterZ), distance);
+        return CommonNMS.getHandle(world).areChunksLoaded(new IntVector3(blockCenterX, 0, blockCenterZ), distance);
     }
 
     /**
@@ -579,7 +582,7 @@ public class WorldUtil extends ChunkUtil {
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
-        Object playerChunkMap = CommonNMS.getNative(world).getPlayerChunkMap();
+        Object playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap().getRaw();
         Object chunk = NMSPlayerChunkMap.getChunk.invoke(playerChunkMap, chunkX, chunkZ);
         if (chunk != null && !NMSPlayerChunk.players.get(chunk).isEmpty()) {
             // Simply remove and re-add the players to the chunk. Does an instant chunk resend, though.
@@ -644,7 +647,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the hit Block, or null if none was found (AIR)
      */
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPosition mop = CommonNMS.getNative(world).rayTrace(new Vec3D(startX, startY, startZ), new Vec3D(endX, endY, endZ), false);
+        MovingObjectPosition mop = (MovingObjectPosition) CommonNMS.getHandle(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ), false);
         return mop == null ? null : world.getBlockAt((int) mop.pos.x, (int) mop.pos.y, (int) mop.pos.z);
     }
 
@@ -687,7 +690,8 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        return new ConvertingList<BlockState>(new ArrayList<TileEntity>(CommonNMS.getNative(world).tileEntityList), DuplexConversion.blockState);
+        List<?> handleList = (List<?>) WorldHandle.T.tileEntityList.raw.get(HandleConversion.toWorldHandle(world));
+        return new ConvertingList<BlockState>(new ArrayList<Object>(handleList), DuplexConversion.blockState);
     }
 
     /**
@@ -733,7 +737,9 @@ public class WorldUtil extends ChunkUtil {
      * @param state to set to
      */
     public static void setWeatherState(org.bukkit.World world, WeatherState state) {
-        CommonNMS.getNative(world).worldData.i(0); // reset 'clear' timer, otherwise we can not change weather!
+        // reset 'clear' timer, otherwise we can not change weather!
+        CommonNMS.getHandle(world).getWorldData().setClearTimer(0);
+
         if (state == WeatherState.CLEAR) {
             if (world.hasStorm()) {
                 world.setStorm(false);

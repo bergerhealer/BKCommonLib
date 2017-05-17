@@ -1,0 +1,15 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+
+class BaseBlockPosition {
+    private final int x:a;
+    private final int y:b;
+    private final int z:c;
+}
+
+class BlockPosition extends BaseBlockPosition {
+
+    public (BlockPositionHandle) BlockPosition(int x, int y, int z);
+
+}

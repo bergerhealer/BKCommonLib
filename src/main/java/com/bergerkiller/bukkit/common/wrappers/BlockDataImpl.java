@@ -199,12 +199,12 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final void dropNaturally(org.bukkit.World world, int x, int y, int z, float yield, int chance) {
-        block.dropNaturally(CommonNMS.getNative(world), new BlockPosition(x, y, z), data, yield, chance);
+        block.dropNaturally((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(x, y, z), data, yield, chance);
     }
 
     @Override
     public final void ignite(org.bukkit.World world, int x, int y, int z) {
-        World worldhandle = CommonNMS.getNative(world);
+        World worldhandle = (World) CommonNMS.getHandle(world).getRaw();
         Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0, true, true);
         block.wasExploded(worldhandle, new BlockPosition(x, y, z), ex);
     }
@@ -217,6 +217,6 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
-        block.stepOn(CommonNMS.getNative(world), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), CommonNMS.getNative(entity));
+        block.stepOn((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), CommonNMS.getNative(entity));
     }
 }

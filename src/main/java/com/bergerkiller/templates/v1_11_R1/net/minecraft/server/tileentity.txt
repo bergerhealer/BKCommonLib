@@ -1,5 +1,10 @@
 package net.minecraft.server;
 
-class TileEntity {
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 
+class TileEntity {
+    public (WorldHandle) World getWorld();
+
+    public (BlockPositionHandle) BlockPosition getPosition();
 }

@@ -4,26 +4,36 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 class World {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
     public final (List<EntityHandle>) List<Entity> entityList;
+    public final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
+    public final (List<EntityHumanHandle>) List<EntityHuman> players;
+    public final Random random;
+    public (WorldProviderHandle) WorldProvider worldProvider;
+    public final (MethodProfilerHandle) MethodProfiler methodProfiler;
+    public boolean keepSpawnInMemory;
 
     public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
 
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
 
     public long getTime();
-
-    public final (MethodProfilerHandle) MethodProfiler methodProfiler;
 
     private boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
 
@@ -33,6 +43,8 @@ class World {
 
     public (List<EntityHandle>) List<Entity> getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
+    public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
+
     public (WorldDataHandle) WorldData getWorldData();
 
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -40,6 +52,14 @@ class World {
     public void removeEntity((EntityHandle) Entity entity);
 
     public boolean addEntity((EntityHandle) Entity entity);
+
+    public (Object) IDataManager getDataManager();
+
+    public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+
+    public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
+
+    public (Object) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
 
     <code>
     public org.bukkit.World toBukkit() {
@@ -56,6 +76,19 @@ class WorldServer extends World {
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
+
+    public void saveLevel();
+}
+
+class ChunkProviderServer {
+    public final Set<Long> unloadQueue;
+    public final (Object) it.unimi.dsi.fastutil.longs.Long2ObjectMap<Chunk> chunks;
+
+    public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
+
+    public void saveChunk((ChunkHandle) Chunk chunk);
 }
 
 class PlayerChunkMap {
@@ -64,10 +97,16 @@ class PlayerChunkMap {
 
 class WorldData {
     public (WorldTypeHandle) WorldType getType();
+
+    public void setClearTimer:i(int ticks);
 }
 
 class WorldType {
     public int getDimension:g();
+}
+
+class WorldProvider {
+    public boolean isDarkWorld:m();
 }
 
 class BiomeBase {

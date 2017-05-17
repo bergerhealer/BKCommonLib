@@ -1,14 +1,19 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import org.bukkit.World;
+import java.util.Random;
 import java.util.List;
+import org.bukkit.util.Vector;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class WorldHandle extends Template.Handle {
@@ -55,6 +60,10 @@ public class WorldHandle extends Template.Handle {
         return T.getEntities.invoke(instance, entity, axisalignedbb);
     }
 
+    public TileEntityHandle getTileEntity(IntVector3 blockposition) {
+        return T.getTileEntity.invoke(instance, blockposition);
+    }
+
     public WorldDataHandle getWorldData() {
         return T.getWorldData.invoke(instance);
     }
@@ -69,6 +78,22 @@ public class WorldHandle extends Template.Handle {
 
     public boolean addEntity(EntityHandle entity) {
         return T.addEntity.invoke(instance, entity);
+    }
+
+    public Object getDataManager() {
+        return T.getDataManager.invoke(instance);
+    }
+
+    public float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds) {
+        return T.getExplosionFactor.invoke(instance, vec3d, bounds);
+    }
+
+    public boolean areChunksLoaded(IntVector3 blockposition, int distance) {
+        return T.areChunksLoaded.invoke(instance, blockposition, distance);
+    }
+
+    public Object rayTrace(Vector point1, Vector point2, boolean flag) {
+        return T.rayTrace.invoke(instance, point1, point2, flag);
     }
 
     public org.bukkit.World toBukkit() {
@@ -87,6 +112,38 @@ public class WorldHandle extends Template.Handle {
         T.entityList.set(instance, value);
     }
 
+    public List<TileEntityHandle> getTileEntityList() {
+        return T.tileEntityList.get(instance);
+    }
+
+    public void setTileEntityList(List<TileEntityHandle> value) {
+        T.tileEntityList.set(instance, value);
+    }
+
+    public List<EntityHumanHandle> getPlayers() {
+        return T.players.get(instance);
+    }
+
+    public void setPlayers(List<EntityHumanHandle> value) {
+        T.players.set(instance, value);
+    }
+
+    public Random getRandom() {
+        return T.random.get(instance);
+    }
+
+    public void setRandom(Random value) {
+        T.random.set(instance, value);
+    }
+
+    public WorldProviderHandle getWorldProvider() {
+        return T.worldProvider.get(instance);
+    }
+
+    public void setWorldProvider(WorldProviderHandle value) {
+        T.worldProvider.set(instance, value);
+    }
+
     public MethodProfilerHandle getMethodProfiler() {
         return T.methodProfiler.get(instance);
     }
@@ -95,9 +152,22 @@ public class WorldHandle extends Template.Handle {
         T.methodProfiler.set(instance, value);
     }
 
+    public boolean isKeepSpawnInMemory() {
+        return T.keepSpawnInMemory.getBoolean(instance);
+    }
+
+    public void setKeepSpawnInMemory(boolean value) {
+        T.keepSpawnInMemory.setBoolean(instance, value);
+    }
+
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
+        public final Template.Field.Converted<List<TileEntityHandle>> tileEntityList = new Template.Field.Converted<List<TileEntityHandle>>();
+        public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
+        public final Template.Field<Random> random = new Template.Field<Random>();
+        public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
+        public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
 
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
@@ -106,10 +176,15 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
+        public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
         public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Object> getDataManager = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
+        public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Object> rayTrace = new Template.Method.Converted<Object>();
 
     }
 }

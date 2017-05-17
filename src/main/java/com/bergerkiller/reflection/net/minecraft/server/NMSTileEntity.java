@@ -3,14 +3,15 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.TileEntity;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -24,7 +25,7 @@ public class NMSTileEntity {
     public static final MethodAccessor<Void> save = T.selectMethod("public NBTTagCompound save(NBTTagCompound nbttagcompound)");
 
     public static boolean hasWorld(Object tileEntity) {
-        return ((TileEntity) tileEntity).getWorld() != null;
+        return TileEntityHandle.createHandle(tileEntity).getWorld() != null;
     }
 
     public static Object getFromWorld(Block block) {
@@ -32,11 +33,11 @@ public class NMSTileEntity {
     }
 
     public static Object getFromWorld(World world, Object blockPosition) {
-    	return CommonNMS.getNative(world).getTileEntity((BlockPosition) blockPosition);
+        return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
     public static Object getFromWorld(World world, int x, int y, int z) {
-    	return getFromWorld(world, new BlockPosition(x, y, z));
+        return getFromWorld(world, BlockPositionHandle.createNew(x, y, z).getRaw());
     }
 
     public static CommonPacket getUpdatePacket(Object tileEntity) {
@@ -47,7 +48,8 @@ public class NMSTileEntity {
     }
 
     public static Block getBlock(Object tileEntity) {
-        TileEntity tile = (TileEntity) tileEntity;
-        return tile.getWorld().getWorld().getBlockAt(tile.getPosition().getX(), tile.getPosition().getY(), tile.getPosition().getZ());
+        TileEntityHandle handle = TileEntityHandle.createHandle(tileEntity);
+        BlockPositionHandle pos = handle.getPosition();
+        return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 }

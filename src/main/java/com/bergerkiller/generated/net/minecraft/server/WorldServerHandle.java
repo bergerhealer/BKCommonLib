@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
+import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.UUID;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
@@ -28,6 +29,14 @@ public class WorldServerHandle extends WorldHandle {
         return T.getPlayerChunkMap.invoke(instance);
     }
 
+    public ChunkProviderServerHandle getChunkProviderServer() {
+        return T.getChunkProviderServer.invoke(instance);
+    }
+
+    public void saveLevel() {
+        T.saveLevel.invoke(instance);
+    }
+
     public Map<UUID, EntityHandle> getEntitiesByUUID() {
         return T.entitiesByUUID.get(instance);
     }
@@ -40,6 +49,8 @@ public class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
+        public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
+        public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 
     }
 }
