@@ -3,6 +3,11 @@ package net.minecraft.server;
 /* import com.bergerkiller.generated.net.minecraft.server.ChunkHandle; */
 /* import com.bergerkiller.generated.net.minecraft.server.EntityHandle; */
 
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
 class Chunk {
     public final (Object) List<Entity>[] entitySlices;
+
+    public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 }

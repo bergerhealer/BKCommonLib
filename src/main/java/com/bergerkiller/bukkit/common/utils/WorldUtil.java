@@ -11,6 +11,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -52,7 +54,10 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        return getBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ());
+        Object chunkHandleRaw = HandleConversion.toChunkHandle(block.getChunk());
+        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(block.getX(), block.getY(), block.getZ());
+        Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
+        return BlockData.fromBlockData(iBlockData);
     }
 
     /**
@@ -76,7 +81,10 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return CommonNMS.getHandle(world).getBlockData(new IntVector3(x, y, z));
+        Object worldHandleRaw = HandleConversion.toWorldHandle(world);
+        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        Object iBlockData = WorldHandle.T.getBlockData.raw.invoke(worldHandleRaw, blockPos); 
+        return BlockData.fromBlockData(iBlockData);
     }
 
     /**

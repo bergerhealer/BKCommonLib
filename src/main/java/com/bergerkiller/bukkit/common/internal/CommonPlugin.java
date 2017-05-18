@@ -23,7 +23,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.mountiplex.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -117,14 +116,17 @@ public class CommonPlugin extends PluginBase {
                 iter.remove();
             }
         }
+        TIMINGS.setActive(!this.timingsListeners.isEmpty());
     }
 
     public void addTimingsListener(TimingsListener listener) {
         this.timingsListeners.add(listener);
+        TIMINGS.setActive(true);
     }
 
     public void removeTimingsListener(TimingsListener listener) {
         this.timingsListeners.remove(listener);
+        TIMINGS.setActive(!this.timingsListeners.isEmpty());
     }
 
     public void notifyAdded(org.bukkit.entity.Entity e) {
@@ -627,6 +629,7 @@ public class CommonPlugin extends PluginBase {
     }
 
     public static class TimingsRootListener implements TimingsListener {
+        private boolean active = false;
 
         /**
          * Gets whether timings are active, and should be informed of
@@ -634,13 +637,23 @@ public class CommonPlugin extends PluginBase {
          *
          * @return True if active, False if not
          */
-        public boolean isActive() {
-            return instance != null && !instance.timingsListeners.isEmpty();
+        public final boolean isActive() {
+            return active;
+        }
+
+        /**
+         * Sets whether the timings listener is active.
+         * Set automatically when timings listeners are added/removed.
+         * 
+         * @param active state to set to
+         */
+        private final void setActive(boolean active) {
+            this.active = active;
         }
 
         @Override
         public void onNextTicked(Runnable runnable, long executionTime) {
-            if (isActive()) {
+            if (this.active) {
                 try {
                     for (int i = 0; i < instance.timingsListeners.size(); i++) {
                         instance.timingsListeners.get(i).onNextTicked(runnable, executionTime);
@@ -653,7 +666,7 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void onChunkLoad(Chunk chunk, long executionTime) {
-            if (isActive()) {
+            if (this.active) {
                 try {
                     for (int i = 0; i < instance.timingsListeners.size(); i++) {
                         instance.timingsListeners.get(i).onChunkLoad(chunk, executionTime);
@@ -666,7 +679,7 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void onChunkGenerate(Chunk chunk, long executionTime) {
-            if (isActive()) {
+            if (this.active) {
                 try {
                     for (int i = 0; i < instance.timingsListeners.size(); i++) {
                         instance.timingsListeners.get(i).onChunkGenerate(chunk, executionTime);
@@ -679,7 +692,7 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void onChunkUnloading(World world, long executionTime) {
-            if (isActive()) {
+            if (this.active) {
                 try {
                     for (int i = 0; i < instance.timingsListeners.size(); i++) {
                         instance.timingsListeners.get(i).onChunkUnloading(world, executionTime);
@@ -692,7 +705,7 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void onChunkPopulate(Chunk chunk, BlockPopulator populator, long executionTime) {
-            if (isActive()) {
+            if (this.active) {
                 try {
                     for (int i = 0; i < instance.timingsListeners.size(); i++) {
                         instance.timingsListeners.get(i).onChunkPopulate(chunk, populator, executionTime);

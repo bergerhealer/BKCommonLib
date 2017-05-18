@@ -1,5 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
@@ -19,6 +21,10 @@ public class ChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public BlockData getBlockData(IntVector3 blockposition) {
+        return T.getBlockData.invoke(instance, blockposition);
+    }
+
     public Object getEntitySlices() {
         return T.entitySlices.get(instance);
     }
@@ -29,6 +35,8 @@ public class ChunkHandle extends Template.Handle {
 
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
         public final Template.Field.Converted<Object> entitySlices = new Template.Field.Converted<Object>();
+
+        public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
     }
 }

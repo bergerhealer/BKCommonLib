@@ -33,8 +33,6 @@ import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectsHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
-import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 
 /**
  * Handles the full Entity move() physics function. It should be kept completely in sync with what is used on the server,
@@ -43,13 +41,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
  * These collisions are to be handled by the controller attached to the Entity
  */
 public class EntityMoveHandler {
-    private static final List<?> collisions_buffer_internal = new ArrayList<Object>();
-    private static final List<AxisAlignedBBHandle> collisions_buffer;
-
-    static {
-        DuplexConverter<?, AxisAlignedBBHandle> d = com.bergerkiller.mountiplex.conversion.Conversion.findDuplex(AxisAlignedBBHandle.T.getType(), AxisAlignedBBHandle.class);
-        collisions_buffer = new ConvertingList<AxisAlignedBBHandle>(collisions_buffer_internal, d);
-    }
+    private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
 
     EntityController<?> controller;
     CommonEntity<?> entity;
