@@ -21,11 +21,11 @@ public class CrashReportHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CrashReportHandle create(Throwable throwable, String message) {
-        return T.create.invoke(throwable, message);
+        return T.create.invokeVA(throwable, message);
     }
 
     public CrashReportSystemDetailsHandle getSystemDetails(String message) {
-        return T.getSystemDetails.invoke(instance, message);
+        return T.getSystemDetails.invokeVA(instance, message);
     }
 
     public static final class CrashReportClass extends Template.Class<CrashReportHandle> {

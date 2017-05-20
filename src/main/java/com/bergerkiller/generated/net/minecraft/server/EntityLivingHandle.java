@@ -27,19 +27,19 @@ public class EntityLivingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public Collection<MobEffectHandle> getEffects() {
-        return T.getEffects.invoke(instance);
+        return T.getEffects.invokeVA(instance);
     }
 
     public ItemStack getEquipment(EquipmentSlot paramEnumItemSlot) {
-        return T.getEquipment.invoke(instance, paramEnumItemSlot);
+        return T.getEquipment.invokeVA(instance, paramEnumItemSlot);
     }
 
     public AttributeMapServerHandle getAttributeMap() {
-        return T.getAttributeMap.invoke(instance);
+        return T.getAttributeMap.invokeVA(instance);
     }
 
     public AttributeInstanceHandle getAttributeInstance(Object iattribute) {
-        return T.getAttributeInstance.invoke(instance, iattribute);
+        return T.getAttributeInstance.invokeVA(instance, iattribute);
     }
 
     public float getHealth() {

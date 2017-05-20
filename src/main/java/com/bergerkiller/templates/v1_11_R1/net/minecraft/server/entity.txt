@@ -17,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
     private static int entityCount;
+    private int idField:id;
     public final (List<EntityHandle>) List<Entity> passengers;
     protected unknown int j;
     private (EntityHandle) net.minecraft.server.Entity vehicle:au

@@ -33,11 +33,11 @@ public class WorldHandle extends Template.Handle {
     /* ============================================================================== */
 
     public World getWorld() {
-        return T.getWorld.invoke(instance);
+        return T.getWorld.invokeVA(instance);
     }
 
     public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invoke(instance, blockposition);
+        return T.getBlockData.invokeVA(instance, blockposition);
     }
 
     public long getTime() {
@@ -45,55 +45,55 @@ public class WorldHandle extends Template.Handle {
     }
 
     public boolean getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle bounds, boolean flag, List<AxisAlignedBBHandle> list) {
-        return T.getBlockCollisions.invoke(instance, entity, bounds, flag, list);
+        return T.getBlockCollisions.invokeVA(instance, entity, bounds, flag, list);
     }
 
     public List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds) {
-        return T.getRawEntitiesOfType.invoke(instance, rawType, bounds);
+        return T.getRawEntitiesOfType.invokeVA(instance, rawType, bounds);
     }
 
     public List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getCubes.invoke(instance, entity, axisalignedbb);
+        return T.getCubes.invokeVA(instance, entity, axisalignedbb);
     }
 
     public List<EntityHandle> getEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getEntities.invoke(instance, entity, axisalignedbb);
+        return T.getEntities.invokeVA(instance, entity, axisalignedbb);
     }
 
     public TileEntityHandle getTileEntity(IntVector3 blockposition) {
-        return T.getTileEntity.invoke(instance, blockposition);
+        return T.getTileEntity.invokeVA(instance, blockposition);
     }
 
     public WorldDataHandle getWorldData() {
-        return T.getWorldData.invoke(instance);
+        return T.getWorldData.invokeVA(instance);
     }
 
     public boolean isBurnArea(AxisAlignedBBHandle bounds) {
-        return T.isBurnArea.invoke(instance, bounds);
+        return T.isBurnArea.invokeVA(instance, bounds);
     }
 
     public void removeEntity(EntityHandle entity) {
-        T.removeEntity.invoke(instance, entity);
+        T.removeEntity.invokeVA(instance, entity);
     }
 
     public boolean addEntity(EntityHandle entity) {
-        return T.addEntity.invoke(instance, entity);
+        return T.addEntity.invokeVA(instance, entity);
     }
 
     public Object getDataManager() {
-        return T.getDataManager.invoke(instance);
+        return T.getDataManager.invokeVA(instance);
     }
 
     public float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds) {
-        return T.getExplosionFactor.invoke(instance, vec3d, bounds);
+        return T.getExplosionFactor.invokeVA(instance, vec3d, bounds);
     }
 
     public boolean areChunksLoaded(IntVector3 blockposition, int distance) {
-        return T.areChunksLoaded.invoke(instance, blockposition, distance);
+        return T.areChunksLoaded.invokeVA(instance, blockposition, distance);
     }
 
     public Object rayTrace(Vector point1, Vector point2, boolean flag) {
-        return T.rayTrace.invoke(instance, point1, point2, flag);
+        return T.rayTrace.invokeVA(instance, point1, point2, flag);
     }
 
     public org.bukkit.World toBukkit() {

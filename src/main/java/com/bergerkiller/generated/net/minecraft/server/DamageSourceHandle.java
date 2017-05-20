@@ -26,35 +26,35 @@ public class DamageSourceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DamageSourceHandle mobAttack(LivingEntity livingEntity) {
-        return T.mobAttack.invoke(livingEntity);
+        return T.mobAttack.invokeVA(livingEntity);
     }
 
     public static DamageSourceHandle playerAttack(HumanEntity humanEntity) {
-        return T.playerAttack.invoke(humanEntity);
+        return T.playerAttack.invokeVA(humanEntity);
     }
 
     public static DamageSourceHandle arrowHit(Arrow arrow, Entity damager) {
-        return T.arrowHit.invoke(arrow, damager);
+        return T.arrowHit.invokeVA(arrow, damager);
     }
 
     public static DamageSourceHandle fireballHit(Fireball fireball, Entity damager) {
-        return T.fireballHit.invoke(fireball, damager);
+        return T.fireballHit.invokeVA(fireball, damager);
     }
 
     public static DamageSourceHandle thrownHit(Entity projectile, Entity damager) {
-        return T.thrownHit.invoke(projectile, damager);
+        return T.thrownHit.invokeVA(projectile, damager);
     }
 
     public static DamageSourceHandle magicHit(Entity magicEntity, Entity damager) {
-        return T.magicHit.invoke(magicEntity, damager);
+        return T.magicHit.invokeVA(magicEntity, damager);
     }
 
     public static DamageSourceHandle thorns(Entity entity) {
-        return T.thorns.invoke(entity);
+        return T.thorns.invokeVA(entity);
     }
 
     public static DamageSourceHandle explosion(ExplosionHandle explosion) {
-        return T.explosion.invoke(explosion);
+        return T.explosion.invokeVA(explosion);
     }
 
     public boolean isExplosion() {
@@ -66,7 +66,7 @@ public class DamageSourceHandle extends Template.Handle {
     }
 
     public Entity getEntity() {
-        return T.getEntity.invoke(instance);
+        return T.getEntity.invokeVA(instance);
     }
 
     public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {

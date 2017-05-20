@@ -27,11 +27,11 @@ public class EntityItemHandle extends EntityHandle {
     /* ============================================================================== */
 
     public ItemStackHandle getItemStack() {
-        return T.getItemStack.invoke(instance);
+        return T.getItemStack.invokeVA(instance);
     }
 
     public void setItemStack(ItemStackHandle itemstack) {
-        T.setItemStack.invoke(instance, itemstack);
+        T.setItemStack.invokeVA(instance, itemstack);
     }
 
     public int getAge() {

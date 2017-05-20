@@ -418,12 +418,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             Object obj = iter.next();
             if (obj instanceof EntityHandle) {
                 EntityHandle obj_e = (EntityHandle) obj;
-                if (obj_e.getId() == entity.getId()) {
+                if (obj_e.getIdField() == entity.getIdField()) {
                     iter.set(entity);
                 }
             } else if (EntityHandle.T.isAssignableFrom(obj)) {
-                int obj_id = EntityHandle.T.getId.invoke(obj);
-                if (obj_id == entity.getId()) {
+                int obj_id = EntityHandle.T.idField.getInteger(obj);
+                if (obj_id == entity.getIdField()) {
                     iter.set(entity.getRaw());
                 }
             }

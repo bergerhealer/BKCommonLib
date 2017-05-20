@@ -50,7 +50,7 @@ public class EntityHandle extends Template.Handle {
     }
 
     public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
-        T.updateFalling.invoke(instance, d0, flag, blockData, position);
+        T.updateFalling.invokeVA(instance, d0, flag, blockData, position);
     }
 
     public void updateBlockCollision() {
@@ -58,7 +58,7 @@ public class EntityHandle extends Template.Handle {
     }
 
     public void playStepSound(IntVector3 position, BlockData blockData) {
-        T.playStepSound.invoke(instance, position, blockData);
+        T.playStepSound.invokeVA(instance, position, blockData);
     }
 
     public void setRotation(float yaw, float pitch) {
@@ -70,19 +70,19 @@ public class EntityHandle extends Template.Handle {
     }
 
     public Item dropItem(Material material, int amount, float force) {
-        return T.dropItem.invoke(instance, material, amount, force);
+        return T.dropItem.invokeVA(instance, material, amount, force);
     }
 
     public Item dropItemStack(ItemStack itemstack, float force) {
-        return T.dropItemStack.invoke(instance, itemstack, force);
+        return T.dropItemStack.invokeVA(instance, itemstack, force);
     }
 
     public SoundEffectHandle getSwimSound() {
-        return T.getSwimSound.invoke(instance);
+        return T.getSwimSound.invokeVA(instance);
     }
 
     public void makeSound(SoundEffectHandle soundeffect, float volume, float pitch) {
-        T.makeSound.invoke(instance, soundeffect, volume, pitch);
+        T.makeSound.invokeVA(instance, soundeffect, volume, pitch);
     }
 
     public boolean isInWaterUpdate() {
@@ -98,11 +98,11 @@ public class EntityHandle extends Template.Handle {
     }
 
     public void doFallUpdate(double d0, boolean flag, BlockData blockData, IntVector3 blockposition) {
-        T.doFallUpdate.invoke(instance, d0, flag, blockData, blockposition);
+        T.doFallUpdate.invokeVA(instance, d0, flag, blockData, blockposition);
     }
 
     public void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData) {
-        T.doStepSoundUpdate.invoke(instance, blockposition, blockData);
+        T.doStepSoundUpdate.invokeVA(instance, blockposition, blockData);
     }
 
     public void checkBlockCollisions() {
@@ -114,7 +114,7 @@ public class EntityHandle extends Template.Handle {
     }
 
     public boolean damageEntity(DamageSourceHandle damagesource, float damage) {
-        return T.damageEntity.invoke(instance, damagesource, damage);
+        return T.damageEntity.invokeVA(instance, damagesource, damage);
     }
 
     public void setPosition(double x, double y, double z) {
@@ -134,19 +134,19 @@ public class EntityHandle extends Template.Handle {
     }
 
     public AxisAlignedBBHandle getBoundingBox() {
-        return T.getBoundingBox.invoke(instance);
+        return T.getBoundingBox.invokeVA(instance);
     }
 
     public void setBoundingBox(AxisAlignedBBHandle axisalignedbb) {
-        T.setBoundingBox.invoke(instance, axisalignedbb);
+        T.setBoundingBox.invokeVA(instance, axisalignedbb);
     }
 
     public AxisAlignedBBHandle getOtherBoundingBox() {
-        return T.getOtherBoundingBox.invoke(instance);
+        return T.getOtherBoundingBox.invokeVA(instance);
     }
 
     public AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity) {
-        return T.getEntityBoundingBox.invoke(instance, entity);
+        return T.getEntityBoundingBox.invokeVA(instance, entity);
     }
 
     public void recalcPosition() {
@@ -178,7 +178,7 @@ public class EntityHandle extends Template.Handle {
     }
 
     public EntityHandle getDriverEntity() {
-        return T.getDriverEntity.invoke(instance);
+        return T.getDriverEntity.invokeVA(instance);
     }
 
     public boolean isSneaking() {
@@ -186,11 +186,11 @@ public class EntityHandle extends Template.Handle {
     }
 
     public boolean isInSameVehicle(EntityHandle entity) {
-        return T.isInSameVehicle.invoke(instance, entity);
+        return T.isInSameVehicle.invokeVA(instance, entity);
     }
 
     public void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails) {
-        T.appendEntityCrashDetails.invoke(instance, crashreportsystemdetails);
+        T.appendEntityCrashDetails.invokeVA(instance, crashreportsystemdetails);
     }
 
     public int getId() {
@@ -202,7 +202,7 @@ public class EntityHandle extends Template.Handle {
     }
 
     public DataWatcher getDataWatcher() {
-        return T.getDataWatcher.invoke(instance);
+        return T.getDataWatcher.invokeVA(instance);
     }
 
     public WorldServerHandle getWorldServer() {
@@ -223,6 +223,14 @@ public class EntityHandle extends Template.Handle {
 
     public void setBukkitEntity(Entity value) {
         T.bukkitEntity.set(instance, value);
+    }
+
+    public int getIdField() {
+        return T.idField.getInteger(instance);
+    }
+
+    public void setIdField(int value) {
+        T.idField.setInteger(instance, value);
     }
 
     public List<EntityHandle> getPassengers() {
@@ -619,6 +627,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Converted<Entity> bukkitEntity = new Template.Field.Converted<Entity>();
+        public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Converted<List<EntityHandle>> passengers = new Template.Field.Converted<List<EntityHandle>>();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();

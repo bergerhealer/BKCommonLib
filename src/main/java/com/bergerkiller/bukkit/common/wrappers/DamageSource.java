@@ -51,7 +51,7 @@ public class DamageSource extends BasicWrapper {
      * @return the Damager Entity, or null if there is none
      */
     public Entity getEntity() {
-        return DamageSourceHandle.T.getEntity.invoke(handle);
+        return DamageSourceHandle.T.getEntity.invokeVA(handle);
     }
 
     /**

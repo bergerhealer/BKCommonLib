@@ -73,6 +73,7 @@ class World {
 }
 
 class WorldServer extends World {
+    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker:tracker;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();

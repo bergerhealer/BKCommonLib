@@ -22,7 +22,7 @@ public class BlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public void entityHitVertical(WorldHandle world, EntityHandle entity) {
-        T.entityHitVertical.invoke(instance, world, entity);
+        T.entityHitVertical.invokeVA(instance, world, entity);
     }
 
     public static final class BlockClass extends Template.Class<BlockHandle> {

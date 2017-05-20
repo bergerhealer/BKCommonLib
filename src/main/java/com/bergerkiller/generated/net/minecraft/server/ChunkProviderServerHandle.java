@@ -22,11 +22,11 @@ public class ChunkProviderServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public ChunkHandle getChunkAt(int cx, int cz) {
-        return T.getChunkAt.invoke(instance, cx, cz);
+        return T.getChunkAt.invokeVA(instance, cx, cz);
     }
 
     public void saveChunk(ChunkHandle chunk) {
-        T.saveChunk.invoke(instance, chunk);
+        T.saveChunk.invokeVA(instance, chunk);
     }
 
     public Set<Long> getUnloadQueue() {

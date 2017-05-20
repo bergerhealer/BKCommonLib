@@ -21,11 +21,11 @@ public class RecipesFurnaceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RecipesFurnaceHandle getInstance() {
-        return T.getInstance.invoke();
+        return T.getInstance.invokeVA();
     }
 
     public ItemStackHandle getResult(ItemStackHandle itemstack) {
-        return T.getResult.invoke(instance, itemstack);
+        return T.getResult.invokeVA(instance, itemstack);
     }
 
     public static final class RecipesFurnaceClass extends Template.Class<RecipesFurnaceHandle> {

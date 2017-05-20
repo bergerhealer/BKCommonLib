@@ -23,11 +23,11 @@ public class CraftEntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Entity createCraftEntity(Server server, EntityHandle entity) {
-        return T.createCraftEntity.invoke(server, entity);
+        return T.createCraftEntity.invokeVA(server, entity);
     }
 
     public void setHandle(EntityHandle entity) {
-        T.setHandle.invoke(instance, entity);
+        T.setHandle.invokeVA(instance, entity);
     }
 
     public EntityHandle getEntityHandle() {

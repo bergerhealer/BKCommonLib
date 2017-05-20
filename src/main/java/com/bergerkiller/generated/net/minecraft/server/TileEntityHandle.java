@@ -22,11 +22,11 @@ public class TileEntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public WorldHandle getWorld() {
-        return T.getWorld.invoke(instance);
+        return T.getWorld.invokeVA(instance);
     }
 
     public BlockPositionHandle getPosition() {
-        return T.getPosition.invoke(instance);
+        return T.getPosition.invokeVA(instance);
     }
 
     public static final class TileEntityClass extends Template.Class<TileEntityHandle> {

@@ -21,7 +21,7 @@ public class CraftInventoryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public IInventoryHandle getHandle() {
-        return T.getHandle.invoke(instance);
+        return T.getHandle.invokeVA(instance);
     }
 
     public IInventoryHandle getHandleField() {

@@ -21,7 +21,7 @@ public class TileEntityHopperHandle extends TileEntityHandle {
     /* ============================================================================== */
 
     public static boolean suckItems(Object ihopper) {
-        return T.suckItems.invoke(ihopper);
+        return T.suckItems.invokeVA(ihopper);
     }
 
     public static final class TileEntityHopperClass extends Template.Class<TileEntityHopperHandle> {

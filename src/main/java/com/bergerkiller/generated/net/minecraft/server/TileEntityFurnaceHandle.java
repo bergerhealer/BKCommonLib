@@ -22,7 +22,7 @@ public class TileEntityFurnaceHandle extends TileEntityHandle {
     /* ============================================================================== */
 
     public static int fuelTime(ItemStackHandle itemstack) {
-        return T.fuelTime.invoke(itemstack);
+        return T.fuelTime.invokeVA(itemstack);
     }
 
     public static final class TileEntityFurnaceClass extends Template.Class<TileEntityFurnaceHandle> {

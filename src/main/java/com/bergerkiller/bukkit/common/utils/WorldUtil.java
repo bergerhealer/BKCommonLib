@@ -13,10 +13,10 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
@@ -25,7 +25,11 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.IDataManager;
+import net.minecraft.server.v1_11_R1.MovingObjectPosition;
+import net.minecraft.server.v1_11_R1.WorldNBTStorage;
+import net.minecraft.server.v1_11_R1.WorldServer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -228,9 +232,9 @@ public class WorldUtil extends ChunkUtil {
      * @param entity to remove
      */
     public static void removeEntity(org.bukkit.entity.Entity entity) {
-        Entity e = CommonNMS.getNative(entity);
-        e.world.removeEntity(e);
-        NMSWorldServer.entityTracker.get(e.world).stopTracking(entity);
+        EntityHandle e = CommonNMS.getHandle(entity);
+        e.getWorld().removeEntity(e);
+        e.getWorldServer().getEntityTracker().stopTracking(entity);
     }
 
     /**
@@ -379,7 +383,7 @@ public class WorldUtil extends ChunkUtil {
      * @return players folder
      */
     public static File getPlayersFolder(org.bukkit.World world) {
-        IDataManager man = (IDataManager) CommonNMS.getHandle(world).getDataManager();
+        IDataManager man = (IDataManager) WorldHandle.fromBukkit(world).getDataManager();
         if (man instanceof WorldNBTStorage) {
             return ((WorldNBTStorage) man).getPlayerDir();
         }
@@ -393,7 +397,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension Id
      */
     public static int getDimension(org.bukkit.World world) {
-        return ((World) Conversion.toWorldHandle.convert(world)).getWorldData().getType().g();
+        return WorldHandle.fromBukkit(world).getWorldData().getType().getDimension();
     }
 
     /**
@@ -473,7 +477,7 @@ public class WorldUtil extends ChunkUtil {
     public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
         Object worldHandle = Conversion.toWorldHandle.convert(entity.getWorld());
         Object entityHandle = Conversion.toEntityHandle.convert(entity);
-        Object entityBounds = NMSEntity.getBoundingBox.invoke(entityHandle);
+        Object entityBounds = EntityHandle.T.getBoundingBox.raw.invoke(entityHandle);
         Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
         List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, entityHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
@@ -655,7 +659,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the hit Block, or null if none was found (AIR)
      */
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPosition mop = (MovingObjectPosition) CommonNMS.getHandle(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ), false);
+        MovingObjectPosition mop = (MovingObjectPosition) WorldHandle.fromBukkit(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ), false);
         return mop == null ? null : world.getBlockAt((int) mop.pos.x, (int) mop.pos.y, (int) mop.pos.z);
     }
 

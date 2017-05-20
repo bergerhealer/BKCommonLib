@@ -22,7 +22,7 @@ public class EntityInsentientHandle extends EntityLivingHandle {
     /* ============================================================================== */
 
     public EntityHandle getLeashHolder() {
-        return T.getLeashHolder.invoke(instance);
+        return T.getLeashHolder.invokeVA(instance);
     }
 
     public static final class EntityInsentientClass extends Template.Class<EntityInsentientHandle> {

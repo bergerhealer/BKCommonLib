@@ -21,7 +21,7 @@ public class PlayerChunkMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ) {
-        return T.isChunkEntered.invoke(instance, entityplayer, chunkX, chunkZ);
+        return T.isChunkEntered.invokeVA(instance, entityplayer, chunkX, chunkZ);
     }
 
     public static final class PlayerChunkMapClass extends Template.Class<PlayerChunkMapHandle> {
