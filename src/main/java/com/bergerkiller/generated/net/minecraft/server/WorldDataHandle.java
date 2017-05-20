@@ -21,7 +21,7 @@ public class WorldDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public WorldTypeHandle getType() {
-        return T.getType.invokeVA(instance);
+        return T.getType.invoke(instance);
     }
 
     public void setClearTimer(int ticks) {

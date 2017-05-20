@@ -25,7 +25,7 @@ public class ItemStackHandle extends Template.Handle {
     }
 
     public ItemStackHandle setName(String s) {
-        return T.setName.invokeVA(instance, s);
+        return T.setName.invoke(instance, s);
     }
 
     public int getRepairCost() {
@@ -45,7 +45,7 @@ public class ItemStackHandle extends Template.Handle {
     }
 
     public CommonTagCompound getTag() {
-        return T.getTag.invokeVA(instance);
+        return T.getTag.invoke(instance);
     }
 
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {

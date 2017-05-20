@@ -26,7 +26,7 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public CommonPacket getSpawnPacket() {
-        return T.getSpawnPacket.invokeVA(instance);
+        return T.getSpawnPacket.invoke(instance);
     }
 
     public EntityHandle getTracker() {

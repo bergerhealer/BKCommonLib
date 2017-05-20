@@ -25,7 +25,7 @@ public class CrashReportHandle extends Template.Handle {
     }
 
     public CrashReportSystemDetailsHandle getSystemDetails(String message) {
-        return T.getSystemDetails.invokeVA(instance, message);
+        return T.getSystemDetails.invoke(instance, message);
     }
 
     public static final class CrashReportClass extends Template.Class<CrashReportHandle> {

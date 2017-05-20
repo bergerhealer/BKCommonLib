@@ -66,7 +66,7 @@ public class DamageSourceHandle extends Template.Handle {
     }
 
     public Entity getEntity() {
-        return T.getEntity.invokeVA(instance);
+        return T.getEntity.invoke(instance);
     }
 
     public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {

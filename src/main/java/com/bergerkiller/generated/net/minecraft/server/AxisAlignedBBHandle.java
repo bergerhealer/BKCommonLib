@@ -24,43 +24,43 @@ public class AxisAlignedBBHandle extends Template.Handle {
     /* ============================================================================== */
 
     public AxisAlignedBBHandle transformA(double lx, double ly, double lz) {
-        return T.transformA.invokeVA(instance, lx, ly, lz);
+        return T.transformA.invoke(instance, lx, ly, lz);
     }
 
     public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
-        return T.transformB.invokeVA(instance, lx, ly, lz);
+        return T.transformB.invoke(instance, lx, ly, lz);
     }
 
     public AxisAlignedBBHandle grow(double sx, double sy, double sz) {
-        return T.grow.invokeVA(instance, sx, sy, sz);
+        return T.grow.invoke(instance, sx, sy, sz);
     }
 
     public AxisAlignedBBHandle growUniform(double size) {
-        return T.growUniform.invokeVA(instance, size);
+        return T.growUniform.invoke(instance, size);
     }
 
     public AxisAlignedBBHandle shrinkUniform(double size) {
-        return T.shrinkUniform.invokeVA(instance, size);
+        return T.shrinkUniform.invoke(instance, size);
     }
 
     public AxisAlignedBBHandle translate(double dx, double dy, double dz) {
-        return T.translate.invokeVA(instance, dx, dy, dz);
+        return T.translate.invoke(instance, dx, dy, dz);
     }
 
     public boolean bbTransformA(AxisAlignedBBHandle paramAxisAlignedBB) {
-        return T.bbTransformA.invokeVA(instance, paramAxisAlignedBB);
+        return T.bbTransformA.invoke(instance, paramAxisAlignedBB);
     }
 
     public double calcSomeX(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeX.invokeVA(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeX.invoke(instance, paramAxisAlignedBB, paramDouble);
     }
 
     public double calcSomeY(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeY.invokeVA(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeY.invoke(instance, paramAxisAlignedBB, paramDouble);
     }
 
     public double calcSomeZ(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeZ.invokeVA(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeZ.invoke(instance, paramAxisAlignedBB, paramDouble);
     }
 
     public double getMinX() {

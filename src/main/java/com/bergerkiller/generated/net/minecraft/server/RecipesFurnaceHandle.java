@@ -25,7 +25,7 @@ public class RecipesFurnaceHandle extends Template.Handle {
     }
 
     public ItemStackHandle getResult(ItemStackHandle itemstack) {
-        return T.getResult.invokeVA(instance, itemstack);
+        return T.getResult.invoke(instance, itemstack);
     }
 
     public static final class RecipesFurnaceClass extends Template.Class<RecipesFurnaceHandle> {

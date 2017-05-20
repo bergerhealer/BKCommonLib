@@ -22,7 +22,7 @@ public class ChunkHandle extends Template.Handle {
     /* ============================================================================== */
 
     public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invokeVA(instance, blockposition);
+        return T.getBlockData.invoke(instance, blockposition);
     }
 
     public Object getEntitySlices() {

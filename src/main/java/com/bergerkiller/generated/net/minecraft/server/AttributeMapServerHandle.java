@@ -21,7 +21,7 @@ public class AttributeMapServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public Collection<Object> attributes() {
-        return T.attributes.invokeVA(instance);
+        return T.attributes.invoke(instance);
     }
 
     public static final class AttributeMapServerClass extends Template.Class<AttributeMapServerHandle> {

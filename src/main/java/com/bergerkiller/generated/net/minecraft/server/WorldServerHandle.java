@@ -27,11 +27,11 @@ public class WorldServerHandle extends WorldHandle {
     /* ============================================================================== */
 
     public PlayerChunkMapHandle getPlayerChunkMap() {
-        return T.getPlayerChunkMap.invokeVA(instance);
+        return T.getPlayerChunkMap.invoke(instance);
     }
 
     public ChunkProviderServerHandle getChunkProviderServer() {
-        return T.getChunkProviderServer.invokeVA(instance);
+        return T.getChunkProviderServer.invoke(instance);
     }
 
     public void saveLevel() {
