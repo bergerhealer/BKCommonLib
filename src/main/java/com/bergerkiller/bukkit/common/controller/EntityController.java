@@ -8,7 +8,6 @@ import org.bukkit.inventory.MainHand;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -69,7 +68,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @return True if interaction occurred, False if not
      */
     public boolean onInteractBy(HumanEntity interacter, MainHand hand) {
-        return this.hook.base.onInteractBy(CommonNMS.getNative(interacter), Conversion.toMainHandHandle.convert(hand));
+        return this.hook.base.onInteractBy(Conversion.toEntityHandle.convert(interacter), Conversion.toMainHandHandle.convert(hand));
     }
 
     /**

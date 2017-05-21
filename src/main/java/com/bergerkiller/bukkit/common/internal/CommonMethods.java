@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
@@ -41,17 +42,17 @@ public class CommonMethods {
         CommonNMS.getPlayerList().setPlayerFileData(playerFileData);
     }
 
-    public static DamageSource DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
+    public static DamageSourceHandle DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
         Location loc = entity.getLocation();
         Explosion ex = Explosion_new(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-        return DamageSource.explosion(ex);
+        return DamageSourceHandle.createHandle(DamageSource.explosion(ex));
     }
 
     /**
      * @deprecated use the double damage version instead
      */
     @Deprecated
-    public static void damage_explode(org.bukkit.entity.Entity entity, int damage, Explosion explosion) {
+    public static void damage_explode(org.bukkit.entity.Entity entity, int damage, ExplosionHandle explosion) {
         damage_explode(entity, (double) damage, explosion);
     }
 
@@ -62,8 +63,8 @@ public class CommonMethods {
      * @param damage of the damage
      * @param explosion wich has damaged the player
      */
-    public static void damage_explode(org.bukkit.entity.Entity entity, double damage, Explosion explosion) {
-        CommonNMS.getNative(entity).damageEntity(DamageSource.explosion(explosion), (float) damage);
+    public static void damage_explode(org.bukkit.entity.Entity entity, double damage, ExplosionHandle explosion) {
+        EntityHandle.fromBukkit(entity).damageEntity(DamageSourceHandle.explosion(explosion), (float) damage);
     }
 
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
@@ -78,7 +79,7 @@ public class CommonMethods {
         CommonNMS.getHandle(entity).damageEntity(source, (float) damage);
     }
 
-    public static DamageSource DamageSource_from_damagecause(DamageCause cause) {
+    public static DamageSourceHandle DamageSource_from_damagecause(DamageCause cause) {
         DamageSource source;
         if (cause == DamageCause.CONTACT) {
             source = DamageSource.CACTUS;
@@ -105,7 +106,7 @@ public class CommonMethods {
         } else {
             source = DamageSource.GENERIC;
         }
-        return source;
+        return DamageSourceHandle.createHandle(source);
     }
 
 }

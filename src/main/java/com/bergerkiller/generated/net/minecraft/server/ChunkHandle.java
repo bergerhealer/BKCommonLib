@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.Chunk;
 
 public class ChunkHandle extends Template.Handle {
     public static final ChunkClass T = new ChunkClass();
@@ -25,6 +26,18 @@ public class ChunkHandle extends Template.Handle {
         return T.getBlockData.invoke(instance, blockposition);
     }
 
+    public void addEntity(EntityHandle entity) {
+        T.addEntity.invoke(instance, entity);
+    }
+
+    public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
+        if (chunk != null) {
+            return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toChunkHandle(chunk));
+        } else {
+            return null;
+        }
+    }
+
     public Object getEntitySlices() {
         return T.entitySlices.get(instance);
     }
@@ -33,10 +46,20 @@ public class ChunkHandle extends Template.Handle {
         T.entitySlices.set(instance, value);
     }
 
+    public Chunk getBukkitChunk() {
+        return T.bukkitChunk.get(instance);
+    }
+
+    public void setBukkitChunk(Chunk value) {
+        T.bukkitChunk.set(instance, value);
+    }
+
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
         public final Template.Field.Converted<Object> entitySlices = new Template.Field.Converted<Object>();
+        public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method.Converted<Void> addEntity = new Template.Method.Converted<Void>();
 
     }
 }

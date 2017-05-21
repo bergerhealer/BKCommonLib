@@ -330,6 +330,8 @@ class Entity {
 
     public boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
+    public void collide((EntityHandle) Entity entity);
+
     <code>
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);

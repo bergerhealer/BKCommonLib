@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -67,7 +68,7 @@ class CommonListener implements Listener {
     protected void onVehicleEnter(final VehicleEnterEvent event) {
         // Set the vehicle and passenger handles for Hook entities
         // This is required to avoid problems with replaced Entities
-        if (CommonNMS.getNative(event.getVehicle()).dead) {
+        if (EntityHandle.fromBukkit(event.getVehicle()).isDead()) {
             // Find the real Entity and redirect the call
             final org.bukkit.entity.Entity realVehicle = EntityUtil.getEntity(event.getEntered().getWorld(), event.getVehicle().getUniqueId());
             if (realVehicle != null && realVehicle != event.getVehicle()) {

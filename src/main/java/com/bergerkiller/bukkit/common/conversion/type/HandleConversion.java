@@ -178,6 +178,11 @@ public class HandleConversion {
         return commonPacket.getHandle();
     }
 
+    @ConverterMethod(output="T extends net.minecraft.server.Packet<?>")
+    public static Object toPacketHandle2(CommonPacket commonPacket) {
+        return commonPacket.getHandle();
+    }
+
     @ConverterMethod(output="net.minecraft.server.ChunkCoordIntPair")
     public static Object toChunkCoordIntPairHandle(IntVector2 intVector2) {
         return NMSVector.newPair(intVector2.x, intVector2.z);

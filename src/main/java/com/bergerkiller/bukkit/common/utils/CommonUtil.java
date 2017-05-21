@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.generated.net.minecraft.server.DispenserRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
@@ -15,8 +16,6 @@ import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
-
-import net.minecraft.server.v1_11_R1.DispenserRegistry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -71,8 +70,8 @@ public class CommonUtil {
      * This function makes sure the server registers are initialized.
      */
     public static void bootstrap() {
-        DispenserRegistry.c();
-        Common.getVersion(); // this initializes the SERVER
+        Common.getVersion(); // this initializes the SERVER (needed for resolving DispenserRegistryHandle, amongst)
+        DispenserRegistryHandle.bootstrap();
     }
 
     /**

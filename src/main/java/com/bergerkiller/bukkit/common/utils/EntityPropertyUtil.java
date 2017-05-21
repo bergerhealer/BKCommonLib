@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
 
 import org.bukkit.Material;
@@ -26,104 +26,108 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
         return minecartTypes;
     }
 
+    private static final Object h(org.bukkit.entity.Entity entity) {
+        return HandleConversion.toEntityHandle(entity);
+    }
+
     public static double getLocX(Entity entity) {
-        return CommonNMS.getNative(entity).locX;
+        return EntityHandle.T.locX.getDouble(h(entity));
     }
 
     public static void setLocX(Entity entity, double value) {
-        CommonNMS.getNative(entity).locX = value;
+        EntityHandle.T.locX.setDouble(h(entity), value);
     }
 
     public static double getLocY(Entity entity) {
-        return CommonNMS.getNative(entity).locY;
+        return EntityHandle.T.locY.getDouble(h(entity));
     }
 
     public static void setLocY(Entity entity, double value) {
-        CommonNMS.getNative(entity).locY = value;
+        EntityHandle.T.locY.setDouble(h(entity), value);
     }
 
     public static double getLocZ(Entity entity) {
-        return CommonNMS.getNative(entity).locZ;
+        return EntityHandle.T.locZ.getDouble(h(entity));
     }
 
     public static void setLocZ(Entity entity, double value) {
-        CommonNMS.getNative(entity).locZ = value;
+        EntityHandle.T.locZ.setDouble(h(entity), value);
     }
 
     public static double getMotX(Entity entity) {
-        return CommonNMS.getNative(entity).motX;
+        return EntityHandle.T.motX.getDouble(h(entity));
     }
 
     public static void setMotX(Entity entity, double value) {
-        CommonNMS.getNative(entity).motX = value;
+        EntityHandle.T.motX.setDouble(h(entity), value);
     }
 
     public static double getMotY(Entity entity) {
-        return CommonNMS.getNative(entity).motY;
+        return EntityHandle.T.motY.getDouble(h(entity));
     }
 
     public static void setMotY(Entity entity, double value) {
-        CommonNMS.getNative(entity).motY = value;
+        EntityHandle.T.motY.setDouble(h(entity), value);
     }
 
     public static double getMotZ(Entity entity) {
-        return CommonNMS.getNative(entity).motZ;
+        return EntityHandle.T.motZ.getDouble(h(entity));
     }
 
     public static void setMotZ(Entity entity, double value) {
-        CommonNMS.getNative(entity).motZ = value;
+        EntityHandle.T.motZ.setDouble(h(entity), value);
     }
 
     public static double getLastX(Entity entity) {
-        return CommonNMS.getNative(entity).lastX;
+        return EntityHandle.T.lastX.getDouble(h(entity));
     }
 
     public static void setLastX(Entity entity, double value) {
-        CommonNMS.getNative(entity).lastX = value;
+        EntityHandle.T.lastX.setDouble(h(entity), value);
     }
 
     public static double getLastY(Entity entity) {
-        return CommonNMS.getNative(entity).lastY;
+        return EntityHandle.T.lastY.getDouble(h(entity));
     }
 
     public static void setLastY(Entity entity, double value) {
-        CommonNMS.getNative(entity).lastY = value;
+        EntityHandle.T.lastY.setDouble(h(entity), value);
     }
 
     public static double getLastZ(Entity entity) {
-        return CommonNMS.getNative(entity).lastZ;
+        return EntityHandle.T.lastZ.getDouble(h(entity));
     }
 
     public static void setLastZ(Entity entity, double value) {
-        CommonNMS.getNative(entity).lastZ = value;
+        EntityHandle.T.lastZ.setDouble(h(entity), value);
     }
 
     public static int getChunkX(Entity entity) {
-        return NMSEntity.chunkX.get(Conversion.toEntityHandle.convert(entity));
+        return EntityHandle.T.chunkX.getInteger(h(entity));
     }
 
     public static void setChunkX(Entity entity, int chunkX) {
-        NMSEntity.chunkX.set(Conversion.toEntityHandle.convert(entity), chunkX);
+        EntityHandle.T.chunkX.setInteger(h(entity), chunkX);
     }
 
     public static int getChunkY(Entity entity) {
-        return NMSEntity.chunkY.get(Conversion.toEntityHandle.convert(entity));
+        return EntityHandle.T.chunkY.getInteger(h(entity));
     }
 
     public static void setChunkY(Entity entity, int chunkY) {
-        NMSEntity.chunkY.set(Conversion.toEntityHandle.convert(entity), chunkY);
+        EntityHandle.T.chunkY.setInteger(h(entity), chunkY);
     }
 
     public static int getChunkZ(Entity entity) {
-        return NMSEntity.chunkZ.get(Conversion.toEntityHandle.convert(entity));
+        return EntityHandle.T.chunkZ.getInteger(h(entity));
     }
 
     public static void setChunkZ(Entity entity, int chunkZ) {
-        NMSEntity.chunkZ.set(Conversion.toEntityHandle.convert(entity), chunkZ);
+        EntityHandle.T.chunkZ.setInteger(h(entity), chunkZ);
     }
 
     public static void setDead(Entity entity, boolean dead) {
-        CommonNMS.getNative(entity).dead = dead;
+        EntityHandle.T.dead.setBoolean(h(entity), dead);
     }
 
     /**
@@ -161,10 +165,11 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param damage to deal
      */
     public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
+        EntityHandle eh = EntityHandle.fromBukkit(entity);
         if (cause == DamageCause.BLOCK_EXPLOSION) {
-        	CommonNMS.getNative(entity).damageEntity(CommonMethods.DamageSource_explosion(entity,  cause, damage), (float) damage);
+            eh.damageEntity(CommonMethods.DamageSource_explosion(entity,  cause, damage), (float) damage);
         } else {
-        	CommonNMS.getNative(entity).damageEntity(CommonMethods.DamageSource_from_damagecause(cause), (float) damage);
+            eh.damageEntity(CommonMethods.DamageSource_from_damagecause(cause), (float) damage);
         }
     }
 
@@ -212,7 +217,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param state to set to
      */
     public static void setAllowTeleportation(Entity entity, boolean state) {
-        NMSEntity.allowTeleportation.set(Conversion.toEntityHandle.convert(entity), state);
+        EntityHandle.T.allowTeleportation.setBoolean(h(entity), state);
     }
 
     /**
@@ -223,7 +228,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param entity to get it for
      */
     public static boolean getAllowTeleportation(Entity entity) {
-        return NMSEntity.allowTeleportation.get(Conversion.toEntityHandle.convert(entity));
+        return EntityHandle.T.allowTeleportation.getBoolean(h(entity));
     }
 
     /**
@@ -233,7 +238,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @param cooldownTicks to set to
      */
     public static void setPortalCooldown(Entity entity, int cooldownTicks) {
-        CommonNMS.getNative(entity).portalCooldown = cooldownTicks;
+        EntityHandle.T.portalCooldown.setInteger(h(entity), cooldownTicks);
     }
 
     /**
@@ -243,7 +248,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return entity cooldown ticks
      */
     public static int getPortalCooldown(Entity entity) {
-        return CommonNMS.getNative(entity).portalCooldown;
+        return EntityHandle.T.portalCooldown.getInteger(h(entity));
     }
 
     /**

@@ -20,7 +20,6 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import net.minecraft.server.v1_11_R1.AttributeMapServer;
 import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 
 import org.bukkit.Bukkit;
@@ -79,10 +78,6 @@ public class CommonNMS {
         } else {
             return null;
         }
-    }
-
-    public static Entity getNative(org.bukkit.entity.Entity entity) {
-        return (Entity) Conversion.toEntityHandle.convert(entity);
     }
 
     public static WorldServerHandle getHandle(org.bukkit.World world) {

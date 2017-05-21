@@ -6,6 +6,7 @@ import java.util.IdentityHashMap;
 import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
@@ -14,6 +15,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSSoundEffect;
 
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.Explosion;
 import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.World;
@@ -194,7 +196,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final float getDamageResilience(org.bukkit.entity.Entity source) {
-        return block.a(CommonNMS.getNative(source));
+        return block.a((Entity) HandleConversion.toEntityHandle(source));
     }
 
     @Override
@@ -217,6 +219,6 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
-        block.stepOn((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), CommonNMS.getNative(entity));
+        block.stepOn((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), (Entity) HandleConversion.toEntityHandle(entity));
     }
 }

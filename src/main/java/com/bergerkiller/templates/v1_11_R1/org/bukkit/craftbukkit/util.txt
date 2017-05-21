@@ -1,0 +1,17 @@
+package org.bukkit.craftbukkit.util;
+
+class LongObjectHashMap {
+    public V get(long key);
+
+    public V remove(long key);
+
+    public V put(long key, V value);
+
+    public Collection<V> values();
+}
+
+class LongHashSet {
+    public boolean add(int msw, int lsw);
+
+    public void remove(int msw, int lsw);
+}

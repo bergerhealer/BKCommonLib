@@ -231,6 +231,10 @@ public class EntityHandle extends Template.Handle {
         return T.onInteractBy.invoke(instance, human, enumhand);
     }
 
+    public void collide(EntityHandle entity) {
+        T.collide.invoke(instance, entity);
+    }
+
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
     public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
@@ -760,6 +764,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
 
     }
 }

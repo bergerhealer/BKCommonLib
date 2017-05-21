@@ -6,11 +6,25 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 class Chunk {
     public final (Object) List<Entity>[] entitySlices;
+    public org.bukkit.Chunk bukkitChunk;
 
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
+
+    public void addEntity:a((EntityHandle) Entity entity);
+
+    <code>
+    public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
+        if (chunk != null) {
+            return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toChunkHandle(chunk));
+        } else {
+            return null;
+        }
+    }
+    </code>
 }
 
 class ChunkSection {

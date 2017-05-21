@@ -8,9 +8,9 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHanging;
 
-import net.minecraft.server.v1_11_R1.Entity;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Hanging;
@@ -55,13 +55,14 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param entity to add
      */
     public static void addEntity(org.bukkit.entity.Entity entity) {
-        Entity nmsentity = CommonNMS.getNative(entity);
-        nmsentity.world.getChunkAt(MathUtil.toChunk(nmsentity.locX), MathUtil.toChunk(nmsentity.locZ));
-        nmsentity.dead = false;
+        EntityHandle nmsentity = CommonNMS.getHandle(entity);
+        WorldServerHandle nmsworld = nmsentity.getWorldServer();
+        entity.getWorld().getChunkAt(MathUtil.toChunk(nmsentity.getLocX()), MathUtil.toChunk(nmsentity.getLocZ()));
+        nmsentity.setDead(false);
         // Remove an entity tracker for this entity if it was present
-        WorldUtil.getTracker(entity.getWorld()).stopTracking(entity);
+        nmsworld.getEntityTracker().stopTracking(entity);
         // Add the entity to the world
-        nmsentity.world.addEntity(nmsentity);
+        nmsworld.addEntity(nmsentity);
     }
 
     /**
@@ -121,7 +122,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param with the entity to collide
      */
     public static void doCollision(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity with) {
-        CommonNMS.getNative(entity).collide(CommonNMS.getNative(with));
+        EntityHandle.fromBukkit(entity).collide(EntityHandle.fromBukkit(with));
     }
 
     /**
