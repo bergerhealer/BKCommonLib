@@ -2,6 +2,9 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle;
+import com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
@@ -28,12 +31,19 @@ public class NMSRecipe {
     public static ItemStack getOutput(Object iRecipe) {
         return Conversion.toItemStack.convert(getOutput.invoke(iRecipe));
     }
-    
+
+    @Deprecated
     public static List<ItemStack> getInputItems(Object iRecipe) {
-        if (Shaped.T.isInstance(iRecipe)) {
-            return Shaped.inputList.get(iRecipe);
-        } else if (Shapeless.T.isInstance(iRecipe)) {
-            return Shapeless.inputList.get(iRecipe);
+        return getInputItems(IRecipeHandle.createHandle(iRecipe));
+    }
+
+    public static List<ItemStack> getInputItems(IRecipeHandle iRecipe) {
+        if (iRecipe == null) {
+            return null;
+        } else if (iRecipe.isInstanceOf(ShapedRecipesHandle.T)) {
+            return ShapedRecipesHandle.T.inputItems.get(iRecipe.getRaw());
+        } else if (iRecipe.isInstanceOf(ShapelessRecipesHandle.T)) {
+            return ShapelessRecipesHandle.T.inputItems.get(iRecipe.getRaw());
         } else {
             return null;
         }

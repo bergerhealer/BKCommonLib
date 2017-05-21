@@ -1,22 +1,17 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingCollection;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
-import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
-import net.minecraft.server.v1_11_R1.CraftingManager;
-import net.minecraft.server.v1_11_R1.IRecipe;
-import net.minecraft.server.v1_11_R1.RecipesFurnace;
-import net.minecraft.server.v1_11_R1.TileEntityFurnace;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -28,10 +23,9 @@ public class RecipeUtil {
     private static final EnumMap<Material, Integer> fuelTimes = new EnumMap<Material, Integer>(Material.class);
 
     static {
-        net.minecraft.server.v1_11_R1.ItemStack item;
         for (Material material : Material.values()) {
-            item = (net.minecraft.server.v1_11_R1.ItemStack) NMSItemStack.newInstance(material, 0, 1);
-            int fuel = TileEntityFurnace.fuelTime(item);
+            Object item = NMSItemStack.newInstance(material, 0, 1);
+            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invokeVA(item)).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);
             }
@@ -93,13 +87,14 @@ public class RecipeUtil {
     }
 
     public static Collection<ItemStack> getHeatableItemStacks() {
-        return new ConvertingCollection<ItemStack>(RecipesFurnace.getInstance().recipes.keySet(), DuplexConversion.itemStack);
+        return RecipesFurnaceHandle.getInstance().getRecipes().keySet();
     }
 
     @Deprecated
     public static Set<Integer> getHeatableItems() {
         DuplexConverter<?, Integer> conv = DuplexConverter.pair(Conversion.toItemId, Conversion.toItemStackHandle);
-        return new ConvertingSet<Integer>(RecipesFurnace.getInstance().recipes.keySet(), conv);
+        Map<?, ?> recipes = (Map<?, ?>) RecipesFurnaceHandle.T.recipes.raw.get(RecipesFurnaceHandle.getInstance().getRaw());
+        return new ConvertingSet<Integer>(recipes.keySet(), conv);
     }
 
     /**
@@ -111,8 +106,8 @@ public class RecipeUtil {
      */
     public static CraftRecipe[] getCraftingRequirements(Material type, int data) {
         List<CraftRecipe> poss = new ArrayList<CraftRecipe>(2);
-        for (Object rec : getCraftRecipes()) {
-            ItemStack item = NMSRecipe.getOutput(rec);
+        for (IRecipeHandle rec : getCraftRecipes()) {
+            ItemStack item = rec.getOutput();
             if (item != null && (type == null || item.getType() == type) && (data == -1 || MaterialUtil.getRawData(item) == data)) {
                 CraftRecipe crec = CraftRecipe.create(rec);
                 if (crec != null) {
@@ -155,7 +150,7 @@ public class RecipeUtil {
         }
     }
 
-    private static List<IRecipe> getCraftRecipes() {
-        return CraftingManager.getInstance().getRecipes();
+    private static List<IRecipeHandle> getCraftRecipes() {
+        return CraftingManagerHandle.getInstance().getRecipes();
     }
 }

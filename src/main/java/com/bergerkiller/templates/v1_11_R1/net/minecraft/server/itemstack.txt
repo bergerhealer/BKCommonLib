@@ -32,11 +32,3 @@ class ItemStack {
     }
     </code>
 }
-
-class RecipesFurnace {
-
-    public static (RecipesFurnaceHandle) RecipesFurnace getInstance();
-
-    public (ItemStackHandle) ItemStack getResult((ItemStackHandle) ItemStack itemstack);
-
-}

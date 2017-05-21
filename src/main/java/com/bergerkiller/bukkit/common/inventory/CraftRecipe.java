@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.*;
+import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
 import org.bukkit.Material;
@@ -223,6 +224,7 @@ public class CraftRecipe {
      * @param recipe to use
      * @return the CraftRecipe, or null on failure
      */
+    @Deprecated
     public static CraftRecipe create(Object recipe) {
         final ItemStack output = NMSRecipe.getOutput(recipe);
         final List<ItemStack> inputs = NMSRecipe.getInputItems(recipe);
@@ -233,6 +235,16 @@ public class CraftRecipe {
         }
     }
 
+    public static CraftRecipe create(IRecipeHandle recipe) {
+        final ItemStack output = recipe.getOutput();
+        final List<ItemStack> inputs = NMSRecipe.getInputItems(recipe);
+        if (inputs != null) {
+            return create(inputs, output);
+        } else {
+            return null;
+        }
+    }
+    
     public static CraftRecipe create(Collection<ItemStack> input, ItemStack output) {
         if (LogicUtil.nullOrEmpty(input) || LogicUtil.nullOrEmpty(output)) {
             return null;

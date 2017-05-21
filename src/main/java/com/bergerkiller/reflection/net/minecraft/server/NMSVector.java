@@ -2,6 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.BlockPosition;
@@ -75,7 +76,7 @@ public class NMSVector {
     /* ============================================================== */
 
     public static Object newPosition(int x, int y, int z) {
-        return new BlockPosition(x, y, z);
+        return BlockPositionHandle.createNew(x, y, z).getRaw();
     }
 
     public static IntVector3 getPosition(Object blockPosition) {

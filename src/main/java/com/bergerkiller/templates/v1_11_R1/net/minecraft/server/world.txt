@@ -64,6 +64,8 @@ class World {
 
     public (Object) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
 
+    public void applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
+
     <code>
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);

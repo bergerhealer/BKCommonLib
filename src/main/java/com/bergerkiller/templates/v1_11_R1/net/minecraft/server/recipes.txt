@@ -1,0 +1,33 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+
+interface IRecipe {
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
+}
+
+class ShapedRecipes extends IRecipe {
+    private final (List<org.bukkit.inventory.ItemStack) ItemStack[] inputItems:items;
+}
+
+class ShapelessRecipes extends IRecipe {
+    private final (List<org.bukkit.inventory.ItemStack) List<ItemStack> inputItems:ingredients;
+}
+
+class RecipesFurnace {
+    public (Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack>) Map<ItemStack, ItemStack> recipes;
+
+    public static (RecipesFurnaceHandle) RecipesFurnace getInstance();
+
+    public (ItemStackHandle) ItemStack getResult((ItemStackHandle) ItemStack itemstack);
+
+}
+
+class CraftingManager {
+    public (List<IRecipeHandle>) List<IRecipe> getRecipes();
+
+    public static (CraftingManagerHandle) CraftingManager getInstance();
+}

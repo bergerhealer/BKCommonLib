@@ -21,8 +21,8 @@ import org.bukkit.material.Rails;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
@@ -362,9 +362,10 @@ public class BlockUtil extends MaterialUtil {
      * @param updateSelf whether the block itself is updated. With false, only surrounding blocks are notified.
      */
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType, boolean updateSelf) {
-        NMSWorld.applyPhysics.invoke(Conversion.toWorldHandle.convert(block.getWorld()),
-                    NMSVector.newPosition(block.getX(), block.getY(), block.getZ()),
-                    HandleConversion.toBlockHandle(callerType), updateSelf);
+        Object worldHandle = HandleConversion.toWorldHandle(block.getWorld());
+        Object blockPos = NMSVector.newPosition(block.getX(), block.getY(), block.getZ());
+        Object blockHandle = HandleConversion.toBlockHandle(callerType);
+        WorldHandle.T.applyPhysics.raw.invoke(worldHandle, blockPos, blockHandle, updateSelf);
     }
 
     /**

@@ -89,6 +89,10 @@ public class WorldHandle extends Template.Handle {
         return T.rayTrace.invoke(instance, point1, point2, flag);
     }
 
+    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        T.applyPhysics.invoke(instance, position, causeType, self);
+    }
+
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
     }
@@ -187,6 +191,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Object> rayTrace = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<Void> applyPhysics = new Template.Method.Converted<Void>();
 
     }
 }
