@@ -41,7 +41,7 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         NMSEntityTrackerEntry.tickCounter.set(handle, NMSEntityTrackerEntry.tickCounter.get(handle) + 1);
     }
 
-    @HookMethod("public void a()")
+    @HookMethod("public void hideForAll:???()")
     public void hideForAll() {
         try {
             controller.makeHiddenForAll();
@@ -61,7 +61,7 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         }
     }
 
-    @HookMethod("public void a(EntityPlayer entityplayer)")
+    @HookMethod("public void removeViewer:???(EntityPlayer entityplayer)")
     public void removeViewer(Object entityplayer) {
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));

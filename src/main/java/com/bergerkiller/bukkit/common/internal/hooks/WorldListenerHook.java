@@ -47,12 +47,12 @@ public class WorldListenerHook extends ClassHook<WorldListenerHook> {
         return new NullInvokable(method);
     }
 
-    @HookMethod("public void a(Entity entity)")
+    @HookMethod("public void onEntityAdded:???(Entity entity)")
     public void onEntityAdded(Object entity) {
         CommonPlugin.getInstance().notifyAdded(Conversion.toEntity.convert(entity));
     }
 
-    @HookMethod("public void b(Entity entity)")
+    @HookMethod("public void onEntityRemoved:???(Entity entity)")
     public void onEntityRemoved(Object entity) {
         CommonPlugin.getInstance().notifyRemoved(Conversion.toEntity.convert(entity));
     }

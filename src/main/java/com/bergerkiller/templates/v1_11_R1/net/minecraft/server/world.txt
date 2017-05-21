@@ -17,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMeta
 import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 class World {
@@ -96,6 +97,8 @@ class ChunkProviderServer {
     public final (Object) it.unimi.dsi.fastutil.longs.Long2ObjectMap<Chunk> chunks;
     public final (WorldServerHandle) WorldServer world;
 
+    public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
+
     public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
 
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
@@ -140,3 +143,8 @@ class BiomeBase {
 
 }
 
+interface IWorldAccess {
+    public abstract void onEntityAdded:a((EntityHandle) Entity entity);
+
+    public abstract void onEntityRemoved:b((EntityHandle) Entity entity);
+}

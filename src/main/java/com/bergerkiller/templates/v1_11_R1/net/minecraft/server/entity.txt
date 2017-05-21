@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -314,6 +315,18 @@ class Entity {
     public UUID getUniqueID();
 
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
+
+    public void onTick:A_();
+
+    public void onPush:f(double d0, double d1, double d2);
+
+    public (CommonTagCompound) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+
+    public boolean savePassenger:c((CommonTagCompound) NBTTagCompound compound);
+
+    public boolean saveEntity:d((CommonTagCompound) NBTTagCompound compound);
+
+    public boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
     <code>
     public WorldServerHandle getWorldServer() {

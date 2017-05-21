@@ -33,7 +33,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.controller = controller;
     }
 
-    @HookMethod("public boolean b(EntityHuman entityhuman, EnumHand enumhand)")
+    @HookMethod("public boolean onInteractBy:???(EntityHuman entityhuman, EnumHand enumhand)")
     public boolean onInteractBy(Object entityHuman, Object enumHand) {
         if (checkController()) {
             return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
@@ -51,7 +51,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public void A_()")
+    @HookMethod("public void onTick:???()")
     public void onTick() {
         if (checkController()) {
             controller.onTick();
@@ -69,7 +69,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public void f(double d0, double d1, double d2)")
+    @HookMethod("public void onPush:???(double d0, double d1, double d2)")
     public void onPush(double dx, double dy, double dz) {
         if (checkController()) {
             controller.onPush(dx, dy, dz);
@@ -105,17 +105,17 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public net.minecraft.server.Entity teleportTo(org.bukkit.Location exit, boolean portal)")
+    @HookMethod("public Entity teleportTo(org.bukkit.Location exit, boolean portal)")
     public Object teleportTo(Location exit, boolean portal) {
         return base.teleportTo(exit, portal);
     }
 
-    @HookMethod("public NBTTagCompound e(NBTTagCompound nbttagcompound)")
+    @HookMethod("public NBTTagCompound saveToNBT:???(NBTTagCompound nbttagcompound)")
     public Object saveEntity(Object nbtTag) {
         return base.saveEntity(nbtTag);
     }
 
-    @HookMethod("public boolean c(NBTTagCompound nbttagcompound)")
+    @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
     public boolean c(Object tag) {
         Object handle = this.instance();
         if (EntityHandle.T.dead.getBoolean(handle)) {
@@ -127,7 +127,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         return true;
     }
 
-    @HookMethod("public boolean d(NBTTagCompound nbttagcompound)")
+    @HookMethod("public boolean saveEntity:???(NBTTagCompound nbttagcompound)")
     public boolean d(Object tag) {
         Object handle = this.instance();
         if (EntityHandle.T.dead.getBoolean(handle)) {

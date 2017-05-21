@@ -24,6 +24,14 @@ public class EntityTrackerEntryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public void hideForAll() {
+        T.hideForAll.invoke(instance);
+    }
+
+    public void removeViewer(Player player) {
+        T.removeViewer.invoke(instance, player);
+    }
+
     public CommonPacket getSpawnPacket() {
         return T.getSpawnPacket.invoke(instance);
     }
@@ -228,6 +236,8 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Converted<List<Entity>> passengers = new Template.Field.Converted<List<Entity>>();
         public final Template.Field.Converted<Set<Player>> viewers = new Template.Field.Converted<Set<Player>>();
 
+        public final Template.Method<Void> hideForAll = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> removeViewer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
 
     }

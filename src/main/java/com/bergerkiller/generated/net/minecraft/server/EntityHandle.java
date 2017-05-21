@@ -5,7 +5,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.UUID;
 import org.bukkit.Material;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import org.bukkit.inventory.MainHand;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Item;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
@@ -198,6 +201,30 @@ public class EntityHandle extends Template.Handle {
 
     public DataWatcher getDataWatcher() {
         return T.getDataWatcher.invoke(instance);
+    }
+
+    public void onTick() {
+        T.onTick.invoke(instance);
+    }
+
+    public void onPush(double d0, double d1, double d2) {
+        T.onPush.invoke(instance, d0, d1, d2);
+    }
+
+    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
+        return T.saveToNBT.invoke(instance, compound);
+    }
+
+    public boolean savePassenger(CommonTagCompound compound) {
+        return T.savePassenger.invoke(instance, compound);
+    }
+
+    public boolean saveEntity(CommonTagCompound compound) {
+        return T.saveEntity.invoke(instance, compound);
+    }
+
+    public boolean onInteractBy(HumanEntity human, MainHand enumhand) {
+        return T.onInteractBy.invoke(instance, human, enumhand);
     }
 
     public WorldServerHandle getWorldServer() {
@@ -711,6 +738,12 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
         public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
+        public final Template.Method<Void> onTick = new Template.Method<Void>();
+        public final Template.Method<Void> onPush = new Template.Method<Void>();
+        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
 
     }
 }

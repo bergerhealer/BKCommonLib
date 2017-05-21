@@ -1,8 +1,11 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.Set;
+import java.util.List;
+import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 
 public class ChunkProviderServerHandle extends Template.Handle {
     public static final ChunkProviderServerClass T = new ChunkProviderServerClass();
@@ -19,6 +22,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public List<BiomeMetaHandle> getBiomeSpawnInfo(Object enumcreaturetype, IntVector3 position) {
+        return T.getBiomeSpawnInfo.invoke(instance, enumcreaturetype, position);
+    }
 
     public ChunkHandle getChunkIfLoaded(int cx, int cz) {
         return T.getChunkIfLoaded.invoke(instance, cx, cz);
@@ -61,6 +68,7 @@ public class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Field.Converted<Object> chunks = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
+        public final Template.Method.Converted<List<BiomeMetaHandle>> getBiomeSpawnInfo = new Template.Method.Converted<List<BiomeMetaHandle>>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();

@@ -49,7 +49,7 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         return WrapperConversion.toWorld(ChunkProviderServerHandle.T.world.raw.get(instance()));
     }
 
-    @HookMethod("public List<BiomeBase.BiomeMeta> a(EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+    @HookMethod("public List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:???(EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
     public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
         List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
         if (CommonPlugin.hasInstance()) {

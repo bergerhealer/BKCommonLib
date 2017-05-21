@@ -40,6 +40,9 @@ class EntityTrackerEntry {
 
     public final (Set<org.bukkit.entity.Player>) Set<EntityPlayer> viewers:trackedPlayers;
 
+    public void hideForAll:a();
+
+    public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
 
     private (CommonPacket) Packet<?> getSpawnPacket:e();
 }
