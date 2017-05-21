@@ -199,7 +199,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     protected T entity;
     /**
-     * A reference to the internel net.minecraft.server.Entity (or its extension)
+     * A reference to the internal net.minecraft.server.Entity (or its extension)
      */
     protected EntityHandle handle = new EntityHandle();
 

@@ -159,7 +159,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public void setItem(int i, ItemStack itemstack)")
+    @HookMethod(value="public void setItem(int i, ItemStack itemstack)", optional=true)
     public void setInventoryItem(int i, Object itemstack) {
         if (checkController()) {
             controller.onItemSet(i, Conversion.toItemStack.convert(itemstack));

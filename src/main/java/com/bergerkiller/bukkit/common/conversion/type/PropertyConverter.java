@@ -85,9 +85,9 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
             }
         }
     };
-    public static final PropertyConverter<EnumDirection> toPaintingFacing = new PropertyConverter<EnumDirection>(EnumDirection.class) {
+    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(EnumDirection.class) {
         @Override
-        public EnumDirection convertInput(Object value) {
+        public Object convertInput(Object value) {
             Integer id = toPaintingFacingId.convert(value);
             if (id != null) {
                 final int idInt = id.intValue();

@@ -12,7 +12,6 @@ import com.bergerkiller.mountiplex.conversion.type.InputConverter;
 import com.bergerkiller.mountiplex.conversion.type.NullConverter;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
-import net.minecraft.server.v1_11_R1.EnumDirection;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -136,7 +135,7 @@ public class Conversion {
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
     public static final PropertyConverter<Material> toItemMaterial = PropertyConverter.toItemMaterial;
     public static final PropertyConverter<Integer> toPaintingFacingId = PropertyConverter.toPaintingFacingId;
-    public static final PropertyConverter<EnumDirection> toPaintingFacing = PropertyConverter.toPaintingFacing;
+    public static final PropertyConverter<Object> toPaintingFacing = PropertyConverter.toPaintingFacing;
     public static final PropertyConverter<EntityType> toMinecartType = PropertyConverter.toMinecartType;
     public static final PropertyConverter<Object> toGameProfileFromId = PropertyConverter.toGameProfileFromId;
     public static final PropertyConverter<UUID> toGameProfileId = PropertyConverter.toGameProfileId;

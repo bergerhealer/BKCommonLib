@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.server.v1_11_R1.EnumDirection;
-
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -68,7 +66,7 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, CommonTag> commonTag = pair(toCommonTag, toNBTTagHandle);
     public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findNMS("NBTTagCompound", CommonTagCompound.class);
     public static final DuplexConverter<Object, CommonTagList> commonTagList = findNMS("NBTTagList", CommonTagList.class);
-    public static final DuplexConverter<Integer, EnumDirection> paintingFacing = pair(toPaintingFacing, toPaintingFacingId);
+    public static final DuplexConverter<Integer, Object> paintingFacing = pair(toPaintingFacing, toPaintingFacingId);
     public static final DuplexConverter<Object, IntVector3> blockPosition = pair(toIntVector3, toBlockPositionHandle);
     public static final DuplexConverter<Object, IntVector2> chunkIntPair = pair(toIntVector2, toChunkCoordIntPairHandle);
     public static final DuplexConverter<Object, Vector> vector = pair(toVector, toVec3DHandle);
