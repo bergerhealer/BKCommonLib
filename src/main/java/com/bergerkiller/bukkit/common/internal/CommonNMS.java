@@ -13,15 +13,11 @@ import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
-import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.MinecraftServer;
-
-import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -83,10 +79,6 @@ public class CommonNMS {
         return WorldServerHandle.createHandle(HandleConversion.toWorldHandle(world));
     }
 
-    public static Chunk getNative(org.bukkit.Chunk chunk) {
-        return (Chunk) Conversion.toChunkHandle.convert(chunk);
-    }
-
     public static ItemHandle getItem(org.bukkit.Material material) {
         return material == null ? null : ItemHandle.createHandle(HandleConversion.toItemHandle(material));
     }
@@ -96,8 +88,8 @@ public class CommonNMS {
      *
      * @return Minecraft Server
      */
-    public static MinecraftServer getMCServer() {
-        return (MinecraftServer) CBCraftServer.getServer.invoke(Bukkit.getServer());
+    public static MinecraftServerHandle getMCServer() {
+        return MinecraftServerHandle.instance();
     }
 
     /**

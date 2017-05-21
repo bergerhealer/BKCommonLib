@@ -12,7 +12,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -58,10 +57,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        Object chunkHandleRaw = HandleConversion.toChunkHandle(block.getChunk());
-        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(block.getX(), block.getY(), block.getZ());
-        Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
-        return BlockData.fromBlockData(iBlockData);
+        return ChunkUtil.getBlockData(block.getChunk(), block.getX(), block.getY(), block.getZ());
     }
 
     /**
@@ -251,7 +247,7 @@ public class WorldUtil extends ChunkUtil {
             }
         }
         // Remove the world from the MinecraftServer worlds mapping
-        CommonNMS.getMCServer().worlds.remove(Conversion.toWorldHandle.convert(world));
+        CommonNMS.getMCServer().getWorlds().remove(WorldServerHandle.fromBukkit(world));
     }
 
     /**

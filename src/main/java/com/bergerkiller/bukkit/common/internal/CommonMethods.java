@@ -1,8 +1,5 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import net.minecraft.server.v1_11_R1.DamageSource;
-import net.minecraft.server.v1_11_R1.Explosion;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -34,8 +31,8 @@ public class CommonMethods {
         return ChunkSectionHandle.createNew(y >> 4 << 4, !CommonNMS.getHandle(world).getWorldProvider().isDarkWorld());
     }
 
-    public static Explosion Explosion_new(org.bukkit.World world, double x, double y, double z) {
-        return (Explosion) ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true).getRaw();
+    public static ExplosionHandle Explosion_new(org.bukkit.World world, double x, double y, double z) {
+        return ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true);
     }
 
     public static void setPlayerFileData(IPlayerFileDataHandle playerFileData) {
@@ -44,8 +41,8 @@ public class CommonMethods {
 
     public static DamageSourceHandle DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
         Location loc = entity.getLocation();
-        Explosion ex = Explosion_new(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-        return DamageSourceHandle.createHandle(DamageSource.explosion(ex));
+        ExplosionHandle ex = Explosion_new(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
+        return DamageSourceHandle.explosion(ex);
     }
 
     /**
@@ -80,33 +77,29 @@ public class CommonMethods {
     }
 
     public static DamageSourceHandle DamageSource_from_damagecause(DamageCause cause) {
-        DamageSource source;
-        if (cause == DamageCause.CONTACT) {
-            source = DamageSource.CACTUS;
-        } else if (cause == DamageCause.DROWNING) {
-            source = DamageSource.DROWN;
-        } else if (cause == DamageCause.FALL) {
-            source = DamageSource.FALL;
-        } else if (cause == DamageCause.FALLING_BLOCK) {
-            source = DamageSource.FALLING_BLOCK;
-        } else if (cause == DamageCause.FIRE) {
-            source = DamageSource.FIRE;
-        } else if (cause == DamageCause.LAVA) {
-            source = DamageSource.LAVA;
-        } else if (cause == DamageCause.MAGIC) {
-            source = DamageSource.MAGIC;
-        } else if (cause == DamageCause.VOID) {
-            source = DamageSource.OUT_OF_WORLD;
-        } else if (cause == DamageCause.STARVATION) {
-            source = DamageSource.STARVE;
-        } else if (cause == DamageCause.SUFFOCATION) {
-            source = DamageSource.STUCK;
-        } else if (cause == DamageCause.WITHER) {
-            source = DamageSource.WITHER;
-        } else {
-            source = DamageSource.GENERIC;
-        }
-        return DamageSourceHandle.createHandle(source);
+        return DamageSourceHandle.byName(getSourceName(cause));
     }
 
+    private static String getSourceName(DamageCause cause) {
+        switch (cause) {
+        case FIRE: return "inFire";
+        case LIGHTNING: return "lightningBolt";
+        case FIRE_TICK: return "onFire";
+        case LAVA: return "lava";
+        case HOT_FLOOR: return "hotFloor";
+        case SUFFOCATION: return "inWall";
+        case CRAMMING: return "cramming";
+        case DROWNING: return "drown";
+        case STARVATION: return "starve";
+        case CONTACT: return "cactus";
+        case FALL: return "fall";
+        case FLY_INTO_WALL: return "flyIntoWall";
+        case VOID: return "outOfWorld";
+        case MAGIC: return "magic";
+        case WITHER: return "wither";
+        case FALLING_BLOCK: return "fallingBlock";
+        case DRAGON_BREATH: return "dragonBreath";
+        default: return "generic";
+        }
+    }
 }

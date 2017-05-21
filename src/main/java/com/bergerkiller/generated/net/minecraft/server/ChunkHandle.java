@@ -3,8 +3,10 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.Chunk;
+import org.bukkit.block.BlockState;
 
 public class ChunkHandle extends Template.Handle {
     public static final ChunkClass T = new ChunkClass();
@@ -30,12 +32,28 @@ public class ChunkHandle extends Template.Handle {
         T.addEntity.invoke(instance, entity);
     }
 
+    public int getHeight(int x, int z) {
+        return T.getHeight.invoke(instance, x, z);
+    }
+
+    public int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position) {
+        return T.getBrightness.invoke(instance, enumskyblock, position);
+    }
+
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
             return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toChunkHandle(chunk));
         } else {
             return null;
         }
+    }
+
+    public Map<IntVector3, BlockState> getTileEntities() {
+        return T.tileEntities.get(instance);
+    }
+
+    public void setTileEntities(Map<IntVector3, BlockState> value) {
+        T.tileEntities.set(instance, value);
     }
 
     public Object getEntitySlices() {
@@ -55,11 +73,14 @@ public class ChunkHandle extends Template.Handle {
     }
 
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
+        public final Template.Field.Converted<Map<IntVector3, BlockState>> tileEntities = new Template.Field.Converted<Map<IntVector3, BlockState>>();
         public final Template.Field.Converted<Object> entitySlices = new Template.Field.Converted<Object>();
         public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> addEntity = new Template.Method.Converted<Void>();
+        public final Template.Method<Integer> getHeight = new Template.Method<Integer>();
+        public final Template.Method.Converted<Integer> getBrightness = new Template.Method.Converted<Integer>();
 
     }
 }

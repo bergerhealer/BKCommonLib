@@ -7,14 +7,20 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 
 class Chunk {
+    public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
     public final (Object) List<Entity>[] entitySlices;
     public org.bukkit.Chunk bukkitChunk;
 
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 
     public void addEntity:a((EntityHandle) Entity entity);
+
+    public int getHeight:b(int x, int z)
+
+    public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
 
     <code>
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
@@ -29,4 +35,17 @@ class Chunk {
 
 class ChunkSection {
     public (ChunkSectionHandle) ChunkSection(int y, boolean hasSkyLight);
+}
+
+class EnumSkyBlock {
+    enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
+    enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
+
+    public final int brightness:c;
+
+    <code>
+    public int ordinal() {
+        return ((Enum<?>) instance).ordinal();
+    }
+    </code>
 }

@@ -1,19 +1,23 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -61,7 +65,7 @@ public class ChunkUtil {
      * @return column height
      */
     public static int getHeight(org.bukkit.Chunk chunk, int x, int z) {
-        return NMSChunk.getHeight(CommonNMS.getNative(chunk), x, z);
+        return ChunkHandle.fromBukkit(chunk).getHeight(x & 0xf, z & 0xf);
     }
 
     /**
@@ -74,7 +78,14 @@ public class ChunkUtil {
      * @return Block light level
      */
     public static int getBlockLight(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return NMSChunk.getBlockLight(CommonNMS.getNative(chunk), x, y, z);
+        if (y < 0) {
+            return 0;
+        } else if (y >= chunk.getWorld().getMaxHeight()) {
+            return EnumSkyBlockHandle.BLOCK.getBrightness();
+        } else {
+            return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.BLOCK,
+                    new IntVector3(x & 0xf, y, z & 0xf));
+        }
     }
 
     /**
@@ -87,7 +98,14 @@ public class ChunkUtil {
      * @return Sky light level
      */
     public static int getSkyLight(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return NMSChunk.getSkyLight(CommonNMS.getNative(chunk), x, y, z);
+        if (y < 0) {
+            return 0;
+        } else if (y >= chunk.getWorld().getMaxHeight()) {
+            return EnumSkyBlockHandle.SKY.getBrightness();
+        } else {
+            return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.SKY,
+                    new IntVector3(x & 0xf, y, z & 0xf));
+        }
     }
 
     /**
@@ -101,7 +119,7 @@ public class ChunkUtil {
      */
     @Deprecated
     public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return NMSChunk.getTypeId(CommonNMS.getNative(chunk), x, y, z);
+        return getBlockData(chunk, x, y, z).getTypeId();
     }
 
     /**
@@ -113,9 +131,24 @@ public class ChunkUtil {
      * @param z - coordinate of the block
      * @return block type
      */
-    @SuppressWarnings("deprecation")
     public static Material getBlockType(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return MaterialUtil.getType(NMSChunk.getTypeId(CommonNMS.getNative(chunk), x, y, z));
+        return getBlockData(chunk, x, y, z).getType();
+    }
+
+    /**
+     * Gets the block type and data from a chunk
+     * 
+     * @param chunk the block is in
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
+     * @return block data information
+     */
+    public static BlockData getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
+        Object chunkHandleRaw = HandleConversion.toChunkHandle(chunk);
+        Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
+        return BlockData.fromBlockData(iBlockData);
     }
 
     /**
@@ -132,7 +165,7 @@ public class ChunkUtil {
             return;
         }
 
-        Object[] sections = (Object[]) NMSChunk.sections.getInternal(CommonNMS.getNative(chunk));
+        Object[] sections = (Object[]) NMSChunk.sections.getInternal(HandleConversion.toChunkHandle(chunk));
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
@@ -370,7 +403,7 @@ public class ChunkUtil {
      * @return collection of Block States (mutable)
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
-        return DuplexConversion.blockStateCollection.convert(CommonNMS.getNative(chunk).tileEntities.values());
+        return ChunkHandle.T.tileEntities.get(HandleConversion.toChunkHandle(chunk)).values();
     }
 
     /**

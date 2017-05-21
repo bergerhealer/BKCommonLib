@@ -4,10 +4,14 @@ import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle
 
 import org.bukkit.command.SimpleCommandMap;
 
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
+
 class CraftServer {
     public SimpleCommandMap getCommandMap();
 
     public (DedicatedPlayerListHandle) net.minecraft.server.DedicatedPlayerList getPlayerList:getHandle();
+
+    public (MinecraftServerHandle) net.minecraft.server.MinecraftServer getServer();
 
     <code>
     public static CraftServerHandle instance() {

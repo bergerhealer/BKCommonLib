@@ -2,7 +2,20 @@ package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+
+class MinecraftServer {
+    public (List<WorldServerHandle>) List<WorldServer> worlds;
+
+    <code>
+    public static MinecraftServerHandle instance() {
+        return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
+    }
+    </code>
+}
 
 class PlayerList {
     public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
