@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
+import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;

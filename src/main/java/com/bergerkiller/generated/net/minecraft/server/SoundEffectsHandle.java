@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 
 public class SoundEffectsHandle extends Template.Handle {
     public static final SoundEffectsClass T = new SoundEffectsClass();

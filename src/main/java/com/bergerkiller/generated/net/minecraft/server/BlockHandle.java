@@ -2,8 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class BlockHandle extends Template.Handle {
     public static final BlockClass T = new BlockClass();

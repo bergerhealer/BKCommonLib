@@ -1,7 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class TileEntityHopperHandle extends TileEntityHandle {

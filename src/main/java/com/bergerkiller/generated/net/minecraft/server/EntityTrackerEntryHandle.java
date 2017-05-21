@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import java.util.Set;
 import java.util.List;
 import org.bukkit.entity.Entity;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class EntityTrackerEntryHandle extends Template.Handle {
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();

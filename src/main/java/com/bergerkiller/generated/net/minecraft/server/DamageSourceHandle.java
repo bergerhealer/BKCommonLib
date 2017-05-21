@@ -1,7 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import org.bukkit.entity.LivingEntity;
-import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import org.bukkit.entity.HumanEntity;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;

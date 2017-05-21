@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
 
 public class ReportedExceptionHandle extends Template.Handle {
     public static final ReportedExceptionClass T = new ReportedExceptionClass();

@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.List;
-import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 
 public class EntityPlayerHandle extends EntityHumanHandle {
     public static final EntityPlayerClass T = new EntityPlayerClass();

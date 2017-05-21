@@ -8,7 +8,6 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSBiomeMeta;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -83,8 +82,8 @@ public class CommonEventFactory {
             creaturePreSpawnEvent.spawnLocation.setYaw(0.0f);
             creaturePreSpawnEvent.spawnLocation.setPitch(0.0f);
             creaturePreSpawnEvent.entityType = oldEntityType;
-            creaturePreSpawnEvent.minSpawnCount = NMSBiomeMeta.minSpawnCount.get(inputMeta);
-            creaturePreSpawnEvent.maxSpawnCount = NMSBiomeMeta.maxSpawnCount.get(inputMeta);
+            creaturePreSpawnEvent.minSpawnCount = inputMeta.getMinSpawnCount();
+            creaturePreSpawnEvent.maxSpawnCount = inputMeta.getMaxSpawnCount();
 
             // Raise it and handle spawn cancel
             if (CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled() || (creaturePreSpawnEvent.minSpawnCount == 0 && creaturePreSpawnEvent.maxSpawnCount == 0)) {
@@ -94,7 +93,7 @@ public class CommonEventFactory {
             // Handle a possibly changed entity type
             final Class<?> entityClass;
             if (oldEntityType == creaturePreSpawnEvent.entityType) {
-                entityClass = NMSBiomeMeta.entity.get(inputMeta);
+                entityClass = inputMeta.getEntityClass();
             } else {
                 entityClass = CommonEntityType.byEntityType(creaturePreSpawnEvent.entityType).nmsType.getType();
             }
@@ -105,11 +104,11 @@ public class CommonEventFactory {
             }
 
             // Add element to buffer
-            final Object outputMeta = creaturePreSpawnMobs.add();
-            NMSBiomeMeta.entity.set(outputMeta, entityClass);
-            NMSBiomeMeta.minSpawnCount.set(outputMeta, creaturePreSpawnEvent.minSpawnCount);
-            NMSBiomeMeta.maxSpawnCount.set(outputMeta, creaturePreSpawnEvent.maxSpawnCount);
-            NMSBiomeMeta.chance.transfer(inputMeta, outputMeta);
+            final BiomeMetaHandle outputMeta = creaturePreSpawnMobs.add();
+            outputMeta.setEntityClass(entityClass);
+            outputMeta.setMinSpawnCount(creaturePreSpawnEvent.minSpawnCount);
+            outputMeta.setMaxSpawnCount(creaturePreSpawnEvent.maxSpawnCount);
+            outputMeta.setChance(inputMeta.getChance());
         }
         return creaturePreSpawnMobs;
     }

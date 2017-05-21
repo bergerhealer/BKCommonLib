@@ -10,8 +10,8 @@ public class Handle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final Handle createHandle(Object handleInstance) {
-        if (handleInstance == null) throw new IllegalArgumentException("Handle instance can not be null");
+    public static Handle createHandle(Object handleInstance) {
+        if (handleInstance == null) return null;
         Handle handle = new Handle();
         handle.instance = handleInstance;
         return handle;
@@ -19,6 +19,6 @@ public class Handle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static final class Class extends Template.Class {
+    public static final class Class extends Template.Class<Handle> {
     }
 }

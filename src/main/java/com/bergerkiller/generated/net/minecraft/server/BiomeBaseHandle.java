@@ -1,5 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
@@ -22,7 +23,7 @@ public class BiomeBaseHandle extends Template.Handle {
     public static final class BiomeBaseClass extends Template.Class<BiomeBaseHandle> {
     }
 
-    public static class BiomeMetaHandle extends Template.Handle {
+    public static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
         public static final BiomeMetaClass T = new BiomeMetaClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta");
 
@@ -50,10 +51,28 @@ public class BiomeBaseHandle extends Template.Handle {
             T.entityClass.set(instance, value);
         }
 
+        public int getMinSpawnCount() {
+            return T.minSpawnCount.getInteger(instance);
+        }
+
+        public void setMinSpawnCount(int value) {
+            T.minSpawnCount.setInteger(instance, value);
+        }
+
+        public int getMaxSpawnCount() {
+            return T.maxSpawnCount.getInteger(instance);
+        }
+
+        public void setMaxSpawnCount(int value) {
+            T.maxSpawnCount.setInteger(instance, value);
+        }
+
         public static final class BiomeMetaClass extends Template.Class<BiomeMetaHandle> {
             public final Template.Constructor.Converted<BiomeMetaHandle> constr_entityClass_x_y_z = new Template.Constructor.Converted<BiomeMetaHandle>();
 
             public final Template.Field.Converted<java.lang.Class<?>> entityClass = new Template.Field.Converted<java.lang.Class<?>>();
+            public final Template.Field.Integer minSpawnCount = new Template.Field.Integer();
+            public final Template.Field.Integer maxSpawnCount = new Template.Field.Integer();
 
         }
     }

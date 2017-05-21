@@ -1,9 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 public class TileEntityHandle extends Template.Handle {
     public static final TileEntityClass T = new TileEntityClass();

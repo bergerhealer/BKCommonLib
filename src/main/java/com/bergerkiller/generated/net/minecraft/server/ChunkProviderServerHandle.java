@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.Set;
@@ -20,6 +19,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public ChunkHandle getChunkIfLoaded(int cx, int cz) {
+        return T.getChunkIfLoaded.invoke(instance, cx, cz);
+    }
 
     public ChunkHandle getChunkAt(int cx, int cz) {
         return T.getChunkAt.invoke(instance, cx, cz);
@@ -45,10 +48,20 @@ public class ChunkProviderServerHandle extends Template.Handle {
         T.chunks.set(instance, value);
     }
 
+    public WorldServerHandle getWorld() {
+        return T.world.get(instance);
+    }
+
+    public void setWorld(WorldServerHandle value) {
+        T.world.set(instance, value);
+    }
+
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
         public final Template.Field<Set<Long>> unloadQueue = new Template.Field<Set<Long>>();
         public final Template.Field.Converted<Object> chunks = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
+        public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();
 

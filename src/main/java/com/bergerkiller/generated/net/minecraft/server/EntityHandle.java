@@ -1,23 +1,18 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.UUID;
 import org.bukkit.Material;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Item;
-import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import java.util.Random;
 import java.util.List;
 import org.bukkit.entity.Entity;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 
 public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();

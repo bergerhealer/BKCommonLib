@@ -2,19 +2,12 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import org.bukkit.World;
 import java.util.Random;
 import java.util.List;
 import org.bukkit.util.Vector;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class WorldHandle extends Template.Handle {
     public static final WorldClass T = new WorldClass();
@@ -144,6 +137,14 @@ public class WorldHandle extends Template.Handle {
         T.worldProvider.set(instance, value);
     }
 
+    public Object getChunkProvider() {
+        return T.chunkProvider.get(instance);
+    }
+
+    public void setChunkProvider(Object value) {
+        T.chunkProvider.set(instance, value);
+    }
+
     public MethodProfilerHandle getMethodProfiler() {
         return T.methodProfiler.get(instance);
     }
@@ -166,6 +167,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
+        public final Template.Field.Converted<Object> chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
         public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
 

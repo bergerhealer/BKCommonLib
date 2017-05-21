@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
@@ -26,6 +27,7 @@ class World {
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;
+    protected (Object) IChunkProvider chunkProvider;
     public final (MethodProfilerHandle) MethodProfiler methodProfiler;
     public boolean keepSpawnInMemory;
 
@@ -81,11 +83,20 @@ class WorldServer extends World {
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
 
     public void saveLevel();
+
+    <code>
+    public static WorldServerHandle fromBukkit(org.bukkit.World world) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+    </code>
 }
 
 class ChunkProviderServer {
     public final Set<Long> unloadQueue;
     public final (Object) it.unimi.dsi.fastutil.longs.Long2ObjectMap<Chunk> chunks;
+    public final (WorldServerHandle) WorldServer world;
+
+    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
 
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 
@@ -110,12 +121,22 @@ class WorldProvider {
     public boolean isDarkWorld:m();
 }
 
+class WeightedRandom {
+
+    class WeightedRandom.WeightedRandomChoice {
+        protected int chance:a;
+    }
+}
+
 class BiomeBase {
 
-    class BiomeBase.BiomeMeta {
+    class BiomeBase.BiomeMeta extends WeightedRandom.WeightedRandomChoice {
         public (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass:b;
+        public int minSpawnCount:c;
+        public int maxSpawnCount:d;
 
         public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
     }
+
 }
 

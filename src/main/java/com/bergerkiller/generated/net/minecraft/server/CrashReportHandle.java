@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 

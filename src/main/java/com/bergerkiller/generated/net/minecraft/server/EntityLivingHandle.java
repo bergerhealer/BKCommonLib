@@ -2,13 +2,9 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import java.util.Collection;
 import org.bukkit.inventory.ItemStack;
-import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.inventory.EquipmentSlot;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class EntityLivingHandle extends EntityHandle {
     public static final EntityLivingClass T = new EntityLivingClass();

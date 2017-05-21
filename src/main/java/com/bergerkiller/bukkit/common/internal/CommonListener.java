@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;

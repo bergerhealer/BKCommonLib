@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 
 public class EntityHumanHandle extends EntityLivingHandle {
     public static final EntityHumanClass T = new EntityHumanClass();
