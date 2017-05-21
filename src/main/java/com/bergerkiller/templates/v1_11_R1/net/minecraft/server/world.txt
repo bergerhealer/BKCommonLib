@@ -3,6 +3,7 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -18,6 +19,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 class World {
@@ -56,13 +58,13 @@ class World {
 
     public boolean addEntity((EntityHandle) Entity entity);
 
-    public (Object) IDataManager getDataManager();
+    public (IDataManagerHandle) IDataManager getDataManager();
 
     public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
 
-    public (Object) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
 
     public void applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
 
@@ -149,4 +151,16 @@ interface IWorldAccess {
     public abstract void onEntityAdded:a((EntityHandle) Entity entity);
 
     public abstract void onEntityRemoved:b((EntityHandle) Entity entity);
+}
+
+interface IDataManager {
+
+}
+
+class WorldNBTStorage extends IDataManager {
+    public java.io.File getPlayerDir();
+}
+
+class MovingObjectPosition {
+    public (org.bukkit.util.Vector) Vec3D pos;
 }

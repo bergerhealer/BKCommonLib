@@ -1,0 +1,5 @@
+package net.minecraft.server;
+
+class PortalTravelAgent {
+    public void adjustExit((org.bukkit.entity.Entity) Entity entity, org.bukkit.Location position, org.bukkit.util.Vector velocity);
+}

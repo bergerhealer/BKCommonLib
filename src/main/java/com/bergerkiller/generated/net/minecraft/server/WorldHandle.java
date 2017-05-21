@@ -73,7 +73,7 @@ public class WorldHandle extends Template.Handle {
         return T.addEntity.invoke(instance, entity);
     }
 
-    public Object getDataManager() {
+    public IDataManagerHandle getDataManager() {
         return T.getDataManager.invoke(instance);
     }
 
@@ -85,7 +85,7 @@ public class WorldHandle extends Template.Handle {
         return T.areChunksLoaded.invoke(instance, blockposition, distance);
     }
 
-    public Object rayTrace(Vector point1, Vector point2, boolean flag) {
+    public MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag) {
         return T.rayTrace.invoke(instance, point1, point2, flag);
     }
 
@@ -187,10 +187,10 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Object> getDataManager = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<IDataManagerHandle> getDataManager = new Template.Method.Converted<IDataManagerHandle>();
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Object> rayTrace = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
         public final Template.Method.Converted<Void> applyPhysics = new Template.Method.Converted<Void>();
 
     }

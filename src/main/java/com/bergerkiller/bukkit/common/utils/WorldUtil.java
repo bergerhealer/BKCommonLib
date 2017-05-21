@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -13,8 +14,12 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
@@ -24,18 +29,11 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.IDataManager;
-import net.minecraft.server.v1_11_R1.MovingObjectPosition;
-import net.minecraft.server.v1_11_R1.WorldNBTStorage;
-import net.minecraft.server.v1_11_R1.WorldServer;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_11_R1.CraftTravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -356,16 +354,15 @@ public class WorldUtil extends ChunkUtil {
      * failed
      */
     public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
-        WorldServerHandle ws = CommonNMS.getHandle(startLocation.getWorld());
         // Use a new travel agent to designate a proper position
-        CraftTravelAgent travelAgent = new CraftTravelAgent((WorldServer) ws.getRaw());
+        CraftTravelAgentHandle travelAgent = CraftTravelAgentHandle.createNew(startLocation.getWorld());
         travelAgent.setCanCreatePortal(createPortals);
         Location exit = travelAgent.findOrCreate(startLocation);
         // Adjust the exit to make it suitable for players
         // Note: this will raise an NPE while trying to fire the PortalExit event
         // This is expected behavior
         try {
-            travelAgent.adjustExit((Entity) findSpawnDummyEntity, exit, new Vector(0, 0, 0));
+            travelAgent.adjustExit(WrapperConversion.toEntity(findSpawnDummyEntity), exit, new Vector(0, 0, 0));
         } catch (NullPointerException ex) {
         }
         // Done!
@@ -379,9 +376,9 @@ public class WorldUtil extends ChunkUtil {
      * @return players folder
      */
     public static File getPlayersFolder(org.bukkit.World world) {
-        IDataManager man = (IDataManager) WorldHandle.fromBukkit(world).getDataManager();
-        if (man instanceof WorldNBTStorage) {
-            return ((WorldNBTStorage) man).getPlayerDir();
+        IDataManagerHandle man = WorldHandle.fromBukkit(world).getDataManager();
+        if (man.isInstanceOf(WorldNBTStorageHandle.T)) {
+            return man.cast(WorldNBTStorageHandle.T).getPlayerDir();
         }
         return new File(getWorldFolder(world), "playerdata");
     }
@@ -655,8 +652,13 @@ public class WorldUtil extends ChunkUtil {
      * @return the hit Block, or null if none was found (AIR)
      */
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPosition mop = (MovingObjectPosition) WorldHandle.fromBukkit(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ), false);
-        return mop == null ? null : world.getBlockAt((int) mop.pos.x, (int) mop.pos.y, (int) mop.pos.z);
+        MovingObjectPositionHandle mop = WorldHandle.fromBukkit(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ), false);
+        if (mop == null) {
+            return null;
+        } else {
+            Vector pos = mop.getPos();
+            return world.getBlockAt(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+        }
     }
 
     /**
