@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 public class MobEffectHandle extends Template.Handle {
     public static final MobEffectClass T = new MobEffectClass();
@@ -19,6 +20,12 @@ public class MobEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static MobEffectHandle fromNBT(CommonTagCompound compound) {
+        return T.fromNBT.invokeVA(compound);
+    }
+
     public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
+        public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
+
     }
 }

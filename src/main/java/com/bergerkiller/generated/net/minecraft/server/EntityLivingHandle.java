@@ -46,6 +46,14 @@ public class EntityLivingHandle extends EntityHandle {
         return T.getMaxHealth.invoke(instance);
     }
 
+    public AttributeMapServerHandle getAttributeMapField() {
+        return T.attributeMapField.get(instance);
+    }
+
+    public void setAttributeMapField(AttributeMapServerHandle value) {
+        T.attributeMapField.set(instance, value);
+    }
+
     public float getLastDamage() {
         return T.lastDamage.getFloat(instance);
     }
@@ -71,6 +79,7 @@ public class EntityLivingHandle extends EntityHandle {
     }
 
     public static final class EntityLivingClass extends Template.Class<EntityLivingHandle> {
+        public final Template.Field.Converted<AttributeMapServerHandle> attributeMapField = new Template.Field.Converted<AttributeMapServerHandle>();
         public final Template.Field.Float lastDamage = new Template.Field.Float();
         public final Template.Field.Float forwardMovement = new Template.Field.Float();
         public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();

@@ -12,6 +12,7 @@ class EntityHuman extends EntityLiving {
 }
 
 class EntityLiving extends Entity {
+    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
     public float lastDamage;
     protected unknown boolean bd;
     public unknown float be;

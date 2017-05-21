@@ -20,6 +20,7 @@ include /net/minecraft/server/axisalignedbb.txt
 include /net/minecraft/server/world.txt
 include /net/minecraft/server/chunk.txt
 include /net/minecraft/server/item.txt
+include /net/minecraft/server/foodmeta.txt
 include /net/minecraft/server/block.txt
 include /net/minecraft/server/block_subtype.txt
 include /net/minecraft/server/enumdirection.txt

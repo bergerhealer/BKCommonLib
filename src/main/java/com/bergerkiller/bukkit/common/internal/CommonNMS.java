@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -15,10 +16,8 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
-import net.minecraft.server.v1_11_R1.AttributeMapServer;
 import net.minecraft.server.v1_11_R1.Chunk;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 
@@ -111,8 +110,8 @@ public class CommonNMS {
         return CraftServerHandle.instance().getPlayerList();
     }
 
-    public static AttributeMapServer getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
-        return (AttributeMapServer) NMSEntityLiving.getAttributesMap.invoke(Conversion.toEntityHandle.convert(entity));
+    public static AttributeMapServerHandle getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
+        return EntityLivingHandle.T.getAttributeMap.invoke(HandleConversion.toEntityHandle(entity));
     }
 
 }

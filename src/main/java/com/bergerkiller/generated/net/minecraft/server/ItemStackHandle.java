@@ -48,6 +48,18 @@ public class ItemStackHandle extends Template.Handle {
         return T.getTag.invoke(instance);
     }
 
+    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
+        return T.saveToNBT.invoke(instance, compound);
+    }
+
+    public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
+        if (itemStack == null) {
+            return null;
+        } else {
+            return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toItemStackHandle(itemStack));
+        }
+    }
+
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();
@@ -56,6 +68,7 @@ public class ItemStackHandle extends Template.Handle {
         public final Template.Method<Boolean> hasName = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasTag = new Template.Method<Boolean>();
         public final Template.Method.Converted<CommonTagCompound> getTag = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
 
     }
 }

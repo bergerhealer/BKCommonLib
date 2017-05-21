@@ -1,5 +1,8 @@
 package net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+
 class MobEffect {
-    
+    public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
 }

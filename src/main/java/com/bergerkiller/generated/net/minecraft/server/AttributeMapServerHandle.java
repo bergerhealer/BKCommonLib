@@ -18,6 +18,10 @@ public class AttributeMapServerHandle extends Template.Handle {
         return handle;
     }
 
+    public static final AttributeMapServerHandle createNew() {
+        return T.constr.newInstance();
+    }
+
     /* ============================================================================== */
 
     public Collection<Object> attributes() {
@@ -25,6 +29,8 @@ public class AttributeMapServerHandle extends Template.Handle {
     }
 
     public static final class AttributeMapServerClass extends Template.Class<AttributeMapServerHandle> {
+        public final Template.Constructor.Converted<AttributeMapServerHandle> constr = new Template.Constructor.Converted<AttributeMapServerHandle>();
+
         public final Template.Method.Converted<Collection<Object>> attributes = new Template.Method.Converted<Collection<Object>>();
 
     }

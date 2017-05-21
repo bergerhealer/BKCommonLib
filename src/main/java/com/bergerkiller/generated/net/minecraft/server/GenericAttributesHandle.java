@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
 public class GenericAttributesHandle extends Template.Handle {
     public static final GenericAttributesClass T = new GenericAttributesClass();
@@ -21,9 +22,20 @@ public class GenericAttributesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static void loadFromNBT(AttributeMapServerHandle attributemapbase, CommonTagList nbttaglist) {
+        T.loadFromNBT.invokeVA(attributemapbase, nbttaglist);
+    }
+
+    public static CommonTagList saveToNBT(AttributeMapServerHandle attributemapbase) {
+        return T.saveToNBT.invokeVA(attributemapbase);
+    }
+
     public static final class GenericAttributesClass extends Template.Class<GenericAttributesHandle> {
         public final Template.StaticField.Converted<Object> FOLLOW_RANGE = new Template.StaticField.Converted<Object>();
         public final Template.StaticField.Converted<Object> MOVEMENT_SPEED = new Template.StaticField.Converted<Object>();
+
+        public final Template.StaticMethod.Converted<Void> loadFromNBT = new Template.StaticMethod.Converted<Void>();
+        public final Template.StaticMethod.Converted<CommonTagList> saveToNBT = new Template.StaticMethod.Converted<CommonTagList>();
 
     }
 }

@@ -5,16 +5,20 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.FoodMetaDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.server.InventoryEnderChestHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
-import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.Inventory;
-
-import java.util.List;
 
 /**
  * Contains utility functions for dealing with NBT data such as saving and loading
@@ -28,7 +32,7 @@ public class NBTUtil {
      * @return Loaded MobEffect
      */
     public static Object loadMobEffect(CommonTagCompound compound) {
-        return MobEffect.b((NBTTagCompound) compound.getHandle());
+        return MobEffectHandle.fromNBT(compound).getRaw();
     }
 
     /**
@@ -42,7 +46,7 @@ public class NBTUtil {
         if (compound == null) {
             compound = new CommonTagCompound();
         }
-        ((Entity) Conversion.toEntityHandle.convert(entity)).e((NBTTagCompound) compound.getHandle());
+        EntityHandle.fromBukkit(entity).saveToNBT(compound);
         return compound;
     }
 
@@ -53,7 +57,7 @@ public class NBTUtil {
      * @param compound to load from
      */
     public static void loadEntity(org.bukkit.entity.Entity entity, CommonTagCompound compound) {
-        ((Entity) Conversion.toEntityHandle.convert(entity)).f((NBTTagCompound) compound.getHandle());
+        EntityHandle.fromBukkit(entity).loadFromNBT(compound);
     }
 
     /**
@@ -63,8 +67,10 @@ public class NBTUtil {
      * @param compound TagCompound
      */
     public static void saveItemStack(org.bukkit.inventory.ItemStack item, CommonTagCompound compound) {
-        ItemStack stack = (ItemStack) Conversion.toItemStackHandle.convert(item);
-        stack.save((NBTTagCompound) compound.getHandle());
+        ItemStackHandle stack = ItemStackHandle.fromBukkit(item);
+        if (stack != null) {
+            stack.saveToNBT(compound);
+        }
     }
 
     /**
@@ -101,7 +107,7 @@ public class NBTUtil {
         if (compound == null) {
             compound = new CommonTagCompound();
         }
-        ((FoodMetaData) foodMetaData).b((NBTTagCompound) compound.getHandle());
+        FoodMetaDataHandle.createHandle(foodMetaData).saveToNBT(compound);
         return compound;
     }
 
@@ -112,7 +118,7 @@ public class NBTUtil {
      * @param compound to load from
      */
     public static void loadFoodMetaData(Object foodMetaData, CommonTagCompound compound) {
-        ((FoodMetaData) foodMetaData).a((NBTTagCompound) compound.getHandle());
+        FoodMetaDataHandle.createHandle(foodMetaData).loadFromNBT(compound);
     }
 
     /**
@@ -127,22 +133,19 @@ public class NBTUtil {
         if (inventoryHandle == null) {
             throw new IllegalArgumentException("This kind of inventory lacks a handle to load");
         }
-        if (inventoryHandle instanceof PlayerInventory) {
+        if (PlayerInventoryHandle.T.isAssignableFrom(inventoryHandle)) {
             if (list == null) {
                 list = new CommonTagList();
             }
-            ((PlayerInventory) inventoryHandle).a((NBTTagList) list.getHandle());
-        } else if (inventoryHandle instanceof InventoryEnderChest) {
-            Object handle = ((InventoryEnderChest) inventoryHandle).h();
-            if (list == null) {
-                return (CommonTagList) CommonTag.create(handle);
-            } else {
-                List<?> data = (List<?>) NMSNBT.getData(handle);
-                for (Object elem : data) {
-                    list.addValue(elem);
+            PlayerInventoryHandle.createHandle(inventoryHandle).saveToNBT(list);
+        } else if (InventoryEnderChestHandle.T.isAssignableFrom(inventoryHandle)) {
+            CommonTagList listSaved = InventoryEnderChestHandle.createHandle(inventoryHandle).saveToNBT();
+            if (listSaved != null) {
+                for (CommonTag savedItem : listSaved.getData()) {
+                    list.add(savedItem);
                 }
-                return list;
             }
+            return list;
         } else {
             throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
         }
@@ -157,13 +160,12 @@ public class NBTUtil {
      */
     public static void loadInventory(org.bukkit.inventory.Inventory inventory, CommonTagList list) {
         final Object inventoryHandle = Conversion.toInventoryHandle.convert(inventory);
-        NBTTagList nbt = (NBTTagList) list.getHandle();
         if (inventoryHandle == null) {
             throw new IllegalArgumentException("This kind of inventory lacks a handle to save");
-        } else if (inventoryHandle instanceof PlayerInventory) {
-            ((PlayerInventory) inventoryHandle).b(nbt);
-        } else if (inventoryHandle instanceof InventoryEnderChest) {
-            ((InventoryEnderChest) inventoryHandle).a(nbt);
+        } else if (PlayerInventoryHandle.T.isAssignableFrom(inventoryHandle)) {
+            PlayerInventoryHandle.createHandle(inventoryHandle).loadFromNBT(list);
+        } else if (InventoryEnderChestHandle.T.isAssignableFrom(inventoryHandle)) {
+            InventoryEnderChestHandle.createHandle(inventoryHandle).loadFromNBT(list);
         } else {
             throw new IllegalArgumentException("This kind of inventory has an unknown type of handle: " + inventoryHandle.getClass().getName());
         }
@@ -178,9 +180,10 @@ public class NBTUtil {
      */
     public static void resetAttributes(LivingEntity livingEntity) {
         Object livingHandle = Conversion.toEntityHandle.convert(livingEntity);
+        AttributeMapServerHandle ams = AttributeMapServerHandle.createNew();
 
         // Clear old attributes and force a re-create
-        NMSEntityLiving.attributeMap.set(livingHandle, new AttributeMapServer());
+        EntityLivingHandle.createHandle(livingHandle).setAttributeMapField(ams);
     }
 
     /**
@@ -194,8 +197,8 @@ public class NBTUtil {
         if (data == null) {
             throw new IllegalArgumentException("Data can not be null");
         }
-        AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
-        GenericAttributes.a(map, (NBTTagList) data.getHandle());
+        AttributeMapServerHandle map = CommonNMS.getEntityAttributes(livingEntity);
+        GenericAttributesHandle.loadFromNBT(map, data);
     }
 
     /**
@@ -205,8 +208,8 @@ public class NBTUtil {
      * @return CommonTagList containing the saved data
      */
     public static CommonTagList saveAttributes(LivingEntity livingEntity) {
-        AttributeMapServer map = CommonNMS.getEntityAttributes(livingEntity);
-        return (CommonTagList) CommonTag.create(GenericAttributes.a(map));
+        AttributeMapServerHandle map = CommonNMS.getEntityAttributes(livingEntity);
+        return GenericAttributesHandle.saveToNBT(map);
     }
 
     /**

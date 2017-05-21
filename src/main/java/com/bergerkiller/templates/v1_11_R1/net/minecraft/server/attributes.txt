@@ -1,6 +1,12 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+
 class AttributeMapServer {
+    public (AttributeMapServerHandle) AttributeMapServer();
+
     public (Collection<Object>) Collection<AttributeInstance> attributes:c();
 }
 
@@ -13,4 +19,8 @@ class AttributeInstance {
 class GenericAttributes {
     public static final (Object) IAttribute FOLLOW_RANGE;
     public static final (Object) IAttribute MOVEMENT_SPEED;
+
+    public static void loadFromNBT:a((AttributeMapServerHandle) AttributeMapBase attributemapbase, (CommonTagList) NBTTagList nbttaglist);
+
+    public static (CommonTagList) NBTTagList saveToNBT:a((AttributeMapServerHandle) AttributeMapBase attributemapbase);
 }

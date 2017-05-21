@@ -20,6 +20,17 @@ class ItemStack {
 
     public (CommonTagCompound) NBTTagCompound getTag();
 
+    public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+    <code>
+    public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
+        if (itemStack == null) {
+            return null;
+        } else {
+            return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toItemStackHandle(itemStack));
+        }
+    }
+    </code>
 }
 
 class RecipesFurnace {

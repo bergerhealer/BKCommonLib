@@ -219,6 +219,10 @@ public class EntityHandle extends Template.Handle {
         return T.saveToNBT.invoke(instance, compound);
     }
 
+    public void loadFromNBT(CommonTagCompound compound) {
+        T.loadFromNBT.invoke(instance, compound);
+    }
+
     public boolean savePassenger(CommonTagCompound compound) {
         return T.savePassenger.invoke(instance, compound);
     }
@@ -761,6 +765,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
         public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
