@@ -73,14 +73,14 @@ public class NMSEntity {
     public static final DataWatcher.Key<Boolean> DATA_SILENT = EntityHandle.DATA_SILENT;
     public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = EntityHandle.DATA_NO_GRAVITY;
 
-    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
-    public static final int DATA_FLAG_SNEAKING = (1 << 1);
-    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
-    public static final int DATA_FLAG_SPRINTING = (1 << 3);
-    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
-    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
-    public static final int DATA_FLAG_GLOWING = (1 << 6);
-    public static final int DATA_FLAG_FLYING = (1 << 7);
+    public static final int DATA_FLAG_ON_FIRE = EntityHandle.DATA_FLAG_ON_FIRE;
+    public static final int DATA_FLAG_SNEAKING = EntityHandle.DATA_FLAG_SNEAKING;
+    public static final int DATA_FLAG_UNKNOWN1 = EntityHandle.DATA_FLAG_UNKNOWN1;
+    public static final int DATA_FLAG_SPRINTING = EntityHandle.DATA_FLAG_SPRINTING;
+    public static final int DATA_FLAG_UNKNOWN2 = EntityHandle.DATA_FLAG_UNKNOWN2;
+    public static final int DATA_FLAG_INVISIBLE = EntityHandle.DATA_FLAG_INVISIBLE;
+    public static final int DATA_FLAG_GLOWING = EntityHandle.DATA_FLAG_GLOWING;
+    public static final int DATA_FLAG_FLYING = EntityHandle.DATA_FLAG_FLYING;
 
     public static final FieldAccessor<Boolean> isLoaded = EntityHandle.T.isLoaded.toFieldAccessor();
     public static final FieldAccessor<Integer> chunkX = EntityHandle.T.chunkX.toFieldAccessor();

@@ -4,11 +4,11 @@ import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 
 import java.util.List;
 
@@ -224,7 +224,7 @@ public class DataWatcher extends BasicWrapper {
             return "{id=" + getKey().getId() + ",changed=" + isChanged() + ",value=" + getValue() + "}";
         }
     }
-    
+
     /**
      * References the value bound to a DataWatcher Key for a particular Entity
      *
@@ -246,7 +246,7 @@ public class DataWatcher extends BasicWrapper {
          */
         @SuppressWarnings("unchecked")
         public V get() {
-            Object watcher = NMSEntity.datawatcher.getInternal(owner.getHandle());
+            Object watcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
             return (V) NMSDataWatcher.get.invoke(watcher, keyHandle);
         }
 
@@ -256,7 +256,7 @@ public class DataWatcher extends BasicWrapper {
          * @param value to set to
          */
         public void set(V value) {
-            Object watcher = NMSEntity.datawatcher.getInternal(owner.getHandle());
+            Object watcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
             NMSDataWatcher.set.invoke(watcher, keyHandle, value);
         }
 

@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 
 /**
@@ -431,7 +430,7 @@ public class MapPlayerInput {
             Location loc = player.getLocation();
             {
                 DataWatcher data = new DataWatcher();
-                data.set(EntityHandle.DATA_FLAGS, (byte) (NMSEntity.DATA_FLAG_INVISIBLE));
+                data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
                 data.set(NMSEntityLiving.DATA_HEALTH, 10.0F);
 
                 CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();

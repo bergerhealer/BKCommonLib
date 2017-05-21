@@ -137,7 +137,7 @@ public class ChunkUtil {
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
-            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y);
+            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y).getRaw();
         }
 
         NMSChunkSection.setBlockData(section, x, y, z, data);

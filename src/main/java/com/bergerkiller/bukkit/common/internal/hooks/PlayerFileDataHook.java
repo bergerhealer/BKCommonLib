@@ -5,6 +5,7 @@ import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
@@ -14,20 +15,21 @@ public class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> {
 
     public static PlayerFileDataHook update(HookAction action) {
         PlayerListHandle playerList = PlayerListHandle.createHandle(CBCraftServer.getPlayerList.invoke(Bukkit.getServer()));
+        Object fileDataHandle = playerList.getPlayerFileData().getRaw();
 
         // Get the player file data hook or hook a new one
-        PlayerFileDataHook hook = PlayerFileDataHook.get(playerList.getPlayerFileData(), PlayerFileDataHook.class);
+        PlayerFileDataHook hook = PlayerFileDataHook.get(fileDataHandle, PlayerFileDataHook.class);
         if ((hook == null) && (action != HookAction.UNHOOK)) {
             hook = new PlayerFileDataHook();
             if (action == HookAction.MOCK) {
-                hook.mock(playerList.getPlayerFileData());
+                hook.mock(fileDataHandle);
             } else {
-                playerList.setPlayerFileData(hook.hook(playerList.getPlayerFileData()));
+                playerList.setPlayerFileData(IPlayerFileDataHandle.createHandle(hook.hook(fileDataHandle)));
             }
         } else if ((hook != null) && (action == HookAction.UNHOOK)) {
-            playerList.setPlayerFileData(PlayerFileDataHook.unhook(playerList.getPlayerFileData()));
+            playerList.setPlayerFileData(IPlayerFileDataHandle.createHandle(PlayerFileDataHook.unhook(fileDataHandle)));
             hook = new PlayerFileDataHook();
-            hook.mock(playerList.getPlayerFileData());
+            hook.mock(fileDataHandle);
         }
         return hook;
     }

@@ -1,0 +1,6 @@
+package org.bukkit.craftbukkit;
+
+class CraftChunk {
+
+
+}

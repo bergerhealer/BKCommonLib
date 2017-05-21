@@ -1,6 +1,9 @@
 include /org/bukkit/plugin.txt
 include /org/bukkit/craftbukkit/entity.txt
+include /org/bukkit/craftbukkit/block.txt
 include /org/bukkit/craftbukkit/inventories.txt
+include /org/bukkit/craftbukkit/chunk.txt
+include /org/bukkit/craftbukkit/server.txt
 include /net/minecraft/server/server.txt
 include /net/minecraft/server/vectors.txt
 include /net/minecraft/server/methodprofiler.txt

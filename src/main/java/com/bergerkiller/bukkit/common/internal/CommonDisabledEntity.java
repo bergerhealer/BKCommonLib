@@ -1,14 +1,19 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.MinecraftServer;
-import net.minecraft.server.v1_11_R1.NBTTagCompound;
+public class CommonDisabledEntity {
+    public static final Object INSTANCE;
 
-public class CommonDisabledEntity extends Entity {
+    static {
+        INSTANCE = EntityHandle.createNew(null).getRaw();
+    }
 
-    public static final CommonDisabledEntity INSTANCE = ClassTemplate.create(CommonDisabledEntity.class).newInstanceNull();
+    //TODO: Really needed to override the below methods?
+    // If so, generate an extended type at runtime.
+
+    /*
+    //public static final CommonDisabledEntity INSTANCE = ClassTemplate.create(CommonDisabledEntity.class).newInstanceNull();
 
     private CommonDisabledEntity() {
         super(null);
@@ -30,4 +35,5 @@ public class CommonDisabledEntity extends Entity {
 	@Override
 	protected void i() {
 	}
+	*/
 }

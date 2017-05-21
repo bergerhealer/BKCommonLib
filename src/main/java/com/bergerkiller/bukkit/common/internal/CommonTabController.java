@@ -258,7 +258,7 @@ public class CommonTabController implements PacketListener, Listener {
         if (event.getResult() == Result.ALLOWED) {
             // Temporarily set the max player count to the one as specified here
             if (hasChangedMaxPlayers()) {
-            	NMSPlayerList.maxPlayers.set(CommonNMS.getPlayerList(), customListCount);
+                CommonNMS.getPlayerList().setMaxPlayers(customListCount);
             }
         }
     }
@@ -267,7 +267,7 @@ public class CommonTabController implements PacketListener, Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (hasChangedMaxPlayers()) {
             // Restore server max players (required, otherwise new people can join a full server all of a sudden!)
-        	NMSPlayerList.maxPlayers.set(CommonNMS.getPlayerList(), serverMaxPlayers);
+            CommonNMS.getPlayerList().setMaxPlayers(serverMaxPlayers);
         }
         // Send all the elements of the current tab for this player
         getInfo(event.getPlayer()).refresh();

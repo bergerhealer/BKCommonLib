@@ -37,6 +37,10 @@ public class EntityHandle extends Template.Handle {
         return handle;
     }
 
+    public static final EntityHandle createNew(WorldHandle world) {
+        return T.constr_world.newInstance(world);
+    }
+
     /* ============================================================================== */
 
     public static int entityCount() {
@@ -226,6 +230,16 @@ public class EntityHandle extends Template.Handle {
     public boolean onInteractBy(HumanEntity human, MainHand enumhand) {
         return T.onInteractBy.invoke(instance, human, enumhand);
     }
+
+    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
+    public static final int DATA_FLAG_SNEAKING = (1 << 1);
+    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
+    public static final int DATA_FLAG_SPRINTING = (1 << 3);
+    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
+    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
+    public static final int DATA_FLAG_GLOWING = (1 << 6);
+    public static final int DATA_FLAG_FLYING = (1 << 7);
+
 
     public WorldServerHandle getWorldServer() {
         return WorldServerHandle.createHandle(T.world.raw.get(instance));
@@ -640,6 +654,8 @@ public class EntityHandle extends Template.Handle {
     }
 
     public static final class EntityClass extends Template.Class<EntityHandle> {
+        public final Template.Constructor.Converted<EntityHandle> constr_world = new Template.Constructor.Converted<EntityHandle>();
+
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         public final Template.StaticField.Converted<Key<Integer>> DATA_AIR_TICKS = new Template.StaticField.Converted<Key<Integer>>();

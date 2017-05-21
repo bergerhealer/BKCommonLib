@@ -4,20 +4,19 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.server.v1_11_R1.DispenserRegistry;
-import net.minecraft.server.v1_11_R1.EntityHuman;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -83,7 +82,7 @@ public class CommonUtil {
      * @return Bukkit command map
      */
     public static CommandMap getCommandMap() {
-        return CommonMethods.CraftServer_instance().getCommandMap();
+        return CraftServerHandle.T.getCommandMap.invoke(Bukkit.getServer());
     }
 
     /**
@@ -166,7 +165,7 @@ public class CommonUtil {
      * @param playerFileData to set to
      */
     public static void setPlayerFileData(Object playerFileData) {
-    	CommonMethods.setPlayerFileData(playerFileData);
+        CommonMethods.setPlayerFileData(IPlayerFileDataHandle.createHandle(playerFileData));
     }
 
     /**
@@ -175,7 +174,7 @@ public class CommonUtil {
      * @param human to save
      */
     public static void savePlayer(HumanEntity human) {
-        CommonNMS.getPlayerList().playerFileData.save((EntityHuman) CommonNMS.getHandle(human).getRaw());
+        CommonNMS.getPlayerList().getPlayerFileData().save(human);
     }
 
     /**
@@ -222,7 +221,7 @@ public class CommonUtil {
      * @return online players
      */
     public static Collection<Player> getOnlinePlayers() {
-        return new ConvertingList<Player>(CommonNMS.getPlayerList().players, DuplexConversion.player);
+        return CommonNMS.getPlayerList().getPlayers();
     }
 
     /**

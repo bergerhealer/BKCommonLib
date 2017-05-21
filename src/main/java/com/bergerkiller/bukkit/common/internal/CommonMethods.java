@@ -1,51 +1,44 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.DamageSource;
 import net.minecraft.server.v1_11_R1.Explosion;
-import net.minecraft.server.v1_11_R1.IPlayerFileData;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.v1_11_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_11_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_11_R1.block.CraftBlockState;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
+import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
 public class CommonMethods {
 
     public static Block CraftBlock_new(Chunk chunk, int x, int y, int z) {
-        return new CraftBlock((CraftChunk) chunk, x, y, z);
+        return CraftBlockHandle.createNew(chunk, x, y, z);
     }
 
     public static BlockState CraftBlockState_new(Block block) {
-        return new CraftBlockState(block);
+        return CraftBlockStateHandle.createNew(block);
     }
 
-    public static ChunkSection ChunkSection_new(org.bukkit.World world, int y) {
-        return new ChunkSection(y >> 4 << 4, !CommonNMS.getHandle(world).getWorldProvider().isDarkWorld());
+    public static ChunkSectionHandle ChunkSection_new(org.bukkit.World world, int y) {
+        return ChunkSectionHandle.createNew(y >> 4 << 4, !CommonNMS.getHandle(world).getWorldProvider().isDarkWorld());
     }
 
     public static Explosion Explosion_new(org.bukkit.World world, double x, double y, double z) {
         return (Explosion) ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true).getRaw();
     }
 
-    public static CraftServer CraftServer_instance() {
-        return (CraftServer) Bukkit.getServer();
-    }
-
-    public static void setPlayerFileData(Object playerFileData) {
-        CommonNMS.getPlayerList().playerFileData = (IPlayerFileData) playerFileData;
+    public static void setPlayerFileData(IPlayerFileDataHandle playerFileData) {
+        CommonNMS.getPlayerList().setPlayerFileData(playerFileData);
     }
 
     public static DamageSource DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {

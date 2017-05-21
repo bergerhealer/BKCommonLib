@@ -1,6 +1,27 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
+
 class PlayerList {
-    public (Object) IPlayerFileData playerFileData;
+    public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
+    public (IPlayerFileDataHandle) IPlayerFileData playerFileData;
     protected int maxPlayers;
+
+    public void savePlayers();
+
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet<?> packet)
+}
+
+class DedicatedPlayerList extends PlayerList {
+
+}
+
+interface IPlayerFileData {
+    public void save((org.bukkit.entity.HumanEntity) EntityHuman human);
+
+    public (CommonTagCompound) NBTTagCompound load((org.bukkit.entity.HumanEntity) EntityHuman human);
+
+    public String[] getSeenPlayers();
 }

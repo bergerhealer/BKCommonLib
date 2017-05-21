@@ -1,0 +1,17 @@
+package org.bukkit.craftbukkit;
+
+import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
+
+import org.bukkit.command.SimpleCommandMap;
+
+class CraftServer {
+    public SimpleCommandMap getCommandMap();
+
+    public (DedicatedPlayerListHandle) net.minecraft.server.DedicatedPlayerList getPlayerList:getHandle();
+
+    <code>
+    public static CraftServerHandle instance() {
+        return createHandle(org.bukkit.Bukkit.getServer());
+    }
+    </code>
+}

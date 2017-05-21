@@ -12,7 +12,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
-import net.minecraft.server.v1_11_R1.Packet;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -253,10 +252,13 @@ public class PacketUtil {
     }
 
     public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Object packet) {
+        CommonPacket packetWrap;
         if (packet instanceof CommonPacket) {
-            packet = ((CommonPacket) packet).getHandle();
+            packetWrap = (CommonPacket) packet;
+        } else {
+            packetWrap = new CommonPacket(packet);
         }
-        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), (Packet<?>) packet);
+        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), packetWrap);
     }
 
     /**

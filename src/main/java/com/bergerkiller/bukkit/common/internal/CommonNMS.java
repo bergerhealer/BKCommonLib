@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
@@ -12,18 +13,17 @@ import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import net.minecraft.server.v1_11_R1.AttributeMapServer;
 import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.DedicatedPlayerList;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_11_R1.CraftWorld;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -112,8 +112,8 @@ public class CommonNMS {
      *
      * @return Minecraft Server Player List
      */
-    public static DedicatedPlayerList getPlayerList() {
-        return (DedicatedPlayerList) CBCraftServer.getPlayerList.invoke(Bukkit.getServer());
+    public static DedicatedPlayerListHandle getPlayerList() {
+        return CraftServerHandle.instance().getPlayerList();
     }
 
     public static AttributeMapServer getEntityAttributes(org.bukkit.entity.LivingEntity entity) {

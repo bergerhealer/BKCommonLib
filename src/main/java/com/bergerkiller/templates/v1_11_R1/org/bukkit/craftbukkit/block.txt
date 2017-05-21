@@ -1,0 +1,11 @@
+package org.bukkit.craftbukkit.block;
+
+import org.bukkit.craftbukkit.CraftChunk;
+
+class CraftBlock {
+    public (org.bukkit.block.Block) CraftBlock((org.bukkit.Chunk) CraftChunk chunk, int x, int y, int z);
+}
+
+class CraftBlockState {
+    public (org.bukkit.block.BlockState) CraftBlockState(org.bukkit.block.Block block);
+}
