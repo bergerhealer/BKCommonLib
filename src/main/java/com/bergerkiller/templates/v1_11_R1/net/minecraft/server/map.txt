@@ -1,0 +1,20 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle;
+
+class MapIcon {
+    public (MapIconHandle) MapIcon((MapIconHandle.TypeHandle) MapIcon.Type type, byte x, byte y, byte direction);
+
+    public byte getTypeId:getType();
+
+    public byte getX();
+
+    public byte getY();
+
+    public byte getDirection:getRotation();
+
+    class MapIcon.Type {
+        public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:a(byte id);
+    }
+}

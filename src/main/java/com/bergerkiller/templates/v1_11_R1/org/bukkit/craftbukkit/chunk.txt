@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit;
 
 class CraftChunk {
-
-
+    public (Object) net.minecraft.server.Chunk getHandle();
 }

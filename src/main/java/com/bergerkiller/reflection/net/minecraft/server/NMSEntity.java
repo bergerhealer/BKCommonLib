@@ -3,7 +3,6 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -20,7 +19,6 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.IBlockData;
@@ -34,7 +32,7 @@ public class NMSEntity {
     /* ================================================== FIELDS ====================================================== */
     /* ================================================================================================================ */
 
-    public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntity.toFieldAccessor();
+    public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntityField.toFieldAccessor();
     public static final FieldAccessor<Integer> globalEntityCount = EntityHandle.T.entityCount.toFieldAccessor();
     public static final TranslatorFieldAccessor<List<Entity>> passengers = EntityHandle.T.passengers.raw.toFieldAccessor().translate(DuplexConversion.entityList);
     public static final TranslatorFieldAccessor<Entity> vehicleField = EntityHandle.T.vehicle.raw.toFieldAccessor().translate(DuplexConversion.entity);
@@ -318,7 +316,4 @@ public class NMSEntity {
         setRotation.invoke(entityHandle, yaw, pitch);
     }
 
-    public static Entity createEntity(Object entityHandle) {
-    	return CBCraftEntity.getEntity.invoke(null, Bukkit.getServer(), entityHandle);
-    }
 }

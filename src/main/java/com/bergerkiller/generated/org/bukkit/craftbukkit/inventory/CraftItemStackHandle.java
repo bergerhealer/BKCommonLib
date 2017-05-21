@@ -20,12 +20,32 @@ public class CraftItemStackHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Object asNMSCopy(ItemStack original) {
+        return T.asNMSCopy.invokeVA(original);
+    }
+
     public static ItemStack asCraftCopy(ItemStack original) {
         return T.asCraftCopy.invokeVA(original);
     }
 
+    public static ItemStack asCraftMirror(Object nmsItemStack) {
+        return T.asCraftMirror.invokeVA(nmsItemStack);
+    }
+
+    public Object getHandle() {
+        return T.handle.get(instance);
+    }
+
+    public void setHandle(Object value) {
+        T.handle.set(instance, value);
+    }
+
     public static final class CraftItemStackClass extends Template.Class<CraftItemStackHandle> {
+        public final Template.Field.Converted<Object> handle = new Template.Field.Converted<Object>();
+
+        public final Template.StaticMethod.Converted<Object> asNMSCopy = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
+        public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
 
     }
 }

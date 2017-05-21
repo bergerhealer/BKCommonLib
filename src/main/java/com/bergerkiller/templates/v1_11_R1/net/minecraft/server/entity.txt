@@ -16,7 +16,7 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 class Entity {
-    protected (org.bukkit.entity.Entity) CraftEntity bukkitEntity;
+    protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
     private static int entityCount;
     private int idField:id;
     public final (List<EntityHandle>) List<Entity> passengers;
@@ -333,6 +333,8 @@ class Entity {
     public boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
     public void collide((EntityHandle) Entity entity);
+
+    public (org.bukkit.entity.Entity) org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity();
 
     <code>
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);

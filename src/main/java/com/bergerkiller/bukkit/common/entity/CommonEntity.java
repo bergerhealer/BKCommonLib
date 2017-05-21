@@ -305,7 +305,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // *** Give the old entity a new Bukkit Entity ***
-        oldInstance.setBukkitEntity(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
+        oldInstance.setBukkitEntityField(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
         this.handle = newInstance;
 
         // *** Replace entity in passenger and vehicle fields ***

@@ -1,0 +1,7 @@
+package org.bukkit.craftbukkit.potion;
+
+class CraftPotionUtil {
+    public static org.bukkit.potion.PotionEffect toBukkit((Object) net.minecraft.server.MobEffect nmsMobEffect);
+
+    public static (Object) net.minecraft.server.MobEffect fromBukkit(org.bukkit.potion.PotionEffect effect);
+}

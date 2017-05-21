@@ -1,38 +1,9 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.Chunk;
-import net.minecraft.server.v1_11_R1.Container;
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.EnumDifficulty;
-import net.minecraft.server.v1_11_R1.EnumHand;
-import net.minecraft.server.v1_11_R1.EnumItemSlot;
-import net.minecraft.server.v1_11_R1.IInventory;
-import net.minecraft.server.v1_11_R1.InventoryCrafting;
-import net.minecraft.server.v1_11_R1.InventoryMerchant;
-import net.minecraft.server.v1_11_R1.Item;
-import net.minecraft.server.v1_11_R1.ItemStack;
-import net.minecraft.server.v1_11_R1.MapIcon;
-import net.minecraft.server.v1_11_R1.MobEffect;
-import net.minecraft.server.v1_11_R1.PlayerInventory;
-import net.minecraft.server.v1_11_R1.TileEntity;
-import net.minecraft.server.v1_11_R1.TileEntityBeacon;
-import net.minecraft.server.v1_11_R1.TileEntityBrewingStand;
-import net.minecraft.server.v1_11_R1.TileEntityFurnace;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryBeacon;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryBrewer;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryCrafting;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryFurnace;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryMerchant;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryPlayer;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_11_R1.potion.CraftPotionUtil;
-import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
@@ -57,30 +28,47 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryFurnaceHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryPlayerHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
+import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Entity", output="T extends org.bukkit.entity.Entity")
     public static org.bukkit.entity.Entity toEntity(Object nmsEntityHandle) {
-        final Entity handle = (Entity) nmsEntityHandle;
-        if (handle.world == null) {
+        if (EntityHandle.T.world.raw.get(nmsEntityHandle) == null) {
             // We need this to avoid NPE's for non-spawned entities!
-            org.bukkit.entity.Entity entity = NMSEntity.bukkitEntity.get(handle);
+            org.bukkit.entity.Entity entity = EntityHandle.T.bukkitEntityField.get(nmsEntityHandle);
             if (entity == null) {
-                entity = NMSEntity.createEntity(handle);
-                NMSEntity.bukkitEntity.set(handle, entity);
+                entity = CBCraftEntity.getEntity.invoke(null, Bukkit.getServer(), nmsEntityHandle);
+                EntityHandle.T.bukkitEntityField.set(nmsEntityHandle, entity);
             }
             return entity;
         } else {
-            return handle.getBukkitEntity();
+            return EntityHandle.T.getBukkitEntity.invoke(nmsEntityHandle);
         }
     }
 
@@ -111,13 +99,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.TileEntity")
     public static org.bukkit.World getWorldFromTileEntity(Object nmsTileEntityHandle) {
-        //Used to read NMSTileEntity.world !!!
-        return ((TileEntity) nmsTileEntityHandle).getWorld().getWorld();
+        return toWorld(TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntityHandle));
     }
 
     @ConverterMethod(input="net.minecraft.server.Chunk")
     public static org.bukkit.Chunk toChunk(Object nmsChunkHandle) {
-        return ((Chunk) nmsChunkHandle).bukkitChunk;
+        return ChunkHandle.T.bukkitChunk.get(nmsChunkHandle);
     }
 
     @ConverterMethod
@@ -165,6 +152,7 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher(nmsDataWatcherHandle);
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod
     public static org.bukkit.Material getMaterialFromId(Number materialId) {
         return Material.getMaterial(materialId.intValue());
@@ -177,12 +165,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Item")
     public static org.bukkit.Material toMaterialFromItemHandle(Object nmsItemHandle) {
-        return CraftMagicNumbers.getMaterial((Item) nmsItemHandle);
+        return CraftMagicNumbersHandle.getMaterialFromItem(nmsItemHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.Block")
     public static org.bukkit.Material toMaterialFromBlockHandle(Object nmsBlockHandle) {
-        return CraftMagicNumbers.getMaterial((Block) nmsBlockHandle);
+        return CraftMagicNumbersHandle.getMaterialFromBlock(nmsBlockHandle);
     }
 
     @ConverterMethod
@@ -192,7 +180,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ItemStack")
     public static org.bukkit.inventory.ItemStack toItemStack(Object nmsItemStackHandle) {
-        return CraftItemStack.asCraftMirror((ItemStack) nmsItemStackHandle);
+        return CraftItemStackHandle.asCraftMirror(nmsItemStackHandle);
     }
 
     @ConverterMethod
@@ -202,42 +190,42 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.InventoryCrafting")
     public static CraftingInventory toCraftingInventory(Object nmsInventoryCraftingHandle) {
-        return new CraftInventoryCrafting((InventoryCrafting) nmsInventoryCraftingHandle, null);
+        return CraftInventoryCraftingHandle.createNew(nmsInventoryCraftingHandle, null);
     }
 
     @ConverterMethod(input="net.minecraft.server.PlayerInventory")
     public static org.bukkit.inventory.PlayerInventory toPlayerInventory(Object nmsPlayerInventoryHandle) {
-        return new CraftInventoryPlayer((PlayerInventory) nmsPlayerInventoryHandle);
+        return CraftInventoryPlayerHandle.createNew(nmsPlayerInventoryHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.TileEntityFurnace")
     public static org.bukkit.inventory.FurnaceInventory toFurnaceInventory(Object nmsTileEntityFurnaceHandle) {
-        return new CraftInventoryFurnace((TileEntityFurnace) nmsTileEntityFurnaceHandle);
+        return CraftInventoryFurnaceHandle.createNew(nmsTileEntityFurnaceHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.TileEntityBrewingStand")
     public static org.bukkit.inventory.BrewerInventory toBrewerInventory(Object nmsTileEntityBrewingStandHandle) {
-        return new CraftInventoryBrewer((TileEntityBrewingStand) nmsTileEntityBrewingStandHandle);
+        return CraftInventoryBrewerHandle.createNew(nmsTileEntityBrewingStandHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.InventoryMerchant")
     public static org.bukkit.inventory.MerchantInventory toMerchantInventory(Object nmsInventoryMerchantHandle) {
-        return new CraftInventoryMerchant((InventoryMerchant) nmsInventoryMerchantHandle);
+        return CraftInventoryMerchantHandle.createNew(nmsInventoryMerchantHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.TileEntityBeacon") 
     public static org.bukkit.inventory.BeaconInventory toBeaconInventory(Object nmsTileEntityBeaconHandle) {
-        return new CraftInventoryBeacon((TileEntityBeacon) nmsTileEntityBeaconHandle);
+        return CraftInventoryBeaconHandle.createNew(nmsTileEntityBeaconHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.IInventory")
     public static org.bukkit.inventory.Inventory toInventory(Object nmsIInventoryHandle) {
-        return new CraftInventory((IInventory) nmsIInventoryHandle);
+        return CraftInventoryHandle.createNew(nmsIInventoryHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.Container")
-    public static org.bukkit.inventory.InventoryView toInventoryView(Object nmsContainerHandle)  {
-        return ((Container) nmsContainerHandle).getBukkitView();
+    public static org.bukkit.inventory.InventoryView toInventoryView(Object nmsContainerHandle) {
+        return ContainerHandle.T.getBukkitView.invoke(nmsContainerHandle);
     }
 
     @ConverterMethod
@@ -245,11 +233,14 @@ public class WrapperConversion {
         return inventoryView.getTopInventory();
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.EnumDifficulty")
     public static org.bukkit.Difficulty toDifficulty(Object nmsEnumDifficultyHandle) {
-        return Difficulty.getByValue(((EnumDifficulty) nmsEnumDifficultyHandle).a());
+        Integer id = EnumDifficultyHandle.T.getId.invoke(nmsEnumDifficultyHandle);
+        return Difficulty.getByValue(id.intValue());
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod
     public static org.bukkit.Difficulty fromId(Number id) {
         return Difficulty.getByValue(id.intValue());
@@ -270,11 +261,13 @@ public class WrapperConversion {
         return ParseUtil.parseEnum(org.bukkit.WorldType.class, text, null);
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.EnumGamemode")
     public static org.bukkit.GameMode toGameMode(Object nmsEnumGamemodeHandle) {
         return org.bukkit.GameMode.getByValue(NMSEnumGamemode.egmId.get(nmsEnumGamemodeHandle));
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod
     public static org.bukkit.GameMode getGameModeById(Number id) {
         return org.bukkit.GameMode.getByValue(id.intValue());
@@ -287,13 +280,13 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.EnumHand")
     public static org.bukkit.inventory.MainHand toMainHand(Object nmsEnumHandHandle) {
-        switch((EnumHand) nmsEnumHandHandle) {
-        case OFF_HAND:
-            return MainHand.LEFT;
-        case MAIN_HAND:
+        if (nmsEnumHandHandle == EnumHandHandle.MAIN_HAND.getRaw()) {
             return MainHand.RIGHT;
+        } else if (nmsEnumHandHandle == EnumHandHandle.OFF_HAND.getRaw()) {
+            return MainHand.LEFT;
+        } else {
+            return null;
         }
-        return null;
     }
 
     @ConverterMethod(input="net.minecraft.server.Packet")
@@ -386,6 +379,7 @@ public class WrapperConversion {
         return BlockData.fromMaterialData(data);
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod
     public static BlockData getBlockData(org.bukkit.inventory.ItemStack item) {
         Material type = item.getType();
@@ -395,6 +389,7 @@ public class WrapperConversion {
         return BlockData.fromMaterialData(type, item.getDurability());
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod
     public static BlockData parseBlockData(String text) {
         ItemParser parser = ItemParser.parse(text);
@@ -413,6 +408,7 @@ public class WrapperConversion {
         return new ChunkSection(nmsChunkSectionHandle);
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
         int id = NMSMobEffect.List.getId.invoke(null, nmsMobEffectListHandle);
@@ -426,7 +422,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.MobEffect")
     public static PotionEffect toPotionEffect(Object nmsMobEffectHandle) {
-        return CraftPotionUtil.toBukkit((MobEffect) nmsMobEffectHandle);
+        return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.DataWatcherObject<T>")
@@ -439,12 +435,13 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(nmsDataWatcherItemHandle);
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.MapIcon")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
         // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
         // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
-        MapIcon icon = (MapIcon) nmsMapCursorHandle;
-        return new MapCursor(icon.getX(), icon.getY(), icon.getRotation(), icon.getType(), true);
+        MapIconHandle icon = MapIconHandle.createHandle(nmsMapCursorHandle);
+        return new MapCursor(icon.getX(), icon.getY(), icon.getDirection(), icon.getTypeId(), true);
     }
 
     @ConverterMethod(input="net.minecraft.server.IChatBaseComponent")
@@ -454,14 +451,6 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
-        switch ((EnumItemSlot) enumItemSlotHandle) {
-        case CHEST: return EquipmentSlot.CHEST;
-        case FEET: return EquipmentSlot.FEET;
-        case MAINHAND: return EquipmentSlot.HAND;
-        case OFFHAND: return EquipmentSlot.OFF_HAND;
-        case HEAD: return EquipmentSlot.HEAD;
-        case LEGS: return EquipmentSlot.LEGS;
-        }
-        return null;
+        return EnumItemSlotHandle.createHandle(enumItemSlotHandle).toBukkit();
     }
 }

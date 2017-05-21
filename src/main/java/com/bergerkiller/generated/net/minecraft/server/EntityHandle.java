@@ -239,6 +239,10 @@ public class EntityHandle extends Template.Handle {
         T.collide.invoke(instance, entity);
     }
 
+    public Entity getBukkitEntity() {
+        return T.getBukkitEntity.invoke(instance);
+    }
+
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
     public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
@@ -261,12 +265,12 @@ public class EntityHandle extends Template.Handle {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
 
-    public Entity getBukkitEntity() {
-        return T.bukkitEntity.get(instance);
+    public Entity getBukkitEntityField() {
+        return T.bukkitEntityField.get(instance);
     }
 
-    public void setBukkitEntity(Entity value) {
-        T.bukkitEntity.set(instance, value);
+    public void setBukkitEntityField(Entity value) {
+        T.bukkitEntityField.set(instance, value);
     }
 
     public int getIdField() {
@@ -672,7 +676,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_SILENT = new Template.StaticField.Converted<Key<Boolean>>();
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
-        public final Template.Field.Converted<Entity> bukkitEntity = new Template.Field.Converted<Entity>();
+        public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Converted<List<EntityHandle>> passengers = new Template.Field.Converted<List<EntityHandle>>();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
@@ -770,6 +774,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 
     }
 }

@@ -1,0 +1,5 @@
+package net.minecraft.server;
+
+class Container {
+    public abstract org.bukkit.inventory.InventoryView getBukkitView();
+}

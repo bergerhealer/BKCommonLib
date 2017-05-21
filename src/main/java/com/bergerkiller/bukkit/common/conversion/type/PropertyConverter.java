@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.Converter;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntity;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_11_R1.EntityItem;
 import net.minecraft.server.v1_11_R1.EnumDirection;
@@ -101,8 +101,8 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
         @Override
         public EntityType convertInput(Object value) {
-            if (NMSEntity.T.isInstance(value)) {
-                value = Conversion.toEntity.convert(value);
+            if (EntityHandle.T.isAssignableFrom(value)) {
+                value = WrapperConversion.toEntity(value);
             }
             if (value instanceof Minecart) {
                 return ((Minecart) value).getType();

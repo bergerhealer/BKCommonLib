@@ -1,0 +1,5 @@
+package org.bukkit.craftbukkit;
+
+class CraftWorld {
+    public (Object) net.minecraft.server.WorldServer getHandle();
+}

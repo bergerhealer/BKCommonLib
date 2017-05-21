@@ -10,4 +10,6 @@ class CraftEntity {
     public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (EntityHandle) net.minecraft.server.Entity entity);
 
     public void setHandle((EntityHandle) net.minecraft.server.Entity entity)
+
+    public (Object) net.minecraft.server.Entity getHandle();
 }

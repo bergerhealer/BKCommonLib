@@ -30,6 +30,10 @@ public class CraftEntityHandle extends Template.Handle {
         T.setHandle.invoke(instance, entity);
     }
 
+    public Object getHandle() {
+        return T.getHandle.invoke(instance);
+    }
+
     public EntityHandle getEntityHandle() {
         return T.entityHandle.get(instance);
     }
@@ -44,6 +48,7 @@ public class CraftEntityHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Entity> createCraftEntity = new Template.StaticMethod.Converted<Entity>();
 
         public final Template.Method.Converted<Void> setHandle = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
 
     }
 }

@@ -1,5 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
@@ -23,8 +24,13 @@ public class BlockHandle extends Template.Handle {
         T.entityHitVertical.invoke(instance, world, entity);
     }
 
+    public BlockData getBlockData() {
+        return T.getBlockData.invoke(instance);
+    }
+
     public static final class BlockClass extends Template.Class<BlockHandle> {
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
     }
 }
