@@ -179,8 +179,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (hook == null) {
             controller = new DefaultEntityController();
             controller.bind(this);
-        } else {
+        } else if (hook.hasController()) {
             controller = hook.getController();
+        } else {
+            // This should not occur. Return some dummy controller for now.
+            controller = new DefaultEntityController();
+            controller.bind(this);
         }
         return controller;
     }
@@ -737,11 +741,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         EntityHook hook = EntityHook.get(handle, EntityHook.class);
-        if (hook != null) {
-            EntityController<?> controller = hook.getController();
-            if (controller != null) {
-                return (CommonEntity<T>) controller.getEntity();
-            }
+        if (hook != null && hook.hasController()) {
+            return (CommonEntity<T>) hook.getController().getEntity();
         }
 
         return CommonEntityType.byNMSEntity(handle).createCommonEntity(entity);

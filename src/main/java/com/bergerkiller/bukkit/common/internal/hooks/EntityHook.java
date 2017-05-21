@@ -22,6 +22,10 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.stack = new Throwable();
     }
 
+    public boolean hasController() {
+        return this.controller != null;
+    }
+
     public EntityController<?> getController() {
         if (this.controller == null) {
             throw new RuntimeException("Controller is never allowed to be null!");
@@ -35,73 +39,108 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public boolean onInteractBy:???(EntityHuman entityhuman, EnumHand enumhand)")
     public boolean onInteractBy(Object entityHuman, Object enumHand) {
-        if (checkController()) {
-            return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
-        } else {
-            return base.onInteractBy(entityHuman, enumHand);
+        try {
+            if (checkController()) {
+                return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
+            } else {
+                return base.onInteractBy(entityHuman, enumHand);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
         }
     }
 
     @HookMethod("public boolean damageEntity(DamageSource damagesource, float f)")
     public boolean onDamageEntity(Object damageSource, float damage) {
-        if (checkController()) {
-            return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
-        } else {
-            return base.onDamageEntity(damageSource, damage);
+        try {
+            if (checkController()) {
+                return controller.onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource.getForHandle(damageSource), damage);
+            } else {
+                return base.onDamageEntity(damageSource, damage);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
         }
     }
 
     @HookMethod("public void onTick:???()")
     public void onTick() {
-        if (checkController()) {
-            controller.onTick();
-        } else {
-            base.onTick();
+        try {
+            if (checkController()) {
+                controller.onTick();
+            } else {
+                base.onTick();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod("protected void burn(float i)")
     public void onBurn(float damage) {
-        if (checkController()) {
-            controller.onBurnDamage((double) damage);
-        } else {
-            base.onBurn(damage);
+        try {
+            if (checkController()) {
+                controller.onBurnDamage((double) damage);
+            } else {
+                base.onBurn(damage);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod("public void onPush:???(double d0, double d1, double d2)")
     public void onPush(double dx, double dy, double dz) {
-        if (checkController()) {
-            controller.onPush(dx, dy, dz);
-        } else {
-            base.onPush(dx, dy, dz);
+        try {
+            if (checkController()) {
+                controller.onPush(dx, dy, dz);
+            } else {
+                base.onPush(dx, dy, dz);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod("public void move(EnumMoveType enummovetype, double d0, double d1, double d2)")
     public void onMove(Object enumMoveType, double dx, double dy, double dz) {
-        if (checkController()) {
-            controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
-        } else {
-            base.onMove(enumMoveType, dx, dy, dz);
+        try {
+            if (checkController()) {
+                controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
+            } else {
+                base.onMove(enumMoveType, dx, dy, dz);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod("public void die()")
     public void die() {
-        if (checkController()) {
-            controller.onDie();
-        } else {
-            base.die();
+        try {
+            if (checkController()) {
+                controller.onDie();
+            } else {
+                base.die();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod("public String getName()")
     public String getName() {
-        if (checkController()) {
-            return controller.getLocalizedName();
-        } else {
-            return base.getName();
+        try {
+            if (checkController()) {
+                return controller.getLocalizedName();
+            } else {
+                return base.getName();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return "ERROR";
         }
     }
 
@@ -129,17 +168,22 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public boolean saveEntity:???(NBTTagCompound nbttagcompound)")
     public boolean d(Object tag) {
-        Object handle = this.instance();
-        if (EntityHandle.T.dead.getBoolean(handle)) {
-            return false;
-        }
-        if (EntityHandle.T.vehicle.raw.get(handle) != null) {
-            return false;
-        }
+        try {
+            Object handle = this.instance();
+            if (EntityHandle.T.dead.getBoolean(handle)) {
+                return false;
+            }
+            if (EntityHandle.T.vehicle.raw.get(handle) != null) {
+                return false;
+            }
 
-        CommonTagCompound.create(tag).putValue("id", getSavedName());
-        saveEntity(tag);
-        return true;
+            CommonTagCompound.create(tag).putValue("id", getSavedName());
+            saveEntity(tag);
+            return true;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
 
     /* This key is used for later de-serializing the entity */
@@ -150,21 +194,29 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     @HookMethod("public void collide(Entity entity)")
     public void collide(Object entity) {
-        if (checkController()) {
-            if (controller.onEntityCollision(Conversion.toEntity.convert(entity))) {
+        try {
+            if (checkController()) {
+                if (controller.onEntityCollision(Conversion.toEntity.convert(entity))) {
+                    base.collide(entity);
+                }
+            } else {
                 base.collide(entity);
             }
-        } else {
-            base.collide(entity);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
     @HookMethod(value="public void setItem(int i, ItemStack itemstack)", optional=true)
     public void setInventoryItem(int i, Object itemstack) {
-        if (checkController()) {
-            controller.onItemSet(i, Conversion.toItemStack.convert(itemstack));
-        } else {
-            base.setInventoryItem(i, itemstack);
+        try {
+            if (checkController()) {
+                controller.onItemSet(i, Conversion.toItemStack.convert(itemstack));
+            } else {
+                base.setInventoryItem(i, itemstack);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
