@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import java.util.List;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.Set;
-import java.util.List;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 
 public class ChunkProviderServerHandle extends Template.Handle {

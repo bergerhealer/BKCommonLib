@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_11_R1.IChatBaseComponent;
-
-import org.bukkit.craftbukkit.v1_11_R1.util.CraftChatMessage;
+import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle;
 
 /**
  * Minecraft formatted text represented as chat components, which can be converted between legacy chat messages
@@ -22,7 +21,8 @@ public final class ChatText extends BasicWrapper {
         if (handle == null) {
             return "{}";
         } else {
-            return IChatBaseComponent.ChatSerializer.a((IChatBaseComponent) handle);
+            IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.createHandle(handle);
+            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToJson(bcHandle);
         }
     }
 
@@ -32,7 +32,8 @@ public final class ChatText extends BasicWrapper {
      * @param jsonText to set to
      */
     public final void setJson(String jsonText) {
-        handle = IChatBaseComponent.ChatSerializer.a(jsonText);
+        IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.ChatSerializerHandle.jsonToChatComponent(jsonText);
+        handle = (bcHandle == null) ? null : bcHandle.getRaw();
     }
 
     /**
@@ -44,7 +45,8 @@ public final class ChatText extends BasicWrapper {
         if (handle == null) {
             return "";
         } else {
-            return CraftChatMessage.fromComponent((IChatBaseComponent) handle);
+            IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.createHandle(handle);
+            return CraftChatMessageHandle.fromComponent(bcHandle);
         }
     }
 
@@ -54,7 +56,8 @@ public final class ChatText extends BasicWrapper {
      * @param messageText to set to
      */
     public final void setMessage(String messageText) {
-        handle = CraftChatMessage.fromString(messageText)[0];
+        IChatBaseComponentHandle bcHandle = CraftChatMessageHandle.fromString(messageText)[0];
+        handle = (bcHandle == null) ? null : bcHandle.getRaw();
     }
 
     public static ChatText fromJson(String jsonText) {

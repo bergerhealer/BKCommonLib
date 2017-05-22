@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
 
 public class BiomeBaseHandle extends Template.Handle {
     public static final BiomeBaseClass T = new BiomeBaseClass();

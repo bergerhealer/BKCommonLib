@@ -21,6 +21,7 @@ include /net/minecraft/server/mobeffect.txt
 include /net/minecraft/server/damagesource.txt
 include /net/minecraft/server/explosion.txt
 include /net/minecraft/server/attributes.txt
+include /net/minecraft/server/chat.txt
 include /net/minecraft/server/entity.txt
 include /net/minecraft/server/entity_tracker.txt
 include /net/minecraft/server/entity_subtype.txt
@@ -31,7 +32,6 @@ include /net/minecraft/server/item.txt
 include /net/minecraft/server/foodmeta.txt
 include /net/minecraft/server/block.txt
 include /net/minecraft/server/block_subtype.txt
-include /net/minecraft/server/enumdirection.txt
 include /net/minecraft/server/datawatcher.txt
 include /net/minecraft/server/inventories.txt
 include /net/minecraft/server/itemstack.txt

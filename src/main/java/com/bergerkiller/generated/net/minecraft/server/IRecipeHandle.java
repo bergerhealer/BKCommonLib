@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.inventory.ItemStack;
 
 public class IRecipeHandle extends Template.Handle {
     public static final IRecipeClass T = new IRecipeClass();

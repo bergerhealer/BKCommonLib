@@ -1,21 +1,21 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import org.bukkit.inventory.MainHand;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.entity.Item;
 import java.util.UUID;
 import org.bukkit.Material;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import org.bukkit.inventory.MainHand;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import org.bukkit.entity.HumanEntity;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.HumanEntity;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import java.util.List;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import java.util.Random;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import java.util.Random;
-import java.util.List;
-import org.bukkit.entity.Entity;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();

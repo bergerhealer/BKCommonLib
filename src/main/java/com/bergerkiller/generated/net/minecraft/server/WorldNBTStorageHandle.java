@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import java.io.File;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.io.File;
 
 public class WorldNBTStorageHandle extends IDataManagerHandle {
     public static final WorldNBTStorageClass T = new WorldNBTStorageClass();

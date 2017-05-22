@@ -6,11 +6,12 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_11_R1.EntityItem;
-import net.minecraft.server.v1_11_R1.EnumDirection;
-import net.minecraft.server.v1_11_R1.ItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -29,7 +30,7 @@ import java.util.UUID;
  */
 public abstract class PropertyConverter<T> extends Converter<Object, T> {
 
-    private static final EnumDirection[] paintingFaces = {EnumDirection.DOWN, EnumDirection.UP, EnumDirection.NORTH, EnumDirection.SOUTH, EnumDirection.WEST, EnumDirection.EAST};
+    private static final EnumDirectionHandle[] paintingFaces = {EnumDirectionHandle.DOWN, EnumDirectionHandle.UP, EnumDirectionHandle.NORTH, EnumDirectionHandle.SOUTH, EnumDirectionHandle.WEST, EnumDirectionHandle.EAST};
 
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
@@ -48,22 +49,21 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         @Override
         public Material convertInput(Object value) {
             // Note: this conversion is a cascade. Order matters!
-            if (value instanceof EntityItem) value = ((EntityItem) value).getItemStack();
-            if (value instanceof ItemStack) value = ((ItemStack) value).getItem();
-
-            // First convert to a material directly
-            Material mat = Conversion.toMaterial.convert(value);
-            if (mat != null) {
-                return mat;
+            if (EntityItemHandle.T.isAssignableFrom(value)) {
+                value = EntityItemHandle.T.getItemStack.raw.invoke(value);
             }
-
-            // Ask additional getters
-            if (value instanceof org.bukkit.block.Block) {
-                return ((org.bukkit.block.Block) value).getType();
-            } else if (value instanceof org.bukkit.inventory.ItemStack) {
+            if (ItemStackHandle.T.isAssignableFrom(value)) {
+                value = ItemStackHandle.T.getItem.invoke(value);
+            }
+            if (ItemHandle.T.isAssignableFrom(value)) {
+                return WrapperConversion.toMaterialFromItemHandle(value);
+            }
+            if (value instanceof org.bukkit.inventory.ItemStack) {
                 return ((org.bukkit.inventory.ItemStack) value).getType();
+            } else if (value instanceof org.bukkit.block.Block) {
+                return ((org.bukkit.block.Block) value).getType();
             } else {
-                return null;
+                return Conversion.toMaterial.convert(value);
             }
         }
     };
@@ -72,27 +72,27 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         public Integer convertInput(Object value) {
             if (value instanceof Number) {
                 return ((Number) value).intValue();
-            } else {
-                EnumDirection face = com.bergerkiller.mountiplex.conversion.Conversion.find(EnumDirection.class).convert(value);
-                if (face != null) {
-                    for (int i = 0; i < paintingFaces.length; i++) {
-                        if (paintingFaces[i] == face) {
-                            return i;
-                        }
+            } else if (EnumDirectionHandle.T.isAssignableFrom(value)) {
+                EnumDirectionHandle face = EnumDirectionHandle.createHandle(value);
+                for (int i = 0; i < paintingFaces.length; i++) {
+                    if (paintingFaces[i].equals(face)) {
+                        return i;
                     }
                 }
+                return null;
+            } else {
                 return null;
             }
         }
     };
-    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(EnumDirection.class) {
+    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(EnumDirectionHandle.T.getType()) {
         @Override
         public Object convertInput(Object value) {
             Integer id = toPaintingFacingId.convert(value);
             if (id != null) {
                 final int idInt = id.intValue();
                 if (LogicUtil.isInBounds(paintingFaces, idInt)) {
-                    return paintingFaces[idInt];
+                    return paintingFaces[idInt].getRaw();
                 }
             }
             return null;

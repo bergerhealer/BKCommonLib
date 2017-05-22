@@ -2,8 +2,8 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.Server;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 
 public class CraftEntityHandle extends Template.Handle {

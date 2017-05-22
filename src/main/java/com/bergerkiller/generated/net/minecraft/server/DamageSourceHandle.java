@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Arrow;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.entity.Arrow;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Entity;
 

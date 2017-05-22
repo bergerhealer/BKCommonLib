@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
 public class InventoryEnderChestHandle extends IInventoryHandle {
     public static final InventoryEnderChestClass T = new InventoryEnderChestClass();

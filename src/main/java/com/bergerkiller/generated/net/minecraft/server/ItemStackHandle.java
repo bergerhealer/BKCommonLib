@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 public class ItemStackHandle extends Template.Handle {
     public static final ItemStackClass T = new ItemStackClass();
@@ -19,6 +19,10 @@ public class ItemStackHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public Object getItem() {
+        return T.getItem.invoke(instance);
+    }
 
     public String getName() {
         return T.getName.invoke(instance);
@@ -61,6 +65,7 @@ public class ItemStackHandle extends Template.Handle {
     }
 
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
+        public final Template.Method.Converted<Object> getItem = new Template.Method.Converted<Object>();
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<Integer> getRepairCost = new Template.Method<Integer>();

@@ -1,7 +1,9 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle
+import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 
 class EnumDifficulty {
     public int getId:a();
@@ -28,4 +30,25 @@ class EnumItemSlot {
 class EnumHand {
     enum (EnumHandHandle) EnumHand MAIN_HAND;
     enum (EnumHandHandle) EnumHand OFF_HAND;
+}
+
+class EnumDirection {
+    enum (EnumDirectionHandle) EnumDirection DOWN;
+    enum (EnumDirectionHandle) EnumDirection UP;
+    enum (EnumDirectionHandle) EnumDirection NORTH;
+    enum (EnumDirectionHandle) EnumDirection SOUTH;
+    enum (EnumDirectionHandle) EnumDirection WEST;
+    enum (EnumDirectionHandle) EnumDirection EAST;
+
+    class EnumDirection.EnumAxis {
+        enum (EnumAxisHandle) EnumDirection.EnumAxis X;
+        enum (EnumAxisHandle) EnumDirection.EnumAxis Y;
+        enum (EnumAxisHandle) EnumDirection.EnumAxis Z;
+
+        <code>
+        public int ordinal() {
+            return ((Enum<?>) instance).ordinal();
+        }
+        </code>
+    }
 }

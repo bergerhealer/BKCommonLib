@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import org.bukkit.entity.HumanEntity;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 public class IPlayerFileDataHandle extends Template.Handle {
     public static final IPlayerFileDataClass T = new IPlayerFileDataClass();

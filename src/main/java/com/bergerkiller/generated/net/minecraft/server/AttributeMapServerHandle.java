@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import java.util.Collection;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.Collection;
 
 public class AttributeMapServerHandle extends Template.Handle {
     public static final AttributeMapServerClass T = new AttributeMapServerClass();

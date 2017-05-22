@@ -1,5 +1,7 @@
 package org.bukkit.craftbukkit.util;
 
+import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+
 class LongObjectHashMap {
     public V get(long key);
 
@@ -24,4 +26,10 @@ class CraftMagicNumbers {
     public static (Object) net.minecraft.server.Item getItemFromMaterial:getItem(org.bukkit.Material material);
 
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
+}
+
+class CraftChatMessage {
+    public static String fromComponent((IChatBaseComponentHandle) net.minecraft.server.IChatBaseComponent component);
+
+    public static (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] fromString(String message);
 }

@@ -7,6 +7,12 @@ public class EnumDirectionHandle extends Template.Handle {
     public static final EnumDirectionClass T = new EnumDirectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDirectionHandle.class, "net.minecraft.server.EnumDirection");
 
+    public static final EnumDirectionHandle DOWN = T.DOWN.getSafe();
+    public static final EnumDirectionHandle UP = T.UP.getSafe();
+    public static final EnumDirectionHandle NORTH = T.NORTH.getSafe();
+    public static final EnumDirectionHandle SOUTH = T.SOUTH.getSafe();
+    public static final EnumDirectionHandle WEST = T.WEST.getSafe();
+    public static final EnumDirectionHandle EAST = T.EAST.getSafe();
 
     /* ============================================================================== */
 
@@ -20,6 +26,13 @@ public class EnumDirectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static final class EnumDirectionClass extends Template.Class<EnumDirectionHandle> {
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> DOWN = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> UP = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> NORTH = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> SOUTH = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> WEST = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+        public final Template.EnumConstant.Converted<EnumDirectionHandle> EAST = new Template.EnumConstant.Converted<EnumDirectionHandle>();
+
     }
 
     public static class EnumAxisHandle extends Template.Handle {

@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
-import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.command.SimpleCommandMap;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 
 public class CraftServerHandle extends Template.Handle {
     public static final CraftServerClass T = new CraftServerClass();

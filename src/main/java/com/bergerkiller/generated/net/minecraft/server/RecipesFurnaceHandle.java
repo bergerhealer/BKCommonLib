@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.Map;
+import org.bukkit.inventory.ItemStack;
 
 public class RecipesFurnaceHandle extends Template.Handle {
     public static final RecipesFurnaceClass T = new RecipesFurnaceClass();

@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import org.bukkit.inventory.InventoryView;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.inventory.InventoryView;
 
 public class ContainerHandle extends Template.Handle {
     public static final ContainerClass T = new ContainerClass();

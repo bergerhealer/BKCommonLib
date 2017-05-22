@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import org.bukkit.inventory.CraftingInventory;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.CraftingInventory;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class CraftInventoryCraftingHandle extends Template.Handle {

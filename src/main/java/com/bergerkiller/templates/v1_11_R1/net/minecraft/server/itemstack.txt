@@ -6,6 +6,8 @@ import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 
 class ItemStack {
 
+    public (Object) Item getItem();
+
     public String getName();
 
     public (ItemStackHandle) ItemStack setName:g(String s);

@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
+import org.bukkit.inventory.MerchantInventory;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.inventory.MerchantInventory;
 
 public class CraftInventoryMerchantHandle extends Template.Handle {
     public static final CraftInventoryMerchantClass T = new CraftInventoryMerchantClass();

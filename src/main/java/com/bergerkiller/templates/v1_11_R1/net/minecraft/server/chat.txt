@@ -1,0 +1,11 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+
+class IChatBaseComponent {
+    class IChatBaseComponent.ChatSerializer {
+        public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
+    }
+}

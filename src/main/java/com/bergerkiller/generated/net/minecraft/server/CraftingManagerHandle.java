@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.List;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class CraftingManagerHandle extends Template.Handle {
     public static final CraftingManagerClass T = new CraftingManagerClass();

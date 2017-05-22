@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import java.util.Collection;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.inventory.EquipmentSlot;
+import java.util.Collection;
+import org.bukkit.inventory.ItemStack;
 
 public class EntityLivingHandle extends EntityHandle {
     public static final EntityLivingClass T = new EntityLivingClass();

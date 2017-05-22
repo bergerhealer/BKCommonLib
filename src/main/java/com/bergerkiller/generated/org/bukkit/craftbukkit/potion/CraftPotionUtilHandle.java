@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.potion;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.bukkit.potion.PotionEffect;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.potion.PotionEffect;
 
 public class CraftPotionUtilHandle extends Template.Handle {
     public static final CraftPotionUtilClass T = new CraftPotionUtilClass();

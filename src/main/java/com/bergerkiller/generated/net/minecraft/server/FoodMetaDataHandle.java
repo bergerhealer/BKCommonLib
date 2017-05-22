@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 public class FoodMetaDataHandle extends Template.Handle {
     public static final FoodMetaDataClass T = new FoodMetaDataClass();

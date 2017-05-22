@@ -374,7 +374,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutChat extends NMSPacket {
         public NMSPacketPlayOutChat() {
-            this.addImport("net.md_5.bungee.api.chat.BaseComponent[]");
+            this.addImport("net.md_5.bungee.api.chat.BaseComponent");
             this.chatComponent = nextField("private IChatBaseComponent a");
             this.components = nextField("public BaseComponent[] components");
             this.unknown1 = nextFieldSignature("private byte b");    

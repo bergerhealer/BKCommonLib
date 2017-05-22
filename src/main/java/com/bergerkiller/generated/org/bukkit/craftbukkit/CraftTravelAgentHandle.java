@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.Location;
-import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.World;
+import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
 
 public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     public static final CraftTravelAgentClass T = new CraftTravelAgentClass();

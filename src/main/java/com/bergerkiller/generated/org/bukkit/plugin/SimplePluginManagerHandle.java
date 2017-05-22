@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.org.bukkit.plugin;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.plugin.Plugin;
 import java.util.List;
+import org.bukkit.plugin.Plugin;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class SimplePluginManagerHandle extends Template.Handle {
     public static final SimplePluginManagerClass T = new SimplePluginManagerClass();
