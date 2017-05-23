@@ -47,7 +47,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     private void updateListType(Object elementHandle) {
-        NMSNBT.List.type.set(handle, NMSNBT.getTypeId(elementHandle));
+        NMSNBT.List.type.set(getRawHandle(), NMSNBT.getTypeId(elementHandle));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public int size() {
-        return NMSNBT.List.size.invoke(handle);
+        return NMSNBT.List.size.invoke(getRawHandle());
     }
 
     @Override
@@ -109,7 +109,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value
      */
     public Object getValue(int index) {
-        return nbtToCommon(NMSNBT.getData(NMSNBT.List.get.invoke(handle, index)), false);
+        return nbtToCommon(NMSNBT.getData(NMSNBT.List.get.invoke(getRawHandle(), index)), false);
     }
 
     /**
@@ -212,7 +212,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     @Override
     public CommonTag get(int index) {
-        return CommonTag.create(NMSNBT.List.get.invoke(handle, index));
+        return CommonTag.create(NMSNBT.List.get.invoke(getRawHandle(), index));
     }
 
     /**

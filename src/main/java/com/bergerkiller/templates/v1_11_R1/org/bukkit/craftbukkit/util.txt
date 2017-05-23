@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.util;
 
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
 
 class LongObjectHashMap {
     public V get(long key);
@@ -13,9 +14,34 @@ class LongObjectHashMap {
 }
 
 class LongHashSet {
-    public boolean add(int msw, int lsw);
+    private int elementsCountField:elements;
+    private long[] valuesField:values;
 
-    public void remove(int msw, int lsw);
+    public (LongHashSetHandle) LongHashSet();
+    public (LongHashSetHandle) LongHashSet(int size);
+
+    public (java.util.Iterator<Long>) java.util.Iterator iterator();
+    public int size();
+    public boolean isEmpty();
+
+    public boolean addPair:add(int msw, int lsw);
+    public boolean add(long value);
+
+    public void removePair:remove(int msw, int lsw);
+    public boolean remove(long value);
+
+    public boolean containsPair:contains(int msw, int lsw);
+    public boolean contains(long value);
+
+    public void clear();
+    public long[] toArray();
+
+    public long popFirst();
+    public long[] popAll();
+
+    private int hash(long value);
+    private void rehash();
+    private void rehashResize:rehash(int newCapacity);
 }
 
 class CraftMagicNumbers {

@@ -1,0 +1,15 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle;
+
+class PlayerAbilities {
+    public boolean isInvulnerable;
+    public boolean isFlying;
+    public boolean canFly;
+    public boolean canInstantlyBuild;
+    public boolean mayBuild;
+    public float flySpeed;
+    public float walkSpeed;
+
+    public (PlayerAbilitiesHandle) PlayerAbilities();
+}

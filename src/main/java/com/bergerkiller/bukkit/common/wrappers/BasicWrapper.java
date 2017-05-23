@@ -1,13 +1,14 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
  * A basic implementation for a wrapper class
  */
-public class BasicWrapper {
+public class BasicWrapper<T extends Template.Handle> {
 
-    protected Object handle;
+    protected T handle;
 
     /**
      * Sets the internal handle for this wrapper<br>
@@ -15,7 +16,7 @@ public class BasicWrapper {
      *
      * @param handle to set to
      */
-    protected void setHandle(Object handle) {
+    protected void setHandle(T handle) {
         if (handle == null) {
             throw new IllegalArgumentException("The handle can not be null");
         }
@@ -23,12 +24,12 @@ public class BasicWrapper {
     }
 
     /**
-     * Gets the internal handle from this wrapper
+     * Gets the raw internal handle from this wrapper
      *
      * @return handle
      */
-    public Object getHandle() {
-        return handle;
+    public Object getRawHandle() {
+        return handle.getRaw();
     }
 
     /**
@@ -40,8 +41,24 @@ public class BasicWrapper {
      * @return the handle cast to the type, or NULL if no handle or casting
      * fails
      */
+    public <H> H getRawHandle(Class<H> type) {
+        return CommonUtil.tryCast(handle.getRaw(), type);
+    }
+
+    /**
+     * <b>Deprecated: </b>use {@link #getRawHandle()} instead
+     */
+    @Deprecated
+    public Object getHandle() {
+        return handle.getRaw();
+    }
+
+    /**
+     * <b>Deprecated: </b>use {@link #getRawHandle()} instead
+     */
+    @Deprecated
     public <T> T getHandle(Class<T> type) {
-        return CommonUtil.tryCast(handle, type);
+        return CommonUtil.tryCast(handle.getRaw(), type);
     }
 
     @Override
@@ -52,8 +69,8 @@ public class BasicWrapper {
     @Override
     public boolean equals(Object o) {
         if (o instanceof BasicWrapper) {
-            o = ((BasicWrapper) o).getHandle();
+            o = ((BasicWrapper) o).getRawHandle();
         }
-        return handle != null && handle.equals(o);
+        return handle != null && handle.getRaw().equals(o);
     }
 }

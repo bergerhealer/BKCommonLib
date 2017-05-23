@@ -1,0 +1,29 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle;
+
+class MobSpawnerAbstract {
+    public int spawnDelay;
+    private final (List<MobSpawnerDataHandle>) List<MobSpawnerData> mobs;
+    private (MobSpawnerDataHandle) MobSpawnerData spawnData;
+
+    private int minSpawnDelay;
+    private int maxSpawnDelay;
+    private int spawnCount;
+
+    private (org.bukkit.entity.Entity) Entity entity:i;
+
+    private int maxNearbyEntities;
+    private int requiredPlayerRange;
+    private int spawnRange;
+
+    public void onTick:c();
+
+    public (MinecraftKeyHandle) MinecraftKey getMobName();
+    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey);
+}
+
+class MobSpawnerData {
+
+}

@@ -297,7 +297,7 @@ public class NMSPacketClasses {
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSPlayerAbilities.T.getType());
 
         public CommonPacket newInstance(PlayerAbilities abilities) {
-            return constructor1.newInstance(abilities.getHandle());
+            return constructor1.newInstance(abilities.getRawHandle());
         }
     }
 

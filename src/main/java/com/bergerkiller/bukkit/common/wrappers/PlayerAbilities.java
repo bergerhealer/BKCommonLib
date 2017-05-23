@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerAbilities;
 
 import org.bukkit.entity.Player;
@@ -11,70 +12,70 @@ import org.bukkit.entity.Player;
  * change these abilities for Players. This wrapper class is intended for human
  * entities or non-player-bound processing.
  */
-public class PlayerAbilities extends BasicWrapper {
+public class PlayerAbilities extends BasicWrapper<PlayerAbilitiesHandle> {
 
     public PlayerAbilities() {
-        this(NMSPlayerAbilities.T.newInstance());
+        setHandle(PlayerAbilitiesHandle.createNew());
     }
 
     public PlayerAbilities(Object handle) {
-        setHandle(handle);
+        setHandle(PlayerAbilitiesHandle.createHandle(handle));
     }
 
     public boolean isInvulnerable() {
-        return NMSPlayerAbilities.isInvulnerable.get(handle);
+        return handle.isInvulnerable();
     }
 
     public void setInvulnerable(boolean invulnerable) {
-        NMSPlayerAbilities.isInvulnerable.set(handle, invulnerable);
+        handle.setIsInvulnerable(invulnerable);
     }
 
     public boolean isFlying() {
-        return NMSPlayerAbilities.isFlying.get(handle);
+        return handle.isFlying();
     }
 
     public void setFlying(boolean flying) {
-        NMSPlayerAbilities.isFlying.set(handle, flying);
+        handle.setIsFlying(flying);
     }
 
     public boolean canFly() {
-        return NMSPlayerAbilities.canFly.get(handle);
+        return handle.isCanFly();
     }
 
     public void setCanFly(boolean canFly) {
-        NMSPlayerAbilities.canFly.set(handle, canFly);
+        handle.setCanFly(canFly);
     }
 
     public boolean canInstantlyBuild() {
-        return NMSPlayerAbilities.canInstantlyBuild.get(handle);
+        return handle.isCanInstantlyBuild();
     }
 
     public void setCanInstantlyBuild(boolean canInstantlyBuild) {
-        NMSPlayerAbilities.canInstantlyBuild.set(handle, canInstantlyBuild);
+        handle.setCanInstantlyBuild(canInstantlyBuild);
     }
 
     public boolean canBuild() {
-        return NMSPlayerAbilities.mayBuild.get(handle);
+        return handle.isMayBuild();
     }
 
     public void setCanBuild(boolean canBuild) {
-        NMSPlayerAbilities.mayBuild.set(handle, canBuild);
+        handle.setMayBuild(canBuild);
     }
 
     public float getFlySpeed() {
-        return NMSPlayerAbilities.flySpeed.get(handle);
+        return handle.getFlySpeed();
     }
 
     public void setFlySpeed(float speed) {
-        NMSPlayerAbilities.flySpeed.set(handle, speed);
+        handle.setFlySpeed(speed);
     }
 
     public float getWalkSpeed() {
-        return NMSPlayerAbilities.walkSpeed.get(handle);
+        return handle.getWalkSpeed();
     }
 
     public void setWalkSpeed(float speed) {
-        NMSPlayerAbilities.walkSpeed.set(handle, speed);
+        handle.setWalkSpeed(speed);
     }
 
     /**

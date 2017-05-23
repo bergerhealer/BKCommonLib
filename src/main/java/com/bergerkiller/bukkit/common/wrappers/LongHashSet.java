@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBLongHashSet;
 
 import java.util.Iterator;
@@ -10,62 +11,62 @@ import java.util.NoSuchElementException;
  * HashSet allows storing long keys. Ideally, two int values are merged into one
  * long to store 2D-coordinates.
  */
-public class LongHashSet extends BasicWrapper implements Iterable<Long> {
+public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iterable<Long> {
 
     public LongHashSet() {
-        this.setHandle(CBLongHashSet.constructor1.newInstance());
+        this.setHandle(LongHashSetHandle.createNew());
     }
 
     public LongHashSet(int size) {
-        this.setHandle(CBLongHashSet.constructor2.newInstance(size));
+        this.setHandle(LongHashSetHandle.createNew(size));
     }
 
     public LongHashSet(Object handle) {
-        this.setHandle(handle);
+        this.setHandle(LongHashSetHandle.createHandle(handle));
     }
 
     public Iterator<Long> iterator() {
-        return CBLongHashSet.iterator.invoke(handle);
+        return handle.iterator();
     }
 
     public boolean add(int msw, int lsw) {
-        return ((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).add(msw, lsw);
+        return handle.addPair(msw, lsw);
     }
 
     public boolean add(long value) {
-        return ((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).add(value);
+        return handle.add(value);
     }
 
     public boolean contains(int msw, int lsw) {
-        return ((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).contains(msw, lsw);
+        return handle.containsPair(msw, lsw);
     }
 
     public boolean contains(long value) {
-        return ((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).contains(value);
+        return handle.contains(value);
     }
 
     public void remove(int msw, int lsw) {
-        CBLongHashSet.remove2.invoke(handle, msw, lsw);
+        handle.removePair(msw, lsw);
     }
 
     public boolean remove(long value) {
-        return CBLongHashSet.remove1.invoke(handle, value);
+        return handle.remove(value);
     }
 
     public void clear() {
-        CBLongHashSet.clear.invoke(handle);
+        handle.clear();
     }
 
     public long[] toArray() {
-        return CBLongHashSet.toArray.invoke(handle);
+        return handle.toArray();
     }
 
     public long popFirst() {
-        return ((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).popFirst();
+        return handle.popFirst();
     }
 
     public long[] popAll() {
-        return CBLongHashSet.popAll.invoke(handle);
+        return handle.popAll();
     }
 
     public int hash(long value) {
@@ -73,15 +74,15 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
     }
 
     public void rehash() {
-        CBLongHashSet.rehash0.invoke(handle);
+        handle.rehash();
     }
 
     public void rehash(int newCapacity) {
-        CBLongHashSet.rehash1.invoke(handle, newCapacity);
+        handle.rehashResize(newCapacity);
     }
 
     public boolean isEmpty() {
-        return CBLongHashSet.isEmpty.invoke(handle);
+        return handle.isEmpty();
     }
 
     /**
@@ -90,7 +91,7 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
      * @return size
      */
     public int size() {
-        return Math.max(((org.bukkit.craftbukkit.v1_11_R1.util.LongHashSet) handle).size(), 0);
+        return Math.max(handle.size(), 0);
     }
 
     /**
@@ -113,12 +114,12 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 
         private int index;
         private int lastReturned = -1;
-        private final Object handle;
+        private final LongHashSetHandle handle;
         private final long[] values;
 
         public LongIterator(LongHashSet source) {
             this.handle = source.handle;
-            this.values = CBLongHashSet.values.get(handle);
+            this.values = handle.getValuesField();
             for (index = 0; index < values.length && (values[index] == CBLongHashSet.FREE || values[index] == CBLongHashSet.REMOVED); index++) {
                 // This is just to drive the index forward to the first valid entry
             }
@@ -154,7 +155,7 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 
             if (values[lastReturned] != CBLongHashSet.FREE && values[lastReturned] != CBLongHashSet.REMOVED) {
                 values[lastReturned] = CBLongHashSet.REMOVED;
-                CBLongHashSet.elements.set(handle, CBLongHashSet.elements.get(handle) - 1);
+                handle.setElementsCountField(handle.getElementsCountField() - 1);
             }
         }
     }

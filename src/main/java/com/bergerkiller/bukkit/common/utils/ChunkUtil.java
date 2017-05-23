@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
@@ -24,7 +25,6 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
 import org.bukkit.Material;
@@ -171,8 +171,7 @@ public class ChunkUtil {
         if (section == null) {
             section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y).getRaw();
         }
-
-        NMSChunkSection.setBlockData(section, x, y, z, data);
+        ChunkSectionHandle.T.setBlockData.invoke(section, x, y, z, data);
     }
 
     /**
@@ -380,9 +379,9 @@ public class ChunkUtil {
                     if (canUseLongHashSet && LongHashSetHandle.T.isAssignableFrom(unloadQueue)) {
                         LongHashSetHandle set = LongHashSetHandle.createHandle(unloadQueue);
                         if (unload) {
-                            set.add(x, z);
+                            set.addPair(x, z);
                         } else {
-                            set.remove(x, z);
+                            set.removePair(x, z);
                         }
                         return;
                     }

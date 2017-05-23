@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
 
 /**
@@ -11,14 +12,14 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
  *
  * @param <T> - value type
  */
-public class IntHashMap<T> extends BasicWrapper {
+public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
 
     public IntHashMap() {
-        this.setHandle(NMSIntHashMap.constructor.newInstance());
+        this(NMSIntHashMap.constructor.newInstance());
     }
 
     public IntHashMap(Object handle) {
-        this.setHandle(handle);
+        this.setHandle(IntHashMapHandle.createHandle(handle));
     }
 
     /**
@@ -29,7 +30,7 @@ public class IntHashMap<T> extends BasicWrapper {
      */
     @SuppressWarnings("unchecked")
     public T get(int key) {
-        return (T) NMSIntHashMap.get.invoke(handle, key);
+        return (T) NMSIntHashMap.get.invoke(handle.getRaw(), key);
     }
 
     /**
@@ -39,7 +40,7 @@ public class IntHashMap<T> extends BasicWrapper {
      * @return True if the key is stored, False if not
      */
     public boolean contains(int key) {
-        return NMSIntHashMap.contains.invoke(handle, key);
+        return NMSIntHashMap.contains.invoke(handle.getRaw(), key);
     }
 
     /**
@@ -50,7 +51,7 @@ public class IntHashMap<T> extends BasicWrapper {
      */
     @SuppressWarnings("unchecked")
     public T remove(int key) {
-        return (T) NMSIntHashMap.remove.invoke(handle, key);
+        return (T) NMSIntHashMap.remove.invoke(handle.getRaw(), key);
     }
 
     /**
@@ -60,14 +61,14 @@ public class IntHashMap<T> extends BasicWrapper {
      * @param value Value
      */
     public void put(int key, Object value) {
-        NMSIntHashMap.put.invoke(handle, key, value);
+        NMSIntHashMap.put.invoke(handle.getRaw(), key, value);
     }
 
     /**
      * Clear the map
      */
     public void clear() {
-        NMSIntHashMap.clear.invoke(handle);
+        NMSIntHashMap.clear.invoke(handle.getRaw());
     }
 
     /**
@@ -78,7 +79,7 @@ public class IntHashMap<T> extends BasicWrapper {
      * @return entry at the key, or null if not found
      */
     public Entry<T> getEntry(int key) {
-        Object entryHandle = NMSIntHashMap.getEntry.invoke(handle, key);
+        Object entryHandle = NMSIntHashMap.getEntry.invoke(handle.getRaw(), key);
         if (entryHandle == null) {
             return null;
         } else {
@@ -93,7 +94,7 @@ public class IntHashMap<T> extends BasicWrapper {
      * @return list of hashmap entries
      */
     public List<Entry<T>> entries() {
-        Object[] handles = NMSIntHashMap.entries.get(handle);
+        Object[] handles = NMSIntHashMap.entries.get(handle.getRaw());
         ArrayList<Entry<T>> result = new ArrayList<Entry<T>>(handles.length);
         for (Object entryHandle : handles) {
             if (entryHandle != null) {
@@ -111,7 +112,7 @@ public class IntHashMap<T> extends BasicWrapper {
      */
     @SuppressWarnings("unchecked")
     public List<T> values() {
-        Object[] handles = NMSIntHashMap.entries.get(handle);
+        Object[] handles = NMSIntHashMap.entries.get(handle.getRaw());
         ArrayList<T> result = new ArrayList<T>(handles.length);
         for (Object entryHandle : handles) {
             if (entryHandle != null) {

@@ -10,6 +10,11 @@ include /org/bukkit/craftbukkit/potions.txt
 include /org/bukkit/craftbukkit/util.txt
 include /net/minecraft/server/server.txt
 include /net/minecraft/server/enums.txt
+include /net/minecraft/server/nibblearray.txt
+include /net/minecraft/server/nbt.txt
+include /net/minecraft/server/minecraftkey.txt
+include /net/minecraft/server/mobspawner.txt
+include /net/minecraft/server/inthashmap.txt
 include /net/minecraft/server/window.txt
 include /net/minecraft/server/travelagent.txt
 include /net/minecraft/server/vectors.txt
@@ -22,6 +27,7 @@ include /net/minecraft/server/damagesource.txt
 include /net/minecraft/server/explosion.txt
 include /net/minecraft/server/attributes.txt
 include /net/minecraft/server/chat.txt
+include /net/minecraft/server/player.txt
 include /net/minecraft/server/entity.txt
 include /net/minecraft/server/entity_tracker.txt
 include /net/minecraft/server/entity_subtype.txt

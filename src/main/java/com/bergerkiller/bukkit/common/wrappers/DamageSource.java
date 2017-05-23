@@ -5,7 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 import org.bukkit.entity.Entity;
 
-public class DamageSource extends BasicWrapper {
+public class DamageSource extends BasicWrapper<DamageSourceHandle> {
 
     public static final DamageSource FIRE = new DamageSource("inFire");
     public static final DamageSource LIGHTNING = new DamageSource("lightningBolt");
@@ -26,23 +26,23 @@ public class DamageSource extends BasicWrapper {
 
     @Deprecated
     protected DamageSource(Object damageSource) {
-        setHandle(damageSource);
+        setHandle(DamageSourceHandle.createHandle(damageSource));
     }
 
     protected DamageSource(String name) {
         setHandle(DamageSourceHandle.byName(name));
     }
-    
+
     protected DamageSource(DamageSourceHandle damageSourceHandle) {
-        setHandle(damageSourceHandle.getRaw());
+        setHandle(damageSourceHandle);
     }
 
     public boolean isFireDamage() {
-        return DamageSourceHandle.T.isFireDamage.invoke(handle);
+        return handle.isFireDamage();
     }
 
     public boolean isExplosive() {
-        return DamageSourceHandle.T.isExplosion.invoke(handle);
+        return handle.isExplosion();
     }
 
     /**
@@ -51,7 +51,7 @@ public class DamageSource extends BasicWrapper {
      * @return the Damager Entity, or null if there is none
      */
     public Entity getEntity() {
-        return DamageSourceHandle.T.getEntity.invokeVA(handle);
+        return handle.getEntity();
     }
 
     /**
@@ -62,7 +62,7 @@ public class DamageSource extends BasicWrapper {
      */
     public static DamageSource getForHandle(Object damageSource) {
         for (DamageSource value : values) {
-            if (value.handle == damageSource) {
+            if (value.handle.getRaw() == damageSource) {
                 return value;
             }
         }

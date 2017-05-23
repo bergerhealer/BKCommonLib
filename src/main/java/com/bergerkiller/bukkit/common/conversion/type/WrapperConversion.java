@@ -431,7 +431,7 @@ public class WrapperConversion {
     }
 
     @ConverterMethod(input="net.minecraft.server.DataWatcher.Item<T>")
-    public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
+    public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(nmsDataWatcherItemHandle);
     }
 

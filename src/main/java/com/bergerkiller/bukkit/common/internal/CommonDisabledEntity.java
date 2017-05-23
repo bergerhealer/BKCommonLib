@@ -3,10 +3,10 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 public class CommonDisabledEntity {
-    public static final Object INSTANCE;
+    public static final EntityHandle INSTANCE;
 
     static {
-        INSTANCE = EntityHandle.createNew(null).getRaw();
+        INSTANCE = EntityHandle.createNew(null);
     }
 
     //TODO: Really needed to override the below methods?

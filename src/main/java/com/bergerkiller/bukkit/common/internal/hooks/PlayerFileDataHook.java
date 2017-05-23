@@ -52,7 +52,7 @@ public class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> {
         if (this.controller == null) {
             return this.base.load(entityHuman);
         } else {
-            return this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(entityHuman)).getHandle();
+            return this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(entityHuman)).getRawHandle();
         }
     }
 

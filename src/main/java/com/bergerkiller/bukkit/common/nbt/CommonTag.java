@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.*;
@@ -16,12 +17,12 @@ import java.util.Map.Entry;
  * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float,
  * double, byte[], int[], String</u>
  */
-public class CommonTag extends BasicWrapper {
+public class CommonTag extends BasicWrapper<NBTBaseHandle> {
     protected final NMSNBT.Type info;
 
     public CommonTag(Object data) {
     	info = NMSNBT.Type.find(data);
-        setHandle(info.createHandle(commonToNbt(data)));
+        setHandle(NBTBaseHandle.createHandle(info.createHandle(commonToNbt(data))));
     }
 
     /**
@@ -39,7 +40,7 @@ public class CommonTag extends BasicWrapper {
      * @return Raw data
      */
     protected Object getRawData() {
-        return info.getData(handle);
+        return info.getData(getRawHandle());
     }
 
     /**
@@ -87,17 +88,17 @@ public class CommonTag extends BasicWrapper {
      * @param data to set to
      */
     public void setData(Object data) {
-        info.setData(handle, commonToNbt(data));
+        info.setData(getRawHandle(), commonToNbt(data));
     }
 
     @Override
     public String toString() {
-        return info.toString(handle, 0);
+        return info.toString(getRawHandle(), 0);
     }
 
     @Override
     public CommonTag clone() {
-        return create(NMSNBT.Base.clone.invoke(handle));
+        return create(NMSNBT.Base.clone.invoke(getRawHandle()));
     }
 
     /**
@@ -110,7 +111,7 @@ public class CommonTag extends BasicWrapper {
     	if (!(out instanceof DataOutput)) {
     		out = new DataOutputStream(out);
     	}
-        NMSNBT.StreamTools.Uncompressed.writeTag.invoke(null, getHandle(), out);
+        NMSNBT.StreamTools.Uncompressed.writeTag.invoke(null, getRawHandle(), out);
     }
 
     /**
@@ -132,7 +133,7 @@ public class CommonTag extends BasicWrapper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected static Object commonToNbt(Object data) {
         if (data instanceof CommonTag) {
-            return ((CommonTag) data).getHandle();
+            return ((CommonTag) data).getRawHandle();
         } else if (NMSNBT.Base.T.isInstance(data) || data == null) {
             return data;
         } else if (data instanceof Entry) {

@@ -1,17 +1,16 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_11_R1.DataPaletteBlock;
-import net.minecraft.server.v1_11_R1.IBlockData;
-
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunkSection;
+import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
 
-public class ChunkSection extends BasicWrapper {
-    private final DataPaletteBlock blockIds;
+public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
+    private final DataPaletteBlockHandle blockIds;
 
     public ChunkSection(Object nmsChunkSectionHandle) {
-        setHandle(nmsChunkSectionHandle);
-        this.blockIds = (DataPaletteBlock) NMSChunkSection.getBlockPalette.invoke(getHandle());
+        setHandle(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
+        this.blockIds = handle.getBlockPalette();
     }
 
     /**
@@ -21,7 +20,7 @@ public class ChunkSection extends BasicWrapper {
      * @return True if skylight exists, False if not
      */
     public boolean hasSkyLight() {
-        return NMSChunkSection.getSkyLightNibble.invoke(getHandle()) != null;
+        return handle.getSkyLightArray() != null;
     }
 
     /**
@@ -31,11 +30,11 @@ public class ChunkSection extends BasicWrapper {
      * @return Sky lighting data
      */
     public byte[] getSkyLightData() {
-        Object skyLightNibble = NMSChunkSection.getSkyLightNibble.invoke(getHandle());
+        NibbleArrayHandle skyLightNibble = handle.getSkyLightArray();
         if (skyLightNibble == null) {
             return null;
         } else {
-            return NMSNibbleArray.getArrayCopy(skyLightNibble);
+            return NMSNibbleArray.getArrayCopy(skyLightNibble.getRaw());
         }
     }
 
@@ -45,8 +44,8 @@ public class ChunkSection extends BasicWrapper {
      * @return Block lighting data
      */
     public byte[] getBlockLightData() {
-        Object blockLightNibble = NMSChunkSection.getBlockLightNibble.invoke(getHandle());
-        return NMSNibbleArray.getArrayCopy(blockLightNibble);
+        NibbleArrayHandle blockLightNibble = handle.getBlockLightArray();
+        return NMSNibbleArray.getArrayCopy(blockLightNibble.getRaw());
     }
 
     /**
@@ -58,7 +57,7 @@ public class ChunkSection extends BasicWrapper {
      * @return BlockData
      */
     public BlockData getBlockData(int x, int y, int z) {
-        return BlockData.fromBlockData(blockIds.a(x, y, z));
+        return blockIds.getBlockData(x, y, z);
     }
 
     /**
@@ -70,6 +69,6 @@ public class ChunkSection extends BasicWrapper {
      * @param data to set to
      */
     public void setBlockData(int x, int y, int z, BlockData data) {
-        blockIds.setBlock(x, y, z, (IBlockData) data.getData());
+        blockIds.setBlockData(x, y, z, data);
     }
 }

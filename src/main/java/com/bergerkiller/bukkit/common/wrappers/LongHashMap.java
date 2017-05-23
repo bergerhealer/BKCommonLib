@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -15,7 +16,7 @@ import java.util.Collection;
  *
  * @param <V> - Value type
  */
-public class LongHashMap<V> extends BasicWrapper {
+public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
 
     public LongHashMap() {
         this(new Long2ObjectOpenHashMap<V>());
@@ -31,12 +32,12 @@ public class LongHashMap<V> extends BasicWrapper {
     }
 
     public LongHashMap(Object handle) {
-        this.setHandle(handle);
+        this.setHandle(Template.Handle.createHandle(handle));
     }
 
     @SuppressWarnings("unchecked")
-	private Long2ObjectMap<V> h() {
-    	return (Long2ObjectMap<V>) getHandle();
+    private Long2ObjectMap<V> h() {
+        return (Long2ObjectMap<V>) getRawHandle();
     }
 
     /**

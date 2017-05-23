@@ -28,7 +28,7 @@ public class NBTConversion {
 
     @ConverterMethod(output="T extends net.minecraft.server.NBTBase")
     public static Object toNBTTagHandle(CommonTag commonTag) {
-        return commonTag.getHandle();
+        return commonTag.getRawHandle();
     }
 
     @ConverterMethod

@@ -8,6 +8,8 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 
 class Chunk {
     public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
@@ -34,7 +36,31 @@ class Chunk {
 }
 
 class ChunkSection {
+    private (NibbleArrayHandle) NibbleArray blockLight:emittedLight;
+    private (NibbleArrayHandle) NibbleArray skyLight;
+
+    public boolean isEmpty:a();
+
     public (ChunkSectionHandle) ChunkSection(int y, boolean hasSkyLight);
+
+    public (NibbleArrayHandle) NibbleArray getBlockLightArray:getEmittedLightArray();
+    public (NibbleArrayHandle) NibbleArray getSkyLightArray:getSkyLightArray();
+    public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
+
+    public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
+    public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+
+    public int getSkyLight:b(int x, int y, int z);
+    public void setSkyLight:a(int x, int y, int z, int level);
+    public int getBlockLight:c(int x, int y, int z);
+    public void setBlockLight:b(int x, int y, int z, int level);
+}
+
+class DataPaletteBlock {
+    public (NibbleArrayHandle) NibbleArray exportData(byte[] abyte, (NibbleArrayHandle) NibbleArray nibblearray);
+
+    public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
+    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data) {
 }
 
 class EnumSkyBlock {

@@ -78,7 +78,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @param damage amount
      */
     public boolean onDamage(com.bergerkiller.bukkit.common.wrappers.DamageSource damageSource, double damage) {
-        return this.hook.base.onDamageEntity(damageSource.getHandle(), (float) damage);
+        return this.hook.base.onDamageEntity(damageSource.getRawHandle(), (float) damage);
     }
 
     /**

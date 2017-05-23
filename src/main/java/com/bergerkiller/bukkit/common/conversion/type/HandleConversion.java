@@ -116,7 +116,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.DataWatcher")
     public static Object toDataWatcherHandle(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
-        return dataWatcher.getHandle();
+        return dataWatcher.getRawHandle();
     }
 
     @ConverterMethod(input="net.minecraft.server.Entity", output="net.minecraft.server.DataWatcher")
@@ -198,27 +198,27 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.PlayerAbilities")
     public static Object toPlayerAbilitiesHandle(PlayerAbilities playerAbilities) {
-        return playerAbilities.getHandle();
+        return playerAbilities.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.EntityTracker")
     public static Object toEntityTrackerHandle(EntityTracker entityTracker) {
-        return entityTracker.getHandle();
+        return entityTracker.getRawHandle();
     }
 
     @ConverterMethod(output="it.unimi.dsi.fastutil.longs.Long2ObjectMap<T>")
     public static <T> Object toLongObjectMapHandle(LongHashMap<T> longHashMapWrapper) {
-        return longHashMapWrapper.getHandle();
+        return longHashMapWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="org.bukkit.craftbukkit.util.LongHashSet")
     public static Object toLongHashSetHandle(LongHashSet longHashSetWrapper) {
-        return longHashSetWrapper.getHandle();
+        return longHashSetWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.IntHashMap<T>")
     public static <T> Object toIntHashMapHandle(IntHashMap<T> intHashMapWrapper) {
-        return intHashMapWrapper.getHandle();
+        return intHashMapWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction")
@@ -244,7 +244,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.ChunkSection")
     public static Object toChunkSectionHandle(ChunkSection section) {
-        return section.getHandle();
+        return section.getRawHandle();
     }
 
     @SuppressWarnings("deprecation")
@@ -260,12 +260,12 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.DataWatcherObject<V>")
     public static <V> Object toDataWatcherObjectHandle(DataWatcher.Key<V> keyWrapper) {
-        return keyWrapper.getHandle();
+        return keyWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.DataWatcher.Item<V>")
     public static <V> Object toDataWatcherItemHandle(DataWatcher.Item<V> itemWrapper) {
-        return itemWrapper.getHandle();
+        return itemWrapper.getRawHandle();
     }
 
     @SuppressWarnings("deprecation")
@@ -285,7 +285,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.IChatBaseComponent")
     public static Object toChatBaseComponent(ChatText text) {
-        return text.getHandle();
+        return text.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.EnumItemSlot")

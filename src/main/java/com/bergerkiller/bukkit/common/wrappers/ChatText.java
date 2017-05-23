@@ -7,7 +7,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHa
  * Minecraft formatted text represented as chat components, which can be converted between legacy chat messages
  * and JSON formatted text.
  */
-public final class ChatText extends BasicWrapper {
+public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
 
     private ChatText() {
     }
@@ -21,8 +21,7 @@ public final class ChatText extends BasicWrapper {
         if (handle == null) {
             return "{}";
         } else {
-            IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.createHandle(handle);
-            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToJson(bcHandle);
+            return IChatBaseComponentHandle.ChatSerializerHandle.chatComponentToJson(handle);
         }
     }
 
@@ -32,8 +31,7 @@ public final class ChatText extends BasicWrapper {
      * @param jsonText to set to
      */
     public final void setJson(String jsonText) {
-        IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.ChatSerializerHandle.jsonToChatComponent(jsonText);
-        handle = (bcHandle == null) ? null : bcHandle.getRaw();
+        handle = IChatBaseComponentHandle.ChatSerializerHandle.jsonToChatComponent(jsonText);
     }
 
     /**
@@ -45,8 +43,7 @@ public final class ChatText extends BasicWrapper {
         if (handle == null) {
             return "";
         } else {
-            IChatBaseComponentHandle bcHandle = IChatBaseComponentHandle.createHandle(handle);
-            return CraftChatMessageHandle.fromComponent(bcHandle);
+            return CraftChatMessageHandle.fromComponent(handle);
         }
     }
 
@@ -56,8 +53,7 @@ public final class ChatText extends BasicWrapper {
      * @param messageText to set to
      */
     public final void setMessage(String messageText) {
-        IChatBaseComponentHandle bcHandle = CraftChatMessageHandle.fromString(messageText)[0];
-        handle = (bcHandle == null) ? null : bcHandle.getRaw();
+        handle = CraftChatMessageHandle.fromString(messageText)[0];
     }
 
     public static ChatText fromJson(String jsonText) {
@@ -74,7 +70,7 @@ public final class ChatText extends BasicWrapper {
 
     public static ChatText fromComponent(Object iChatBaseComponentHandle) {
         ChatText text = new ChatText();
-        text.setHandle(iChatBaseComponentHandle);
+        text.setHandle(IChatBaseComponentHandle.createHandle(iChatBaseComponentHandle));
         return text;
     }
 

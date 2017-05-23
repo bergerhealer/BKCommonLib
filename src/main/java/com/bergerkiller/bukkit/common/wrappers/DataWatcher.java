@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -17,7 +19,7 @@ import java.util.List;
  * It is used to store data and to keep track of changes so they can be
  * synchronized
  */
-public class DataWatcher extends BasicWrapper {
+public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
         this(NMSDataWatcher.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
@@ -29,11 +31,11 @@ public class DataWatcher extends BasicWrapper {
      * Entity-accepting constructor.
      */
     public DataWatcher() {
-        this(NMSDataWatcher.constructor1.newInstance(CommonDisabledEntity.INSTANCE));
+        setHandle(DataWatcherHandle.createNew(CommonDisabledEntity.INSTANCE));
     }
 
     public DataWatcher(Object handle) {
-        setHandle(handle);
+        setHandle(DataWatcherHandle.createHandle(handle));
     }
 
     /**
@@ -45,7 +47,7 @@ public class DataWatcher extends BasicWrapper {
      */
     public <V> void set(Key<V> key, V value) {
         if (isWatched(key)) {
-            NMSDataWatcher.set.invoke(handle, key.handle, value);
+            handle.set(key, value);
         } else {
             watch(key, value);
         }
@@ -59,11 +61,12 @@ public class DataWatcher extends BasicWrapper {
      */
     @SuppressWarnings("unchecked")
     public <V> V get(Key<V> key) {
-        Object item = NMSDataWatcher.read.invoke(handle, key.handle);
+        Item<?> item = handle.read(key);
         if (item == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
+        } else {
+            return (V) item.getValue();
         }
-        return (V) NMSDataWatcher.Item.value.get(item);
     }
 
     /**
@@ -73,7 +76,7 @@ public class DataWatcher extends BasicWrapper {
      * @param defaultValue of the watched item
      */
     public <T> void watch(Key<T> key, T defaultValue) {
-        NMSDataWatcher.watch.invoke(handle, key.handle, defaultValue);
+        handle.watch(key, defaultValue);
     }
 
     /**
@@ -83,7 +86,7 @@ public class DataWatcher extends BasicWrapper {
      * @return True if watched, False if not
      */
     public boolean isWatched(Key<?> key) {
-        return NMSDataWatcher.read.invoke(handle, key.handle) != null;
+        return handle.read(key) != null;
     }
 
     /**
@@ -102,11 +105,11 @@ public class DataWatcher extends BasicWrapper {
      * @return Watched objects
      */
     public List<Item<?>> getWatchedItems(boolean unwatch) {
-        List<Object> itemHandles;
+        List<?> itemHandles;
         if (unwatch) {
-            itemHandles = NMSDataWatcher.unwatchAndReturnAllWatched.invoke(handle);
+            itemHandles = (List<?>) DataWatcherHandle.T.unwatchAndReturnAllWatched.raw.invoke(handle.getRaw());
         } else {
-            itemHandles = NMSDataWatcher.returnAllWatched.invoke(handle);
+            itemHandles = (List<?>) DataWatcherHandle.T.returnAllWatched.raw.invoke(handle.getRaw());
         }
         return new ConvertingList<Item<?>>(itemHandles, DuplexConversion.dataWatcherItem);
     }
@@ -117,7 +120,7 @@ public class DataWatcher extends BasicWrapper {
      * @return True if it had changed, False if not
      */
     public boolean isChanged() {
-        return NMSDataWatcher.isChanged.invoke(handle);
+        return handle.isChanged();
     }
 
     /**
@@ -127,7 +130,7 @@ public class DataWatcher extends BasicWrapper {
      * @return True if empty, False if not
      */
     public boolean isEmpty() {
-        return NMSDataWatcher.isEmpty.invoke(handle);
+        return handle.isEmpty();
     }
 
     @Override
@@ -151,10 +154,10 @@ public class DataWatcher extends BasicWrapper {
      * 
      * @param <V> value type bound to the key
      */
-    public static class Key<V> extends BasicWrapper {
+    public static class Key<V> extends BasicWrapper<DataWatcherObjectHandle> {
 
         public Key(Object handle) {
-            setHandle(handle);
+            setHandle(DataWatcherObjectHandle.createHandle(handle));
         }
 
         /**
@@ -164,7 +167,7 @@ public class DataWatcher extends BasicWrapper {
          * @return Serializer Id
          */
         public int getSerializerId() {
-            Object s = NMSDataWatcher.Object2.getSerializer.invoke(this.handle);
+            Object s = NMSDataWatcher.Object2.getSerializer.invoke(this.handle.getRaw());
             return NMSDataWatcher.Registry.getSerializerId.invoke(null, s);
         }
 
@@ -174,7 +177,7 @@ public class DataWatcher extends BasicWrapper {
          * @return Id
          */
         public int getId() {
-            return NMSDataWatcher.Object2.getId.invoke(this.handle);
+            return NMSDataWatcher.Object2.getId.invoke(this.handle.getRaw());
         }
 
         /**
@@ -194,29 +197,29 @@ public class DataWatcher extends BasicWrapper {
      * 
      * @param <V> value type of the item
      */
-    public static class Item<V> extends BasicWrapper {
+    public static class Item<V> extends BasicWrapper<DataWatcherHandle.ItemHandle> {
 
         public Item(Object handle) {
-            setHandle(handle);
+            setHandle(DataWatcherHandle.ItemHandle.createHandle(handle));
         }
 
         @SuppressWarnings("unchecked")
         public Key<V> getKey() {
-            return (Key<V>) NMSDataWatcher.Item.key.get(this.handle);
+            return (Key<V>) NMSDataWatcher.Item.key.get(this.getRawHandle());
         }
 
         public boolean isChanged() {
-            return NMSDataWatcher.Item.changed.get(this.handle);
+            return NMSDataWatcher.Item.changed.get(this.getRawHandle());
         }
 
         @SuppressWarnings("unchecked")
         public V getValue() {
-            return (V) NMSDataWatcher.Item.value.get(this.handle);
+            return (V) NMSDataWatcher.Item.value.get(this.getRawHandle());
         }
 
         public void setValue(V value, boolean changed) {
-            NMSDataWatcher.Item.value.set(this.handle, value);
-            NMSDataWatcher.Item.changed.set(this.handle, changed);
+            NMSDataWatcher.Item.value.set(this.getRawHandle(), value);
+            NMSDataWatcher.Item.changed.set(this.getRawHandle(), changed);
         }
 
         @Override
@@ -236,7 +239,7 @@ public class DataWatcher extends BasicWrapper {
 
         public EntityItem(ExtendedEntity<?> owner, Key<V> key) {
             this.owner = owner;
-            this.keyHandle = (key == null) ? null : key.handle;
+            this.keyHandle = (key == null) ? null : key.getRawHandle();
         }
 
         /**

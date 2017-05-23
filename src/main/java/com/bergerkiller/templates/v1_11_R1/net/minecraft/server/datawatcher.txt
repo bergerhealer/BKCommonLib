@@ -1,8 +1,46 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 
 class DataWatcher {
     private final (EntityHandle) Entity owner:c
+
+    public (DataWatcherHandle) DataWatcher((EntityHandle) Entity entity);
+
+    /*
+     *  } else if (this.d.containsKey(Integer.valueOf(i))) {
+     *      throw new IllegalArgumentException("Duplicate id value for " + i + "!");
+     #  } else if (DataWatcherRegistry.b(datawatcherobject.##METHODNAME##()) < 0) {
+     *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
+     *  } else {
+     */
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:b();
+
+    /*
+     * Same signature as unwatchAndReturnAllWatched, find other function that matches
+     */
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:c();
+
+    private void watch:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
+
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+
+    public T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+    public void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
+
+    public boolean isChanged:a();
+    public boolean isEmpty:d();
+
+    class DataWatcher.Item {
+        private final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
+        private T value:b;
+        private boolean changed:c;
+    }
+}
+
+class DataWatcherObject {
 
 }

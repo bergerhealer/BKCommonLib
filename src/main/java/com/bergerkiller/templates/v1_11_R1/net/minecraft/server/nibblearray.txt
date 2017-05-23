@@ -1,0 +1,7 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
+
+class NibbleArray {
+    public (NibbleArrayHandle) NibbleArray();
+}
