@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.IBlockData;
-
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
+
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 
 public class BlockDataRegistry {
 
@@ -25,7 +25,7 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlock(Object block) {
-        return BlockDataImpl.BY_BLOCK_DATA.get(((Block) block).getBlockData());
+        return BlockDataImpl.BY_BLOCK_DATA.get(BlockHandle.T.getBlockData.raw.invoke(block));
     }
 
     /**
@@ -40,7 +40,7 @@ public class BlockDataRegistry {
             return data;
         }
 
-        IBlockData b = (IBlockData) iBlockData;
+        IBlockDataHandle b = IBlockDataHandle.createHandle(iBlockData);
         BlockDataImpl.BlockDataConstant c = new BlockDataImpl.BlockDataConstant(b);
         BlockDataImpl.BY_BLOCK_DATA.put(b, c);
         return c;
@@ -52,6 +52,7 @@ public class BlockDataRegistry {
      * @param material input
      * @return Immutable BlockData
      */
+    @SuppressWarnings("deprecation")
     public static BlockData fromMaterial(Material material) {
         if (material.isBlock()) {
             return BlockDataImpl.BY_ID[material.getId()];
@@ -66,6 +67,7 @@ public class BlockDataRegistry {
      * @param materialData input MaterialData
      * @return Immutable BlockData
      */
+    @SuppressWarnings("deprecation")
     public static BlockData fromMaterialData(MaterialData materialData) {
         return fromTypeIdAndData(materialData.getItemType().getId(), (int) materialData.getData());
     }
@@ -102,6 +104,6 @@ public class BlockDataRegistry {
      */
     @Deprecated
     public static BlockData fromCombinedId(int combinedId) {
-        return fromBlockData(Block.getByCombinedId(combinedId));
+        return fromBlockData(BlockHandle.T.getByCombinedId.raw.invokeVA(combinedId));
     }
 }

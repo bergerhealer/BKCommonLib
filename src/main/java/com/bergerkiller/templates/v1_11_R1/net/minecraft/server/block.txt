@@ -1,16 +1,48 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.bases.IntVector3
 
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
+    public static final (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
+    public static final (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
+
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 
-    public final (BlockData) IBlockData getBlockData();
+    public int getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
+    public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+    public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
+
+    public (SoundEffectTypeHandle) SoundEffectType getStepSound();
+
+    public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
+    public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);
+    public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
+
+    public final (IBlockDataHandle) IBlockData getBlockData();
+
+    public (IBlockDataHandle) IBlockData fromLegacyData(int data);
+    public int toLegacyData((IBlockDataHandle) IBlockData iblockdata);
+
+    public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
+    public static int getId((BlockHandle) Block block);
+    public static (BlockHandle) Block getById(int id);
+    public static (IBlockDataHandle) IBlockData getByCombinedId(int combinedId);
 }
 
 class Blocks {
     public static final (Object) Block LADDER;
+}
+
+interface IBlockData {
+    public abstract (BlockHandle) Block getBlock();
 }

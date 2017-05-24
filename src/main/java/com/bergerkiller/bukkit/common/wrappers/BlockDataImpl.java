@@ -6,24 +6,15 @@ import java.util.IdentityHashMap;
 import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSMinecraftKey;
-import com.bergerkiller.reflection.net.minecraft.server.NMSSoundEffect;
-
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.Entity;
-import net.minecraft.server.v1_11_R1.Explosion;
-import net.minecraft.server.v1_11_R1.IBlockData;
-import net.minecraft.server.v1_11_R1.World;
+import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 
 public class BlockDataImpl extends BlockData {
-    private Block block; //TODO: Remove
-    private BlockHandle blockHandle;
-    private IBlockData data;
+    private BlockHandle block;
+    private IBlockDataHandle data;
 
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
@@ -35,32 +26,33 @@ public class BlockDataImpl extends BlockData {
     public static final int REGISTRY_SIZE = (1 << (ID_BITS + DATA_BITS));
     public static final int REGISTRY_MASK = (REGISTRY_SIZE - 1);
 
-    public static final BlockDataConstant AIR = new BlockDataConstant(Block.getById(0));
+    public static final BlockDataConstant AIR = new BlockDataConstant(BlockHandle.getById(0));
     public static final BlockDataConstant[] BY_ID = new BlockDataConstant[ID_SIZE];
     public static final BlockDataConstant[] BY_ID_AND_DATA = new BlockDataConstant[REGISTRY_SIZE];
-    public static final IdentityHashMap<IBlockData, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<IBlockData, BlockDataConstant>();
+    public static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
 
     static {
         // Cache all possible Block Ids (0 - 255) and combined Id+Data (0 - 4096)
         Arrays.fill(BY_ID, AIR);
         Arrays.fill(BY_ID_AND_DATA, AIR);
-        for (Object oblock : Block.REGISTRY) {
-            Block b = (Block) oblock;
-            int id = Block.getId(b);
-            BlockDataConstant blockConst = (id == 0) ? AIR : new BlockDataConstant(b);
+        for (Object rawBlock : BlockHandle.REGISTRY) {
+            BlockHandle block = BlockHandle.createHandle(rawBlock);
+            int id = BlockHandle.getId(block);
+            BlockDataConstant blockConst = (id == 0) ? AIR : new BlockDataConstant(block);
             BY_ID[id] = blockConst;
             Arrays.fill(BY_ID_AND_DATA, id << DATA_BITS, (id + 1) << DATA_BITS, blockConst);
         }
 
         // Cache a mapping of all possible IBlockData instances
-        for (Object oblockdata : Block.REGISTRY_ID) {
-            IBlockData blockData = (IBlockData) oblockdata;
-            BlockDataConstant block_const = BY_ID[Block.getId(blockData.getBlock())];
-            if (block_const.getData() != blockData) {
+        RegistryBlockIDHandle idReg = RegistryBlockIDHandle.createHandle(BlockHandle.REGISTRY_ID);
+        for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
+            IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
+            BlockDataConstant block_const = BY_ID[BlockHandle.getId(blockData.getBlock())];
+            if (block_const.getData() != rawIBlockData) {
                 block_const = new BlockDataConstant(blockData);
             }
-            BY_BLOCK_DATA.put(blockData, block_const);
-            BY_ID_AND_DATA[Block.REGISTRY_ID.getId(blockData)] = block_const;
+            BY_BLOCK_DATA.put(rawIBlockData, block_const);
+            BY_ID_AND_DATA[idReg.getId(rawIBlockData)] = block_const;
         }
 
         BY_BLOCK_DATA.put(null, AIR);
@@ -72,11 +64,11 @@ public class BlockDataImpl extends BlockData {
      */
     public static class BlockDataConstant extends BlockDataImpl {
 
-        public BlockDataConstant(Block block) {
+        public BlockDataConstant(BlockHandle block) {
             super(block);
         }
 
-        public BlockDataConstant(IBlockData blockData) {
+        public BlockDataConstant(IBlockDataHandle blockData) {
             super(blockData);
         }
 
@@ -97,57 +89,54 @@ public class BlockDataImpl extends BlockData {
     }
 
     public BlockDataImpl() {
-        this(Block.getById(0));
+        this(BlockHandle.getById(0));
     }
 
-    public BlockDataImpl(IBlockData data) {
+    public BlockDataImpl(IBlockDataHandle data) {
         this(data.getBlock(), data);
     }
 
-    public BlockDataImpl(Block block) {
+    public BlockDataImpl(BlockHandle block) {
         this(block, block.getBlockData());
     }
 
-    public BlockDataImpl(Block block, IBlockData data) {
+    public BlockDataImpl(BlockHandle block, IBlockDataHandle data) {
         this.block = block;
-        this.blockHandle = BlockHandle.createHandle(block);
         this.data = data;
     }
 
     @Override
     public void loadBlock(Object block) {
-        this.block = (Block) block;
-        this.blockHandle = BlockHandle.createHandle(block);
+        this.block = BlockHandle.createHandle(block);
         this.data = this.block.getBlockData();
     }
 
     @Override
     public void loadBlockData(Object iBlockData) {
-        this.data = (IBlockData) iBlockData;
+        this.data = IBlockDataHandle.createHandle(iBlockData);
         this.block = this.data.getBlock();
-        this.blockHandle = BlockHandle.createHandle(this.block);
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void loadMaterialData(Material material, int data) {
-        this.block = Block.getById(material.getId());
-        this.blockHandle = BlockHandle.createHandle(this.block);
+        this.block = BlockHandle.getById(material.getId());
         this.data = this.block.fromLegacyData(data);
     }
 
     @Override
     public final BlockHandle getBlock() {
-        return this.blockHandle;
+        return this.block;
     }
 
     @Override
     public final Object getData() {
-        return this.data;
+        return this.data.getRaw();
     }
 
     @Override
     public final int getTypeId() {
-        return Block.getId(this.block);
+        return BlockHandle.getId(this.block);
     }
 
     @Override
@@ -157,7 +146,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final int getCombinedId() {
-        return Block.getCombinedId(this.data);
+        return BlockHandle.getCombinedId(this.data);
     }
 
     /* ====================================================================== */
@@ -166,49 +155,48 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final String getStepSound() {
-        return NMSMinecraftKey.getCombinedName(NMSSoundEffect.key.get(block.getStepSound().e()));
+        return block.getStepSound().getDefault().toString();
     }
 
     @Override
     public final int getOpacity() {
-        return block.m(data);
+        return this.block.getOpacity(this.data);
     }
 
     @Override
     public final int getEmission() {
-        return block.o(data);
+        return this.block.getEmission(this.data);
     }
 
     @Override
     public final boolean isOccluding() {
-        return block.isOccluding(data);
+        return this.block.isOccluding(this.data);
     }
 
     @Override
     public final boolean isSuffocating() {
-        return block.isOccluding(data);
+        return this.block.isOccluding(this.data);
     }
 
     @Override
     public final boolean isPowerSource() {
-        return block.isPowerSource(data);
+        return this.block.isPowerSource(this.data);
     }
 
     @Override
     public final float getDamageResilience(org.bukkit.entity.Entity source) {
-        return block.a((Entity) HandleConversion.toEntityHandle(source));
+        return this.block.getDamageResillience(source);
     }
 
     @Override
     public final void dropNaturally(org.bukkit.World world, int x, int y, int z, float yield, int chance) {
-        block.dropNaturally((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(x, y, z), data, yield, chance);
+        this.block.dropNaturally(world, new IntVector3(x, y, z), this.data, yield, chance);
     }
 
     @Override
     public final void ignite(org.bukkit.World world, int x, int y, int z) {
-        World worldhandle = (World) CommonNMS.getHandle(world).getRaw();
-        Explosion ex = new Explosion(worldhandle, null, x, y, z, (float) 4.0, true, true);
-        block.wasExploded(worldhandle, new BlockPosition(x, y, z), ex);
+        ExplosionHandle ex = ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true);
+        this.block.ignite(world, new IntVector3(x, y, z), ex);
     }
 
     @Override
@@ -219,6 +207,6 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
-        block.stepOn((World) CommonNMS.getHandle(world).getRaw(), new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z), (Entity) HandleConversion.toEntityHandle(entity));
+        this.block.stepOn(world, blockPosition, entity);
     }
 }

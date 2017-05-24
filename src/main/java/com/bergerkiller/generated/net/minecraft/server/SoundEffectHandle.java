@@ -19,6 +19,16 @@ public class SoundEffectHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public MinecraftKeyHandle getName() {
+        return T.name.get(instance);
+    }
+
+    public void setName(MinecraftKeyHandle value) {
+        T.name.set(instance, value);
+    }
+
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
+        public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
+
     }
 }

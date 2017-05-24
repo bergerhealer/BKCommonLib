@@ -57,7 +57,7 @@ public class BasicWrapper<T extends Template.Handle> {
      * <b>Deprecated: </b>use {@link #getRawHandle()} instead
      */
     @Deprecated
-    public <T> T getHandle(Class<T> type) {
+    public <H> H getHandle(Class<H> type) {
         return CommonUtil.tryCast(handle.getRaw(), type);
     }
 
@@ -69,7 +69,7 @@ public class BasicWrapper<T extends Template.Handle> {
     @Override
     public boolean equals(Object o) {
         if (o instanceof BasicWrapper) {
-            o = ((BasicWrapper) o).getRawHandle();
+            o = ((BasicWrapper<?>) o).getRawHandle();
         }
         return handle != null && handle.getRaw().equals(o);
     }

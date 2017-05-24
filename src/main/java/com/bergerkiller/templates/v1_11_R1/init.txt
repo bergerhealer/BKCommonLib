@@ -21,7 +21,7 @@ include /net/minecraft/server/vectors.txt
 include /net/minecraft/server/methodprofiler.txt
 include /net/minecraft/server/recipes.txt
 include /net/minecraft/server/map.txt
-include /net/minecraft/server/sounds.txt
+include /net/minecraft/server/registry.txt
 include /net/minecraft/server/mobeffect.txt
 include /net/minecraft/server/damagesource.txt
 include /net/minecraft/server/explosion.txt

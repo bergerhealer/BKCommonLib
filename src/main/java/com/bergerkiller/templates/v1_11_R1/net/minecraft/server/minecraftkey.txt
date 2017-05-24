@@ -1,5 +1,20 @@
 package net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+
 class MinecraftKey {
 
+}
+
+class SoundEffectType {
+    public (SoundEffectHandle) SoundEffect getDefault:e();
+}
+
+class SoundEffect {
+    private final (MinecraftKeyHandle) MinecraftKey name:b;
+}
+
+class SoundEffects {
+    public static final (SoundEffectHandle) SoundEffect EXTINGUISH_FIRE:bQ;
 }
