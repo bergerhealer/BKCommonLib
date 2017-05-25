@@ -152,6 +152,9 @@
                                 <generatorAction>
                                     <source>com/bergerkiller/templates/${project.mcversion}/init.txt</source>
                                     <target>com/bergerkiller/generated</target>
+                                    <variables>
+                                        <version>${project.mcversion}</version>
+                                    </variables>
                                 </generatorAction>
                             </generatorActions>
                         </configuration>
