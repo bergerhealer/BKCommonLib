@@ -1,14 +1,16 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_11_R1.PacketPlayInUseEntity.EnumEntityUseAction;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 
 public enum UseAction {
 
-    ATTACK(EnumEntityUseAction.ATTACK), INTERACT(EnumEntityUseAction.INTERACT);
+    ATTACK(EnumEntityUseActionHandle.ATTACK),
+    INTERACT(EnumEntityUseActionHandle.INTERACT),
+    INTERACT_AT(EnumEntityUseActionHandle.INTERACT_AT);
 
-    private final Object handle;
+    private final EnumEntityUseActionHandle handle;
 
-    private UseAction(Object handle) {
+    private UseAction(EnumEntityUseActionHandle handle) {
         this.handle = handle;
     }
 
@@ -18,7 +20,7 @@ public enum UseAction {
      * @return handle
      */
     public Object getHandle() {
-        return this.handle;
+        return this.handle.getRaw();
     }
 
     /**

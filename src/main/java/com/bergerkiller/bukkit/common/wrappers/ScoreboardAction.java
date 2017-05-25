@@ -1,15 +1,15 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import net.minecraft.server.v1_11_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 
 public enum ScoreboardAction {
 
-    CHANGE(EnumScoreboardAction.CHANGE),
-    REMOVE(EnumScoreboardAction.REMOVE);
+    CHANGE(EnumScoreboardActionHandle.CHANGE),
+    REMOVE(EnumScoreboardActionHandle.REMOVE);
 
-    private final Object handle;
+    private final EnumScoreboardActionHandle handle;
 
-    private ScoreboardAction(Object handle) {
+    private ScoreboardAction(EnumScoreboardActionHandle handle) {
         this.handle = handle;
     }
 
@@ -19,7 +19,7 @@ public enum ScoreboardAction {
      * @return handle
      */
     public Object getHandle() {
-        return this.handle;
+        return this.handle.getRaw();
     }
 
     /**

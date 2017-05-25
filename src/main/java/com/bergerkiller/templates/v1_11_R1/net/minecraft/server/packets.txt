@@ -1,0 +1,20 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
+
+class PacketPlayOutScoreboardScore {
+    class PacketPlayOutScoreboardScore.EnumScoreboardAction {
+        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction CHANGE;
+        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction REMOVE;
+    }
+}
+
+
+class PacketPlayInUseEntity {
+    class PacketPlayInUseEntity.EnumEntityUseAction {
+        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT;
+        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction ATTACK;
+        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT_AT;
+    }
+}

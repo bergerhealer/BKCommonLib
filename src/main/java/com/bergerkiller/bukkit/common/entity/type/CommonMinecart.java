@@ -12,6 +12,8 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 /**
@@ -33,7 +35,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     public double getDamage() {
-        return getHandle(net.minecraft.server.v1_11_R1.EntityMinecartAbstract.class).getDamage();
+        return entity.getDamage();
     }
 
     public Vector getDerailedVelocityMod() {
@@ -109,7 +111,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @return Minecart type ID
      */
     public int getMinecartType() {
-        return getHandle(net.minecraft.server.v1_11_R1.EntityMinecartAbstract.class).getType();
+        return EntityMinecartAbstractHandle.T.getType.invoke(getHandle());
     }
 
     /**
@@ -242,7 +244,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
     @Override
     public boolean isVehicle() {
-        return getHandle() instanceof net.minecraft.server.v1_11_R1.EntityMinecartRideable;
+        return this.handle.isInstanceOf(EntityMinecartRideableHandle.T);
     }
 
     /**

@@ -36,6 +36,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
@@ -74,7 +75,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.World")
     public static org.bukkit.World toWorld(Object nmsWorldHandle) {
-        return ((net.minecraft.server.v1_11_R1.World) nmsWorldHandle).getWorld();
+        return (org.bukkit.World) WorldHandle.T.getWorld.raw.invoke(nmsWorldHandle);
     }
 
     @ConverterMethod

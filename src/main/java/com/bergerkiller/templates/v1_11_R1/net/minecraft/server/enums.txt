@@ -4,6 +4,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
 
 class EnumDifficulty {
     public int getId:a();
@@ -51,4 +52,12 @@ class EnumDirection {
         }
         </code>
     }
+}
+
+class EnumMoveType {
+    enum (EnumMoveTypeHandle) EnumMoveType SELF;
+    enum (EnumMoveTypeHandle) EnumMoveType PLAYER;
+    enum (EnumMoveTypeHandle) EnumMoveType PISTON;
+    enum (EnumMoveTypeHandle) EnumMoveType SHULKER_BOX;
+    enum (EnumMoveTypeHandle) EnumMoveType SHULKER;
 }

@@ -13,6 +13,7 @@
 #include /net/minecraft/server/nibblearray.txt
 #include /net/minecraft/server/nbt.txt
 #include /net/minecraft/server/minecraftkey.txt
+#include /net/minecraft/server/packets.txt
 #include /net/minecraft/server/mobspawner.txt
 #include /net/minecraft/server/inthashmap.txt
 #include /net/minecraft/server/window.txt

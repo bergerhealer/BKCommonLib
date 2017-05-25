@@ -54,3 +54,13 @@ class EntityItem extends Entity {
 
     public void setItemStack((ItemStackHandle) ItemStack itemstack);
 }
+
+class EntityMinecartAbstract extends Entity {
+     public float getDamage();
+     public void setDamage(float damage);
+     public int getType();
+}
+
+class EntityMinecartRideable extends EntityMinecartAbstract {
+
+}
