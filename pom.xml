@@ -48,6 +48,16 @@
 
     </repositories>
 
+    <pluginRepositories>
+        
+        <!-- Repo for access to Mountiplex -->
+        <pluginRepository>
+            <id>mgdev-repo</id>
+            <url>https://maven.mg-dev.eu</url>
+        </pluginRepository>
+
+    </pluginRepositories>
+
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -55,6 +65,7 @@
             <version>${project.bversion}-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
