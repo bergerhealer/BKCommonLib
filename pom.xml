@@ -29,6 +29,12 @@
           <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
 
+        <!-- Repo for access to Mountiplex -->
+        <repository>
+            <id>mgdev-repo</id>
+            <url>https://maven.mg-dev.eu</url>
+        </repository>
+
         <!-- Repo for access to Objenesis -->
         <repository>
             <id>mvnrepository</id>
