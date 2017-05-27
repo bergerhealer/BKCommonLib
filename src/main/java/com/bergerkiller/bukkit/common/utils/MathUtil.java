@@ -3,9 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_11_R1.TrigMath;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+
+import com.bergerkiller.bukkit.common.internal.CommonTrigMath;
 
 /**
  * Multiple Math utilities to compare and calculate using Vectors and raw values
@@ -198,7 +199,7 @@ public class MathUtil {
      * @return inverse tangent angle in degrees
      */
     public static float atan(double value) {
-        return RADTODEG * (float) TrigMath.atan(value);
+        return RADTODEG * (float) CommonTrigMath.atan(value);
     }
 
     /**
@@ -209,7 +210,7 @@ public class MathUtil {
      * @return inverse tangent 2 angle in degrees
      */
     public static float atan2(double y, double x) {
-        return RADTODEG * (float) TrigMath.atan2(y, x);
+        return RADTODEG * (float) CommonTrigMath.atan2(y, x);
     }
 
     /**

@@ -5,6 +5,7 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
@@ -12,17 +13,33 @@ import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 
 class Chunk {
+    private final (ChunkSectionHandle[]) ChunkSection[] sections;
+    public final (WorldHandle) World world;
+    public final int locX;
+    public final int locZ;
     public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
     public final (Object) List<Entity>[] entitySlices;
     public org.bukkit.Chunk bukkitChunk;
 
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 
+    public (BlockData) IBlockData setBlockData:a((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata);
+
     public void addEntity:a((EntityHandle) Entity entity);
 
     public int getHeight:b(int x, int z)
 
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
+
+    public int getTopSliceY:g();
+
+    public byte[] getBiomeIndex();
+
+    public void addEntities();
+
+    public void loadNearby((Object) IChunkProvider iChunkProviderRaw, (Object) ChunkGenerator chunkGeneratorRaw, boolean newChunk);
+
+    public boolean checkCanSave:a(boolean isNotAutosave);
 
     <code>
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
