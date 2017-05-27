@@ -5,6 +5,13 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 
 class ItemStack {
+    public static final (ItemStackHandle) ItemStack EMPTY_ITEM:a;
+    private int amountField:count;
+    private (org.bukkit.Material) Item typeField:item;
+    private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
+    private int durabilityField:damage;
+
+    public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);
 
     public (Object) Item getItem();
 
@@ -23,6 +30,8 @@ class ItemStack {
     public (CommonTagCompound) NBTTagCompound getTag();
 
     public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+    public (ItemStackHandle) ItemStack cloneAndSubtract(int n);
 
     <code>
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {

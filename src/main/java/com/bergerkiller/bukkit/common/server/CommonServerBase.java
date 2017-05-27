@@ -1,8 +1,13 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +15,27 @@ import java.util.Collection;
 import java.util.Locale;
 
 public abstract class CommonServerBase implements CommonServer {
+    public static final Class<?> SERVER_CLASS = findServerClass();
+
+    private static final Class<?> findServerClass() {
+        // On a live-running server, this method is all that will be needed
+        if (Bukkit.getServer() != null) {
+            return Bukkit.getServer().getClass();
+        }
+
+        // Attempt to figure out the Bukkit class type by inspecting the Main class (CraftBukkit)
+        Class<?> cbMailClass = CommonUtil.getClass("org.bukkit.craftbukkit.Main");
+        if (cbMailClass != null) {
+            for (Class<?> type : ASMUtil.findUsedTypes(cbMailClass)) {
+                if (Server.class.isAssignableFrom(type)) {
+                    return type;
+                }
+            }
+        }
+
+        // Not found. Unsupported server.
+        return null;
+    }
 
     @Override
     public Collection<String> getLoadableWorlds() {
@@ -72,6 +98,11 @@ public abstract class CommonServerBase implements CommonServer {
         }
         // Unknown???
         return null;
+    }
+
+    @Override
+    public boolean isCompatible() {
+        return Common.TEMPLATE_RESOLVER.isSupported(this.getMinecraftVersion());
     }
 
     @Override

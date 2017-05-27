@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Common;
 
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,8 +91,21 @@ public class UnknownServer extends CommonServerBase {
     public void postInit() {
         // Hardcode the NMS and CB paths at compilation time
         // UnknownServer is only used during testing phase when no server is available, so it's fine
-        NMS_ROOT_VERSIONED = net.minecraft.server.v1_11_R1.MinecraftServer.class.getPackage().getName();
-        CB_ROOT_VERSIONED = org.bukkit.craftbukkit.v1_11_R1.CraftServer.class.getPackage().getName();
+        if (CommonServerBase.SERVER_CLASS != null) {
+            CB_ROOT_VERSIONED = CommonServerBase.SERVER_CLASS.getPackage().getName();
+            NMS_ROOT_VERSIONED = "net.minecraft.server" + CB_ROOT_VERSIONED.substring(Common.CB_ROOT.length());
+            for (Constructor<?> c : CommonServerBase.SERVER_CLASS.getDeclaredConstructors()) {
+                for (Class<?> type : c.getParameterTypes()) {
+                    if (type.getName().startsWith(Common.NMS_ROOT)) {
+                        NMS_ROOT_VERSIONED = type.getPackage().getName();
+                        break;
+                    }
+                }
+            }
+        } else {
+            CB_ROOT_VERSIONED = Common.CB_ROOT;
+            NMS_ROOT_VERSIONED = Common.NMS_ROOT;
+        }
     }
 
 }

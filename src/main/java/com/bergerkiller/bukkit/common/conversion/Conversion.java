@@ -142,7 +142,7 @@ public class Conversion {
 
     @SuppressWarnings("unchecked")
     private static InputConverter<Object> getConverterToHandle(String className) {
-        return (InputConverter<Object>) getConverterTo(CommonUtil.getClass(className));
+        return (InputConverter<Object>) getConverterTo(CommonUtil.getClass(className, false));
     }
 
     @SuppressWarnings("unchecked")

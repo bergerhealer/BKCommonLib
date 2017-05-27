@@ -219,7 +219,7 @@ public class NBTUtil {
      * @param data to load into the blockState
      */
     public static void loadBlockState(BlockState blockState, CommonTagCompound data) {
-        NMSTileEntity.load.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getHandle());
+        NMSTileEntity.load.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getRawHandle());
     }
 
     /**
@@ -243,7 +243,7 @@ public class NBTUtil {
         if (data == null) {
             data = new CommonTagCompound();
         }
-        NMSTileEntity.save.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getHandle());
+        NMSTileEntity.save.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getRawHandle());
         return data;
     }
 }

@@ -32,8 +32,13 @@ public class CraftBukkitServer extends CommonServerBase {
 
     @Override
     public boolean init() {
+        // No Bukkit server class, can't continue
+        if (SERVER_CLASS == null) {
+            return false;
+        }
+
         // Find out what package version is used
-        String serverPath = Bukkit.getServer().getClass().getName();
+        String serverPath = SERVER_CLASS.getName();
         if (!serverPath.startsWith(Common.CB_ROOT)) {
             return false;
         }
@@ -94,11 +99,6 @@ public class CraftBukkitServer extends CommonServerBase {
     @Override
     public List<Integer> getEntityRemoveQueue(Player player) {
         return CommonNMS.getHandle(player).getRemoveQueue();
-    }
-
-    @Override
-    public boolean isCompatible() {
-        return PACKAGE_VERSION.isEmpty() || PACKAGE_VERSION.equals(Common.DEPENDENT_MC_VERSION);
     }
 
     @Override

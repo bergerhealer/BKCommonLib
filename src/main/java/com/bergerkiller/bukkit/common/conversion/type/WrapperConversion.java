@@ -34,6 +34,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -179,9 +180,13 @@ public class WrapperConversion {
         return ParseUtil.parseMaterial(text, null);
     }
 
-    @ConverterMethod(input="net.minecraft.server.ItemStack")
+    @ConverterMethod(input="net.minecraft.server.ItemStack", acceptsNull = true)
     public static org.bukkit.inventory.ItemStack toItemStack(Object nmsItemStackHandle) {
-        return CraftItemStackHandle.asCraftMirror(nmsItemStackHandle);
+        if (nmsItemStackHandle == null || ItemStackHandle.T.typeField.raw.get(nmsItemStackHandle) == null) {
+            return null;
+        } else {
+            return CraftItemStackHandle.asCraftMirror(nmsItemStackHandle);
+        }
     }
 
     @ConverterMethod

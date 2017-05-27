@@ -2,6 +2,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -15,9 +17,9 @@ import org.bukkit.entity.Entity;
 public class NMSDataWatcher {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher");
 
-    public static final TranslatorFieldAccessor<Entity> owner = T.selectField("private final Entity c").translate(DuplexConversion.entity);
+    public static final TranslatorFieldAccessor<Entity> owner = DataWatcherHandle.T.owner.raw.toFieldAccessor().translate(DuplexConversion.entity);
 
-    public static final MethodAccessor<Void> watch = T.selectMethod("private <T> void registerObject(DataWatcherObject<T> datawatcherobject, Object t0)");
+    public static final MethodAccessor<Void> watch = DataWatcherHandle.T.watch.raw.toMethodAccessor();
 
     /*
      *  } else if (this.d.containsKey(Integer.valueOf(i))) {
@@ -26,21 +28,21 @@ public class NMSDataWatcher {
      *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
      *  } else {
      */
-    public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = T.selectMethod("public List<DataWatcher.Item<?>> b()");
+    public static final MethodAccessor<List<Object>> unwatchAndReturnAllWatched = DataWatcherHandle.T.unwatchAndReturnAllWatched.raw.toMethodAccessor();
     
     /*
      * Same signature as unwatchAndReturnAllWatched, find other function that matches
      */
-    public static final MethodAccessor<List<Object>> returnAllWatched = T.selectMethod("public List<DataWatcher.Item<?>> c()");
+    public static final MethodAccessor<List<Object>> returnAllWatched = DataWatcherHandle.T.returnAllWatched.raw.toMethodAccessor();
 
-    public static final MethodAccessor<Object> read = T.selectMethod("private <T> DataWatcher.Item<T> c(DataWatcherObject<T> datawatcherobject)");
+    public static final MethodAccessor<Object> read = DataWatcherHandle.T.read.raw.toMethodAccessor();
 
-    public static final MethodAccessor<Object> get = T.selectMethod("public <T> T get(DataWatcherObject<T> datawatcherobject)");
-    public static final MethodAccessor<Void> set = T.selectMethod("public <T> void set(DataWatcherObject<T> datawatcherobject, T t0)");
-    
-    public static final MethodAccessor<Boolean> isChanged = T.selectMethod("public boolean a()");
-    public static final MethodAccessor<Boolean> isEmpty = T.selectMethod("public boolean d()");
-    public static final SafeConstructor<?> constructor1 = T.getConstructor(NMSEntity.T.getType());
+    public static final MethodAccessor<Object> get = DataWatcherHandle.T.get.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> set = DataWatcherHandle.T.set.raw.toMethodAccessor();
+
+    public static final MethodAccessor<Boolean> isChanged = DataWatcherHandle.T.isChanged.toMethodAccessor();
+    public static final MethodAccessor<Boolean> isEmpty = DataWatcherHandle.T.isEmpty.toMethodAccessor();
+    public static final SafeConstructor<?> constructor1 = T.getConstructor(EntityHandle.T.getType());
 
     /**
      * @deprecated Use com.bergerkiller.bukkit.common.wrappers.DataWatcher

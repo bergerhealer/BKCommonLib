@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
@@ -9,10 +8,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.proxies.InventoryProxy;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -30,6 +30,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -76,13 +77,15 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.ItemStack")
+    @ConverterMethod(output="net.minecraft.server.ItemStack", acceptsNull = true)
     public static Object toItemStackHandle(org.bukkit.inventory.ItemStack itemStack) {
-        if (CraftItemStackHandle.T.isAssignableFrom(itemStack)) {
+        if (itemStack == null) {
+            return ItemStackHandle.EMPTY_ITEM.getRaw();
+        } else if (CraftItemStackHandle.T.isAssignableFrom(itemStack)) {
             return CraftItemStackHandle.T.handle.get(itemStack);
         } else {
             org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) itemStack;
-            Object rval = Bukkit.getServer() != null ? CraftItemStackHandle.asNMSCopy(stack) : null;
+            Object rval = Common.IS_TEST_MODE ? null : CraftItemStackHandle.asNMSCopy(stack);
             if (rval == null) {
                 rval = NMSItemStack.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
             }
@@ -101,8 +104,8 @@ public class HandleConversion {
     }
 
     @ConverterMethod(output="net.minecraft.server.IInventory")
-    public static Object toIInventoryHandle(InventoryProxy proxy) {
-        return proxy.getProxyBase();
+    public static Object toIInventoryHandle(InventoryBase inventory) {
+        return inventory.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.IInventory")

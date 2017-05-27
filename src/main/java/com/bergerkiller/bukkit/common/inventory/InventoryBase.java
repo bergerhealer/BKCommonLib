@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import com.bergerkiller.bukkit.common.bases.IInventoryBase;
-import com.bergerkiller.bukkit.common.proxies.CraftInventoryProxy;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
+import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +12,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -23,8 +25,43 @@ import java.util.ListIterator;
  * up-to-date with the latest bugfixes and additions.
  */
 public abstract class InventoryBase implements Inventory {
+    private final Object nmsProxy;
+    private final Inventory cbProxy;
+    private int maxstacksize;
 
-    private final CraftInventoryProxy proxy = new CraftInventoryProxy(new IInventoryBase(), this);
+    static {
+        // Verify all Inventory interface methods are implemented by this InventoryBase
+        for (Method m : Inventory.class.getDeclaredMethods()) {
+            try {
+                InventoryBase.class.getDeclaredMethod(m.getName(), m.getParameterTypes());
+            } catch (Throwable t) {
+                throw new RuntimeException("Method " + m.toString() + " is not implemented in InventoryBase");
+            }
+        }
+    }
+
+    /*
+     * - nmsProxy implements a basic net.minecraft.server.IInventory, but redirects
+     * all calls to the abstract functions found in here.
+     * - cbProxy has the Inventory implementation and will call nmsProxy to do item
+     * transactions.
+     * - this InventoryBase proxies all non-abstract functions to call the cbProxy.
+     * This handles things like merging, splitting, etc.
+     */
+    public InventoryBase() {
+        this.nmsProxy = new IInventoryProxyHook(this).createInstance(IInventoryHandle.T.getType());
+        this.cbProxy = CraftInventoryHandle.createNew(this.nmsProxy);
+        this.maxstacksize = 64;
+    }
+
+    /**
+     * Gets the raw underlying net.minecraft.server.IInventory that is used to proxy item transactions
+     * 
+     * @return raw IInventory handle
+     */
+    public final Object getRawHandle() {
+        return this.nmsProxy;
+    }
 
     @Override
     public abstract int getSize();
@@ -37,25 +74,12 @@ public abstract class InventoryBase implements Inventory {
 
     @Override
     public ItemStack[] getContents() {
-        // Overridden because the NMS IInventory is used in CraftInventory
-        final int size = getSize();
-        ItemStack[] items = new ItemStack[size];
-        for (int i = 0; i < size; i++) {
-            items[i] = ItemUtil.cloneItem(getItem(i));
-        }
-        return items;
+        return this.cbProxy.getContents();
     }
 
     @Override
     public void setContents(ItemStack[] items) {
-        // Overridden because the NMS IInventory is used in CraftInventory
-        final int size = getSize();
-        if (size < items.length) {
-            throw new IllegalArgumentException("Invalid inventory size; expected " + size + " or less");
-        }
-        for (int i = 0; i < size; i++) {
-            setItem(i, i >= items.length ? null : items[i]);
-        }
+        this.cbProxy.setContents(items);
     }
 
     @Override
@@ -80,161 +104,167 @@ public abstract class InventoryBase implements Inventory {
 
     @Override
     public List<HumanEntity> getViewers() {
-        return proxy.super_getViewers();
+        return Collections.emptyList();
     }
 
     @Override
     public int getMaxStackSize() {
-        return proxy.super_getMaxStackSize();
+        return this.maxstacksize;
     }
 
     @Override
     public void setMaxStackSize(int size) {
-        proxy.super_setMaxStackSize(size);
+        this.maxstacksize = size;
     }
 
     @Override
     public HashMap<Integer, ItemStack> addItem(ItemStack... items) throws IllegalArgumentException {
-        return proxy.super_addItem(items);
+        return cbProxy.addItem(items);
     }
 
     @Override
+    @Deprecated
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        return proxy.super_all(materialId);
+        return cbProxy.all(materialId);
     }
 
     @Override
     public HashMap<Integer, ? extends ItemStack> all(Material material) throws IllegalArgumentException {
-        return proxy.super_all(material);
+        return cbProxy.all(material);
     }
 
     @Override
     public HashMap<Integer, ? extends ItemStack> all(ItemStack item) {
-        return proxy.super_all(item);
+        return cbProxy.all(item);
     }
 
     @Override
     public void clear() {
-        proxy.super_clear();
+        cbProxy.clear();
     }
 
     @Override
     public void clear(int index) {
-        proxy.super_clear(index);
+        cbProxy.clear(index);
     }
 
     @Override
+    @Deprecated
     public boolean contains(int materialId) {
-        return proxy.super_contains(materialId);
+        return cbProxy.contains(materialId);
     }
 
     @Override
     public boolean contains(Material material) throws IllegalArgumentException {
-        return proxy.super_contains(material);
+        return cbProxy.contains(material);
     }
 
     @Override
     public boolean contains(ItemStack item) {
-        return proxy.super_contains(item);
+        return cbProxy.contains(item);
     }
 
     @Override
+    @Deprecated
     public boolean contains(int materialId, int amount) {
-        return proxy.super_contains(materialId, amount);
+        return cbProxy.contains(materialId, amount);
     }
 
     @Override
     public boolean contains(Material material, int amount) throws IllegalArgumentException {
-        return proxy.super_contains(material, amount);
+        return cbProxy.contains(material, amount);
     }
 
     @Override
     public boolean contains(ItemStack item, int amount) {
-        return proxy.super_contains(item, amount);
+        return cbProxy.contains(item, amount);
     }
 
     @Override
     public boolean containsAtLeast(ItemStack item, int amount) {
-        return proxy.super_containsAtLeast(item, amount);
+        return cbProxy.containsAtLeast(item, amount);
     }
 
     @Override
+    @Deprecated
     public int first(int materialId) {
-        return proxy.super_first(materialId);
+        return cbProxy.first(materialId);
     }
 
     @Override
     public int first(Material material) throws IllegalArgumentException {
-        return proxy.super_first(material);
+        return cbProxy.first(material);
     }
 
     @Override
     public int first(ItemStack item) {
-        return proxy.super_first(item);
+        return cbProxy.first(item);
     }
 
     @Override
     public int firstEmpty() {
-        return proxy.super_firstEmpty();
+        return cbProxy.firstEmpty();
     }
 
     @Override
     public ListIterator<ItemStack> iterator() {
-        return proxy.super_iterator();
+        return cbProxy.iterator();
     }
 
     @Override
     public ListIterator<ItemStack> iterator(int index) {
-        return proxy.super_iterator(index);
+        return cbProxy.iterator(index);
     }
 
     @Override
+    @Deprecated
     public void remove(int materialId) {
-        proxy.super_remove(materialId);
+        cbProxy.remove(materialId);
     }
 
     @Override
     public void remove(Material material) throws IllegalArgumentException {
-        proxy.super_remove(material);
+        cbProxy.remove(material);
     }
 
     @Override
     public void remove(ItemStack item) {
-        proxy.super_remove(item);
+        cbProxy.remove(item);
     }
 
     @Override
     public HashMap<Integer, ItemStack> removeItem(ItemStack... items) throws IllegalArgumentException {
-        return proxy.super_removeItem(items);
+        return cbProxy.removeItem(items);
     }
 
     @Override
     public int hashCode() {
-        return proxy.super_hashCode();
+        return cbProxy.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return proxy.super_equals(obj);
+        return cbProxy.equals(obj);
     }
 
     @Override
     public String toString() {
-        return proxy.super_toString();
+        return cbProxy.toString();
     }
 
     @Override
     public Location getLocation() {
-        return proxy.super_getLocation();
+        return null;
     }
 
     @Override
     public ItemStack[] getStorageContents() {
-        return this.proxy.super_getStorageContents();
+        return this.cbProxy.getStorageContents();
     }
 
     @Override
     public void setStorageContents(ItemStack[] items) throws IllegalArgumentException {
-        this.proxy.setStorageContents(items);
+        this.cbProxy.setStorageContents(items);
     }
+
 }

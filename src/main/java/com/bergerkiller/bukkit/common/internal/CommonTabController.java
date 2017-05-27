@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -323,7 +322,7 @@ public class CommonTabController implements PacketListener, Listener {
      */
     private static class PlayerTabInfo {
 
-        private final Player player;
+        //private final Player player;
         private final Map<String, Integer> defaultView = new LinkedHashMap<String, Integer>();
         private final UniqueList<String> names = new UniqueList<String>();
         private final String[] text;
@@ -333,7 +332,7 @@ public class CommonTabController implements PacketListener, Listener {
         private int dirtyStartIndex;
 
         public PlayerTabInfo(Player player, int width, int height, TabView currentTab) {
-            this.player = player;
+            //this.player = player;
             this.width = width;
             this.height = height;
             this.count = width * height;
@@ -440,6 +439,7 @@ public class CommonTabController implements PacketListener, Listener {
             this.showSlot(names.get(index), ping);
         }
 
+        /*
         public boolean handlePlayerInfoPacket(String name, int ping, boolean register) {
             // Update the default view
             if (register) {
@@ -451,6 +451,7 @@ public class CommonTabController implements PacketListener, Listener {
             // If the default tab is shown, allow it to go through
             return this.currentTab == TabView.DEFAULT;
         }
+        */
 
         public void refresh() {
             if (this.dirtyStartIndex < this.count) {

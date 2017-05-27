@@ -28,10 +28,6 @@ public class Common {
      */
     public static final int VERSION = 11102;
     /**
-     * The Minecraft package path version BKCommonLib is built against
-     */
-    public static final String DEPENDENT_MC_VERSION = "v1_11_R1";
-    /**
      * Defines the Minecraft version that runs on the server.
      */
     public static final String MC_VERSION;
@@ -57,9 +53,13 @@ public class Common {
      */
     public static final CommonServer SERVER;
     /**
+     * Description text of the server, logged during startup
+     */
+    public static final String SERVER_DESCRIPTION;
+    /**
      * Resolves template Class Declarations at runtime
      */
-    public static final TemplateResolver TEMPLATE_RESOLVER;
+    public static final TemplateResolver TEMPLATE_RESOLVER = new TemplateResolver();
     /**
      * Gets whether the current server software used is the Spigot
      * implementation
@@ -78,41 +78,78 @@ public class Common {
     /**
      * Server or test level logger that is in use
      */
-    public static final ModuleLogger LOGGER = Logging.LOGGER;
+    public static final ModuleLogger LOGGER;
+    /**
+     * Whether BKCommonLib is run under test, indicating not all server functionality is available
+     */
+    public static final boolean IS_TEST_MODE;
+
+    /**
+     * When under test internal classes have to be loaded in a very specific order.
+     * This function makes sure the server registers are initialized.
+     */
+    public static void bootstrap() {
+        // Nothing. The static block will be executed, where the magic happens.
+    }
 
     static {
+        // We MUST have an instantiated Bukkit server to perform tests
+        // This here initializes a test server as required
+        IS_TEST_MODE = (Bukkit.getServer() == null);
+        if (IS_TEST_MODE) {
+            TestServerFactory.initTestServer();
+        }
+
+        // Depends on whether Bukkit server is initialized
+        LOGGER = Logging.LOGGER;
+
         // Find out what server software we are running on
         CommonServer runningServer = new UnknownServer();
-        if (Bukkit.getServer() != null) {
-            try {
-                // Get all available server types
-                List<CommonServer> servers = new ArrayList<>();
-                servers.add(new MCPCPlusServer());
-                servers.add(new PaperSpigotServer());
-                servers.add(new SpigotServer());
-                servers.add(new SportBukkitServer());
-                servers.add(new CraftBukkitServer());
-                servers.add(new UnknownServer());
+        boolean compatible = false;
+        String mc_version = "UNKNOWN";
 
-                // Use the first one that initializes correctly
-                for (CommonServer server : servers) {
-                    if (server.init()) {
-                        runningServer = server;
-                        break;
-                    }
+        // Get all available server types
+        List<CommonServer> servers = new ArrayList<>();
+        servers.add(new MCPCPlusServer());
+        servers.add(new PaperSpigotServer());
+        servers.add(new SpigotServer());
+        servers.add(new SportBukkitServer());
+        servers.add(new CraftBukkitServer());
+        servers.add(new UnknownServer());
+
+        // Use the first one that initializes correctly
+        for (CommonServer server : servers) {
+            try {
+                if (server.init()) {
+                    server.postInit();
+                    compatible = server.isCompatible();
+                    mc_version = server.getMinecraftVersion();
+                    runningServer = server;
+                    break;
                 }
             } catch (Throwable t) {
-               Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
+                Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
             }
         }
 
         // Set up the constants
         SERVER = runningServer;
-        SERVER.postInit();
-        IS_COMPATIBLE = SERVER.isCompatible();
+        IS_COMPATIBLE = compatible;
+        MC_VERSION = mc_version;
         IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
-        MC_VERSION = SERVER.getMinecraftVersion();
+
+        // Create server description token
+        final StringBuilder serverDesc = new StringBuilder(300);
+        serverDesc.append(SERVER.getServerName()).append(" (");
+        serverDesc.append(SERVER.getServerDescription());
+        serverDesc.append(") : ").append(SERVER.getServerVersion());
+        SERVER_DESCRIPTION = serverDesc.toString();
+
+        // Under test, log server information
+        if (Common.IS_TEST_MODE) {
+            Logging.LOGGER.log(Level.INFO, "Test running on " + SERVER_DESCRIPTION);
+        }
 
         // Register server to handle field, method and class resolving
         //TODO! Implement these functions in SERVER directly
@@ -134,7 +171,10 @@ public class Common {
                 return SERVER.getMethodName(declaredClass, methodName, parameterTypes);
             }
         });
-        Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER = new TemplateResolver());
+
+        // This must be initialized AFTER we have registered the Class path resolvers!
+        TEMPLATE_RESOLVER.load();
+        Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);
 
         // Conversion types registration
         try {
@@ -199,4 +239,5 @@ public class Common {
         }
         ex.printStackTrace();
     }
+
 }

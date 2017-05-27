@@ -346,15 +346,12 @@ public class CommonPlugin extends PluginBase {
     @Override
     public void enable() {
         // Validate version
-        final StringBuilder serverDesc = new StringBuilder(300);
-        serverDesc.append(Common.SERVER.getServerName()).append(" (");
-        serverDesc.append(Common.SERVER.getServerDescription());
-        serverDesc.append(") : ").append(Common.SERVER.getServerVersion());
         if (Common.IS_COMPATIBLE) {
-            log(Level.INFO, "BKCommonLib is running on " + serverDesc);
+            log(Level.INFO, "BKCommonLib is running on " + Common.SERVER_DESCRIPTION);
         } else {
-            log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
-            log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);
+            String verText = StringUtil.combineNames(Common.TEMPLATE_RESOLVER.getSupportedVersions());
+            log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + Common.SERVER_DESCRIPTION);
+            log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + verText);
             log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
             log(Level.SEVERE, "http://www.spigotmc.org/resources/updated-bkcommonlib.7716/");
             this.onCriticalFailure();

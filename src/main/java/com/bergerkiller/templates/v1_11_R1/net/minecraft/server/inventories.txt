@@ -1,9 +1,23 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 interface IInventory {
+    public abstract int getSize();
+    public abstract (ItemStackHandle) ItemStack getItem(int index);
+    public abstract void setItem(int paramInt, (ItemStackHandle) ItemStack paramItemStack);
+    public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
+
     public abstract void update();
+
+    public abstract boolean canOpen:a((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
+
+    public abstract boolean canStoreItem:b(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
+
+    public abstract int someFunction:h();
+
+    public abstract boolean someFunction2:w_();
 }
 
 class PlayerInventory extends IInventory {

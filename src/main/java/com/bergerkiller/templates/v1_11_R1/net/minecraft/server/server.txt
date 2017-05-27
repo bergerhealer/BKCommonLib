@@ -38,7 +38,3 @@ interface IPlayerFileData {
 
     public String[] getSeenPlayers();
 }
-
-class DispenserRegistry {
-    public static void bootstrap:c();
-}

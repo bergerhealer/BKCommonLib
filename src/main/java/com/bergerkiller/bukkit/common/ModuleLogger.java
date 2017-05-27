@@ -26,7 +26,7 @@ public class ModuleLogger extends Logger {
     private final HashSet<String> logOnceSet = new HashSet<String>();
 
     private static Logger createDefaultLogger() {
-    	if (Bukkit.getServer() != null)
+    	if (!Common.IS_TEST_MODE)
     		return Bukkit.getLogger();
     	
     	Logger log = Logger.getLogger("");

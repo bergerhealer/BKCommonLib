@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.generated.net.minecraft.server.DispenserRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
@@ -70,8 +69,7 @@ public class CommonUtil {
      * This function makes sure the server registers are initialized.
      */
     public static void bootstrap() {
-        Common.getVersion(); // this initializes the SERVER (needed for resolving DispenserRegistryHandle, amongst)
-        DispenserRegistryHandle.bootstrap();
+        Common.bootstrap();
     }
 
     /**
