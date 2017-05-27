@@ -1,0 +1,5 @@
+package org.bukkit.craftbukkit;
+
+class CraftSound {
+    public static String getSoundName:getSound(org.bukkit.Sound sound);
+}

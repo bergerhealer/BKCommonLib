@@ -8,6 +8,7 @@
 #include /org/bukkit/craftbukkit/travelagent.txt
 #include /org/bukkit/craftbukkit/potions.txt
 #include /org/bukkit/craftbukkit/util.txt
+#include /org/bukkit/craftbukkit/sound.txt
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
 #include /net/minecraft/server/nibblearray.txt

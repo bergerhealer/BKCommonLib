@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_11_R1.CraftSound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -40,7 +39,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
@@ -426,7 +428,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch (average) to play at
      */
     public void makeRandomSound(Sound sound, float volume, float pitch) {
-        makeRandomSound(CraftSound.getSound(sound), volume, pitch);
+        makeRandomSound(CraftSoundHandle.getSoundName(sound), volume, pitch);
     }
 
     /**
@@ -442,12 +444,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeSound(Sound sound, float volume, float pitch) {
-        makeSound(CraftSound.getSound(sound), volume, pitch);
+        makeSound(CraftSoundHandle.getSoundName(sound), volume, pitch);
     }
 
-    @SuppressWarnings("unused")
-	public void makeSound(String soundName, float volume, float pitch) {
-       // handle.makeSound(soundeffect, volume, pitch)
+    public void makeSound(String soundName, float volume, float pitch) {
+        Object soundEffectKey = MinecraftKeyHandle.createNew(soundName).getRaw();
+        SoundEffectHandle soundEffectHandle = SoundEffectHandle.createHandle(SoundEffectHandle.REGISTRY.get(soundEffectKey));
+        if (soundEffectHandle != null) {
+            handle.makeSound(soundEffectHandle, volume, pitch);
+        }
     }
 
     public void makeStepSound(org.bukkit.block.Block block) {

@@ -2,9 +2,10 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 class MinecraftKey {
-
+    public (MinecraftKeyHandle) MinecraftKey(String keyToken);
 }
 
 class SoundEffectType {
@@ -12,6 +13,7 @@ class SoundEffectType {
 }
 
 class SoundEffect {
+    public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
     private final (MinecraftKeyHandle) MinecraftKey name:b;
 }
 

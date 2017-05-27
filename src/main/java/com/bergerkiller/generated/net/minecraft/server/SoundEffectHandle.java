@@ -7,6 +7,7 @@ public class SoundEffectHandle extends Template.Handle {
     public static final SoundEffectClass T = new SoundEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectHandle.class, "net.minecraft.server.SoundEffect");
 
+    public static final RegistryMaterialsHandle REGISTRY = T.REGISTRY.getSafe();
 
     /* ============================================================================== */
 
@@ -28,6 +29,8 @@ public class SoundEffectHandle extends Template.Handle {
     }
 
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
+        public final Template.StaticField.Converted<RegistryMaterialsHandle> REGISTRY = new Template.StaticField.Converted<RegistryMaterialsHandle>();
+
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
 
     }

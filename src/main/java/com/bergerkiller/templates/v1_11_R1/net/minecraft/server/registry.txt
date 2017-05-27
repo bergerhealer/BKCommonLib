@@ -1,7 +1,9 @@
 package net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
-
 class RegistryBlockID {
     public int getId(T value);
+}
+
+class RegistryMaterials {
+    public V get(K key);
 }

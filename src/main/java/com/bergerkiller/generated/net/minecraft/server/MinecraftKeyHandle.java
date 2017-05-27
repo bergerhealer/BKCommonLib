@@ -17,8 +17,14 @@ public class MinecraftKeyHandle extends Template.Handle {
         return handle;
     }
 
+    public static final MinecraftKeyHandle createNew(String keyToken) {
+        return T.constr_keyToken.newInstance(keyToken);
+    }
+
     /* ============================================================================== */
 
     public static final class MinecraftKeyClass extends Template.Class<MinecraftKeyHandle> {
+        public final Template.Constructor.Converted<MinecraftKeyHandle> constr_keyToken = new Template.Constructor.Converted<MinecraftKeyHandle>();
+
     }
 }
