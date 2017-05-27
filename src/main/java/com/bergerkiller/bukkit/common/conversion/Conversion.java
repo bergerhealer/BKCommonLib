@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
@@ -81,6 +82,7 @@ public class Conversion {
     public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.server.MobEffect");
     public static final InputConverter<Object> toMapIconHandle = getConverterToHandle("net.minecraft.server.MapIcon");
     public static final InputConverter<Object> toChatComponentHandle = getConverterToHandle("net.minecraft.server.IChatBaseComponent");
+    public static final InputConverter<Object> toEnumItemSlotHandle = getConverterToHandle("net.minecraft.server.EnumItemSlot");
     // Wrappers
     public static final InputConverter<Entity> toEntity = getConverterTo(Entity.class);
     public static final InputConverter<Player> toPlayer = getConverterTo(Player.class);
@@ -118,6 +120,7 @@ public class Conversion {
     public static final InputConverter<PotionEffect> toPotionEffect = getConverterTo(PotionEffect.class);
     public static final InputConverter<MapCursor> toMapCursor = getConverterTo(MapCursor.class);
     public static final InputConverter<ChatText> toChatText = getConverterTo(ChatText.class);
+    public static final InputConverter<EquipmentSlot> toEquipmentSlot = getConverterTo(EquipmentSlot.class);
     // Arrays
     public static final InputConverter<ItemStack[]> toItemStackArr = getConverterTo(ItemStack[].class);
     public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getNMSClass("ItemStack")));

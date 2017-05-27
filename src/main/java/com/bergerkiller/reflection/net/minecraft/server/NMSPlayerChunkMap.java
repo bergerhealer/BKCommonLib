@@ -7,8 +7,6 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
-import net.minecraft.server.v1_11_R1.BlockPosition;
-
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +34,7 @@ public class NMSPlayerChunkMap {
     private static final MethodAccessor<Void> flagDirty = T.selectMethod("public void flagDirty(BlockPosition blockposition)");
 
     public static void flagBlockDirty(Object playerChunkMap, int x, int y, int z) {
-        flagDirty.invoke(playerChunkMap, new BlockPosition(x, y, z));
+        flagDirty.invoke(playerChunkMap, NMSVector.newPosition(x, y, z));
     }
 
     public static Object getPlayerChunk(Object playerChunkMap, int x, int z) {

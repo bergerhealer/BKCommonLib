@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
 
 class PacketPlayOutScoreboardScore {
     class PacketPlayOutScoreboardScore.EnumScoreboardAction {
@@ -18,3 +19,15 @@ class PacketPlayInUseEntity {
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT_AT;
     }
 }
+
+class PacketPlayOutTitle {
+    class PacketPlayOutTitle.EnumTitleAction {
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TITLE;
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction SUBTITLE;
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction ACTIONBAR;
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TIMES;
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction CLEAR;
+        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction RESET;
+    }
+}
+

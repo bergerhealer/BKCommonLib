@@ -13,15 +13,13 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
-
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.IBlockData;
 
 @Deprecated
 public class NMSEntity {
@@ -97,19 +95,6 @@ public class NMSEntity {
     /* ================================================================================================================ */
     /* ================================================== METHODS ===================================================== */
     /* ================================================================================================================ */
-
-    /*
-     * protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
-     *     if (flag) {
-     *         if (this.fallDistance > 0.0F) {
-     *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
-     *         }
-     *         ...
-     *     }
-     *     ...
-     * }
-     */
-    private static final MethodAccessor<Void> updateFalling = EntityHandle.T.updateFalling.raw.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##() {
@@ -288,10 +273,6 @@ public class NMSEntity {
         return update ? isInWaterUpdate.invoke(entityHandle) : isInWaterNoUpdate.invoke(entityHandle);
     }
 
-    public static void updateFalling(Object entityHandle, double deltaY, boolean hitGround, IBlockData block, BlockPosition bpos) {
-        updateFalling.invoke(entityHandle, deltaY, hitGround, block, bpos);
-    }
-
     public static void updateBlockCollision(Object entityHandle) {
         updateBlockCollision.invoke(entityHandle);
     }
@@ -304,7 +285,7 @@ public class NMSEntity {
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {
         if (blockStepped != null) {
-            playStepSound.invoke(entityHandle, new BlockPosition(x, y, z), blockStepped);
+            playStepSound.invoke(entityHandle, BlockPositionHandle.createNew(x, y, z).getRaw(), blockStepped);
         }
     }
 

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import net.minecraft.server.v1_11_R1.*;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -40,7 +39,11 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
+import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -327,7 +330,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final TranslatorFieldAccessor<IntVector3> bedPosition = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntityHuman.T.getType(), BlockPosition.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntityHuman.T.getType(), BlockPositionHandle.T.getType());
 
         public CommonPacket newInstance(HumanEntity entity, IntVector3 bedPosition) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), Conversion.toBlockPositionHandle.convert(bedPosition));
@@ -537,7 +540,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityEquipment extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<EnumItemSlot> slot = nextFieldSignature("private EnumItemSlot b");
+        public final FieldAccessor<EquipmentSlot> slot = nextFieldSignature("private EnumItemSlot b").translate(DuplexConversion.equipmentSlot);
         public final TranslatorFieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(DuplexConversion.itemStack);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("EnumItemSlot"), NMSItemStack.T.getType());
 
@@ -650,7 +653,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> pushMotX = nextFieldSignature("private float f");
         public final FieldAccessor<Float> pushMotY = nextFieldSignature("private float g");
         public final FieldAccessor<Float> pushMotZ = nextFieldSignature("private float h");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(double.class, double.class, double.class, float.class, List.class, Vec3D.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(double.class, double.class, double.class, float.class, List.class, CommonUtil.getNMSClass("Vec3D"));
 
         @SuppressWarnings("unchecked")
         public CommonPacket newInstance(double x, double y, double z, float radius) {
@@ -1033,19 +1036,19 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> a = nextFieldSignature("private int c");
         public final FieldAccessor<Integer> b = nextFieldSignature("private int d");
         public final FieldAccessor<Integer> c = nextFieldSignature("private int e");
-        
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(PacketPlayOutTitle.EnumTitleAction.class, IChatBaseComponent.class, int.class, int.class, int.class);
+
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EnumTitleActionHandle.T.getType(), IChatBaseComponentHandle.T.getType(), int.class, int.class, int.class);
 
         public CommonPacket newInstance(int a, int b, int c) {
-            return constructor1.newInstance(PacketPlayOutTitle.EnumTitleAction.TIMES, (IChatBaseComponent) null, a, b, c);
+            return constructor1.newInstance(EnumTitleActionHandle.TIMES.getRaw(), null, a, b, c);
         }
 
-        public CommonPacket newInstance(PacketPlayOutTitle.EnumTitleAction enumTitleAction, IChatBaseComponent iChatBaseComponent) {
-            return constructor1.newInstance(enumTitleAction, iChatBaseComponent, -1, -1, -1);
+        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, IChatBaseComponentHandle iChatBaseComponent) {
+            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), -1, -1, -1);
         }
 
-        public CommonPacket newInstance(PacketPlayOutTitle.EnumTitleAction enumTitleAction, IChatBaseComponent iChatBaseComponent, int a, int b, int c) {
-            return constructor1.newInstance(enumTitleAction, iChatBaseComponent, a, b, c);
+        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, IChatBaseComponentHandle iChatBaseComponent, int a, int b, int c) {
+            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), a, b, c);
         }
     }
 
@@ -1123,10 +1126,10 @@ public class NMSPacketClasses {
         public final FieldAccessor<Long> g = nextFieldSignature("private long g");
         public final FieldAccessor<Integer> warningTime = nextFieldSignature("private int h");
         public final FieldAccessor<Integer> warningDistance = nextFieldSignature("private int i");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(WorldBorder.class, PacketPlayOutWorldBorder.EnumWorldBorderAction.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("WorldBorder"), CommonUtil.getNMSClass("PacketPlayOutWorldBorder.EnumWorldBorderAction"));
 
-        public CommonPacket newInstance (WorldBorder worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction enumw) {
-            return constructor1.newInstance(worldBorder, enumw);
+        public CommonPacket newInstance (Object nmsWorldBorder, Object nmsEnumBorderAction) {
+            return constructor1.newInstance(nmsWorldBorder, nmsEnumBorderAction);
         }
     }
 
@@ -1158,7 +1161,7 @@ public class NMSPacketClasses {
 
         public CommonPacket newInstance(String name, int count, double x, double y, double z, double rx, double ry, double rz, double speed) {
             final CommonPacket packet = newInstance();
-            packet.write(this.particle, EnumParticle.a(name));
+            packet.write(this.particle, EnumParticleHandle.getRaw(EnumParticleHandle.byName(name)));
             packet.write(this.particleCount, count);
             packet.write(this.x, (float) x);
             packet.write(this.y, (float) y);

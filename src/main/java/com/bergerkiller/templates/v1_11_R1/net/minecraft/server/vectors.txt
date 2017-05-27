@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 
 class BaseBlockPosition {
     private final int x:a;
@@ -12,4 +14,19 @@ class BlockPosition extends BaseBlockPosition {
 
     public (BlockPositionHandle) BlockPosition(int x, int y, int z);
 
+}
+
+class Vec3D {
+    public final double x;
+    public final double y;
+    public final double z;
+
+    public (Vec3DHandle) Vec3D(double x, double y, double z);
+}
+
+class ChunkCoordIntPair {
+    public final int x;
+    public final int z;
+
+    public (ChunkCoordIntPairHandle) ChunkCoordIntPair(int x, int z);
 }
