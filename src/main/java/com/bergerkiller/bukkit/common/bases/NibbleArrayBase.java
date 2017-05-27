@@ -1,30 +1,20 @@
 package com.bergerkiller.bukkit.common.bases;
 
+import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
-
-import net.minecraft.server.v1_11_R1.NibbleArray;
 
 /**
  * Base class to work with Nibble Array implementations
  */
-public class NibbleArrayBase extends NibbleArray {
-
-    @Deprecated
-    public NibbleArrayBase(byte[] data, int dataBits) {
-        super(data);
-    }
-
-    @Deprecated
-    public NibbleArrayBase(int size, int dataBits) {
-        super();
-    }
+public class NibbleArrayBase {
+    private final NibbleArrayHandle arr;
 
     public NibbleArrayBase(byte[] data) {
-        super(data);
+        this.arr = NibbleArrayHandle.createNew(data);
     }
 
     public NibbleArrayBase() {
-        super();
+        this.arr = NibbleArrayHandle.createNew();
     }
 
     /**
@@ -34,7 +24,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @return data
      */
     public byte[] getData() {
-        return NMSNibbleArray.getValueArray(this);
+        return NMSNibbleArray.getValueArray(arr.getRaw());
     }
 
     /**
@@ -43,26 +33,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @return nibble array data copy
      */
     public byte[] toArray() {
-        return NMSNibbleArray.getArrayCopy(this);
-    }
-
-    /**
-     * @deprecated use {@link #set(int, int, int, int) set(x, y, z, value)}
-     * instead
-     */
-    @Override
-    @Deprecated
-    public void a(int i, int j, int k, int l) {
-        this.set(i, j, k, l);
-    }
-
-    /**
-     * @deprecated use {@link #get(int, int, int) get(x, y, z)} instead
-     */
-    @Override
-    @Deprecated
-    public int a(int i, int j, int k) {
-        return this.get(i, j, k);
+        return NMSNibbleArray.getArrayCopy(arr.getRaw());
     }
 
     /**
@@ -74,7 +45,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @param value to set to
      */
     public void set(int x, int y, int z, int value) {
-        super.a(x, y, z, value);
+        this.arr.set(x, y, z, value);
     }
 
     /**
@@ -86,7 +57,7 @@ public class NibbleArrayBase extends NibbleArray {
      * @return value
      */
     public int get(int x, int y, int z) {
-        return super.a(x, y, z);
+        return this.arr.get(x, y, z);
     }
 
     /**
@@ -97,6 +68,6 @@ public class NibbleArrayBase extends NibbleArray {
      * @return handle
      */
     public Object toHandle() {
-        return new NibbleArray(this.getData());
+        return NibbleArrayHandle.T.constr_data.raw.newInstance(this.getData());
     }
 }

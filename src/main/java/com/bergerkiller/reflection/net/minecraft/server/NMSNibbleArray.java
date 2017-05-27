@@ -1,11 +1,12 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class NMSNibbleArray {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("NibbleArray");
-    public static final FieldAccessor<byte[]> array = T.selectField("private final byte[] a");
+    public static final FieldAccessor<byte[]> array = NibbleArrayHandle.T.data.toFieldAccessor();
 
     /**
      * Copies all data contained in the Nibble Array to the byte array specified
