@@ -2,7 +2,9 @@ package com.bergerkiller.templates;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -37,7 +39,9 @@ public class TemplateResolver implements ClassDeclarationResolver {
         if (!classes_loaded) {
             classes_loaded = true;
 
-            String templatePath = "com/bergerkiller/templates/v1_11_R1/init.txt";
+            String templatePath = "com/bergerkiller/templates/init.txt";
+            Map<String, String> variables = new HashMap<String, String>();
+            variables.put("version", Common.MC_VERSION);
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath);
             for (ClassDeclaration cdec : sourceDec.classes) {
