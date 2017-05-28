@@ -1,5 +1,5 @@
-#BKCommonLib [![Build Status](https://drone.io/github.com/bergerhealer/BKCommonLib/status.png)](https://drone.io/github.com/bergerhealer/BKCommonLib/latest)
-[Spigot Resource Page](http://www.spigotmc.org/threads/updated-bkcommonlib.69358/) | [Dev Builds](https://drone.io/github.com/bergerhealer/BKCommonLib/files)
+BKCommonLib
+[Spigot Resource Page](https://www.spigotmc.org/resources/bkcommonlib.39590/) | [Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/)
 
 This is a library-plugin system, introducing a lot of utility classes
 It also simplifies coding:
@@ -12,7 +12,7 @@ It also simplifies coding:
 * Nanosecond StopWatch class for performance monitoring
 * Operation class to handle entities, players, chunks and worlds the way you want it
 
-###License:
+License:
 Copyright (C) 2013-2015 bergerkiller
 Copyright (C) 2016 Berger Healer
 
