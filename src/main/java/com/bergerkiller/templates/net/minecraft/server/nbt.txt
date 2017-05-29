@@ -1,5 +1,33 @@
 package net.minecraft.server;
 
-class NBTBase {
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 
+class NBTBase {
+    public abstract byte getTypeId();
+    public abstract (NBTBaseHandle) NBTBase clone();
+}
+
+class NBTTagList extends NBTBase {
+    private (List<NBTBaseHandle>) List<NBTBase> list;
+    private byte type;
+
+    public void add((NBTBaseHandle) NBTBase value);
+    public int size();
+#if version >= 1.12-pre5
+    public (NBTBaseHandle) NBTBase get:i(int index);
+#else
+    public (NBTBaseHandle) NBTBase get:h(int index);
+#endif
+}
+
+class NBTTagCompound extends NBTBase {
+    private final (Map<String, NBTBaseHandle>) Map<String, NBTBase> map;
+
+    public int size:d();
+    public Set<String> getKeys:c();
+    public void remove(String key);
+    public void set(String key, (NBTBaseHandle) NBTBase value);
+    public (NBTBaseHandle) NBTBase get(String key);
+    public boolean contains:hasKey(String key);
+    public boolean isEmpty();
 }

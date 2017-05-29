@@ -14,7 +14,7 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
 @SuppressWarnings("deprecation")
 public class MapColorPalette {
     public static final Color[] COLOR_MAP;
-    public static final int COLOR_COUNT = 144; // we want this to be inlined for optimized performance
+    public static final int COLOR_COUNT;
     public static final byte[] COLOR_MAP_AVERAGE  = new byte[0x10000];
     public static final byte[] COLOR_MAP_ADD      = new byte[0x10000];
     public static final byte[] COLOR_MAP_SUBTRACT = new byte[0x10000];
@@ -26,9 +26,7 @@ public class MapColorPalette {
     static {
         // Ugh.
         COLOR_MAP = SafeField.create(MapPalette.class, "colors", Color[].class).get(null);
-        if (COLOR_MAP.length != COLOR_COUNT) {
-            throw new RuntimeException("Color count is incorrect! Should be " + COLOR_MAP.length + ", but was " + COLOR_COUNT);
-        }
+        COLOR_COUNT = COLOR_MAP.length;
 
         // Transparent colors at (a==0)
         for (int b = 1; b < COLOR_COUNT; b++) {
@@ -38,10 +36,10 @@ public class MapColorPalette {
         // Generate the blend map
         for (int a = 1; a < COLOR_COUNT; a++) {
             int index = (a * 256);
-            Color color_a = MapPalette.getColor((byte) a);
+            Color color_a = getRealColor((byte) a);
             initTransparent(index++, (byte) a, true);
             for (int b = 0; b < COLOR_COUNT; b++) {
-                Color color_b = MapPalette.getColor((byte) b);
+                Color color_b = getRealColor((byte) b);
                 initTable(index++,
                         color_a.getRed(), color_a.getGreen(), color_a.getBlue(),
                         color_b.getRed(), color_b.getGreen(), color_b.getBlue());
@@ -147,6 +145,6 @@ public class MapColorPalette {
      * @return real RGB color
      */
     public static final Color getRealColor(byte color) {
-        return COLOR_MAP[color];
+        return COLOR_MAP[color & 0xFF];
     }
 }

@@ -23,8 +23,13 @@ public class EntityInsentientHandle extends EntityLivingHandle {
         return T.getLeashHolder.invoke(instance);
     }
 
+    public Object getNavigation() {
+        return T.getNavigation.invoke(instance);
+    }
+
     public static final class EntityInsentientClass extends Template.Class<EntityInsentientHandle> {
         public final Template.Method.Converted<EntityHandle> getLeashHolder = new Template.Method.Converted<EntityHandle>();
+        public final Template.Method.Converted<Object> getNavigation = new Template.Method.Converted<Object>();
 
     }
 }

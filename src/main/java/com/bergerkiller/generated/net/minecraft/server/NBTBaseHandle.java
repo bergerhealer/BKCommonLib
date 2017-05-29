@@ -19,6 +19,17 @@ public class NBTBaseHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public byte getTypeId() {
+        return T.getTypeId.invoke(instance);
+    }
+
+    public NBTBaseHandle clone() {
+        return T.clone.invoke(instance);
+    }
+
     public static final class NBTBaseClass extends Template.Class<NBTBaseHandle> {
+        public final Template.Method<Byte> getTypeId = new Template.Method<Byte>();
+        public final Template.Method.Converted<NBTBaseHandle> clone = new Template.Method.Converted<NBTBaseHandle>();
+
     }
 }

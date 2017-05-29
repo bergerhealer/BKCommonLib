@@ -1,20 +1,35 @@
 package net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
+#if version >= 1.12-pre5
+class IRecipe {
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
+}
+#else
 interface IRecipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
 }
+#endif
 
 class ShapedRecipes extends IRecipe {
+#if version >= 1.12-pre5
+    private final (List<org.bukkit.inventory.ItemStack) NonNullList<RecipeItemStack> inputItems:items;
+#else
     private final (List<org.bukkit.inventory.ItemStack) ItemStack[] inputItems:items;
+#endif
 }
 
 class ShapelessRecipes extends IRecipe {
+#if version >= 1.12-pre5
+    private final (List<org.bukkit.inventory.ItemStack) NonNullList<RecipeItemStack> inputItems:ingredients;
+#else
     private final (List<org.bukkit.inventory.ItemStack) List<ItemStack> inputItems:ingredients;
+#endif
 }
 
 class RecipesFurnace {
@@ -27,7 +42,24 @@ class RecipesFurnace {
 }
 
 class CraftingManager {
-    public (List<IRecipeHandle>) List<IRecipe> getRecipes();
+    // >= 1.12
+    optional public static (Iterable) RegistryMaterials<MinecraftKey, IRecipe> opt_recipesField:recipes;
 
-    public static (CraftingManagerHandle) CraftingManager getInstance();
+    // <= 1.11.2
+    optional public (List<IRecipeHandle>) List<IRecipe> opt_getRecipes:getRecipes();
+    optional public static (CraftingManagerHandle) CraftingManager opt_getInstance:getInstance();
+
+    <code>
+    public static Iterable<com.bergerkiller.generated.net.minecraft.server.IRecipeHandle> getRecipes() {
+        if (T.opt_recipesField.isAvailable()) {
+            Iterable<?> irecipeIter = T.opt_recipesField.get();
+            return new com.bergerkiller.mountiplex.conversion.util.ConvertingIterable<IRecipeHandle>(irecipeIter,
+                com.bergerkiller.generated.net.minecraft.server.IRecipeHandle.T.getHandleConverter());
+        } else if (T.opt_getRecipes.isAvailable() && T.opt_getInstance.isAvailable()) {
+            return T.opt_getRecipes.invoke(T.opt_getInstance.invokeVA());
+        } else {
+            throw new RuntimeException("Recipes listing information not resolved");
+        }
+    }
+    </code>
 }

@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
-            <version>1.1</version>
+            <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
@@ -163,7 +163,7 @@
             <plugin>
                 <groupId>com.bergerkiller.mountiplex</groupId>
                 <artifactId>Mountiplex</artifactId>
-                <version>1.0</version>
+                <version>1.2-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>Generate reflection templates</id>

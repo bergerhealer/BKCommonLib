@@ -30,6 +30,7 @@
 #include /net/minecraft/server/attributes.txt
 #include /net/minecraft/server/chat.txt
 #include /net/minecraft/server/player.txt
+#include /net/minecraft/server/network.txt
 #include /net/minecraft/server/entity.txt
 #include /net/minecraft/server/entity_tracker.txt
 #include /net/minecraft/server/entity_subtype.txt

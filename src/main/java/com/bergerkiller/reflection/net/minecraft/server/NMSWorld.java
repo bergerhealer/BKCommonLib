@@ -14,30 +14,31 @@ import org.bukkit.World;
 
 import java.util.List;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("World");
 
-    private static final MethodAccessor<Server> getServer  = T.selectMethod("public org.bukkit.craftbukkit.CraftServer getServer()");
-    public static final FieldAccessor<List> tileEntityList =  T.selectField("public final List<TileEntity> tileEntityList");
-    public static final FieldAccessor<World> bukkitWorld   =  T.selectField("private final org.bukkit.craftbukkit.CraftWorld world");
+    private static final MethodAccessor<Server> getServer  = WorldHandle.T.getServer.raw.toMethodAccessor();
+
+    public static final FieldAccessor<List> tileEntityList = (FieldAccessor) WorldHandle.T.tileEntityList.raw.toFieldAccessor();
+    public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(DuplexConversion.intHashMap);
 
-    public static final FieldAccessor<Object> worldProvider = T.nextField("public WorldProvider worldProvider");
-    public static final FieldAccessor<Object> navigationListener = T.nextFieldSignature("protected NavigationListener t");
-    public static final FieldAccessor<List<Object>> accessList = T.nextFieldSignature("protected List<IWorldAccess> u");
+    public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
+    public static final FieldAccessor<Object> navigationListener = WorldHandle.T.navigationListener.raw.toFieldAccessor();
+    public static final FieldAccessor<List<Object>> accessList = (FieldAccessor) WorldHandle.T.accessList.raw.toFieldAccessor();
 
-    public static final FieldAccessor<List<Object>> players = T.selectField("public final List<EntityHuman> players");
+    public static final FieldAccessor<List<Object>> players = (FieldAccessor) WorldHandle.T.players.raw.toFieldAccessor();
 
-    public static final MethodAccessor<Boolean> getBlockCollisions = T.selectMethod("private boolean a(Entity entity, AxisAlignedBB axisalignedbb, boolean flag, List<AxisAlignedBB> list)");
+    public static final MethodAccessor<Boolean> getBlockCollisions = WorldHandle.T.getBlockCollisions.raw.toMethodAccessor();
 
     //public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("h"); TODO: Disabling it for now to support PaperSpigot. Fixing it later.
 
     public static final MethodAccessor<Void> applyPhysics = WorldHandle.T.applyPhysics.raw.toMethodAccessor();
 
-    public static final MethodAccessor<List<?>> getEntities = T.selectMethod("public List<Entity> getEntities(Entity entity, AxisAlignedBB axisalignedbb)");
+    public static final MethodAccessor<List<?>> getEntities = WorldHandle.T.getEntities.raw.toMethodAccessor();
 
-    private static final MethodAccessor<Boolean> isChunkLoaded = T.selectMethod("protected boolean isChunkLoaded(int paramInt1, int paramInt2, boolean paramBoolean)");
+    private static final MethodAccessor<Boolean> isChunkLoaded = WorldHandle.T.isChunkLoaded.toMethodAccessor();
 
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
@@ -51,9 +52,7 @@ public class NMSWorld {
         return getServer.invoke(worldHandle);
     }
 
-    private static final MethodAccessor<Boolean> setType = T.selectMethod("public boolean setTypeAndData(BlockPosition blockposition, IBlockData iblockdata, int i)");
-
     public static boolean updateBlock(Object worldHandle, int x, int y, int z, BlockData data, int updateFlags) {
-        return setType.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
+        return (Boolean) WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
     }
 }

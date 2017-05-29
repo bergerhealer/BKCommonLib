@@ -1,5 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.google.common.collect.BiMap;
@@ -7,19 +9,18 @@ import com.google.common.collect.BiMap;
 import java.util.Map;
 
 public class NMSEnumProtocol {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol")
-            .addImport("com.google.common.collect.BiMap");
+    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol");
 
-    private static final Object PLAY = T.selectStaticValue("public static final EnumProtocol PLAY");
+    private static final Object PLAY = EnumProtocolHandle.PLAY.getRaw();
 
     static class Direction {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocolDirection");
-        public static final Object CLIENTBOUND = T.selectStaticValue("public static final EnumProtocolDirection CLIENTBOUND");
+        public static final Object CLIENTBOUND = EnumProtocolDirectionHandle.CLIENTBOUND.getRaw();
         public static final Object SERVERBOUND = T.selectStaticValue("public static final EnumProtocolDirection SERVERBOUND");
     }
 
-    public static final FieldAccessor<Map<Object, BiMap<Integer, Class<?>>>> packetMap = 
-            T.selectField("private final Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> h");
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static final FieldAccessor<Map<Object, BiMap<Integer, Class<?>>>> packetMap = (FieldAccessor) EnumProtocolHandle.T.packetMap.raw.toFieldAccessor();
 
     public static Class<?> getPacketClassIn(Integer id) {
         return packetMap.get(PLAY).get(Direction.CLIENTBOUND).get(id);

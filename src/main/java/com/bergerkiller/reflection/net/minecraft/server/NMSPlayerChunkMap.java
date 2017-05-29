@@ -1,11 +1,8 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import java.util.List;
 import java.util.Set;
@@ -15,9 +12,7 @@ public class NMSPlayerChunkMap {
     		.addImport("it.unimi.dsi.fastutil.longs.Long2ObjectMap");
     
     public static final FieldAccessor<List<?>> managedPlayers = T.nextField("private final List<EntityPlayer> managedPlayers");
-    public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = 
-    		T.nextFieldSignature("private final Long2ObjectMap<PlayerChunk> e").translate(DuplexConversion.longHashMap);
-    
+
     public static final FieldAccessor<Set<?>> dirtyBlockChunks = T.nextField("private final Set<PlayerChunk> f");
     
     static {
@@ -37,7 +32,10 @@ public class NMSPlayerChunkMap {
         flagDirty.invoke(playerChunkMap, NMSVector.newPosition(x, y, z));
     }
 
-    public static Object getPlayerChunk(Object playerChunkMap, int x, int z) {
-    	return playerInstances.get(playerChunkMap).get(x, z);
-    }
+    //public static final TranslatorFieldAccessor<LongHashMap<Object>> playerInstances = 
+    //      T.nextFieldSignature("private final Long2ObjectMap<PlayerChunk> e").translate(DuplexConversion.longHashMap);
+
+    //public static Object getPlayerChunk(Object playerChunkMap, int x, int z) {
+    //	return playerInstances.get(playerChunkMap).get(x, z);
+    //}
 }

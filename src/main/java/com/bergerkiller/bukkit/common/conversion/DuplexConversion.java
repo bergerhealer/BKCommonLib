@@ -74,7 +74,6 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, PlayerAbilities> playerAbilities = pair(toPlayerAbilities, toPlayerAbilitiesHandle);
     public static final DuplexConverter<Object, EntityTracker> entityTracker = pair(toEntityTracker, toEntityTrackerHandle);
     public static final DuplexConverter<Object, LongHashSet> longHashSet = pair(toLongHashSet, toLongHashSetHandle);
-    public static final DuplexConverter<Object, LongHashMap<Object>> longHashMap = pair(toLongHashMap, toLongHashMapHandle);
     public static final DuplexConverter<Object, IntHashMap<Object>> intHashMap = pair(toIntHashMap, toIntHashMapHandle);
     public static final DuplexConverter<Object, BlockState> blockState = pair(toBlockState, toTileEntityHandle);
     public static final DuplexConverter<Object, Material> block = pair(toMaterial, toBlockHandle);

@@ -150,7 +150,7 @@ public class RecipeUtil {
         }
     }
 
-    private static List<IRecipeHandle> getCraftRecipes() {
-        return CraftingManagerHandle.getInstance().getRecipes();
+    private static Iterable<IRecipeHandle> getCraftRecipes() {
+        return CraftingManagerHandle.getRecipes();
     }
 }

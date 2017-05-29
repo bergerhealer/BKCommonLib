@@ -183,6 +183,26 @@ public class EntityHandle extends Template.Handle {
         return T.getDriverEntity.invoke(instance);
     }
 
+    public void onTick() {
+        T.onTick.invoke(instance);
+    }
+
+    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
+        return T.saveToNBT.invoke(instance, compound);
+    }
+
+    public void loadFromNBT(CommonTagCompound compound) {
+        T.loadFromNBT.invoke(instance, compound);
+    }
+
+    public boolean savePassenger(CommonTagCompound compound) {
+        return T.savePassenger.invoke(instance, compound);
+    }
+
+    public boolean saveEntity(CommonTagCompound compound) {
+        return T.saveEntity.invoke(instance, compound);
+    }
+
     public boolean isSneaking() {
         return T.isSneaking.invoke(instance);
     }
@@ -207,28 +227,8 @@ public class EntityHandle extends Template.Handle {
         return T.getDataWatcher.invoke(instance);
     }
 
-    public void onTick() {
-        T.onTick.invoke(instance);
-    }
-
     public void onPush(double d0, double d1, double d2) {
         T.onPush.invoke(instance, d0, d1, d2);
-    }
-
-    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
-        return T.saveToNBT.invoke(instance, compound);
-    }
-
-    public void loadFromNBT(CommonTagCompound compound) {
-        T.loadFromNBT.invoke(instance, compound);
-    }
-
-    public boolean savePassenger(CommonTagCompound compound) {
-        return T.savePassenger.invoke(instance, compound);
-    }
-
-    public boolean saveEntity(CommonTagCompound compound) {
-        return T.saveEntity.invoke(instance, compound);
     }
 
     public boolean onInteractBy(HumanEntity human, MainHand enumhand) {
@@ -760,18 +760,18 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Integer> getMaxFireTicks = new Template.Method<Integer>();
         public final Template.Method<Boolean> isWet = new Template.Method<Boolean>();
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
+        public final Template.Method<Void> onTick = new Template.Method<Void>();
+        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
         public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
         public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
-        public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
-        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
-        public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();

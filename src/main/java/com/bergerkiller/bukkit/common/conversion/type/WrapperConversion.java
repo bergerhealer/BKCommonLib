@@ -340,13 +340,8 @@ public class WrapperConversion {
         return new EntityTracker(nmsEntityTrackerHandle);
     }
 
-    @ConverterMethod
-    public static <T> LongHashMap<T> toLongHashMap(it.unimi.dsi.fastutil.longs.Long2ObjectMap<T> longObjectMap) {
-        return new LongHashMap<T>(longObjectMap);
-    }
-
     @ConverterMethod(input="org.bukkit.craftbukkit.util.LongHashSet")
-    public static LongHashSet toLOngHashSet(Object cbLongHashSetHandle) {
+    public static LongHashSet toLongHashSet(Object cbLongHashSetHandle) {
         return new LongHashSet(cbLongHashSetHandle);
     }
 

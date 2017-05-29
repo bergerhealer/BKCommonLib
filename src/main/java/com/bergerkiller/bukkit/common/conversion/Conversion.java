@@ -28,8 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-
 import java.util.UUID;
 
 public class Conversion {
@@ -70,7 +68,6 @@ public class Conversion {
     public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.server.BlockPosition");
     public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.server.PlayerAbilities");
     public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
-    public static final InputConverter<Object> toLongHashMapHandle = getConverterToHandle(Long2ObjectMap.class.getName());
     public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("org.bukkit.craftbukkit.util.LongHashSet");
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.server.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
@@ -109,7 +106,6 @@ public class Conversion {
     public static final InputConverter<PlayerAbilities> toPlayerAbilities = getConverterTo(PlayerAbilities.class);
     public static final InputConverter<EntityTracker> toEntityTracker = getConverterTo(EntityTracker.class);
     public static final InputConverter<LongHashSet> toLongHashSet = getConverterTo(LongHashSet.class);
-    public static final InputConverter<LongHashMap<Object>> toLongHashMap = CommonUtil.unsafeCast(getConverterTo(LongHashMap.class));
     public static final InputConverter<IntHashMap<Object>> toIntHashMap = CommonUtil.unsafeCast(getConverterTo(IntHashMap.class));
     public static final InputConverter<ScoreboardAction> toScoreboardAction = getConverterTo(ScoreboardAction.class);
     public static final InputConverter<UseAction> toUseAction = getConverterTo(UseAction.class);

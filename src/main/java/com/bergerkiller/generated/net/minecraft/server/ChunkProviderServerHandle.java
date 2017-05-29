@@ -47,14 +47,6 @@ public class ChunkProviderServerHandle extends Template.Handle {
         T.unloadQueue.set(instance, value);
     }
 
-    public Object getChunks() {
-        return T.chunks.get(instance);
-    }
-
-    public void setChunks(Object value) {
-        T.chunks.set(instance, value);
-    }
-
     public WorldServerHandle getWorld() {
         return T.world.get(instance);
     }
@@ -65,7 +57,6 @@ public class ChunkProviderServerHandle extends Template.Handle {
 
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
         public final Template.Field<Set<Long>> unloadQueue = new Template.Field<Set<Long>>();
-        public final Template.Field.Converted<Object> chunks = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
         public final Template.Method.Converted<List<BiomeMetaHandle>> getBiomeSpawnInfo = new Template.Method.Converted<List<BiomeMetaHandle>>();

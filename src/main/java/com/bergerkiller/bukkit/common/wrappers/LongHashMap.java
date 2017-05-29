@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+import gnu.trove.map.hash.TLongObjectHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -19,7 +20,7 @@ import java.util.Collection;
 public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
 
     public LongHashMap() {
-        this(new Long2ObjectOpenHashMap<V>());
+        this(new TLongObjectHashMap<V>());
     }
 
     /**
@@ -28,7 +29,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
      * @param initialCapacity for the new LongHashMap
      */
     public LongHashMap(int initialCapacity) {
-    	this(new Long2ObjectOpenHashMap<V>(initialCapacity));
+    	this(new TLongObjectHashMap<V>(initialCapacity));
     }
 
     public LongHashMap(Object handle) {
@@ -36,8 +37,8 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     @SuppressWarnings("unchecked")
-    private Long2ObjectMap<V> h() {
-        return (Long2ObjectMap<V>) getRawHandle();
+    private TLongObjectHashMap<V> h() {
+        return (TLongObjectHashMap<V>) getRawHandle();
     }
 
     /**
@@ -119,7 +120,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public Collection<V> getValues() {
-    	return h().values();
+    	return h().valueCollection();
     }
 
     public long[] getKeys() {

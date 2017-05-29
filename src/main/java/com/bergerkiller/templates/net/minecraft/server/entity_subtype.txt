@@ -1,5 +1,9 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -8,21 +12,33 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 
-class EntityHuman extends EntityLiving {
-}
-
 class EntityLiving extends Entity {
+    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+#if version >= 1.12-pre5
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:br;
+#else
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:bq;
+#endif
+
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
+    public final (Map<Object, Object>) Map<MobEffectList, MobEffect> mobEffects:effects;
+
     public float lastDamage;
     protected unknown boolean bd;
     public unknown float be;
     public float forwardMovement:bf;
     public unknown float bg;
+
     public boolean updateEffects;
 
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
 
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot)
+
+    protected void resetAttributes:initAttributes();
 
     public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
 
@@ -31,6 +47,52 @@ class EntityLiving extends Entity {
     public final float getHealth();
 
     public final float getMaxHealth();
+}
+
+class EntityHuman extends EntityLiving {
+    public (Object) PlayerInventory inventoryRaw:inventory;
+#if version >= 1.12-pre5
+    protected (Object) InventoryEnderChest enderChestRaw:enderChest;
+#else
+    private (Object) InventoryEnderChest enderChestRaw:enderChest;
+#endif
+    public unknown Container defaultContainer;
+    public unknown Container activeContainer;
+    protected (Object) FoodMetaData foodDataRaw:foodData;
+
+    public boolean sleeping;
+    public (IntVector3) BlockPosition bedPosition;
+    public int sleepTicks;
+#if version >= 1.12-pre5
+    public unknown float bM;
+    public unknown float bN;
+    private (IntVector3) BlockPosition spawnCoord:d;
+    private boolean spawnForced:e;
+#else
+    public unknown float bI;
+    public unknown float bJ;
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+    private unknown BlockPosition g;
+#endif
+    public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
+    public int expLevel;
+    public int expTotal;
+    public float exp;
+#if version >= 1.12-pre5
+    protected unknown int bS;
+    protected unknown float bT = 0.02F;
+    private unknown int f;
+    private final com.mojang.authlib.GameProfile gameProfile:g;
+#else
+    private unknown int h;
+    protected unknown float bO;
+    protected unknown float bP;
+    private unknown int bR;
+    private final com.mojang.authlib.GameProfile gameProfile:bS;
+#endif
+
+    public String spawnWorld;
 }
 
 class EntityPlayer extends EntityHuman {
@@ -42,6 +104,8 @@ class EntityPlayer extends EntityHuman {
 
 class EntityInsentient extends EntityLiving {
     public (EntityHandle) Entity getLeashHolder();
+
+    public (Object) NavigationAbstract getNavigation();
 }
 
 class EntityItem extends Entity {
@@ -56,11 +120,37 @@ class EntityItem extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-     public float getDamage();
-     public void setDamage(float damage);
-     public int getType();
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
+    private static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:d;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:e;
+    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:f;
+
+    public float getDamage();
+    public void setDamage(float damage);
+    public int getType();
+    public void activate:a(int x, int y, int z, boolean active);
 }
 
 class EntityMinecartRideable extends EntityMinecartAbstract {
 
+}
+
+class EntityMinecartFurnace extends EntityMinecartAbstract {
+    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
+    private int fuel:d;
+    public double pushForceX:a;
+    public double pushForceZ:b;
+}
+
+class EntityMinecartHopper extends EntityMinecartAbstract {
+    private int suckingCooldown:b;
+}
+
+class EntityMinecartTNT extends EntityMinecartAbstract {
+    private int fuse:a;
+
+    protected void explode:c(double damage);
+    public void prime:j();
 }

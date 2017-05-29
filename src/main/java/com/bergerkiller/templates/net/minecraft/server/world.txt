@@ -20,7 +20,9 @@ import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
+import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 
 class World {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
@@ -30,13 +32,21 @@ class World {
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;
+    protected (Object) NavigationListener navigationListener:t;
+    protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:u;
     protected (Object) IChunkProvider chunkProvider;
     public final (MethodProfilerHandle) MethodProfiler methodProfiler;
+
+    private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld bukkitWorld:world;
     public boolean keepSpawnInMemory;
 
     public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
 
+    public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer();
+
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
+
+    public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
 
     public long getTime();
 
@@ -68,6 +78,8 @@ class World {
 
     public void applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
 
+    protected abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
+
     <code>
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
@@ -80,7 +92,9 @@ class World {
 }
 
 class WorldServer extends World {
+    private final (MinecraftServerHandle) MinecraftServer minecraftServer:server;
     public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker:tracker;
+    private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMapField:manager;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
@@ -98,7 +112,6 @@ class WorldServer extends World {
 
 class ChunkProviderServer {
     public final Set<Long> unloadQueue;
-    public final (Object) it.unimi.dsi.fastutil.longs.Long2ObjectMap<Chunk> chunks;
     public final (WorldServerHandle) WorldServer world;
 
     public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
@@ -163,4 +176,18 @@ class WorldNBTStorage extends IDataManager {
 
 class MovingObjectPosition {
     public (org.bukkit.util.Vector) Vec3D pos;
+}
+
+class RegionFile {
+    private final java.io.File file:b;
+    private java.io.RandomAccessFile stream:c;
+
+    public (RegionFileHandle) RegionFile(java.io.File file);
+
+    public void close:c();
+    public boolean chunkExists:c(int cx, int cz);
+}
+
+class RegionFileCache {
+    public static final (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> FILES:a;
 }

@@ -1,11 +1,16 @@
 package net.minecraft.server;
 
+import com.google.common.collect.BiMap;
+
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
 
 class EnumDifficulty {
     public int getId:a();
@@ -65,4 +70,21 @@ class EnumMoveType {
 
 class EnumParticle {
     public static (EnumParticleHandle) EnumParticle byName:a(String name);
+}
+
+class EnumGamemode {
+    int id:f;
+
+    public static (EnumGamemodeHandle) EnumGamemode getById(int id);
+}
+
+class EnumProtocol {
+    enum (EnumProtocolHandle) EnumProtocol PLAY;
+
+    private final (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
+}
+
+class EnumProtocolDirection {
+    enum (EnumProtocolDirectionHandle) EnumProtocolDirection SERVERBOUND;
+    enum (EnumProtocolDirectionHandle) EnumProtocolDirection CLIENTBOUND;
 }

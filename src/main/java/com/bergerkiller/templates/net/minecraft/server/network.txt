@@ -1,0 +1,17 @@
+package net.minecraft.server;
+
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+
+class NetworkManager {
+    private final unknown EnumProtocolDirection h;
+    private final (Queue<Object>) Queue<NetworkManager.QueuedPacket> queue:i;
+    public io.netty.channel.Channel channel;
+
+    public boolean isConnected();
+}
+
+class PlayerConnection {
+    public final (Object) NetworkManager networkManager;
+
+    public void sendPacket((CommonPacket) Packet<?> packet);
+}

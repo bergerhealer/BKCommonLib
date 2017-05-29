@@ -38,12 +38,28 @@ public class WorldServerHandle extends WorldHandle {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
 
+    public MinecraftServerHandle getMinecraftServer() {
+        return T.minecraftServer.get(instance);
+    }
+
+    public void setMinecraftServer(MinecraftServerHandle value) {
+        T.minecraftServer.set(instance, value);
+    }
+
     public EntityTracker getEntityTracker() {
         return T.entityTracker.get(instance);
     }
 
     public void setEntityTracker(EntityTracker value) {
         T.entityTracker.set(instance, value);
+    }
+
+    public PlayerChunkMapHandle getPlayerChunkMapField() {
+        return T.playerChunkMapField.get(instance);
+    }
+
+    public void setPlayerChunkMapField(PlayerChunkMapHandle value) {
+        T.playerChunkMapField.set(instance, value);
     }
 
     public Map<UUID, EntityHandle> getEntitiesByUUID() {
@@ -55,7 +71,9 @@ public class WorldServerHandle extends WorldHandle {
     }
 
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
+        public final Template.Field.Converted<MinecraftServerHandle> minecraftServer = new Template.Field.Converted<MinecraftServerHandle>();
         public final Template.Field.Converted<EntityTracker> entityTracker = new Template.Field.Converted<EntityTracker>();
+        public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMapField = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();

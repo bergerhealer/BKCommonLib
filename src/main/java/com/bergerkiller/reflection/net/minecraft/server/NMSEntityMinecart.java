@@ -1,6 +1,10 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -8,14 +12,14 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 public class NMSEntityMinecart {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartAbstract");
 
-    public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = DataWatcher.Key.fromStaticField(T, "a");
-    public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = DataWatcher.Key.fromStaticField(T, "b");
-    public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = DataWatcher.Key.fromStaticField(T, "c");
-    public static DataWatcher.Key<Integer> DATA_BLOCK_TYPE = DataWatcher.Key.fromStaticField(T, "d");
-    public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = DataWatcher.Key.fromStaticField(T, "e");
-    public static DataWatcher.Key<Boolean> DATA_BLOCK_VISIBLE = DataWatcher.Key.fromStaticField(T, "f");
+    public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR;
+    public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION;
+    public static DataWatcher.Key<Float> DATA_SHAKING_DAMAGE = EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE;
+    public static DataWatcher.Key<Integer> DATA_BLOCK_TYPE = EntityMinecartAbstractHandle.DATA_BLOCK_TYPE;
+    public static DataWatcher.Key<Integer> DATA_BLOCK_OFFSET = EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET;
+    public static DataWatcher.Key<Boolean> DATA_BLOCK_VISIBLE = EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE;
 
-    public static final MethodAccessor<Void> activate = T.selectMethod("public void a(int x, int y, int z, boolean active)");
+    public static final MethodAccessor<Void> activate = EntityMinecartAbstractHandle.T.activate.toMethodAccessor();
 
     public static class Rideable {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartRideable");
@@ -24,11 +28,11 @@ public class NMSEntityMinecart {
     public static class Furnace {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartFurnace");
 
-        public static DataWatcher.Key<Boolean> DATA_SMOKING = DataWatcher.Key.fromStaticField(T, "c");
+        public static DataWatcher.Key<Boolean> DATA_SMOKING = EntityMinecartFurnaceHandle.DATA_SMOKING;
 
-        public static final FieldAccessor<Integer> fuel = T.nextField("private int d");
-        public static final FieldAccessor<Double> pushForceX = T.nextFieldSignature("public double a");
-        public static final FieldAccessor<Double> pushForceZ = T.nextFieldSignature("public double b");
+        public static final FieldAccessor<Integer> fuel = EntityMinecartFurnaceHandle.T.fuel.toFieldAccessor();
+        public static final FieldAccessor<Double> pushForceX = EntityMinecartFurnaceHandle.T.pushForceX.toFieldAccessor();
+        public static final FieldAccessor<Double> pushForceZ = EntityMinecartFurnaceHandle.T.pushForceZ.toFieldAccessor();
     }
 
     public static class MobSpawner {
@@ -38,14 +42,14 @@ public class NMSEntityMinecart {
 
     public static class Hopper {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartHopper");
-        public static final FieldAccessor<Integer> suckingCooldown = T.selectField("private int b");
+        public static final FieldAccessor<Integer> suckingCooldown = EntityMinecartHopperHandle.T.suckingCooldown.toFieldAccessor();
     }
 
     public static class TNT {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartTNT");
-        public static final FieldAccessor<Integer> fuse = T.selectField("private int a");
-        public static final MethodAccessor<Void> explode = T.selectMethod("protected void c(double damage)");
-        public static final MethodAccessor<Void> prime = T.selectMethod("public void j()");
+        public static final FieldAccessor<Integer> fuse = EntityMinecartTNTHandle.T.fuse.toFieldAccessor();
+        public static final MethodAccessor<Void> explode = EntityMinecartTNTHandle.T.explode.toMethodAccessor();
+        public static final MethodAccessor<Void> prime = EntityMinecartTNTHandle.T.prime.toMethodAccessor();
     }
 
     public static class CommandBlock {

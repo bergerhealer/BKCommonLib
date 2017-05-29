@@ -1,5 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.RegionFileCacheHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
@@ -8,10 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NMSRegionFileCache {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegionFileCache")
-            .addImport("java.io.File");
+    public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegionFileCache");
 
-    public static final FieldAccessor<Map<File, Object>> filesField = T.selectField("public static final Map<File, RegionFile> a");
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static final FieldAccessor<Map<File, Object>> filesField = (FieldAccessor) RegionFileCacheHandle.T.FILES.raw.toFieldAccessor();
     public static final Map<File, Object> FILES;
 
     static {

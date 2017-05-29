@@ -1,5 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -11,16 +12,12 @@ import java.util.Queue;
 public class NMSNetworkManager {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("NetworkManager");
 
-    static {
-    	// Note: no proper name to hook from. h might be subject to change!
-    	T.nextField("private final EnumProtocolDirection h");
-    }
-
-    public static final FieldAccessor<Queue<Object>> queue = T.nextFieldSignature("private final Queue<NetworkManager.QueuedPacket> i");
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static final FieldAccessor<Queue<Object>> queue = (FieldAccessor) NetworkManagerHandle.T.queue.raw.toFieldAccessor();
 
     //	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("l");
 
-    public static final FieldAccessor<Channel> channel = T.nextField("public io.netty.channel.Channel channel");
+    public static final FieldAccessor<Channel> channel = NetworkManagerHandle.T.channel.toFieldAccessor();
 
     /*
      # public boolean ##METHODNAME##() {
@@ -37,5 +34,5 @@ public class NMSNetworkManager {
      *     ...
      * }
      */
-    public static final MethodAccessor<Boolean> getIsOpen = T.selectMethod("public boolean isConnected()");
+    public static final MethodAccessor<Boolean> getIsOpen = NetworkManagerHandle.T.isConnected.toMethodAccessor();
 }

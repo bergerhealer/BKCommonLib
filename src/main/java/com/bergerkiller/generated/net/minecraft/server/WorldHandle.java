@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.util.Vector;
+import org.bukkit.Server;
 import org.bukkit.World;
 
 public class WorldHandle extends Template.Handle {
@@ -29,8 +30,16 @@ public class WorldHandle extends Template.Handle {
         return T.getWorld.invoke(instance);
     }
 
+    public Server getServer() {
+        return T.getServer.invoke(instance);
+    }
+
     public BlockData getBlockData(IntVector3 blockposition) {
         return T.getBlockData.invoke(instance, blockposition);
+    }
+
+    public boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags) {
+        return T.setBlockData.invoke(instance, blockposition, iblockdata, updateFlags);
     }
 
     public long getTime() {
@@ -93,6 +102,10 @@ public class WorldHandle extends Template.Handle {
         T.applyPhysics.invoke(instance, position, causeType, self);
     }
 
+    public boolean isChunkLoaded(int cx, int cz, boolean flag) {
+        return T.isChunkLoaded.invoke(instance, cx, cz, flag);
+    }
+
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
     }
@@ -141,6 +154,22 @@ public class WorldHandle extends Template.Handle {
         T.worldProvider.set(instance, value);
     }
 
+    public Object getNavigationListener() {
+        return T.navigationListener.get(instance);
+    }
+
+    public void setNavigationListener(Object value) {
+        T.navigationListener.set(instance, value);
+    }
+
+    public List<IWorldAccessHandle> getAccessList() {
+        return T.accessList.get(instance);
+    }
+
+    public void setAccessList(List<IWorldAccessHandle> value) {
+        T.accessList.set(instance, value);
+    }
+
     public Object getChunkProvider() {
         return T.chunkProvider.get(instance);
     }
@@ -157,6 +186,14 @@ public class WorldHandle extends Template.Handle {
         T.methodProfiler.set(instance, value);
     }
 
+    public World getBukkitWorld() {
+        return T.bukkitWorld.get(instance);
+    }
+
+    public void setBukkitWorld(World value) {
+        T.bukkitWorld.set(instance, value);
+    }
+
     public boolean isKeepSpawnInMemory() {
         return T.keepSpawnInMemory.getBoolean(instance);
     }
@@ -171,12 +208,17 @@ public class WorldHandle extends Template.Handle {
         public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
+        public final Template.Field.Converted<Object> navigationListener = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<List<IWorldAccessHandle>> accessList = new Template.Field.Converted<List<IWorldAccessHandle>>();
         public final Template.Field.Converted<Object> chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
+        public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();
         public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
 
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
+        public final Template.Method.Converted<Server> getServer = new Template.Method.Converted<Server>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
@@ -192,6 +234,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
         public final Template.Method.Converted<Void> applyPhysics = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isChunkLoaded = new Template.Method<Boolean>();
 
     }
 }

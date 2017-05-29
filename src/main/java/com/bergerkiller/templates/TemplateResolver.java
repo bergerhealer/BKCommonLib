@@ -15,7 +15,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private boolean classes_loaded = false;
 
     private final String[] supported_mc_versions = new String[] {
-            "1.11.2"
+            "1.11.2", "1.12-pre5"
     };
 
     @Override
@@ -43,7 +43,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
             Map<String, String> variables = new HashMap<String, String>();
             variables.put("version", Common.MC_VERSION);
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
-            SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath);
+            SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);
             for (ClassDeclaration cdec : sourceDec.classes) {
                 register(cdec);
             }

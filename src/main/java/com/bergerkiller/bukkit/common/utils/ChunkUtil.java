@@ -7,20 +7,16 @@ import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
@@ -43,7 +39,6 @@ import java.util.logging.Level;
  */
 public class ChunkUtil {
 
-    private static boolean canUseLongObjectHashMap = CommonUtil.getCBClass("util.LongObjectHashMap") != null;
     private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
 
     /**
@@ -236,23 +231,6 @@ public class ChunkUtil {
      * @return Loaded chunks
      */
     public static Collection<org.bukkit.Chunk> getChunks(World world) {
-        // LongObjectHashMap mirror
-        if (canUseLongObjectHashMap) {
-            Object chunks = CommonNMS.getHandle(world).getChunkProviderServer().getChunks();
-            if (chunks != null) {
-                try {
-                    if (canUseLongObjectHashMap && LongObjectHashMapHandle.T.isAssignableFrom(chunks)) {
-                        Object hashmap_values = LongObjectHashMapHandle.T.values.invoke(chunks);
-                        Collection<org.bukkit.Chunk> chunk_collection = DuplexConversion.chunkCollection.convert(hashmap_values);
-                        return FilteredCollection.createNullFilter(chunk_collection);
-                    }
-                } catch (Throwable t) {
-                    canUseLongObjectHashMap = false;
-                    CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
-                    CommonUtil.filterStackTrace(t).printStackTrace();
-                }
-            }
-        }
         // Bukkit alternative
         return FilteredCollection.createNullFilter(Arrays.asList(world.getLoadedChunks()));
     }
@@ -268,20 +246,6 @@ public class ChunkUtil {
      * @return The chunk, or null if it is not loaded
      */
     public static org.bukkit.Chunk getChunk(World world, final int x, final int z) {
-        final long key = MathUtil.longHashToLong(x, z);
-        Object chunks = CommonNMS.getHandle(world).getChunkProviderServer().getChunks();
-        if (chunks != null) {
-            if (canUseLongObjectHashMap && LongObjectHashMapHandle.T.isAssignableFrom(chunks)) {
-                try {
-                    return WrapperConversion.toChunk(LongObjectHashMapHandle.T.get.invoke(chunks, key));
-                } catch (Throwable t) {
-                    canUseLongObjectHashMap = false;
-                    CommonPlugin.getInstance().log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
-                    CommonUtil.filterStackTrace(t).printStackTrace();
-                }
-            }
-        }
-
         // Bukkit alternative
         if (world.isChunkLoaded(x, z)) {
             return world.getChunkAt(x, z);
@@ -302,46 +266,6 @@ public class ChunkUtil {
      */
     public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
         CommonNMS.getHandle(world).getChunkProviderServer().getChunkAt(x, z);
-    }
-
-    /**
-     * Sets a given chunk coordinate to contain the chunk specified
-     *
-     * @param world to set the chunk in
-     * @param x - coordinate of the chunk
-     * @param z - coordinate of the chunk
-     * @param chunk to set to (use null to remove)
-     */
-    public static void setChunk(World world, final int x, final int z, final org.bukkit.Chunk chunk) {
-        final ChunkHandle handle = ChunkHandle.fromBukkit(chunk);
-        if (handle != null && handle.getBukkitChunk() == null) {
-            throw new RuntimeException("Can not put a chunk that has no BukkitChunk");
-        }
-        if (canUseLongObjectHashMap) {
-            ChunkProviderServerHandle cps = CommonNMS.getHandle(world).getChunkProviderServer();
-            Object chunks = cps.getChunks();
-            if (chunks != null) {
-                final long key = MathUtil.longHashToLong(x, z);
-                try {
-                    if (canUseLongObjectHashMap && LongObjectHashMapHandle.T.isAssignableFrom(chunks)) {
-                        LongObjectHashMapHandle map = LongObjectHashMapHandle.createHandle(chunks);
-                        if (handle == null) {
-                            // Remove the chunk
-                            map.remove(key);
-                        } else {
-                            // Add the chunk
-                            map.put(key, handle.getRaw());
-                        }
-                        return;
-                    }
-                } catch (Throwable t) {
-                    canUseLongObjectHashMap = false;
-                    Logging.LOGGER.log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
-                    CommonUtil.filterStackTrace(t).printStackTrace();
-                }
-            }
-        }
-        throw new RuntimeException("Failed to set chunk using a known method");
     }
 
     /**

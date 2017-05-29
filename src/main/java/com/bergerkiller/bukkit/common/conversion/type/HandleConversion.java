@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -207,11 +206,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.EntityTracker")
     public static Object toEntityTrackerHandle(EntityTracker entityTracker) {
         return entityTracker.getRawHandle();
-    }
-
-    @ConverterMethod(output="it.unimi.dsi.fastutil.longs.Long2ObjectMap<T>")
-    public static <T> Object toLongObjectMapHandle(LongHashMap<T> longHashMapWrapper) {
-        return longHashMapWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="org.bukkit.craftbukkit.util.LongHashSet")
