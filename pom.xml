@@ -13,7 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>v1_11_R1</project.mcversion>
+        <project_mcversion>v1_11_R1</project_mcversion>
+        <project.mcversion>1.11.2</project.mcversion>
         <project.bversion>1.11.2-R0.1</project.bversion>
         <project.cbversion>1.11.2-R0.1</project.cbversion>
         <project.stableversion>1.68</project.stableversion>
@@ -176,7 +177,7 @@
                             <target_root>src/main/java</target_root>
                             <generatorActions>
                                 <generatorAction>
-                                    <source>com/bergerkiller/templates/${project.mcversion}/init.txt</source>
+                                    <source>com/bergerkiller/templates/init.txt</source>
                                     <target>com/bergerkiller/generated</target>
                                     <variables>
                                         <version>${project.mcversion}</version>
