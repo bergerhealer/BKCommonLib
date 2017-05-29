@@ -39,7 +39,7 @@
         <!-- Repository for Mountiplex -->
         <repository>
             <id>MG-Dev Jenkins CI Maven Repository</id>
-            <url>https://ci.mg-dev.eu/plugin/repository/everything/</url>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
         </repository>
 
         <!-- Repo for access to Mountiplex archived builds (defunct) -->
