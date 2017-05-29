@@ -29,18 +29,27 @@
           <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
 
-        <!-- Repo for access to Mountiplex -->
-        <repository>
-            <id>mgdev-repo</id>
-            <url>https://maven.mg-dev.eu</url>
-        </repository>
-
         <!-- Repo for access to Objenesis -->
         <repository>
             <id>mvnrepository</id>
             <url>https://mvnrepository.com/artifact/</url>
         </repository>
 
+        <!-- Repository for Mountiplex -->
+        <repository>
+            <id>MG-Dev Jenkins CI Maven Repository</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything/</url>
+        </repository>
+
+        <!-- Repo for access to Mountiplex archived builds (defunct) -->
+        <!--
+        <repository>
+            <id>mgdev-repo</id>
+            <url>https://maven.mg-dev.eu</url>
+        </repository>
+        -->
+
+        <!-- Repository for the Vault plugin -->
         <repository>
             <id>vault-repo</id>
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
