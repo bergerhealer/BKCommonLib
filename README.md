@@ -12,7 +12,7 @@ It also simplifies coding:
 * Nanosecond StopWatch class for performance monitoring
 * Operation class to handle entities, players, chunks and worlds the way you want it
 
-License:
+### License
 Copyright (C) 2013-2015 bergerkiller
 Copyright (C) 2016-2017 Berger Healer
 
