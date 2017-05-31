@@ -59,13 +59,19 @@
     </repositories>
 
     <pluginRepositories>
-        
-        <!-- Repo for access to Mountiplex -->
+        <!-- Repository for Mountiplex -->
+        <pluginRepository>
+            <id>MG-Dev Jenkins CI Maven Repository</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+        </pluginRepository>
+
+        <!-- Repo for access to Mountiplex archived builds (defunct) -->
+        <!--
         <pluginRepository>
             <id>mgdev-repo</id>
             <url>https://maven.mg-dev.eu</url>
         </pluginRepository>
-
+        -->
     </pluginRepositories>
 
     <dependencies>
