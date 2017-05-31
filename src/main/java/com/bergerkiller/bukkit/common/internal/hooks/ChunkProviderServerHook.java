@@ -16,6 +16,10 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
+/**
+ * This hook is used exclusively for the 'getMobsFor' function, which enables
+ * pre-creature-spawn handling to reduce CPU usage when disabling entity spawns.
+ */
 public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> {
 
     public static void hook(org.bukkit.World world) {
@@ -68,60 +72,6 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
             return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
         } else {
             return mobs;
-        }
-    }
-
-    @HookMethod("public Chunk loadChunk(int cx, int cz)")
-    public Object loadChunk(int cx, int cz) {
-        // Perform chunk load from file timings
-        if (!CommonPlugin.TIMINGS.isActive()) {
-            return base.loadChunk(cx, cz);
-        } else {
-            long time = System.nanoTime();
-            Object nmsChunk = base.loadChunk(cx, cz);
-            if (nmsChunk != null) {
-                time = System.nanoTime() - time;
-                CommonPlugin.TIMINGS.onChunkLoad(Conversion.toChunk.convert(nmsChunk), time);
-            }
-            return nmsChunk;
-        }
-    }
-
-    @HookMethod("public Chunk getChunkAt(int cx, int cz, Runnable runnable, boolean generate)")
-    public Object getChunkAt(int cx, int cz, Runnable runnable, boolean generate) {
-        if (!CommonPlugin.TIMINGS.isActive()) {
-            return base.getChunkAt(cx, cz, runnable, generate);
-        }
-
-        // First check if we can fetch the chunk right away (this is not loading!)
-        Object nmsChunk = ChunkProviderServerHandle.T.getChunkIfLoaded.raw.invoke(instance(), cx, cz);
-        if (nmsChunk != null) {
-            if (runnable != null) {
-                runnable.run();
-            }
-            return nmsChunk;
-        }
-
-        // We need to load or generate the chunk - time it
-        long time = System.nanoTime();
-        nmsChunk = base.getChunkAt(cx, cz, runnable, generate);
-        CommonPlugin.TIMINGS.onChunkLoad(Conversion.toChunk.convert(nmsChunk), System.nanoTime() - time);
-        return nmsChunk;
-    }
-
-    @HookMethod("public boolean unloadChunks()")
-    public boolean unloadChunks() {
-        if (!CommonPlugin.TIMINGS.isActive()) {
-            return base.unloadChunks();
-        }
-
-        long time = System.nanoTime();
-        try {
-            return base.unloadChunks();
-        } finally {
-            time = System.nanoTime() - time;
-            org.bukkit.World world = Conversion.toWorld.convert(ChunkProviderServerHandle.T.world.raw.get(instance()));
-            CommonPlugin.TIMINGS.onChunkUnloading(world, time);
         }
     }
 }

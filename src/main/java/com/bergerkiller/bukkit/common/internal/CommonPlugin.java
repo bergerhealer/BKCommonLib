@@ -409,6 +409,7 @@ public class CommonPlugin extends PluginBase {
 
         // Register events and tasks, initialize
         register(listener = new CommonListener());
+
         register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 
         tabController = new CommonTabController();
