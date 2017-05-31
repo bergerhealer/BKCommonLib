@@ -15,7 +15,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private boolean classes_loaded = false;
 
     private final String[] supported_mc_versions = new String[] {
-            "1.11.2", "1.12-pre5"
+            "1.11.2", "1.12-pre5", "1.12-pre6"
     };
 
     @Override

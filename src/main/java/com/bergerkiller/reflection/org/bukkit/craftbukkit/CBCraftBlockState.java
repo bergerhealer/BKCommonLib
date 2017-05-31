@@ -128,7 +128,11 @@ public class CBCraftBlockState {
                 }
                 String[] lines = new String[linesText.length];
                 for (int i = 0; i < lines.length; i++) {
-                    lines[i] = linesText[i].getMessage();
+                    if (linesText[i] == null) {
+                        lines[i] = "";
+                    } else {
+                        lines[i] = linesText[i].getMessage();
+                    }
                 }
                 state_lines.set(state, lines);
             }
