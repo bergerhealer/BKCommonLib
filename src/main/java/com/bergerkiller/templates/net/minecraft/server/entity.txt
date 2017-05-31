@@ -53,7 +53,7 @@ class Entity {
     public float walkedDistanceXYZ:K;
     public float fallDistance;
     private int stepCounter:ax;
-#if version >= 1.12-pre5
+#if version >= 1.12
     private unknown float ay;
 #endif
     public unknown double M;
@@ -68,7 +68,7 @@ class Entity {
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
     protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
-#if version >= 1.12-pre5
+#if version >= 1.12
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
     private static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
     private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
@@ -97,7 +97,7 @@ class Entity {
 
     public int dimension;
 
-#if version >= 1.12-pre5
+#if version >= 1.12
     private final double[] move_SomeArray:aJ;
     private long move_SomeState:aK;
 #else
@@ -182,7 +182,7 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if version >= 1.12-pre5
+#if version >= 1.12
     protected (SoundEffectHandle) SoundEffect getSwimSound:ae();
 #else
     protected (SoundEffectHandle) SoundEffect getSwimSound:aa();
@@ -211,7 +211,7 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.12-pre5
+#if version >= 1.12
     public boolean isInWaterUpdate:aq();
 #else
     public boolean isInWaterUpdate:ak();
@@ -310,7 +310,7 @@ class Entity {
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.12-pre5
+#if version >= 1.12
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
 #else
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
@@ -330,7 +330,7 @@ class Entity {
 
     public int getMaxFireTicks();
 
-#if version >= 1.12-pre5
+#if version >= 1.12
     public boolean isWet:an();
 
     public (EntityHandle) Entity getDriverEntity:bC();

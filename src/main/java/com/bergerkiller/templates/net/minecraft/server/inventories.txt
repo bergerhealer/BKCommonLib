@@ -17,7 +17,7 @@ interface IInventory {
 
     public abstract int someFunction:h();
 
-#if version >= 1.12-pre5
+#if version >= 1.12
     public abstract boolean someFunction2:x_();
 #else
     public abstract boolean someFunction2:w_();

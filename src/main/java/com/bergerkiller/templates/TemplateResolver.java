@@ -15,7 +15,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private boolean classes_loaded = false;
 
     private final String[] supported_mc_versions = new String[] {
-            "1.11.2", "1.12-pre5", "1.12-pre6"
+            "1.11.2", "1.12"
     };
 
     @Override
@@ -41,7 +41,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
 
             String templatePath = "com/bergerkiller/templates/init.txt";
             Map<String, String> variables = new HashMap<String, String>();
-            variables.put("version", Common.MC_VERSION);
+            variables.put("version", cleanVersion(Common.MC_VERSION));
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);
             for (ClassDeclaration cdec : sourceDec.classes) {
@@ -64,7 +64,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
      * @return True if supported, False if not
      */
     public boolean isSupported(String mc_version) {
-        return LogicUtil.contains(mc_version, supported_mc_versions);
+        return LogicUtil.contains(cleanVersion(mc_version), supported_mc_versions);
     }
 
     /**
@@ -74,5 +74,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
      */
     public String[] getSupportedVersions() {
         return supported_mc_versions;
+    }
+
+    private static String cleanVersion(String mc_version) {
+        String clean_version = mc_version;
+        int pre_idx = clean_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            clean_version = clean_version.substring(0, pre_idx);
+        }
+        return clean_version;
     }
 }
