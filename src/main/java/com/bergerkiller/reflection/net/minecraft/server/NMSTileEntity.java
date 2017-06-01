@@ -25,7 +25,7 @@ public class NMSTileEntity {
     public static final MethodAccessor<Void> save = T.selectMethod("public NBTTagCompound save(NBTTagCompound nbttagcompound)");
 
     public static boolean hasWorld(Object tileEntity) {
-        return TileEntityHandle.createHandle(tileEntity).getWorld() != null;
+        return TileEntityHandle.T.getWorld.invoke(tileEntity) != null;
     }
 
     public static Object getFromWorld(Block block) {

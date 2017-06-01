@@ -23,7 +23,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -54,7 +53,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 public class WrapperConversion {
@@ -141,12 +139,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.TileEntity")
     public static org.bukkit.block.BlockState toBlockState(Object nmsTileEntityHandle) {
-        return CBCraftBlockState.toBlockState(nmsTileEntityHandle);
+        return BlockStateConversion.tileEntityToBlockState(nmsTileEntityHandle);
     }
 
     @ConverterMethod
     public static org.bukkit.block.BlockState getBlockState(org.bukkit.block.Block block) {
-        return block.getState();
+        return BlockStateConversion.blockToBlockState(block);
     }
 
     @ConverterMethod(input="net.minecraft.server.DataWatcher")

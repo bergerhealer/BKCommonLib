@@ -1,50 +1,50 @@
 package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.bukkit.Chunk;
-import org.bukkit.DyeColor;
-import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
 import org.bukkit.material.MaterialData;
 
-import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
-import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeDirectField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSCommandBlockListenerAbstract;
-import com.bergerkiller.reflection.net.minecraft.server.NMSRegistryMaterials;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
-import com.mojang.authlib.GameProfile;
 
+/**
+ * Deprecated: use {@link BlockStateConversion} and {@link CraftBlockStateHandle} instead to perform BlockState
+ * conversion and initialization, or to access private members.
+ */
+@Deprecated
 public class CBCraftBlockState {
     public static final ClassTemplate<?> T = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
+    @Deprecated public static final FieldAccessor<World> world  = CraftBlockStateHandle.T.world.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<Chunk> chunk  = CraftBlockStateHandle.T.chunk.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<Integer> x         = CraftBlockStateHandle.T.x.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<Integer> y         = CraftBlockStateHandle.T.y.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<Integer> z         = CraftBlockStateHandle.T.z.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<Integer> type      = CraftBlockStateHandle.T.typeId.toFieldAccessor();
+    @Deprecated public static final FieldAccessor<MaterialData> data = CraftBlockStateHandle.T.data.toFieldAccessor();
 
+    public static Object toTileEntity(BlockState state) {
+        return BlockStateConversion.blockStateToTileEntity(state);
+    }
+
+    public static BlockState toBlockState(Block block) {
+        return BlockStateConversion.blockToBlockState(block);
+    }
+
+    public static BlockState toBlockState(Object tileEntity) {
+        return BlockStateConversion.tileEntityToBlockState(tileEntity);
+    }
+
+    // Down below is an old implementation of BlockStateConversion.
+    // This has been replaced because it failed too often and required too much maintenance.
+
+    /*
     private static final ClassMap<TileInstantiator> tileToInst = new ClassMap<TileInstantiator>();
     private static final ClassMap<TileInstantiator> stateToInst = new ClassMap<TileInstantiator>();
-    public static final FieldAccessor<World> world  = T.selectField("private final org.bukkit.craftbukkit.CraftWorld world");
-    public static final FieldAccessor<Chunk> chunk  = T.selectField("private final org.bukkit.craftbukkit.CraftChunk chunk");
-    public static final FieldAccessor<Integer> x         = T.selectField("private final int x");
-    public static final FieldAccessor<Integer> y         = T.selectField("private final int y");
-    public static final FieldAccessor<Integer> z         = T.selectField("private final int z");
-    public static final FieldAccessor<Integer> type      = T.selectField("protected int flag");
-    public static final FieldAccessor<MaterialData> data = T.selectField("protected org.bukkit.material.MaterialData data");
 
     private static void registerInst(TileInstantiator inst) {
         tileToInst.put(inst.TILE.getType(), inst);
@@ -156,7 +156,7 @@ public class CBCraftBlockState {
         registerInst(new TileInstantiator("Structure", "StructureBlock", "structure"));
     }
 
-    /* This verifies that all tile entity classes are properly registered here */
+    // This verifies that all tile entity classes are properly registered here
     static {
         FieldAccessor<Object> mapField = ClassTemplate.createNMS("TileEntity").selectField("private static final RegistryMaterials<MinecraftKey, Class<? extends TileEntity>> f");
         if (!mapField.isValid()) {
@@ -257,19 +257,20 @@ public class CBCraftBlockState {
         }
 
         public BlockState newInstance(Block block, Object tileEntity) {
-            final BlockState state = (BlockState) STATE.newInstanceNull();
+            final CraftBlockStateHandle state = CraftBlockStateHandle.createHandle(STATE.newInstanceNull());
             final BlockData bdata = WorldUtil.getBlockData(block);
-            tileField.set(state, tileEntity);
-            world.set(state, block.getWorld());
-            secondWorld.set(state, block.getWorld());
-            chunk.set(state, block.getChunk());
-            type.set(state, bdata.getTypeId());
-            x.set(state, block.getX());
-            y.set(state, block.getY());
-            z.set(state, block.getZ());
-            data.set(state, bdata.newMaterialData());
-            this.apply(state, tileEntity);
-            return state;
+            tileField.set(state.getRaw(), tileEntity);
+            secondWorld.set(state.getRaw(), block.getWorld());
+            state.setWorld(block.getWorld());
+            state.setChunk(block.getChunk());
+            state.setTypeId(block.getTypeId());
+            state.setX(block.getX());
+            state.setY(block.getY());
+            state.setZ(block.getZ());
+            this.apply((BlockState) state.getRaw(), tileEntity);
+            return (BlockState) state.getRaw();
         }
     }
+    */
+
 }

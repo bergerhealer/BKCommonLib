@@ -45,7 +45,6 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
 
 public class HandleConversion {
 
@@ -94,7 +93,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="T extends net.minecraft.server.TileEntity")
     public static Object toTileEntityHandle(org.bukkit.block.BlockState blockState) {
-        return CBCraftBlockState.toTileEntity(blockState);
+        return BlockStateConversion.blockStateToTileEntity(blockState);
     }
 
     @ConverterMethod(output="T extends net.minecraft.server.TileEntity")

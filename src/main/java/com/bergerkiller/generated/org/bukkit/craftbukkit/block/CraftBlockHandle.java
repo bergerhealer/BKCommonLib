@@ -25,8 +25,45 @@ public class CraftBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public Chunk getChunk() {
+        return T.chunk.get(instance);
+    }
+
+    public void setChunk(Chunk value) {
+        T.chunk.set(instance, value);
+    }
+
+    public int getX() {
+        return T.x.getInteger(instance);
+    }
+
+    public void setX(int value) {
+        T.x.setInteger(instance, value);
+    }
+
+    public int getY() {
+        return T.y.getInteger(instance);
+    }
+
+    public void setY(int value) {
+        T.y.setInteger(instance, value);
+    }
+
+    public int getZ() {
+        return T.z.getInteger(instance);
+    }
+
+    public void setZ(int value) {
+        T.z.setInteger(instance, value);
+    }
+
     public static final class CraftBlockClass extends Template.Class<CraftBlockHandle> {
         public final Template.Constructor.Converted<Block> constr_chunk_x_y_z = new Template.Constructor.Converted<Block>();
+
+        public final Template.Field.Converted<Chunk> chunk = new Template.Field.Converted<Chunk>();
+        public final Template.Field.Integer x = new Template.Field.Integer();
+        public final Template.Field.Integer y = new Template.Field.Integer();
+        public final Template.Field.Integer z = new Template.Field.Integer();
 
     }
 }

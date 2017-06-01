@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 
@@ -7,4 +9,7 @@ class TileEntity {
     public (WorldHandle) World getWorld();
 
     public (BlockPositionHandle) BlockPosition getPosition();
+
+    public (org.bukkit.Material) Block getType:getBlock();
+    public int getRawData:v();
 }

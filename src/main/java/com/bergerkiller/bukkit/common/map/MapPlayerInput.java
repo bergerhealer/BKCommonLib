@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityLiving;
+import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 
 /**
  * Input controller for virtual map navigation and UI.
@@ -431,7 +431,7 @@ public class MapPlayerInput {
             {
                 DataWatcher data = new DataWatcher();
                 data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
-                data.set(NMSEntityLiving.DATA_HEALTH, 10.0F);
+                data.set(EntityLivingHandle.DATA_HEALTH, 10.0F);
 
                 CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId, this._fakeMountId);

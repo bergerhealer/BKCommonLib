@@ -4,8 +4,6 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.Collection;
 

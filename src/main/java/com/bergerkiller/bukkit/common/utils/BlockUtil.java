@@ -20,13 +20,13 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftBlockState;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
@@ -419,7 +419,7 @@ public class BlockUtil extends MaterialUtil {
      * @return the Block State
      */
     public static BlockState getState(org.bukkit.block.Block block) {
-        return CBCraftBlockState.toBlockState(block);
+        return BlockStateConversion.blockToBlockState(block);
     }
 
     /**

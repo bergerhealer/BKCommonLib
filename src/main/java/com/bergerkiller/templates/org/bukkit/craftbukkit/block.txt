@@ -3,9 +3,23 @@ package org.bukkit.craftbukkit.block;
 import org.bukkit.craftbukkit.CraftChunk;
 
 class CraftBlock {
+    private final (org.bukkit.Chunk) CraftChunk chunk;
+    private final int x;
+    private final int y;
+    private final int z;
+
     public (org.bukkit.block.Block) CraftBlock((org.bukkit.Chunk) CraftChunk chunk, int x, int y, int z);
 }
 
 class CraftBlockState {
+    private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld world;
+    private final (org.bukkit.Chunk) org.bukkit.craftbukkit.CraftChunk chunk;
+    private final int x;
+    private final int y;
+    private final int z;
+    protected int typeId:type;
+    protected org.bukkit.material.MaterialData data;
+    protected int flag;
+
     public (org.bukkit.block.BlockState) CraftBlockState(org.bukkit.block.Block block);
 }
