@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -27,6 +28,7 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -451,5 +453,15 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
         return EnumItemSlotHandle.createHandle(enumItemSlotHandle).toBukkit();
+    }
+
+    @ConverterMethod(input="net.minecraft.server.ChatMessageType", optional=true)
+    public static ChatMessageType toChatMessageType(Object nmsChatMessageType) {
+        return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoke(nmsChatMessageType).byteValue());
+    }
+
+    @ConverterMethod()
+    public static ChatMessageType toChatMessageType(byte chatMessageTypeId) {
+        return ChatMessageType.getById(chatMessageTypeId);
     }
 }

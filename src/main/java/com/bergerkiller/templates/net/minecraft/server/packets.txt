@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
@@ -10,7 +12,6 @@ class PacketPlayOutScoreboardScore {
         enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction REMOVE;
     }
 }
-
 
 class PacketPlayInUseEntity {
     class PacketPlayInUseEntity.EnumEntityUseAction {
@@ -31,3 +32,13 @@ class PacketPlayOutTitle {
     }
 }
 
+class PacketPlayOutChat {
+    private (ChatText) IChatBaseComponent text:a;
+    public (Object[]) net.md_5.bungee.api.chat.BaseComponent[] components;
+#if version >= 1.12
+    private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) ChatMessageType type:b;
+#else
+    private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) byte type:b;
+#endif
+
+}

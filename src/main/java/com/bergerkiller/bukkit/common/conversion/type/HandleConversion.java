@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -25,6 +26,7 @@ import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
@@ -296,5 +298,15 @@ public class HandleConversion {
         } else {
             return null;
         }
+    }
+
+    @ConverterMethod(output="net.minecraft.server.ChatMessageType", optional=true)
+    public static Object toChatMessageTypeHandle(ChatMessageType chatMessageType) {
+        return ChatMessageTypeHandle.getRawById(chatMessageType.getId());
+    }
+
+    @ConverterMethod()
+    public static byte getChatMessageTypeId(ChatMessageType chatMessageType) {
+        return chatMessageType.getId();
     }
 }

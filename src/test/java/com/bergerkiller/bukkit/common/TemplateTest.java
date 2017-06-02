@@ -44,7 +44,7 @@ public class TemplateTest {
                 if (c == null) {
                     fail("Failed to initialize template class " + genClassPath);
                 }
-                if (!c.isValid()) {
+                if (!c.isValid() && !c.isOptional()) {
                     System.err.println("Failed to fully load template class " + genClassPath);
                     fullySuccessful = false;
                 }

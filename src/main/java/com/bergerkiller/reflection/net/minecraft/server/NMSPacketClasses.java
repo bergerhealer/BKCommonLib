@@ -35,6 +35,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -43,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -376,16 +378,9 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutChat extends NMSPacket {
-        public NMSPacketPlayOutChat() {
-            this.addImport("net.md_5.bungee.api.chat.BaseComponent");
-            this.chatComponent = nextField("private IChatBaseComponent a");
-            this.components = nextField("public BaseComponent[] components");
-            this.unknown1 = nextFieldSignature("private byte b");    
-        }
-
-        public final FieldAccessor<Object> chatComponent;
-        public final FieldAccessor<Object[]> components;
-        public final FieldAccessor<Byte> unknown1;
+        public final FieldAccessor<Object> chatComponent = PacketPlayOutChatHandle.T.text.raw.toFieldAccessor();
+        public final FieldAccessor<Object[]> components = PacketPlayOutChatHandle.T.components.toFieldAccessor();
+        public final FieldAccessor<ChatMessageType> type = PacketPlayOutChatHandle.T.type.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutCloseWindow extends NMSPacket {

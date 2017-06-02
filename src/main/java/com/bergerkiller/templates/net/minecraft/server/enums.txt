@@ -88,3 +88,10 @@ class EnumProtocolDirection {
     enum (EnumProtocolDirectionHandle) EnumProtocolDirection SERVERBOUND;
     enum (EnumProtocolDirectionHandle) EnumProtocolDirection CLIENTBOUND;
 }
+
+// version >= 1.12
+optional class ChatMessageType {
+    public byte getId:a();
+
+    public static (Object) ChatMessageType getRawById:a(byte id);
+}
