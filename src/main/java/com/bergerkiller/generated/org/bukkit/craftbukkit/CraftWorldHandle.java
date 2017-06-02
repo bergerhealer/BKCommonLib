@@ -7,7 +7,6 @@ public class CraftWorldHandle extends Template.Handle {
     public static final CraftWorldClass T = new CraftWorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftWorldHandle.class, "org.bukkit.craftbukkit.CraftWorld");
 
-
     /* ============================================================================== */
 
     public static CraftWorldHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class CraftWorldHandle extends Template.Handle {
         public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
 
     }
+
 }
+

@@ -9,7 +9,6 @@ public class CraftInventoryHandle extends Template.Handle {
     public static final CraftInventoryClass T = new CraftInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventory");
 
-
     /* ============================================================================== */
 
     public static CraftInventoryHandle createHandle(Object handleInstance) {
@@ -45,4 +44,6 @@ public class CraftInventoryHandle extends Template.Handle {
         public final Template.Method.Converted<IInventoryHandle> getHandle = new Template.Method.Converted<IInventoryHandle>();
 
     }
+
 }
+

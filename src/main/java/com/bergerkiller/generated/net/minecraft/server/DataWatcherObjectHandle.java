@@ -7,7 +7,6 @@ public class DataWatcherObjectHandle extends Template.Handle {
     public static final DataWatcherObjectClass T = new DataWatcherObjectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherObjectHandle.class, "net.minecraft.server.DataWatcherObject");
 
-
     /* ============================================================================== */
 
     public static DataWatcherObjectHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class DataWatcherObjectHandle extends Template.Handle {
 
     public static final class DataWatcherObjectClass extends Template.Class<DataWatcherObjectHandle> {
     }
+
 }
+

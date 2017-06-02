@@ -7,7 +7,6 @@ public class PlayerAbilitiesHandle extends Template.Handle {
     public static final PlayerAbilitiesClass T = new PlayerAbilitiesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerAbilitiesHandle.class, "net.minecraft.server.PlayerAbilities");
 
-
     /* ============================================================================== */
 
     public static PlayerAbilitiesHandle createHandle(Object handleInstance) {
@@ -91,4 +90,6 @@ public class PlayerAbilitiesHandle extends Template.Handle {
         public final Template.Field.Float walkSpeed = new Template.Field.Float();
 
     }
+
 }
+

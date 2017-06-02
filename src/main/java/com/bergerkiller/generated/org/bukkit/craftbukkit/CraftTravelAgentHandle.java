@@ -10,7 +10,6 @@ public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     public static final CraftTravelAgentClass T = new CraftTravelAgentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTravelAgentHandle.class, "org.bukkit.craftbukkit.CraftTravelAgent");
 
-
     /* ============================================================================== */
 
     public static CraftTravelAgentHandle createHandle(Object handleInstance) {
@@ -41,4 +40,6 @@ public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
         public final Template.Method<Location> findOrCreate = new Template.Method<Location>();
 
     }
+
 }
+

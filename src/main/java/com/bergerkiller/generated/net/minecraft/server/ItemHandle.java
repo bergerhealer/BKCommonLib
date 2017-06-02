@@ -7,7 +7,6 @@ public class ItemHandle extends Template.Handle {
     public static final ItemClass T = new ItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item");
 
-
     /* ============================================================================== */
 
     public static ItemHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class ItemHandle extends Template.Handle {
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
 
     }
+
 }
+

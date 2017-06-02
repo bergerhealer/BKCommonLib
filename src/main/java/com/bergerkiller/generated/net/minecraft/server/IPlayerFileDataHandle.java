@@ -9,7 +9,6 @@ public class IPlayerFileDataHandle extends Template.Handle {
     public static final IPlayerFileDataClass T = new IPlayerFileDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IPlayerFileDataHandle.class, "net.minecraft.server.IPlayerFileData");
 
-
     /* ============================================================================== */
 
     public static IPlayerFileDataHandle createHandle(Object handleInstance) {
@@ -39,4 +38,6 @@ public class IPlayerFileDataHandle extends Template.Handle {
         public final Template.Method<String[]> getSeenPlayers = new Template.Method<String[]>();
 
     }
+
 }
+

@@ -10,7 +10,6 @@ public class EnumProtocolHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolHandle.class, "net.minecraft.server.EnumProtocol");
 
     public static final EnumProtocolHandle PLAY = T.PLAY.getSafe();
-
     /* ============================================================================== */
 
     public static EnumProtocolHandle createHandle(Object handleInstance) {
@@ -36,4 +35,6 @@ public class EnumProtocolHandle extends Template.Handle {
         public final Template.Field.Converted<Map<EnumProtocolDirectionHandle, BiMap>> packetMap = new Template.Field.Converted<Map<EnumProtocolDirectionHandle, BiMap>>();
 
     }
+
 }
+

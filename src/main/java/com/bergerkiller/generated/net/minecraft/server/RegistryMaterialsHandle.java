@@ -7,7 +7,6 @@ public class RegistryMaterialsHandle extends Template.Handle {
     public static final RegistryMaterialsClass T = new RegistryMaterialsClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryMaterialsHandle.class, "net.minecraft.server.RegistryMaterials");
 
-
     /* ============================================================================== */
 
     public static RegistryMaterialsHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class RegistryMaterialsHandle extends Template.Handle {
         public final Template.Method<Object> get = new Template.Method<Object>();
 
     }
+
 }
+

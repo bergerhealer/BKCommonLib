@@ -9,7 +9,6 @@ public class RegionFileHandle extends Template.Handle {
     public static final RegionFileClass T = new RegionFileClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileHandle.class, "net.minecraft.server.RegionFile");
 
-
     /* ============================================================================== */
 
     public static RegionFileHandle createHandle(Object handleInstance) {
@@ -59,4 +58,6 @@ public class RegionFileHandle extends Template.Handle {
         public final Template.Method<Boolean> chunkExists = new Template.Method<Boolean>();
 
     }
+
 }
+

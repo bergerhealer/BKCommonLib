@@ -10,7 +10,6 @@ public class GenericAttributesHandle extends Template.Handle {
 
     public static final Object FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
     public static final Object MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();
-
     /* ============================================================================== */
 
     public static GenericAttributesHandle createHandle(Object handleInstance) {
@@ -38,4 +37,6 @@ public class GenericAttributesHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<CommonTagList> saveToNBT = new Template.StaticMethod.Converted<CommonTagList>();
 
     }
+
 }
+

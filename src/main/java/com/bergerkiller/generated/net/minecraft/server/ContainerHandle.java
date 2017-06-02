@@ -8,7 +8,6 @@ public class ContainerHandle extends Template.Handle {
     public static final ContainerClass T = new ContainerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerHandle.class, "net.minecraft.server.Container");
 
-
     /* ============================================================================== */
 
     public static ContainerHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class ContainerHandle extends Template.Handle {
         public final Template.Method<InventoryView> getBukkitView = new Template.Method<InventoryView>();
 
     }
+
 }
+

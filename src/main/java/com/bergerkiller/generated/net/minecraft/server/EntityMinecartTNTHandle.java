@@ -7,7 +7,6 @@ public class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
     public static final EntityMinecartTNTClass T = new EntityMinecartTNTClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartTNTHandle.class, "net.minecraft.server.EntityMinecartTNT");
 
-
     /* ============================================================================== */
 
     public static EntityMinecartTNTHandle createHandle(Object handleInstance) {
@@ -42,4 +41,6 @@ public class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
         public final Template.Method<Void> prime = new Template.Method<Void>();
 
     }
+
 }
+

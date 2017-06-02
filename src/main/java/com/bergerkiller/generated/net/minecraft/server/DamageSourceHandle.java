@@ -12,7 +12,6 @@ public class DamageSourceHandle extends Template.Handle {
     public static final DamageSourceClass T = new DamageSourceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource");
 
-
     /* ============================================================================== */
 
     public static DamageSourceHandle createHandle(Object handleInstance) {
@@ -68,6 +67,7 @@ public class DamageSourceHandle extends Template.Handle {
         return T.getEntity.invoke(instance);
     }
 
+
     public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {
         ExplosionHandle explosionHandle = null;
         if (explodableEntity != null) {
@@ -92,7 +92,6 @@ public class DamageSourceHandle extends Template.Handle {
         }
         return result;
     }
-
     public String getTranslationIndex() {
         return T.translationIndex.get(instance);
     }
@@ -118,4 +117,6 @@ public class DamageSourceHandle extends Template.Handle {
         public final Template.Method.Converted<Entity> getEntity = new Template.Method.Converted<Entity>();
 
     }
+
 }
+

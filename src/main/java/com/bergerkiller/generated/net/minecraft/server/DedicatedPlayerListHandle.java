@@ -7,7 +7,6 @@ public class DedicatedPlayerListHandle extends PlayerListHandle {
     public static final DedicatedPlayerListClass T = new DedicatedPlayerListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DedicatedPlayerListHandle.class, "net.minecraft.server.DedicatedPlayerList");
 
-
     /* ============================================================================== */
 
     public static DedicatedPlayerListHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class DedicatedPlayerListHandle extends PlayerListHandle {
 
     public static final class DedicatedPlayerListClass extends Template.Class<DedicatedPlayerListHandle> {
     }
+
 }
+

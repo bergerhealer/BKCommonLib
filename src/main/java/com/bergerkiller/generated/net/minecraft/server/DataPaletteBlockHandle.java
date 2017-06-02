@@ -8,7 +8,6 @@ public class DataPaletteBlockHandle extends Template.Handle {
     public static final DataPaletteBlockClass T = new DataPaletteBlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataPaletteBlockHandle.class, "net.minecraft.server.DataPaletteBlock");
 
-
     /* ============================================================================== */
 
     public static DataPaletteBlockHandle createHandle(Object handleInstance) {
@@ -38,4 +37,6 @@ public class DataPaletteBlockHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();
 
     }
+
 }
+

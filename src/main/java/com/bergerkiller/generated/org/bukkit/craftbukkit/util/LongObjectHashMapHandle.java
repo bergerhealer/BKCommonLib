@@ -8,7 +8,6 @@ public class LongObjectHashMapHandle extends Template.Handle {
     public static final LongObjectHashMapClass T = new LongObjectHashMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LongObjectHashMapHandle.class, "org.bukkit.craftbukkit.util.LongObjectHashMap");
 
-
     /* ============================================================================== */
 
     public static LongObjectHashMapHandle createHandle(Object handleInstance) {
@@ -43,4 +42,6 @@ public class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method<Collection<Object>> values = new Template.Method<Collection<Object>>();
 
     }
+
 }
+

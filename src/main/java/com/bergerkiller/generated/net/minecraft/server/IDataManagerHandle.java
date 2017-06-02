@@ -7,7 +7,6 @@ public class IDataManagerHandle extends Template.Handle {
     public static final IDataManagerClass T = new IDataManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IDataManagerHandle.class, "net.minecraft.server.IDataManager");
 
-
     /* ============================================================================== */
 
     public static IDataManagerHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class IDataManagerHandle extends Template.Handle {
 
     public static final class IDataManagerClass extends Template.Class<IDataManagerHandle> {
     }
+
 }
+

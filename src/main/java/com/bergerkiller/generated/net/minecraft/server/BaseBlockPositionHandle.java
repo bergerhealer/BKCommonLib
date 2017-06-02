@@ -7,7 +7,6 @@ public class BaseBlockPositionHandle extends Template.Handle {
     public static final BaseBlockPositionClass T = new BaseBlockPositionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BaseBlockPositionHandle.class, "net.minecraft.server.BaseBlockPosition");
 
-
     /* ============================================================================== */
 
     public static BaseBlockPositionHandle createHandle(Object handleInstance) {
@@ -49,4 +48,6 @@ public class BaseBlockPositionHandle extends Template.Handle {
         public final Template.Field.Integer z = new Template.Field.Integer();
 
     }
+
 }
+

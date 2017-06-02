@@ -12,7 +12,6 @@ public class EnumMoveTypeHandle extends Template.Handle {
     public static final EnumMoveTypeHandle PISTON = T.PISTON.getSafe();
     public static final EnumMoveTypeHandle SHULKER_BOX = T.SHULKER_BOX.getSafe();
     public static final EnumMoveTypeHandle SHULKER = T.SHULKER.getSafe();
-
     /* ============================================================================== */
 
     public static EnumMoveTypeHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class EnumMoveTypeHandle extends Template.Handle {
         public final Template.EnumConstant.Converted<EnumMoveTypeHandle> SHULKER = new Template.EnumConstant.Converted<EnumMoveTypeHandle>();
 
     }
+
 }
+

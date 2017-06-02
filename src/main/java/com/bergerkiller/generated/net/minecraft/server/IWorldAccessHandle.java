@@ -7,7 +7,6 @@ public class IWorldAccessHandle extends Template.Handle {
     public static final IWorldAccessClass T = new IWorldAccessClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IWorldAccessHandle.class, "net.minecraft.server.IWorldAccess");
 
-
     /* ============================================================================== */
 
     public static IWorldAccessHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class IWorldAccessHandle extends Template.Handle {
         public final Template.Method.Converted<Void> onEntityRemoved = new Template.Method.Converted<Void>();
 
     }
+
 }
+

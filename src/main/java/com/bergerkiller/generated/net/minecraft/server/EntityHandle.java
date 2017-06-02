@@ -27,7 +27,6 @@ public class EntityHandle extends Template.Handle {
     public static final Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = T.DATA_CUSTOM_NAME_VISIBLE.getSafe();
     public static final Key<Boolean> DATA_SILENT = T.DATA_SILENT.getSafe();
     public static final Key<Boolean> DATA_NO_GRAVITY = T.DATA_NO_GRAVITY.getSafe();
-
     /* ============================================================================== */
 
     public static EntityHandle createHandle(Object handleInstance) {
@@ -243,6 +242,7 @@ public class EntityHandle extends Template.Handle {
         return T.getBukkitEntity.invoke(instance);
     }
 
+
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);
     public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
@@ -264,7 +264,6 @@ public class EntityHandle extends Template.Handle {
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
-
     public Entity getBukkitEntityField() {
         return T.bukkitEntityField.get(instance);
     }
@@ -777,4 +776,6 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 
     }
+
 }
+

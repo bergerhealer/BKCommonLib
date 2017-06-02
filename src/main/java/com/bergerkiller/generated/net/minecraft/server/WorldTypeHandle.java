@@ -7,7 +7,6 @@ public class WorldTypeHandle extends Template.Handle {
     public static final WorldTypeClass T = new WorldTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldTypeHandle.class, "net.minecraft.server.WorldType");
 
-
     /* ============================================================================== */
 
     public static WorldTypeHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class WorldTypeHandle extends Template.Handle {
         public final Template.Method<Integer> getDimension = new Template.Method<Integer>();
 
     }
+
 }
+

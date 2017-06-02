@@ -7,7 +7,6 @@ public class MinecraftKeyHandle extends Template.Handle {
     public static final MinecraftKeyClass T = new MinecraftKeyClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftKeyHandle.class, "net.minecraft.server.MinecraftKey");
 
-
     /* ============================================================================== */
 
     public static MinecraftKeyHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class MinecraftKeyHandle extends Template.Handle {
         public final Template.Constructor.Converted<MinecraftKeyHandle> constr_keyToken = new Template.Constructor.Converted<MinecraftKeyHandle>();
 
     }
+
 }
+

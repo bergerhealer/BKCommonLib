@@ -7,7 +7,6 @@ public class PacketPlayOutScoreboardScoreHandle extends Template.Handle {
     public static final PacketPlayOutScoreboardScoreClass T = new PacketPlayOutScoreboardScoreClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardScoreHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore");
 
-
     /* ============================================================================== */
 
     public static PacketPlayOutScoreboardScoreHandle createHandle(Object handleInstance) {
@@ -22,13 +21,13 @@ public class PacketPlayOutScoreboardScoreHandle extends Template.Handle {
     public static final class PacketPlayOutScoreboardScoreClass extends Template.Class<PacketPlayOutScoreboardScoreHandle> {
     }
 
+
     public static class EnumScoreboardActionHandle extends Template.Handle {
         public static final EnumScoreboardActionClass T = new EnumScoreboardActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumScoreboardActionHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
 
         public static final EnumScoreboardActionHandle CHANGE = T.CHANGE.getSafe();
         public static final EnumScoreboardActionHandle REMOVE = T.REMOVE.getSafe();
-
         /* ============================================================================== */
 
         public static EnumScoreboardActionHandle createHandle(Object handleInstance) {
@@ -45,5 +44,8 @@ public class PacketPlayOutScoreboardScoreHandle extends Template.Handle {
             public final Template.EnumConstant.Converted<EnumScoreboardActionHandle> REMOVE = new Template.EnumConstant.Converted<EnumScoreboardActionHandle>();
 
         }
+
     }
+
 }
+

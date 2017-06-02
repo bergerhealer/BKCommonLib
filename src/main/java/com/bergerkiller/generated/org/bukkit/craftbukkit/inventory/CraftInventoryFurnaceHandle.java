@@ -8,7 +8,6 @@ public class CraftInventoryFurnaceHandle extends Template.Handle {
     public static final CraftInventoryFurnaceClass T = new CraftInventoryFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryFurnaceHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryFurnace");
 
-
     /* ============================================================================== */
 
     public static CraftInventoryFurnaceHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class CraftInventoryFurnaceHandle extends Template.Handle {
         public final Template.Constructor.Converted<FurnaceInventory> constr_nmsTileEntityFurnace = new Template.Constructor.Converted<FurnaceInventory>();
 
     }
+
 }
+

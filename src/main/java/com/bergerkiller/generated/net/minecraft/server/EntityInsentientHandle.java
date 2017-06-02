@@ -7,7 +7,6 @@ public class EntityInsentientHandle extends EntityLivingHandle {
     public static final EntityInsentientClass T = new EntityInsentientClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityInsentientHandle.class, "net.minecraft.server.EntityInsentient");
 
-
     /* ============================================================================== */
 
     public static EntityInsentientHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class EntityInsentientHandle extends EntityLivingHandle {
         public final Template.Method.Converted<Object> getNavigation = new Template.Method.Converted<Object>();
 
     }
+
 }
+

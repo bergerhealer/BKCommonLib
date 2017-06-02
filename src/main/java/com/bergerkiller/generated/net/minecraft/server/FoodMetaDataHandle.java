@@ -8,7 +8,6 @@ public class FoodMetaDataHandle extends Template.Handle {
     public static final FoodMetaDataClass T = new FoodMetaDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(FoodMetaDataHandle.class, "net.minecraft.server.FoodMetaData");
 
-
     /* ============================================================================== */
 
     public static FoodMetaDataHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class FoodMetaDataHandle extends Template.Handle {
         public final Template.Method.Converted<Void> saveToNBT = new Template.Method.Converted<Void>();
 
     }
+
 }
+

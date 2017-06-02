@@ -10,7 +10,6 @@ public class WorldServerHandle extends WorldHandle {
     public static final WorldServerClass T = new WorldServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer");
 
-
     /* ============================================================================== */
 
     public static WorldServerHandle createHandle(Object handleInstance) {
@@ -34,10 +33,10 @@ public class WorldServerHandle extends WorldHandle {
         T.saveLevel.invoke(instance);
     }
 
+
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
-
     public MinecraftServerHandle getMinecraftServer() {
         return T.minecraftServer.get(instance);
     }
@@ -81,4 +80,6 @@ public class WorldServerHandle extends WorldHandle {
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 
     }
+
 }
+

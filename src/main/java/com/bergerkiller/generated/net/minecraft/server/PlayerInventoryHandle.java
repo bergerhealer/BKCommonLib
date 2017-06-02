@@ -8,7 +8,6 @@ public class PlayerInventoryHandle extends IInventoryHandle {
     public static final PlayerInventoryClass T = new PlayerInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "net.minecraft.server.PlayerInventory");
 
-
     /* ============================================================================== */
 
     public static PlayerInventoryHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class PlayerInventoryHandle extends IInventoryHandle {
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
 
     }
+
 }
+

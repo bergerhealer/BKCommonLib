@@ -7,7 +7,6 @@ public class MobSpawnerDataHandle extends Template.Handle {
     public static final MobSpawnerDataClass T = new MobSpawnerDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerDataHandle.class, "net.minecraft.server.MobSpawnerData");
 
-
     /* ============================================================================== */
 
     public static MobSpawnerDataHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class MobSpawnerDataHandle extends Template.Handle {
 
     public static final class MobSpawnerDataClass extends Template.Class<MobSpawnerDataHandle> {
     }
+
 }
+

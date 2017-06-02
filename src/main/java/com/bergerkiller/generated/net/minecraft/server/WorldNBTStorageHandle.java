@@ -8,7 +8,6 @@ public class WorldNBTStorageHandle extends IDataManagerHandle {
     public static final WorldNBTStorageClass T = new WorldNBTStorageClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldNBTStorageHandle.class, "net.minecraft.server.WorldNBTStorage");
 
-
     /* ============================================================================== */
 
     public static WorldNBTStorageHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class WorldNBTStorageHandle extends IDataManagerHandle {
         public final Template.Method<File> getPlayerDir = new Template.Method<File>();
 
     }
+
 }
+

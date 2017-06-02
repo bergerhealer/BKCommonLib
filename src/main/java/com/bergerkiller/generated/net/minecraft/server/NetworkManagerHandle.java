@@ -9,7 +9,6 @@ public class NetworkManagerHandle extends Template.Handle {
     public static final NetworkManagerClass T = new NetworkManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NetworkManagerHandle.class, "net.minecraft.server.NetworkManager");
 
-
     /* ============================================================================== */
 
     public static NetworkManagerHandle createHandle(Object handleInstance) {
@@ -48,4 +47,6 @@ public class NetworkManagerHandle extends Template.Handle {
         public final Template.Method<Boolean> isConnected = new Template.Method<Boolean>();
 
     }
+
 }
+

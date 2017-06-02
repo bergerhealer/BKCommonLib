@@ -7,7 +7,6 @@ public class EnumParticleHandle extends Template.Handle {
     public static final EnumParticleClass T = new EnumParticleClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumParticleHandle.class, "net.minecraft.server.EnumParticle");
 
-
     /* ============================================================================== */
 
     public static EnumParticleHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class EnumParticleHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<EnumParticleHandle> byName = new Template.StaticMethod.Converted<EnumParticleHandle>();
 
     }
+
 }
+

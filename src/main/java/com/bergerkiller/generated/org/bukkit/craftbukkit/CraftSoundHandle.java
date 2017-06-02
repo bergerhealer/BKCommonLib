@@ -8,7 +8,6 @@ public class CraftSoundHandle extends Template.Handle {
     public static final CraftSoundClass T = new CraftSoundClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftSoundHandle.class, "org.bukkit.craftbukkit.CraftSound");
 
-
     /* ============================================================================== */
 
     public static CraftSoundHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class CraftSoundHandle extends Template.Handle {
         public final Template.StaticMethod<String> getSoundName = new Template.StaticMethod<String>();
 
     }
+
 }
+

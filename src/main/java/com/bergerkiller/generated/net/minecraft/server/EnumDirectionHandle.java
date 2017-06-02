@@ -13,7 +13,6 @@ public class EnumDirectionHandle extends Template.Handle {
     public static final EnumDirectionHandle SOUTH = T.SOUTH.getSafe();
     public static final EnumDirectionHandle WEST = T.WEST.getSafe();
     public static final EnumDirectionHandle EAST = T.EAST.getSafe();
-
     /* ============================================================================== */
 
     public static EnumDirectionHandle createHandle(Object handleInstance) {
@@ -35,6 +34,7 @@ public class EnumDirectionHandle extends Template.Handle {
 
     }
 
+
     public static class EnumAxisHandle extends Template.Handle {
         public static final EnumAxisClass T = new EnumAxisClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumAxisHandle.class, "net.minecraft.server.EnumDirection.EnumAxis");
@@ -42,7 +42,6 @@ public class EnumDirectionHandle extends Template.Handle {
         public static final EnumAxisHandle X = T.X.getSafe();
         public static final EnumAxisHandle Y = T.Y.getSafe();
         public static final EnumAxisHandle Z = T.Z.getSafe();
-
         /* ============================================================================== */
 
         public static EnumAxisHandle createHandle(Object handleInstance) {
@@ -54,15 +53,18 @@ public class EnumDirectionHandle extends Template.Handle {
 
         /* ============================================================================== */
 
+
         public int ordinal() {
             return ((Enum<?>) instance).ordinal();
         }
-
         public static final class EnumAxisClass extends Template.Class<EnumAxisHandle> {
             public final Template.EnumConstant.Converted<EnumAxisHandle> X = new Template.EnumConstant.Converted<EnumAxisHandle>();
             public final Template.EnumConstant.Converted<EnumAxisHandle> Y = new Template.EnumConstant.Converted<EnumAxisHandle>();
             public final Template.EnumConstant.Converted<EnumAxisHandle> Z = new Template.EnumConstant.Converted<EnumAxisHandle>();
 
         }
+
     }
+
 }
+

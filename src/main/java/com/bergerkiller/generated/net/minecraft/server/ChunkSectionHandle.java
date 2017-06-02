@@ -8,7 +8,6 @@ public class ChunkSectionHandle extends Template.Handle {
     public static final ChunkSectionClass T = new ChunkSectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkSectionHandle.class, "net.minecraft.server.ChunkSection");
 
-
     /* ============================================================================== */
 
     public static ChunkSectionHandle createHandle(Object handleInstance) {
@@ -98,4 +97,6 @@ public class ChunkSectionHandle extends Template.Handle {
         public final Template.Method<Void> setBlockLight = new Template.Method<Void>();
 
     }
+
 }
+

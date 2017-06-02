@@ -7,7 +7,6 @@ public class BlockFenceGateHandle extends Template.Handle {
     public static final BlockFenceGateClass T = new BlockFenceGateClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockFenceGateHandle.class, "net.minecraft.server.BlockFenceGate");
 
-
     /* ============================================================================== */
 
     public static BlockFenceGateHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class BlockFenceGateHandle extends Template.Handle {
 
     public static final class BlockFenceGateClass extends Template.Class<BlockFenceGateHandle> {
     }
+
 }
+

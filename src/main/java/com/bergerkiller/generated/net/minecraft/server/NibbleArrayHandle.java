@@ -7,7 +7,6 @@ public class NibbleArrayHandle extends Template.Handle {
     public static final NibbleArrayClass T = new NibbleArrayClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NibbleArrayHandle.class, "net.minecraft.server.NibbleArray");
 
-
     /* ============================================================================== */
 
     public static NibbleArrayHandle createHandle(Object handleInstance) {
@@ -53,4 +52,6 @@ public class NibbleArrayHandle extends Template.Handle {
         public final Template.Method<Void> set = new Template.Method<Void>();
 
     }
+
 }
+

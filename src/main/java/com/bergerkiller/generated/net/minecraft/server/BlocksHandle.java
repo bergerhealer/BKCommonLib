@@ -8,7 +8,6 @@ public class BlocksHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlocksHandle.class, "net.minecraft.server.Blocks");
 
     public static final Object LADDER = T.LADDER.getSafe();
-
     /* ============================================================================== */
 
     public static BlocksHandle createHandle(Object handleInstance) {
@@ -24,4 +23,6 @@ public class BlocksHandle extends Template.Handle {
         public final Template.StaticField.Converted<Object> LADDER = new Template.StaticField.Converted<Object>();
 
     }
+
 }
+

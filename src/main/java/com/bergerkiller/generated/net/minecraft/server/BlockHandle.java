@@ -12,7 +12,6 @@ public class BlockHandle extends Template.Handle {
 
     public static final Iterable REGISTRY = T.REGISTRY.getSafe();
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();
-
     /* ============================================================================== */
 
     public static BlockHandle createHandle(Object handleInstance) {
@@ -116,4 +115,6 @@ public class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Integer> toLegacyData = new Template.Method.Converted<Integer>();
 
     }
+
 }
+

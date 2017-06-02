@@ -8,7 +8,6 @@ public class IRecipeHandle extends Template.Handle {
     public static final IRecipeClass T = new IRecipeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IRecipeHandle.class, "net.minecraft.server.IRecipe");
 
-
     /* ============================================================================== */
 
     public static IRecipeHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class IRecipeHandle extends Template.Handle {
         public final Template.Method.Converted<ItemStack> getOutput = new Template.Method.Converted<ItemStack>();
 
     }
+
 }
+

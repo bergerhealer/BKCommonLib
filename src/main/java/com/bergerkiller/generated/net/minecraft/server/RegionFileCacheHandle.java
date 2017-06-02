@@ -10,7 +10,6 @@ public class RegionFileCacheHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileCacheHandle.class, "net.minecraft.server.RegionFileCache");
 
     public static final Map<File, RegionFileHandle> FILES = T.FILES.getSafe();
-
     /* ============================================================================== */
 
     public static RegionFileCacheHandle createHandle(Object handleInstance) {
@@ -26,4 +25,6 @@ public class RegionFileCacheHandle extends Template.Handle {
         public final Template.StaticField.Converted<Map<File, RegionFileHandle>> FILES = new Template.StaticField.Converted<Map<File, RegionFileHandle>>();
 
     }
+
 }
+

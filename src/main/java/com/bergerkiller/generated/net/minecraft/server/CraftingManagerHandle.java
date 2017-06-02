@@ -8,7 +8,6 @@ public class CraftingManagerHandle extends Template.Handle {
     public static final CraftingManagerClass T = new CraftingManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftingManagerHandle.class, "net.minecraft.server.CraftingManager");
 
-
     /* ============================================================================== */
 
     public static CraftingManagerHandle createHandle(Object handleInstance) {
@@ -19,6 +18,7 @@ public class CraftingManagerHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
 
     public static Iterable<com.bergerkiller.generated.net.minecraft.server.IRecipeHandle> getRecipes() {
         if (T.opt_recipesField.isAvailable()) {
@@ -31,7 +31,6 @@ public class CraftingManagerHandle extends Template.Handle {
             throw new RuntimeException("Recipes listing information not resolved");
         }
     }
-
     public static final class CraftingManagerClass extends Template.Class<CraftingManagerHandle> {
         @Template.Optional
         public final Template.StaticField.Converted<Iterable> opt_recipesField = new Template.StaticField.Converted<Iterable>();
@@ -43,4 +42,6 @@ public class CraftingManagerHandle extends Template.Handle {
         public final Template.Method.Converted<List<IRecipeHandle>> opt_getRecipes = new Template.Method.Converted<List<IRecipeHandle>>();
 
     }
+
 }
+

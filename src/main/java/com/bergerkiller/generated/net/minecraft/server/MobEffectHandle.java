@@ -8,7 +8,6 @@ public class MobEffectHandle extends Template.Handle {
     public static final MobEffectClass T = new MobEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectHandle.class, "net.minecraft.server.MobEffect");
 
-
     /* ============================================================================== */
 
     public static MobEffectHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class MobEffectHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
 
     }
+
 }
+

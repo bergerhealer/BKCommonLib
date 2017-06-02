@@ -8,7 +8,6 @@ public class CraftItemStackHandle extends Template.Handle {
     public static final CraftItemStackClass T = new CraftItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftItemStackHandle.class, "org.bukkit.craftbukkit.inventory.CraftItemStack");
 
-
     /* ============================================================================== */
 
     public static CraftItemStackHandle createHandle(Object handleInstance) {
@@ -48,4 +47,6 @@ public class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
 
     }
+
 }
+

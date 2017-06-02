@@ -7,7 +7,6 @@ public class CrashReportHandle extends Template.Handle {
     public static final CrashReportClass T = new CrashReportClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CrashReportHandle.class, "net.minecraft.server.CrashReport");
 
-
     /* ============================================================================== */
 
     public static CrashReportHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class CrashReportHandle extends Template.Handle {
         public final Template.Method.Converted<CrashReportSystemDetailsHandle> getSystemDetails = new Template.Method.Converted<CrashReportSystemDetailsHandle>();
 
     }
+
 }
+

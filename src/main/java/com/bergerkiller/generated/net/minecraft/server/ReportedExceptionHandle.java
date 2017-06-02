@@ -7,7 +7,6 @@ public class ReportedExceptionHandle extends Template.Handle {
     public static final ReportedExceptionClass T = new ReportedExceptionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ReportedExceptionHandle.class, "net.minecraft.server.ReportedException");
 
-
     /* ============================================================================== */
 
     public static ReportedExceptionHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class ReportedExceptionHandle extends Template.Handle {
         public final Template.Constructor.Converted<ReportedExceptionHandle> constr_paramCrashReport = new Template.Constructor.Converted<ReportedExceptionHandle>();
 
     }
+
 }
+

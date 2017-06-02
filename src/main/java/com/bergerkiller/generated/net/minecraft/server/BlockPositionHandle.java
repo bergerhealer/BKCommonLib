@@ -7,7 +7,6 @@ public class BlockPositionHandle extends BaseBlockPositionHandle {
     public static final BlockPositionClass T = new BlockPositionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockPositionHandle.class, "net.minecraft.server.BlockPosition");
 
-
     /* ============================================================================== */
 
     public static BlockPositionHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class BlockPositionHandle extends BaseBlockPositionHandle {
         public final Template.Constructor.Converted<BlockPositionHandle> constr_x_y_z = new Template.Constructor.Converted<BlockPositionHandle>();
 
     }
+
 }
+

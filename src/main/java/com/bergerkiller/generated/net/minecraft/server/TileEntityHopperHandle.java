@@ -7,7 +7,6 @@ public class TileEntityHopperHandle extends TileEntityHandle {
     public static final TileEntityHopperClass T = new TileEntityHopperClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHopperHandle.class, "net.minecraft.server.TileEntityHopper");
 
-
     /* ============================================================================== */
 
     public static TileEntityHopperHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class TileEntityHopperHandle extends TileEntityHandle {
         public final Template.StaticMethod.Converted<Boolean> suckItems = new Template.StaticMethod.Converted<Boolean>();
 
     }
+
 }
+

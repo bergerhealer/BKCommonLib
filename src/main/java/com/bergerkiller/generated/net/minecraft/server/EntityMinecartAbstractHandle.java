@@ -14,7 +14,6 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
     public static final Key<Integer> DATA_BLOCK_TYPE = T.DATA_BLOCK_TYPE.getSafe();
     public static final Key<Integer> DATA_BLOCK_OFFSET = T.DATA_BLOCK_OFFSET.getSafe();
     public static final Key<Boolean> DATA_BLOCK_VISIBLE = T.DATA_BLOCK_VISIBLE.getSafe();
-
     /* ============================================================================== */
 
     public static EntityMinecartAbstractHandle createHandle(Object handleInstance) {
@@ -56,4 +55,6 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
         public final Template.Method<Void> activate = new Template.Method<Void>();
 
     }
+
 }
+

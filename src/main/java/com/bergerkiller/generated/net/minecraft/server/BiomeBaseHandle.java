@@ -8,7 +8,6 @@ public class BiomeBaseHandle extends Template.Handle {
     public static final BiomeBaseClass T = new BiomeBaseClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase");
 
-
     /* ============================================================================== */
 
     public static BiomeBaseHandle createHandle(Object handleInstance) {
@@ -23,10 +22,10 @@ public class BiomeBaseHandle extends Template.Handle {
     public static final class BiomeBaseClass extends Template.Class<BiomeBaseHandle> {
     }
 
+
     public static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
         public static final BiomeMetaClass T = new BiomeMetaClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta");
-
 
         /* ============================================================================== */
 
@@ -75,5 +74,8 @@ public class BiomeBaseHandle extends Template.Handle {
             public final Template.Field.Integer maxSpawnCount = new Template.Field.Integer();
 
         }
+
     }
+
 }
+

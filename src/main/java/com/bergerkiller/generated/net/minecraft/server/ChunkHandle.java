@@ -12,7 +12,6 @@ public class ChunkHandle extends Template.Handle {
     public static final ChunkClass T = new ChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk");
 
-
     /* ============================================================================== */
 
     public static ChunkHandle createHandle(Object handleInstance) {
@@ -64,6 +63,7 @@ public class ChunkHandle extends Template.Handle {
         return T.checkCanSave.invoke(instance, isNotAutosave);
     }
 
+
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
             return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toChunkHandle(chunk));
@@ -71,7 +71,6 @@ public class ChunkHandle extends Template.Handle {
             return null;
         }
     }
-
     public ChunkSectionHandle[] getSections() {
         return T.sections.get(instance);
     }
@@ -149,4 +148,6 @@ public class ChunkHandle extends Template.Handle {
         public final Template.Method<Boolean> checkCanSave = new Template.Method<Boolean>();
 
     }
+
 }
+

@@ -7,7 +7,6 @@ public class EntityItemHandle extends EntityHandle {
     public static final EntityItemClass T = new EntityItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemHandle.class, "net.minecraft.server.EntityItem");
 
-
     /* ============================================================================== */
 
     public static EntityItemHandle createHandle(Object handleInstance) {
@@ -57,4 +56,6 @@ public class EntityItemHandle extends EntityHandle {
         public final Template.Method.Converted<Void> setItemStack = new Template.Method.Converted<Void>();
 
     }
+
 }
+

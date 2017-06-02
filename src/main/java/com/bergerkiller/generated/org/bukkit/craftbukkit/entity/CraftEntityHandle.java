@@ -10,7 +10,6 @@ public class CraftEntityHandle extends Template.Handle {
     public static final CraftEntityClass T = new CraftEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftEntityHandle.class, "org.bukkit.craftbukkit.entity.CraftEntity");
 
-
     /* ============================================================================== */
 
     public static CraftEntityHandle createHandle(Object handleInstance) {
@@ -51,4 +50,6 @@ public class CraftEntityHandle extends Template.Handle {
         public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
 
     }
+
 }
+

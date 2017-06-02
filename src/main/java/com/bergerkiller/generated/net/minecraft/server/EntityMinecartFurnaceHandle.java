@@ -9,7 +9,6 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace");
 
     public static final Key<Boolean> DATA_SMOKING = T.DATA_SMOKING.getSafe();
-
     /* ============================================================================== */
 
     public static EntityMinecartFurnaceHandle createHandle(Object handleInstance) {
@@ -53,4 +52,6 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
         public final Template.Field.Double pushForceZ = new Template.Field.Double();
 
     }
+
 }
+

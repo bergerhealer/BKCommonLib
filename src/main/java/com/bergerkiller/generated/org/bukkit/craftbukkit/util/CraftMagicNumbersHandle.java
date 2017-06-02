@@ -8,7 +8,6 @@ public class CraftMagicNumbersHandle extends Template.Handle {
     public static final CraftMagicNumbersClass T = new CraftMagicNumbersClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftMagicNumbersHandle.class, "org.bukkit.craftbukkit.util.CraftMagicNumbers");
 
-
     /* ============================================================================== */
 
     public static CraftMagicNumbersHandle createHandle(Object handleInstance) {
@@ -43,4 +42,6 @@ public class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Object> getBlockFromMaterial = new Template.StaticMethod.Converted<Object>();
 
     }
+
 }
+

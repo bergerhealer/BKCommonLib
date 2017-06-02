@@ -9,7 +9,6 @@ public class SimplePluginManagerHandle extends Template.Handle {
     public static final SimplePluginManagerClass T = new SimplePluginManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SimplePluginManagerHandle.class, "org.bukkit.plugin.SimplePluginManager");
 
-
     /* ============================================================================== */
 
     public static SimplePluginManagerHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class SimplePluginManagerHandle extends Template.Handle {
         public final Template.Field<List<Plugin>> plugins = new Template.Field<List<Plugin>>();
 
     }
+
 }
+

@@ -9,7 +9,6 @@ public class RecipesFurnaceHandle extends Template.Handle {
     public static final RecipesFurnaceClass T = new RecipesFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RecipesFurnaceHandle.class, "net.minecraft.server.RecipesFurnace");
 
-
     /* ============================================================================== */
 
     public static RecipesFurnaceHandle createHandle(Object handleInstance) {
@@ -45,4 +44,6 @@ public class RecipesFurnaceHandle extends Template.Handle {
         public final Template.Method.Converted<ItemStackHandle> getResult = new Template.Method.Converted<ItemStackHandle>();
 
     }
+
 }
+

@@ -8,7 +8,6 @@ public class CraftInventoryBeaconHandle extends Template.Handle {
     public static final CraftInventoryBeaconClass T = new CraftInventoryBeaconClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBeaconHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBeacon");
 
-
     /* ============================================================================== */
 
     public static CraftInventoryBeaconHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class CraftInventoryBeaconHandle extends Template.Handle {
         public final Template.Constructor.Converted<BeaconInventory> constr_nmsTileEntityBeacon = new Template.Constructor.Converted<BeaconInventory>();
 
     }
+
 }
+

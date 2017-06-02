@@ -8,7 +8,6 @@ public class RegisteredListenerHandle extends Template.Handle {
     public static final RegisteredListenerClass T = new RegisteredListenerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegisteredListenerHandle.class, "org.bukkit.plugin.RegisteredListener");
 
-
     /* ============================================================================== */
 
     public static RegisteredListenerHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class RegisteredListenerHandle extends Template.Handle {
         public final Template.Field<EventExecutor> executor = new Template.Field<EventExecutor>();
 
     }
+
 }
+

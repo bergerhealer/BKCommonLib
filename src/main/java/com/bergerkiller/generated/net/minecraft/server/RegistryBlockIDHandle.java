@@ -7,7 +7,6 @@ public class RegistryBlockIDHandle extends Template.Handle {
     public static final RegistryBlockIDClass T = new RegistryBlockIDClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryBlockIDHandle.class, "net.minecraft.server.RegistryBlockID");
 
-
     /* ============================================================================== */
 
     public static RegistryBlockIDHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class RegistryBlockIDHandle extends Template.Handle {
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
 
     }
+
 }
+

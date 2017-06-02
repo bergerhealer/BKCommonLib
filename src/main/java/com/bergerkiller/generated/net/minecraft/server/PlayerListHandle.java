@@ -11,7 +11,6 @@ public class PlayerListHandle extends Template.Handle {
     public static final PlayerListClass T = new PlayerListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerListHandle.class, "net.minecraft.server.PlayerList");
 
-
     /* ============================================================================== */
 
     public static PlayerListHandle createHandle(Object handleInstance) {
@@ -64,4 +63,6 @@ public class PlayerListHandle extends Template.Handle {
         public final Template.Method.Converted<Void> sendPacketNearby = new Template.Method.Converted<Void>();
 
     }
+
 }
+

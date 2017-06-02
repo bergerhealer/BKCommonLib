@@ -7,7 +7,6 @@ public class WeightedRandomHandle extends Template.Handle {
     public static final WeightedRandomClass T = new WeightedRandomClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomHandle.class, "net.minecraft.server.WeightedRandom");
 
-
     /* ============================================================================== */
 
     public static WeightedRandomHandle createHandle(Object handleInstance) {
@@ -22,10 +21,10 @@ public class WeightedRandomHandle extends Template.Handle {
     public static final class WeightedRandomClass extends Template.Class<WeightedRandomHandle> {
     }
 
+
     public static class WeightedRandomChoiceHandle extends Template.Handle {
         public static final WeightedRandomChoiceClass T = new WeightedRandomChoiceClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomChoiceHandle.class, "net.minecraft.server.WeightedRandom.WeightedRandomChoice");
-
 
         /* ============================================================================== */
 
@@ -50,5 +49,8 @@ public class WeightedRandomHandle extends Template.Handle {
             public final Template.Field.Integer chance = new Template.Field.Integer();
 
         }
+
     }
+
 }
+

@@ -7,7 +7,6 @@ public class NBTBaseHandle extends Template.Handle {
     public static final NBTBaseClass T = new NBTBaseClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTBaseHandle.class, "net.minecraft.server.NBTBase");
 
-
     /* ============================================================================== */
 
     public static NBTBaseHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class NBTBaseHandle extends Template.Handle {
         public final Template.Method.Converted<NBTBaseHandle> clone = new Template.Method.Converted<NBTBaseHandle>();
 
     }
+
 }
+

@@ -8,7 +8,6 @@ public class SoundEffectsHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectsHandle.class, "net.minecraft.server.SoundEffects");
 
     public static final SoundEffectHandle EXTINGUISH_FIRE = T.EXTINGUISH_FIRE.getSafe();
-
     /* ============================================================================== */
 
     public static SoundEffectsHandle createHandle(Object handleInstance) {
@@ -24,4 +23,6 @@ public class SoundEffectsHandle extends Template.Handle {
         public final Template.StaticField.Converted<SoundEffectHandle> EXTINGUISH_FIRE = new Template.StaticField.Converted<SoundEffectHandle>();
 
     }
+
 }
+

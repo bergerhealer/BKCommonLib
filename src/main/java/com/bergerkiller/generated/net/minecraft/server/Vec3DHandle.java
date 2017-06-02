@@ -7,7 +7,6 @@ public class Vec3DHandle extends Template.Handle {
     public static final Vec3DClass T = new Vec3DClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(Vec3DHandle.class, "net.minecraft.server.Vec3D");
 
-
     /* ============================================================================== */
 
     public static Vec3DHandle createHandle(Object handleInstance) {
@@ -55,4 +54,6 @@ public class Vec3DHandle extends Template.Handle {
         public final Template.Field.Double z = new Template.Field.Double();
 
     }
+
 }
+

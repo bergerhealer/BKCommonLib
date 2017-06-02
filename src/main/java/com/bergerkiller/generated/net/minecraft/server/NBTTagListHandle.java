@@ -8,7 +8,6 @@ public class NBTTagListHandle extends NBTBaseHandle {
     public static final NBTTagListClass T = new NBTTagListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagListHandle.class, "net.minecraft.server.NBTTagList");
 
-
     /* ============================================================================== */
 
     public static NBTTagListHandle createHandle(Object handleInstance) {
@@ -57,4 +56,6 @@ public class NBTTagListHandle extends NBTBaseHandle {
         public final Template.Method.Converted<NBTBaseHandle> get = new Template.Method.Converted<NBTBaseHandle>();
 
     }
+
 }
+

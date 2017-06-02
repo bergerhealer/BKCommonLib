@@ -7,7 +7,6 @@ public class ChunkCoordIntPairHandle extends Template.Handle {
     public static final ChunkCoordIntPairClass T = new ChunkCoordIntPairClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkCoordIntPairHandle.class, "net.minecraft.server.ChunkCoordIntPair");
 
-
     /* ============================================================================== */
 
     public static ChunkCoordIntPairHandle createHandle(Object handleInstance) {
@@ -46,4 +45,6 @@ public class ChunkCoordIntPairHandle extends Template.Handle {
         public final Template.Field.Integer z = new Template.Field.Integer();
 
     }
+
 }
+

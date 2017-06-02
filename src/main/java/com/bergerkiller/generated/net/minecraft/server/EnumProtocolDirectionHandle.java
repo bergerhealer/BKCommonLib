@@ -9,7 +9,6 @@ public class EnumProtocolDirectionHandle extends Template.Handle {
 
     public static final EnumProtocolDirectionHandle SERVERBOUND = T.SERVERBOUND.getSafe();
     public static final EnumProtocolDirectionHandle CLIENTBOUND = T.CLIENTBOUND.getSafe();
-
     /* ============================================================================== */
 
     public static EnumProtocolDirectionHandle createHandle(Object handleInstance) {
@@ -26,4 +25,6 @@ public class EnumProtocolDirectionHandle extends Template.Handle {
         public final Template.EnumConstant.Converted<EnumProtocolDirectionHandle> CLIENTBOUND = new Template.EnumConstant.Converted<EnumProtocolDirectionHandle>();
 
     }
+
 }
+

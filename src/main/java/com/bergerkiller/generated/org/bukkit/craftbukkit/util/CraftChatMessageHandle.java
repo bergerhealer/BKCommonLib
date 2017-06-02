@@ -8,7 +8,6 @@ public class CraftChatMessageHandle extends Template.Handle {
     public static final CraftChatMessageClass T = new CraftChatMessageClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChatMessageHandle.class, "org.bukkit.craftbukkit.util.CraftChatMessage");
 
-
     /* ============================================================================== */
 
     public static CraftChatMessageHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class CraftChatMessageHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<IChatBaseComponentHandle[]> fromString = new Template.StaticMethod.Converted<IChatBaseComponentHandle[]>();
 
     }
+
 }
+

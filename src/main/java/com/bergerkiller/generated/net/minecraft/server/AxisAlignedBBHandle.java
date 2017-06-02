@@ -7,7 +7,6 @@ public class AxisAlignedBBHandle extends Template.Handle {
     public static final AxisAlignedBBClass T = new AxisAlignedBBClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AxisAlignedBBHandle.class, "net.minecraft.server.AxisAlignedBB");
 
-
     /* ============================================================================== */
 
     public static AxisAlignedBBHandle createHandle(Object handleInstance) {
@@ -133,4 +132,6 @@ public class AxisAlignedBBHandle extends Template.Handle {
         public final Template.Method.Converted<Double> calcSomeZ = new Template.Method.Converted<Double>();
 
     }
+
 }
+

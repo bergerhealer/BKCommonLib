@@ -8,7 +8,6 @@ public class InventoryEnderChestHandle extends IInventoryHandle {
     public static final InventoryEnderChestClass T = new InventoryEnderChestClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryEnderChestHandle.class, "net.minecraft.server.InventoryEnderChest");
 
-
     /* ============================================================================== */
 
     public static InventoryEnderChestHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class InventoryEnderChestHandle extends IInventoryHandle {
         public final Template.Method.Converted<CommonTagList> saveToNBT = new Template.Method.Converted<CommonTagList>();
 
     }
+
 }
+

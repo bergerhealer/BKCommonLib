@@ -7,7 +7,6 @@ public class EntityTrackerHandle extends Template.Handle {
     public static final EntityTrackerClass T = new EntityTrackerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerHandle.class, "net.minecraft.server.EntityTracker");
 
-
     /* ============================================================================== */
 
     public static EntityTrackerHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class EntityTrackerHandle extends Template.Handle {
 
     public static final class EntityTrackerClass extends Template.Class<EntityTrackerHandle> {
     }
+
 }
+

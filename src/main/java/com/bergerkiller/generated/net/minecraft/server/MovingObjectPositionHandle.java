@@ -8,7 +8,6 @@ public class MovingObjectPositionHandle extends Template.Handle {
     public static final MovingObjectPositionClass T = new MovingObjectPositionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MovingObjectPositionHandle.class, "net.minecraft.server.MovingObjectPosition");
 
-
     /* ============================================================================== */
 
     public static MovingObjectPositionHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class MovingObjectPositionHandle extends Template.Handle {
         public final Template.Field.Converted<Vector> pos = new Template.Field.Converted<Vector>();
 
     }
+
 }
+

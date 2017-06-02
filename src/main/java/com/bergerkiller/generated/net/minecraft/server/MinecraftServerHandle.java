@@ -8,7 +8,6 @@ public class MinecraftServerHandle extends Template.Handle {
     public static final MinecraftServerClass T = new MinecraftServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftServerHandle.class, "net.minecraft.server.MinecraftServer");
 
-
     /* ============================================================================== */
 
     public static MinecraftServerHandle createHandle(Object handleInstance) {
@@ -20,10 +19,10 @@ public class MinecraftServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
     }
-
     public List<WorldServerHandle> getWorlds() {
         return T.worlds.get(instance);
     }
@@ -36,4 +35,6 @@ public class MinecraftServerHandle extends Template.Handle {
         public final Template.Field.Converted<List<WorldServerHandle>> worlds = new Template.Field.Converted<List<WorldServerHandle>>();
 
     }
+
 }
+

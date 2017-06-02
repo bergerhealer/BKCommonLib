@@ -10,7 +10,6 @@ public class ItemStackHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack");
 
     public static final ItemStackHandle EMPTY_ITEM = T.EMPTY_ITEM.getSafe();
-
     /* ============================================================================== */
 
     public static ItemStackHandle createHandle(Object handleInstance) {
@@ -66,6 +65,7 @@ public class ItemStackHandle extends Template.Handle {
         return T.cloneAndSubtract.invoke(instance, n);
     }
 
+
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
         if (itemStack == null) {
             return null;
@@ -73,7 +73,6 @@ public class ItemStackHandle extends Template.Handle {
             return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toItemStackHandle(itemStack));
         }
     }
-
     public int getAmountField() {
         return T.amountField.getInteger(instance);
     }
@@ -128,4 +127,6 @@ public class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
 
     }
+
 }
+

@@ -7,7 +7,6 @@ public class EnumGamemodeHandle extends Template.Handle {
     public static final EnumGamemodeClass T = new EnumGamemodeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumGamemodeHandle.class, "net.minecraft.server.EnumGamemode");
 
-
     /* ============================================================================== */
 
     public static EnumGamemodeHandle createHandle(Object handleInstance) {
@@ -37,4 +36,6 @@ public class EnumGamemodeHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<EnumGamemodeHandle> getById = new Template.StaticMethod.Converted<EnumGamemodeHandle>();
 
     }
+
 }
+

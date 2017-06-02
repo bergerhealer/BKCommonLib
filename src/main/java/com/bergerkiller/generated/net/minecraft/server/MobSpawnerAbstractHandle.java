@@ -9,7 +9,6 @@ public class MobSpawnerAbstractHandle extends Template.Handle {
     public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract");
 
-
     /* ============================================================================== */
 
     public static MobSpawnerAbstractHandle createHandle(Object handleInstance) {
@@ -130,4 +129,6 @@ public class MobSpawnerAbstractHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setMobName = new Template.Method.Converted<Void>();
 
     }
+
 }
+

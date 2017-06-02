@@ -9,7 +9,6 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
     public static final NBTTagCompoundClass T = new NBTTagCompoundClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagCompoundHandle.class, "net.minecraft.server.NBTTagCompound");
 
-
     /* ============================================================================== */
 
     public static NBTTagCompoundHandle createHandle(Object handleInstance) {
@@ -69,4 +68,6 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
 
     }
+
 }
+

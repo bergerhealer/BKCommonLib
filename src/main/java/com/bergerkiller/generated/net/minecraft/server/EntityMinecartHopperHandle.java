@@ -7,7 +7,6 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
     public static final EntityMinecartHopperClass T = new EntityMinecartHopperClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartHopperHandle.class, "net.minecraft.server.EntityMinecartHopper");
 
-
     /* ============================================================================== */
 
     public static EntityMinecartHopperHandle createHandle(Object handleInstance) {
@@ -31,4 +30,6 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
         public final Template.Field.Integer suckingCooldown = new Template.Field.Integer();
 
     }
+
 }
+

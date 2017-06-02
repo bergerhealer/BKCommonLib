@@ -8,7 +8,6 @@ public class LongHashSetHandle extends Template.Handle {
     public static final LongHashSetClass T = new LongHashSetClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LongHashSetHandle.class, "org.bukkit.craftbukkit.util.LongHashSet");
 
-
     /* ============================================================================== */
 
     public static LongHashSetHandle createHandle(Object handleInstance) {
@@ -133,4 +132,6 @@ public class LongHashSetHandle extends Template.Handle {
         public final Template.Method<Void> rehashResize = new Template.Method<Void>();
 
     }
+
 }
+

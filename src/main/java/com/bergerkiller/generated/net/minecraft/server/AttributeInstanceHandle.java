@@ -7,7 +7,6 @@ public class AttributeInstanceHandle extends Template.Handle {
     public static final AttributeInstanceClass T = new AttributeInstanceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeInstanceHandle.class, "net.minecraft.server.AttributeInstance");
 
-
     /* ============================================================================== */
 
     public static AttributeInstanceHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class AttributeInstanceHandle extends Template.Handle {
         public final Template.Method<Double> getValue = new Template.Method<Double>();
 
     }
+
 }
+

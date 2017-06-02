@@ -9,7 +9,6 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
     public static final ShapelessRecipesClass T = new ShapelessRecipesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ShapelessRecipesHandle.class, "net.minecraft.server.ShapelessRecipes");
 
-
     /* ============================================================================== */
 
     public static ShapelessRecipesHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
         public final Template.Field.Converted<List<ItemStack>> inputItems = new Template.Field.Converted<List<ItemStack>>();
 
     }
+
 }
+

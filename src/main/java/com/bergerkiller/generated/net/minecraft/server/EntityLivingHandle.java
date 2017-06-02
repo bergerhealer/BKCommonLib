@@ -17,7 +17,6 @@ public class EntityLivingHandle extends EntityHandle {
     public static final Key<Integer> DATA_PARTICLES_TIMER = T.DATA_PARTICLES_TIMER.getSafe();
     public static final Key<Boolean> DATA_PARTICLES_HIDDEN = T.DATA_PARTICLES_HIDDEN.getSafe();
     public static final Key<Integer> DATA_UNKNOWN1 = T.DATA_UNKNOWN1.getSafe();
-
     /* ============================================================================== */
 
     public static EntityLivingHandle createHandle(Object handleInstance) {
@@ -119,4 +118,6 @@ public class EntityLivingHandle extends EntityHandle {
         public final Template.Method<Float> getMaxHealth = new Template.Method<Float>();
 
     }
+
 }
+

@@ -7,7 +7,6 @@ public class EntityMinecartRideableHandle extends EntityMinecartAbstractHandle {
     public static final EntityMinecartRideableClass T = new EntityMinecartRideableClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartRideableHandle.class, "net.minecraft.server.EntityMinecartRideable");
 
-
     /* ============================================================================== */
 
     public static EntityMinecartRideableHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class EntityMinecartRideableHandle extends EntityMinecartAbstractHandle {
 
     public static final class EntityMinecartRideableClass extends Template.Class<EntityMinecartRideableHandle> {
     }
+
 }
+

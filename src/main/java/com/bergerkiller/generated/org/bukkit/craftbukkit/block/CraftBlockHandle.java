@@ -9,7 +9,6 @@ public class CraftBlockHandle extends Template.Handle {
     public static final CraftBlockClass T = new CraftBlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockHandle.class, "org.bukkit.craftbukkit.block.CraftBlock");
 
-
     /* ============================================================================== */
 
     public static CraftBlockHandle createHandle(Object handleInstance) {
@@ -66,4 +65,6 @@ public class CraftBlockHandle extends Template.Handle {
         public final Template.Field.Integer z = new Template.Field.Integer();
 
     }
+
 }
+

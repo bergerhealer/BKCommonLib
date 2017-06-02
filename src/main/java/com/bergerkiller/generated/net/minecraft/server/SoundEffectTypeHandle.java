@@ -7,7 +7,6 @@ public class SoundEffectTypeHandle extends Template.Handle {
     public static final SoundEffectTypeClass T = new SoundEffectTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectTypeHandle.class, "net.minecraft.server.SoundEffectType");
 
-
     /* ============================================================================== */
 
     public static SoundEffectTypeHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class SoundEffectTypeHandle extends Template.Handle {
         public final Template.Method.Converted<SoundEffectHandle> getDefault = new Template.Method.Converted<SoundEffectHandle>();
 
     }
+
 }
+

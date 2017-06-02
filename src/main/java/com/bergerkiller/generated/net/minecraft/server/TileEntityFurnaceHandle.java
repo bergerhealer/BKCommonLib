@@ -7,7 +7,6 @@ public class TileEntityFurnaceHandle extends TileEntityHandle {
     public static final TileEntityFurnaceClass T = new TileEntityFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityFurnaceHandle.class, "net.minecraft.server.TileEntityFurnace");
 
-
     /* ============================================================================== */
 
     public static TileEntityFurnaceHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class TileEntityFurnaceHandle extends TileEntityHandle {
         public final Template.StaticMethod.Converted<Integer> fuelTime = new Template.StaticMethod.Converted<Integer>();
 
     }
+
 }
+

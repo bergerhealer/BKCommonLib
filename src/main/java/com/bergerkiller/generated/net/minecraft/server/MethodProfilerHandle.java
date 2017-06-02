@@ -7,7 +7,6 @@ public class MethodProfilerHandle extends Template.Handle {
     public static final MethodProfilerClass T = new MethodProfilerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MethodProfilerHandle.class, "net.minecraft.server.MethodProfiler");
 
-
     /* ============================================================================== */
 
     public static MethodProfilerHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class MethodProfilerHandle extends Template.Handle {
         public final Template.Method<Void> end = new Template.Method<Void>();
 
     }
+
 }
+

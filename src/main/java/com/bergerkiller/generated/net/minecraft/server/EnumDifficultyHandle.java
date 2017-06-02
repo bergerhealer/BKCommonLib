@@ -7,7 +7,6 @@ public class EnumDifficultyHandle extends Template.Handle {
     public static final EnumDifficultyClass T = new EnumDifficultyClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDifficultyHandle.class, "net.minecraft.server.EnumDifficulty");
 
-
     /* ============================================================================== */
 
     public static EnumDifficultyHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class EnumDifficultyHandle extends Template.Handle {
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
 
     }
+
 }
+

@@ -9,7 +9,6 @@ public class EnumSkyBlockHandle extends Template.Handle {
 
     public static final EnumSkyBlockHandle SKY = T.SKY.getSafe();
     public static final EnumSkyBlockHandle BLOCK = T.BLOCK.getSafe();
-
     /* ============================================================================== */
 
     public static EnumSkyBlockHandle createHandle(Object handleInstance) {
@@ -21,10 +20,10 @@ public class EnumSkyBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+
     public int ordinal() {
         return ((Enum<?>) instance).ordinal();
     }
-
     public int getBrightness() {
         return T.brightness.getInteger(instance);
     }
@@ -40,4 +39,6 @@ public class EnumSkyBlockHandle extends Template.Handle {
         public final Template.Field.Integer brightness = new Template.Field.Integer();
 
     }
+
 }
+

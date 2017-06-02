@@ -7,7 +7,6 @@ public class PacketPlayInUseEntityHandle extends Template.Handle {
     public static final PacketPlayInUseEntityClass T = new PacketPlayInUseEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity");
 
-
     /* ============================================================================== */
 
     public static PacketPlayInUseEntityHandle createHandle(Object handleInstance) {
@@ -22,6 +21,7 @@ public class PacketPlayInUseEntityHandle extends Template.Handle {
     public static final class PacketPlayInUseEntityClass extends Template.Class<PacketPlayInUseEntityHandle> {
     }
 
+
     public static class EnumEntityUseActionHandle extends Template.Handle {
         public static final EnumEntityUseActionClass T = new EnumEntityUseActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumEntityUseActionHandle.class, "net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
@@ -29,7 +29,6 @@ public class PacketPlayInUseEntityHandle extends Template.Handle {
         public static final EnumEntityUseActionHandle INTERACT = T.INTERACT.getSafe();
         public static final EnumEntityUseActionHandle ATTACK = T.ATTACK.getSafe();
         public static final EnumEntityUseActionHandle INTERACT_AT = T.INTERACT_AT.getSafe();
-
         /* ============================================================================== */
 
         public static EnumEntityUseActionHandle createHandle(Object handleInstance) {
@@ -47,5 +46,8 @@ public class PacketPlayInUseEntityHandle extends Template.Handle {
             public final Template.EnumConstant.Converted<EnumEntityUseActionHandle> INTERACT_AT = new Template.EnumConstant.Converted<EnumEntityUseActionHandle>();
 
         }
+
     }
+
 }
+

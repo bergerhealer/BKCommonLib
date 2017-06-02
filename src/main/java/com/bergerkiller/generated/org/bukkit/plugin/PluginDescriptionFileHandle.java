@@ -8,7 +8,6 @@ public class PluginDescriptionFileHandle extends Template.Handle {
     public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile");
 
-
     /* ============================================================================== */
 
     public static PluginDescriptionFileHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class PluginDescriptionFileHandle extends Template.Handle {
         public final Template.Field<Map<String, Map<String, Object>>> commands = new Template.Field<Map<String, Map<String, Object>>>();
 
     }
+
 }
+

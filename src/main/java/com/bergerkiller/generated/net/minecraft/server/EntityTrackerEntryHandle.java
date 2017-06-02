@@ -12,7 +12,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryHandle.class, "net.minecraft.server.EntityTrackerEntry");
 
-
     /* ============================================================================== */
 
     public static EntityTrackerEntryHandle createHandle(Object handleInstance) {
@@ -241,4 +240,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
 
     }
+
 }
+

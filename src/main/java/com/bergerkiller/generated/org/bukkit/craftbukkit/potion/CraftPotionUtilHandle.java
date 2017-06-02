@@ -8,7 +8,6 @@ public class CraftPotionUtilHandle extends Template.Handle {
     public static final CraftPotionUtilClass T = new CraftPotionUtilClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftPotionUtilHandle.class, "org.bukkit.craftbukkit.potion.CraftPotionUtil");
 
-
     /* ============================================================================== */
 
     public static CraftPotionUtilHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class CraftPotionUtilHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Object> fromBukkit = new Template.StaticMethod.Converted<Object>();
 
     }
+
 }
+

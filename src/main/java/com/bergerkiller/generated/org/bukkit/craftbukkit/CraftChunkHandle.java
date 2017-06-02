@@ -7,7 +7,6 @@ public class CraftChunkHandle extends Template.Handle {
     public static final CraftChunkClass T = new CraftChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChunkHandle.class, "org.bukkit.craftbukkit.CraftChunk");
 
-
     /* ============================================================================== */
 
     public static CraftChunkHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class CraftChunkHandle extends Template.Handle {
         public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
 
     }
+
 }
+

@@ -8,7 +8,6 @@ public class AttributeMapServerHandle extends Template.Handle {
     public static final AttributeMapServerClass T = new AttributeMapServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeMapServerHandle.class, "net.minecraft.server.AttributeMapServer");
 
-
     /* ============================================================================== */
 
     public static AttributeMapServerHandle createHandle(Object handleInstance) {
@@ -34,4 +33,6 @@ public class AttributeMapServerHandle extends Template.Handle {
         public final Template.Method.Converted<Collection<Object>> attributes = new Template.Method.Converted<Collection<Object>>();
 
     }
+
 }
+

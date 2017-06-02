@@ -9,7 +9,6 @@ public class EnumHandHandle extends Template.Handle {
 
     public static final EnumHandHandle MAIN_HAND = T.MAIN_HAND.getSafe();
     public static final EnumHandHandle OFF_HAND = T.OFF_HAND.getSafe();
-
     /* ============================================================================== */
 
     public static EnumHandHandle createHandle(Object handleInstance) {
@@ -26,4 +25,6 @@ public class EnumHandHandle extends Template.Handle {
         public final Template.EnumConstant.Converted<EnumHandHandle> OFF_HAND = new Template.EnumConstant.Converted<EnumHandHandle>();
 
     }
+
 }
+

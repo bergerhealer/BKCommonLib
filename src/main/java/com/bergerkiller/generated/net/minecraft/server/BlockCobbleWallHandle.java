@@ -7,7 +7,6 @@ public class BlockCobbleWallHandle extends Template.Handle {
     public static final BlockCobbleWallClass T = new BlockCobbleWallClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCobbleWallHandle.class, "net.minecraft.server.BlockCobbleWall");
 
-
     /* ============================================================================== */
 
     public static BlockCobbleWallHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class BlockCobbleWallHandle extends Template.Handle {
 
     public static final class BlockCobbleWallClass extends Template.Class<BlockCobbleWallHandle> {
     }
+
 }
+

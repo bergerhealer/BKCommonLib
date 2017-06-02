@@ -12,7 +12,6 @@ public class CraftBlockStateHandle extends Template.Handle {
     public static final CraftBlockStateClass T = new CraftBlockStateClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState");
 
-
     /* ============================================================================== */
 
     public static CraftBlockStateHandle createHandle(Object handleInstance) {
@@ -105,4 +104,6 @@ public class CraftBlockStateHandle extends Template.Handle {
         public final Template.Field.Integer flag = new Template.Field.Integer();
 
     }
+
 }
+

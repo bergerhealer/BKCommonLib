@@ -7,7 +7,6 @@ public class IBlockDataHandle extends Template.Handle {
     public static final IBlockDataClass T = new IBlockDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockDataHandle.class, "net.minecraft.server.IBlockData");
 
-
     /* ============================================================================== */
 
     public static IBlockDataHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class IBlockDataHandle extends Template.Handle {
         public final Template.Method.Converted<BlockHandle> getBlock = new Template.Method.Converted<BlockHandle>();
 
     }
+
 }
+

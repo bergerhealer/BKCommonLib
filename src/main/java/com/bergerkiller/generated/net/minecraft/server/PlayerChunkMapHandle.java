@@ -7,7 +7,6 @@ public class PlayerChunkMapHandle extends Template.Handle {
     public static final PlayerChunkMapClass T = new PlayerChunkMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkMapHandle.class, "net.minecraft.server.PlayerChunkMap");
 
-
     /* ============================================================================== */
 
     public static PlayerChunkMapHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class PlayerChunkMapHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
 
     }
+
 }
+

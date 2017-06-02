@@ -11,7 +11,6 @@ public class ChunkProviderServerHandle extends Template.Handle {
     public static final ChunkProviderServerClass T = new ChunkProviderServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkProviderServerHandle.class, "net.minecraft.server.ChunkProviderServer");
 
-
     /* ============================================================================== */
 
     public static ChunkProviderServerHandle createHandle(Object handleInstance) {
@@ -65,4 +64,6 @@ public class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();
 
     }
+
 }
+

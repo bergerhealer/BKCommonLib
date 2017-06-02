@@ -7,7 +7,6 @@ public class MapIconHandle extends Template.Handle {
     public static final MapIconClass T = new MapIconClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MapIconHandle.class, "net.minecraft.server.MapIcon");
 
-
     /* ============================================================================== */
 
     public static MapIconHandle createHandle(Object handleInstance) {
@@ -49,10 +48,10 @@ public class MapIconHandle extends Template.Handle {
 
     }
 
+
     public static class TypeHandle extends Template.Handle {
         public static final TypeClass T = new TypeClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(TypeHandle.class, "net.minecraft.server.MapIcon.Type");
-
 
         /* ============================================================================== */
 
@@ -73,5 +72,8 @@ public class MapIconHandle extends Template.Handle {
             public final Template.StaticMethod.Converted<TypeHandle> fromId = new Template.StaticMethod.Converted<TypeHandle>();
 
         }
+
     }
+
 }
+

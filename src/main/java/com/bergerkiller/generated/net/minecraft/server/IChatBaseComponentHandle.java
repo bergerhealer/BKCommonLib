@@ -7,7 +7,6 @@ public class IChatBaseComponentHandle extends Template.Handle {
     public static final IChatBaseComponentClass T = new IChatBaseComponentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IChatBaseComponentHandle.class, "net.minecraft.server.IChatBaseComponent");
 
-
     /* ============================================================================== */
 
     public static IChatBaseComponentHandle createHandle(Object handleInstance) {
@@ -22,10 +21,10 @@ public class IChatBaseComponentHandle extends Template.Handle {
     public static final class IChatBaseComponentClass extends Template.Class<IChatBaseComponentHandle> {
     }
 
+
     public static class ChatSerializerHandle extends Template.Handle {
         public static final ChatSerializerClass T = new ChatSerializerClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ChatSerializerHandle.class, "net.minecraft.server.IChatBaseComponent.ChatSerializer");
-
 
         /* ============================================================================== */
 
@@ -51,5 +50,8 @@ public class IChatBaseComponentHandle extends Template.Handle {
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> jsonToChatComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
 
         }
+
     }
+
 }
+

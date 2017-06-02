@@ -10,7 +10,6 @@ public class DataWatcherHandle extends Template.Handle {
     public static final DataWatcherClass T = new DataWatcherClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher");
 
-
     /* ============================================================================== */
 
     public static DataWatcherHandle createHandle(Object handleInstance) {
@@ -82,10 +81,10 @@ public class DataWatcherHandle extends Template.Handle {
 
     }
 
+
     public static class ItemHandle extends Template.Handle {
         public static final ItemClass T = new ItemClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item");
-
 
         /* ============================================================================== */
 
@@ -128,5 +127,8 @@ public class DataWatcherHandle extends Template.Handle {
             public final Template.Field.Boolean changed = new Template.Field.Boolean();
 
         }
+
     }
+
 }
+

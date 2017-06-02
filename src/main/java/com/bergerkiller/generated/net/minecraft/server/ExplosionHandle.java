@@ -9,7 +9,6 @@ public class ExplosionHandle extends Template.Handle {
     public static final ExplosionClass T = new ExplosionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ExplosionHandle.class, "net.minecraft.server.Explosion");
 
-
     /* ============================================================================== */
 
     public static ExplosionHandle createHandle(Object handleInstance) {
@@ -29,4 +28,6 @@ public class ExplosionHandle extends Template.Handle {
         public final Template.Constructor.Converted<ExplosionHandle> constr_world_entity_x_y_z_yield_fire_destroyBlocks = new Template.Constructor.Converted<ExplosionHandle>();
 
     }
+
 }
+

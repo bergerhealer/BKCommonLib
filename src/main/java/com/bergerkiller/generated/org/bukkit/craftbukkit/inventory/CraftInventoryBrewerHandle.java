@@ -8,7 +8,6 @@ public class CraftInventoryBrewerHandle extends Template.Handle {
     public static final CraftInventoryBrewerClass T = new CraftInventoryBrewerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBrewerHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBrewer");
 
-
     /* ============================================================================== */
 
     public static CraftInventoryBrewerHandle createHandle(Object handleInstance) {
@@ -28,4 +27,6 @@ public class CraftInventoryBrewerHandle extends Template.Handle {
         public final Template.Constructor.Converted<BrewerInventory> constr_nmsTileEntityBrewingStand = new Template.Constructor.Converted<BrewerInventory>();
 
     }
+
 }
+

@@ -8,7 +8,6 @@ public class TileEntityHandle extends Template.Handle {
     public static final TileEntityClass T = new TileEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHandle.class, "net.minecraft.server.TileEntity");
 
-
     /* ============================================================================== */
 
     public static TileEntityHandle createHandle(Object handleInstance) {
@@ -43,4 +42,6 @@ public class TileEntityHandle extends Template.Handle {
         public final Template.Method<Integer> getRawData = new Template.Method<Integer>();
 
     }
+
 }
+

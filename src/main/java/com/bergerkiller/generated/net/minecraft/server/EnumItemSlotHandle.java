@@ -7,7 +7,6 @@ public class EnumItemSlotHandle extends Template.Handle {
     public static final EnumItemSlotClass T = new EnumItemSlotClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumItemSlotHandle.class, "net.minecraft.server.EnumItemSlot");
 
-
     /* ============================================================================== */
 
     public static EnumItemSlotHandle createHandle(Object handleInstance) {
@@ -18,6 +17,7 @@ public class EnumItemSlotHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
 
     public org.bukkit.inventory.EquipmentSlot toBukkit() {
         return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) instance).ordinal()];
@@ -30,7 +30,8 @@ public class EnumItemSlotHandle extends Template.Handle {
     public static EnumItemSlotHandle fromBukkit(org.bukkit.inventory.EquipmentSlot slot) {
         return createHandle(T.getType().getEnumConstants()[slot.ordinal()]);
     }
-
     public static final class EnumItemSlotClass extends Template.Class<EnumItemSlotHandle> {
     }
+
 }
+

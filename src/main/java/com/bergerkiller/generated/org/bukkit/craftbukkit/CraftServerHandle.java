@@ -10,7 +10,6 @@ public class CraftServerHandle extends Template.Handle {
     public static final CraftServerClass T = new CraftServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftServerHandle.class, "org.bukkit.craftbukkit.CraftServer");
 
-
     /* ============================================================================== */
 
     public static CraftServerHandle createHandle(Object handleInstance) {
@@ -34,14 +33,16 @@ public class CraftServerHandle extends Template.Handle {
         return T.getServer.invoke(instance);
     }
 
+
     public static CraftServerHandle instance() {
         return createHandle(org.bukkit.Bukkit.getServer());
     }
-
     public static final class CraftServerClass extends Template.Class<CraftServerHandle> {
         public final Template.Method<SimpleCommandMap> getCommandMap = new Template.Method<SimpleCommandMap>();
         public final Template.Method.Converted<DedicatedPlayerListHandle> getPlayerList = new Template.Method.Converted<DedicatedPlayerListHandle>();
         public final Template.Method.Converted<MinecraftServerHandle> getServer = new Template.Method.Converted<MinecraftServerHandle>();
 
     }
+
 }
+

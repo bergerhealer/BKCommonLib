@@ -14,7 +14,6 @@ public class WorldHandle extends Template.Handle {
     public static final WorldClass T = new WorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World");
 
-
     /* ============================================================================== */
 
     public static WorldHandle createHandle(Object handleInstance) {
@@ -106,6 +105,7 @@ public class WorldHandle extends Template.Handle {
         return T.isChunkLoaded.invoke(instance, cx, cz, flag);
     }
 
+
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
     }
@@ -113,7 +113,6 @@ public class WorldHandle extends Template.Handle {
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
-
     public List<EntityHandle> getEntityList() {
         return T.entityList.get(instance);
     }
@@ -237,4 +236,6 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method<Boolean> isChunkLoaded = new Template.Method<Boolean>();
 
     }
+
 }
+

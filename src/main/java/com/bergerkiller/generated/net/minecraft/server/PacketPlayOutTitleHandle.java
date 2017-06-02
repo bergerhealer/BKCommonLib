@@ -7,7 +7,6 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
     public static final PacketPlayOutTitleClass T = new PacketPlayOutTitleClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutTitleHandle.class, "net.minecraft.server.PacketPlayOutTitle");
 
-
     /* ============================================================================== */
 
     public static PacketPlayOutTitleHandle createHandle(Object handleInstance) {
@@ -22,6 +21,7 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
     public static final class PacketPlayOutTitleClass extends Template.Class<PacketPlayOutTitleHandle> {
     }
 
+
     public static class EnumTitleActionHandle extends Template.Handle {
         public static final EnumTitleActionClass T = new EnumTitleActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumTitleActionHandle.class, "net.minecraft.server.PacketPlayOutTitle.EnumTitleAction");
@@ -32,7 +32,6 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
         public static final EnumTitleActionHandle TIMES = T.TIMES.getSafe();
         public static final EnumTitleActionHandle CLEAR = T.CLEAR.getSafe();
         public static final EnumTitleActionHandle RESET = T.RESET.getSafe();
-
         /* ============================================================================== */
 
         public static EnumTitleActionHandle createHandle(Object handleInstance) {
@@ -53,5 +52,8 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> RESET = new Template.EnumConstant.Converted<EnumTitleActionHandle>();
 
         }
+
     }
+
 }
+

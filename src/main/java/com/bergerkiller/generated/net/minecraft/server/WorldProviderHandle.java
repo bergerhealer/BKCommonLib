@@ -7,7 +7,6 @@ public class WorldProviderHandle extends Template.Handle {
     public static final WorldProviderClass T = new WorldProviderClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldProviderHandle.class, "net.minecraft.server.WorldProvider");
 
-
     /* ============================================================================== */
 
     public static WorldProviderHandle createHandle(Object handleInstance) {
@@ -27,4 +26,6 @@ public class WorldProviderHandle extends Template.Handle {
         public final Template.Method<Boolean> isDarkWorld = new Template.Method<Boolean>();
 
     }
+
 }
+

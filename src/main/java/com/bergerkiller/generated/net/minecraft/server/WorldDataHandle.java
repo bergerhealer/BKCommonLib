@@ -7,7 +7,6 @@ public class WorldDataHandle extends Template.Handle {
     public static final WorldDataClass T = new WorldDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldDataHandle.class, "net.minecraft.server.WorldData");
 
-
     /* ============================================================================== */
 
     public static WorldDataHandle createHandle(Object handleInstance) {
@@ -32,4 +31,6 @@ public class WorldDataHandle extends Template.Handle {
         public final Template.Method<Void> setClearTimer = new Template.Method<Void>();
 
     }
+
 }
+

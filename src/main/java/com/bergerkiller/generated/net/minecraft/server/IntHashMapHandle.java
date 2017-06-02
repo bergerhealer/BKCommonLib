@@ -7,7 +7,6 @@ public class IntHashMapHandle extends Template.Handle {
     public static final IntHashMapClass T = new IntHashMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapHandle.class, "net.minecraft.server.IntHashMap");
 
-
     /* ============================================================================== */
 
     public static IntHashMapHandle createHandle(Object handleInstance) {
@@ -21,4 +20,6 @@ public class IntHashMapHandle extends Template.Handle {
 
     public static final class IntHashMapClass extends Template.Class<IntHashMapHandle> {
     }
+
 }
+

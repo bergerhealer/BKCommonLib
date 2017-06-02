@@ -10,7 +10,6 @@ public class EntityHumanHandle extends EntityLivingHandle {
     public static final EntityHumanClass T = new EntityHumanClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHumanHandle.class, "net.minecraft.server.EntityHuman");
 
-
     /* ============================================================================== */
 
     public static EntityHumanHandle createHandle(Object handleInstance) {
@@ -151,4 +150,6 @@ public class EntityHumanHandle extends EntityLivingHandle {
         public final Template.Field<String> spawnWorld = new Template.Field<String>();
 
     }
+
 }
+

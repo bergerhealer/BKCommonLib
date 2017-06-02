@@ -8,7 +8,6 @@ public class EntityPlayerHandle extends EntityHumanHandle {
     public static final EntityPlayerClass T = new EntityPlayerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer");
 
-
     /* ============================================================================== */
 
     public static EntityPlayerHandle createHandle(Object handleInstance) {
@@ -59,4 +58,6 @@ public class EntityPlayerHandle extends EntityHumanHandle {
         public final Template.Field.Integer ping = new Template.Field.Integer();
 
     }
+
 }
+

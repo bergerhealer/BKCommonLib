@@ -10,7 +10,6 @@ public class PortalTravelAgentHandle extends Template.Handle {
     public static final PortalTravelAgentClass T = new PortalTravelAgentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PortalTravelAgentHandle.class, "net.minecraft.server.PortalTravelAgent");
 
-
     /* ============================================================================== */
 
     public static PortalTravelAgentHandle createHandle(Object handleInstance) {
@@ -30,4 +29,6 @@ public class PortalTravelAgentHandle extends Template.Handle {
         public final Template.Method.Converted<Void> adjustExit = new Template.Method.Converted<Void>();
 
     }
+
 }
+

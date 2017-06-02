@@ -9,7 +9,6 @@ public class ShapedRecipesHandle extends IRecipeHandle {
     public static final ShapedRecipesClass T = new ShapedRecipesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ShapedRecipesHandle.class, "net.minecraft.server.ShapedRecipes");
 
-
     /* ============================================================================== */
 
     public static ShapedRecipesHandle createHandle(Object handleInstance) {
@@ -33,4 +32,6 @@ public class ShapedRecipesHandle extends IRecipeHandle {
         public final Template.Field.Converted<List<ItemStack>> inputItems = new Template.Field.Converted<List<ItemStack>>();
 
     }
+
 }
+

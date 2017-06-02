@@ -8,7 +8,6 @@ public class PlayerConnectionHandle extends Template.Handle {
     public static final PlayerConnectionClass T = new PlayerConnectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerConnectionHandle.class, "net.minecraft.server.PlayerConnection");
 
-
     /* ============================================================================== */
 
     public static PlayerConnectionHandle createHandle(Object handleInstance) {
@@ -38,4 +37,6 @@ public class PlayerConnectionHandle extends Template.Handle {
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
 
     }
+
 }
+

@@ -10,7 +10,6 @@ public class IInventoryHandle extends Template.Handle {
     public static final IInventoryClass T = new IInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IInventoryHandle.class, "net.minecraft.server.IInventory");
 
-
     /* ============================================================================== */
 
     public static IInventoryHandle createHandle(Object handleInstance) {
@@ -70,4 +69,6 @@ public class IInventoryHandle extends Template.Handle {
         public final Template.Method<Boolean> someFunction2 = new Template.Method<Boolean>();
 
     }
+
 }
+
