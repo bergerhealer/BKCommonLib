@@ -700,8 +700,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        List<?> handleList = (List<?>) WorldHandle.T.tileEntityList.raw.get(HandleConversion.toWorldHandle(world));
-        return new ConvertingList<BlockState>(new ArrayList<Object>(handleList), DuplexConversion.blockState);
+        return new ConvertingList<BlockState>(NMSWorld.getTileList(world), DuplexConversion.blockState);
     }
 
     /**

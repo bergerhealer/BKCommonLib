@@ -474,13 +474,13 @@ public class BlockUtil extends MaterialUtil {
                 int yMax = y + radiusY;
                 int zMax = z + radiusZ;
                 Object blockPosition;
-                for (Object tile : NMSWorld.tileEntityList.get(Conversion.toWorldHandle.convert(world))) {
-                	blockPosition = NMSTileEntity.position.getInternal(tile);
+                for (Object tile : NMSWorld.getTileList(world)) {
+                    blockPosition = NMSTileEntity.position.getInternal(tile);
 
-                	// Check again - security against ghost tiles
-                	if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
-                		offerTile(world, blockPosition);
-                	}
+                    // Check again - security against ghost tiles
+                    if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
+                        offerTile(world, blockPosition);
+                    }
                 }
             }
             return new ArrayList<BlockState>(blockStateBuff);

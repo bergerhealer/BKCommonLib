@@ -1,8 +1,11 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -12,7 +15,9 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import org.bukkit.Server;
 import org.bukkit.World;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class NMSWorld {
@@ -20,7 +25,6 @@ public class NMSWorld {
 
     private static final MethodAccessor<Server> getServer  = WorldHandle.T.getServer.raw.toMethodAccessor();
 
-    public static final FieldAccessor<List> tileEntityList = (FieldAccessor) WorldHandle.T.tileEntityList.raw.toFieldAccessor();
     public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(DuplexConversion.intHashMap);
 
@@ -54,5 +58,21 @@ public class NMSWorld {
 
     public static boolean updateBlock(Object worldHandle, int x, int y, int z, BlockData data, int updateFlags) {
         return (Boolean) WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
+    }
+
+    public static List<Object> getTileList(org.bukkit.World world) {
+        if (WorldHandle.T.tileEntityList.isAvailable()) {
+            return new ArrayList<Object>((List<Object>) WorldHandle.T.tileEntityList.raw.get(HandleConversion.toWorldHandle(world)));
+        } else {
+            // Go by all the chunks and add their tile entities (slower!)
+            //TODO: Maybe do this in a smart way so no new list has to be allocated?
+            //      Iterate the chunks while iterating the list, for example.
+            ArrayList<Object> tiles = new ArrayList<Object>();
+            for (org.bukkit.Chunk chunk : WorldUtil.getChunks(world)) {
+                Object chunkTileMap = ChunkHandle.T.tileEntities.raw.get(HandleConversion.toChunkHandle(chunk));
+                tiles.addAll(((Map<?, Object>) chunkTileMap).values());
+            }
+            return tiles;
+        }
     }
 }

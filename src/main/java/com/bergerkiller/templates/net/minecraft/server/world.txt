@@ -28,7 +28,7 @@ class World {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
     public final (List<EntityHandle>) List<Entity> entityList;
-    public final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
+    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;

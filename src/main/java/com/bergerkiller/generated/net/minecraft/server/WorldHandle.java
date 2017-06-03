@@ -121,14 +121,6 @@ public class WorldHandle extends Template.Handle {
         T.entityList.set(instance, value);
     }
 
-    public List<TileEntityHandle> getTileEntityList() {
-        return T.tileEntityList.get(instance);
-    }
-
-    public void setTileEntityList(List<TileEntityHandle> value) {
-        T.tileEntityList.set(instance, value);
-    }
-
     public List<EntityHumanHandle> getPlayers() {
         return T.players.get(instance);
     }
@@ -203,6 +195,7 @@ public class WorldHandle extends Template.Handle {
 
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
+        @Template.Optional
         public final Template.Field.Converted<List<TileEntityHandle>> tileEntityList = new Template.Field.Converted<List<TileEntityHandle>>();
         public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
         public final Template.Field<Random> random = new Template.Field<Random>();
