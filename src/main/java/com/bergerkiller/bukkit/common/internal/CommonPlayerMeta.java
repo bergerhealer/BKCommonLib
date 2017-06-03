@@ -20,7 +20,7 @@ public class CommonPlayerMeta {
 
     private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
-    private List<Integer> removeQueue = null;
+    private final List<Integer> removeQueue;
 
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
@@ -39,11 +39,13 @@ public class CommonPlayerMeta {
      * Sends out destroy packets for all entity ids in the removal queue
      */
     public void syncRemoveQueue() {
-        CommonPacket packet = PacketType.OUT_ENTITY_DESTROY.newInstance(this.removeQueue);
-        this.removeQueue.clear();
-        Player p = this.playerRef.get();
-        if (p != null) {
-            PacketUtil.sendPacket(p, packet);
+        if (!this.removeQueue.isEmpty()) {
+            CommonPacket packet = PacketType.OUT_ENTITY_DESTROY.newInstance(this.removeQueue);
+            this.removeQueue.clear();
+            Player p = this.playerRef.get();
+            if (p != null) {
+                PacketUtil.sendPacket(p, packet);
+            }
         }
     }
 
