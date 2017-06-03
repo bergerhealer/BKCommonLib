@@ -582,7 +582,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
                 has_passengers_field = false;
             }
         }
-        return Arrays.asList(entity.getPassenger());
+        org.bukkit.entity.Entity p = entity.getPassenger();
+        if (p == null) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(p);
+        }
     }
 
     /**
