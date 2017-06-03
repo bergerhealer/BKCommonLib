@@ -1,13 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Common;
 
 import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.List;
 
 public class UnknownServer extends CommonServerBase {
 
@@ -54,11 +51,6 @@ public class UnknownServer extends CommonServerBase {
     @Override
     public String getMinecraftVersion() {
         return "UNKNOWN";
-    }
-
-    @Override
-    public List<Integer> getEntityRemoveQueue(Player player) {
-        return Collections.emptyList();
     }
 
     @Override

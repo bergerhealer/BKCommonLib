@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.LongLocationAbstract;
@@ -482,7 +481,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param remove - True to remove, False NOT to remove
      */
     public void setRemoveNextTick(Player player, boolean remove) {
-        LogicUtil.addOrRemove(Common.SERVER.getEntityRemoveQueue(player), entity.getEntityId(), remove);
+        LogicUtil.addOrRemove(PlayerUtil.getEntityRemoveQueue(player), entity.getEntityId(), remove);
     }
 
     /**

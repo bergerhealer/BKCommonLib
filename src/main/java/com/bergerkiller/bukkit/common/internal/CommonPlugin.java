@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -425,6 +426,12 @@ public class CommonPlugin extends PluginBase {
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
 
+        // Some servers do not have an Entity Remove Queue.
+        // For those servers, we handle them using our own system
+        if (!EntityPlayerHandle.T.removeQueue.isAvailable()) {
+            startedTasks.add(new EntityRemoveQueueSyncTask(this).start(1, 1));
+        }
+
         // Operations to execute the next tick (when the server has started)
         CommonUtil.nextTick(new Runnable() {
             public void run() {
@@ -597,6 +604,22 @@ public class CommonPlugin extends PluginBase {
         @Override
         public void run() {
             CommonPlugin.getInstance().getEventFactory().handleEntityMove();
+        }
+    }
+
+    private static class EntityRemoveQueueSyncTask extends Task {
+
+        public EntityRemoveQueueSyncTask(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            if (CommonPlugin.hasInstance()) {
+                for (CommonPlayerMeta meta : CommonPlugin.getInstance().playerVisibleChunks.values()) {
+                    meta.syncRemoveQueue();
+                }
+            }
         }
     }
 

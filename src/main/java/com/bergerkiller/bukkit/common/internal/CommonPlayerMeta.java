@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.server.SportBukkitServer;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 
 import org.bukkit.entity.Player;
 
@@ -18,23 +20,31 @@ public class CommonPlayerMeta {
 
     private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
-    private final List<Integer> removeQueue;
+    private List<Integer> removeQueue = null;
 
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
-        if (Common.SERVER instanceof SportBukkitServer) {
-            removeQueue = new ArrayList<Integer>();
+        if (EntityPlayerHandle.T.removeQueue.isAvailable()) {
+            removeQueue = EntityPlayerHandle.T.removeQueue.get(Conversion.toEntityHandle.convert(player));
         } else {
-            removeQueue = CommonNMS.getHandle(player).getRemoveQueue();
+            removeQueue = new ArrayList<Integer>();
         }
     }
 
     public List<Integer> getRemoveQueue() {
-        return removeQueue;
+        return this.removeQueue;
     }
 
-    public void setQueueForRemoval(int entityId, boolean remove) {
-        LogicUtil.addOrRemove(removeQueue, entityId, remove);
+    /**
+     * Sends out destroy packets for all entity ids in the removal queue
+     */
+    public void syncRemoveQueue() {
+        CommonPacket packet = PacketType.OUT_ENTITY_DESTROY.newInstance(this.removeQueue);
+        this.removeQueue.clear();
+        Player p = this.playerRef.get();
+        if (p != null) {
+            PacketUtil.sendPacket(p, packet);
+        }
     }
 
     public Player getPlayer() {

@@ -1,11 +1,9 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 
 public interface CommonServer {
 
@@ -133,13 +131,4 @@ public interface CommonServer {
      * @return True if the world can be loaded, False if not
      */
     public boolean isLoadableWorld(String worldName);
-
-    /**
-     * Obtains the Entity remove queue used for queuing removal packets for a
-     * Player
-     *
-     * @param player to get it for
-     * @return Entity remove queue
-     */
-    public List<Integer> getEntityRemoveQueue(Player player);
 }

@@ -501,6 +501,13 @@ public class NMSPacketClasses {
             return constructor1.newInstance(entityIds);
         }
 
+        /**
+         * Creates a new instance with the entity Ids specified.
+         * Note: input Collection will be copied.
+         * 
+         * @param entityIds
+         * @return packet
+         */
         public CommonPacket newInstance(Collection<Integer> entityIds) {
             return newInstance(Conversion.toIntArr.convert(entityIds));
         }

@@ -243,7 +243,7 @@ public class PlayerUtil extends EntityUtil {
      * @return Entity Remove Queue
      */
     public static List<Integer> getEntityRemoveQueue(Player player) {
-        return Common.SERVER.getEntityRemoveQueue(player);
+        return CommonPlugin.getInstance().getPlayerMeta(player).getRemoveQueue();
     }
 
     /**

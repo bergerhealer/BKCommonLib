@@ -1,15 +1,11 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class CraftBukkitServer extends CommonServerBase {
 
@@ -94,11 +90,6 @@ public class CraftBukkitServer extends CommonServerBase {
     @Override
     public String getFieldName(Class<?> type, String fieldName) {
         return fieldName;
-    }
-
-    @Override
-    public List<Integer> getEntityRemoveQueue(Player player) {
-        return CommonNMS.getHandle(player).getRemoveQueue();
     }
 
     @Override

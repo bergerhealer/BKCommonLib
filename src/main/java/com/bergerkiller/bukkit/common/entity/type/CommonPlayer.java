@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 
 import org.bukkit.Location;
@@ -118,7 +118,7 @@ public class CommonPlayer extends CommonHumanEntity<Player> {
      * @return list of entity ids to send destroy packets for
      */
     public List<Integer> getEntityRemoveQueue() {
-        return Common.SERVER.getEntityRemoveQueue(entity);
+        return PlayerUtil.getEntityRemoveQueue(entity);
     }
 
     /**

@@ -35,14 +35,6 @@ public class EntityPlayerHandle extends EntityHumanHandle {
         T.chunkSyncZ.setDouble(instance, value);
     }
 
-    public List<Integer> getRemoveQueue() {
-        return T.removeQueue.get(instance);
-    }
-
-    public void setRemoveQueue(List<Integer> value) {
-        T.removeQueue.set(instance, value);
-    }
-
     public int getPing() {
         return T.ping.getInteger(instance);
     }
@@ -54,6 +46,7 @@ public class EntityPlayerHandle extends EntityHumanHandle {
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Double chunkSyncX = new Template.Field.Double();
         public final Template.Field.Double chunkSyncZ = new Template.Field.Double();
+        @Template.Optional
         public final Template.Field<List<Integer>> removeQueue = new Template.Field<List<Integer>>();
         public final Template.Field.Integer ping = new Template.Field.Integer();
 

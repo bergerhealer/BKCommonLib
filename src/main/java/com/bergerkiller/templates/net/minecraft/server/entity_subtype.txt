@@ -98,7 +98,7 @@ class EntityHuman extends EntityLiving {
 class EntityPlayer extends EntityHuman {
     public double chunkSyncX:d;
     public double chunkSyncZ:e;
-    public final List<Integer> removeQueue;
+    public final optional List<Integer> removeQueue;
     public int ping;
 }
 
