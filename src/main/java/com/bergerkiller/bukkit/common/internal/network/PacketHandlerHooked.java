@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 
 import org.bukkit.entity.Player;
@@ -364,29 +363,6 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             }
         }
         return true;
-    }
-
-    protected static long calculatePendingBytes(Player player) {
-        final Object playerHandle = Conversion.toEntityHandle.convert(player);
-        final Object playerConnection = NMSEntityPlayer.playerConnection.get(playerHandle);
-        final Object nm = NMSPlayerConnection.networkManager.get(playerConnection);
-        // We can only work on Network manager implementations, INetworkManager implementations are unknown to us
-        if (!NMSNetworkManager.T.isInstance(nm)) {
-            return 0L;
-        }
-        Collection<Object> low = NMSNetworkManager.queue.get(nm);
-        Collection<Object> high = NMSNetworkManager.queue.get(nm);
-        if (low == null || high == null) {
-            return 0L;
-        }
-        long queuedsize = 0;
-        for (Object p : low) {
-            queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
-        }
-        for (Object p : high) {
-            queuedsize += PacketType.getType(p).getPacketSize(p) + 1;
-        }
-        return queuedsize;
     }
 
     private static class SilentPacket {

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
@@ -13,13 +12,12 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunkProviderServer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
@@ -32,14 +30,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
-
-    private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
 
     /**
      * Gets an array of vertical Chunk Sections that make up the data of a chunk
@@ -209,11 +204,11 @@ public class ChunkUtil {
      */
     public static boolean isChunkAvailable(World world, int x, int z) {
         Object cps = NMSWorldServer.chunkProviderServer.get(Conversion.toWorldHandle.convert(world));
-        if (NMSChunkProviderServer.isChunkLoaded.invoke(cps, x, z)) {
+        if (ChunkProviderServerHandle.T.isLoaded.invoke(cps, x, z)) {
             // Chunk is loaded into memory, True
             return true;
         } else {
-            Object chunkLoader = NMSChunkProviderServer.chunkLoader.get(cps);
+            Object chunkLoader = ChunkProviderServerHandle.T.chunkLoader.get(cps);
             if (NMSChunkRegionLoader.T.isInstance(chunkLoader)) {
                 // Chunk can be loaded from file
                 return NMSChunkRegionLoader.chunkExists(chunkLoader, world, x, z);
@@ -285,38 +280,6 @@ public class ChunkUtil {
      */
     public static boolean needsSaving(org.bukkit.Chunk chunk) {
         return NMSChunk.needsSaving(Conversion.toChunkHandle.convert(chunk));
-    }
-
-    /**
-     * Sets whether a given chunk coordinate has to be unloaded
-     *
-     * @param world to set the unload request for
-     * @param x - coordinate of the chunk
-     * @param z - coordinate of the chunk
-     * @param unload state to set to
-     */
-    public static void setChunkUnloading(World world, final int x, final int z, boolean unload) {
-        if (canUseLongHashSet) {
-            Object unloadQueue = CommonNMS.getHandle(world).getChunkProviderServer().getUnloadQueue();
-            if (unloadQueue != null) {
-                try {
-                    if (canUseLongHashSet && LongHashSetHandle.T.isAssignableFrom(unloadQueue)) {
-                        LongHashSetHandle set = LongHashSetHandle.createHandle(unloadQueue);
-                        if (unload) {
-                            set.addPair(x, z);
-                        } else {
-                            set.removePair(x, z);
-                        }
-                        return;
-                    }
-                } catch (Throwable t) {
-                    canUseLongHashSet = false;
-                    Logging.LOGGER.log(Level.WARNING, "Failed to access chunks using CraftBukkit's long object hashmap, support disabled");
-                    CommonUtil.filterStackTrace(t).printStackTrace();
-                }
-            }
-        }
-        throw new RuntimeException("Failed to set unload queue using a known method");
     }
 
     /**

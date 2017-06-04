@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class NetworkManager {
     private final unknown EnumProtocolDirection h;
-    private final (Queue<Object>) Queue<NetworkManager.QueuedPacket> queue:i;
     public io.netty.channel.Channel channel;
 
     public boolean isConnected();

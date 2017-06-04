@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
@@ -89,11 +90,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
         CommonChannelListener.bind(player);
     }
 
-    @Override
-    public long getPendingBytes(Player player) {
-        return calculatePendingBytes(player);
-    }
-
     private static void failPacketListener(String pluginName) {
         showFailureMessage("a plugin conflict, namely " + pluginName);
     }
@@ -111,7 +107,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
             Object playerConnection = NMSEntityPlayer.playerConnection.get(entityPlayer);
             Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
-            Channel channel = NMSNetworkManager.channel.get(networkManager);
+            Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
             channel.pipeline().addBefore("packet_handler", "bkcommonlib", new CommonChannelListener(player));
         }
 
@@ -119,7 +115,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
             Object playerConnection = NMSEntityPlayer.playerConnection.get(entityPlayer);
             Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
-            final Channel channel = NMSNetworkManager.channel.get(networkManager);
+            final Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
             channel.eventLoop().submit(new Callable<Object>() {
 
                 @Override

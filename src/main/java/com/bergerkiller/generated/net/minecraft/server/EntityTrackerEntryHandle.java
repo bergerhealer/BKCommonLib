@@ -6,6 +6,7 @@ import java.util.List;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.Set;
+import java.util.Map;
 import org.bukkit.entity.Entity;
 
 public class EntityTrackerEntryHandle extends Template.Handle {
@@ -35,6 +36,36 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         return T.getSpawnPacket.invoke(instance);
     }
 
+
+    public java.util.Collection<org.bukkit.entity.Player> getViewers() {
+        if (T.viewersMap.isAvailable()) {
+            return T.viewersMap.get(instance).keySet();
+        } else {
+            return T.viewersSet.get(instance);
+        }
+    }
+
+    public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
+        if (T.viewersMap.isAvailable()) {
+            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(instance);
+            if (map.containsKey(viewer)) {
+                return false;
+            } else {
+                map.put(viewer, true);
+                return true;
+            }
+        } else {
+            return T.viewersSet.get(instance).add(viewer);
+        }
+    }
+
+    public boolean removeViewerFromSet(org.bukkit.entity.Player viewer) {
+        if (T.viewersMap.isAvailable()) {
+            return T.viewersMap.get(instance).remove(viewer) != null;
+        } else {
+            return T.viewersSet.get(instance).remove(viewer);
+        }
+    }
     public EntityHandle getTracker() {
         return T.tracker.get(instance);
     }
@@ -203,14 +234,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.passengers.set(instance, value);
     }
 
-    public Set<Player> getViewers() {
-        return T.viewers.get(instance);
-    }
-
-    public void setViewers(Set<Player> value) {
-        T.viewers.set(instance, value);
-    }
-
     public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
         public final Template.Field.Converted<EntityHandle> tracker = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
@@ -233,7 +256,10 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         public final Template.Field.Converted<List<Entity>> passengers = new Template.Field.Converted<List<Entity>>();
-        public final Template.Field.Converted<Set<Player>> viewers = new Template.Field.Converted<Set<Player>>();
+        @Template.Optional
+        public final Template.Field.Converted<Map<Player, Boolean>> viewersMap = new Template.Field.Converted<Map<Player, Boolean>>();
+        @Template.Optional
+        public final Template.Field.Converted<Set<Player>> viewersSet = new Template.Field.Converted<Set<Player>>();
 
         public final Template.Method<Void> hideForAll = new Template.Method<Void>();
         public final Template.Method.Converted<Void> removeViewer = new Template.Method.Converted<Void>();

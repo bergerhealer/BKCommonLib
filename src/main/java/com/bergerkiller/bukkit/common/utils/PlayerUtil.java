@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
@@ -42,7 +43,7 @@ public class PlayerUtil extends EntityUtil {
             return true;
         }
         final Object network = NMSPlayerConnection.networkManager.get(connection);
-        return network == null || !NMSNetworkManager.getIsOpen.invoke(network);
+        return network == null || !NetworkManagerHandle.T.isConnected.invoke(network);
     }
 
     /**

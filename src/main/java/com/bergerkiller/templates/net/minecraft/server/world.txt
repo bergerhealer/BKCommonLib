@@ -111,7 +111,7 @@ class WorldServer extends World {
 }
 
 class ChunkProviderServer {
-    public final Set<Long> unloadQueue;
+    private final (Object) IChunkLoader chunkLoader;
     public final (WorldServerHandle) WorldServer world;
 
     public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
@@ -121,6 +121,8 @@ class ChunkProviderServer {
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 
     public void saveChunk((ChunkHandle) Chunk chunk);
+
+    public boolean isLoaded(int cx, int cz);
 }
 
 class PlayerChunkMap {

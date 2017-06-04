@@ -38,11 +38,45 @@ class EntityTrackerEntry {
 
     private (List<org.bukkit.entity.Entity>) List<Entity> passengers:w;
 
-    public final (Set<org.bukkit.entity.Player>) Set<EntityPlayer> viewers:trackedPlayers;
+    // Note: on PaperSpigot trackedPlayers is a HashMap instead
+    public optional (Map<org.bukkit.entity.Player, Boolean>) Map<EntityPlayer, Boolean> viewersMap:trackedPlayerMap;
+    public optional final (Set<org.bukkit.entity.Player>) Set<EntityPlayer> viewersSet:trackedPlayers;
 
     public void hideForAll:a();
 
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
 
     private (CommonPacket) Packet<?> getSpawnPacket:e();
+
+    <code>
+    public java.util.Collection<org.bukkit.entity.Player> getViewers() {
+        if (T.viewersMap.isAvailable()) {
+            return T.viewersMap.get(instance).keySet();
+        } else {
+            return T.viewersSet.get(instance);
+        }
+    }
+
+    public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
+        if (T.viewersMap.isAvailable()) {
+            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(instance);
+            if (map.containsKey(viewer)) {
+                return false;
+            } else {
+                map.put(viewer, true);
+                return true;
+            }
+        } else {
+            return T.viewersSet.get(instance).add(viewer);
+        }
+    }
+
+    public boolean removeViewerFromSet(org.bukkit.entity.Player viewer) {
+        if (T.viewersMap.isAvailable()) {
+            return T.viewersMap.get(instance).remove(viewer) != null;
+        } else {
+            return T.viewersSet.get(instance).remove(viewer);
+        }
+    }
+    </code>
 }

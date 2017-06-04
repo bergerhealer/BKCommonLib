@@ -272,15 +272,4 @@ public class PacketUtil {
     public static Collection<Plugin> getListenerPlugins(PacketType packetType) {
         return CommonPlugin.getInstance().getPacketHandler().getListening(packetType);
     }
-
-    /**
-     * Gets the total amount of bytes of packet data that still has to be sent
-     * to the player
-     *
-     * @param player to get the pending bytes of
-     * @return pending bytes
-     */
-    public static long getPendingBytes(Player player) {
-        return CommonPlugin.getInstance().getPacketHandler().getPendingBytes(player);
-    }
 }

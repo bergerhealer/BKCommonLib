@@ -174,11 +174,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
     }
 
-    @Override
-    public long getPendingBytes(Player player) {
-        return PacketHandlerHooked.calculatePendingBytes(player);
-    }
-
     private static com.comphenix.protocol.PacketType getPacketType(PacketType commonType) {
         return getPacketType(commonType.getType());
     }

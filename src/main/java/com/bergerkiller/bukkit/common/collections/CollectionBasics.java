@@ -207,4 +207,5 @@ public class CollectionBasics {
             return list.addAll(index, c);
         }
     }
+
 }

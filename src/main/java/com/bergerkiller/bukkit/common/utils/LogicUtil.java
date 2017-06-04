@@ -747,4 +747,5 @@ public class LogicUtil {
 
         return has_changes;
     }
+
 }

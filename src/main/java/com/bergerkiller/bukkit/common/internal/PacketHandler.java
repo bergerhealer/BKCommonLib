@@ -68,13 +68,4 @@ public interface PacketHandler {
      * @param player that joined
      */
     public void onPlayerJoin(Player player);
-
-    /**
-     * Gets the amount of bytes of packet data still pending to be sent to the
-     * player
-     *
-     * @param player to get the size for
-     * @return pending packet queue byte size
-     */
-    public long getPendingBytes(Player player);
 }

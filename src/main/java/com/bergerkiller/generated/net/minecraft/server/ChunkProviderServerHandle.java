@@ -4,7 +4,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import java.util.List;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Set;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 
 public class ChunkProviderServerHandle extends Template.Handle {
@@ -38,12 +37,16 @@ public class ChunkProviderServerHandle extends Template.Handle {
         T.saveChunk.invoke(instance, chunk);
     }
 
-    public Set<Long> getUnloadQueue() {
-        return T.unloadQueue.get(instance);
+    public boolean isLoaded(int cx, int cz) {
+        return T.isLoaded.invoke(instance, cx, cz);
     }
 
-    public void setUnloadQueue(Set<Long> value) {
-        T.unloadQueue.set(instance, value);
+    public Object getChunkLoader() {
+        return T.chunkLoader.get(instance);
+    }
+
+    public void setChunkLoader(Object value) {
+        T.chunkLoader.set(instance, value);
     }
 
     public WorldServerHandle getWorld() {
@@ -55,13 +58,14 @@ public class ChunkProviderServerHandle extends Template.Handle {
     }
 
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
-        public final Template.Field<Set<Long>> unloadQueue = new Template.Field<Set<Long>>();
+        public final Template.Field.Converted<Object> chunkLoader = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
         public final Template.Method.Converted<List<BiomeMetaHandle>> getBiomeSpawnInfo = new Template.Method.Converted<List<BiomeMetaHandle>>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
 
     }
 

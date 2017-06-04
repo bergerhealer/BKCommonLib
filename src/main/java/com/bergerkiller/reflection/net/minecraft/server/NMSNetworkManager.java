@@ -7,13 +7,12 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 import io.netty.channel.Channel;
 
-import java.util.Queue;
-
+/**
+ * Deprecated: use NetworkManagerHandle (or not at all)
+ */
+@Deprecated
 public class NMSNetworkManager {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("NetworkManager");
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static final FieldAccessor<Queue<Object>> queue = (FieldAccessor) NetworkManagerHandle.T.queue.raw.toFieldAccessor();
 
     //	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("l");
 

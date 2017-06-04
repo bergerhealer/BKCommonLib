@@ -402,11 +402,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * added
      */
     public boolean addViewer(Player viewer) {
-        if (!handle.getViewers().add(viewer)) {
-            return false;
-        }
-        this.makeVisible(viewer);
-        return true;
+        return handle.addViewerToSet(viewer);
     }
 
     /**
@@ -419,7 +415,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * contained
      */
     public boolean removeViewer(Player viewer) {
-        if (!handle.getViewers().remove(viewer)) {
+        if (!handle.removeViewerFromSet(viewer)) {
             return false;
         }
         this.makeHidden(viewer);
