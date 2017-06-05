@@ -46,6 +46,11 @@ public class DamageSource extends BasicWrapper<DamageSourceHandle> {
         return handle.isExplosion();
     }
 
+    @Override
+    public String toString() {
+        return handle.getTranslationIndex();
+    }
+
     /**
      * Gets the Entity that dealt the damage
      *
