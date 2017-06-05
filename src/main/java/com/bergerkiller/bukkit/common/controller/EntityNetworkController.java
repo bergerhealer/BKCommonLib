@@ -402,7 +402,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * added
      */
     public boolean addViewer(Player viewer) {
-        return handle.addViewerToSet(viewer);
+        if (!handle.addViewerToSet(viewer)) {
+            return false;
+        }
+        this.makeVisible(viewer);
+        return true;
     }
 
     /**
