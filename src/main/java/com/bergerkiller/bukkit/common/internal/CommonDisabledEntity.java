@@ -1,12 +1,14 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 public class CommonDisabledEntity {
     public static final EntityHandle INSTANCE;
 
     static {
-        INSTANCE = EntityHandle.createNew(null);
+        INSTANCE = EntityHandle.createHandle(ClassTemplate.create(EntityItemHandle.T.getType()).newInstanceNull());
     }
 
     //TODO: Really needed to override the below methods?
