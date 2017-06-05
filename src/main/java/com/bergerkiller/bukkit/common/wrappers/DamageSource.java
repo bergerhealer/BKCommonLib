@@ -22,6 +22,7 @@ public class DamageSource extends BasicWrapper<DamageSourceHandle> {
     public static final DamageSource WITHER = new DamageSource("wither");
     public static final DamageSource ANVIL = new DamageSource("anvil");
     public static final DamageSource FALLING_BLOCK = new DamageSource("fallingBlock");
+    public static final DamageSource FIREWORKS = new DamageSource("fireworks");
     private static final DamageSource[] values = CommonUtil.getClassConstants(DamageSource.class);
 
     @Deprecated
