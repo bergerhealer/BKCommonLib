@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
+import org.bukkit.inventory.Inventory;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
-import org.bukkit.inventory.Inventory;
 
 public class CraftInventoryHandle extends Template.Handle {
     public static final CraftInventoryClass T = new CraftInventoryClass();

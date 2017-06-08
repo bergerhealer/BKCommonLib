@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class DataWatcherHandle extends Template.Handle {
     public static final DataWatcherClass T = new DataWatcherClass();

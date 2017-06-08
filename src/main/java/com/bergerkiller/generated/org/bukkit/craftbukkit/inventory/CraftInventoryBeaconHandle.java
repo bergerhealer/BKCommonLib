@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.BeaconInventory;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class CraftInventoryBeaconHandle extends Template.Handle {

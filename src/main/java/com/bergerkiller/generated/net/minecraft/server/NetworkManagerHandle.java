@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import io.netty.channel.Channel;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import io.netty.channel.Channel;
 
 public class NetworkManagerHandle extends Template.Handle {
     public static final NetworkManagerClass T = new NetworkManagerClass();

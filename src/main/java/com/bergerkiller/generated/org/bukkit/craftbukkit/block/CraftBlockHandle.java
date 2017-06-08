@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.block;
 
-import org.bukkit.Chunk;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.block.Block;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.Chunk;
 
 public class CraftBlockHandle extends Template.Handle {
     public static final CraftBlockClass T = new CraftBlockClass();

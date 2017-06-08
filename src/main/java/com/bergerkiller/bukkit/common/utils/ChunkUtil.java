@@ -13,12 +13,12 @@ import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunkRegionLoader;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
 import org.bukkit.Material;
@@ -209,9 +209,9 @@ public class ChunkUtil {
             return true;
         } else {
             Object chunkLoader = ChunkProviderServerHandle.T.chunkLoader.get(cps);
-            if (NMSChunkRegionLoader.T.isInstance(chunkLoader)) {
+            if (ChunkRegionLoaderHandle.T.isAssignableFrom(chunkLoader)) {
                 // Chunk can be loaded from file
-                return NMSChunkRegionLoader.chunkExists(chunkLoader, world, x, z);
+                return ChunkRegionLoaderHandle.T.chunkExists.invoke(chunkLoader, x, z);
             } else {
                 // Unable to find out...
                 return false;

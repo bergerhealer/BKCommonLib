@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class NBTTagListHandle extends NBTBaseHandle {
     public static final NBTTagListClass T = new NBTTagListClass();

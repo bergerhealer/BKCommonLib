@@ -1,7 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle;
 import com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle;
@@ -20,12 +19,12 @@ public class NMSRecipe {
     
     public static class Shaped {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("ShapedRecipes");
-        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = T.selectField("private final ItemStack[] items").translate(DuplexConversion.itemStackList);
+        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = ShapedRecipesHandle.T.inputItems.toFieldAccessor();
     }
     
     public static class Shapeless {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("ShapelessRecipes");
-        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = T.selectField("private final List<ItemStack> ingredients").translate(DuplexConversion.itemStackList);
+        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = ShapelessRecipesHandle.T.inputItems.toFieldAccessor();
     }
 
     public static ItemStack getOutput(Object iRecipe) {

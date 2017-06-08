@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import java.util.Map;
+import java.util.Set;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Set;
-import java.util.Map;
 
 public class NBTTagCompoundHandle extends NBTBaseHandle {
     public static final NBTTagCompoundClass T = new NBTTagCompoundClass();

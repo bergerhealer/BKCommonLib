@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.World;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 
 public class ExplosionHandle extends Template.Handle {
     public static final ExplosionClass T = new ExplosionClass();

@@ -1,13 +1,13 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import org.bukkit.entity.Entity;
+import java.util.Map;
+import java.util.Set;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Player;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Set;
-import java.util.Map;
-import org.bukkit.entity.Entity;
+import java.util.List;
 
 public class EntityTrackerEntryHandle extends Template.Handle {
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();

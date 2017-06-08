@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.entity.Entity;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class MobSpawnerAbstractHandle extends Template.Handle {
     public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();

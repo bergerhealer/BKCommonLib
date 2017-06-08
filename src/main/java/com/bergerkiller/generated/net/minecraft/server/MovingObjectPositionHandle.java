@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import org.bukkit.util.Vector;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.util.Vector;
 
 public class MovingObjectPositionHandle extends Template.Handle {
     public static final MovingObjectPositionClass T = new MovingObjectPositionClass();

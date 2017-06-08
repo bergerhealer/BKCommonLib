@@ -1,12 +1,12 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.block.BlockState;
-import org.bukkit.Chunk;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.Map;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import org.bukkit.block.BlockState;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.Chunk;
 
 public class ChunkHandle extends Template.Handle {
     public static final ChunkClass T = new ChunkClass();

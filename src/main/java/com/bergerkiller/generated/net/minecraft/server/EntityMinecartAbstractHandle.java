@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 public class EntityMinecartAbstractHandle extends EntityHandle {
     public static final EntityMinecartAbstractClass T = new EntityMinecartAbstractClass();

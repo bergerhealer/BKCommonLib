@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.plugin;
 
+import org.bukkit.plugin.EventExecutor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.plugin.EventExecutor;
 
 public class RegisteredListenerHandle extends Template.Handle {
     public static final RegisteredListenerClass T = new RegisteredListenerClass();

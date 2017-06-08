@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import java.util.Map;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.UUID;
-import java.util.Map;
-import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 
 public class WorldServerHandle extends WorldHandle {
     public static final WorldServerClass T = new WorldServerClass();

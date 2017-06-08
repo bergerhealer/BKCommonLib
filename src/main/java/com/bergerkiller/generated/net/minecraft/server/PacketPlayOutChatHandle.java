@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
-import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 public class PacketPlayOutChatHandle extends Template.Handle {
     public static final PacketPlayOutChatClass T = new PacketPlayOutChatClass();

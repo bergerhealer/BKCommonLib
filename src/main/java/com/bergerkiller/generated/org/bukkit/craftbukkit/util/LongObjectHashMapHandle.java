@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
+import java.util.Collection;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Collection;
 
 public class LongObjectHashMapHandle extends Template.Handle {
     public static final LongObjectHashMapClass T = new LongObjectHashMapClass();

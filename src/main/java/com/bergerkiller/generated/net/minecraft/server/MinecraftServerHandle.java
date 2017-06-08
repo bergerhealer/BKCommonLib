@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class MinecraftServerHandle extends Template.Handle {
     public static final MinecraftServerClass T = new MinecraftServerClass();

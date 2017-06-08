@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import org.bukkit.World;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class BlockHandle extends Template.Handle {
     public static final BlockClass T = new BlockClass();

@@ -1,9 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import java.util.Map;
 import java.io.File;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Map;
 
 public class RegionFileCacheHandle extends Template.Handle {
     public static final RegionFileCacheClass T = new RegionFileCacheClass();

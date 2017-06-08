@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -37,6 +39,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -463,5 +466,11 @@ public class WrapperConversion {
     @ConverterMethod()
     public static ChatMessageType toChatMessageType(byte chatMessageTypeId) {
         return ChatMessageType.getById(chatMessageTypeId);
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    @ConverterMethod(input="net.minecraft.server.NonNullList<E>", optional=true)
+    public static <E> List<E> toList(Object nonNullListHandle) {
+        return (List<E>) nonNullListHandle;
     }
 }

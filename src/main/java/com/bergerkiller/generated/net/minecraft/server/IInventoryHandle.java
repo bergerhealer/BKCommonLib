@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import org.bukkit.entity.HumanEntity;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import org.bukkit.inventory.ItemStack;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class IInventoryHandle extends Template.Handle {
     public static final IInventoryClass T = new IInventoryClass();

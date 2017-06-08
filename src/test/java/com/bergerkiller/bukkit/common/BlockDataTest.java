@@ -18,10 +18,10 @@ public class BlockDataTest {
     public void testBlockData() {
         for (Material mat : Material.values()) {
             if (mat.isBlock()) {
-                assertEquals(mat, BlockData.fromMaterial(mat).getType());
-                assertEquals(BlockData.fromMaterialData(mat, 0).getType(), BlockData.fromMaterial(mat).getType());
+                assertType(mat, BlockData.fromMaterial(mat).getType());
+                assertType(BlockData.fromMaterialData(mat, 0).getType(), BlockData.fromMaterial(mat).getType());
             } else {
-                assertEquals(Material.AIR, BlockData.fromMaterial(mat).getType());
+                assertType(Material.AIR, BlockData.fromMaterial(mat).getType());
             }
         }
         assertEquals(0, BlockData.fromMaterial(Material.AIR).getEmission());
@@ -29,5 +29,11 @@ public class BlockDataTest {
         assertEquals(15, BlockData.fromMaterial(Material.GLOWSTONE).getEmission());
         assertEquals(7, BlockData.fromMaterial(Material.REDSTONE_TORCH_ON).getEmission());
         assertEquals(14, BlockData.fromMaterial(Material.TORCH).getEmission());
+    }
+
+    private void assertType(Material expected, Material object) {
+        if (expected != object) {
+            fail("Expected " + expected + " (id=" + expected.getId() + "), but got " + object + " (id=" + object.getId() + ")");
+        }
     }
 }

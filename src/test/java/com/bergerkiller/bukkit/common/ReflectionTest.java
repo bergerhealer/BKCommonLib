@@ -62,7 +62,6 @@ public class ReflectionTest {
             loadClass(NMSBlock.class);
             loadClass(NMSChunk.class);
             loadClass(NMSChunkProviderServer.class);
-            loadClass(NMSChunkRegionLoader.class);
             loadClass(NMSChunkSection.class);
             loadClass(NMSEntity.class);
             loadClass(NMSItemStack.class);

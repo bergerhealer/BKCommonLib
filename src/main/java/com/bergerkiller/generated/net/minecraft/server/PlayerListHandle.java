@@ -1,11 +1,11 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import org.bukkit.entity.HumanEntity;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Player;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import java.util.List;
 
 public class PlayerListHandle extends Template.Handle {
     public static final PlayerListClass T = new PlayerListClass();

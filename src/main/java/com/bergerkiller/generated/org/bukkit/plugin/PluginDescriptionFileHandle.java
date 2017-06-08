@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.plugin;
 
+import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.Map;
 
 public class PluginDescriptionFileHandle extends Template.Handle {
     public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();

@@ -1,10 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import com.mojang.authlib.GameProfile;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.mojang.authlib.GameProfile;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class EntityHumanHandle extends EntityLivingHandle {
     public static final EntityHumanClass T = new EntityHumanClass();

@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
+import org.bukkit.Sound;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.Sound;
 
 public class CraftSoundHandle extends Template.Handle {
     public static final CraftSoundClass T = new CraftSoundClass();

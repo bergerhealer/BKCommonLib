@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.util.List;
+
 import org.bukkit.Difficulty;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
@@ -33,6 +35,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
@@ -308,5 +311,13 @@ public class HandleConversion {
     @ConverterMethod()
     public static byte getChatMessageTypeId(ChatMessageType chatMessageType) {
         return chatMessageType.getId();
+    }
+
+    @SuppressWarnings("unchecked")
+    @ConverterMethod(output="net.minecraft.server.NonNullList<E>", optional=true)
+    public static <E> Object toNonNullListHandle(List<E> list) {
+        List<E> result = (List<E>) NonNullListHandle.create();
+        result.addAll(list);
+        return result;
     }
 }

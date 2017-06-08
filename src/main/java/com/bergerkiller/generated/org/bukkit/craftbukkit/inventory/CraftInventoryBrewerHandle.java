@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
+import org.bukkit.inventory.BrewerInventory;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.inventory.BrewerInventory;
 
 public class CraftInventoryBrewerHandle extends Template.Handle {
     public static final CraftInventoryBrewerClass T = new CraftInventoryBrewerClass();

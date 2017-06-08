@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class PlayerConnectionHandle extends Template.Handle {

@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
 public class CraftChatMessageHandle extends Template.Handle {
