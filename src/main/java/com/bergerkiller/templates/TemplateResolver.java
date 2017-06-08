@@ -42,6 +42,11 @@ public class TemplateResolver implements ClassDeclarationResolver {
             String templatePath = "com/bergerkiller/templates/init.txt";
             Map<String, String> variables = new HashMap<String, String>();
             variables.put("version", cleanVersion(Common.MC_VERSION));
+            String pre_version = preVersion(Common.MC_VERSION);
+            if (pre_version != null) {
+                variables.put("pre", pre_version);
+            }
+
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);
             for (ClassDeclaration cdec : sourceDec.classes) {
@@ -83,5 +88,13 @@ public class TemplateResolver implements ClassDeclarationResolver {
             clean_version = clean_version.substring(0, pre_idx);
         }
         return clean_version;
+    }
+
+    private static String preVersion(String mc_version) {
+        int pre_idx = mc_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            return mc_version.substring(pre_idx + 4);
+        }
+        return null;
     }
 }

@@ -333,7 +333,13 @@ class Entity {
 #if version >= 1.12
     public boolean isWet:an();
 
+#if pre
+    // This was on the pre-release version
     public (EntityHandle) Entity getDriverEntity:bC();
+#else
+    // Official 1.12
+    public (EntityHandle) Entity getDriverEntity:bE();
+#endif
 
     public void onTick:B_();
 
