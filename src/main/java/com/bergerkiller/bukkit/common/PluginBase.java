@@ -98,9 +98,9 @@ public abstract class PluginBase extends JavaPlugin {
      * number!</b><br><br>
      * <p/>
      * Examples:<br>
-     * - v1.0 = 100<br>
-     * - v8.6 = 860<br>
-     * - v8.06 = 806<br>
+     * - v1.0 = 10000<br>
+     * - v8.6 = 86000<br>
+     * - v8.06 = 80600<br>
      * - v1.0.0 = 10000<br>
      * - v1.81.65 = 18165
      *
@@ -109,6 +109,7 @@ public abstract class PluginBase extends JavaPlugin {
     public int getVersionNumber() {
         // Split by dots
         int versionNumber = 0;
+        int numDigits = 0;
         for (String part : this.getVersion().split("\\.")) {
             // Trim non-digits from the start of the version part
             int part_start = 0;
@@ -129,7 +130,14 @@ public abstract class PluginBase extends JavaPlugin {
             try {
                 versionNumber *= 100;
                 versionNumber += Integer.parseInt(part.substring(part_start, part_end));
+                numDigits++;
             } catch (NumberFormatException ex) {}
+        }
+
+        // Guarantee three-digit version format
+        while (numDigits < 3) {
+            numDigits++;
+            versionNumber *= 100;
         }
 
         return versionNumber;
