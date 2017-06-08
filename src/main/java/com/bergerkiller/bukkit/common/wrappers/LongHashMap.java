@@ -15,6 +15,7 @@ import java.util.Collection;
  *
  * @param <V> - Value type
  */
+@SuppressWarnings("unchecked")
 public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
 
     public LongHashMap() {
@@ -27,16 +28,11 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
      * @param initialCapacity for the new LongHashMap
      */
     public LongHashMap(int initialCapacity) {
-    	this(new TLongObjectHashMap<V>(initialCapacity));
+        this(new TLongObjectHashMap<V>(initialCapacity));
     }
 
     public LongHashMap(Object handle) {
         this.setHandle(Template.Handle.createHandle(handle));
-    }
-
-    @SuppressWarnings("unchecked")
-    private TLongObjectHashMap<V> h() {
-        return (TLongObjectHashMap<V>) getRawHandle();
     }
 
     /**
@@ -45,7 +41,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
      * @return size
      */
     public int size() {
-    	return h().size();
+        return ((TLongObjectHashMap<V>) getRawHandle()).size();
     }
 
     /**
@@ -62,7 +58,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public boolean contains(long key) {
-    	return h().containsKey(key);
+        return ((TLongObjectHashMap<V>) getRawHandle()).containsKey(key);
     }
 
     /**
@@ -79,7 +75,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public V get(long key) {
-    	return h().get(key);
+        return ((TLongObjectHashMap<V>) getRawHandle()).get(key);
     }
 
     /**
@@ -97,7 +93,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public V remove(long key) {
-    	return h().remove(key);
+        return ((TLongObjectHashMap<V>) getRawHandle()).remove(key);
     }
 
     /**
@@ -114,14 +110,14 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public void put(long key, V value) {
-    	h().put(key, value);
+        ((TLongObjectHashMap<V>) getRawHandle()).put(key, value);
     }
 
     public Collection<V> getValues() {
-    	return h().valueCollection();
+        return ((TLongObjectHashMap<V>) getRawHandle()).valueCollection();
     }
 
     public long[] getKeys() {
-    	return h().keySet().toArray(new long[0]);
+        return ((TLongObjectHashMap<V>) getRawHandle()).keySet().toArray(new long[0]);
     }
 }
