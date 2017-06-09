@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityPlayer</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityPlayerHandle extends EntityHumanHandle {
+    /** @See {@link EntityPlayerClass} */
     public static final EntityPlayerClass T = new EntityPlayerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer");
 
@@ -18,6 +24,14 @@ public class EntityPlayerHandle extends EntityHumanHandle {
     }
 
     /* ============================================================================== */
+
+    public Object getPlayerConnection() {
+        return T.playerConnection.get(instance);
+    }
+
+    public void setPlayerConnection(Object value) {
+        T.playerConnection.set(instance, value);
+    }
 
     public double getChunkSyncX() {
         return T.chunkSyncX.getDouble(instance);
@@ -43,7 +57,12 @@ public class EntityPlayerHandle extends EntityHumanHandle {
         T.ping.setInteger(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityPlayer</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
+        public final Template.Field.Converted<Object> playerConnection = new Template.Field.Converted<Object>();
         public final Template.Field.Double chunkSyncX = new Template.Field.Double();
         public final Template.Field.Double chunkSyncZ = new Template.Field.Double();
         @Template.Optional

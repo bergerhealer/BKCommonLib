@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityMinecartAbstract</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityMinecartAbstractHandle extends EntityHandle {
+    /** @See {@link EntityMinecartAbstractClass} */
     public static final EntityMinecartAbstractClass T = new EntityMinecartAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartAbstractHandle.class, "net.minecraft.server.EntityMinecartAbstract");
 
@@ -41,6 +47,10 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
         T.activate.invoke(instance, x, y, z, active);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityMinecartAbstract</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityMinecartAbstractClass extends Template.Class<EntityMinecartAbstractHandle> {
         public final Template.StaticField.Converted<Key<Integer>> DATA_SHAKING_FACTOR = new Template.StaticField.Converted<Key<Integer>>();
         public final Template.StaticField.Converted<Key<Integer>> DATA_SHAKING_DIRECTION = new Template.StaticField.Converted<Key<Integer>>();

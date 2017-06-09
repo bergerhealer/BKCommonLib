@@ -2,8 +2,6 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.HashMap;
 
-import org.junit.Test;
-
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 
 // Tests the correct workings of DebugUtil.logInstances to make sure it works

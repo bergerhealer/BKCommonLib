@@ -35,11 +35,11 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -53,7 +53,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
@@ -273,7 +272,7 @@ public class WrapperConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.EnumGamemode")
     public static org.bukkit.GameMode toGameMode(Object nmsEnumGamemodeHandle) {
-        return org.bukkit.GameMode.getByValue(NMSEnumGamemode.egmId.get(nmsEnumGamemodeHandle));
+        return org.bukkit.GameMode.getByValue(EnumGamemodeHandle.T.id.get(nmsEnumGamemodeHandle));
     }
 
     @SuppressWarnings("deprecation")

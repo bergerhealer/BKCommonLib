@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityMinecartFurnace</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
+    /** @See {@link EntityMinecartFurnaceClass} */
     public static final EntityMinecartFurnaceClass T = new EntityMinecartFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace");
 
@@ -44,6 +50,10 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
         T.pushForceZ.setDouble(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityMinecartFurnace</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityMinecartFurnaceClass extends Template.Class<EntityMinecartFurnaceHandle> {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_SMOKING = new Template.StaticField.Converted<Key<Boolean>>();
 

@@ -394,6 +394,7 @@ public class ParseUtil {
      * @param def to return on failure
      * @return Parsed or default value
      */
+    @SuppressWarnings("deprecation")
     public static Material parseMaterial(String text, Material def) {
         if (LogicUtil.nullOrEmpty(text)) {
             return def;
@@ -449,6 +450,7 @@ public class ParseUtil {
      * @param def to return on failure (hint: use -1)
      * @return Parsed or default value
      */
+    @SuppressWarnings("deprecation")
     public static int parseMaterialData(String text, Material material, int def) {
         try {
             return Integer.parseInt(text);

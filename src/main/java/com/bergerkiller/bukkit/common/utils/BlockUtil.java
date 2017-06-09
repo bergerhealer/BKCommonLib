@@ -55,6 +55,7 @@ public class BlockUtil extends MaterialUtil {
      * @param isBuildable - Initial allow state
      * @return True if permitted, False if not
      */
+    @SuppressWarnings("deprecation")
     public static boolean canBuildBlock(org.bukkit.block.Block block, Material type, boolean isBuildable) {
         return CommonUtil.callEvent(new BlockCanBuildEvent(block, type.getId(), true)).isBuildable();
     }
@@ -78,6 +79,7 @@ public class BlockUtil extends MaterialUtil {
      * @param data to set to
      * @param update - whether to perform physics afterwards
      */
+    @SuppressWarnings("deprecation")
     public static void setTypeAndData(org.bukkit.block.Block block, Material type, MaterialData data, boolean update) {
         block.setTypeIdAndData(type.getId(), data.getData(), update);
     }
@@ -101,6 +103,7 @@ public class BlockUtil extends MaterialUtil {
      * @param data to set to
      * @param update - whether to perform physics afterwards
      */
+    @SuppressWarnings("deprecation")
     public static void setTypeAndRawData(org.bukkit.block.Block block, Material type, int data, boolean update) {
         block.setTypeIdAndData(type.getId(), (byte) data, update);
     }
@@ -111,6 +114,7 @@ public class BlockUtil extends MaterialUtil {
      * @param block to set it for
      * @param materialData to set to
      */
+    @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData) {
         block.setData(materialData.getData());
     }
@@ -122,6 +126,7 @@ public class BlockUtil extends MaterialUtil {
      * @param materialData to set to
      * @param doPhysics - True to perform physics, False for 'silent'
      */
+    @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData, boolean doPhysics) {
         block.setData(materialData.getData(), doPhysics);
     }
@@ -299,6 +304,7 @@ public class BlockUtil extends MaterialUtil {
      * @param lever block
      * @return True if the lever is down, False if not
      */
+    @SuppressWarnings("deprecation")
     public static boolean isLeverDown(org.bukkit.block.Block lever) {
         int dat = getRawData(lever);
         return dat == (dat | 0x8);
@@ -311,6 +317,7 @@ public class BlockUtil extends MaterialUtil {
      * @param lever block
      * @param down state to set to
      */
+    @SuppressWarnings("deprecation")
     public static void setLever(org.bukkit.block.Block lever, boolean down) {
         int data = getRawData(lever);
         Lever newMaterialData = (Lever) getData(Material.LEVER, data);
@@ -399,6 +406,7 @@ public class BlockUtil extends MaterialUtil {
      * @param rails to set the alignment for
      * @param direction alignment
      */
+    @SuppressWarnings("deprecation")
     public static void setRails(org.bukkit.block.Block rails, BlockFace direction) {
         Material type = rails.getType();
         if (type == Material.RAILS) {

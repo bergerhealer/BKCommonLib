@@ -90,6 +90,7 @@ public class BlockStateConversion {
                 } else if (name.equals("getTypeId")) {
                     return new Invokable() {
                         @Override
+                        @SuppressWarnings("deprecation")
                         public Object invoke(Object instance, Object... args) {
                             return input_state.type.getId();
                         }

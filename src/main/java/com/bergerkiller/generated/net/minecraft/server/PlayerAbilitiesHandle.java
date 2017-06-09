@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.PlayerAbilities</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class PlayerAbilitiesHandle extends Template.Handle {
+    /** @See {@link PlayerAbilitiesClass} */
     public static final PlayerAbilitiesClass T = new PlayerAbilitiesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerAbilitiesHandle.class, "net.minecraft.server.PlayerAbilities");
 
@@ -78,6 +84,10 @@ public class PlayerAbilitiesHandle extends Template.Handle {
         T.walkSpeed.setFloat(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.PlayerAbilities</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class PlayerAbilitiesClass extends Template.Class<PlayerAbilitiesHandle> {
         public final Template.Constructor.Converted<PlayerAbilitiesHandle> constr = new Template.Constructor.Converted<PlayerAbilitiesHandle>();
 

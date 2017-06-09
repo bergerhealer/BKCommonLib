@@ -10,6 +10,10 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.HumanEntity;
 
+/**
+ * Deprecated: use {@link EntityHumanHandle} instead
+ */
+@Deprecated
 public class NMSEntityHuman extends NMSEntityLiving {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityHuman");
 

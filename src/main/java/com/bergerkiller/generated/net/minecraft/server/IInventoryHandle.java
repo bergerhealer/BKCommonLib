@@ -1,12 +1,18 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.IInventory</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class IInventoryHandle extends Template.Handle {
+    /** @See {@link IInventoryClass} */
     public static final IInventoryClass T = new IInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IInventoryHandle.class, "net.minecraft.server.IInventory");
 
@@ -57,6 +63,10 @@ public class IInventoryHandle extends Template.Handle {
         return T.someFunction2.invoke(instance);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.IInventory</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class IInventoryClass extends Template.Class<IInventoryHandle> {
         public final Template.Method<Integer> getSize = new Template.Method<Integer>();
         public final Template.Method.Converted<ItemStackHandle> getItem = new Template.Method.Converted<ItemStackHandle>();

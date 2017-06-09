@@ -81,7 +81,7 @@ class EnumGamemode {
 class EnumProtocol {
     enum (EnumProtocolHandle) EnumProtocol PLAY;
 
-    private final (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
+    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
 }
 
 class EnumProtocolDirection {

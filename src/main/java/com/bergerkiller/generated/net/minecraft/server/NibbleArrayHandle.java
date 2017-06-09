@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.NibbleArray</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class NibbleArrayHandle extends Template.Handle {
+    /** @See {@link NibbleArrayClass} */
     public static final NibbleArrayClass T = new NibbleArrayClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NibbleArrayHandle.class, "net.minecraft.server.NibbleArray");
 
@@ -42,6 +48,10 @@ public class NibbleArrayHandle extends Template.Handle {
         T.data.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.NibbleArray</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class NibbleArrayClass extends Template.Class<NibbleArrayHandle> {
         public final Template.Constructor.Converted<NibbleArrayHandle> constr = new Template.Constructor.Converted<NibbleArrayHandle>();
         public final Template.Constructor.Converted<NibbleArrayHandle> constr_data = new Template.Constructor.Converted<NibbleArrayHandle>();

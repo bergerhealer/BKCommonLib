@@ -31,6 +31,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -44,7 +45,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEnumGamemode;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
@@ -158,7 +158,7 @@ public class HandleConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.server.EnumGamemode")
     public static Object toEnumGamemodeHandle(org.bukkit.GameMode gameMode) {
-        return NMSEnumGamemode.getFromId.invoke(null, gameMode.getValue());
+        return EnumGamemodeHandle.T.getById.raw.invokeVA(gameMode.getValue());
     }
 
     @ConverterMethod(output="net.minecraft.server.EnumHand")

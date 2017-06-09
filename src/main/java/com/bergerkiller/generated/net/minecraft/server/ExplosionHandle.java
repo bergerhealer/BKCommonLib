@@ -1,11 +1,17 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.World;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.Explosion</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class ExplosionHandle extends Template.Handle {
+    /** @See {@link ExplosionClass} */
     public static final ExplosionClass T = new ExplosionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ExplosionHandle.class, "net.minecraft.server.Explosion");
 
@@ -24,6 +30,10 @@ public class ExplosionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    /**
+     * Stores class members for <b>net.minecraft.server.Explosion</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class ExplosionClass extends Template.Class<ExplosionHandle> {
         public final Template.Constructor.Converted<ExplosionHandle> constr_world_entity_x_y_z_yield_fire_destroyBlocks = new Template.Constructor.Converted<ExplosionHandle>();
 

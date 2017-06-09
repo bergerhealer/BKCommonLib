@@ -1,11 +1,17 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
 import java.util.Set;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.NBTTagCompound</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class NBTTagCompoundHandle extends NBTBaseHandle {
+    /** @See {@link NBTTagCompoundClass} */
     public static final NBTTagCompoundClass T = new NBTTagCompoundClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagCompoundHandle.class, "net.minecraft.server.NBTTagCompound");
 
@@ -56,6 +62,10 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
         T.map.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.NBTTagCompound</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class NBTTagCompoundClass extends Template.Class<NBTTagCompoundHandle> {
         public final Template.Field.Converted<Map<String, NBTBaseHandle>> map = new Template.Field.Converted<Map<String, NBTBaseHandle>>();
 

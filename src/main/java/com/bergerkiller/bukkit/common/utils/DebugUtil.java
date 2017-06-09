@@ -79,6 +79,7 @@ public class DebugUtil {
      * @param format to use
      * @return Formatted String
      */
+    @SuppressWarnings("deprecation")
     public static String formatBlock(Block block, String format) {
         StringBuilder buffer = new StringBuilder(format);
         StringUtil.replaceAll(buffer, "#x", Integer.toString(block.getX()));

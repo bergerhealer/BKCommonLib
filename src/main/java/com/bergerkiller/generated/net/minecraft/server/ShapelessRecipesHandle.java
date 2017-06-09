@@ -1,11 +1,17 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.inventory.ItemStack;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.ShapelessRecipes</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class ShapelessRecipesHandle extends IRecipeHandle {
+    /** @See {@link ShapelessRecipesClass} */
     public static final ShapelessRecipesClass T = new ShapelessRecipesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ShapelessRecipesHandle.class, "net.minecraft.server.ShapelessRecipes");
 
@@ -28,6 +34,10 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
         T.inputItems.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.ShapelessRecipes</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class ShapelessRecipesClass extends Template.Class<ShapelessRecipesHandle> {
         public final Template.Field.Converted<List<ItemStack>> inputItems = new Template.Field.Converted<List<ItemStack>>();
 

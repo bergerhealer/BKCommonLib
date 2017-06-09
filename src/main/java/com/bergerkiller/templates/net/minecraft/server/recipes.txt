@@ -43,7 +43,7 @@ class RecipesFurnace {
 
 class CraftingManager {
     // >= 1.12
-    optional public static (Iterable) RegistryMaterials<MinecraftKey, IRecipe> opt_recipesField:recipes;
+    optional public static rawtype (Iterable) RegistryMaterials<MinecraftKey, IRecipe> opt_recipesField:recipes;
 
     // <= 1.11.2
     optional public (List<IRecipeHandle>) List<IRecipe> opt_getRecipes:getRecipes();

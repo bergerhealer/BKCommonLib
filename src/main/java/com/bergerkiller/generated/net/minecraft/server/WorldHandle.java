@@ -1,16 +1,22 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Server;
-import org.bukkit.util.Vector;
-import java.util.Random;
 import org.bukkit.World;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.util.Vector;
 import java.util.List;
+import java.util.Random;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.World</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class WorldHandle extends Template.Handle {
+    /** @See {@link WorldClass} */
     public static final WorldClass T = new WorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World");
 
@@ -193,6 +199,10 @@ public class WorldHandle extends Template.Handle {
         T.keepSpawnInMemory.setBoolean(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.World</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
         @Template.Optional

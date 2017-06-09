@@ -1,13 +1,19 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.HumanEntity;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import org.bukkit.entity.Player;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.PlayerList</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class PlayerListHandle extends Template.Handle {
+    /** @See {@link PlayerListClass} */
     public static final PlayerListClass T = new PlayerListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerListHandle.class, "net.minecraft.server.PlayerList");
 
@@ -54,6 +60,10 @@ public class PlayerListHandle extends Template.Handle {
         T.maxPlayers.setInteger(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.PlayerList</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class PlayerListClass extends Template.Class<PlayerListHandle> {
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
         public final Template.Field.Converted<IPlayerFileDataHandle> playerFileData = new Template.Field.Converted<IPlayerFileDataHandle>();

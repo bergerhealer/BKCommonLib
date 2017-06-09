@@ -1,15 +1,21 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import org.bukkit.entity.Player;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityTrackerEntry</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityTrackerEntryHandle extends Template.Handle {
+    /** @See {@link EntityTrackerEntryClass} */
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryHandle.class, "net.minecraft.server.EntityTrackerEntry");
 
@@ -234,6 +240,10 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.passengers.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityTrackerEntry</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
         public final Template.Field.Converted<EntityHandle> tracker = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();

@@ -15,6 +15,7 @@ public class BlockDataTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testBlockData() {
         for (Material mat : Material.values()) {
             if (mat.isBlock()) {
@@ -31,6 +32,7 @@ public class BlockDataTest {
         assertEquals(14, BlockData.fromMaterial(Material.TORCH).getEmission());
     }
 
+    @SuppressWarnings("deprecation")
     private void assertType(Material expected, Material object) {
         if (expected != object) {
             fail("Expected " + expected + " (id=" + expected.getId() + "), but got " + object + " (id=" + object.getId() + ")");

@@ -96,6 +96,7 @@ class EntityHuman extends EntityLiving {
 }
 
 class EntityPlayer extends EntityHuman {
+    public (Object) PlayerConnection playerConnection;
     public double chunkSyncX:d;
     public double chunkSyncZ:e;
     public final optional List<Integer> removeQueue;
@@ -117,6 +118,10 @@ class EntityItem extends Entity {
     public (ItemStackHandle) ItemStack getItemStack();
 
     public void setItemStack((ItemStackHandle) ItemStack itemstack);
+}
+
+class EntityHanging extends Entity {
+    public (IntVector3) BlockPosition blockPosition;
 }
 
 class EntityMinecartAbstract extends Entity {

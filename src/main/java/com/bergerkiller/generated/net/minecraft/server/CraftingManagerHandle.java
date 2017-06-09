@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.CraftingManager</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class CraftingManagerHandle extends Template.Handle {
+    /** @See {@link CraftingManagerClass} */
     public static final CraftingManagerClass T = new CraftingManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftingManagerHandle.class, "net.minecraft.server.CraftingManager");
 
@@ -31,7 +37,12 @@ public class CraftingManagerHandle extends Template.Handle {
             throw new RuntimeException("Recipes listing information not resolved");
         }
     }
+    /**
+     * Stores class members for <b>net.minecraft.server.CraftingManager</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class CraftingManagerClass extends Template.Class<CraftingManagerHandle> {
+        @SuppressWarnings("rawtypes")
         @Template.Optional
         public final Template.StaticField.Converted<Iterable> opt_recipesField = new Template.StaticField.Converted<Iterable>();
 

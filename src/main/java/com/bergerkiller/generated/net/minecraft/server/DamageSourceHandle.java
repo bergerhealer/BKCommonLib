@@ -1,14 +1,20 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Fireball;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.DamageSource</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class DamageSourceHandle extends Template.Handle {
+    /** @See {@link DamageSourceClass} */
     public static final DamageSourceClass T = new DamageSourceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource");
 
@@ -100,6 +106,10 @@ public class DamageSourceHandle extends Template.Handle {
         T.translationIndex.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.DamageSource</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class DamageSourceClass extends Template.Class<DamageSourceHandle> {
         public final Template.Field<String> translationIndex = new Template.Field<String>();
 

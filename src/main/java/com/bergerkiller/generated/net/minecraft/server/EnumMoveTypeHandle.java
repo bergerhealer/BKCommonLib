@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EnumMoveType</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EnumMoveTypeHandle extends Template.Handle {
+    /** @See {@link EnumMoveTypeClass} */
     public static final EnumMoveTypeClass T = new EnumMoveTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumMoveTypeHandle.class, "net.minecraft.server.EnumMoveType");
 
@@ -23,6 +29,10 @@ public class EnumMoveTypeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EnumMoveType</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EnumMoveTypeClass extends Template.Class<EnumMoveTypeHandle> {
         public final Template.EnumConstant.Converted<EnumMoveTypeHandle> SELF = new Template.EnumConstant.Converted<EnumMoveTypeHandle>();
         public final Template.EnumConstant.Converted<EnumMoveTypeHandle> PLAYER = new Template.EnumConstant.Converted<EnumMoveTypeHandle>();

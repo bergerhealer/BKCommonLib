@@ -50,6 +50,7 @@ public class PermissionHandler implements PermissionChecker {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private boolean hasSuperWildcardSupport() {
         if (this.needsWildcardCheck.clear()) {
             this.hasSuperWildcardSupport = false;
@@ -131,6 +132,7 @@ public class PermissionHandler implements PermissionChecker {
         return perm;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean handlePermission(CommandSender sender, String permission) {
         // Initialize the permission (and it's default) prior to check

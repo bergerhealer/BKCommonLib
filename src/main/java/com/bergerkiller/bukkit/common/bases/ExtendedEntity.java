@@ -582,6 +582,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
                 has_passengers_field = false;
             }
         }
+
+        // Fallback for older version of Bukkit
+        @SuppressWarnings("deprecation")
         org.bukkit.entity.Entity p = entity.getPassenger();
         if (p == null) {
             return Collections.emptyList();

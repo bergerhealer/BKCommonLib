@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.ChunkSection</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class ChunkSectionHandle extends Template.Handle {
+    /** @See {@link ChunkSectionClass} */
     public static final ChunkSectionClass T = new ChunkSectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkSectionHandle.class, "net.minecraft.server.ChunkSection");
 
@@ -79,6 +85,10 @@ public class ChunkSectionHandle extends Template.Handle {
         T.skyLight.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.ChunkSection</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class ChunkSectionClass extends Template.Class<ChunkSectionHandle> {
         public final Template.Constructor.Converted<ChunkSectionHandle> constr_y_hasSkyLight = new Template.Constructor.Converted<ChunkSectionHandle>();
 

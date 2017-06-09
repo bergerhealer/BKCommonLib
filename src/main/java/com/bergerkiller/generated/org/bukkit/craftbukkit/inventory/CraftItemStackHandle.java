@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import org.bukkit.inventory.ItemStack;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.ItemStack;
 
+/**
+ * Instance wrapper handle for type <b>org.bukkit.craftbukkit.inventory.CraftItemStack</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class CraftItemStackHandle extends Template.Handle {
+    /** @See {@link CraftItemStackClass} */
     public static final CraftItemStackClass T = new CraftItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftItemStackHandle.class, "org.bukkit.craftbukkit.inventory.CraftItemStack");
 
@@ -39,6 +45,10 @@ public class CraftItemStackHandle extends Template.Handle {
         T.handle.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftItemStack</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class CraftItemStackClass extends Template.Class<CraftItemStackHandle> {
         public final Template.Field.Converted<Object> handle = new Template.Field.Converted<Object>();
 

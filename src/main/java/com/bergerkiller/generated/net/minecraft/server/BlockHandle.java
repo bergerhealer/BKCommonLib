@@ -1,16 +1,24 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.Entity;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.World;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.entity.Entity;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.Block</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class BlockHandle extends Template.Handle {
+    /** @See {@link BlockClass} */
     public static final BlockClass T = new BlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block");
 
+    @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY = T.REGISTRY.getSafe();
+    @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();
     /* ============================================================================== */
 
@@ -91,8 +99,14 @@ public class BlockHandle extends Template.Handle {
         return T.toLegacyData.invoke(instance, iblockdata);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.Block</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class BlockClass extends Template.Class<BlockHandle> {
+        @SuppressWarnings("rawtypes")
         public final Template.StaticField.Converted<Iterable> REGISTRY = new Template.StaticField.Converted<Iterable>();
+        @SuppressWarnings("rawtypes")
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();

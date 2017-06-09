@@ -1,14 +1,20 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.block;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.Chunk;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
-import org.bukkit.block.Block;
-import org.bukkit.World;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import org.bukkit.Chunk;
 
+/**
+ * Instance wrapper handle for type <b>org.bukkit.craftbukkit.block.CraftBlockState</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class CraftBlockStateHandle extends Template.Handle {
+    /** @See {@link CraftBlockStateClass} */
     public static final CraftBlockStateClass T = new CraftBlockStateClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState");
 
@@ -91,6 +97,10 @@ public class CraftBlockStateHandle extends Template.Handle {
         T.flag.setInteger(instance, value);
     }
 
+    /**
+     * Stores class members for <b>org.bukkit.craftbukkit.block.CraftBlockState</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class CraftBlockStateClass extends Template.Class<CraftBlockStateHandle> {
         public final Template.Constructor.Converted<BlockState> constr_block = new Template.Constructor.Converted<BlockState>();
 

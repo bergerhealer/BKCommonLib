@@ -42,6 +42,7 @@ import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
@@ -91,7 +92,7 @@ public class NMSPacketClasses {
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSPlayerAbilities.T.getType());
 
         public CommonPacket newInstance(PlayerAbilities abilities) {
-            return constructor1.newInstance(abilities.getHandle());
+            return constructor1.newInstance(abilities.getRawHandle());
         }
     }
 
@@ -321,7 +322,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> vehicleId = nextField("private int a");
         public final FieldAccessor<Integer> passengerId = nextFieldSignature("private int b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntity.T.getType(), NMSEntity.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType(), EntityHandle.T.getType());
 
         public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
@@ -332,7 +333,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final TranslatorFieldAccessor<IntVector3> bedPosition = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntityHuman.T.getType(), BlockPositionHandle.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHumanHandle.T.getType(), BlockPositionHandle.T.getType());
 
         public CommonPacket newInstance(HumanEntity entity, IntVector3 bedPosition) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), Conversion.toBlockPositionHandle.convert(bedPosition));
@@ -559,7 +560,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
         public final FieldAccessor<Byte> headYaw = nextFieldSignature("private byte b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntity.T.getType(), byte.class);
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType(), byte.class);
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity, byte headRotation) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), headRotation);
@@ -573,7 +574,7 @@ public class NMSPacketClasses {
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, NMSDataWatcher.T.getType(), boolean.class);
 
         public CommonPacket newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
-            return constructor1.newInstance(entityId, dataWatcher.getHandle(), sendUnchangedData);
+            return constructor1.newInstance(entityId, dataWatcher.getRawHandle(), sendUnchangedData);
         }
     }
 
@@ -592,7 +593,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> yaw = nextFieldSignature("private byte e");
         public final FieldAccessor<Byte> pitch = nextFieldSignature("private byte f");
         public final FieldAccessor<Boolean> onGround = nextFieldSignature("private boolean g");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntity.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType());
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
@@ -617,7 +618,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> motX = nextFieldSignature("private int b");
         public final FieldAccessor<Integer> motY = nextFieldSignature("private int c");
         public final FieldAccessor<Integer> motZ = nextFieldSignature("private int d");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSEntity.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType());
         private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, double.class, double.class, double.class);
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
@@ -975,7 +976,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> pitch = nextFieldSignature("private byte k");
         public final FieldAccessor<Byte> headYaw = nextFieldSignature("private byte l");
         public final TranslatorFieldAccessor<DataWatcher> dataWatcher = nextFieldSignature("private DataWatcher m").translate(DuplexConversion.dataWatcher);
-        private final FieldAccessor<List<?>> dataWatcherItems = nextFieldSignature("private List<DataWatcher.Item<?>> n"); // unused!
+        //private final FieldAccessor<List<?>> dataWatcherItems = nextFieldSignature("private List<DataWatcher.Item<?>> n"); // unused!
         
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("EntityLiving"));
 

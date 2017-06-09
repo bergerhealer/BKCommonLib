@@ -3,6 +3,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -70,7 +71,7 @@ public class NMSEntityTrackerEntry {
     private static final MethodAccessor<Void> scanPlayers = T.selectMethod("public void scanPlayers(List<EntityHuman> list)");
     private static final MethodAccessor<Void> updatePlayer = T.selectMethod("public void updatePlayer(EntityPlayer entityplayer)");
 
-    private static final SafeConstructor<?> constructor = T.getConstructor(NMSEntity.T.getType(), int.class, int.class, int.class, boolean.class);
+    private static final SafeConstructor<?> constructor = T.getConstructor(EntityHandle.T.getType(), int.class, int.class, int.class, boolean.class);
 
     public static CommonPacket getSpawnPacket(Object instance) {
         return Conversion.toCommonPacket.convert(getSpawnPacket.invoke(instance));

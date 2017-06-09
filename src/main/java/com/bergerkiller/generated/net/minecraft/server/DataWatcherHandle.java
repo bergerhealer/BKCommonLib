@@ -1,12 +1,18 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.DataWatcher</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class DataWatcherHandle extends Template.Handle {
+    /** @See {@link DataWatcherClass} */
     public static final DataWatcherClass T = new DataWatcherClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher");
 
@@ -65,6 +71,10 @@ public class DataWatcherHandle extends Template.Handle {
         T.owner.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.DataWatcher</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class DataWatcherClass extends Template.Class<DataWatcherHandle> {
         public final Template.Constructor.Converted<DataWatcherHandle> constr_entity = new Template.Constructor.Converted<DataWatcherHandle>();
 
@@ -82,7 +92,13 @@ public class DataWatcherHandle extends Template.Handle {
     }
 
 
+    /**
+     * Instance wrapper handle for type <b>net.minecraft.server.DataWatcher.Item</b>.
+     * To access members without creating a handle type, use the static {@link #T} member.
+     * New handles can be created from raw instances using {@link #createHandle(Object)}.
+     */
     public static class ItemHandle extends Template.Handle {
+        /** @See {@link ItemClass} */
         public static final ItemClass T = new ItemClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item");
 
@@ -121,6 +137,10 @@ public class DataWatcherHandle extends Template.Handle {
             T.changed.setBoolean(instance, value);
         }
 
+        /**
+         * Stores class members for <b>net.minecraft.server.DataWatcher.Item</b>.
+         * Methods, fields, and constructors can be used without using Handle Objects.
+         */
         public static final class ItemClass extends Template.Class<ItemHandle> {
             public final Template.Field.Converted<Key<?>> key = new Template.Field.Converted<Key<?>>();
             public final Template.Field<Object> value = new Template.Field<Object>();

@@ -243,7 +243,7 @@ public class EntityMoveHandler {
             double d9 = d2;
 
             if ((movetype == MoveType.SELF || movetype == MoveType.PLAYER) && that.isOnGround() && that.isSneaking() && that.isInstanceOf(EntityHumanHandle.T)) {
-                for (double d10 = 0.05D; d0 != 0.0D && world.getCubes(that, that.getBoundingBox().translate(d0, (double) (-that.getHeightOffset()), 0.0D)).isEmpty(); d7 = d0) {
+                for (/* double d10 = 0.05D*/; d0 != 0.0D && world.getCubes(that, that.getBoundingBox().translate(d0, (double) (-that.getHeightOffset()), 0.0D)).isEmpty(); d7 = d0) {
                     if (d0 < 0.05D && d0 >= -0.05D) {
                         d0 = 0.0D;
                     } else if (d0 > 0.0D) {

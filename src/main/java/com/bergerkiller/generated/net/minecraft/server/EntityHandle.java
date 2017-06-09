@@ -1,23 +1,29 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import org.bukkit.entity.Entity;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MainHand;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.Material;
-import java.util.Random;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
-import java.util.UUID;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.Entity</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityHandle extends Template.Handle {
+    /** @See {@link EntityClass} */
     public static final EntityClass T = new EntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity");
 
@@ -664,6 +670,10 @@ public class EntityHandle extends Template.Handle {
         T.valid.setBoolean(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.Entity</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityClass extends Template.Class<EntityHandle> {
         public final Template.Constructor.Converted<EntityHandle> constr_world = new Template.Constructor.Converted<EntityHandle>();
 

@@ -1,14 +1,20 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import java.util.Map;
-import org.bukkit.inventory.ItemStack;
-import java.util.Collection;
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import org.bukkit.inventory.EquipmentSlot;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import org.bukkit.inventory.ItemStack;
+import java.util.Collection;
+import java.util.Map;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityLiving</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityLivingHandle extends EntityHandle {
+    /** @See {@link EntityLivingClass} */
     public static final EntityLivingClass T = new EntityLivingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityLivingHandle.class, "net.minecraft.server.EntityLiving");
 
@@ -96,6 +102,10 @@ public class EntityLivingHandle extends EntityHandle {
         T.updateEffects.setBoolean(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityLiving</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityLivingClass extends Template.Class<EntityLivingHandle> {
         public final Template.StaticField.Converted<Key<Byte>> DATA_LIVING_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         public final Template.StaticField.Converted<Key<Float>> DATA_HEALTH = new Template.StaticField.Converted<Key<Float>>();

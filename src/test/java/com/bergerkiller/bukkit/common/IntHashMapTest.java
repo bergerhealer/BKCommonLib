@@ -24,7 +24,7 @@ public class IntHashMapTest {
         Object handle = DuplexConversion.intHashMap.convertReverse(test);
         assertNotNull(handle);
 
-        IntHashMap<String> original = (IntHashMap) Conversion.toIntHashMap.convert(handle);
+        IntHashMap<String> original = CommonUtil.unsafeCast(Conversion.toIntHashMap.convert(handle));
         assertNotNull(original);
         assertEquals("test_string", original.get(154));
     }

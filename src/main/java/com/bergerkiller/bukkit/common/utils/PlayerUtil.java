@@ -1,17 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNetworkManager;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import com.mojang.authlib.GameProfile;
@@ -38,7 +35,7 @@ public class PlayerUtil extends EntityUtil {
         if (handle == null) {
             return true;
         }
-        final Object connection = NMSEntityPlayer.playerConnection.get(handle);
+        final Object connection = EntityPlayerHandle.T.playerConnection.get(handle);
         if (connection == null) {
             return true;
         }
@@ -178,7 +175,7 @@ public class PlayerUtil extends EntityUtil {
      * @return The player's GameProfile
      */
     public static GameProfile getGameProfile(Player player) {
-        return NMSEntityHuman.gameProfile.get(Conversion.toEntityHandle.convert(player));
+        return EntityHumanHandle.T.gameProfile.get(Conversion.toEntityHandle.convert(player));
     }
 
     /**

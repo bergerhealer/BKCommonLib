@@ -11,8 +11,8 @@ import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
-    public static final (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
-    public static final (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
+    public static final rawtype (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
+    public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
 
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 

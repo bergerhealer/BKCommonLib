@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.BiomeBase</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class BiomeBaseHandle extends Template.Handle {
+    /** @See {@link BiomeBaseClass} */
     public static final BiomeBaseClass T = new BiomeBaseClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase");
 
@@ -19,11 +25,21 @@ public class BiomeBaseHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    /**
+     * Stores class members for <b>net.minecraft.server.BiomeBase</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class BiomeBaseClass extends Template.Class<BiomeBaseHandle> {
     }
 
 
+    /**
+     * Instance wrapper handle for type <b>net.minecraft.server.BiomeBase.BiomeMeta</b>.
+     * To access members without creating a handle type, use the static {@link #T} member.
+     * New handles can be created from raw instances using {@link #createHandle(Object)}.
+     */
     public static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
+        /** @See {@link BiomeMetaClass} */
         public static final BiomeMetaClass T = new BiomeMetaClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta");
 
@@ -66,6 +82,10 @@ public class BiomeBaseHandle extends Template.Handle {
             T.maxSpawnCount.setInteger(instance, value);
         }
 
+        /**
+         * Stores class members for <b>net.minecraft.server.BiomeBase.BiomeMeta</b>.
+         * Methods, fields, and constructors can be used without using Handle Objects.
+         */
         public static final class BiomeMetaClass extends Template.Class<BiomeMetaHandle> {
             public final Template.Constructor.Converted<BiomeMetaHandle> constr_entityClass_x_y_z = new Template.Constructor.Converted<BiomeMetaHandle>();
 

@@ -362,6 +362,7 @@ public class CommonUtil {
      * @return an InputStream to the resource
      * @throws IOException if loading fails or the file can not be found
      */
+    @SuppressWarnings("resource")
     public static InputStream getPluginResource(File pluginJarFile, String resourcePath) throws IOException {
         // First, find the plugin by Jar file (avoids Jar File decompression times)
         // Then we can use the ClassLoader of this Jar File to load the resource instead

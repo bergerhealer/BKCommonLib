@@ -1,14 +1,20 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import java.util.Map;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import org.bukkit.block.BlockState;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import org.bukkit.Chunk;
+import org.bukkit.block.BlockState;
+import java.util.Map;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.Chunk</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class ChunkHandle extends Template.Handle {
+    /** @See {@link ChunkClass} */
     public static final ChunkClass T = new ChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk");
 
@@ -127,6 +133,10 @@ public class ChunkHandle extends Template.Handle {
         T.bukkitChunk.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.Chunk</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
         public final Template.Field.Converted<ChunkSectionHandle[]> sections = new Template.Field.Converted<ChunkSectionHandle[]>();
         public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();

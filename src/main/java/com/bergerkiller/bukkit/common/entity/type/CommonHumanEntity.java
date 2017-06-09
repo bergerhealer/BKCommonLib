@@ -4,7 +4,7 @@ import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.BlockLocation;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHuman;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 
 /**
  * A Common Entity implementation for Human Entities
@@ -23,8 +23,8 @@ public class CommonHumanEntity<T extends HumanEntity> extends CommonLivingEntity
      */
     public BlockLocation getSpawnPoint() {
         Object handle = getHandle();
-        String world = NMSEntityHuman.spawnWorld.get(handle);
-        IntVector3 coords = NMSEntityHuman.spawnCoord.get(handle);
+        String world = EntityHumanHandle.T.spawnWorld.get(handle);
+        IntVector3 coords = EntityHumanHandle.T.spawnCoord.get(handle);
         if (world != null && coords != null && !world.isEmpty()) {
             return new BlockLocation(world, coords);
         } else {
@@ -46,8 +46,8 @@ public class CommonHumanEntity<T extends HumanEntity> extends CommonLivingEntity
             world = spawnPoint.world;
             coord = spawnPoint.getCoordinates();
         }
-        NMSEntityHuman.spawnWorld.set(handle, world);
-        NMSEntityHuman.spawnCoord.set(handle, coord);
+        EntityHumanHandle.T.spawnWorld.set(handle, world);
+        EntityHumanHandle.T.spawnCoord.set(handle, coord);
     }
 
 }

@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EnumDirection</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EnumDirectionHandle extends Template.Handle {
+    /** @See {@link EnumDirectionClass} */
     public static final EnumDirectionClass T = new EnumDirectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDirectionHandle.class, "net.minecraft.server.EnumDirection");
 
@@ -24,6 +30,10 @@ public class EnumDirectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EnumDirection</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EnumDirectionClass extends Template.Class<EnumDirectionHandle> {
         public final Template.EnumConstant.Converted<EnumDirectionHandle> DOWN = new Template.EnumConstant.Converted<EnumDirectionHandle>();
         public final Template.EnumConstant.Converted<EnumDirectionHandle> UP = new Template.EnumConstant.Converted<EnumDirectionHandle>();
@@ -35,7 +45,13 @@ public class EnumDirectionHandle extends Template.Handle {
     }
 
 
+    /**
+     * Instance wrapper handle for type <b>net.minecraft.server.EnumDirection.EnumAxis</b>.
+     * To access members without creating a handle type, use the static {@link #T} member.
+     * New handles can be created from raw instances using {@link #createHandle(Object)}.
+     */
     public static class EnumAxisHandle extends Template.Handle {
+        /** @See {@link EnumAxisClass} */
         public static final EnumAxisClass T = new EnumAxisClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumAxisHandle.class, "net.minecraft.server.EnumDirection.EnumAxis");
 
@@ -57,6 +73,10 @@ public class EnumDirectionHandle extends Template.Handle {
         public int ordinal() {
             return ((Enum<?>) instance).ordinal();
         }
+        /**
+         * Stores class members for <b>net.minecraft.server.EnumDirection.EnumAxis</b>.
+         * Methods, fields, and constructors can be used without using Handle Objects.
+         */
         public static final class EnumAxisClass extends Template.Class<EnumAxisHandle> {
             public final Template.EnumConstant.Converted<EnumAxisHandle> X = new Template.EnumConstant.Converted<EnumAxisHandle>();
             public final Template.EnumConstant.Converted<EnumAxisHandle> Y = new Template.EnumConstant.Converted<EnumAxisHandle>();

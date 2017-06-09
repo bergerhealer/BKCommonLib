@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EnumParticle</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EnumParticleHandle extends Template.Handle {
+    /** @See {@link EnumParticleClass} */
     public static final EnumParticleClass T = new EnumParticleClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumParticleHandle.class, "net.minecraft.server.EnumParticle");
 
@@ -22,6 +28,10 @@ public class EnumParticleHandle extends Template.Handle {
         return T.byName.invokeVA(name);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EnumParticle</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EnumParticleClass extends Template.Class<EnumParticleHandle> {
         public final Template.StaticMethod.Converted<EnumParticleHandle> byName = new Template.StaticMethod.Converted<EnumParticleHandle>();
 

@@ -1,12 +1,18 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
+import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.mojang.authlib.GameProfile;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.EntityHuman</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class EntityHumanHandle extends EntityLivingHandle {
+    /** @See {@link EntityHumanClass} */
     public static final EntityHumanClass T = new EntityHumanClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHumanHandle.class, "net.minecraft.server.EntityHuman");
 
@@ -133,6 +139,10 @@ public class EntityHumanHandle extends EntityLivingHandle {
         T.spawnWorld.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.EntityHuman</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class EntityHumanClass extends Template.Class<EntityHumanHandle> {
         public final Template.Field.Converted<Object> inventoryRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<Object> enderChestRaw = new Template.Field.Converted<Object>();

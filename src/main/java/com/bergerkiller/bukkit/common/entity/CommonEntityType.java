@@ -71,6 +71,7 @@ public class CommonEntityType {
             case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
             case TIPPED_ARROW: nmsName = "EntityTippedArrow"; break;
             case LINGERING_POTION: nmsName = "EntityPotion"; break;
+            default: nmsName = null; break;
             }
             if (nmsName == null) {
                 Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");

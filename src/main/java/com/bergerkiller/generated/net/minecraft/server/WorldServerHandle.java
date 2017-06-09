@@ -1,12 +1,18 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import java.util.Map;
-import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.WorldServer</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class WorldServerHandle extends WorldHandle {
+    /** @See {@link WorldServerClass} */
     public static final WorldServerClass T = new WorldServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer");
 
@@ -69,6 +75,10 @@ public class WorldServerHandle extends WorldHandle {
         T.entitiesByUUID.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.WorldServer</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
         public final Template.Field.Converted<MinecraftServerHandle> minecraftServer = new Template.Field.Converted<MinecraftServerHandle>();
         public final Template.Field.Converted<EntityTracker> entityTracker = new Template.Field.Converted<EntityTracker>();

@@ -6,10 +6,10 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityHanging;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -167,7 +167,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return block
      */
     public static Block getHangingBlock(Hanging entityHanging) {
-        IntVector3 pos = NMSEntityHanging.blockPosition.get(Conversion.toEntityHandle.convert(entityHanging));
+        IntVector3 pos = EntityHangingHandle.T.blockPosition.get(Conversion.toEntityHandle.convert(entityHanging));
         return pos.toBlock(entityHanging.getWorld());
     }
 }

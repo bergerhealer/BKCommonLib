@@ -1,11 +1,17 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.entity.Entity;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.entity.Entity;
 import java.util.List;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.MobSpawnerAbstract</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class MobSpawnerAbstractHandle extends Template.Handle {
+    /** @See {@link MobSpawnerAbstractClass} */
     public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract");
 
@@ -112,6 +118,10 @@ public class MobSpawnerAbstractHandle extends Template.Handle {
         T.spawnRange.setInteger(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.MobSpawnerAbstract</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class MobSpawnerAbstractClass extends Template.Class<MobSpawnerAbstractHandle> {
         public final Template.Field.Integer spawnDelay = new Template.Field.Integer();
         public final Template.Field.Converted<List<MobSpawnerDataHandle>> mobs = new Template.Field.Converted<List<MobSpawnerDataHandle>>();

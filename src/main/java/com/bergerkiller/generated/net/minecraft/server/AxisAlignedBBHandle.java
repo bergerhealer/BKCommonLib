@@ -1,9 +1,15 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.AxisAlignedBB</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class AxisAlignedBBHandle extends Template.Handle {
+    /** @See {@link AxisAlignedBBClass} */
     public static final AxisAlignedBBClass T = new AxisAlignedBBClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AxisAlignedBBHandle.class, "net.minecraft.server.AxisAlignedBB");
 
@@ -110,6 +116,10 @@ public class AxisAlignedBBHandle extends Template.Handle {
         T.maxZ.setDouble(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.AxisAlignedBB</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class AxisAlignedBBClass extends Template.Class<AxisAlignedBBHandle> {
         public final Template.Constructor.Converted<AxisAlignedBBHandle> constr_x1_y1_z1_x2_y2_z2 = new Template.Constructor.Converted<AxisAlignedBBHandle>();
 

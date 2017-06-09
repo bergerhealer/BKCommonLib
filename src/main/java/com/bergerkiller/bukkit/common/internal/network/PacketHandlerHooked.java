@@ -12,8 +12,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 
 import org.bukkit.entity.Player;
@@ -204,7 +204,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             }
         }
 
-        final Object connection = NMSEntityPlayer.playerConnection.get(handle);
+        final Object connection = EntityPlayerHandle.T.playerConnection.get(handle);
         NMSPlayerConnection.sendPacket(connection, packet);
     }
 
@@ -241,7 +241,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     }
 
     protected Object getPlayerConnection(Player player) {
-        return NMSEntityPlayer.playerConnection.get(Conversion.toEntityHandle.convert(player));
+        return EntityPlayerHandle.T.playerConnection.get(Conversion.toEntityHandle.convert(player));
     }
 
     private PacketType[] getListenerTypes(PacketListener listener) {

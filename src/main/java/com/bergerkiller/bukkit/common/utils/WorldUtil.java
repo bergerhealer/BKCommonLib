@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -21,7 +22,6 @@ import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityPlayer;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
@@ -46,7 +46,7 @@ import java.util.Random;
 
 public class WorldUtil extends ChunkUtil {
 
-    private static final Object findSpawnDummyEntity = NMSEntityPlayer.T.newInstanceNull();
+    private static final Object findSpawnDummyEntity = EntityPlayerHandle.T.newInstanceNull();
 
     /**
      * Gets BlockData for a particular Block

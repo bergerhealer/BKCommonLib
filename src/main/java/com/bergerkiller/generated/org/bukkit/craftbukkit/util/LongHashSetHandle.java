@@ -1,10 +1,16 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
-import java.util.Iterator;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Iterator;
 
+/**
+ * Instance wrapper handle for type <b>org.bukkit.craftbukkit.util.LongHashSet</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class LongHashSetHandle extends Template.Handle {
+    /** @See {@link LongHashSetClass} */
     public static final LongHashSetClass T = new LongHashSetClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LongHashSetHandle.class, "org.bukkit.craftbukkit.util.LongHashSet");
 
@@ -107,6 +113,10 @@ public class LongHashSetHandle extends Template.Handle {
         T.valuesField.set(instance, value);
     }
 
+    /**
+     * Stores class members for <b>org.bukkit.craftbukkit.util.LongHashSet</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class LongHashSetClass extends Template.Class<LongHashSetHandle> {
         public final Template.Constructor.Converted<LongHashSetHandle> constr = new Template.Constructor.Converted<LongHashSetHandle>();
         public final Template.Constructor.Converted<LongHashSetHandle> constr_size = new Template.Constructor.Converted<LongHashSetHandle>();

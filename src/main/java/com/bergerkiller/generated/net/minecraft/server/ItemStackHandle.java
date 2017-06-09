@@ -1,11 +1,17 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import org.bukkit.Material;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import org.bukkit.Material;
 
+/**
+ * Instance wrapper handle for type <b>net.minecraft.server.ItemStack</b>.
+ * To access members without creating a handle type, use the static {@link #T} member.
+ * New handles can be created from raw instances using {@link #createHandle(Object)}.
+ */
 public class ItemStackHandle extends Template.Handle {
+    /** @See {@link ItemStackClass} */
     public static final ItemStackClass T = new ItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack");
 
@@ -105,6 +111,10 @@ public class ItemStackHandle extends Template.Handle {
         T.durabilityField.setInteger(instance, value);
     }
 
+    /**
+     * Stores class members for <b>net.minecraft.server.ItemStack</b>.
+     * Methods, fields, and constructors can be used without using Handle Objects.
+     */
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
         public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability_convert = new Template.Constructor.Converted<ItemStackHandle>();
 
