@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
@@ -40,6 +41,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -472,4 +474,17 @@ public class WrapperConversion {
     public static <E> List<E> toList(Object nonNullListHandle) {
         return (List<E>) nonNullListHandle;
     }
+
+    // <= 1.11.2
+    @ConverterMethod()
+    public static CraftInputSlot toCraftInputSlot(org.bukkit.inventory.ItemStack defaultChoice) {
+        return new CraftInputSlot(new org.bukkit.inventory.ItemStack[] { defaultChoice });
+    }
+
+    // 1.12 =>
+    @ConverterMethod(input="net.minecraft.server.RecipeItemStack", optional=true)
+    public static CraftInputSlot toCraftInputSlot(Object recipeItemStackHandle) {
+        return new CraftInputSlot(RecipeItemStackHandle.T.choices.get(recipeItemStackHandle));
+    }
+
 }

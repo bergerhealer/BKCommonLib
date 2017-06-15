@@ -2,7 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.bukkit.inventory.ItemStack;
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import java.util.List;
 
 /**
@@ -26,11 +26,11 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
 
     /* ============================================================================== */
 
-    public List<ItemStack> getInputItems() {
+    public List<CraftInputSlot> getInputItems() {
         return T.inputItems.get(instance);
     }
 
-    public void setInputItems(List<ItemStack> value) {
+    public void setInputItems(List<CraftInputSlot> value) {
         T.inputItems.set(instance, value);
     }
 
@@ -39,7 +39,7 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ShapelessRecipesClass extends Template.Class<ShapelessRecipesHandle> {
-        public final Template.Field.Converted<List<ItemStack>> inputItems = new Template.Field.Converted<List<ItemStack>>();
+        public final Template.Field.Converted<List<CraftInputSlot>> inputItems = new Template.Field.Converted<List<CraftInputSlot>>();
 
     }
 

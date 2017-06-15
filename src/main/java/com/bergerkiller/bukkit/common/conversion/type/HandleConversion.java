@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Difficulty;
@@ -13,6 +14,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
@@ -37,6 +39,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
+import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
@@ -319,5 +322,19 @@ public class HandleConversion {
         List<E> result = (List<E>) NonNullListHandle.create();
         result.addAll(list);
         return result;
+    }
+
+    // <= 1.11.2
+    @ConverterMethod(output="net.minecraft.server.ItemStack")
+    public static Object toDefaultItemStackHandle(CraftInputSlot slot) {
+        return toItemStackHandle(slot.getDefaultChoice());
+    }
+
+    // 1.12 =>
+    @ConverterMethod(output="net.minecraft.server.RecipeItemStack", optional=true)
+    public static Object toRecipeItemStackHandle(CraftInputSlot slot) {
+        Object recipe = RecipeItemStackHandle.T.newInstanceNull();
+        RecipeItemStackHandle.T.choices.set(recipe, Arrays.asList(slot.getChoices()));
+        return recipe;
     }
 }

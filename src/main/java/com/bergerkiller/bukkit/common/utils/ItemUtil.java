@@ -275,6 +275,18 @@ public class ItemUtil {
     }
 
     /**
+     * Creates a copy of an existing inventory, with all fields deeply copied.
+     * Changes to this returned inventory will not affect the original inventory.
+     * The returned inventory is not of the same class type!
+     * 
+     * @param inventory to clone
+     * @return cloned inventory
+     */
+    public static Inventory cloneInventory(Inventory inventory) {
+        return new InventoryBaseImpl(inventory.getContents(), true);
+    }
+
+    /**
      * Checks whether two item stacks equal, while ignoring the item amounts
      *
      * @param item1 to check

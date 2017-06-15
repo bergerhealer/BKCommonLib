@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
+
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
@@ -7,29 +9,37 @@ import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 #if version >= 1.12
+
 class IRecipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
 }
-#else
-interface IRecipe {
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
-}
-#endif
 
 class ShapedRecipes extends IRecipe {
-#if version >= 1.12
-    private final (List<org.bukkit.inventory.ItemStack) NonNullList<RecipeItemStack> inputItems:items;
-#else
-    private final (List<org.bukkit.inventory.ItemStack) ItemStack[] inputItems:items;
-#endif
+    private final (List<CraftInputSlot>) NonNullList<RecipeItemStack> inputItems:items;
 }
 
 class ShapelessRecipes extends IRecipe {
-#if version >= 1.12
-    private final (List<org.bukkit.inventory.ItemStack) NonNullList<RecipeItemStack> inputItems:ingredients;
+    private final (List<CraftInputSlot>) NonNullList<RecipeItemStack> inputItems:ingredients;
+}
+
 #else
-    private final (List<org.bukkit.inventory.ItemStack) List<ItemStack> inputItems:ingredients;
+
+interface IRecipe {
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
+}
+
+class ShapedRecipes extends IRecipe {
+    private final (List<CraftInputSlot>) ItemStack[] inputItems:items;
+}
+
+class ShapelessRecipes extends IRecipe {
+    private final (List<CraftInputSlot>) List<ItemStack> inputItems:ingredients;
+}
+
 #endif
+
+optional class RecipeItemStack {
+    public final (List<org.bukkit.inventory.ItemStack>) ItemStack[] choices;
 }
 
 class RecipesFurnace {

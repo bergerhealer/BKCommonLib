@@ -1,42 +1,24 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle;
 import com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NMSRecipe {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("IRecipe");
-    
-    private static final MethodAccessor<Object> getOutput = T.selectMethod("public abstract ItemStack b()");
-    
-    public static class Shaped {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("ShapedRecipes");
-        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = ShapedRecipesHandle.T.inputItems.toFieldAccessor();
-    }
-    
-    public static class Shapeless {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("ShapelessRecipes");
-        public static final TranslatorFieldAccessor<List<ItemStack>> inputList = ShapelessRecipesHandle.T.inputItems.toFieldAccessor();
-    }
 
     public static ItemStack getOutput(Object iRecipe) {
-        return Conversion.toItemStack.convert(getOutput.invoke(iRecipe));
+        return IRecipeHandle.T.getOutput.invoke(iRecipe);
     }
 
-    @Deprecated
-    public static List<ItemStack> getInputItems(Object iRecipe) {
-        return getInputItems(IRecipeHandle.createHandle(iRecipe));
-    }
-
-    public static List<ItemStack> getInputItems(IRecipeHandle iRecipe) {
+    public static List<CraftInputSlot> getInputSlots(IRecipeHandle iRecipe) {
         if (iRecipe == null) {
             return null;
         } else if (iRecipe.isInstanceOf(ShapedRecipesHandle.T)) {
@@ -45,6 +27,31 @@ public class NMSRecipe {
             return ShapelessRecipesHandle.T.inputItems.get(iRecipe.getRaw());
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Deprecated: input slots have more than one choice. Use {@link #getInputSlots(IRecipeHandle)} instead.
+     */
+    @Deprecated
+    public static List<ItemStack> getInputItems(Object iRecipe) {
+        return getInputItems(IRecipeHandle.createHandle(iRecipe));
+    }
+
+    /**
+     * Deprecated: input slots have more than one choice. Use {@link #getInputSlots(IRecipeHandle)} instead.
+     */
+    @Deprecated
+    public static List<ItemStack> getInputItems(IRecipeHandle iRecipe) {
+        List<CraftInputSlot> slots = getInputSlots(iRecipe);
+        if (slots == null) {
+            return null;
+        } else {
+            ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+            for (CraftInputSlot slot : slots) {
+                items.add(slot.getDefaultChoice());
+            }
+            return items;
         }
     }
 }
