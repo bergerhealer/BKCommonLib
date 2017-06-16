@@ -24,6 +24,18 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
 
     /* ============================================================================== */
 
+    public boolean suckItems() {
+        return T.suckItems.invoke(instance);
+    }
+
+    public boolean isSuckingEnabled() {
+        return T.isSuckingEnabled.invoke(instance);
+    }
+
+    public void setSuckingEnabled(boolean enabled) {
+        T.setSuckingEnabled.invoke(instance, enabled);
+    }
+
     public int getSuckingCooldown() {
         return T.suckingCooldown.getInteger(instance);
     }
@@ -38,6 +50,10 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
      */
     public static final class EntityMinecartHopperClass extends Template.Class<EntityMinecartHopperHandle> {
         public final Template.Field.Integer suckingCooldown = new Template.Field.Integer();
+
+        public final Template.Method<Boolean> suckItems = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isSuckingEnabled = new Template.Method<Boolean>();
+        public final Template.Method<Void> setSuckingEnabled = new Template.Method<Void>();
 
     }
 

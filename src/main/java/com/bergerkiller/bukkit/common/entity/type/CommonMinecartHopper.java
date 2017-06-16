@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHopperHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 import org.bukkit.Material;
@@ -35,7 +35,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return True if Items were sucked in, False if not
      */
     public boolean suckItems() {
-        return TileEntityHopperHandle.suckItems(handle.getRaw());
+        return EntityMinecartHopperHandle.T.suckItems.invoke(this.getHandle());
     }
 
     /**
@@ -44,9 +44,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return True if sucking items, False if not
      */
     public boolean isSuckingItems() {
-    	//TODO: BROKEN!!!!
-    	return false;
-        //return getHandle(EntityMinecartHopper.class).C();
+        return EntityMinecartHopperHandle.T.isSuckingEnabled.invoke(this.getHandle());
     }
 
     /**
@@ -55,9 +53,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @param sucking state to set to
      */
     public void setSuckingItems(boolean sucking) {
-    	//TODO: BROKEN!!!!
-    	return;
-        //getHandle(EntityMinecartHopper.class).f(sucking);
+        EntityMinecartHopperHandle.T.setSuckingEnabled.invoke(this.getHandle(), sucking);
     }
 
     /**
