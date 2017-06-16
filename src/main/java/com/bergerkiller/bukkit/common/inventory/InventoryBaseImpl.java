@@ -23,7 +23,7 @@ public class InventoryBaseImpl extends InventoryBase {
     }
 
     public InventoryBaseImpl(Collection<ItemStack> contents, boolean clone) {
-        this(contents.toArray(new ItemStack[0]), false);
+        this(contents.toArray(new ItemStack[contents.size()]), false);
         if (clone) {
             for (int i = 0; i < this.items.length; i++) {
                 this.items[i] = ItemUtil.cloneItem(this.items[i]);
@@ -50,17 +50,17 @@ public class InventoryBaseImpl extends InventoryBase {
 
     @Override
     public void setItem(int index, ItemStack item) {
-        this.items[index] = ItemUtil.cloneItem(item);
+        this.items[index] = item;
     }
 
     @Override
     public ItemStack getItem(int index) {
-        return ItemUtil.cloneItem(this.items[index]);
+        return this.items[index];
     }
 
     @Override
     public ItemStack[] getContents() {
-        return ItemUtil.cloneItems(this.items);
+        return this.items;
     }
 
     //TODO FIX

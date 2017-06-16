@@ -74,7 +74,11 @@ public abstract class InventoryBase implements Inventory {
 
     @Override
     public ItemStack[] getContents() {
-        return this.cbProxy.getContents();
+        ItemStack[] contents = new ItemStack[getSize()];
+        for (int i = 0; i < contents.length; i++) {
+            contents[i] = this.getItem(i);
+        }
+        return contents;
     }
 
     @Override
