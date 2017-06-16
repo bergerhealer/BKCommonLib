@@ -152,7 +152,11 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 class EntityMinecartHopper extends EntityMinecartAbstract {
     private int suckingCooldown:b;
 
+#if version >= 1.12
     public boolean suckItems:H();
+#else
+    public boolean suckItems:I();
+#endif
 
     public boolean isSuckingEnabled:isEnabled();
     public void setSuckingEnabled:setEnabled(boolean enabled);
