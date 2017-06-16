@@ -32,7 +32,7 @@ public class CraftingManagerHandle extends Template.Handle {
             return new com.bergerkiller.mountiplex.conversion.util.ConvertingIterable<IRecipeHandle>(irecipeIter,
                 com.bergerkiller.generated.net.minecraft.server.IRecipeHandle.T.getHandleConverter());
         } else if (T.opt_getRecipes.isAvailable() && T.opt_getInstance.isAvailable()) {
-            return T.opt_getRecipes.invoke(T.opt_getInstance.invokeVA());
+            return T.opt_getRecipes.invoke(T.opt_getInstance.raw.invokeVA());
         } else {
             throw new RuntimeException("Recipes listing information not resolved");
         }
