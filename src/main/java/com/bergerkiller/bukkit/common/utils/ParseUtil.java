@@ -49,7 +49,7 @@ public class ParseUtil {
 
         // Material by name aliases
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-        MAT_ALIASES.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
+        MAT_ALIASES.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("PLANK", "WOOD").add("WOODEN", "WOOD");
         MAT_ALIASES.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
         MAT_ALIASES.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
         MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
