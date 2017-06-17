@@ -10,6 +10,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.RecipeUtil;
 
 public class RecipeTest {
@@ -43,6 +44,7 @@ public class RecipeTest {
                 new ItemStack(Material.STONE, 3));
         assertRequirements(Material.WOOD, new ItemStack(Material.LOG, 1));
         assertRequirements(Material.GLOWSTONE, new ItemStack(Material.GLOWSTONE_DUST, 4));
+        assertRequirements(Material.IRON_BLOCK, new ItemStack(Material.IRON_INGOT, 9));
     }
 
     @Test
@@ -69,13 +71,16 @@ public class RecipeTest {
         assertEquals(testInventory.getItem(4), new ItemStack(Material.WOOD, 12));
         assertEquals(testInventory.getItem(5), new ItemStack(Material.DIODE, 2));
     }
-    
+
     public void assertRequirements(Material outputType, ItemStack... inputs) {
         CraftRecipe[] recipes = RecipeUtil.getCraftingRequirements(outputType, 0);
         assertEquals(1, recipes.length);
         assertEquals(inputs.length, recipes[0].getInputSlots().length);
         for (int i = 0; i < inputs.length; i++) {
-            assertEquals(inputs[i], recipes[0].getInputSlots()[i].getDefaultChoice());
+            ItemStack item2 = recipes[0].getInputSlots()[i].getDefaultChoice();
+            if (item2.getType() != inputs[i].getType() || item2.getAmount() != inputs[i].getAmount()) {
+                fail("Item at [" +  i + "] expected " + inputs[i] + ", but was " + item2);
+            }
         }
     }
 }

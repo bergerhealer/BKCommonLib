@@ -478,6 +478,8 @@ public class WrapperConversion {
     // <= 1.11.2
     @ConverterMethod()
     public static CraftInputSlot toCraftInputSlot(org.bukkit.inventory.ItemStack defaultChoice) {
+        defaultChoice = defaultChoice.clone();
+        defaultChoice.setAmount(1);
         return new CraftInputSlot(new org.bukkit.inventory.ItemStack[] { defaultChoice });
     }
 

@@ -87,7 +87,7 @@
             <artifactId>craftbukkit</artifactId>
             <version>${project.cbversion}-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot-1.12-R0.1-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot-${project.cbversion}-SNAPSHOT.jar</systemPath>
         </dependency>
 
         <dependency>
