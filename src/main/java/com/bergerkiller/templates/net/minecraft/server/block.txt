@@ -24,7 +24,7 @@ class Block {
 
 #if version >= 1.11.2
     public (SoundEffectTypeHandle) SoundEffectType getStepSound();
-#elseif version >= 1.10.2
+#else
     public (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
 #endif
 
