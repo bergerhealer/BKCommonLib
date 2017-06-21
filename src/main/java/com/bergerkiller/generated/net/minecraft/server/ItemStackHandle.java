@@ -25,8 +25,8 @@ public class ItemStackHandle extends Template.Handle {
         return handle;
     }
 
-    public static final ItemStackHandle createNew(Material type, int amount, int durability, boolean convert) {
-        return T.constr_type_amount_durability_convert.newInstance(type, amount, durability, convert);
+    public static final ItemStackHandle createNew(Material type, int amount, int durability) {
+        return T.constr_type_amount_durability.newInstance(type, amount, durability);
     }
 
     /* ============================================================================== */
@@ -116,6 +116,8 @@ public class ItemStackHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
+        public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability = new Template.Constructor.Converted<ItemStackHandle>();
+        @Template.Optional
         public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability_convert = new Template.Constructor.Converted<ItemStackHandle>();
 
         public final Template.StaticField.Converted<ItemStackHandle> EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();

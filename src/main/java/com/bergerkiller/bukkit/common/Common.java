@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
@@ -240,4 +241,14 @@ public class Common {
         ex.printStackTrace();
     }
 
+    /**
+     * Checks if the Minecraft version matches a version condition
+     * 
+     * @param operand to evaluate with, for example ">=" and "!="
+     * @param version the operand is applied to (right side)
+     * @return True if the version matches, False if not
+     */
+    public static boolean evaluateMCVersion(String operand, String version) {
+        return MountiplexUtil.evaluateText(MC_VERSION, operand, version);
+    }
 }

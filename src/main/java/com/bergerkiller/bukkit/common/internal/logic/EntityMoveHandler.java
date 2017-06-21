@@ -52,8 +52,18 @@ public class EntityMoveHandler {
     }
 
     private boolean world_getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle bounds, boolean flag) {
-        if (!entity.getWorld().getBlockCollisions(entity, bounds, flag, collisions_buffer)) {
-            return false;
+        Object entityWorld_Raw = entity.getWorld().getRaw();
+        if (WorldHandle.T.getBlockCollisions.isAvailable()) {
+            if (!WorldHandle.T.getBlockCollisions.invoke(entityWorld_Raw, entity, bounds, flag, collisions_buffer)) {
+                return false;
+            }
+        } else if (WorldHandle.T.getBlockCollisions_old.isAvailable()) {
+            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getBlockCollisions_old.invoke(entityWorld_Raw, entity, bounds);
+            if (foundBounds.isEmpty()) {
+                return false;
+            }
+            collisions_buffer.clear();
+            collisions_buffer.addAll(foundBounds);
         }
 
         org.bukkit.World bWorld = entity.getWorld().getWorld();
@@ -156,7 +166,6 @@ public class EntityMoveHandler {
         that = EntityHandle.createHandle(entity.getHandle());
 
         final Random this_random = that.getRandom();
-        final double[] that_aI = that.getMove_SomeArray();
         WorldHandle world = that.getWorld();
 
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.startTiming(); // Spigot
@@ -180,12 +189,16 @@ public class EntityMoveHandler {
                 return;
             }
             // CraftBukkit end
-            if (movetype == MoveType.PISTON) {
+
+            // This logic is only >= 1.11.2
+            if (EntityHandle.IS_OLD_MOVE && movetype == MoveType.PISTON) {
                 long i = world.getTime();
 
-                if (i != that.getMove_SomeState()) {
+                final double[] that_aI = EntityHandle.T.move_SomeArray.get(entity.getHandle());
+
+                if (i != EntityHandle.T.move_SomeState.getLong(entity.getHandle())) {
                     Arrays.fill(that_aI, 0.0D);
-                    that.setMove_SomeState(i);
+                    EntityHandle.T.move_SomeState.setLong(entity.getHandle(), i);
                 }
 
                 int j;

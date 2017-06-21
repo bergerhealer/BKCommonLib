@@ -13,24 +13,46 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 
 class EntityLiving extends Entity {
+#if version >= 1.12
     protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
     private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
-#if version >= 1.12
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:br;
-#else
+#elseif version >= 1.11.2
+    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:bq;
+#else
+    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
+    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:h;
 #endif
 
+#if version >= 1.11.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
+#else
+    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
+#endif
+
     public final (Map<Object, Object>) Map<MobEffectList, MobEffect> mobEffects:effects;
 
     public float lastDamage;
+#if version >= 1.11.2
     protected unknown boolean bd;
     public unknown float be;
     public float forwardMovement:bf;
     public unknown float bg;
+#else
+    protected unknown boolean be;
+    public unknown float bf;
+    public float forwardMovement:bg;
+    public unknown float bh;
+#endif
 
     public boolean updateEffects;
 
@@ -63,18 +85,26 @@ class EntityHuman extends EntityLiving {
     public boolean sleeping;
     public (IntVector3) BlockPosition bedPosition;
     public int sleepTicks;
+
 #if version >= 1.12
     public unknown float bM;
     public unknown float bN;
     private (IntVector3) BlockPosition spawnCoord:d;
     private boolean spawnForced:e;
-#else
+#elseif version >= 1.11.2
     public unknown float bI;
     public unknown float bJ;
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
+#else
+    public unknown float bJ;
+    public unknown float bK;
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+    private unknown BlockPosition g;
 #endif
+
     public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
     public int expLevel;
     public int expTotal;
@@ -84,12 +114,18 @@ class EntityHuman extends EntityLiving {
     protected unknown float bT = 0.02F;
     private unknown int f;
     private final com.mojang.authlib.GameProfile gameProfile:g;
-#else
+#elseif version >= 1.11.2
     private unknown int h;
     protected unknown float bO;
     protected unknown float bP;
     private unknown int bR;
     private final com.mojang.authlib.GameProfile gameProfile:bS;
+#else
+    private unknown int h;
+    protected unknown float bP;
+    protected unknown float bQ;
+    private unknown int bS;
+    private final com.mojang.authlib.GameProfile gameProfile:bT;
 #endif
 
     public String spawnWorld;
@@ -167,4 +203,12 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
 
     protected void explode:c(double damage);
     public void prime:j();
+}
+
+class EntityMinecartCommandBlock extends EntityMinecartAbstract {
+#if version >= 1.11.2
+    public static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:COMMAND;
+#else
+    public static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:a;
+#endif
 }

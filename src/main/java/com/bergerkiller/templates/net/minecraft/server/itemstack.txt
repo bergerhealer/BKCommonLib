@@ -11,13 +11,18 @@ class ItemStack {
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
     private int durabilityField:damage;
 
-    public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);
+    public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability);
+    public optional (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);
 
     public (Object) Item getItem();
 
     public String getName();
 
+#if version >= 1.11.2
     public (ItemStackHandle) ItemStack setName:g(String s);
+#else
+    public (ItemStackHandle) ItemStack setName:c(String s);
+#endif
 
     public int getRepairCost();
 

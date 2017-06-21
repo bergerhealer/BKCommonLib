@@ -39,10 +39,6 @@ public class IInventoryHandle extends Template.Handle {
         T.setItem.invoke(instance, paramInt, paramItemStack);
     }
 
-    public List<ItemStackHandle> getContents() {
-        return T.getContents.invoke(instance);
-    }
-
     public void update() {
         T.update.invoke(instance);
     }
@@ -55,12 +51,12 @@ public class IInventoryHandle extends Template.Handle {
         return T.canStoreItem.invoke(instance, index, itemstack);
     }
 
-    public int someFunction() {
-        return T.someFunction.invoke(instance);
+    public List<ItemStackHandle> getContents() {
+        return T.getContents.invoke(instance);
     }
 
-    public boolean someFunction2() {
-        return T.someFunction2.invoke(instance);
+    public int someFunction() {
+        return T.someFunction.invoke(instance);
     }
 
     /**
@@ -71,11 +67,12 @@ public class IInventoryHandle extends Template.Handle {
         public final Template.Method<Integer> getSize = new Template.Method<Integer>();
         public final Template.Method.Converted<ItemStackHandle> getItem = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<List<ItemStackHandle>> getContents = new Template.Method.Converted<List<ItemStackHandle>>();
         public final Template.Method<Void> update = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> canOpen = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> canStoreItem = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<List<ItemStackHandle>> getContents = new Template.Method.Converted<List<ItemStackHandle>>();
         public final Template.Method<Integer> someFunction = new Template.Method<Integer>();
+        @Template.Optional
         public final Template.Method<Boolean> someFunction2 = new Template.Method<Boolean>();
 
     }

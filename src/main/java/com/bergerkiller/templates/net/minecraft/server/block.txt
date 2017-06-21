@@ -22,7 +22,11 @@ class Block {
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata);
     public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
 
+#if version >= 1.11.2
     public (SoundEffectTypeHandle) SoundEffectType getStepSound();
+#elseif version >= 1.10.2
+    public (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
+#endif
 
     public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
     public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);

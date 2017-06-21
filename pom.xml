@@ -13,7 +13,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project_mcversion>v1_12_R1</project_mcversion>
         <project.mcversion>1.12</project.mcversion>
         <project.bversion>1.12-R0.1</project.bversion>
         <project.cbversion>1.12-R0.1</project.cbversion>

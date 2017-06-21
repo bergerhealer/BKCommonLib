@@ -4,7 +4,11 @@ import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle;
 
 class MapIcon {
-    public (MapIconHandle) MapIcon((MapIconHandle.TypeHandle) MapIcon.Type type, byte x, byte y, byte direction);
+#if version >= 1.11.2
+    public (MapIconHandle) MapIcon((byte) MapIcon.Type type, byte x, byte y, byte direction);
+#else
+    public (MapIconHandle) MapIcon(byte type, byte x, byte y, byte direction);
+#endif
 
     public byte getTypeId:getType();
 
@@ -14,7 +18,7 @@ class MapIcon {
 
     public byte getDirection:getRotation();
 
-    class MapIcon.Type {
+    optional class MapIcon.Type {
         public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:a(byte id);
     }
 }

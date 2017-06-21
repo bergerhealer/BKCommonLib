@@ -1,4 +1,5 @@
 #include /org/bukkit/plugin.txt
+#include /org/bukkit/entity.txt
 #include /org/bukkit/craftbukkit/entity.txt
 #include /org/bukkit/craftbukkit/world.txt
 #include /org/bukkit/craftbukkit/block.txt
@@ -34,6 +35,7 @@
 #include /net/minecraft/server/network.txt
 #include /net/minecraft/server/entity.txt
 #include /net/minecraft/server/entity_tracker.txt
+#include /net/minecraft/server/entity_types.txt
 #include /net/minecraft/server/entity_subtype.txt
 #include /net/minecraft/server/axisalignedbb.txt
 #include /net/minecraft/server/world.txt

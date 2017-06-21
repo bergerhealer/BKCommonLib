@@ -28,7 +28,7 @@ public class CommonMethods {
     }
 
     public static ChunkSectionHandle ChunkSection_new(org.bukkit.World world, int y) {
-        return ChunkSectionHandle.createNew(y >> 4 << 4, !CommonNMS.getHandle(world).getWorldProvider().isDarkWorld());
+        return ChunkSectionHandle.createNew(y >> 4 << 4, CommonNMS.getHandle(world).getWorldProvider().hasSkyLight());
     }
 
     public static ExplosionHandle Explosion_new(org.bukkit.World world, double x, double y, double z) {
@@ -81,6 +81,11 @@ public class CommonMethods {
     }
 
     private static String getSourceName(DamageCause cause) {
+        // Special case >= v1.11.2
+        if (cause.name().equals("CRAMMING")) {
+            return "cramming";
+        }
+
         switch (cause) {
         case FIRE: return "inFire";
         case LIGHTNING: return "lightningBolt";
@@ -88,7 +93,6 @@ public class CommonMethods {
         case LAVA: return "lava";
         case HOT_FLOOR: return "hotFloor";
         case SUFFOCATION: return "inWall";
-        case CRAMMING: return "cramming";
         case DROWNING: return "drown";
         case STARVATION: return "starve";
         case CONTACT: return "cactus";

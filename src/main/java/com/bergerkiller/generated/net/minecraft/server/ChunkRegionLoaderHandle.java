@@ -24,16 +24,23 @@ public class ChunkRegionLoaderHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean chunkExists(int cx, int cz) {
-        return T.chunkExists.invoke(instance, cx, cz);
-    }
 
+    public boolean chunkExists(org.bukkit.World world, int cx, int cz) {
+        if (T.opt_chunkExists_old.isAvailable()) {
+            return T.opt_chunkExists_old.invoke(instance, world, cx, cz);
+        } else {
+            return T.opt_chunkExists.invoke(instance, cx, cz);
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.server.ChunkRegionLoader</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkRegionLoaderClass extends Template.Class<ChunkRegionLoaderHandle> {
-        public final Template.Method<Boolean> chunkExists = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method<Boolean> opt_chunkExists = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> opt_chunkExists_old = new Template.Method.Converted<Boolean>();
 
     }
 

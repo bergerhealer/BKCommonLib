@@ -567,20 +567,14 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return CommonUtil.tryCast(getPassenger(), Player.class);
     }
 
-    private static boolean has_passengers_field = true;
-
     /**
      * Retrieves a list of passenger entities
      * 
      * @return passenger entity list
      */
     public List<org.bukkit.entity.Entity> getPassengers() {
-        if (has_passengers_field) {
-            try {
-                return entity.getPassengers();
-            } catch (Throwable t) {
-                has_passengers_field = false;
-            }
+        if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.isAvailable()) {
+            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.invoke(entity);
         }
 
         // Fallback for older version of Bukkit
@@ -836,7 +830,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if the passenger was successfully set, False if not
      */
 	public boolean addPassenger(org.bukkit.entity.Entity passenger) {
-	    return entity.addPassenger(passenger);
+	    if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.isAvailable()) {
+	        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.invoke(entity, passenger);
+	    } else {
+	        return entity.setPassenger(passenger);
+	    }
 	}
 
     /**
@@ -847,7 +845,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if the passenger was successfully removed, False if not
      */
     public boolean removePassenger(org.bukkit.entity.Entity passenger) {
-        return entity.removePassenger(passenger);
+        if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.isAvailable()) {
+            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.invoke(entity, passenger);
+        } else if (entity.getPassenger() == passenger) {
+            return entity.setPassenger(null);
+        } else {
+            return false;
+        }
     }
 
     /**

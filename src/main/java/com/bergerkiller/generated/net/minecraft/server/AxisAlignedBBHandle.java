@@ -28,14 +28,6 @@ public class AxisAlignedBBHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public AxisAlignedBBHandle transformA(double lx, double ly, double lz) {
-        return T.transformA.invoke(instance, lx, ly, lz);
-    }
-
-    public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
-        return T.transformB.invoke(instance, lx, ly, lz);
-    }
-
     public AxisAlignedBBHandle grow(double sx, double sy, double sz) {
         return T.grow.invoke(instance, sx, sy, sz);
     }
@@ -46,6 +38,10 @@ public class AxisAlignedBBHandle extends Template.Handle {
 
     public AxisAlignedBBHandle shrinkUniform(double size) {
         return T.shrinkUniform.invoke(instance, size);
+    }
+
+    public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
+        return T.transformB.invoke(instance, lx, ly, lz);
     }
 
     public AxisAlignedBBHandle translate(double dx, double dy, double dz) {
@@ -130,11 +126,10 @@ public class AxisAlignedBBHandle extends Template.Handle {
         public final Template.Field.Double maxY = new Template.Field.Double();
         public final Template.Field.Double maxZ = new Template.Field.Double();
 
-        public final Template.Method.Converted<AxisAlignedBBHandle> transformA = new Template.Method.Converted<AxisAlignedBBHandle>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> transformB = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> grow = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> growUniform = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> shrinkUniform = new Template.Method.Converted<AxisAlignedBBHandle>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> transformB = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> translate = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<Boolean> bbTransformA = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Double> calcSomeX = new Template.Method.Converted<Double>();

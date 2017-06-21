@@ -22,7 +22,7 @@ public class MapIconHandle extends Template.Handle {
         return handle;
     }
 
-    public static final MapIconHandle createNew(TypeHandle type, byte x, byte y, byte direction) {
+    public static final MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
         return T.constr_type_x_y_direction.newInstance(type, x, y, direction);
     }
 
@@ -64,6 +64,7 @@ public class MapIconHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.Optional
     public static class TypeHandle extends Template.Handle {
         /** @See {@link TypeClass} */
         public static final TypeClass T = new TypeClass();

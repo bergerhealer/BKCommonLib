@@ -211,7 +211,7 @@ public class ChunkUtil {
             Object chunkLoader = ChunkProviderServerHandle.T.chunkLoader.get(cps);
             if (ChunkRegionLoaderHandle.T.isAssignableFrom(chunkLoader)) {
                 // Chunk can be loaded from file
-                return ChunkRegionLoaderHandle.T.chunkExists.invoke(chunkLoader, x, z);
+                return ChunkRegionLoaderHandle.createHandle(chunkLoader).chunkExists(world, x, z);
             } else {
                 // Unable to find out...
                 return false;

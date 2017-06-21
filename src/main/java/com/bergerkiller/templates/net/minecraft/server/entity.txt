@@ -64,10 +64,15 @@ class Entity {
     public unknown float R;
     protected Random random;
     public int ticksLived;
+    public optional int field_maxFireTicks:maxFireTicks;
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
+#if version >= 1.11.2
     protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
+#else
+    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+#endif
 #if version >= 1.12
     private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
     private static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
@@ -82,28 +87,44 @@ class Entity {
     private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
 #endif
 
+#if version >= 1.11.2
     public boolean isLoaded:aa;
     public int chunkX:ab;
     public int chunkY:ac;
     public int chunkZ:ad;
-
     public unknown boolean ah;
+#else
+    public boolean isLoaded:ab;
+    public int chunkX:ac;
+    public int chunkY:ad;
+    public int chunkZ:ae;
+    public unknown boolean ai;
+#endif
 
     public boolean positionChanged:impulse;
     public int portalCooldown;
-    protected boolean allowTeleportation:ak;
 
+#if version >= 1.11.2
+    protected boolean allowTeleportation:ak;
     protected unknown int al;
+#else
+    protected boolean allowTeleportation:al;
+    protected unknown int am;
+#endif
 
     public int dimension;
 
 #if version >= 1.12
-    private final double[] move_SomeArray:aJ;
-    private long move_SomeState:aK;
+    optional private final double[] move_SomeArray:aJ;
+    optional private long move_SomeState:aK;
+#elseif version >= 1.11.2
+    optional private double[] move_SomeArray:aI;
+    optional private long move_SomeState:aJ;
 #else
-    private double[] move_SomeArray:aI;
-    private long move_SomeState:aJ;
+    optional private double[] move_SomeArray:???;
+    optional private long move_SomeState:???;
 #endif
+
     public boolean valid;
 
     public (EntityHandle) Entity((WorldHandle) World world);
@@ -328,7 +349,19 @@ class Entity {
 
     public void setOnFire(int numSeconds);
 
-    public int getMaxFireTicks();
+    public optional int prop_getMaxFireTicks:getMaxFireTicks();
+
+    <code>
+    public int getMaxFireTicks() {
+        if (T.prop_getMaxFireTicks.isAvailable()) {
+            return T.prop_getMaxFireTicks.invoke(instance);
+        } else if (T.field_maxFireTicks.isAvailable()) {
+            return T.field_maxFireTicks.getInteger(instance);
+        } else {
+            throw new UnsupportedOperationException("Max Fire Ticks can not be read");
+        }
+    }
+    </code>
 
 #if version >= 1.12
     public boolean isWet:an();
@@ -341,17 +374,21 @@ class Entity {
     public (EntityHandle) Entity getDriverEntity:bE();
 #endif
 
-    public void onTick:B_();
-
     public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 #else
     public boolean isWet:ai();
 
     public (EntityHandle) Entity getDriverEntity:bw();
 
-    public void onTick:A_();
-
     public (CommonTagCompound) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#endif
+
+#if version >= 1.12
+    public void onTick:B_();
+#else if version >= 1.11.2
+    public void onTick:A_();
+#else
+    public void onTick:m();
 #endif
 
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
@@ -372,13 +409,25 @@ class Entity {
 
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
+#if version >= 1.11.2
     public void onPush:f(double d0, double d1, double d2);
+#else
+    public void onPush:g(double d0, double d1, double d2);
+#endif
 
-    public boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    // 1.11.2 and after
+    public optional boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    
+    // 1.10.2 and before
+    public optional boolean onInteractBy_old:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
     public void collide((EntityHandle) Entity entity);
 
     public (org.bukkit.entity.Entity) org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity();
+
+    <code>
+    public static final boolean IS_OLD_MOVE = com.bergerkiller.bukkit.common.Common.evaluateMCVersion("<=", "1.10.2");
+    </code>
 
     <code>
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);

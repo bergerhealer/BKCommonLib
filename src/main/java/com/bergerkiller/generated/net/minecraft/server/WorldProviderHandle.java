@@ -24,16 +24,26 @@ public class WorldProviderHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean isDarkWorld() {
-        return T.isDarkWorld.invoke(instance);
+    public boolean int_skyLightProperty() {
+        return T.int_skyLightProperty.invoke(instance);
     }
 
+
+    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
+
+    public boolean hasSkyLight() {
+        return T.int_skyLightProperty.invoke(instance).booleanValue() != _darkInverted;
+    }
+
+    public boolean isDarkWorld() {
+        return !hasSkyLight();
+    }
     /**
      * Stores class members for <b>net.minecraft.server.WorldProvider</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldProviderClass extends Template.Class<WorldProviderHandle> {
-        public final Template.Method<Boolean> isDarkWorld = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> int_skyLightProperty = new Template.Method<Boolean>();
 
     }
 

@@ -38,6 +38,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
@@ -277,8 +278,7 @@ public class HandleConversion {
     public static Object toMapIconHandle(MapCursor cursor) {
         // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
         // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
-        Object mapIconType = MapIconHandle.TypeHandle.T.fromId.raw.invokeVA(cursor.getRawType());
-        return MapIconHandle.T.constr_type_x_y_direction.raw.newInstance(mapIconType,
+        return MapIconHandle.T.constr_type_x_y_direction.raw.newInstance(cursor.getRawType(),
                 cursor.getX(), cursor.getY(), cursor.getDirection());
     }
 
@@ -336,5 +336,15 @@ public class HandleConversion {
         Object recipe = RecipeItemStackHandle.T.newInstanceNull();
         RecipeItemStackHandle.T.choices.set(recipe, Arrays.asList(slot.getChoices()));
         return recipe;
+    }
+
+    @ConverterMethod(output="net.minecraft.server.MinecraftKey")
+    public static Object getMinecraftKeyFromName(String name) {
+        return MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.MinecraftKey")
+    public static String getNameFromMinecraftKey(Object minecraftKeyHandle) {
+        return minecraftKeyHandle.toString();
     }
 }

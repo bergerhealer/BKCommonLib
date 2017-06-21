@@ -1,0 +1,7 @@
+package net.minecraft.server;
+
+class EntityTypes {
+    private static void register:a(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
+
+    public static (Object) MinecraftKey getName((Class<?>) Class<? extends Entity> paramClass);
+}

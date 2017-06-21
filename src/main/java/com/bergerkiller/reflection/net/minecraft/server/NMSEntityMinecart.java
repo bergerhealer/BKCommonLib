@@ -2,6 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
@@ -55,7 +56,7 @@ public class NMSEntityMinecart {
     public static class CommandBlock {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartCommandBlock");
 
-        public static final DataWatcher.Key<String> DATA_COMMAND = DataWatcher.Key.fromStaticField(T, "COMMAND");
+        public static final DataWatcher.Key<String> DATA_COMMAND = EntityMinecartCommandBlockHandle.DATA_COMMAND;
         public static final DataWatcher.Key<Object> DATA_PREVIOUS_OUTPUT = DataWatcher.Key.fromStaticField(T, "b");
     }
 }

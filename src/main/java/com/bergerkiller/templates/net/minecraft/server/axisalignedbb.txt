@@ -12,17 +12,24 @@ class AxisAlignedBB {
 
     public (AxisAlignedBBHandle) AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
 
-    public (AxisAlignedBBHandle) AxisAlignedBB transformA:a(double lx, double ly, double lz);
-    public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
-
     public (AxisAlignedBBHandle) AxisAlignedBB grow(double sx, double sy, double sz);
     public (AxisAlignedBBHandle) AxisAlignedBB growUniform:g(double size);
 
     public (AxisAlignedBBHandle) AxisAlignedBB shrinkUniform:shrink(double size);
 
+#if version >= 1.11.2
+    public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
+
     public (AxisAlignedBBHandle) AxisAlignedBB translate:d(double dx, double dy, double dz);
 
     public boolean bbTransformA:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB transformB:a(double lx, double ly, double lz);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB translate:c(double dx, double dy, double dz);
+
+    public boolean bbTransformA:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+#endif
 
     public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
     public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);

@@ -516,7 +516,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // If in a vehicle, make sure we eject first
         if (isInsideVehicle()) {
-            getVehicle().removePassenger(entity);
+            ExtendedEntity<Entity> extVeh = new ExtendedEntity<Entity>(getVehicle());
+            extVeh.removePassenger(entity);
         }
 
         // If vehicle, eject the passenger first

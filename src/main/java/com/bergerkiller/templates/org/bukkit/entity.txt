@@ -1,0 +1,13 @@
+package org.bukkit.entity;
+
+class Entity {
+#if version >= 1.11.2
+    public optional List<Entity> getPassengers();
+    public optional boolean addPassenger(Entity passenger);
+    public optional boolean removePassenger(Entity passenger);
+#else
+    public optional List<Entity> getPassengers:???();
+    public optional boolean addPassenger:???(Entity passenger);
+    public optional boolean removePassenger:???(Entity passenger);
+#endif
+}

@@ -7,7 +7,6 @@ interface IInventory {
     public abstract int getSize();
     public abstract (ItemStackHandle) ItemStack getItem(int index);
     public abstract void setItem(int paramInt, (ItemStackHandle) ItemStack paramItemStack);
-    public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
 
     public abstract void update();
 
@@ -15,12 +14,22 @@ interface IInventory {
 
     public abstract boolean canStoreItem:b(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
 
+#if version >= 1.11.2
+    public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
+
     public abstract int someFunction:h();
+#else
+    public abstract (List<ItemStackHandle>) ItemStack[] getContents();
+
+    public abstract int someFunction:g();
+#endif
 
 #if version >= 1.12
-    public abstract boolean someFunction2:x_();
+    public optional abstract boolean someFunction2:x_();
+#elseif version >= 1.11.2
+    public optional abstract boolean someFunction2:w_();
 #else
-    public abstract boolean someFunction2:w_();
+    public optional abstract boolean someFunction2:???();
 #endif
 }
 
@@ -33,5 +42,9 @@ class PlayerInventory extends IInventory {
 class InventoryEnderChest extends IInventory {
    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 
+#if version >= 1.11.2
    public (CommonTagList) NBTTagList saveToNBT:i()
+#else
+   public (CommonTagList) NBTTagList saveToNBT:h()
+#endif
 }

@@ -9,10 +9,8 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -176,10 +174,6 @@ public class EntityHandle extends Template.Handle {
         T.setOnFire.invoke(instance, numSeconds);
     }
 
-    public int getMaxFireTicks() {
-        return T.getMaxFireTicks.invoke(instance);
-    }
-
     public boolean isWet() {
         return T.isWet.invoke(instance);
     }
@@ -188,12 +182,12 @@ public class EntityHandle extends Template.Handle {
         return T.getDriverEntity.invoke(instance);
     }
 
-    public void onTick() {
-        T.onTick.invoke(instance);
-    }
-
     public CommonTagCompound saveToNBT(CommonTagCompound compound) {
         return T.saveToNBT.invoke(instance, compound);
+    }
+
+    public void onTick() {
+        T.onTick.invoke(instance);
     }
 
     public void loadFromNBT(CommonTagCompound compound) {
@@ -236,10 +230,6 @@ public class EntityHandle extends Template.Handle {
         T.onPush.invoke(instance, d0, d1, d2);
     }
 
-    public boolean onInteractBy(HumanEntity human, MainHand enumhand) {
-        return T.onInteractBy.invoke(instance, human, enumhand);
-    }
-
     public void collide(EntityHandle entity) {
         T.collide.invoke(instance, entity);
     }
@@ -247,6 +237,20 @@ public class EntityHandle extends Template.Handle {
     public Entity getBukkitEntity() {
         return T.getBukkitEntity.invoke(instance);
     }
+
+
+    public int getMaxFireTicks() {
+        if (T.prop_getMaxFireTicks.isAvailable()) {
+            return T.prop_getMaxFireTicks.invoke(instance);
+        } else if (T.field_maxFireTicks.isAvailable()) {
+            return T.field_maxFireTicks.getInteger(instance);
+        } else {
+            throw new UnsupportedOperationException("Max Fire Ticks can not be read");
+        }
+    }
+
+
+    public static final boolean IS_OLD_MOVE = com.bergerkiller.bukkit.common.Common.evaluateMCVersion("<=", "1.10.2");
 
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
@@ -646,22 +650,6 @@ public class EntityHandle extends Template.Handle {
         T.dimension.setInteger(instance, value);
     }
 
-    public double[] getMove_SomeArray() {
-        return T.move_SomeArray.get(instance);
-    }
-
-    public void setMove_SomeArray(double[] value) {
-        T.move_SomeArray.set(instance, value);
-    }
-
-    public long getMove_SomeState() {
-        return T.move_SomeState.getLong(instance);
-    }
-
-    public void setMove_SomeState(long value) {
-        T.move_SomeState.setLong(instance, value);
-    }
-
     public boolean isValid() {
         return T.valid.getBoolean(instance);
     }
@@ -722,6 +710,8 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Integer ticksLived = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Integer field_maxFireTicks = new Template.Field.Integer();
         public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
@@ -732,7 +722,9 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
         public final Template.Field.Integer dimension = new Template.Field.Integer();
+        @Template.Optional
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
+        @Template.Optional
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
@@ -766,11 +758,12 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
         public final Template.Method<Void> setOnFire = new Template.Method<Void>();
-        public final Template.Method<Integer> getMaxFireTicks = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
         public final Template.Method<Boolean> isWet = new Template.Method<Boolean>();
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
-        public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
@@ -781,7 +774,10 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
         public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
+        @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> onInteractBy_old = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 

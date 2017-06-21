@@ -20,8 +20,13 @@ class MobSpawnerAbstract {
 
     public void onTick:c();
 
+#if version >= 1.11.2
     public (MinecraftKeyHandle) MinecraftKey getMobName();
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey);
+#else
+    public (MinecraftKeyHandle) String getMobName();
+    public void setMobName((MinecraftKeyHandle) String nameKey);
+#endif
 }
 
 class MobSpawnerData {

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
@@ -10,6 +11,7 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -74,7 +76,8 @@ class CommonListener implements Listener {
             if (realVehicle != null && realVehicle != event.getVehicle()) {
                 // Perform the event again for the right Bukkit entity/Handle
                 event.setCancelled(true);
-                realVehicle.addPassenger(event.getEntered());
+                ExtendedEntity<Entity> extRealVehicle = new ExtendedEntity<Entity>(realVehicle);
+                extRealVehicle.addPassenger(event.getEntered());
             }
         }
     }

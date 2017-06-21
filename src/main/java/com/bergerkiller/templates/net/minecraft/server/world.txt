@@ -50,7 +50,10 @@ class World {
 
     public long getTime();
 
-    private boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+    // >= 1.11.2
+    private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+    // <= 1.10.2
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getBlockCollisions_old:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
@@ -62,7 +65,11 @@ class World {
 
     public (WorldDataHandle) WorldData getWorldData();
 
+#if version >= 1.11.2
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#else
+    public boolean isBurnArea:f((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#endif
 
     public void removeEntity((EntityHandle) Entity entity);
 
@@ -140,7 +147,19 @@ class WorldType {
 }
 
 class WorldProvider {
-    public boolean isDarkWorld:m();
+    public boolean int_skyLightProperty:m();
+
+<code>
+    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
+
+    public boolean hasSkyLight() {
+        return T.int_skyLightProperty.invoke(instance).booleanValue() != _darkInverted;
+    }
+
+    public boolean isDarkWorld() {
+        return !hasSkyLight();
+    }
+</code>
 }
 
 class WeightedRandom {
@@ -196,8 +215,21 @@ class RegionFileCache {
 
 class ChunkRegionLoader {
 #if version >= 1.12
-    public boolean chunkExists(int cx, int cz);
+    public optional boolean opt_chunkExists:chunkExists(int cx, int cz);
 #else
-    public boolean chunkExists:a(int cx, int cz);
+    public optional boolean opt_chunkExists:a(int cx, int cz);
 #endif
+
+    // <= 1.10.2
+    public optional boolean opt_chunkExists_old:chunkExists((org.bukkit.World) World world, int cx, int cz);
+
+<code>
+    public boolean chunkExists(org.bukkit.World world, int cx, int cz) {
+        if (T.opt_chunkExists_old.isAvailable()) {
+            return T.opt_chunkExists_old.invoke(instance, world, cx, cz);
+        } else {
+            return T.opt_chunkExists.invoke(instance, cx, cz);
+        }
+    }
+</code>
 }

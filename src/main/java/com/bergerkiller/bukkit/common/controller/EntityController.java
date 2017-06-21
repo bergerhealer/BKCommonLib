@@ -68,7 +68,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @return True if interaction occurred, False if not
      */
     public boolean onInteractBy(HumanEntity interacter, MainHand hand) {
-        return this.hook.base.onInteractBy(Conversion.toEntityHandle.convert(interacter), Conversion.toMainHandHandle.convert(hand));
+        return this.hook.base_onInteractBy(Conversion.toEntityHandle.convert(interacter), Conversion.toMainHandHandle.convert(hand));
     }
 
     /**

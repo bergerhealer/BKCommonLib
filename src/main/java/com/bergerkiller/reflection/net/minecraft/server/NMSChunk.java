@@ -44,7 +44,7 @@ public class NMSChunk {
 
         @Override
         public Boolean get(Object instance) {
-            return WorldProviderHandle.T.isDarkWorld.invoke(instance);
+            return WorldProviderHandle.createHandle(instance).hasSkyLight();
         }
 
         @Override

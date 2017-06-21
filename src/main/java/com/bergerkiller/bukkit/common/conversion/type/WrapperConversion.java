@@ -449,6 +449,15 @@ public class WrapperConversion {
         return new MapCursor(icon.getX(), icon.getY(), icon.getDirection(), icon.getTypeId(), true);
     }
 
+    @ConverterMethod(output="net.minecraft.server.MapIcon.Type", optional=true)
+    public static Object mapIconTypeIdToEnum(byte typeId) {
+        if (MapIconHandle.TypeHandle.T.isValid()) {
+            return MapIconHandle.TypeHandle.T.fromId.raw.invokeVA(typeId);
+        } else {
+            throw new UnsupportedOperationException("Map Icon Type enum not supported");
+        }
+    }
+
     @ConverterMethod(input="net.minecraft.server.IChatBaseComponent")
     public static ChatText toChatText(Object iChatBaseComponentHandle) {
         return ChatText.fromComponent(iChatBaseComponentHandle);
