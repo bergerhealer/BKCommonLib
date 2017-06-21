@@ -191,7 +191,7 @@ public class EntityMoveHandler {
             // CraftBukkit end
 
             // This logic is only >= 1.11.2
-            if (EntityHandle.IS_OLD_MOVE && movetype == MoveType.PISTON) {
+            if (EntityHandle.IS_NEW_MOVE_FUNCTION && movetype == MoveType.PISTON) {
                 long i = world.getTime();
 
                 final double[] that_aI = EntityHandle.T.move_SomeArray.get(entity.getHandle());

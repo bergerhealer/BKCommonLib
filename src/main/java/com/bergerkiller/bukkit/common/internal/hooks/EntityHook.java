@@ -134,16 +134,16 @@ public class EntityHook extends ClassHook<EntityHook> {
     public void onMove(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {
-                if (EntityHandle.IS_OLD_MOVE) {
-                    controller.onMove(MoveType.SELF, dx, dy, dz);
-                } else {
+                if (EntityHandle.IS_NEW_MOVE_FUNCTION) {
                     controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
+                } else {
+                    controller.onMove(MoveType.SELF, dx, dy, dz);
                 }
             } else {
-                if (EntityHandle.IS_OLD_MOVE) {
-                    base.onMove_old(dx, dy, dz);
-                } else {
+                if (EntityHandle.IS_NEW_MOVE_FUNCTION) {
                     base.onMove(enumMoveType, dx, dy, dz);
+                } else {
+                    base.onMove_old(dx, dy, dz);
                 }
             }
         } catch (Throwable t) {

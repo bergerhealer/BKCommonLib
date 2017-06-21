@@ -426,7 +426,9 @@ class Entity {
     public (org.bukkit.entity.Entity) org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity();
 
     <code>
-    public static final boolean IS_OLD_MOVE = com.bergerkiller.bukkit.common.Common.evaluateMCVersion("<=", "1.10.2");
+    // Since MC 1.11.2 there is a new move function and signature, which must be dealt with correctly
+    // This one handles piston motion specifically with an Enum Move Type, not present <= 1.10.2
+    public static final boolean IS_NEW_MOVE_FUNCTION = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
     </code>
 
     <code>

@@ -250,7 +250,7 @@ public class EntityHandle extends Template.Handle {
     }
 
 
-    public static final boolean IS_OLD_MOVE = com.bergerkiller.bukkit.common.Common.evaluateMCVersion("<=", "1.10.2");
+    public static final boolean IS_NEW_MOVE_FUNCTION = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
 
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
