@@ -45,12 +45,12 @@ public class InventoryTest {
         IInventoryHandle handle = IInventoryHandle.createHandle(HandleConversion.toIInventoryHandle(inventory));
         assertEquals(9 * 3, handle.getSize());
         for (int i = 0; i < handle.getSize(); i++) {
-            assertNotNull(handle.getItem(i));
+            assertTrue(ItemStackHandle.EMPTY_ITEM.equals(handle.getItem(i)));
         }
         List<ItemStackHandle> handleContents = handle.getContents();
         assertEquals(9 * 3, handleContents.size());
         for (int i = 0; i < handleContents.size(); i++) {
-            assertNotNull(handleContents.get(i));
+            assertTrue(ItemStackHandle.EMPTY_ITEM.equals(handle.getItem(i)));
         }
 
         ItemStack testItem1 = new ItemStack(Material.WOOD, 1);

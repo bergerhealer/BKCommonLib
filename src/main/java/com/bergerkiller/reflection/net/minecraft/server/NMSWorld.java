@@ -38,8 +38,6 @@ public class NMSWorld {
 
     //public static final FieldAccessor<List> entityRemovalList = TEMPLATE.getField("h"); TODO: Disabling it for now to support PaperSpigot. Fixing it later.
 
-    public static final MethodAccessor<Void> applyPhysics = WorldHandle.T.applyPhysics.raw.toMethodAccessor();
-
     public static final MethodAccessor<List<?>> getEntities = WorldHandle.T.getEntities.raw.toMethodAccessor();
 
     private static final MethodAccessor<Boolean> isChunkLoaded = WorldHandle.T.isChunkLoaded.toMethodAccessor();

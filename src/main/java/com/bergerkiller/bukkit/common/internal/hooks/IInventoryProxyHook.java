@@ -52,7 +52,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return HandleConversion.toItemStackHandle(this.inventory.getItem(index));
     }
 
-    @HookMethod("public abstract void clear()")
+    @HookMethod("public abstract void clear:???()")
     public void clear() {
         this.inventory.clear();
     }

@@ -44,7 +44,6 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
 
         public static final EnumTitleActionHandle TITLE = T.TITLE.getSafe();
         public static final EnumTitleActionHandle SUBTITLE = T.SUBTITLE.getSafe();
-        public static final EnumTitleActionHandle ACTIONBAR = T.ACTIONBAR.getSafe();
         public static final EnumTitleActionHandle TIMES = T.TIMES.getSafe();
         public static final EnumTitleActionHandle CLEAR = T.CLEAR.getSafe();
         public static final EnumTitleActionHandle RESET = T.RESET.getSafe();
@@ -66,6 +65,7 @@ public class PacketPlayOutTitleHandle extends Template.Handle {
         public static final class EnumTitleActionClass extends Template.Class<EnumTitleActionHandle> {
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> TITLE = new Template.EnumConstant.Converted<EnumTitleActionHandle>();
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> SUBTITLE = new Template.EnumConstant.Converted<EnumTitleActionHandle>();
+            @Template.Optional
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> ACTIONBAR = new Template.EnumConstant.Converted<EnumTitleActionHandle>();
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> TIMES = new Template.EnumConstant.Converted<EnumTitleActionHandle>();
             public final Template.EnumConstant.Converted<EnumTitleActionHandle> CLEAR = new Template.EnumConstant.Converted<EnumTitleActionHandle>();

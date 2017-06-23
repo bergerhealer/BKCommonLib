@@ -25,7 +25,7 @@ class PacketPlayOutTitle {
     class PacketPlayOutTitle.EnumTitleAction {
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TITLE;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction SUBTITLE;
-        enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction ACTIONBAR;
+        enum optional (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction ACTIONBAR;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TIMES;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction CLEAR;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction RESET;
@@ -40,5 +40,22 @@ class PacketPlayOutChat {
 #else
     private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) byte type:b;
 #endif
+}
 
+class PacketPlayOutCollect {
+    private int collectedItemId:a;
+    private int collectorEntityId:b;
+
+    // since 1.11.2
+    private optional int unknown:c;
+}
+
+class PacketPlayOutWindowItems {
+    private int windowId:a;
+
+#if version >= 1.11.2
+    private (List<org.bukkit.inventory.ItemStack>) List<ItemStack> items:b;
+#else
+    private (List<org.bukkit.inventory.ItemStack>) ItemStack[] items:b;
+#endif
 }

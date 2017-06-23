@@ -5,11 +5,29 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 
 class ItemStack {
-    public static final (ItemStackHandle) ItemStack EMPTY_ITEM:a;
+#if version >= 1.11.2
+    public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:a;
+#else
+    public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:???;
+#endif
+
     private int amountField:count;
     private (org.bukkit.Material) Item typeField:item;
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
     private int durabilityField:damage;
+
+    <code>
+    public static final ItemStackHandle EMPTY_ITEM;
+    static {
+        // On 1.11.2, an empty item constant is used. <= 1.10.2, null is used.
+        if (T.OPT_EMPTY_ITEM.isAvailable()) {
+            EMPTY_ITEM = T.OPT_EMPTY_ITEM.get();
+        } else {
+            EMPTY_ITEM = new ItemStackHandle();
+            EMPTY_ITEM.instance = null;
+        }
+    }
+    </code>
 
     public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability);
     public optional (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);

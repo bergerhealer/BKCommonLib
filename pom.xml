@@ -14,11 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>1.12</project.mcversion>
-        <project.bversion>1.12-R0.1</project.bversion>
-        <project.cbversion>1.12-R0.1</project.cbversion>
-        <project.stableversion>1.68</project.stableversion>
-        <project.stableserver>1.8.9-R0.1</project.stableserver>
-        <project.stabledate>30 June 2015</project.stabledate>
+        <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
         <junit.version>4.11</junit.version>
     </properties>
 
@@ -77,16 +73,16 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>${project.bversion}-SNAPSHOT</version>
+            <version>${project.cbversion}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>${project.cbversion}-SNAPSHOT</version>
+            <version>${project.cbversion}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/spigot-${project.cbversion}-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/lib/spigot-${project.cbversion}.jar</systemPath>
         </dependency>
 
         <dependency>

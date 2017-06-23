@@ -69,9 +69,10 @@ public class TemplateTest {
         int idx = path.indexOf(prefix);
         if (idx != -1) {
             idx += prefix.length();
-            int endIdx = path.indexOf('.', idx);
-            if (endIdx != -1) {
-                path = path.substring(0, idx) + path.substring(endIdx + 1);
+
+            // Must start with a format the likes of v1_11_R1.<anything>
+            if (path.substring(idx).matches("v\\d+(_\\d+)+_R\\d+..*")) {
+                path = path.substring(0, idx) + path.substring(path.indexOf('.', idx) + 1);
             }
         }
         return path;

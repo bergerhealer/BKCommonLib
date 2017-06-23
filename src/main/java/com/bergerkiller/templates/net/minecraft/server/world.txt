@@ -83,7 +83,24 @@ class World {
 
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
 
-    public void applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
+    // >= 1.11.2 (has 'self' option)
+    public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
+
+    // <= 1.10.2 (lacks 'self' option)
+    public optional void opt_applyPhysics_old:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType);
+
+    <code>
+    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        if (T.opt_applyPhysics.isAvailable()) {
+            T.opt_applyPhysics.invoke(instance, position, causeType, self);
+        } else if (T.opt_applyPhysics_old.isAvailable()) {
+            // On older versions 'observer' blocks did not exist, and so the 'self' parameter is unused.
+            T.opt_applyPhysics_old.invoke(instance, position, causeType);
+        } else {
+            throw new UnsupportedOperationException("Apply physics function not available on this server");
+        }
+    }
+    </code>
 
     protected abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
 

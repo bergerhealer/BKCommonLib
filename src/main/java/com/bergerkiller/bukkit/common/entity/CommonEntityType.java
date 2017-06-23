@@ -15,8 +15,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
-import com.bergerkiller.reflection.net.minecraft.server.NMSMinecraftKey;
-import com.bergerkiller.reflection.net.minecraft.server.NMSRegistryMaterials;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 import org.bukkit.Location;
@@ -94,28 +92,33 @@ public class CommonEntityType {
             }
         } else {
             // Registered entity types
-            Object entityMapping = EntityTypesHandle.T.entityMap.get();
-            if (entityMapping == null) {
-                Logging.LOGGER_REGISTRY.once(Level.SEVERE, "Failed to initialize CommonEntityType registry: no entity mapping registry");
+            // Create minecraft key from EntityType name
+            String entityTypeName = entityType.getName();
+            if (entityType == EntityType.MINECART_FURNACE) {
+                // New naming system had a bug, DAMMIT BUKKIT
+                if (EntityTypesHandle.T.getName.isAvailable()) {
+                    entityTypeName = "furnace_minecart";
+                }
+            } else if (entityType == EntityType.MINECART_MOB_SPAWNER) {
+                // Old naming system had a bug, DAMMIT BUKKIT
+                if (!EntityTypesHandle.T.getName.isAvailable()) {
+                    entityTypeName = "MinecartSpawner";
+                }
+            } else if (entityType == EntityType.TIPPED_ARROW) {
+                // Old naming system had a bug, DAMMIT BUKKIT
+                if (!EntityTypesHandle.T.getName.isAvailable()) {
+                    entityTypeName = "Arrow";
+                }
+            }
+            if (entityTypeName != null) {
+                // Lookup by name
+                nmsType = NMSEntityTypes.getEntityClass(entityTypeName);
+                if (nmsType == null) {
+                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
+                }
             } else {
-                // Create minecraft key from EntityType name
-                String entityTypeName;
-                if (entityType == EntityType.MINECART_FURNACE) {
-                    entityTypeName = "furnace_minecart"; // DAMMIT BUKKIT
-                } else {
-                    entityTypeName = entityType.getName();
-                }
-                if (entityTypeName != null) {
-                    Object mcKey = NMSMinecraftKey.newInstance(entityTypeName);
-                    nmsType = (Class<?>) NMSRegistryMaterials.getValue.invoke(entityMapping, mcKey);
-                    if (nmsType == null) {
-                        // Try by EntityTypeId instead
-                        Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
-                    }
-                } else {
-                    // EntityType without a MC name? That's not good.
-                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: no name (" + entityType.toString() + ")");
-                }
+                // EntityType without a MC name? That's not good.
+                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: no name (" + entityType.toString() + ")");
             }
         }
 

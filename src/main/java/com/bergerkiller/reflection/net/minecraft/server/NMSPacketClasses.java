@@ -46,6 +46,8 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -391,9 +393,17 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCollect extends NMSPacket {
 
-        public final FieldAccessor<Integer> collectedItemId = nextField("private int a");
-        public final FieldAccessor<Integer> collectorEntityId = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> unknown1 = nextFieldSignature("private int c");
+        public final FieldAccessor<Integer> collectedItemId = PacketPlayOutCollectHandle.T.collectedItemId.toFieldAccessor();
+        public final FieldAccessor<Integer> collectorEntityId = PacketPlayOutCollectHandle.T.collectorEntityId.toFieldAccessor();
+        public final FieldAccessor<Integer> unknown1;
+        
+        public NMSPacketPlayOutCollect() {
+            if (PacketPlayOutCollectHandle.T.unknown.isAvailable()) {
+                this.unknown1 = PacketPlayOutCollectHandle.T.unknown.toFieldAccessor();
+            } else {
+                this.unknown1 = null;
+            }
+        }
     }
 
     public static class NMSPacketPlayOutCombatEvent extends NMSPacket {
@@ -1114,8 +1124,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutWindowItems extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<List<ItemStack>> items = nextFieldSignature("private List<ItemStack> b").translate(DuplexConversion.itemStackList);
+        public final FieldAccessor<Integer> windowId = PacketPlayOutWindowItemsHandle.T.windowId.toFieldAccessor();
+        public final FieldAccessor<List<ItemStack>> items = PacketPlayOutWindowItemsHandle.T.items.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutWorldBorder extends NMSPacket {

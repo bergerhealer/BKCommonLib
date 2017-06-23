@@ -99,12 +99,19 @@ public class WorldHandle extends Template.Handle {
         return T.rayTrace.invoke(instance, point1, point2, flag);
     }
 
-    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
-        T.applyPhysics.invoke(instance, position, causeType, self);
-    }
-
     public boolean isChunkLoaded(int cx, int cz, boolean flag) {
         return T.isChunkLoaded.invoke(instance, cx, cz, flag);
+    }
+
+
+    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        if (T.opt_applyPhysics.isAvailable()) {
+            T.opt_applyPhysics.invoke(instance, position, causeType, self);
+        } else if (T.opt_applyPhysics_old.isAvailable()) {
+            T.opt_applyPhysics_old.invoke(instance, position, causeType);
+        } else {
+            throw new UnsupportedOperationException("Apply physics function not available on this server");
+        }
     }
 
 
@@ -234,7 +241,10 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
-        public final Template.Method.Converted<Void> applyPhysics = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> opt_applyPhysics = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isChunkLoaded = new Template.Method<Boolean>();
 
     }

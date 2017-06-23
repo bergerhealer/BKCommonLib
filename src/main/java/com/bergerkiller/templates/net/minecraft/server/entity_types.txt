@@ -1,9 +1,30 @@
 package net.minecraft.server;
 
 class EntityTypes {
-    public static final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> entityMap:b;
+#if version >= 1.11.2
+    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:b;
 
-    private static void register:a(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
+    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:???;
 
-    public static (Object) MinecraftKey getName((Class<?>) Class<? extends Entity> paramClass);
+    private static optional void register:a(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
+
+    private static optional void register_old:???((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
+
+    public static optional (Object) MinecraftKey getName((Class<?>) Class<? extends Entity> paramClass);
+
+    public static optional String getName_old:???((Class<?>) Class<? extends Entity> oclass);
+#else
+    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:???;
+
+    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:c;
+
+    private static optional void register:???(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
+
+    private static optional void register_old:a((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
+
+    public static optional (Object) MinecraftKey getName:???((Class<?>) Class<? extends Entity> paramClass);
+    
+    public static optional String getName_old:getName((Class<?>) Class<? extends Entity> oclass);
+#endif
+
 }

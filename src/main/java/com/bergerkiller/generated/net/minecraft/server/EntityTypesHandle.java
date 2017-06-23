@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Map;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityTypes</b>.
@@ -13,7 +14,6 @@ public class EntityTypesHandle extends Template.Handle {
     public static final EntityTypesClass T = new EntityTypesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes");
 
-    public static final Object entityMap = T.entityMap.getSafe();
     /* ============================================================================== */
 
     public static EntityTypesHandle createHandle(Object handleInstance) {
@@ -25,23 +25,24 @@ public class EntityTypesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static void register(int entityId, String name1, Class<?> entityClass, String name2) {
-        T.register.invokeVA(entityId, name1, entityClass, name2);
-    }
-
-    public static Object getName(Class<?> paramClass) {
-        return T.getName.invokeVA(paramClass);
-    }
-
     /**
      * Stores class members for <b>net.minecraft.server.EntityTypes</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTypesClass extends Template.Class<EntityTypesHandle> {
-        public final Template.StaticField.Converted<Object> entityMap = new Template.StaticField.Converted<Object>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Object> opt_entityRegistry = new Template.StaticField.Converted<Object>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Map<String, Class<?>>> opt_entityMap = new Template.StaticField.Converted<Map<String, Class<?>>>();
 
+        @Template.Optional
         public final Template.StaticMethod.Converted<Void> register = new Template.StaticMethod.Converted<Void>();
+        @Template.Optional
+        public final Template.StaticMethod.Converted<Void> register_old = new Template.StaticMethod.Converted<Void>();
+        @Template.Optional
         public final Template.StaticMethod.Converted<Object> getName = new Template.StaticMethod.Converted<Object>();
+        @Template.Optional
+        public final Template.StaticMethod.Converted<String> getName_old = new Template.StaticMethod.Converted<String>();
 
     }
 

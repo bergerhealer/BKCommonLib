@@ -15,7 +15,6 @@ public class ItemStackHandle extends Template.Handle {
     public static final ItemStackClass T = new ItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack");
 
-    public static final ItemStackHandle EMPTY_ITEM = T.EMPTY_ITEM.getSafe();
     /* ============================================================================== */
 
     public static ItemStackHandle createHandle(Object handleInstance) {
@@ -72,6 +71,17 @@ public class ItemStackHandle extends Template.Handle {
     }
 
 
+    public static final ItemStackHandle EMPTY_ITEM;
+    static {
+        if (T.OPT_EMPTY_ITEM.isAvailable()) {
+            EMPTY_ITEM = T.OPT_EMPTY_ITEM.get();
+        } else {
+            EMPTY_ITEM = new ItemStackHandle();
+            EMPTY_ITEM.instance = null;
+        }
+    }
+
+
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
         if (itemStack == null) {
             return null;
@@ -120,7 +130,8 @@ public class ItemStackHandle extends Template.Handle {
         @Template.Optional
         public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability_convert = new Template.Constructor.Converted<ItemStackHandle>();
 
-        public final Template.StaticField.Converted<ItemStackHandle> EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();
+        @Template.Optional
+        public final Template.StaticField.Converted<ItemStackHandle> OPT_EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();
 
         public final Template.Field.Integer amountField = new Template.Field.Integer();
         public final Template.Field.Converted<Material> typeField = new Template.Field.Converted<Material>();

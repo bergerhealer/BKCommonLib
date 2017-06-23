@@ -18,10 +18,14 @@ interface IInventory {
     public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
 
     public abstract int someFunction:h();
+
+    public abstract void clear();
 #else
     public abstract (List<ItemStackHandle>) ItemStack[] getContents();
 
     public abstract int someFunction:g();
+
+    public abstract void clear:l();
 #endif
 
 #if version >= 1.12

@@ -228,8 +228,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     /* This key is used for later de-serializing the entity */
     private final String getSavedName() {
-        Object key = NMSEntityTypes.getName(this.instanceBaseType());
-        return key == null ? null : key.toString();
+        return NMSEntityTypes.getName(this.instanceBaseType());
     }
 
     @HookMethod("public void collide(Entity entity)")

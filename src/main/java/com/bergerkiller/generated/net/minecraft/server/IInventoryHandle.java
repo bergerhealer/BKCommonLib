@@ -59,6 +59,10 @@ public class IInventoryHandle extends Template.Handle {
         return T.someFunction.invoke(instance);
     }
 
+    public void clear() {
+        T.clear.invoke(instance);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.IInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -72,6 +76,7 @@ public class IInventoryHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> canStoreItem = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<List<ItemStackHandle>> getContents = new Template.Method.Converted<List<ItemStackHandle>>();
         public final Template.Method<Integer> someFunction = new Template.Method<Integer>();
+        public final Template.Method<Void> clear = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method<Boolean> someFunction2 = new Template.Method<Boolean>();
 
