@@ -33,6 +33,7 @@ public class TemplateTest {
             genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
             Class<?> genClass = CommonUtil.getClass(genClassPath, true);
             if (genClass == null) {
+                System.out.println("Error occurred testing handle for " + dec.type.typePath);
                 fail("Failed to find generated class at " + genClassPath);
             }
             try {

@@ -7,7 +7,7 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 public class NMSEntityTypes {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTypes");
 
-    public static final FieldAccessor<Object> entityMapping = T.selectField("public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> b");
+    public static final FieldAccessor<Object> entityMapping = EntityTypesHandle.T.entityMap.raw.toFieldAccessor();
 
     /**
      * Registers a new entity

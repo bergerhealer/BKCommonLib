@@ -13,6 +13,7 @@ public class EntityTypesHandle extends Template.Handle {
     public static final EntityTypesClass T = new EntityTypesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes");
 
+    public static final Object entityMap = T.entityMap.getSafe();
     /* ============================================================================== */
 
     public static EntityTypesHandle createHandle(Object handleInstance) {
@@ -37,6 +38,8 @@ public class EntityTypesHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTypesClass extends Template.Class<EntityTypesHandle> {
+        public final Template.StaticField.Converted<Object> entityMap = new Template.StaticField.Converted<Object>();
+
         public final Template.StaticMethod.Converted<Void> register = new Template.StaticMethod.Converted<Void>();
         public final Template.StaticMethod.Converted<Object> getName = new Template.StaticMethod.Converted<Object>();
 

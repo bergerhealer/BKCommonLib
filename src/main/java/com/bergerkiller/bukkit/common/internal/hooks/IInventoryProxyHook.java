@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -56,9 +57,14 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         this.inventory.clear();
     }
 
-    @HookMethod("public abstract List<ItemStack> getContents()")
+    @HookMethod(value="public abstract List<ItemStack> getContents()", optional=true)
     public List<?> getContents() {
         return new ConvertingList<Object>(Arrays.asList(this.inventory.getContents()), DuplexConversion.itemStack.reverse());
+    }
+
+    @HookMethod(value="public abstract ItemStack[] getContents()", optional=true)
+    public Object[] getContents_old() {
+        return LogicUtil.toArray(this.getContents(), ItemStackHandle.T.getType());
     }
 
     @HookMethod("public abstract List<org.bukkit.entity.HumanEntity> getViewers()")

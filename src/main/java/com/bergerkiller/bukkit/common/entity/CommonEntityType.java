@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
@@ -63,15 +64,25 @@ public class CommonEntityType {
         if (entityType.getTypeId() == -1) {
             // Some special types that don't show up as a registered class
             String nmsName = null;
-            switch (entityType) {
-            case PLAYER: nmsName = "EntityPlayer"; break;
-            case WEATHER: nmsName = "EntityWeather"; break;
-            case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
-            case LIGHTNING: nmsName = "EntityLightning"; break;
-            case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
-            case TIPPED_ARROW: nmsName = "EntityTippedArrow"; break;
-            case LINGERING_POTION: nmsName = "EntityPotion"; break;
-            default: nmsName = null; break;
+
+            // <= 1.10.2 (now removed)
+            if (entityType.name().equals("EGG")) {
+                nmsName = "EntityEgg";
+            } else if (entityType.name().equals("AREA_EFFECT_CLOUD")) {
+                nmsName = "EntityAreaEffectCloud";
+            } else if (entityType.name().equals("SPLASH_POTION")) {
+                nmsName = "EntityPotion";
+            } else {
+                switch (entityType) {
+                case PLAYER: nmsName = "EntityPlayer"; break;
+                case WEATHER: nmsName = "EntityWeather"; break;
+                case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
+                case LIGHTNING: nmsName = "EntityLightning"; break;
+                case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
+                case TIPPED_ARROW: nmsName = "EntityTippedArrow"; break;
+                case LINGERING_POTION: nmsName = "EntityPotion"; break;
+                default: nmsName = null; break;
+                }
             }
             if (nmsName == null) {
                 Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");
@@ -83,7 +94,7 @@ public class CommonEntityType {
             }
         } else {
             // Registered entity types
-            Object entityMapping = NMSEntityTypes.entityMapping.get(null);
+            Object entityMapping = EntityTypesHandle.T.entityMap.get();
             if (entityMapping == null) {
                 Logging.LOGGER_REGISTRY.once(Level.SEVERE, "Failed to initialize CommonEntityType registry: no entity mapping registry");
             } else {
@@ -238,6 +249,7 @@ public class CommonEntityType {
         };
 
         // Register all entity types and verify them
+        int logLimitCtr = 0;
         for (EntityType entityType : EntityType.values()) {
             if (entityType == EntityType.UNKNOWN) {
                 continue; // ignore UNKNOWN
@@ -246,7 +258,11 @@ public class CommonEntityType {
             try {
                 commonEntityType = new CommonEntityType(entityType, false);
             } catch (Throwable t) {
-                Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to register entity type " + entityType.toString(), t);
+                if (++logLimitCtr <= 10) {
+                    Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to register entity type " + entityType.toString(), t);
+                } else {
+                    Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to register entity type " + entityType.toString());
+                }
             }
             if (commonEntityType == null) {
                 commonEntityType = new CommonEntityType(entityType, true);

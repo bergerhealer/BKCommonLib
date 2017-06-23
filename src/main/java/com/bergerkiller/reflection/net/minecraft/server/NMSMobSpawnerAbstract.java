@@ -1,6 +1,10 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -13,38 +17,32 @@ import java.util.List;
 public class NMSMobSpawnerAbstract {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobSpawnerAbstract");
 
-    public static final FieldAccessor<Integer> spawnDelay = T.nextField("public int spawnDelay");
-    public static final FieldAccessor<List<Object>> mobs = T.nextField("private final List<MobSpawnerData> mobs");
-    public static final FieldAccessor<Object> spawnData = T.nextField("private MobSpawnerData spawnData");
+    public static final FieldAccessor<Integer> spawnDelay = MobSpawnerAbstractHandle.T.spawnDelay.toFieldAccessor();
+    public static final FieldAccessor<List<Object>> mobs = CommonUtil.unsafeCast(MobSpawnerAbstractHandle.T.mobs.raw.toFieldAccessor());
+    public static final FieldAccessor<Object> spawnData = MobSpawnerAbstractHandle.T.spawnData.raw.toFieldAccessor();
 
-    public static final FieldAccessor<Integer> minSpawnDelay = T.nextField("private int minSpawnDelay");
-    public static final FieldAccessor<Integer> maxSpawnDelay = T.nextField("private int maxSpawnDelay");
-    public static final FieldAccessor<Integer> spawnCount = T.nextField("private int spawnCount");
+    public static final FieldAccessor<Integer> minSpawnDelay = MobSpawnerAbstractHandle.T.minSpawnDelay.toFieldAccessor();
+    public static final FieldAccessor<Integer> maxSpawnDelay = MobSpawnerAbstractHandle.T.maxSpawnDelay.toFieldAccessor();
+    public static final FieldAccessor<Integer> spawnCount = MobSpawnerAbstractHandle.T.spawnCount.toFieldAccessor();
 
-    public static final FieldAccessor<Entity> entity = T.nextFieldSignature("private Entity i").translate(DuplexConversion.entity);
+    public static final FieldAccessor<Entity> entity = MobSpawnerAbstractHandle.T.entity.toFieldAccessor();
 
-    public static final FieldAccessor<Integer> maxNearbyEntities = T.selectField("private int maxNearbyEntities");
-    public static final FieldAccessor<Integer> requiredPlayerRange = T.selectField("private int requiredPlayerRange");
-    public static final FieldAccessor<Integer> spawnRange = T.selectField("private int spawnRange");
+    public static final FieldAccessor<Integer> maxNearbyEntities = MobSpawnerAbstractHandle.T.maxNearbyEntities.toFieldAccessor();
+    public static final FieldAccessor<Integer> requiredPlayerRange = MobSpawnerAbstractHandle.T.requiredPlayerRange.toFieldAccessor();
+    public static final FieldAccessor<Integer> spawnRange = MobSpawnerAbstractHandle.T.spawnRange.toFieldAccessor();
 
-    public static final MethodAccessor<Void> onTick = T.selectMethod("public void c()");
+    public static final MethodAccessor<Void> onTick = MobSpawnerAbstractHandle.T.onTick.toMethodAccessor();
 
     public static final FieldAccessor<Object> mobMinecraftKey = new SafeDirectField<Object>() {
-        private final MethodAccessor<Object> getMobMinecraftKey = T.selectMethod("public MinecraftKey getMobName()");
-        private final MethodAccessor<Void> setMobMinecraftKey = T.selectMethod("public void setMobName(MinecraftKey minecraftkey)");
-
 		@Override
 		public Object get(Object instance) {
-			return getMobMinecraftKey.invoke(instance);
+			return MobSpawnerAbstractHandle.T.getMobName.invoke(instance).getRaw();
 		}
 
 		@Override
 		public boolean set(Object instance, Object value) {
-			if (setMobMinecraftKey.isValid()) {
-				setMobMinecraftKey.invoke(instance, value);
-				return true;
-			}
-			return false;
+		    MobSpawnerAbstractHandle.T.setMobName.invoke(instance, MinecraftKeyHandle.createHandle(value));
+		    return true;
 		}
     };
 
