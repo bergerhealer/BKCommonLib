@@ -911,6 +911,22 @@ public abstract class PluginBase extends JavaPlugin {
         return this.pluginYaml;
     }
 
+    /**
+     * Collects known plugin information and compiles it into a single version description.
+     * This will include at least the version number, and if available, the 'build' property
+     * stored in the plugin.yml.
+     * 
+     * @return debugging version information
+     */
+    public final String getDebugVersion() {
+        String buildInfo = this.getPluginYaml().get("build", "");
+        String debugVersion = this.getVersion();
+        if (buildInfo.length() > 0) {
+            debugVersion += " (build: " + buildInfo + ")";
+        }
+        return debugVersion;
+    }
+
     public final void saveLocalization() {
         this.localizationconfig.save();
     }

@@ -1,6 +1,7 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
 version: ${project.version}
+build: ${project.cibuild}
 authors: [bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg_1999, Friwi]
 load: startup
 description: Is used in all of my plugins to re-use common functions
