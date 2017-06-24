@@ -53,7 +53,7 @@ class World {
     // >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
     // <= 1.10.2
-    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getBlockCollisions_old:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getBlockAndEntityCollisions:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 

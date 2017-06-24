@@ -57,12 +57,46 @@ public class EntityMoveHandler {
             if (!WorldHandle.T.getBlockCollisions.invoke(entityWorld_Raw, entity, bounds, flag, collisions_buffer)) {
                 return false;
             }
-        } else if (WorldHandle.T.getBlockCollisions_old.isAvailable()) {
-            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getBlockCollisions_old.invoke(entityWorld_Raw, entity, bounds);
+        } else if (WorldHandle.T.getBlockAndEntityCollisions.isAvailable()) {
+            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getBlockAndEntityCollisions.invoke(entityWorld_Raw, entity, bounds);
             if (foundBounds.isEmpty()) {
                 return false;
             }
-            collisions_buffer.clear();
+
+            // Remove all collisions that have to do with Entities; not Blocks.
+            // This is a bit of a hacked in way for backwards <= 1.10.2 support
+            // Basically, we repeat getCubes() and ignore all found bounding boxes in here
+            List<EntityHandle> list = entity.getWorld().getEntities(entity, bounds.growUniform(0.25D));
+            for (int i = 0; i < list.size(); i++) {
+                EntityHandle entity1 = list.get(i);
+
+                if (!entity.isInSameVehicle(entity1)) {
+                    // BKCommonLib start: block collision event handler
+                    AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
+                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(bounds)) {
+                        foundBounds.remove(axisalignedbb1);
+                    }
+
+                    axisalignedbb1 = entity.getEntityBoundingBox(entity1);
+                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(bounds)) {
+                        foundBounds.remove(axisalignedbb1);
+                    }
+
+                    /*
+                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
+                        list.add(axisalignedbb1);
+                    }
+
+                    axisalignedbb1 = entity.j(entity1);
+                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
+                        list.add(axisalignedbb1);
+                    }
+                    */
+
+                    // BKCommonLib end
+                }
+            }
+
             collisions_buffer.addAll(foundBounds);
         }
 

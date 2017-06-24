@@ -60,7 +60,7 @@ class EnumDirection {
     }
 }
 
-class EnumMoveType {
+optional class EnumMoveType {
     enum (EnumMoveTypeHandle) EnumMoveType SELF;
     enum (EnumMoveTypeHandle) EnumMoveType PLAYER;
     enum (EnumMoveTypeHandle) EnumMoveType PISTON;

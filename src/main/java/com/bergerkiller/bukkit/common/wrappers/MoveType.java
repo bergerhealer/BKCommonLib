@@ -12,7 +12,11 @@ public enum MoveType {
     private final EnumMoveTypeHandle handle;
 
     private MoveType(EnumMoveTypeHandle handle) {
-        this.handle = handle;
+        if (EnumMoveTypeHandle.T.isValid()) {
+            this.handle = handle;
+        } else {
+            this.handle = EnumMoveTypeHandle.createHandle(new Object()); // dummy
+        }
     }
 
     /**
@@ -31,11 +35,9 @@ public enum MoveType {
      * @return MoveType, or null if it could not be converted
      */
     public static MoveType getFromHandle(Object handle) {
-        if (EnumMoveTypeHandle.T.isAssignableFrom(handle)) {
-            for (MoveType type : MoveType.values()) {
-                if (type.handle.getRaw() == handle) {
-                    return type;
-                }
+        for (MoveType type : MoveType.values()) {
+            if (type.handle.getRaw() == handle) {
+                return type;
             }
         }
         return null;

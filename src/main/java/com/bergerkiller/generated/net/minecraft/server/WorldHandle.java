@@ -228,7 +228,7 @@ public class WorldHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
         @Template.Optional
-        public final Template.Method.Converted<List<AxisAlignedBBHandle>> getBlockCollisions_old = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
+        public final Template.Method.Converted<List<AxisAlignedBBHandle>> getBlockAndEntityCollisions = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
