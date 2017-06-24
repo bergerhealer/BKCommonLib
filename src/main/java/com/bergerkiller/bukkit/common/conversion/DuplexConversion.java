@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -80,7 +79,6 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, UseAction> useAction = pair(toUseAction, toUseActionHandle);
     public static final DuplexConverter<Object, UUID> gameProfileId = pair(toGameProfileId, toGameProfileFromId);
     public static final DuplexConverter<Object, ScoreboardAction> scoreboardAction = pair(toScoreboardAction, toScoreboardActionHandle);
-    public static final DuplexConverter<Object, MainHand> mainHand = pair(toMainHand, toMainHandHandle);
     public static final DuplexConverter<Object, BlockData> blockData = pair(toBlockData, toBlockDataHandle);
     public static final DuplexConverter<Object, ChunkSection> chunkSection = pair(toChunkSection, toChunkSectionHandle);
     public static final DuplexConverter<Object, PotionEffectType> potionEffectType = pair(toPotionEffectType, toMobEffectList);

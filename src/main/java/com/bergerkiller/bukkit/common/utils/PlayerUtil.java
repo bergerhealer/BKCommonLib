@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
@@ -15,7 +16,6 @@ import com.mojang.authlib.GameProfile;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 
 import java.util.List;
 
@@ -251,11 +251,7 @@ public class PlayerUtil extends EntityUtil {
      * @param hand which hand
      * @return item the player is holding in the hand
      */
-    public static ItemStack getItemInHand(Player player, MainHand hand) {
-        if (hand == player.getMainHand()) {
-            return player.getInventory().getItemInMainHand();
-        } else {
-            return player.getInventory().getItemInOffHand();
-        }
+    public static ItemStack getItemInHand(Player player, HumanHand hand) {
+        return HumanHand.getHeldItem(player, hand);
     }
 }

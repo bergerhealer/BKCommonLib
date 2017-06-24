@@ -1,9 +1,28 @@
 package org.bukkit.inventory;
 
+import com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle;
+
 class Inventory {
 
     // These functions were introduced since 1.10.2
     public optional org.bukkit.Location getLocation();
     public optional org.bukkit.inventory.ItemStack[] getStorageContents();
     public optional void setStorageContents(org.bukkit.inventory.ItemStack[] items);
+}
+
+optional class MainHand {
+    enum (MainHandHandle) MainHand LEFT;
+    enum (MainHandHandle) MainHand RIGHT;
+}
+
+class PlayerInventory extends Inventory {
+    // New hand API >= 1.10.2
+    public optional abstract ItemStack getItemInMainHand()
+    public optional abstract ItemStack getItemInOffHand()
+    public optional abstract void setItemInMainHand(ItemStack item);
+    public optional abstract void setItemInOffHand(ItemStack item)
+
+    // Deprecated <= 1.8.8
+    public optional abstract ItemStack getItemInHand()
+    public optional abstract void setItemInHand(ItemStack stack)
 }

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.Difficulty;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,6 +22,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
@@ -34,7 +34,6 @@ import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
@@ -165,15 +164,19 @@ public class HandleConversion {
         return EnumGamemodeHandle.T.getById.raw.invokeVA(gameMode.getValue());
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumHand")
-    public static Object toEnumHandHandle(org.bukkit.inventory.MainHand mainHand) {
-        switch((MainHand) mainHand) {
-        case LEFT:
-            return EnumHandHandle.OFF_HAND.getRaw();
-        case RIGHT:
-            return EnumHandHandle.MAIN_HAND.getRaw();
-        }
-        return null;
+    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.server.EnumHand", optional=true)
+    public static Object mainHandToEnumHandHandle(Object mainHand) {
+        return HumanHand.fromMainHand(mainHand).toNMSEnumHand(null);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EnumHand", optional=true)
+    public static Object humanHandToEnumHandHandle(HumanHand hand) {
+        return hand.toNMSEnumHand(null);
+    }
+
+    @ConverterMethod(output="org.bukkit.inventory.MainHand", optional=true)
+    public static Object humanHandToMainHandHandle(HumanHand hand) {
+        return hand.toMainHand();
     }
 
     @ConverterMethod(output="net.minecraft.server.WorldType")

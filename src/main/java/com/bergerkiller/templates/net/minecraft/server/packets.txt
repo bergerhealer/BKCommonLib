@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
@@ -14,11 +16,34 @@ class PacketPlayOutScoreboardScore {
 }
 
 class PacketPlayInUseEntity {
+    private int usedEntityId:a;
+    private (UseAction) PacketPlayInUseEntity.EnumEntityUseAction action;
+    private (org.bukkit.util.Vector) Vec3D offset:c;
+#if version >= 1.10.2
+    private optional (Object) EnumHand enumHand:d;
+#else
+    private optional (Object) EnumHand enumHand:???;
+#endif
+
     class PacketPlayInUseEntity.EnumEntityUseAction {
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT;
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction ATTACK;
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT_AT;
     }
+}
+
+class PacketPlayInUseItem {
+    private (IntVector3) BlockPosition position:a;
+    private (Object) EnumDirection direction:b;
+#if version >= 1.10.2
+    private optional (Object) EnumHand enumHand:c;
+#else
+    private optional (Object) EnumHand enumHand:???;
+#endif
+    private float unknown1:d;
+    private float unknown2:e;
+    private float unknown3:f;
+    public long timestamp;
 }
 
 class PacketPlayOutTitle {
@@ -58,4 +83,21 @@ class PacketPlayOutWindowItems {
 #else
     private (List<org.bukkit.inventory.ItemStack>) ItemStack[] items:b;
 #endif
+}
+
+class PacketPlayInArmAnimation {
+#if version >= 1.10.2
+    private optional (Object) EnumHand enumHand:a;
+#else
+    private optional (Object) EnumHand enumHand:???;
+#endif
+}
+
+class PacketPlayInBlockPlace {
+#if version >= 1.10.2
+    private optional (Object) EnumHand enumHand:a;
+#else
+    private optional (Object) EnumHand enumHand:???;
+#endif
+    public long timestamp;
 }

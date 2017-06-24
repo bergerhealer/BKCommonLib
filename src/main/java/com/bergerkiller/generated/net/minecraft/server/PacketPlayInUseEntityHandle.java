@@ -2,6 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import org.bukkit.util.Vector;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayInUseEntity</b>.
@@ -24,11 +26,41 @@ public class PacketPlayInUseEntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public int getUsedEntityId() {
+        return T.usedEntityId.getInteger(instance);
+    }
+
+    public void setUsedEntityId(int value) {
+        T.usedEntityId.setInteger(instance, value);
+    }
+
+    public UseAction getAction() {
+        return T.action.get(instance);
+    }
+
+    public void setAction(UseAction value) {
+        T.action.set(instance, value);
+    }
+
+    public Vector getOffset() {
+        return T.offset.get(instance);
+    }
+
+    public void setOffset(Vector value) {
+        T.offset.set(instance, value);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInUseEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInUseEntityClass extends Template.Class<PacketPlayInUseEntityHandle> {
+        public final Template.Field.Integer usedEntityId = new Template.Field.Integer();
+        public final Template.Field.Converted<UseAction> action = new Template.Field.Converted<UseAction>();
+        public final Template.Field.Converted<Vector> offset = new Template.Field.Converted<Vector>();
+        @Template.Optional
+        public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
+
     }
 
 

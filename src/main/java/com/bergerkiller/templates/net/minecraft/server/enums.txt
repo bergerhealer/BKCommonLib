@@ -34,7 +34,8 @@ class EnumItemSlot {
     </code>
 }
 
-class EnumHand {
+// Since 1.10.2
+optional class EnumHand {
     enum (EnumHandHandle) EnumHand MAIN_HAND;
     enum (EnumHandHandle) EnumHand OFF_HAND;
 }

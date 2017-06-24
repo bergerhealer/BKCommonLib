@@ -775,9 +775,11 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
         @Template.Optional
-        public final Template.Method.Converted<Boolean> onInteractBy = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> onInteractBy_1_8_8 = new Template.Method.Converted<Boolean>();
         @Template.Optional
-        public final Template.Method.Converted<Boolean> onInteractBy_old = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> onInteractBy_1_10_2 = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 

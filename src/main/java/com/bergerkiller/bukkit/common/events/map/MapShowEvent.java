@@ -5,11 +5,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 /**
  * Event fired when a map becomes shown to a player somewhere. This can be in his own
@@ -20,10 +20,10 @@ public class MapShowEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final Player player;
     private final ItemStack mapItem;
-    private final MainHand hand;
+    private final HumanHand hand;
     private final ItemFrame itemFrame;
 
-    public MapShowEvent(Player player, MainHand hand, ItemStack mapItem) {
+    public MapShowEvent(Player player, HumanHand hand, ItemStack mapItem) {
         this.player = player;
         this.mapItem = mapItem;
         this.hand = hand;
@@ -80,7 +80,7 @@ public class MapShowEvent extends Event {
      * 
      * @return hand with which the player is holding the map
      */
-    public MainHand getHand() {
+    public HumanHand getHand() {
         return this.hand;
     }
 

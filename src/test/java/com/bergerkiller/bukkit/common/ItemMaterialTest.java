@@ -57,7 +57,6 @@ public class ItemMaterialTest {
         testProperty(MaterialUtil.EMISSION, "EMISSION")
             .check(Material.STONE, 0)
             .check(Material.APPLE, 0)
-            .check(Material.MAGMA, 3)
             .check(Material.REDSTONE_LAMP_ON, 15)
             .check(Material.TORCH, 14)
             .check(Material.GLOWSTONE, 15)
@@ -95,10 +94,13 @@ public class ItemMaterialTest {
             .checkOthers(false)
             .done();
 
-        testProperty(MaterialUtil.ISCOMPARATOR, "ISCOMPARATOR")
-            .checkData(org.bukkit.material.Comparator.class, true)
-            .checkOthers(false)
-            .done();
+        Class<?> comparatorClass = CommonUtil.getClass("org.bukkit.material.Comparator");
+        if (comparatorClass != null) {
+            testProperty(MaterialUtil.ISCOMPARATOR, "ISCOMPARATOR")
+                .checkData(comparatorClass, true)
+                .checkOthers(false)
+                .done();
+        }
 
         testProperty(MaterialUtil.ISRAILS, "ISRAILS")
             .checkData(org.bukkit.material.Rails.class, true)

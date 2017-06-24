@@ -415,11 +415,15 @@ class Entity {
     public void onPush:g(double d0, double d1, double d2);
 #endif
 
-    // 1.11.2 and after
-    public optional boolean onInteractBy:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
-    
-    // 1.10.2 and before
-    public optional boolean onInteractBy_old:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    // Since MC 1.8.8
+    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+
+    // Since MC 1.10.2
+    public optional boolean onInteractBy_1_10_2:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+
+    // Since MC 1.11.2
+    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+
 
     public void collide((EntityHandle) Entity entity);
 

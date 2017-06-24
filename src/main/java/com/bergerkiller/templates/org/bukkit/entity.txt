@@ -11,3 +11,7 @@ class Entity {
     public optional boolean removePassenger:???(Entity passenger);
 #endif
 }
+
+class HumanEntity extends Entity {
+    public optional (Object) org.bukkit.inventory.MainHand getMainHand();
+}

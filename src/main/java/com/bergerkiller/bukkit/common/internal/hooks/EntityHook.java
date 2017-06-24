@@ -4,8 +4,6 @@ import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityController;
@@ -13,6 +11,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -41,40 +40,50 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.controller = controller;
     }
 
-    public boolean base_onInteractBy(Object entityHuman, Object enumHand) {
-        if (EntityHandle.T.onInteractBy_old.isAvailable()) {
-            MainHand hand = Conversion.toMainHand.convert(enumHand);
-            HumanEntity human = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-            ItemStack item = null;
-            if (hand == MainHand.LEFT) {
-                item = human.getInventory().getItemInOffHand();
-            } else {
-                item = human.getInventory().getItemInMainHand();
-            }
-            return base.onInteractBy_old(entityHuman, HandleConversion.toItemStackHandle(item), enumHand);
+    public boolean base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
+        Object entityHumanHandle = HandleConversion.toEntityHandle(humanEntity);
+        if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
+            return base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity));
+        } else if (EntityHandle.T.onInteractBy_1_10_2.isAvailable()) {
+            Object item = HandleConversion.toItemStackHandle(HumanHand.getHeldItem(humanEntity, humanHand));
+            return base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSEnumHand(humanEntity));
+        } else if (EntityHandle.T.onInteractBy_1_8_8.isAvailable()) {
+            return base.onInteractBy_1_8_8(entityHumanHandle);
         } else {
-            return base.onInteractBy(entityHuman, enumHand);
+            throw new UnsupportedOperationException("Don't know what interact method is used!");
         }
     }
 
-    @HookMethod(value="public boolean onInteractBy:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
-    public boolean onInteractBy(Object entityHuman, Object enumHand) {
+    @Deprecated
+    @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)", optional=true)
+    public boolean onInteractBy_1_8_8(Object entityHuman) {
+        return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT);
+    }
+
+    @Deprecated
+    @HookMethod(value="public boolean onInteractBy_1_10_2:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)", optional=true)
+    public boolean onInteractBy_1_10_2(Object entityHuman, Object itemstack, Object enumHand) {
+        return onInteractBy_1_11_2(entityHuman, enumHand);
+    }
+
+    @Deprecated
+    @HookMethod(value="public boolean onInteractBy_1_11_2:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
+    public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
+        HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
+        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand));
+    }
+
+    public boolean onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
         try {
             if (checkController()) {
-                return controller.onInteractBy((HumanEntity) Conversion.toEntity.convert(entityHuman), Conversion.toMainHand.convert(enumHand));
+                return controller.onInteractBy(humanEntity, humanHand);
             } else {
-                return base_onInteractBy(entityHuman, enumHand);
+                return base_onInteractBy(humanEntity, humanHand);
             }
         } catch (Throwable t) {
             t.printStackTrace();
             return false;
         }
-    }
-
-    @Deprecated
-    @HookMethod(value="public boolean onInteractBy_old:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)", optional=true)
-    public boolean onInteractBy_old(Object entityHuman, Object itemstack, Object enumHand) {
-        return onInteractBy(entityHuman, enumHand);
     }
 
     @HookMethod("public boolean damageEntity(DamageSource damagesource, float f)")

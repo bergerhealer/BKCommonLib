@@ -28,7 +28,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -52,6 +51,7 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
@@ -652,20 +652,20 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             public void update() {
-                ItemStack currLeftHand = PlayerUtil.getItemInHand(this.player, MainHand.LEFT);
-                ItemStack currRightHand = PlayerUtil.getItemInHand(this.player, MainHand.RIGHT);
+                ItemStack currLeftHand = PlayerUtil.getItemInHand(this.player, HumanHand.LEFT);
+                ItemStack currRightHand = PlayerUtil.getItemInHand(this.player, HumanHand.RIGHT);
 
                 if (isMap(currLeftHand) 
                         && !mapEquals(currLeftHand, lastLeftHand) 
                         && !mapEquals(currLeftHand, lastRightHand)) {
                     // Left hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapShowEvent(player, MainHand.LEFT, currLeftHand));
+                    CommonUtil.callEvent(new MapShowEvent(player, HumanHand.LEFT, currLeftHand));
                 }
                 if (isMap(currRightHand) 
                         && !mapEquals(currRightHand, lastRightHand) 
                         && !mapEquals(currRightHand, lastLeftHand)) {
                     // Right hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapShowEvent(player, MainHand.RIGHT, currRightHand));
+                    CommonUtil.callEvent(new MapShowEvent(player, HumanHand.RIGHT, currRightHand));
                 }
 
                 lastLeftHand = currLeftHand;

@@ -19,7 +19,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
@@ -37,6 +36,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
@@ -45,6 +45,10 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
@@ -100,9 +104,36 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
 
-        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(DuplexConversion.mainHand);
+        /**
+         * Sets the hand that is animated
+         * 
+         * @param packet to write to
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @param humanHand to set to
+         */
+        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
+            if (PacketPlayInArmAnimationHandle.T.enumHand.isAvailable()) {
+                PacketPlayInArmAnimationHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
+            }
+        }
+
+        /**
+         * Gets the hand that is animated
+         * 
+         * @param packet to read from
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @return humanHand
+         */
+        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            if (PacketPlayInArmAnimationHandle.T.enumHand.isAvailable()) {
+                Object enumHand = PacketPlayInArmAnimationHandle.T.enumHand.get(packet.getHandle());
+                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
+            } else {
+                return HumanHand.RIGHT;
+            }
+        }
     }
-    
+
     public static class NMSPacketPlayInBlockDig extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
@@ -112,8 +143,36 @@ public class NMSPacketClasses {
     
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
 
-        public final TranslatorFieldAccessor<MainHand> enumHand = nextField("private EnumHand a").translate(DuplexConversion.mainHand);
-        public final FieldAccessor<Long> timestamp = nextField("public long timestamp");
+        public final FieldAccessor<Long> timestamp = PacketPlayInBlockPlaceHandle.T.timestamp.toFieldAccessor();
+
+        /**
+         * Sets the hand that placed the block
+         * 
+         * @param packet to write to
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @param humanHand to set to
+         */
+        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
+            if (PacketPlayInBlockPlaceHandle.T.enumHand.isAvailable()) {
+                PacketPlayInBlockPlaceHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
+            }
+        }
+
+        /**
+         * Gets the hand that placed the block
+         * 
+         * @param packet to read from
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @return humanHand
+         */
+        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            if (PacketPlayInBlockPlaceHandle.T.enumHand.isAvailable()) {
+                Object enumHand = PacketPlayInBlockPlaceHandle.T.enumHand.get(packet.getHandle());
+                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
+            } else {
+                return HumanHand.RIGHT;
+            }
+        }
     }
     
     public static class NMSPacketPlayInBoatMove extends NMSPacket {
@@ -252,21 +311,77 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInUseEntity extends NMSPacket {
 
-        public final FieldAccessor<Integer> clickedEntityId = nextFieldSignature("private int a");
-        public final TranslatorFieldAccessor<UseAction> useAction = nextFieldSignature("private EnumEntityUseAction action").translate(DuplexConversion.useAction);
-        public final TranslatorFieldAccessor<Vector> offset = nextFieldSignature("private Vec3D c").translate(DuplexConversion.vector);
-        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand d").translate(DuplexConversion.mainHand);
+        public final FieldAccessor<Integer> clickedEntityId = PacketPlayInUseEntityHandle.T.usedEntityId.toFieldAccessor();
+        public final TranslatorFieldAccessor<UseAction> useAction = PacketPlayInUseEntityHandle.T.action.toFieldAccessor();
+        public final TranslatorFieldAccessor<Vector> offset = PacketPlayInUseEntityHandle.T.offset.toFieldAccessor();
+
+        /**
+         * Sets the hand that interacted with the entity
+         * 
+         * @param packet to write to
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @param humanHand to set to
+         */
+        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
+            if (PacketPlayInUseEntityHandle.T.enumHand.isAvailable()) {
+                PacketPlayInUseEntityHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
+            }
+        }
+
+        /**
+         * Gets the hand that interacted with the entity
+         * 
+         * @param packet to read from
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @return humanHand
+         */
+        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            if (PacketPlayInUseEntityHandle.T.enumHand.isAvailable()) {
+                Object enumHand = PacketPlayInUseEntityHandle.T.enumHand.get(packet.getHandle());
+                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
+            } else {
+                return HumanHand.RIGHT;
+            }
+        }
     }
 
     public static class NMSPacketPlayInUseItem extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Object> direction = nextFieldSignature("private EnumDirection b");
-        public final TranslatorFieldAccessor<MainHand> hand = nextFieldSignature("private EnumHand c").translate(DuplexConversion.mainHand);
-        public final FieldAccessor<Float> unknown1 = nextFieldSignature("private float d");
-        public final FieldAccessor<Float> unknown2 = nextFieldSignature("private float e");
-        public final FieldAccessor<Float> unknown3 = nextFieldSignature("private float f");
-        public final FieldAccessor<Long> timestamp = nextField("public long timestamp");
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayInUseItemHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<Object> direction = PacketPlayInUseItemHandle.T.direction.toFieldAccessor();
+        public final FieldAccessor<Float> unknown1 = PacketPlayInUseItemHandle.T.unknown1.toFieldAccessor();
+        public final FieldAccessor<Float> unknown2 = PacketPlayInUseItemHandle.T.unknown2.toFieldAccessor();
+        public final FieldAccessor<Float> unknown3 = PacketPlayInUseItemHandle.T.unknown3.toFieldAccessor();
+        public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor();
+
+        /**
+         * Sets the hand that used the item
+         * 
+         * @param packet to write to
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @param humanHand to set to
+         */
+        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
+            if (PacketPlayInUseItemHandle.T.enumHand.isAvailable()) {
+                PacketPlayInUseItemHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
+            }
+        }
+
+        /**
+         * Gets the hand that used the item
+         * 
+         * @param packet to read from
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @return humanHand
+         */
+        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            if (PacketPlayInUseItemHandle.T.enumHand.isAvailable()) {
+                Object enumHand = PacketPlayInUseItemHandle.T.enumHand.get(packet.getHandle());
+                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
+            } else {
+                return HumanHand.RIGHT;
+            }
+        }
     }
 
     public static class NMSPacketPlayInVehicleMove extends NMSPacket {

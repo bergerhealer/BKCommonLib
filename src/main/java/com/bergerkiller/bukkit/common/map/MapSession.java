@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.bergerkiller.bukkit.common.internal.CommonMapController.ViewStack;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 /**
  * Maintains information about the player owners that own the session of a Map Display.
@@ -64,9 +64,8 @@ public class MapSession {
                 }
 
                 // Check if holding the map
-                PlayerInventory inv = owner.player.getInventory();
-                owner.controlling = info.isMap(inv.getItemInMainHand());
-                owner.holding = owner.controlling || info.isMap(inv.getItemInOffHand());
+                owner.controlling = info.isMap(HumanHand.getItemInMainHand(owner.player));
+                owner.holding = owner.controlling || info.isMap(HumanHand.getItemInOffHand(owner.player));
                 if (!owner.holding && this.mode == MapSessionMode.HOLDING) {
                     this.owners.remove(owner.player.getUniqueId());
                     onOwnerRemoved(owner);

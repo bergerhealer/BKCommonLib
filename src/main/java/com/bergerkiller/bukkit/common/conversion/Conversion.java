@@ -72,7 +72,6 @@ public class Conversion {
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.server.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
     public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
-    public static final InputConverter<Object> toMainHandHandle = getConverterToHandle("net.minecraft.server.EnumHand");
     public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.server.IBlockData");
     public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.server.ChunkSection");
     public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.server.MobEffectList");
@@ -109,7 +108,6 @@ public class Conversion {
     public static final InputConverter<IntHashMap<Object>> toIntHashMap = CommonUtil.unsafeCast(getConverterTo(IntHashMap.class));
     public static final InputConverter<ScoreboardAction> toScoreboardAction = getConverterTo(ScoreboardAction.class);
     public static final InputConverter<UseAction> toUseAction = getConverterTo(UseAction.class);
-    public static final InputConverter<org.bukkit.inventory.MainHand> toMainHand = getConverterTo(org.bukkit.inventory.MainHand.class);
     public static final InputConverter<BlockData> toBlockData = getConverterTo(BlockData.class);
     public static final InputConverter<ChunkSection> toChunkSection = getConverterTo(ChunkSection.class);
     public static final InputConverter<PotionEffectType> toPotionEffectType = getConverterTo(PotionEffectType.class);
