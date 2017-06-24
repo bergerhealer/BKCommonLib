@@ -30,17 +30,15 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -448,11 +446,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeSound(String soundName, float volume, float pitch) {
-        Object soundEffectKey = MinecraftKeyHandle.createNew(soundName).getRaw();
-        SoundEffectHandle soundEffectHandle = SoundEffectHandle.createHandle(SoundEffectHandle.REGISTRY.get(soundEffectKey));
-        if (soundEffectHandle != null) {
-            handle.makeSound(soundEffectHandle, volume, pitch);
-        }
+        handle.makeSound(ResourceKey.fromPath(soundName), volume, pitch);
     }
 
     public void makeStepSound(org.bukkit.block.Block block) {
@@ -604,7 +598,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public boolean hasPassenger() {
-        return !LogicUtil.nullOrEmpty(handle.getPassengers());
+        return handle.hasPassengers();
     }
 
     public boolean hasPlayerPassenger() {
@@ -871,10 +865,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     public void setPassengersSilent(List<org.bukkit.entity.Entity> newPassengers) {
         final EntityHandle handle = this.handle;
 
+        // This list will be filled with the update handles, finally set using setPassengers
+        List<EntityHandle> newPassengerHandles = new ArrayList<EntityHandle>(this.handle.getPassengers());
+
         // Generate a difference view between the expected list of passengers, and the current
-        List<EntityHandle> removedPassengers = new ArrayList<EntityHandle>(handle.getPassengers().size());
+        List<EntityHandle> removedPassengers = new ArrayList<EntityHandle>(newPassengerHandles.size());
         List<org.bukkit.entity.Entity> keptPassengers = new ArrayList<org.bukkit.entity.Entity>(newPassengers.size());
-        for (EntityHandle oldPassenger : handle.getPassengers()) {
+        for (EntityHandle oldPassenger : newPassengerHandles) {
             boolean found = false;
             for (org.bukkit.entity.Entity p : newPassengers) {
                 if (oldPassenger.getRaw() == Conversion.toEntityHandle.convert(p)) {
@@ -899,24 +896,23 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         // Remove vehicle information and passenger information for all removed passengers
         for (EntityHandle passenger : removedPassengers) {
             passenger.setVehicle(null);
-            handle.getPassengers().remove(passenger);
+            newPassengerHandles.remove(passenger);
         }
 
         // Add new passengers as required
-        List<EntityHandle> currPassengers = handle.getPassengers();
         for (org.bukkit.entity.Entity p : newPassengers) {
             EntityHandle passengerHandle = EntityHandle.fromBukkit(p);
-            if (!currPassengers.contains(passengerHandle)) {
-                currPassengers.add(passengerHandle);
+            if (!newPassengerHandles.contains(passengerHandle)) {
+                newPassengerHandles.add(passengerHandle);
                 passengerHandle.setVehicle(handle);
-
-                // Send mount packet
-                CommonPacket packet = PacketType.OUT_MOUNT.newInstance(entity, keptPassengers);
-                PacketUtil.broadcastEntityPacket(entity, packet);
             }
         }
 
-        CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, currPassengers);
+        // Update the passengers field
+        this.handle.setPassengers(newPassengerHandles);
+
+        // Send packets to refresh passenger information
+        CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, newPassengerHandles);
         PacketUtil.broadcastEntityPacket(entity, packet);
 
         // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time

@@ -311,13 +311,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // *** Replace entity in passenger and vehicle fields ***
         EntityHandle vehicle = newInstance.getVehicle();
         if (vehicle != null) {
-            replaceInList(vehicle.getPassengers(), newInstance);
+            List<EntityHandle> passengers = new ArrayList<EntityHandle>(vehicle.getPassengers());
+            replaceInList(passengers, newInstance);
+            vehicle.setPassengers(passengers);
         }
-        if (newInstance.getPassengers() != null) {
-            for (EntityHandle passenger : newInstance.getPassengers()) {
-                if (oldInstance.getRaw() == passenger.getVehicle().getRaw()) {
-                    passenger.setVehicle(newInstance);
-                }
+        for (EntityHandle passenger : newInstance.getPassengers()) {
+            if (oldInstance.getRaw() == passenger.getVehicle().getRaw()) {
+                passenger.setVehicle(newInstance);
             }
         }
 

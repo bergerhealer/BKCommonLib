@@ -8,6 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 public class SoundEffectTypeHandle extends Template.Handle {
     /** @See {@link SoundEffectTypeClass} */
     public static final SoundEffectTypeClass T = new SoundEffectTypeClass();

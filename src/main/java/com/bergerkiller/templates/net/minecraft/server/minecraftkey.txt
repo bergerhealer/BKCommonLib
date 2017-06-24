@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
@@ -8,15 +10,17 @@ class MinecraftKey {
     public (MinecraftKeyHandle) MinecraftKey(String keyToken);
 }
 
-class SoundEffectType {
+optional class SoundEffectType {
     public (SoundEffectHandle) SoundEffect getDefault:e();
 }
 
-class SoundEffect {
+optional class SoundEffect {
     public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
     private final (MinecraftKeyHandle) MinecraftKey name:b;
+
+    public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
 }
 
-class SoundEffects {
-    public static final (SoundEffectHandle) SoundEffect EXTINGUISH_FIRE:bQ;
+optional class SoundEffects {
+    public static final (ResourceKey) SoundEffect EXTINGUISH_FIRE:bQ;
 }

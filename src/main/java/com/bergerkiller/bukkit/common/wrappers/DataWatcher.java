@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -10,9 +12,11 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * This class is a wrapper of the DataWatcher class from CraftBukkit<br>
@@ -189,6 +193,27 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          */
         public static <T> Key<T> fromStaticField(ClassTemplate<?> template, String fieldname) {
             return new DataWatcher.Key<T>(template.getStaticFieldValue(fieldname, NMSDataWatcher.Object2.T.getType()));
+        }
+
+        /**
+         * Reads a datawatcher key from a template static field. For MC 1.8.8, an alternative method wrapping
+         * the datawatcher field "ID" is included.
+         * 
+         * @param field
+         * @param alternativeId alternative Id for MC 1.8.8
+         * @param alternativeType alternative data value type for MC 1.8.8
+         * @return datawatcher key
+         */
+        public static <T> Key<T> fromTemplate(Template.StaticField.Converted<Key<T>> field, int alternativeId, Class<?> alternativeType) {
+            if (field.isAvailable()) {
+                return field.get();
+            } else if (Common.evaluateMCVersion("<=", "1.8.8")) {
+                // For MC 1.8.8 we have a fallback wrapping our ID in a custom implementation
+                return null;
+            } else {
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to find datawatcher key constant", new RuntimeException());
+                return null;
+            }
         }
     }
 

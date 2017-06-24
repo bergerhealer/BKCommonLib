@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 
@@ -40,11 +41,6 @@ public class TestServerFactory {
             Method dispenserRegistryBootstrapMethod = dispenserRegistryClass.getMethod("c");
             dispenserRegistryBootstrapMethod.invoke(null);
 
-            // Create data converter registry manager object - used for serialization/deserialization
-            Class<?> dataConverterRegistryClass = Class.forName(nms_root + "DataConverterRegistry");
-            Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
-            Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
-
             // Create some stuff by null-constructing them (not calling initializer)
             // This prevents loads of extra server logic executing during test
             ClassTemplate<?> server_t = ClassTemplate.create(CommonServerBase.SERVER_CLASS);
@@ -53,8 +49,17 @@ public class TestServerFactory {
             ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
             Object mc_server = mc_server_t.newInstanceNull();
 
+            // Create data converter registry manager object - used for serialization/deserialization
+            // Only used >= MC 1.10.2
+            Class<?> dataConverterRegistryClass = null;
+            try {
+                dataConverterRegistryClass = Class.forName(nms_root + "DataConverterRegistry");
+                Method dataConverterRegistryInitMethod = dataConverterRegistryClass.getMethod("a");
+                Object dataConverterManager = dataConverterRegistryInitMethod.invoke(null);
+                setField(mc_server, "dataConverterManager", dataConverterManager);
+            } catch (ClassNotFoundException ex) {}
+
             // Initialize some of the fields so they don't result into NPE during test
-            setField(mc_server, "dataConverterManager", dataConverterManager);
             setField(server, "console", mc_server);
             setField(server, "logger",  MountiplexUtil.LOGGER);
 

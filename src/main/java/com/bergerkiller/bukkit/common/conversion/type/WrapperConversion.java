@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
@@ -41,6 +42,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -501,4 +503,38 @@ public class WrapperConversion {
         return new CraftInputSlot(RecipeItemStackHandle.T.choices.get(recipeItemStackHandle));
     }
 
+    // 1.10.2 =>
+    @ConverterMethod(input="net.minecraft.server.SoundEffect", optional=true)
+    public static ResourceKey soundEffectToResourceKey(Object nmsSoundEffectHandle) {
+        if (SoundEffectHandle.T.isAvailable()) {
+            return ResourceKey.fromMinecraftKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle).getRaw());
+        } else {
+            return null;
+        }
+    }
+
+    // 1.10.2 =>
+    @ConverterMethod(output="net.minecraft.server.SoundEffect", optional=true)
+    public static Object soundEffectFromResourceKey(ResourceKey soundKey) {
+        if (SoundEffectHandle.T.isAvailable()) {
+            Object mcKey = soundKey.toMinecraftKey();
+            Object effect = SoundEffectHandle.REGISTRY.get(mcKey);
+            if (effect == null) {
+                effect = SoundEffectHandle.T.constr_minecraftkey.raw.newInstance(mcKey);
+            }
+            return effect;
+        } else {
+            return null;
+        }
+    }
+
+    @ConverterMethod()
+    public static String resourceKeyToPath(ResourceKey key) {
+        return key.getPath();
+    }
+
+    @ConverterMethod()
+    public static ResourceKey resourceKeyFromPath(String path) {
+        return ResourceKey.fromPath(path);
+    }
 }

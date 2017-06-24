@@ -12,6 +12,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
+import com.bergerkiller.bukkit.common.Resources;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -30,7 +31,6 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectsHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 
@@ -608,7 +608,7 @@ public class EntityMoveHandler {
             }
 
             if (flag1 && that.isBurning()) {
-                that.makeSound(SoundEffectsHandle.EXTINGUISH_FIRE, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
+                that.makeSound(Resources.SOUND_FIRE_EXTINGUISH, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
                 that.setFireTicks(-that.getMaxFireTicks());
             }
 

@@ -3,6 +3,7 @@ package net.minecraft.server;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -19,9 +20,65 @@ class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
     private static int entityCount;
     private int idField:id;
-    public final (List<EntityHandle>) List<Entity> passengers;
+
+    /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
+#if version >= 1.10.2
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:???;
     protected unknown int j;
-    private (EntityHandle) net.minecraft.server.Entity vehicle:au
+    private (EntityHandle) net.minecraft.server.Entity vehicle:au;
+#else
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:???;
+    public optional (EntityHandle) Entity opt_passenger;
+    private (EntityHandle) net.minecraft.server.Entity vehicle;
+#endif
+
+    <code>
+    public List<EntityHandle> getPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            if (passengers == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return passengers;
+            }
+        } else {
+            EntityHandle passenger = T.opt_passenger.get(instance);
+            if (passenger == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return java.util.Arrays.asList(passenger);
+            }
+        }
+    }
+
+    public boolean hasPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            return passengers != null && passengers.size() > 0;
+        } else {
+            return T.opt_passenger.get(instance) != null;
+        }
+    }
+
+    public void setPassengers(List<EntityHandle> passengers) {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> entity_passengers = T.opt_passengers.get(instance);
+            if (entity_passengers == null) {
+                T.opt_passengers.set(instance, passengers);
+            } else {
+                entity_passengers.clear();
+                entity_passengers.addAll(passengers);
+            }
+        } else if (passengers.size() == 0) {
+            T.opt_passenger.set(instance, null);
+        } else {
+            T.opt_passenger.set(instance, passengers.get(0));
+        }
+    }
+    </code>
+    /* ====== END OF PASSENGER AND VEHICLE LOGIC ====== */
+
     public boolean ignoreChunkCheck:attachedToPlayer;
     public (WorldHandle) World world;
     public double lastX;
@@ -40,52 +97,115 @@ class Entity {
     private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
     public boolean onGround;
     public boolean horizontalMovementImpaired:positionChanged;
+
+#if version >= 1.10.2
     public boolean verticalMovementImpaired:B;
     public boolean movementImpaired:C;
     public boolean velocityChanged;
     protected boolean justLanded:E;
     private unknown boolean aw;
+#else
+    public boolean verticalMovementImpaired:E;
+    public boolean movementImpaired:F;
+    public boolean velocityChanged;
+    protected boolean justLanded:H;
+    private unknown boolean g;
+#endif
+
     public boolean dead;
     public float width;
     public float length;
+
+#if version >= 1.10.2
     public unknown float I;
     public float walkedDistanceXZ:J;
     public float walkedDistanceXYZ:K;
+#else
+    public unknown float L;
+    public float walkedDistanceXZ:M;
+    public float walkedDistanceXYZ:N;
+#endif
+
     public float fallDistance;
+
+#if version >= 1.10.2
     private int stepCounter:ax;
+#else
+    private int stepCounter:h;
+#endif
+
 #if version >= 1.12
     private unknown float ay;
 #endif
+
+#if version >= 1.10.2
     public unknown double M;
     public unknown double N;
     public unknown double O;
     public float heightOffset:P;
     public boolean noclip;
     public unknown float R;
+#else
+    public unknown double P;
+    public unknown double Q;
+    public unknown double R;
+    public float heightOffset:S;
+    public boolean noclip;
+    public unknown float U;
+#endif
+
     protected Random random;
     public int ticksLived;
     public optional int field_maxFireTicks:maxFireTicks;
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
-#if version >= 1.11.2
-    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
+#if version >= 1.10.2
+    /* === MC 1.10.2 and onwards has constants like these for datawatcher keys === */
+    #if version >= 1.11.2
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
+    #else
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    #endif
+    #if version >= 1.12
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
+        private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aD;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aE;
+    #else
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+    #endif
 #else
-    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    /* === MC 1.8.8: These constants do not exist == */
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:???;
+    private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
 #endif
-#if version >= 1.12
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
-    private static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aD;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aE;
-#else
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
-    private static final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
-#endif
+    <code>
+    public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromTemplate(T.DATA_FLAGS, 0, byte.class);
+    public static DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromTemplate(T.DATA_AIR_TICKS, 1, short.class);
+    public static DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME, 2, String.class);
+    public static DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME_VISIBLE, 3, byte.class);
+    public static DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.fromTemplate(T.DATA_SILENT, 4, byte.class);
+    public static DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.fromTemplate(T.DATA_NO_GRAVITY, -1, byte.class);
+
+    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
+    public static final int DATA_FLAG_SNEAKING = (1 << 1);
+    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
+    public static final int DATA_FLAG_SPRINTING = (1 << 3);
+    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
+    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
+    public static final int DATA_FLAG_GLOWING = (1 << 6);
+    public static final int DATA_FLAG_FLYING = (1 << 7);
+    </code>
 
 #if version >= 1.11.2
     public boolean isLoaded:aa;
@@ -93,23 +213,36 @@ class Entity {
     public int chunkY:ac;
     public int chunkZ:ad;
     public unknown boolean ah;
-#else
+    public boolean positionChanged:impulse;
+#elseif version >= 1.10.2
     public boolean isLoaded:ab;
     public int chunkX:ac;
     public int chunkY:ad;
     public int chunkZ:ae;
     public unknown boolean ai;
+    public boolean positionChanged:impulse;
+#else
+    private unknown double ar;
+    private unknown double as;
+    public boolean isLoaded:ad;
+    public int chunkX:ae;
+    public int chunkY:af;
+    public int chunkZ:ag;
+    public unknown boolean ah;
+    public boolean positionChanged:ai;
 #endif
 
-    public boolean positionChanged:impulse;
     public int portalCooldown;
 
 #if version >= 1.11.2
     protected boolean allowTeleportation:ak;
     protected unknown int al;
-#else
+#elseif version >= 1.10.2
     protected boolean allowTeleportation:al;
     protected unknown int am;
+#else
+    protected boolean allowTeleportation:ak;
+    protected unknown int al;
 #endif
 
     public int dimension;
@@ -204,9 +337,11 @@ class Entity {
      * }
      */
 #if version >= 1.12
-    protected (SoundEffectHandle) SoundEffect getSwimSound:ae();
+    protected (ResourceKey) SoundEffect getSwimSound:ae();
+#elseif version >= 1.10.2
+    protected (ResourceKey) SoundEffect getSwimSound:aa();
 #else
-    protected (SoundEffectHandle) SoundEffect getSwimSound:aa();
+    protected (ResourceKey) String getSwimSound:P();
 #endif
 
     /*
@@ -221,7 +356,11 @@ class Entity {
      *     }
      * }
      */
-    public void makeSound:a((SoundEffectHandle) SoundEffect soundeffect, float volume, float pitch);
+#if version >= 1.10.2
+    public void makeSound:a((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
+#else
+    public void makeSound:makeSound((ResourceKey) String soundeffect, float volume, float pitch);
+#endif
 
     /*
      # public boolean ###METHODNAME###() {
@@ -433,17 +572,6 @@ class Entity {
     // Since MC 1.11.2 there is a new move function and signature, which must be dealt with correctly
     // This one handles piston motion specifically with an Enum Move Type, not present <= 1.10.2
     public static final boolean IS_NEW_MOVE_FUNCTION = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
-    </code>
-
-    <code>
-    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
-    public static final int DATA_FLAG_SNEAKING = (1 << 1);
-    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
-    public static final int DATA_FLAG_SPRINTING = (1 << 3);
-    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
-    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
-    public static final int DATA_FLAG_GLOWING = (1 << 6);
-    public static final int DATA_FLAG_FLYING = (1 << 7);
     </code>
 
     <code>

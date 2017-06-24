@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -25,12 +26,6 @@ public class EntityHandle extends Template.Handle {
     public static final EntityClass T = new EntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity");
 
-    public static final Key<Byte> DATA_FLAGS = T.DATA_FLAGS.getSafe();
-    public static final Key<Integer> DATA_AIR_TICKS = T.DATA_AIR_TICKS.getSafe();
-    public static final Key<String> DATA_CUSTOM_NAME = T.DATA_CUSTOM_NAME.getSafe();
-    public static final Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = T.DATA_CUSTOM_NAME_VISIBLE.getSafe();
-    public static final Key<Boolean> DATA_SILENT = T.DATA_SILENT.getSafe();
-    public static final Key<Boolean> DATA_NO_GRAVITY = T.DATA_NO_GRAVITY.getSafe();
     /* ============================================================================== */
 
     public static EntityHandle createHandle(Object handleInstance) {
@@ -82,11 +77,11 @@ public class EntityHandle extends Template.Handle {
         return T.dropItemStack.invoke(instance, itemstack, force);
     }
 
-    public SoundEffectHandle getSwimSound() {
+    public ResourceKey getSwimSound() {
         return T.getSwimSound.invoke(instance);
     }
 
-    public void makeSound(SoundEffectHandle soundeffect, float volume, float pitch) {
+    public void makeSound(ResourceKey soundeffect, float volume, float pitch) {
         T.makeSound.invoke(instance, soundeffect, volume, pitch);
     }
 
@@ -239,6 +234,67 @@ public class EntityHandle extends Template.Handle {
     }
 
 
+    public List<EntityHandle> getPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            if (passengers == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return passengers;
+            }
+        } else {
+            EntityHandle passenger = T.opt_passenger.get(instance);
+            if (passenger == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return java.util.Arrays.asList(passenger);
+            }
+        }
+    }
+
+    public boolean hasPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            return passengers != null && passengers.size() > 0;
+        } else {
+            return T.opt_passenger.get(instance) != null;
+        }
+    }
+
+    public void setPassengers(List<EntityHandle> passengers) {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> entity_passengers = T.opt_passengers.get(instance);
+            if (entity_passengers == null) {
+                T.opt_passengers.set(instance, passengers);
+            } else {
+                entity_passengers.clear();
+                entity_passengers.addAll(passengers);
+            }
+        } else if (passengers.size() == 0) {
+            T.opt_passenger.set(instance, null);
+        } else {
+            T.opt_passenger.set(instance, passengers.get(0));
+        }
+    }
+
+
+    public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromTemplate(T.DATA_FLAGS, 0, byte.class);
+    public static DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromTemplate(T.DATA_AIR_TICKS, 1, short.class);
+    public static DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME, 2, String.class);
+    public static DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME_VISIBLE, 3, byte.class);
+    public static DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.fromTemplate(T.DATA_SILENT, 4, byte.class);
+    public static DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.fromTemplate(T.DATA_NO_GRAVITY, -1, byte.class);
+
+    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
+    public static final int DATA_FLAG_SNEAKING = (1 << 1);
+    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
+    public static final int DATA_FLAG_SPRINTING = (1 << 3);
+    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
+    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
+    public static final int DATA_FLAG_GLOWING = (1 << 6);
+    public static final int DATA_FLAG_FLYING = (1 << 7);
+
+
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
             return T.prop_getMaxFireTicks.invoke(instance);
@@ -251,16 +307,6 @@ public class EntityHandle extends Template.Handle {
 
 
     public static final boolean IS_NEW_MOVE_FUNCTION = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
-
-
-    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
-    public static final int DATA_FLAG_SNEAKING = (1 << 1);
-    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
-    public static final int DATA_FLAG_SPRINTING = (1 << 3);
-    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
-    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
-    public static final int DATA_FLAG_GLOWING = (1 << 6);
-    public static final int DATA_FLAG_FLYING = (1 << 7);
 
 
     public WorldServerHandle getWorldServer() {
@@ -288,14 +334,6 @@ public class EntityHandle extends Template.Handle {
 
     public void setIdField(int value) {
         T.idField.setInteger(instance, value);
-    }
-
-    public List<EntityHandle> getPassengers() {
-        return T.passengers.get(instance);
-    }
-
-    public void setPassengers(List<EntityHandle> value) {
-        T.passengers.set(instance, value);
     }
 
     public EntityHandle getVehicle() {
@@ -666,16 +704,25 @@ public class EntityHandle extends Template.Handle {
         public final Template.Constructor.Converted<EntityHandle> constr_world = new Template.Constructor.Converted<EntityHandle>();
 
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_AIR_TICKS = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<String>> DATA_CUSTOM_NAME = new Template.StaticField.Converted<Key<String>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_CUSTOM_NAME_VISIBLE = new Template.StaticField.Converted<Key<Boolean>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_SILENT = new Template.StaticField.Converted<Key<Boolean>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
-        public final Template.Field.Converted<List<EntityHandle>> passengers = new Template.Field.Converted<List<EntityHandle>>();
+        @Template.Optional
+        public final Template.Field.Converted<List<EntityHandle>> opt_passengers = new Template.Field.Converted<List<EntityHandle>>();
+        @Template.Optional
+        public final Template.Field.Converted<EntityHandle> opt_passenger = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
         public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
@@ -735,7 +782,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Void> burn = new Template.Method<Void>();
         public final Template.Method.Converted<Item> dropItem = new Template.Method.Converted<Item>();
         public final Template.Method.Converted<Item> dropItemStack = new Template.Method.Converted<Item>();
-        public final Template.Method.Converted<SoundEffectHandle> getSwimSound = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<ResourceKey> getSwimSound = new Template.Method.Converted<ResourceKey>();
         public final Template.Method.Converted<Void> makeSound = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();

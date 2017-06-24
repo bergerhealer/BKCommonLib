@@ -8,6 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 public class SoundEffectHandle extends Template.Handle {
     /** @See {@link SoundEffectClass} */
     public static final SoundEffectClass T = new SoundEffectClass();
@@ -21,6 +22,10 @@ public class SoundEffectHandle extends Template.Handle {
         SoundEffectHandle handle = new SoundEffectHandle();
         handle.instance = handleInstance;
         return handle;
+    }
+
+    public static final SoundEffectHandle createNew(MinecraftKeyHandle minecraftkey) {
+        return T.constr_minecraftkey.newInstance(minecraftkey);
     }
 
     /* ============================================================================== */
@@ -38,6 +43,8 @@ public class SoundEffectHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
+        public final Template.Constructor.Converted<SoundEffectHandle> constr_minecraftkey = new Template.Constructor.Converted<SoundEffectHandle>();
+
         public final Template.StaticField.Converted<RegistryMaterialsHandle> REGISTRY = new Template.StaticField.Converted<RegistryMaterialsHandle>();
 
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
