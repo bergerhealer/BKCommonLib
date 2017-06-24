@@ -1,8 +1,9 @@
 package com.bergerkiller.bukkit.common.controller;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.mutable.FloatAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
-import com.bergerkiller.bukkit.common.bases.mutable.LongLocationAbstract;
+import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.ObjectAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -41,15 +42,15 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     /**
      * The maximum allowed distance per relative movement update
      */
-    public static final int MAX_RELATIVE_DISTANCE = 32768;
+    public static final double MAX_RELATIVE_DISTANCE = 32768.0 / 4096.0;
     /**
      * The minimum value position change that is able to trigger an update
      */
-    public static final int MIN_RELATIVE_POS_CHANGE = 128;
+    public static final double MIN_RELATIVE_POS_CHANGE = 128.0 / 4096.0;
     /**
      * The minimum value rotation change that is able to trigger an update
      */
-    public static final int MIN_RELATIVE_ROT_CHANGE = 4;
+    public static final float MIN_RELATIVE_ROT_CHANGE = 4.0f / 360.0f;
     /**
      * The minimum velocity change that is able to trigger an update
      */
@@ -129,58 +130,58 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Obtains the protocol location as the clients know it, allowing it to be
      * read from or written to
      */
-    public LongLocationAbstract locSynched = new LongLocationAbstract() {
+    public LocationAbstract locSynched = new LocationAbstract() {
         public World getWorld() {
             return entity.getWorld();
         }
 
-        public LongLocationAbstract setWorld(World world) {
+        public LocationAbstract setWorld(World world) {
             entity.setWorld(world);
             return this;
         }
 
-        public long getX() {
-            return handle.getXLoc();
+        public double getX() {
+            return handle.getLocX();
         }
 
-        public long getY() {
-            return handle.getYLoc();
+        public double getY() {
+            return handle.getLocY();
         }
 
-        public long getZ() {
-            return handle.getZLoc();
+        public double getZ() {
+            return handle.getLocZ();
         }
 
-        public LongLocationAbstract setX(long x) {
-            handle.setXLoc(x);
+        public LocationAbstract setX(double x) {
+            handle.setLocX(x);
             return this;
         }
 
-        public LongLocationAbstract setY(long y) {
-            handle.setYLoc(y);
+        public LocationAbstract setY(double y) {
+            handle.setLocY(y);
             return this;
         }
 
-        public LongLocationAbstract setZ(long z) {
-            handle.setZLoc(z);
+        public LocationAbstract setZ(double z) {
+            handle.setLocZ(z);
             return this;
         }
 
-        public int getYaw() {
-            return handle.getYRot();
+        public float getYaw() {
+            return handle.getYaw();
         }
 
-        public int getPitch() {
-            return handle.getXRot();
+        public float getPitch() {
+            return handle.getPitch();
         }
 
-        public LongLocationAbstract setYaw(int yaw) {
-            handle.setYRot(yaw);
+        public LocationAbstract setYaw(float yaw) {
+            handle.setYaw(yaw);
             return this;
         }
 
-        public LongLocationAbstract setPitch(int pitch) {
-            handle.setXRot(pitch);
+        public LocationAbstract setPitch(float pitch) {
+            handle.setPitch(pitch);
             return this;
         }
     };
@@ -190,7 +191,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * setters, the loss of accuracy of the protocol values make it rather
      * pointless to use.
      */
-    public LongLocationAbstract locLive = new LongLocationAbstract() {
+    public LocationAbstract locLive = new LocationAbstract() {
 
         @Override
         public World getWorld() {
@@ -198,53 +199,53 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         @Override
-        public LongLocationAbstract setWorld(World world) {
+        public LocationAbstract setWorld(World world) {
             entity.setWorld(world);
             return this;
         }
 
-        public long getX() {
-            return protLoc(entity.loc.getX());
+        public double getX() {
+            return entity.loc.getX();
         }
 
-        public long getY() {
-            return protLoc(entity.loc.getY());
+        public double getY() {
+            return entity.loc.getY();
         }
 
-        public long getZ() {
-            return protLoc(entity.loc.getZ());
+        public double getZ() {
+            return entity.loc.getZ();
         }
 
-        public LongLocationAbstract setX(long x) {
-            entity.loc.setX(locProt(x));
+        public LocationAbstract setX(double x) {
+            entity.loc.setX(x);
             return this;
         }
 
-        public LongLocationAbstract setY(long y) {
-            entity.loc.setY(locProt(y));
+        public LocationAbstract setY(double y) {
+            entity.loc.setY(y);
             return this;
         }
 
-        public LongLocationAbstract setZ(long z) {
-            entity.loc.setZ(locProt(z));
+        public LocationAbstract setZ(double z) {
+            entity.loc.setZ(z);
             return this;
         }
 
-        public int getYaw() {
-            return protRot(entity.loc.getYaw());
+        public float getYaw() {
+            return entity.loc.getYaw();
         }
 
-        public int getPitch() {
-            return protRot(entity.loc.getPitch());
+        public float getPitch() {
+            return entity.loc.getPitch();
         }
 
-        public LongLocationAbstract setYaw(int yaw) {
-            entity.loc.setYaw((float) yaw / 256.0f * 360.0f);
+        public LocationAbstract setYaw(float yaw) {
+            entity.loc.setYaw(yaw);
             return this;
         }
 
-        public LongLocationAbstract setPitch(int pitch) {
-            entity.loc.setPitch((float) pitch / 256.0f * 360.0f);
+        public LocationAbstract setPitch(float pitch) {
+            entity.loc.setPitch(pitch);
             return this;
         }
 
@@ -253,12 +254,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Obtains the protocol head rotation as the clients know it, allowing it to
      * be read from or written to
      */
-    public IntegerAbstract headRotSynched = new IntegerAbstract() {
-        public int get() {
+    public FloatAbstract headRotSynched = new FloatAbstract() {
+        public float get() {
         	return handle.getHeadYaw();
         }
 
-        public IntegerAbstract set(int value) {
+        public FloatAbstract set(float value) {
         	handle.setHeadYaw(value);
             return this;
         }
@@ -267,12 +268,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Obtains the protocol head rotation as it is live, on the server. Only
      * reading is supported.
      */
-    public IntegerAbstract headRotLive = new IntegerAbstract() {
-        public int get() {
-            return protRot(entity.getHeadRotation());
+    public FloatAbstract headRotLive = new FloatAbstract() {
+        public float get() {
+            return entity.getHeadRotation();
         }
 
-        public IntegerAbstract set(int value) {
+        public FloatAbstract set(float value) {
             throw new UnsupportedOperationException();
         }
     };
@@ -454,8 +455,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     private boolean isViewable(Player viewer) {
         // View range check
-        final int dx = MathUtil.floor(Math.abs(EntityUtil.getLocX(viewer) - (double) locProt(this.locSynched.getX())));
-        final int dz = MathUtil.floor(Math.abs(EntityUtil.getLocZ(viewer) - (double) locProt(this.locSynched.getZ())));
+        final int dx = MathUtil.floor(Math.abs(EntityUtil.getLocX(viewer) - this.locSynched.getX()));
+        final int dz = MathUtil.floor(Math.abs(EntityUtil.getLocZ(viewer) - this.locSynched.getZ()));
         final int view = this.getViewDistance();
         if (dx > view || dz > view) {
             return false;
@@ -575,8 +576,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         // Initial entity head rotation
-        int headRot = headRotLive.get();
-        if (headRot != 0) {
+        float headRot = headRotLive.get();
+        if (headRot != 0.0f) {
             PacketUtil.sendPacket(viewer, getHeadRotationPacket(headRot));
         }
     }
@@ -705,7 +706,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param minChange to look for
      * @return True if changed, False if not
      */
-    public boolean isPositionChanged(long minChange) {
+    public boolean isPositionChanged(double minChange) {
         return Math.abs(locLive.getX() - locSynched.getX()) >= minChange
                 || Math.abs(locLive.getY() - locSynched.getY()) >= minChange
                 || Math.abs(locLive.getZ() - locSynched.getZ()) >= minChange;
@@ -719,9 +720,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param minChange to look for
      * @return True if changed, False if not
      */
-    public boolean isRotationChanged(int minChange) {
-        return Math.abs(locLive.getYaw() - locSynched.getYaw()) >= minChange
-                || Math.abs(locLive.getPitch() - locSynched.getPitch()) >= minChange;
+    public boolean isRotationChanged(float minChange) {
+        return MathUtil.getAngleDifference(locLive.getYaw(), locSynched.getYaw()) >= minChange
+                || MathUtil.getAngleDifference(locLive.getPitch(), locSynched.getPitch()) >= minChange;
     }
 
     /**
@@ -744,7 +745,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param minChange to look for
      * @return True if changed, False if not
      */
-    public boolean isHeadRotationChanged(int minChange) {
+    public boolean isHeadRotationChanged(float minChange) {
         return Math.abs(headRotLive.get() - headRotSynched.get()) >= minChange;
     }
 
@@ -835,7 +836,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      *
      * @param headRotation to set to
      */
-    public void syncHeadRotation(int headRotation) {
+    public void syncHeadRotation(float headRotation) {
         headRotSynched.set(headRotation);
         this.broadcast(getHeadRotationPacket(headRotation));
     }
@@ -902,7 +903,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param yaw - protocol rotation yaw
      * @param pitch - protocol rotation pitch
      */
-    public void syncLocationAbsolute(long posX, long posY, long posZ, int yaw, int pitch) {
+    public void syncLocationAbsolute(double posX, double posY, double posZ, float yaw, float pitch) {
         // Update protocol values
         locSynched.set(posX, posY, posZ, yaw, pitch);
 
@@ -938,12 +939,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param yaw - protocol rotation yaw
      * @param pitch - protocol rotation pitch
      */
-    public void syncLocation(boolean position, boolean rotation, long posX, long posY, long posZ, int yaw, int pitch) {
+    public void syncLocation(boolean position, boolean rotation, double posX, double posY, double posZ, float yaw, float pitch) {
         // No position updates allowed for passengers (this is FORCED). Rotation is allowed.
         if (position && !entity.isInsideVehicle()) {
-            final long deltaX = posX - locSynched.getX();
-            final long deltaY = posY - locSynched.getY();
-            final long deltaZ = posZ - locSynched.getZ();
+            final double deltaX = posX - locSynched.getX();
+            final double deltaY = posY - locSynched.getY();
+            final double deltaZ = posZ - locSynched.getZ();
 
             // There is no use sending relative updates with zero change...
             if (deltaX == 0 && deltaY == 0 && deltaZ == 0) {
@@ -963,7 +964,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 // Update rotation and position relatively
                 locSynched.set(posX, posY, posZ, yaw, pitch);
                 broadcast(PacketType.OUT_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(),
-                        deltaX, deltaY, deltaZ, (byte) yaw, (byte) pitch, entity.isOnGround()));
+                        deltaX, deltaY, deltaZ, yaw, pitch, entity.isOnGround()));
             } else {
                 // Only update position relatively
                 locSynched.set(posX, posY, posZ);
@@ -973,7 +974,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         } else if (rotation) {
             // Only update rotation
             locSynched.setRotation(yaw, pitch);
-            broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch, entity.isOnGround()));
+            broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), yaw, pitch, entity.isOnGround()));
         }
     }
 
@@ -1018,8 +1019,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param pitch - position pitch (protocol)
      * @return a packet with absolute position information
      */
-    public CommonPacket getLocationPacket(long posX, long posY, long posZ, int yaw, int pitch) {
-        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), locProt(posX), locProt(posY), locProt(posZ), (byte) yaw, (byte) pitch, true);
+    public CommonPacket getLocationPacket(double posX, double posY, double posZ, float yaw, float pitch) {
+        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, 
+                (byte) EntityTrackerEntryHandle.getProtocolRotation(yaw),
+                (byte) EntityTrackerEntryHandle.getProtocolRotation(pitch), true);
     }
 
     /**
@@ -1052,12 +1055,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             packet.write(PacketType.OUT_ENTITY_SPAWN.motY, protMot(velSynched.getY()));
             packet.write(PacketType.OUT_ENTITY_SPAWN.motZ, protMot(velSynched.getZ()));
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locProt(locSynched.getX()));
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locProt(locSynched.getY()));
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locProt(locSynched.getZ()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
             // Rotation
-            packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, locSynched.getYaw());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, locSynched.getPitch());
+            packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, EntityTrackerEntryHandle.getProtocolRotation(locSynched.getYaw()));
+            packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, EntityTrackerEntryHandle.getProtocolRotation(locSynched.getPitch()));
         }
         return packet;
     }
@@ -1078,30 +1081,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param headRotation value (protocol value)
      * @return packet with head rotation information
      */
-    public CommonPacket getHeadRotationPacket(int headRotation) {
-        return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntity(), (byte) headRotation);
-    }
-
-    private int protRot(float rot) {
-        return MathUtil.floor(rot * 256.0f / 360.0f);
-    }
-
-    /**
-     * Converts position information into a protocol long value.
-     * Taken from EntityTracker MC source
-     */
-    public static long protLoc(double loc) {
-        return MathUtil.longFloor(loc * 4096.0D);
-    }
-
-    /**
-     * Converts protocol long value into position information
-     * 
-     * @param prot protocol value
-     * @return absolute world coordinate value
-     */
-    public static double locProt(long prot) {
-        return prot / 4096.0D;
+    public CommonPacket getHeadRotationPacket(float headRotation) {
+        int prot = EntityTrackerEntryHandle.getProtocolRotation(headRotation);
+        return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntity(), (byte) prot);
     }
 
     /**

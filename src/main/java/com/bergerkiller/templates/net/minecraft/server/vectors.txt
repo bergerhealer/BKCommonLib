@@ -5,9 +5,15 @@ import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 
 class BaseBlockPosition {
+#if version >= 1.10.2
     private final int x:a;
     private final int y:b;
     private final int z:c;
+#else
+    private final int x:a;
+    private final int y:c;
+    private final int z:d;
+#endif
 }
 
 class BlockPosition extends BaseBlockPosition {
@@ -17,9 +23,15 @@ class BlockPosition extends BaseBlockPosition {
 }
 
 class Vec3D {
+#if version >= 1.10.2
     public final double x;
     public final double y;
     public final double z;
+#else
+    public final double x:a;
+    public final double y:b;
+    public final double z:c;
+#endif
 
     public (Vec3DHandle) Vec3D(double x, double y, double z);
 }

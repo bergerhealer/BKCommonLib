@@ -33,6 +33,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -43,6 +44,7 @@ import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
@@ -576,8 +578,12 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, boolean.class);
 
-        public CommonPacket newInstance(int paramInt, long paramLong1, long paramLong2, long paramLong3, boolean paramBoolean) {
-            return constructor1.newInstance(paramInt,paramLong1,paramLong2,paramLong3,paramBoolean);
+        public CommonPacket newInstance(int entityId, double dx, double dy, double dz, boolean onGround) {
+            //TODO! Fix this mess.
+            long l_dx = MathUtil.longFloor(dx * 4096.0);
+            long l_dy = MathUtil.longFloor(dy * 4096.0);
+            long l_dz = MathUtil.longFloor(dz * 4096.0);
+            return constructor1.newInstance(entityId, l_dx, l_dy, l_dz, onGround);
         }
     }
 
@@ -595,8 +601,14 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, byte.class, byte.class, boolean.class);
 
-        public CommonPacket newInstance(int entityId, long dx, long dy, long dz, byte dyaw, byte dpitch, boolean onGround) {
-            return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, onGround);
+        public CommonPacket newInstance(int entityId, double dx, double dy, double dz, float dyaw, float dpitch, boolean onGround) {
+            //TODO! Fix this mess.
+            long l_dx = MathUtil.longFloor(dx * 4096.0);
+            long l_dy = MathUtil.longFloor(dy * 4096.0);
+            long l_dz = MathUtil.longFloor(dz * 4096.0);
+            byte l_dyaw = (byte) EntityTrackerEntryHandle.getProtocolRotation(dyaw);
+            byte l_dpitch = (byte) EntityTrackerEntryHandle.getProtocolRotation(dpitch);
+            return constructor1.newInstance(entityId, l_dx, l_dy, l_dz, l_dyaw, l_dpitch, onGround);
         }
     }
 
@@ -611,8 +623,10 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
 
-        public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch, boolean onGround) {
-            return constructor1.newInstance(entityId, dyaw, dpitch, onGround);
+        public CommonPacket newInstance(int entityId, float dyaw, float dpitch, boolean onGround) {
+            byte l_dyaw = (byte) EntityTrackerEntryHandle.getProtocolRotation(dyaw);
+            byte l_dpitch = (byte) EntityTrackerEntryHandle.getProtocolRotation(dpitch);
+            return constructor1.newInstance(entityId, l_dyaw, l_dpitch, onGround);
         }
     }
 

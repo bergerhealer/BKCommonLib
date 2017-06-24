@@ -359,6 +359,16 @@ public class MathUtil {
     }
 
     /**
+     * Returns 0 if the value is not-a-number
+     *
+     * @param value to check
+     * @return The value, or 0 if it is NaN
+     */
+    public static float fixNaN(float value) {
+        return fixNaN(value, 0.0f);
+    }
+
+    /**
      * Returns the default if the value is not-a-number
      *
      * @param value to check
@@ -367,6 +377,17 @@ public class MathUtil {
      */
     public static double fixNaN(double value, double def) {
         return Double.isNaN(value) ? def : value;
+    }
+
+    /**
+     * Returns the default if the value is not-a-number
+     *
+     * @param value to check
+     * @param def value
+     * @return The value, or the default if it is NaN
+     */
+    public static float fixNaN(float value, float def) {
+        return Float.isNaN(value) ? def : value;
     }
 
     /**

@@ -323,7 +323,12 @@ public class NMSNBT {
     public static class Compound extends Base {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("NBTTagCompound");
         public static final FieldAccessor<Map<String, ?>> map = (FieldAccessor) NBTTagCompoundHandle.T.map.raw.toFieldAccessor();
-        public static final MethodAccessor<Integer> size = NBTTagCompoundHandle.T.size.toMethodAccessor();
+        public static final MethodAccessor<Integer> size = new SafeDirectMethod<Integer>() {
+            @Override
+            public Integer invoke(Object instance, Object... args) {
+                return map.get(instance).size();
+            }
+        };
         public static final MethodAccessor<Set<String>> getKeys = NBTTagCompoundHandle.T.getKeys.toMethodAccessor();
 
         public static final MethodAccessor<Collection<?>> getValues = new SafeDirectMethod<Collection<?>>() {

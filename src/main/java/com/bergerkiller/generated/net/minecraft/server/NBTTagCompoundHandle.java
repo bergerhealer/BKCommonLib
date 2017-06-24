@@ -26,10 +26,6 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
 
     /* ============================================================================== */
 
-    public int size() {
-        return T.size.invoke(instance);
-    }
-
     public Set<String> getKeys() {
         return T.getKeys.invoke(instance);
     }
@@ -54,6 +50,10 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
         return T.isEmpty.invoke(instance);
     }
 
+
+    public int size() {
+        return ((java.util.Map<?, ?>) T.map.raw.get(instance)).size();
+    }
     public Map<String, NBTBaseHandle> getMap() {
         return T.map.get(instance);
     }
@@ -69,7 +69,6 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
     public static final class NBTTagCompoundClass extends Template.Class<NBTTagCompoundHandle> {
         public final Template.Field.Converted<Map<String, NBTBaseHandle>> map = new Template.Field.Converted<Map<String, NBTBaseHandle>>();
 
-        public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method<Set<String>> getKeys = new Template.Method<Set<String>>();
         public final Template.Method<Void> remove = new Template.Method<Void>();
         public final Template.Method.Converted<Void> set = new Template.Method.Converted<Void>();

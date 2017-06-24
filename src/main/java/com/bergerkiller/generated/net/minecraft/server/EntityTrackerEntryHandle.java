@@ -43,6 +43,118 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     }
 
 
+    public static double POSITION_STEP;
+    public static float ROTATION_STEP;
+    static {
+        if (T.long_xLoc.isAvailable()) {
+            POSITION_STEP = 1.0 / 4096.0;
+        } else {
+            POSITION_STEP = 1.0 / 32.0;
+        }
+        ROTATION_STEP = 360.0f / 256.0f;
+    }
+
+    public static final int getProtocolRotation(float angle) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * 256.0F / 360.0F);
+    }
+
+    public void setLocX(double x) {
+        if (T.long_xLoc.isAvailable()) {
+            T.long_xLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
+        } else {
+            T.int_xLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
+        }
+    }
+
+    public void setLocY(double y) {
+        if (T.long_yLoc.isAvailable()) {
+            T.long_yLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
+        } else {
+            T.int_yLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
+        }
+    }
+
+    public void setLocZ(double z) {
+        if (T.long_zLoc.isAvailable()) {
+            T.long_zLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
+        } else {
+            T.int_zLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
+        }
+    }
+
+    public void setYaw(float yaw) {
+        T.raw_yRot.setInteger(instance, getProtocolRotation(yaw));
+    }
+
+    public void setPitch(float pitch) {
+        T.raw_xRot.setInteger(instance, getProtocolRotation(pitch));
+    }
+
+    public void setHeadYaw(float headYaw) {
+        T.raw_headYaw.setInteger(instance, getProtocolRotation(headYaw));
+    }
+
+    public double getLocX() {
+        if (T.long_xLoc.isAvailable()) {
+            return (double) T.long_xLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_xLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    public double getLocY() {
+        if (T.long_yLoc.isAvailable()) {
+            return (double) T.long_yLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_yLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    public double getLocZ() {
+        if (T.long_zLoc.isAvailable()) {
+            return (double) T.long_zLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_zLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    public float getYaw() {
+        return ((float) T.raw_yRot.getInteger(instance) * 360) / 256.0F;
+    }
+
+    public float getPitch() {
+        return ((float) T.raw_xRot.getInteger(instance) * 360) / 256.0F;
+    }
+
+    public float getHeadYaw() {
+        return ((float) T.raw_headYaw.getInteger(instance) * 360) / 256.0F;
+    }
+
+
+    public List<org.bukkit.entity.Entity> getPassengers() {
+        if (T.opt_passengerList.isAvailable()) {
+            return T.opt_passengerList.get(instance);
+        } else {
+            org.bukkit.entity.Entity passenger = T.opt_passenger.get(instance);
+            if (passenger == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return java.util.Arrays.asList(passenger);
+            }
+        }
+    }
+
+    public void setPassengers(List<org.bukkit.entity.Entity> passengers) {
+        if (T.opt_passengerList.isAvailable()) {
+            T.opt_passengerList.set(instance, passengers);
+        } else if (passengers.size() == 0) {
+            T.opt_passenger.set(instance, null);
+        } else {
+            T.opt_passenger.set(instance, passengers.get(0));
+        }
+    }
+
+
     public java.util.Collection<org.bukkit.entity.Player> getViewers() {
         if (T.viewersMap.isAvailable()) {
             return T.viewersMap.get(instance).keySet();
@@ -88,14 +200,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.viewDistance.setInteger(instance, value);
     }
 
-    public int getPlayerViewDistance() {
-        return T.playerViewDistance.getInteger(instance);
-    }
-
-    public void setPlayerViewDistance(int value) {
-        T.playerViewDistance.setInteger(instance, value);
-    }
-
     public int getUpdateInterval() {
         return T.updateInterval.getInteger(instance);
     }
@@ -104,52 +208,28 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.updateInterval.setInteger(instance, value);
     }
 
-    public long getXLoc() {
-        return T.xLoc.getLong(instance);
+    public int getRaw_xRot() {
+        return T.raw_xRot.getInteger(instance);
     }
 
-    public void setXLoc(long value) {
-        T.xLoc.setLong(instance, value);
+    public void setRaw_xRot(int value) {
+        T.raw_xRot.setInteger(instance, value);
     }
 
-    public long getYLoc() {
-        return T.yLoc.getLong(instance);
+    public int getRaw_yRot() {
+        return T.raw_yRot.getInteger(instance);
     }
 
-    public void setYLoc(long value) {
-        T.yLoc.setLong(instance, value);
+    public void setRaw_yRot(int value) {
+        T.raw_yRot.setInteger(instance, value);
     }
 
-    public long getZLoc() {
-        return T.zLoc.getLong(instance);
+    public int getRaw_headYaw() {
+        return T.raw_headYaw.getInteger(instance);
     }
 
-    public void setZLoc(long value) {
-        T.zLoc.setLong(instance, value);
-    }
-
-    public int getYRot() {
-        return T.yRot.getInteger(instance);
-    }
-
-    public void setYRot(int value) {
-        T.yRot.setInteger(instance, value);
-    }
-
-    public int getXRot() {
-        return T.xRot.getInteger(instance);
-    }
-
-    public void setXRot(int value) {
-        T.xRot.setInteger(instance, value);
-    }
-
-    public int getHeadYaw() {
-        return T.headYaw.getInteger(instance);
-    }
-
-    public void setHeadYaw(int value) {
-        T.headYaw.setInteger(instance, value);
+    public void setRaw_headYaw(int value) {
+        T.raw_headYaw.setInteger(instance, value);
     }
 
     public double getXVel() {
@@ -232,14 +312,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.timeSinceLocationSync.setInteger(instance, value);
     }
 
-    public List<Entity> getPassengers() {
-        return T.passengers.get(instance);
-    }
-
-    public void setPassengers(List<Entity> value) {
-        T.passengers.set(instance, value);
-    }
-
     /**
      * Stores class members for <b>net.minecraft.server.EntityTrackerEntry</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -247,14 +319,24 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
         public final Template.Field.Converted<EntityHandle> tracker = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
+        @Template.Optional
         public final Template.Field.Integer playerViewDistance = new Template.Field.Integer();
         public final Template.Field.Integer updateInterval = new Template.Field.Integer();
-        public final Template.Field.Long xLoc = new Template.Field.Long();
-        public final Template.Field.Long yLoc = new Template.Field.Long();
-        public final Template.Field.Long zLoc = new Template.Field.Long();
-        public final Template.Field.Integer yRot = new Template.Field.Integer();
-        public final Template.Field.Integer xRot = new Template.Field.Integer();
-        public final Template.Field.Integer headYaw = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Long long_xLoc = new Template.Field.Long();
+        @Template.Optional
+        public final Template.Field.Long long_yLoc = new Template.Field.Long();
+        @Template.Optional
+        public final Template.Field.Long long_zLoc = new Template.Field.Long();
+        @Template.Optional
+        public final Template.Field.Integer int_xLoc = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Integer int_yLoc = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Integer int_zLoc = new Template.Field.Integer();
+        public final Template.Field.Integer raw_xRot = new Template.Field.Integer();
+        public final Template.Field.Integer raw_yRot = new Template.Field.Integer();
+        public final Template.Field.Integer raw_headYaw = new Template.Field.Integer();
         public final Template.Field.Double xVel = new Template.Field.Double();
         public final Template.Field.Double yVel = new Template.Field.Double();
         public final Template.Field.Double zVel = new Template.Field.Double();
@@ -265,7 +347,10 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Boolean synched = new Template.Field.Boolean();
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
-        public final Template.Field.Converted<List<Entity>> passengers = new Template.Field.Converted<List<Entity>>();
+        @Template.Optional
+        public final Template.Field.Converted<List<Entity>> opt_passengerList = new Template.Field.Converted<List<Entity>>();
+        @Template.Optional
+        public final Template.Field.Converted<Entity> opt_passenger = new Template.Field.Converted<Entity>();
         @Template.Optional
         public final Template.Field.Converted<Map<Player, Boolean>> viewersMap = new Template.Field.Converted<Map<Player, Boolean>>();
         @Template.Optional

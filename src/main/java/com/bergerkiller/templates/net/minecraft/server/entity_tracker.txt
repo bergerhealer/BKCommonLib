@@ -8,25 +8,155 @@ class EntityTracker {
 }
 
 class EntityTrackerEntry {
+#if version >= 1.10.2
     private final (EntityHandle) Entity tracker;
 
     private final int viewDistance:e;
-    private int playerViewDistance:f;
+    private optional int playerViewDistance:f;
     private final int updateInterval:g;
 
-    private long xLoc;
-    private long yLoc;
-    private long zLoc;
+    private optional long long_xLoc:xLoc;
+    private optional long long_yLoc:yLoc;
+    private optional long long_zLoc:zLoc;
+    private optional int int_xLoc:???;
+    private optional int int_yLoc:???;
+    private optional int int_zLoc:???;
 
-    private int yRot;
-    private int xRot;
-    private int headYaw;
+    public int raw_xRot:yRot;
+    public int raw_yRot:xRot;
+    public int raw_headYaw:headYaw;
 
     private double xVel:n;
     private double yVel:o;
     private double zVel:p;
 
     public int tickCounter:a;
+#else
+    public final (EntityHandle) Entity tracker;
+
+    public int viewDistance:b;
+    public optional int playerViewDistance:???;
+    public int updateInterval:c;
+
+    public optional long long_xLoc:???;
+    public optional long long_yLoc:???;
+    public optional long long_zLoc:???;
+    public optional int int_xLoc:xLoc;
+    public optional int int_yLoc:yLoc;
+    public optional int int_zLoc:zLoc;
+
+    public int raw_xRot:yRot;
+    public int raw_yRot:xRot;
+    public int raw_headYaw:i;
+
+    public double xVel:j;
+    public double yVel:k;
+    public double zVel:l;
+
+    public int tickCounter:m;
+#endif
+
+    <code>
+    // Minimal change of x/y/z position or rotation that is supported
+    public static double POSITION_STEP;
+    public static float ROTATION_STEP;
+    static {
+        if (T.long_xLoc.isAvailable()) {
+            POSITION_STEP = 1.0 / 4096.0;
+        } else {
+            POSITION_STEP = 1.0 / 32.0;
+        }
+        ROTATION_STEP = 360.0f / 256.0f;
+    }
+
+    public static final int getProtocolRotation(float angle) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * 256.0F / 360.0F);
+    }
+
+    // Performs protocol translation to set the synchronized x position coordinate
+    public void setLocX(double x) {
+        if (T.long_xLoc.isAvailable()) {
+            T.long_xLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
+        } else {
+            T.int_xLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
+        }
+    }
+
+    // Performs protocol translation to set the synchronized y position coordinate
+    public void setLocY(double y) {
+        if (T.long_yLoc.isAvailable()) {
+            T.long_yLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
+        } else {
+            T.int_yLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
+        }
+    }
+
+    // Performs protocol translation to set the synchronized z position coordinate
+    public void setLocZ(double z) {
+        if (T.long_zLoc.isAvailable()) {
+            T.long_zLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
+        } else {
+            T.int_zLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
+        }
+    }
+
+    // Performs protocol translation to set the synchronized yaw rotation
+    public void setYaw(float yaw) {
+        T.raw_yRot.setInteger(instance, getProtocolRotation(yaw));
+    }
+
+    // Performs protocol translation to set the synchronized pitch rotation
+    public void setPitch(float pitch) {
+        T.raw_xRot.setInteger(instance, getProtocolRotation(pitch));
+    }
+
+    // Performs protocol translation to set the synchronized head rotation
+    public void setHeadYaw(float headYaw) {
+        T.raw_headYaw.setInteger(instance, getProtocolRotation(headYaw));
+    }
+
+    // Performs protocol translation to get the synchronized x position coordinate
+    public double getLocX() {
+        if (T.long_xLoc.isAvailable()) {
+            return (double) T.long_xLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_xLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    // Performs protocol translation to get the synchronized y position coordinate
+    public double getLocY() {
+        if (T.long_yLoc.isAvailable()) {
+            return (double) T.long_yLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_yLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    // Performs protocol translation to get the synchronized z position coordinate
+    public double getLocZ() {
+        if (T.long_zLoc.isAvailable()) {
+            return (double) T.long_zLoc.getLong(instance) / 4096.0;
+        } else {
+            return (double) T.int_zLoc.getInteger(instance) / 32.0;
+        }
+    }
+
+    // Performs protocol translation to get the synchronized yaw rotation
+    public float getYaw() {
+        return ((float) T.raw_yRot.getInteger(instance) * 360) / 256.0F;
+    }
+
+    // Performs protocol translation to get the synchronized pitch rotation
+    public float getPitch() {
+        return ((float) T.raw_xRot.getInteger(instance) * 360) / 256.0F;
+    }
+
+    // Performs protocol translation to get the synchronized head rotation
+    public float getHeadYaw() {
+        return ((float) T.raw_headYaw.getInteger(instance) * 360) / 256.0F;
+    }
+    </code>
 
     private double prevX:q;
     private double prevY:r;
@@ -36,7 +166,38 @@ class EntityTrackerEntry {
     private final boolean isMobile:u;
     private int timeSinceLocationSync:v;
 
-    private (List<org.bukkit.entity.Entity>) List<Entity> passengers:w;
+#if version >= 1.10.2
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengerList:w;
+    private optional (org.bukkit.entity.Entity) Entity opt_passenger:???;
+#else
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengerList:???;
+    private optional (org.bukkit.entity.Entity) Entity opt_passenger:w;
+#endif
+
+    <code>
+    public List<org.bukkit.entity.Entity> getPassengers() {
+        if (T.opt_passengerList.isAvailable()) {
+            return T.opt_passengerList.get(instance);
+        } else {
+            org.bukkit.entity.Entity passenger = T.opt_passenger.get(instance);
+            if (passenger == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return java.util.Arrays.asList(passenger);
+            }
+        }
+    }
+
+    public void setPassengers(List<org.bukkit.entity.Entity> passengers) {
+        if (T.opt_passengerList.isAvailable()) {
+            T.opt_passengerList.set(instance, passengers);
+        } else if (passengers.size() == 0) {
+            T.opt_passenger.set(instance, null);
+        } else {
+            T.opt_passenger.set(instance, passengers.get(0));
+        }
+    }
+    </code>
 
     // Note: on PaperSpigot trackedPlayers is a HashMap instead
     public optional (Map<org.bukkit.entity.Player, Boolean>) Map<EntityPlayer, Boolean> viewersMap:trackedPlayerMap;

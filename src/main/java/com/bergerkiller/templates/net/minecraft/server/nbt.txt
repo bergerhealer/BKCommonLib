@@ -15,19 +15,26 @@ class NBTTagList extends NBTBase {
     public int size();
 #if version >= 1.12
     public (NBTBaseHandle) NBTBase get:i(int index);
-#else
+#elseif version >= 1.10.2
     public (NBTBaseHandle) NBTBase get:h(int index);
+#else
+    public (NBTBaseHandle) NBTBase get:g(int index);
 #endif
 }
 
 class NBTTagCompound extends NBTBase {
     private final (Map<String, NBTBaseHandle>) Map<String, NBTBase> map;
 
-    public int size:d();
     public Set<String> getKeys:c();
     public void remove(String key);
     public void set(String key, (NBTBaseHandle) NBTBase value);
     public (NBTBaseHandle) NBTBase get(String key);
     public boolean contains:hasKey(String key);
     public boolean isEmpty();
+
+    <code>
+    public int size() {
+        return ((java.util.Map<?, ?>) T.map.raw.get(instance)).size();
+    }
+    </code>
 }
