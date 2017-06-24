@@ -13,7 +13,7 @@ class CraftItemStack {
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.server.ItemStack nmsItemStack);
 }
 
-class CraftInventory {
+class CraftInventory extends org.bukkit.inventory.Inventory {
     public (org.bukkit.inventory.Inventory) CraftInventory((Object) IInventory nmsIInventory);
 
     protected final (IInventoryHandle) IInventory handleField:inventory;

@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
@@ -77,9 +78,14 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return this.inventory.getHolder();
     }
 
-    @HookMethod("public abstract org.bukkit.Location getLocation()")
+    // Since 1.10.2
+    @HookMethod(value="public abstract org.bukkit.Location getLocation()", optional=true)
     public Location getLocation() {
-        return this.inventory.getLocation();
+        if (InventoryHandle.T.getLocation.isAvailable()) {
+            return InventoryHandle.T.getLocation.invoke(this.inventory);
+        } else {
+            return null;
+        }
     }
 
     /* Questionable implementations taken over from EntityMinecartContainer */

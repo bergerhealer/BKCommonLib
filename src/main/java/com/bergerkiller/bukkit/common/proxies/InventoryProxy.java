@@ -8,6 +8,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -48,16 +50,31 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         base.setContents(items);
     }
 
-    //TODO FIX
-    @Override
+    // @Override // Since >= v1.10.2
     public ItemStack[] getStorageContents() {
-        return new ItemStack[0];
+        if (InventoryHandle.T.getStorageContents.isAvailable()) {
+            return InventoryHandle.T.getStorageContents.invoke(base);
+        } else {
+            return new ItemStack[0];
+        }
     }
 
-    //TODO FIX
-    @Override
+    // @Override // Since >= v1.10.2
     public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
+        if (InventoryHandle.T.setStorageContents.isAvailable()) {
+            InventoryHandle.T.setStorageContents.invoke(base, itemStacks);
+        } else {
+            // Do nothing.
+        }
+    }
 
+    // @Override // Since >= v1.10.2
+    public Location getLocation() {
+        if (InventoryHandle.T.getLocation.isAvailable()) {
+            return InventoryHandle.T.getLocation.invoke(base);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -210,8 +227,4 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         base.setMaxStackSize(size);
     }
 
-	@Override
-	public Location getLocation() {
-		return base.getLocation();
-	}
 }

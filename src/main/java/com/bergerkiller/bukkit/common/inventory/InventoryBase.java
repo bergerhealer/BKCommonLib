@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.inventory;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -256,19 +257,27 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.toString();
     }
 
-    @Override
+    //@Override // Only on >= v1.10.2
     public Location getLocation() {
         return null;
     }
 
-    @Override
+    //@Override // Only on >= v1.10.2
     public ItemStack[] getStorageContents() {
-        return this.cbProxy.getStorageContents();
+        if (InventoryHandle.T.getStorageContents.isAvailable()) {
+            return InventoryHandle.T.getStorageContents.invoke(this.cbProxy);
+        } else {
+            return new ItemStack[0];
+        }
     }
 
-    @Override
+    //@Override // Only on >= v1.10.2
     public void setStorageContents(ItemStack[] items) throws IllegalArgumentException {
-        this.cbProxy.setStorageContents(items);
+        if (InventoryHandle.T.setStorageContents.isAvailable()) {
+            InventoryHandle.T.setStorageContents.invoke(this.cbProxy, items);
+        } else {
+            // Do nothing.
+        }
     }
 
 }

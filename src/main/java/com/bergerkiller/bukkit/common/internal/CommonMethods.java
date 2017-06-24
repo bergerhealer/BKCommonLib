@@ -86,23 +86,31 @@ public class CommonMethods {
             return "cramming";
         }
 
+        // Special case >= v1.10.2
+        if (cause.name().equals("HOT_FLOOR")) {
+            return "hotFloor";
+        }
+        if (cause.name().equals("FLY_INTO_WALL")) {
+            return "flyIntoWall";
+        }
+        if (cause.name().equals("DRAGON_BREATH")) {
+            return "dragonBreath";
+        }
+
         switch (cause) {
         case FIRE: return "inFire";
         case LIGHTNING: return "lightningBolt";
         case FIRE_TICK: return "onFire";
         case LAVA: return "lava";
-        case HOT_FLOOR: return "hotFloor";
         case SUFFOCATION: return "inWall";
         case DROWNING: return "drown";
         case STARVATION: return "starve";
         case CONTACT: return "cactus";
         case FALL: return "fall";
-        case FLY_INTO_WALL: return "flyIntoWall";
         case VOID: return "outOfWorld";
         case MAGIC: return "magic";
         case WITHER: return "wither";
         case FALLING_BLOCK: return "fallingBlock";
-        case DRAGON_BREATH: return "dragonBreath";
         default: return "generic";
         }
     }

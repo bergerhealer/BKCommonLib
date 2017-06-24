@@ -59,17 +59,26 @@ public class CommonEntityType {
 
         // Figure out what kind of NMS Class belongs to this EntityType by comparing with the internal NMS EntityTypes listing
         Class<?> nmsType = null;
+        final String entityTypeEnumName = entityType.name();
         if (entityType.getTypeId() == -1) {
             // Some special types that don't show up as a registered class
             String nmsName = null;
 
             // <= 1.10.2 (now removed)
-            if (entityType.name().equals("EGG")) {
+            if (entityTypeEnumName.equals("EGG")) {
                 nmsName = "EntityEgg";
-            } else if (entityType.name().equals("AREA_EFFECT_CLOUD")) {
+            } else if (entityTypeEnumName.equals("AREA_EFFECT_CLOUD")) {
                 nmsName = "EntityAreaEffectCloud";
-            } else if (entityType.name().equals("SPLASH_POTION")) {
+            } else if (entityTypeEnumName.equals("SPLASH_POTION")) {
                 nmsName = "EntityPotion";
+
+                // Added in >= 1.10.2
+            } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
+                nmsName = "EntityTippedArrow";
+            } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
+                nmsName = "EntityPotion";
+
+                // Standard types
             } else {
                 switch (entityType) {
                 case PLAYER: nmsName = "EntityPlayer"; break;
@@ -77,8 +86,6 @@ public class CommonEntityType {
                 case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
                 case LIGHTNING: nmsName = "EntityLightning"; break;
                 case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
-                case TIPPED_ARROW: nmsName = "EntityTippedArrow"; break;
-                case LINGERING_POTION: nmsName = "EntityPotion"; break;
                 default: nmsName = null; break;
                 }
             }
@@ -104,7 +111,7 @@ public class CommonEntityType {
                 if (!EntityTypesHandle.T.getName.isAvailable()) {
                     entityTypeName = "MinecartSpawner";
                 }
-            } else if (entityType == EntityType.TIPPED_ARROW) {
+            } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
                 // Old naming system had a bug, DAMMIT BUKKIT
                 if (!EntityTypesHandle.T.getName.isAvailable()) {
                     entityTypeName = "Arrow";

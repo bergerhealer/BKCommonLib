@@ -3,6 +3,7 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import org.bukkit.inventory.Inventory;
 
 /**
@@ -10,7 +11,7 @@ import org.bukkit.inventory.Inventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftInventoryHandle extends Template.Handle {
+public class CraftInventoryHandle extends InventoryHandle {
     /** @See {@link CraftInventoryClass} */
     public static final CraftInventoryClass T = new CraftInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventory");

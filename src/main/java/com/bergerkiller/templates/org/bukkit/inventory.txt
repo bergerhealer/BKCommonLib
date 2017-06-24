@@ -1,0 +1,9 @@
+package org.bukkit.inventory;
+
+class Inventory {
+
+    // These functions were introduced since 1.10.2
+    public optional org.bukkit.Location getLocation();
+    public optional org.bukkit.inventory.ItemStack[] getStorageContents();
+    public optional void setStorageContents(org.bukkit.inventory.ItemStack[] items);
+}
