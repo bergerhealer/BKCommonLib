@@ -207,10 +207,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          * 
          * @param field
          * @param alternativeId alternative Id for MC 1.8.8
-         * @param alternativeType alternative data value type for MC 1.8.8
          * @return datawatcher key
          */
-        public static <T> Key<T> fromTemplate(Template.StaticField.Converted<Key<T>> field, int alternativeId, Class<?> alternativeType) {
+        public static <T> Key<T> fromTemplate(Template.StaticField.Converted<Key<T>> field, int alternativeId) {
             if (field.isAvailable()) {
                 return field.get();
             } else if (Common.evaluateMCVersion("<=", "1.8.8")) {

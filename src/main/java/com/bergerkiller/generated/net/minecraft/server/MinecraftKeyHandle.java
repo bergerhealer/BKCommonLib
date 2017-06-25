@@ -26,7 +26,31 @@ public class MinecraftKeyHandle extends Template.Handle {
         return T.constr_keyToken.newInstance(keyToken);
     }
 
+    public static final MinecraftKeyHandle createNew(int code, String[] parts) {
+        return T.constr_code_parts.newInstance(code, parts);
+    }
+
     /* ============================================================================== */
+
+
+    public static MinecraftKeyHandle createNew(String namespace, String name) {
+        return createNew(0, new String[] { namespace, name });
+    }
+    public String getNamespace() {
+        return T.namespace.get(instance);
+    }
+
+    public void setNamespace(String value) {
+        T.namespace.set(instance, value);
+    }
+
+    public String getName() {
+        return T.name.get(instance);
+    }
+
+    public void setName(String value) {
+        T.name.set(instance, value);
+    }
 
     /**
      * Stores class members for <b>net.minecraft.server.MinecraftKey</b>.
@@ -34,6 +58,10 @@ public class MinecraftKeyHandle extends Template.Handle {
      */
     public static final class MinecraftKeyClass extends Template.Class<MinecraftKeyHandle> {
         public final Template.Constructor.Converted<MinecraftKeyHandle> constr_keyToken = new Template.Constructor.Converted<MinecraftKeyHandle>();
+        public final Template.Constructor.Converted<MinecraftKeyHandle> constr_code_parts = new Template.Constructor.Converted<MinecraftKeyHandle>();
+
+        public final Template.Field<String> namespace = new Template.Field<String>();
+        public final Template.Field<String> name = new Template.Field<String>();
 
     }
 

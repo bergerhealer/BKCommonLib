@@ -58,11 +58,11 @@ public class EntityLivingHandle extends EntityHandle {
     }
 
 
-    public static final Key<Byte> DATA_LIVING_FLAGS = Key.fromTemplate(T.DATA_LIVING_FLAGS, -1, byte.class);
-    public static final Key<Float> DATA_HEALTH = Key.fromTemplate(T.DATA_HEALTH, 6, float.class);
-    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7, int.class);
-    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8, byte.class);
-    public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9, byte.class);
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.fromTemplate(T.DATA_LIVING_FLAGS, -1);
+    public static final Key<Float> DATA_HEALTH = Key.fromTemplate(T.DATA_HEALTH, 6);
+    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9);
 
 
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {

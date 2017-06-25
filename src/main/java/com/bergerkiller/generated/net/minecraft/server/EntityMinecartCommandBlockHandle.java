@@ -14,7 +14,6 @@ public class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHand
     public static final EntityMinecartCommandBlockClass T = new EntityMinecartCommandBlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartCommandBlockHandle.class, "net.minecraft.server.EntityMinecartCommandBlock");
 
-    public static final Key<String> DATA_COMMAND = T.DATA_COMMAND.getSafe();
     /* ============================================================================== */
 
     public static EntityMinecartCommandBlockHandle createHandle(Object handleInstance) {
@@ -26,12 +25,18 @@ public class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHand
 
     /* ============================================================================== */
 
+
+    public static final Key<String> DATA_COMMAND = Key.fromTemplate(T.DATA_COMMAND, 23);
+    public static final Key<Object> DATA_PREVIOUS_COMMAND = Key.fromTemplate(T.DATA_PREVIOUS_COMMAND, 24);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartCommandBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartCommandBlockClass extends Template.Class<EntityMinecartCommandBlockHandle> {
+        @Template.Optional
         public final Template.StaticField.Converted<Key<String>> DATA_COMMAND = new Template.StaticField.Converted<Key<String>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Object>> DATA_PREVIOUS_COMMAND = new Template.StaticField.Converted<Key<Object>>();
 
     }
 

@@ -876,7 +876,11 @@ public class NMSPacketClasses {
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSChunk.T.getType(), int.class);
 
         public CommonPacket newInstance(Chunk chunk) {
-            return newInstance(Conversion.toChunkHandle.convert(chunk));
+            return newInstance(chunk, 0xFFFF);
+        }
+
+        public CommonPacket newInstance(Chunk chunk, int sectionsMask) {
+            return constructor1.newInstance(Conversion.toChunkHandle.convert(chunk), sectionsMask);
         }
 
         public CommonPacket newInstance(Object chunk) {

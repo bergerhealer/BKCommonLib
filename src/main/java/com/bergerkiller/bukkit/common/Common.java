@@ -187,6 +187,9 @@ public class Common {
                     if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcher$Item")) {
                         return "net.minecraft.server.v1_8_R3.DataWatcher$WatchableObject";
                     }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.PlayerChunk")) {
+                        return "net.minecraft.server.v1_8_R3.PlayerChunkMap$PlayerChunk"; // nested on 1.8.8
+                    }
 
                     // We proxy a bunch of classes, because they don't exist in 1.8.8
                     // Writing custom wrappers with switches would be too tiresome

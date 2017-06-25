@@ -7,7 +7,18 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 class MinecraftKey {
+    protected final String namespace:a;
+    protected final String name:b;
+
     public (MinecraftKeyHandle) MinecraftKey(String keyToken);
+
+    protected transient (MinecraftKeyHandle) MinecraftKey(int code, String[] parts);
+
+    <code>
+    public static MinecraftKeyHandle createNew(String namespace, String name) {
+        return createNew(0, new String[] { namespace, name });
+    }
+    </code>
 }
 
 optional class SoundEffectType {

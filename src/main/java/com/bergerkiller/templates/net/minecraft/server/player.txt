@@ -1,10 +1,12 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 
 class PlayerAbilities {
     public boolean isInvulnerable;
@@ -19,20 +21,115 @@ class PlayerAbilities {
 }
 
 class PlayerChunk {
+#if version >= 1.10.2
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
     public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
+#else
+    private final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:b;
+#endif
+
     private final (IntVector2) ChunkCoordIntPair location;
-    public (org.bukkit.Chunk) Chunk chunk;
+
+#if version >= 1.10.2
+    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:chunk;
     private int dirtyCount;
     private int dirtySectionMask:h;
     private boolean done;
+#else
+    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:???;
+    private unknown short[] dirtyBlocks;
+    private int dirtyCount;
+    private int dirtySectionMask:f;
+    private boolean done:loaded;
+
+    // Nested class is appended as a hidden field at the end of the class declaration
+    private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap:this$0;
+#endif
 
     public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);
     public void removePlayer:b((org.bukkit.entity.Player) EntityPlayer player);
+
+#if version >= 1.10.2
     public void sendChunk((org.bukkit.entity.Player) EntityPlayer player);
+#else
+    public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
+#endif
+
+    <code>
+    public org.bukkit.Chunk getChunk(org.bukkit.World world) {
+        if (T.opt_loaded_chunk.isAvailable()) {
+            return T.opt_loaded_chunk.get(instance);
+        } else {
+            // Fallback for 1.8.8: check if loaded, only then get the chunk
+            IntVector2 loc = this.getLocation();
+            if (world.isChunkLoaded(loc.x, loc.z)) {
+                return world.getChunkAt(loc.x, loc.z);
+            } else {
+                return null;
+            }
+        }
+    }
+    </code>
 }
 
 class PlayerChunkMap {
+    private final (List<org.bukkit.entity.Player>) List<EntityPlayer> managedPlayers;
 
+#if version >= 1.10.2
+    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:???;
+    private final unknown Set<PlayerChunk> dirtyBlockChunks:f;
+    private final unknown List<PlayerChunk> g;
+    private final unknown List<PlayerChunk> h;
+    private final unknown List<PlayerChunk> i;
+    private int radius:j;
+#else
+    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:e;
+    private final unknown Queue<PlayerChunk> f;
+    private int radius:g;
+#endif
+
+#if version >= 1.10.2
+    public optional void markForUpdate_1_10_2:a((PlayerChunkHandle) PlayerChunk playerchunk);
+#else
+    public optional void markForUpdate_1_10_2:???((PlayerChunkHandle) PlayerChunk playerchunk);
+#endif
+    <code>
+    public void markForUpdate(PlayerChunkHandle playerChunk) {
+        if (T.markForUpdate_1_10_2.isAvailable()) {
+            T.markForUpdate_1_10_2.invoke(instance, playerChunk);
+        } else {
+            T.updateQueue_1_8_8.get(instance).add(playerChunk);
+        }
+    }
+    </code>
+
+    private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
+
+#if version >= 1.10.2
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:getChunk(int x, int z);
+#else
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:???(int x, int z);
+#endif
+    <code>
+    public PlayerChunkHandle getChunk(int x, int z) {
+        if (T.getChunk_1_10_2.isAvailable()) {
+            return T.getChunk_1_10_2.invoke(instance, x, z);
+        } else {
+            return T.getChunk_1_8_8.invoke(instance, x, z, false);
+        }
+    }
+    </code>
+
+    public void flagDirty((IntVector3) BlockPosition blockposition);
+
+    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
+
+    <code>
+    public void flagDirty(int x, int y, int z) {
+        T.flagDirty.raw.invoke(instance, BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
+    }
+    </code>
 
 }

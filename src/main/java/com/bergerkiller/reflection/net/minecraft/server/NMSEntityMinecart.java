@@ -57,6 +57,6 @@ public class NMSEntityMinecart {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartCommandBlock");
 
         public static final DataWatcher.Key<String> DATA_COMMAND = EntityMinecartCommandBlockHandle.DATA_COMMAND;
-        public static final DataWatcher.Key<Object> DATA_PREVIOUS_OUTPUT = DataWatcher.Key.fromStaticField(T, "b");
+        public static final DataWatcher.Key<Object> DATA_PREVIOUS_OUTPUT = EntityMinecartCommandBlockHandle.DATA_PREVIOUS_COMMAND;
     }
 }

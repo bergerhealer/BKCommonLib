@@ -40,6 +40,19 @@ public class PlayerChunkHandle extends Template.Handle {
         T.sendChunk.invoke(instance, player);
     }
 
+
+    public org.bukkit.Chunk getChunk(org.bukkit.World world) {
+        if (T.opt_loaded_chunk.isAvailable()) {
+            return T.opt_loaded_chunk.get(instance);
+        } else {
+            IntVector2 loc = this.getLocation();
+            if (world.isChunkLoaded(loc.x, loc.z)) {
+                return world.getChunkAt(loc.x, loc.z);
+            } else {
+                return null;
+            }
+        }
+    }
     public PlayerChunkMapHandle getPlayerChunkMap() {
         return T.playerChunkMap.get(instance);
     }
@@ -62,14 +75,6 @@ public class PlayerChunkHandle extends Template.Handle {
 
     public void setLocation(IntVector2 value) {
         T.location.set(instance, value);
-    }
-
-    public Chunk getChunk() {
-        return T.chunk.get(instance);
-    }
-
-    public void setChunk(Chunk value) {
-        T.chunk.set(instance, value);
     }
 
     public int getDirtyCount() {
@@ -104,7 +109,8 @@ public class PlayerChunkHandle extends Template.Handle {
         public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMap = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
         public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
-        public final Template.Field.Converted<Chunk> chunk = new Template.Field.Converted<Chunk>();
+        @Template.Optional
+        public final Template.Field.Converted<Chunk> opt_loaded_chunk = new Template.Field.Converted<Chunk>();
         public final Template.Field.Integer dirtyCount = new Template.Field.Integer();
         public final Template.Field.Integer dirtySectionMask = new Template.Field.Integer();
         public final Template.Field.Boolean done = new Template.Field.Boolean();

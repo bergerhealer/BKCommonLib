@@ -188,10 +188,6 @@ class ChunkProviderServer {
 
 }
 
-class PlayerChunkMap {
-    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
-}
-
 class WorldData {
     public (WorldTypeHandle) WorldType getType();
 

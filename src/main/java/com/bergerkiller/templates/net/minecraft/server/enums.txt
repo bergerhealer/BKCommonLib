@@ -116,7 +116,11 @@ class EnumGamemode {
 class EnumProtocol {
     enum (EnumProtocolHandle) EnumProtocol PLAY;
 
+#if version >= 1.10.2
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
+#else
+    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:j;
+#endif
 }
 
 class EnumProtocolDirection {

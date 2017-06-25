@@ -18,19 +18,20 @@ import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunk;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerChunkMap;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
@@ -588,9 +589,9 @@ public class WorldUtil extends ChunkUtil {
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
-        Object playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap().getRaw();
-        Object chunk = NMSPlayerChunkMap.getChunk.invoke(playerChunkMap, chunkX, chunkZ);
-        if (chunk != null && !NMSPlayerChunk.players.get(chunk).isEmpty()) {
+        PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
+        PlayerChunkHandle playerChunk = playerChunkMap.getChunk(chunkX, chunkZ);
+        if (playerChunk != null && !playerChunk.getPlayers().isEmpty()) {
             // Simply remove and re-add the players to the chunk. Does an instant chunk resend, though.
             // This doesn't work because block updates disable in the chunk permanently
             /*
@@ -612,10 +613,10 @@ public class WorldUtil extends ChunkUtil {
             // Manual resend because none of the above work without bugs
             // We use 0x1FFFF instead of 0xFFFF to avoid sending biome data, as that despawns the entities
             // The 0x10000 is an ignored mask as it is outside of the range of chunk slices.
-            Object chunkHandle = NMSPlayerChunk.chunk.getInternal(chunk);
-            if (chunkHandle != null) {
-                List<Player> old_players = new ArrayList<Player>(NMSPlayerChunk.players.get(chunk));
-                CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunkHandle, 0x1FFFF);
+            Chunk chunk = playerChunk.getChunk(world);
+            if (chunk != null) {
+                List<Player> old_players = new ArrayList<Player>(playerChunk.getPlayers());
+                CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk, 0x1FFFF);
                 for (Player player : old_players) {
                     PacketUtil.sendPacket(player, packet);
                 }
@@ -635,8 +636,9 @@ public class WorldUtil extends ChunkUtil {
      * @param blockZ of the block
      */
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
-        Object playerChunkMap = NMSWorldServer.playerChunkMap.get(Conversion.toWorldHandle.convert(world));
-        NMSPlayerChunkMap.flagBlockDirty(playerChunkMap, blockX, blockY, blockZ);
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        PlayerChunkMapHandle playerChunkMap = WorldServerHandle.T.playerChunkMapField.get(worldHandle);
+        playerChunkMap.flagDirty(blockX, blockY, blockZ);
     }
 
     /**

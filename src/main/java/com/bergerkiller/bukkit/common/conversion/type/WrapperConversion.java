@@ -444,7 +444,7 @@ public class WrapperConversion {
         return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcherObject<T>")
+    @ConverterMethod(input="net.minecraft.server.DataWatcherObject<?>")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> toKey(Object nmsDataWatcherObjectHandle) {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T>(nmsDataWatcherObjectHandle);
     }
