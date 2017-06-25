@@ -61,14 +61,32 @@ class DataWatcher {
     public boolean isEmpty:d();
 
     class DataWatcher.Item {
+#if version >= 1.10.2
+        private optional final int typeId:???;
         private final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
         private T value:b;
         private boolean changed:c;
+#else
+        private optional final int typeId:a;
+        private final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key:b;
+        private Object value:c;
+        private boolean changed:d;
+#endif
     }
 }
 
 class DataWatcherObject {
-    // Only used on MC 1.8.8 and defined in the proxy, to allow for backwards compatibility
+#if version >= 1.10.2
+    public int getId:a();
+    public optional (Object) DataWatcherSerializer<T> getSerializer:b()
+#else
+    public int getId();
+    public optional (Object) DataWatcherSerializer<T> getSerializer:???()
+#endif
+
     public optional (DataWatcherObjectHandle) DataWatcherObject(int index);
-    public optional int getId();
+}
+
+optional class DataWatcherRegistry {
+    public static int getSerializerId:b((Object) DataWatcherSerializer<?> paramDataWatcherSerializer);
 }

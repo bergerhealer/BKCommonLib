@@ -1,6 +1,10 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
+
 import com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
 
 class PlayerAbilities {
     public boolean isInvulnerable;
@@ -12,4 +16,23 @@ class PlayerAbilities {
     public float walkSpeed;
 
     public (PlayerAbilitiesHandle) PlayerAbilities();
+}
+
+class PlayerChunk {
+    private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
+    public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
+    private final (IntVector2) ChunkCoordIntPair location;
+    public (org.bukkit.Chunk) Chunk chunk;
+    private int dirtyCount;
+    private int dirtySectionMask:h;
+    private boolean done;
+
+    public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);
+    public void removePlayer:b((org.bukkit.entity.Player) EntityPlayer player);
+    public void sendChunk((org.bukkit.entity.Player) EntityPlayer player);
+}
+
+class PlayerChunkMap {
+
+
 }

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -53,6 +54,7 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 public class CommonMapController implements PacketListener, Listener {
@@ -545,7 +547,7 @@ public class CommonMapController implements PacketListener, Listener {
                     continue;
                 }
 
-                Object trackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+                EntityTrackerEntryHandle trackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
                 if (trackerEntry == null) {
                     // Item Frame isn't tracked on the server, so no players can view it
                     info.remove();
@@ -564,7 +566,7 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapId != -1) {
-                    Set<Player> liveViewers = NMSEntityTrackerEntry.viewers.get(trackerEntry);
+                    Collection<Player> liveViewers = trackerEntry.getViewers();
                     boolean changes = LogicUtil.synchronizeList(info.viewers, liveViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
                         @Override
                         public boolean isItem(Player item, Player value) {

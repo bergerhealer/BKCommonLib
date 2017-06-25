@@ -19,7 +19,18 @@ public class ChatTextTest {
         String msg = "Hello, " + ChatColor.RED + "World!";
         ChatText text = ChatText.fromMessage(msg);
         assertEquals(msg, text.getMessage());
-        assertEquals("{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}",
-                text.getJson());
+
+        String expected;
+        if (Common.evaluateMCVersion(">=", "1.10.2")) {
+            expected = "{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
+        } else {
+            expected = "{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
+        }
+        String result = text.getJson();
+        if (!expected.equals(result)) {
+            System.out.println("EXPECTED: " + expected);
+            System.out.println("INSTEAD : " + result);;
+            fail("Chat text conversion to JSON is not working correctly");
+        }
     }
 }

@@ -2,7 +2,6 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
@@ -15,14 +14,17 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+/**
+ * <b>Deprecated: </b>Use {@link TileEntityHandle} instead
+ */
+@Deprecated
 public class NMSTileEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("TileEntity");
-    public static final TranslatorFieldAccessor<World> world = T.selectField("protected World world").translate(DuplexConversion.world);
-    public static final TranslatorFieldAccessor<IntVector3> position = T.selectField("protected BlockPosition position").translate(DuplexConversion.blockPosition);
-    private static final MethodAccessor<Object> getUpdatePacket = T.selectMethod("public PacketPlayOutTileEntityData getUpdatePacket()");
+    public static final TranslatorFieldAccessor<World> world = TileEntityHandle.T.world_field.toFieldAccessor();
+    public static final TranslatorFieldAccessor<IntVector3> position = TileEntityHandle.T.position_field.toFieldAccessor();
 
-    public static final MethodAccessor<Void> load = T.selectMethod("public void a(NBTTagCompound nbttagcompound)");
-    public static final MethodAccessor<Void> save = T.selectMethod("public NBTTagCompound save(NBTTagCompound nbttagcompound)");
+    public static final MethodAccessor<Void> load = TileEntityHandle.T.load.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> save = TileEntityHandle.T.save.raw.toMethodAccessor();
 
     public static boolean hasWorld(Object tileEntity) {
         return TileEntityHandle.T.getWorld.invoke(tileEntity) != null;
@@ -44,7 +46,7 @@ public class NMSTileEntity {
         if (tileEntity == null) {
             return null;
         }
-        return Conversion.toCommonPacket.convert(getUpdatePacket.invoke(tileEntity));
+        return TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
 
     public static Block getBlock(Object tileEntity) {

@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
@@ -179,10 +180,9 @@ public class PacketUtil {
         if (entity == null || packet == null) return;
 
         EntityTracker tracker = WorldUtil.getTracker(entity.getWorld());
-        Object entry = tracker.getEntry(entity);
+        EntityTrackerEntryHandle entry = tracker.getEntry(entity);
         if (entry != null) {
-            Set<Player> viewers = NMSEntityTrackerEntry.viewers.get(entry);
-            for (Player viewer : viewers) {
+            for (Player viewer : entry.getViewers()) {
                 sendPacket(viewer, packet);
             }
         }

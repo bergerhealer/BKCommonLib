@@ -1,7 +1,16 @@
 package net.minecraft.server;
 
-class RegistryBlockID {
+// Only available >= MC 1.10.2
+optional class RegistryBlockID {
     public int getId(T value);
+}
+
+class RegistryID {
+#if version >= 1.10.2
+    public int getId(K value);
+#else
+    public int getId:b(T value);
+#endif
 }
 
 class RegistryMaterials {

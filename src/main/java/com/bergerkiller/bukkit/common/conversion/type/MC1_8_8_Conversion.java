@@ -8,12 +8,12 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 public class MC1_8_8_Conversion {
 
     @ConverterMethod()
-    public int dataWatcherObjectToId(com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?> dataWatcherObject) {
+    public static int dataWatcherObjectToId(com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?> dataWatcherObject) {
         return ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?>) dataWatcherObject).getId();
     }
 
     @ConverterMethod()
-    public com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?> dataWatcherObjectFromId(int id) {
+    public static com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?> dataWatcherObjectFromId(int id) {
         return new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<Object>(id);
     }
 
@@ -30,5 +30,10 @@ public class MC1_8_8_Conversion {
     @ConverterMethod()
     public static Integer getMobEffectListId(com.bergerkiller.bukkit.common.internal.proxy.MobEffectList list) {
         return list.getId();
+    }
+
+    @ConverterMethod(input="net.minecraft.server.DataWatcher.WatchableObject")
+    public static com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> watchableObjectToItem(Object watchableObject) {
+        return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>(watchableObject);
     }
 }

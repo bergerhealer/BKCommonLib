@@ -23,6 +23,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
@@ -67,7 +68,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             return null;
         }
         final EntityNetworkController result;
-        final Object entityTrackerEntry = WorldUtil.getTrackerEntry(entity);
+        final Object entityTrackerEntry = Handle.getRaw(WorldUtil.getTrackerEntry(entity));
         if (entityTrackerEntry == null) {
             return null;
         }
@@ -101,7 +102,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new RuntimeException("Can not set the network controller when no world is known! (need to spawn it?)");
         }
         final EntityTracker tracker = WorldUtil.getTracker(getWorld());
-        final Object storedEntry = tracker.getEntry(entity);
+        final Object storedEntry = Handle.getRaw(tracker.getEntry(entity));
 
         // Properly handle a previously set controller
         EntityTrackerHook hook = EntityTrackerHook.get(storedEntry, EntityTrackerHook.class);
@@ -158,7 +159,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // Attach (new?) entry to the world
         if (storedEntry != newEntry) {
-            tracker.setEntry(entity, newEntry);
+            tracker.setEntry(entity, EntityTrackerEntryHandle.createHandle(newEntry));
 
             // Make sure to update the viewers
             NMSEntityTrackerEntry.scanPlayers(newEntry, getWorld().getPlayers());
@@ -402,13 +403,17 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
     private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {
         final EntityTracker trackerMap = WorldUtil.getTracker(newInstance.getWorld().getWorld());
-        Object entry = trackerMap.getEntry(entityId);
+        EntityTrackerEntryHandle entry = trackerMap.getEntry(entityId);
         if (entry != null) {
-            EntityHandle tracker = EntityHandle.createHandle(NMSEntityTrackerEntry.tracker.getInternal(entry));
+
+            EntityHandle tracker = entry.getTracker();
             if (tracker != null && tracker.getId() == newInstance.getId()) {
-                NMSEntityTrackerEntry.tracker.setInternal(entry, newInstance.getRaw());
+                entry.setTracker(newInstance);
             }
-            replaceInList((List<?>) NMSEntityTrackerEntry.passengers.getInternal(entry), newInstance);
+
+            List<EntityHandle> passengers = new ArrayList<EntityHandle>(tracker.getPassengers());
+            replaceInList(passengers, newInstance);
+            tracker.setPassengers(passengers);
         }
     }
 

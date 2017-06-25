@@ -147,6 +147,8 @@ public class DataWatcherHandle extends Template.Handle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class ItemClass extends Template.Class<ItemHandle> {
+            @Template.Optional
+            public final Template.Field.Integer typeId = new Template.Field.Integer();
             public final Template.Field.Converted<Key<?>> key = new Template.Field.Converted<Key<?>>();
             public final Template.Field<Object> value = new Template.Field<Object>();
             public final Template.Field.Boolean changed = new Template.Field.Boolean();

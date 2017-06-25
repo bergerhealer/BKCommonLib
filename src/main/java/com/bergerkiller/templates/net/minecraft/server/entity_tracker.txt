@@ -1,10 +1,20 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class EntityTracker {
+    private final (org.bukkit.World) WorldServer world;
+    private final (Set<EntityTrackerEntryHandle>) Set<EntityTrackerEntry> entries:c;
+    public final (com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>) IntHashMap<EntityTrackerEntry> trackedEntities;
+    private int viewDistance:e;
 
+#if version >= 1.10.2
+    public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
+#else
+    public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet packet);
+#endif
 }
 
 class EntityTrackerEntry {
@@ -55,6 +65,23 @@ class EntityTrackerEntry {
 
     public int tickCounter:m;
 #endif
+
+    // Constructors, with a helper method to choose the right one (difference between MC 1.8.8 and 1.10.2 onwards)
+    // On MC 1.8.8, the playerViewDistance field is ignored.
+    public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile);
+    public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int updateInterval, boolean isMobile);
+    <code>
+    public static EntityTrackerEntryHandle createNew(org.bukkit.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
+        if (T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.isAvailable()) {
+            return T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.newInstance(
+                entity, viewDistance, playerViewDistance, updateInterval, isMobile);
+        } else {
+            return T.constr_entity_viewDistance_updateInterval_isMobile.newInstance(
+                entity, viewDistance, updateInterval, isMobile);
+        }
+    }
+    </code>
+
 
     <code>
     // Minimal change of x/y/z position or rotation that is supported
@@ -206,6 +233,9 @@ class EntityTrackerEntry {
     public void hideForAll:a();
 
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
+
+    public void scanPlayers((List<org.bukkit.entity.Player>) List<EntityHuman> playerList);
+    public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
 
 #if version >= 1.10.2
     private (CommonPacket) Packet<?> getSpawnPacket:e();

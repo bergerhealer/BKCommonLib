@@ -11,6 +11,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
 
 public class BlockDataImpl extends BlockData {
     private BlockHandle block;
@@ -53,7 +54,16 @@ public class BlockDataImpl extends BlockData {
                 block_const = new BlockDataConstant(blockData);
             }
             BY_BLOCK_DATA.put(rawIBlockData, block_const);
-            BY_ID_AND_DATA[idReg.getId(rawIBlockData)] = block_const;
+
+            int id;
+            if (RegistryBlockIDHandle.T.isAssignableFrom(BlockHandle.REGISTRY_ID)) {
+                // >= MC 1.10.2
+                id = RegistryBlockIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, rawIBlockData);
+            } else {
+                // <= MC 1.8.8
+                id = RegistryIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, rawIBlockData);
+            }
+            BY_ID_AND_DATA[id] = block_const;
         }
 
         BY_BLOCK_DATA.put(null, AIR);

@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
@@ -41,6 +42,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
@@ -56,8 +58,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSMobEffect;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
@@ -141,7 +141,9 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.TileEntity")
     public static org.bukkit.block.Block getBlockFromTileEntity(Object nmsTileEntityHandle) {
-        return NMSTileEntity.getBlock(nmsTileEntityHandle);
+        TileEntityHandle handle = TileEntityHandle.createHandle(nmsTileEntityHandle);
+        BlockPositionHandle pos = handle.getPosition();
+        return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
     @ConverterMethod(input="net.minecraft.server.TileEntity")
@@ -359,6 +361,11 @@ public class WrapperConversion {
         return new IntHashMap<T>(nmsIntHashMapHandle);
     }
 
+    @ConverterMethod(input="net.minecraft.server.IntHashMap<?>")
+    public static IntHashMap<Object> toRawIntHashMap(Object nmsIntHashMapHandle) {
+        return new IntHashMap<Object>(nmsIntHashMapHandle);
+    }
+
     @ConverterMethod(input="net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction")
     public static UseAction toUseAction(Object nmsEnumEntityUseActionHandle) {
         return UseAction.fromHandle(nmsEnumEntityUseActionHandle);
@@ -418,11 +425,13 @@ public class WrapperConversion {
         return new ChunkSection(nmsChunkSectionHandle);
     }
 
-    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
-        int id = NMSMobEffect.List.getId.invoke(null, nmsMobEffectListHandle);
+        int id = MobEffectListHandle.T.getId.invokeVA(nmsMobEffectListHandle);
+
+        @SuppressWarnings("deprecation")
         PotionEffectType type = PotionEffectType.getById(id);
+
         if (type != null) {
             return type;
         } else {

@@ -1,24 +1,46 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 
 class TileEntity {
+    protected (org.bukkit.World) World world_field:world;
+    protected (IntVector3) BlockPosition position_field:position;
+
     public (WorldHandle) World getWorld();
 
     public (BlockPositionHandle) BlockPosition getPosition();
-
-#if version >= 1.10.2
-    public (org.bukkit.Material) Block getType:getBlock();
-#else
-    public (org.bukkit.Material) Block getType:w();
-#endif
 
 #if version >= 1.11.2
     public int getRawData:v();
 #else
     public int getRawData:u();
 #endif
+
+#if version >= 1.10.2
+    public (org.bukkit.Material) Block getType:getBlock();
+    public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
+    public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);
+    public (void) NBTTagCompound save((CommonTagCompound) NBTTagCompound nbttagcompound);
+#else
+    public (org.bukkit.Material) Block getType:w();
+    public (CommonPacket) Packet getUpdatePacket();
+    public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);
+    public void save:b((CommonTagCompound) NBTTagCompound nbttagcompound);
+#endif
+
+    <code>
+    public org.bukkit.block.BlockState toBukkit() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toBlockState.convert(getRaw());
+    }
+
+    public static TileEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
+    }
+    </code>
 }

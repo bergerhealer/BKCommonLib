@@ -39,6 +39,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -916,9 +917,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         PacketUtil.broadcastEntityPacket(entity, packet);
 
         // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
-        Object entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
+        EntityTrackerEntryHandle entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
         if (entry != null) {
-            NMSEntityTrackerEntry.passengers.set(entry, newPassengers);
+            entry.setPassengers(newPassengers);
         }
     }
 

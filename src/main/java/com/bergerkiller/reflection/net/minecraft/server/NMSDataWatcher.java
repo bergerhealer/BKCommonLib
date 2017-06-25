@@ -1,11 +1,9 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
@@ -14,6 +12,10 @@ import java.util.List;
 
 import org.bukkit.entity.Entity;
 
+/**
+ * <b>Deprecated: </b>Use the appropriate {@link DataWatcherHandle} and related classes instead
+ */
+@Deprecated
 public class NMSDataWatcher {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher");
 
@@ -78,24 +80,6 @@ public class NMSDataWatcher {
     @Deprecated
     public static Object create() {
         return T.newInstance();
-    }
-
-    public static class Object2 {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcherObject");
-        public static final MethodAccessor<Integer> getId = T.selectMethod("public int a()");
-        public static final MethodAccessor<Object> getSerializer = T.selectMethod("public DataWatcherSerializer<T> b()");
-    }
-
-    public static class Registry {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcherRegistry");
-        public static final MethodAccessor<Integer> getSerializerId = T.selectMethod("public static int b(DataWatcherSerializer<?> paramDataWatcherSerializer)");
-    }
-
-    public static class Item {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher.Item");
-        public static final TranslatorFieldAccessor<DataWatcher.Key<?>> key = T.nextField("private final DataWatcherObject<T> a").translate(DuplexConversion.dataWatcherKey);
-        public static final FieldAccessor<Object> value = T.nextFieldSignature("private T b");
-        public static final FieldAccessor<Boolean> changed = T.nextFieldSignature("private boolean c");
     }
 
 }

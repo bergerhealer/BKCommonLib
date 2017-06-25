@@ -5,12 +5,22 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class MobEffect {
+#if version >= 1.10.2
     private final (MobEffectListHandle) MobEffectList effectList:b;
+#else
+    private (MobEffectListHandle) int effectList:effectId;
+#endif
+
     private int duration;
     private int amplification;
     private boolean splash;
     private boolean ambient;
+
+#if version >= 1.10.2
     private boolean particles:h;
+#else
+    private boolean particles:particles;
+#endif
 
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
 }

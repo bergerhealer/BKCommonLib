@@ -14,7 +14,7 @@ import com.bergerkiller.generated.net.minecraft.server.InventoryEnderChestHandle
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
@@ -219,7 +219,7 @@ public class NBTUtil {
      * @param data to load into the blockState
      */
     public static void loadBlockState(BlockState blockState, CommonTagCompound data) {
-        NMSTileEntity.load.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getRawHandle());
+        TileEntityHandle.fromBukkit(blockState).load(data);
     }
 
     /**
@@ -243,7 +243,7 @@ public class NBTUtil {
         if (data == null) {
             data = new CommonTagCompound();
         }
-        NMSTileEntity.save.invoke(Conversion.toTileEntityHandle.convert(blockState), data.getRawHandle());
+        TileEntityHandle.fromBukkit(blockState).save(data);
         return data;
     }
 }

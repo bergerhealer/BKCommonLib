@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTracker;
 
@@ -96,8 +97,8 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @param entityTrackerEntry to set to
      * @return previously set entity tracker entry, null if there was none
      */
-    public Object setEntry(Entity entity, Object entityTrackerEntry) {
-        return NMSEntityTracker.setEntry(handle.getRaw(), entity, entityTrackerEntry);
+    public Object setEntry(Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
+        return NMSEntityTracker.setEntry(handle.getRaw(), entity, entityTrackerEntry.getRaw());
     }
 
     /**
@@ -106,8 +107,8 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @param entity to get the entry of
      * @return entity tracker entry
      */
-    public Object getEntry(Entity entity) {
-        return NMSEntityTracker.getEntry(handle.getRaw(), entity);
+    public EntityTrackerEntryHandle getEntry(Entity entity) {
+        return EntityTrackerEntryHandle.createHandle(this.handle.getTrackedEntities().get(entity.getEntityId()));
     }
 
     /**
@@ -116,7 +117,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @param id of the entity to get the entry of
      * @return entity tracker entry
      */
-    public Object getEntry(int id) {
-        return NMSEntityTracker.getEntry(handle.getRaw(), id);
+    public EntityTrackerEntryHandle getEntry(int id) {
+        return EntityTrackerEntryHandle.createHandle(this.handle.getTrackedEntities().get(id));
     }
 }

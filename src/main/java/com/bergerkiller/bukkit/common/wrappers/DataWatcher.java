@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -167,12 +168,17 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
         /**
          * Gets the unique global serializer Id of this key.
          * This id is unique for this data value type.
+         * Always returns -1 on MC 1.8.8.
          * 
          * @return Serializer Id
          */
         public int getSerializerId() {
-            Object s = NMSDataWatcher.Object2.getSerializer.invoke(this.handle.getRaw());
-            return NMSDataWatcher.Registry.getSerializerId.invoke(null, s);
+            if (DataWatcherObjectHandle.T.getSerializer.isAvailable() && DataWatcherRegistryHandle.T.isAvailable()) {
+                Object s = DataWatcherObjectHandle.T.getSerializer.invoke(this.handle.getRaw());
+                return DataWatcherRegistryHandle.getSerializerId(s);
+            } else {
+                return -1;
+            }
         }
 
         /**
@@ -181,7 +187,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          * @return Id
          */
         public int getId() {
-            return NMSDataWatcher.Object2.getId.invoke(this.handle.getRaw());
+            return DataWatcherObjectHandle.T.getId.invoke(this.handle.getRaw());
         }
 
         /**
@@ -192,7 +198,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          * @return datawatcher key
          */
         public static <T> Key<T> fromStaticField(ClassTemplate<?> template, String fieldname) {
-            return new DataWatcher.Key<T>(template.getStaticFieldValue(fieldname, NMSDataWatcher.Object2.T.getType()));
+            return new DataWatcher.Key<T>(template.getStaticFieldValue(fieldname, DataWatcherObjectHandle.T.getType()));
         }
 
         /**
@@ -209,7 +215,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
                 return field.get();
             } else if (Common.evaluateMCVersion("<=", "1.8.8")) {
                 // For MC 1.8.8 we have a fallback wrapping our ID in a custom implementation
-                return null;
+                Object dwo = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<T>(alternativeId);
+                return new Key<T>(dwo);
             } else {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to find datawatcher key constant", new RuntimeException());
                 return null;
@@ -230,21 +237,21 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
 
         @SuppressWarnings("unchecked")
         public Key<V> getKey() {
-            return (Key<V>) NMSDataWatcher.Item.key.get(this.getRawHandle());
+            return (Key<V>) this.handle.getKey();
         }
 
         public boolean isChanged() {
-            return NMSDataWatcher.Item.changed.get(this.getRawHandle());
+            return this.handle.isChanged();
         }
 
         @SuppressWarnings("unchecked")
         public V getValue() {
-            return (V) NMSDataWatcher.Item.value.get(this.getRawHandle());
+            return (V) this.handle.getValue();
         }
 
         public void setValue(V value, boolean changed) {
-            NMSDataWatcher.Item.value.set(this.getRawHandle(), value);
-            NMSDataWatcher.Item.changed.set(this.getRawHandle(), changed);
+            this.handle.setValue(value);
+            this.handle.setChanged(true);
         }
 
         @Override

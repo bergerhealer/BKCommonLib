@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -419,7 +420,7 @@ public class WorldUtil extends ChunkUtil {
      * @param entity to get it for
      * @return entity tracker entry, or null if none is set
      */
-    public static Object getTrackerEntry(org.bukkit.entity.Entity entity) {
+    public static EntityTrackerEntryHandle getTrackerEntry(org.bukkit.entity.Entity entity) {
         return getTracker(entity.getWorld()).getEntry(entity);
     }
 
@@ -431,7 +432,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the previous tracker entry for the entity, or null if there was
      * none
      */
-    public static Object setTrackerEntry(org.bukkit.entity.Entity entity, Object entityTrackerEntry) {
+    public static Object setTrackerEntry(org.bukkit.entity.Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
         return getTracker(entity.getWorld()).setEntry(entity, entityTrackerEntry);
     }
 

@@ -1,91 +1,95 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
-import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * <b>Deprecated: </b>Please move on to using {@link EntityTrackerEntryHandle} instead
+ */
+@Deprecated
 public class NMSEntityTrackerEntry {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTrackerEntry");
 
     public static final TranslatorFieldAccessor<Entity> tracker = T.nextField("private final Entity tracker").translate(DuplexConversion.entity);
 
-    public static final FieldAccessor<Integer> viewDistance = T.nextFieldSignature("private final int e");
-    public static final FieldAccessor<Integer> playerViewDistance = T.nextFieldSignature("private int f");
-    public static final FieldAccessor<Integer> updateInterval = T.nextFieldSignature("private final int g");
+    public static final FieldAccessor<Integer> viewDistance = EntityTrackerEntryHandle.T.viewDistance.toFieldAccessor();
+    public static final FieldAccessor<Integer> updateInterval = EntityTrackerEntryHandle.T.updateInterval.toFieldAccessor();
 
-    public static final FieldAccessor<Long> xLoc = T.nextField("private long xLoc");
-    public static final FieldAccessor<Long> yLoc = T.nextField("private long yLoc");
-    public static final FieldAccessor<Long> zLoc = T.nextField("private long zLoc");
-    public static final FieldAccessor<Integer> yRot = T.nextField("private int yRot");
-    public static final FieldAccessor<Integer> xRot = T.nextField("private int xRot");
-    public static final FieldAccessor<Integer> headYaw = T.nextField("private int headYaw");
+    public static final FieldAccessor<Double> xVel = EntityTrackerEntryHandle.T.xVel.toFieldAccessor();
+    public static final FieldAccessor<Double> yVel = EntityTrackerEntryHandle.T.yVel.toFieldAccessor();
+    public static final FieldAccessor<Double> zVel = EntityTrackerEntryHandle.T.zVel.toFieldAccessor();
 
-    public static final FieldAccessor<Double> xVel = T.nextFieldSignature("private double n");
-    public static final FieldAccessor<Double> yVel = T.nextFieldSignature("private double o");
-    public static final FieldAccessor<Double> zVel = T.nextFieldSignature("private double p");
+    public static final FieldAccessor<Integer> tickCounter = EntityTrackerEntryHandle.T.tickCounter.toFieldAccessor();
 
-    public static final FieldAccessor<Integer> tickCounter = T.nextFieldSignature("public int a");
+    public static final FieldAccessor<Double> prevX = EntityTrackerEntryHandle.T.prevX.toFieldAccessor();
+    public static final FieldAccessor<Double> prevY = EntityTrackerEntryHandle.T.prevY.toFieldAccessor();
+    public static final FieldAccessor<Double> prevZ = EntityTrackerEntryHandle.T.prevZ.toFieldAccessor();
 
-    public static final FieldAccessor<Double> prevX = T.nextFieldSignature("private double q");
-    public static final FieldAccessor<Double> prevY = T.nextFieldSignature("private double r");
-    public static final FieldAccessor<Double> prevZ = T.nextFieldSignature("private double s");
+    public static final FieldAccessor<Boolean> synched = EntityTrackerEntryHandle.T.synched.toFieldAccessor();
+    public static final FieldAccessor<Boolean> isMobile = EntityTrackerEntryHandle.T.isMobile.toFieldAccessor();
+    public static final FieldAccessor<Integer> timeSinceLocationSync = EntityTrackerEntryHandle.T.timeSinceLocationSync.toFieldAccessor();
+    public static final FieldAccessor<List<Entity>> passengers = new SafeDirectField<List<Entity>>() {
+        @Override
+        public List<Entity> get(Object instance) {
+            return EntityTrackerEntryHandle.createHandle(instance).getPassengers();
+        }
 
-    public static final FieldAccessor<Boolean> synched = T.nextField("private boolean isMoving");
-    public static final FieldAccessor<Boolean> isMobile = T.nextFieldSignature("private final boolean u");
-    public static final FieldAccessor<Integer> timeSinceLocationSync = T.nextFieldSignature("private int v");
-    public static final TranslatorFieldAccessor<List<Entity>> passengers = T.nextFieldSignature("private List<Entity> w").translate(DuplexConversion.entityList);
+        @Override
+        public boolean set(Object instance, List<Entity> value) {
+            EntityTrackerEntryHandle.createHandle(instance).setPassengers(value);
+            return true;
+        }
+    };
 
-    public static final TranslatorFieldAccessor<Set<Player>> viewers = T.nextField("public final Set<EntityPlayer> trackedPlayers").translate(DuplexConversion.playerSet);
+    public static final FieldAccessor<Collection<Player>> viewers = new SafeDirectField<Collection<Player>>() {
+        @Override
+        public Collection<Player> get(Object instance) {
+            return EntityTrackerEntryHandle.createHandle(instance).getViewers();
+        }
 
-    /*
-     # private Packet<?> ##METHODNAME##() {
-     *     if (this.tracker.dead) {
-     *         // CraftBukkit start - Remove useless error spam, just return
-     *         // EntityTrackerEntry.d.warn("Fetching addPacket for removed entity");
-     *         return null;
-     *         // CraftBukkit end
-     *     }
-     * 
-     *     if (this.tracker instanceof EntityPlayer) {
-     *         return new PacketPlayOutNamedEntitySpawn((EntityHuman) this.tracker);
-     *     } else if (this.tracker instanceof IAnimal) {
-     *         ...
-     *     }
-     *     ...
-     * }
-     */
-    private static final MethodAccessor<Object> getSpawnPacket = T.selectMethod("private Packet<?> e()");
-
-    private static final MethodAccessor<Void> scanPlayers = T.selectMethod("public void scanPlayers(List<EntityHuman> list)");
-    private static final MethodAccessor<Void> updatePlayer = T.selectMethod("public void updatePlayer(EntityPlayer entityplayer)");
-
-    private static final SafeConstructor<?> constructor = T.getConstructor(EntityHandle.T.getType(), int.class, int.class, int.class, boolean.class);
+        @Override
+        public boolean set(Object instance, Collection<Player> value) {
+            EntityTrackerEntryHandle handle = EntityTrackerEntryHandle.createHandle(instance);
+            HashSet<Player> oldViewers = new HashSet<Player>(handle.getViewers());
+            for (Player p : oldViewers) {
+                if (!value.contains(p)) {
+                    handle.removeViewerFromSet(p);
+                }
+            }
+            for (Player p : value) {
+                if (!oldViewers.contains(p)) {
+                    handle.addViewerToSet(p);
+                }
+            }
+            return true;
+        }
+    };
 
     public static CommonPacket getSpawnPacket(Object instance) {
-        return Conversion.toCommonPacket.convert(getSpawnPacket.invoke(instance));
+        return EntityTrackerEntryHandle.T.getSpawnPacket.invoke(instance);
     }
 
     public static void scanPlayers(Object instance, List<Player> players) {
-        scanPlayers.invoke(instance, DuplexConversion.playerList.convertReverse(players));
+        EntityTrackerEntryHandle.T.scanPlayers.invoke(instance, players);
     }
 
     public static void updatePlayer(Object instance, Player player) {
-        updatePlayer.invoke(instance, Conversion.toEntityHandle.convert(player));
+        EntityTrackerEntryHandle.T.updatePlayer.invoke(instance, player);
     }
 
     public static Object createNew(Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
-        return constructor.newInstance(Conversion.toEntityHandle.convert(entity), viewDistance, playerViewDistance, updateInterval, isMobile);
+        return EntityTrackerEntryHandle.createNew(entity, viewDistance, playerViewDistance, updateInterval, isMobile).getRaw();
     }
 }

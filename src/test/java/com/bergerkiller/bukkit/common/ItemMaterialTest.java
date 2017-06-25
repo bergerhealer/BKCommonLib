@@ -159,6 +159,10 @@ public class ItemMaterialTest {
             .check(Material.DETECTOR_RAIL, true)
             .check(Material.TRAPPED_CHEST, true)
             .check(Material.REDSTONE_BLOCK, true)
+            .check(Material.DIODE_BLOCK_OFF, true)
+            .check(Material.DIODE_BLOCK_ON, true)
+            .check(Material.REDSTONE_COMPARATOR_ON, true)
+            .check(Material.REDSTONE_COMPARATOR_OFF, true)
             .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
             .checkOthers(false)
             .done();

@@ -141,12 +141,12 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void closeContainer(Object entityHuman) {
     }
 
-    @HookMethod("public abstract int getProperty(int paramInt)")
+    @HookMethod("public abstract int getProperty:???(int key)")
     public int getProperty(int key) {
         return 0;
     }
 
-    @HookMethod("public abstract void setProperty(int paramInt1, int paramInt2)")
+    @HookMethod("public abstract void setProperty:???(int key, int value)")
     public void setProperty(int key, int value) {
     }
 

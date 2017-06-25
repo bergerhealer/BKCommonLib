@@ -38,8 +38,27 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         T.removeViewer.invoke(instance, player);
     }
 
+    public void scanPlayers(List<Player> playerList) {
+        T.scanPlayers.invoke(instance, playerList);
+    }
+
+    public void updatePlayer(Player player) {
+        T.updatePlayer.invoke(instance, player);
+    }
+
     public CommonPacket getSpawnPacket() {
         return T.getSpawnPacket.invoke(instance);
+    }
+
+
+    public static EntityTrackerEntryHandle createNew(org.bukkit.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
+        if (T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.isAvailable()) {
+            return T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.newInstance(
+                entity, viewDistance, playerViewDistance, updateInterval, isMobile);
+        } else {
+            return T.constr_entity_viewDistance_updateInterval_isMobile.newInstance(
+                entity, viewDistance, updateInterval, isMobile);
+        }
     }
 
 
@@ -317,6 +336,11 @@ public class EntityTrackerEntryHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
+        @Template.Optional
+        public final Template.Constructor.Converted<EntityTrackerEntryHandle> constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile = new Template.Constructor.Converted<EntityTrackerEntryHandle>();
+        @Template.Optional
+        public final Template.Constructor.Converted<EntityTrackerEntryHandle> constr_entity_viewDistance_updateInterval_isMobile = new Template.Constructor.Converted<EntityTrackerEntryHandle>();
+
         public final Template.Field.Converted<EntityHandle> tracker = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         @Template.Optional
@@ -358,6 +382,8 @@ public class EntityTrackerEntryHandle extends Template.Handle {
 
         public final Template.Method<Void> hideForAll = new Template.Method<Void>();
         public final Template.Method.Converted<Void> removeViewer = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> scanPlayers = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> updatePlayer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
 
     }
