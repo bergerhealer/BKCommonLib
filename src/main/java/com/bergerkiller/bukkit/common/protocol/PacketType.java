@@ -167,7 +167,7 @@ public class PacketType extends ClassTemplate<Object> {
         }
 
         if (packetClass == null) {
-            Logging.LOGGER_REFLECTION.warning("Failed to find NMS Packet class type for " + getClass().getSimpleName());
+            //Logging.LOGGER_REFLECTION.warning("Failed to find NMS Packet class type for " + getClass().getSimpleName());
             this.outgoing = false;
             this.id = -1;
             this.dataWatcherField = null;

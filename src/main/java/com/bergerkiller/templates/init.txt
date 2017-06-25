@@ -13,6 +13,7 @@
 #include /org/bukkit/craftbukkit/sound.txt
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
+#include /net/minecraft/server/sound.txt
 #include /net/minecraft/server/nibblearray.txt
 #include /net/minecraft/server/nbt.txt
 #include /net/minecraft/server/minecraftkey.txt

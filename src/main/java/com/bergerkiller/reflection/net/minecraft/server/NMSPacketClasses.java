@@ -27,24 +27,22 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
@@ -52,14 +50,29 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutBossHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCustomSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutLoginHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
@@ -442,12 +455,11 @@ public class NMSPacketClasses {
      */
     public static class NMSPacketPlayOutAttachEntity extends NMSPacket {
 
-        public final FieldAccessor<Integer> vehicleId = nextField("private int a");
-        public final FieldAccessor<Integer> passengerId = nextFieldSignature("private int b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType(), EntityHandle.T.getType());
+        public final FieldAccessor<Integer> vehicleId = PacketPlayOutAttachEntityHandle.T.vehicleId.toFieldAccessor();
+        public final FieldAccessor<Integer> passengerId = PacketPlayOutAttachEntityHandle.T.passengerId.toFieldAccessor();
 
         public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-            return constructor1.newInstance(Conversion.toEntityHandle.convert(passenger), Conversion.toEntityHandle.convert(vehicle));
+            return new CommonPacket(PacketPlayOutAttachEntityHandle.createNew(passenger, vehicle).getRaw());
         }
     }
 
@@ -484,15 +496,15 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutBoss extends NMSPacket {
-        public final FieldAccessor<UUID> entityUUID = nextField("private UUID a");
-        public final FieldAccessor<Object> action = nextFieldSignature("private Action b");
-        public final FieldAccessor<Object> chat = nextFieldSignature("private IChatBaseComponent c");
-        public final FieldAccessor<Float> progress = nextFieldSignature("private float d");
-        public final FieldAccessor<Object> bossBarColor = nextFieldSignature("private BossBattle.BarColor e");
-        public final FieldAccessor<Object> bossBarStyle = nextFieldSignature("private BossBattle.BarStyle f");
-        public final FieldAccessor<Boolean> unknown1 = nextFieldSignature("private boolean g");
-        public final FieldAccessor<Boolean> unknown2 = nextFieldSignature("private boolean h");
-        public final FieldAccessor<Boolean> unknown3 = nextFieldSignature("private boolean i");
+        public final FieldAccessor<UUID> entityUUID = PacketPlayOutBossHandle.T.entityUUID.toFieldAccessor();
+        public final FieldAccessor<Object> action = PacketPlayOutBossHandle.T.action.toFieldAccessor();
+        public final FieldAccessor<Object> chat = PacketPlayOutBossHandle.T.chat.toFieldAccessor();
+        public final FieldAccessor<Float> progress = PacketPlayOutBossHandle.T.progress.toFieldAccessor();
+        public final FieldAccessor<Object> bossBarColor = PacketPlayOutBossHandle.T.bossBarColor.toFieldAccessor();
+        public final FieldAccessor<Object> bossBarStyle = PacketPlayOutBossHandle.T.bossBarStyle.toFieldAccessor();
+        public final FieldAccessor<Boolean> unknown1 = PacketPlayOutBossHandle.T.unknown1.toFieldAccessor();
+        public final FieldAccessor<Boolean> unknown2 = PacketPlayOutBossHandle.T.unknown2.toFieldAccessor();
+        public final FieldAccessor<Boolean> unknown3 = PacketPlayOutBossHandle.T.unknown3.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutCamera extends NMSPacket {
@@ -543,18 +555,83 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {
 
-          public final FieldAccessor<?> soundName = nextFieldSignature("private String a");
-          public final FieldAccessor<?> soundCategory = nextFieldSignature("private SoundCategory b");
-          public final FieldAccessor<Integer> unknown1 = nextFieldSignature("private int c");
-          public final FieldAccessor<Integer> unknown2 = nextFieldSignature("private int d");
-          public final FieldAccessor<Integer> unknown3 = nextFieldSignature("private int e");
-          public final FieldAccessor<Float> volume = nextFieldSignature("private float f");
-          public final FieldAccessor<Float> pitch = nextFieldSignature("private float g");
+        public final FieldAccessor<ResourceKey> sound = PacketPlayOutCustomSoundEffectHandle.T.sound.toFieldAccessor();
+        public final FieldAccessor<String> category = PacketPlayOutCustomSoundEffectHandle.T.category.toFieldAccessor();
+        public final FieldAccessor<Integer> x = PacketPlayOutCustomSoundEffectHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Integer> y = PacketPlayOutCustomSoundEffectHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Integer> z = PacketPlayOutCustomSoundEffectHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> volume = PacketPlayOutCustomSoundEffectHandle.T.volume.toFieldAccessor();
+        public final FieldAccessor<Float> pitch = PacketPlayOutCustomSoundEffectHandle.T.pitch.toFieldAccessor();
     }
 
     /// ====================== NMSPacketPlayOutEntity and derivatives ===========================
 
     public static class NMSPacketPlayOutEntity extends NMSPacket {
+
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityHandle.T.entityId.toFieldAccessor();
+
+        public final FieldAccessor<Double> dx = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaX();
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutEntityHandle.createHandle(instance).setDeltaX(value.doubleValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> dy = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaY();
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutEntityHandle.createHandle(instance).setDeltaY(value.doubleValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> dz = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaZ();
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutEntityHandle.createHandle(instance).setDeltaZ(value.doubleValue());
+                return true;
+            }
+        };
+
+        public final FieldAccessor<Float> dyaw = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaYaw();
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayOutEntityHandle.createHandle(instance).setDeltaYaw(value.floatValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Float> dpitch = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaPitch();
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayOutEntityHandle.createHandle(instance).setDeltaPitch(value.floatValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<Boolean> onGround = PacketPlayOutEntityHandle.T.onGround.toFieldAccessor();
 
         public NMSPacketPlayOutEntity() {
             super();
@@ -563,10 +640,6 @@ public class NMSPacketClasses {
         protected NMSPacketPlayOutEntity(Class<?> packetClass) {
             super(packetClass);
         }
-
-        public final FieldAccessor<Integer> entityId = getField("a", int.class);
-        // Note: field boolean h is a flag indicating that 'look' information is contained
-        // this flag is automatically set on packet construction
     }
 
     public static class NMSPacketPlayOutRelEntityMove extends NMSPacketPlayOutEntity {
@@ -575,18 +648,8 @@ public class NMSPacketClasses {
             super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutRelEntityMove"));
         }
 
-        public final FieldAccessor<Integer> dx = getField("b", int.class);
-        public final FieldAccessor<Integer> dy = getField("c", int.class);
-        public final FieldAccessor<Integer> dz = getField("d", int.class);
-        public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, boolean.class);
-
         public CommonPacket newInstance(int entityId, double dx, double dy, double dz, boolean onGround) {
-            //TODO! Fix this mess.
-            long l_dx = MathUtil.longFloor(dx * 4096.0);
-            long l_dy = MathUtil.longFloor(dy * 4096.0);
-            long l_dz = MathUtil.longFloor(dz * 4096.0);
-            return constructor1.newInstance(entityId, l_dx, l_dy, l_dz, onGround);
+            return PacketPlayOutRelEntityMoveHandle.createNew(entityId, dx, dy, dz, onGround).toCommonPacket();
         }
     }
 
@@ -596,22 +659,8 @@ public class NMSPacketClasses {
             super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook"));
         }
 
-        public final FieldAccessor<Integer> dx = getField("b", int.class);
-        public final FieldAccessor<Integer> dy = getField("c", int.class);
-        public final FieldAccessor<Integer> dz = getField("d", int.class);
-        public final FieldAccessor<Byte> dyaw = getField("e", byte.class);
-        public final FieldAccessor<Byte> dpitch = getField("f", byte.class);
-        public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, long.class, long.class, long.class, byte.class, byte.class, boolean.class);
-
         public CommonPacket newInstance(int entityId, double dx, double dy, double dz, float dyaw, float dpitch, boolean onGround) {
-            //TODO! Fix this mess.
-            long l_dx = MathUtil.longFloor(dx * 4096.0);
-            long l_dy = MathUtil.longFloor(dy * 4096.0);
-            long l_dz = MathUtil.longFloor(dz * 4096.0);
-            byte l_dyaw = (byte) EntityTrackerEntryHandle.getProtocolRotation(dyaw);
-            byte l_dpitch = (byte) EntityTrackerEntryHandle.getProtocolRotation(dpitch);
-            return constructor1.newInstance(entityId, l_dx, l_dy, l_dz, l_dyaw, l_dpitch, onGround);
+            return PacketPlayOutRelEntityMoveLookHandle.createNew(entityId, dx, dy, dz, dyaw, dpitch, onGround).toCommonPacket();
         }
     }
 
@@ -621,15 +670,8 @@ public class NMSPacketClasses {
             super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutEntityLook"));
         }
 
-        public final FieldAccessor<Byte> yaw = getField("e", byte.class);
-        public final FieldAccessor<Byte> pitch = getField("f", byte.class);
-        public final FieldAccessor<Boolean> onGround = getField("g", boolean.class);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
-
         public CommonPacket newInstance(int entityId, float dyaw, float dpitch, boolean onGround) {
-            byte l_dyaw = (byte) EntityTrackerEntryHandle.getProtocolRotation(dyaw);
-            byte l_dpitch = (byte) EntityTrackerEntryHandle.getProtocolRotation(dpitch);
-            return constructor1.newInstance(entityId, l_dyaw, l_dpitch, onGround);
+            return PacketPlayOutEntityLookHandle.createNew(entityId, dyaw, dpitch, onGround).toCommonPacket();
         }
     }
 
@@ -684,17 +726,12 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityEquipment extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<EquipmentSlot> slot = nextFieldSignature("private EnumItemSlot b").translate(DuplexConversion.equipmentSlot);
-        public final TranslatorFieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(DuplexConversion.itemStack);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("EnumItemSlot"), NMSItemStack.T.getType());
-
-        public CommonPacket newInstance(int entityId, Object enumItemSlot, ItemStack item) {
-            return constructor1.newInstance(entityId, enumItemSlot, Conversion.toItemStackHandle.convert(item));
-        }
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityEquipmentHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<EquipmentSlot> slot = PacketPlayOutEntityEquipmentHandle.T.slot.toFieldAccessor();
+        public final TranslatorFieldAccessor<ItemStack> item = PacketPlayOutEntityEquipmentHandle.T.itemStack.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, EquipmentSlot equipmentSlot, ItemStack item) {
-            return constructor1.newInstance(entityId, HandleConversion.toEnumItemSlotHandle(equipmentSlot), Conversion.toItemStackHandle.convert(item));
+            return PacketPlayOutEntityEquipmentHandle.createNew(entityId, equipmentSlot, item).toCommonPacket();
         }
     }
 
@@ -842,71 +879,115 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutLogin extends NMSPacket {
 
-        public final FieldAccessor<Integer> playerId = nextField("private int a");
-        public final FieldAccessor<Boolean> hardcore = nextFieldSignature("private boolean b");
-        public final TranslatorFieldAccessor<GameMode> gameMode = nextFieldSignature("private EnumGamemode c").translate(DuplexConversion.gameMode);
-        public final FieldAccessor<Integer> dimension = nextFieldSignature("private int d");
-        public final TranslatorFieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty e").translate(DuplexConversion.difficulty);
-        public final FieldAccessor<Integer> maxPlayers = nextFieldSignature("private int f");
-        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType g").translate(DuplexConversion.worldType);
-        public final FieldAccessor<Boolean> unknown1 = nextFieldSignature("private boolean h"); // Unknown field
+        public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
+        public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
+        public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
+        public final FieldAccessor<Integer> dimension = PacketPlayOutLoginHandle.T.dimension.toFieldAccessor();
+        public final TranslatorFieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor();
+        public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
+        public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutLoginHandle.T.worldType.toFieldAccessor();
+        public final FieldAccessor<Boolean> unknown1 = PacketPlayOutLoginHandle.T.unknown1.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
 
-        public final FieldAccessor<Integer> itemId = nextField("private int a");
-        public final FieldAccessor<Byte> scale = nextFieldSignature("private byte b");
-        public final FieldAccessor<Boolean> track = nextFieldSignature("private boolean c");
-        public final FieldAccessor<MapCursor[]> cursors = nextFieldSignature("private MapIcon[] d").translate(DuplexConversion.mapCursorArray);
-        public final FieldAccessor<Integer> xmin = nextFieldSignature("private int e");
-        public final FieldAccessor<Integer> ymin = nextFieldSignature("private int f");
-        public final FieldAccessor<Integer> width = nextFieldSignature("private int g");
-        public final FieldAccessor<Integer> height = nextFieldSignature("private int h");
-        public final FieldAccessor<byte[]> pixels = nextFieldSignature("private byte[] i");
+        public final FieldAccessor<Integer> itemId = PacketPlayOutMapHandle.T.itemId.toFieldAccessor();
+        public final FieldAccessor<Byte> scale = PacketPlayOutMapHandle.T.scale.toFieldAccessor();
+        public final FieldAccessor<MapCursor[]> cursors = PacketPlayOutMapHandle.T.cursors.toFieldAccessor();
+        public final FieldAccessor<Integer> xmin = PacketPlayOutMapHandle.T.xmin.toFieldAccessor();
+        public final FieldAccessor<Integer> ymin = PacketPlayOutMapHandle.T.ymin.toFieldAccessor();
+        public final FieldAccessor<Integer> width = PacketPlayOutMapHandle.T.width.toFieldAccessor();
+        public final FieldAccessor<Integer> height = PacketPlayOutMapHandle.T.height.toFieldAccessor();
+        public final FieldAccessor<byte[]> pixels = PacketPlayOutMapHandle.T.pixels.toFieldAccessor();
+
+        public final FieldAccessor<Boolean> track = new SafeDirectField<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                if (PacketPlayOutMapHandle.T.track.isAvailable()) {
+                    return PacketPlayOutMapHandle.T.track.get(instance);
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                if (PacketPlayOutMapHandle.T.track.isAvailable()) {
+                    PacketPlayOutMapHandle.T.track.set(instance, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
     }
 
     public static class NMSPacketPlayOutMapChunk extends NMSPacket {
 
-        public final FieldAccessor<Integer> x = nextField("private int a");
-        public final FieldAccessor<Integer> z = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> sectionsMask = nextFieldSignature("private int c");
-        public final FieldAccessor<byte[]> data = nextFieldSignature("private byte[] d");
-        public final FieldAccessor<List<CommonTagCompound>> tags = nextFieldSignature("private List<NBTTagCompound> e");
-        public final FieldAccessor<Boolean> hasBiomeData = nextFieldSignature("private boolean f");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSChunk.T.getType(), int.class);
+        public final FieldAccessor<Integer> x = PacketPlayOutMapChunkHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Integer> z = PacketPlayOutMapChunkHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Integer> sectionsMask = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getSectionsMask();
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutMapChunkHandle.createHandle(instance).setSectionsMask(value.intValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<byte[]> data = new SafeDirectField<byte[]>() {
+            @Override
+            public byte[] get(Object instance) {
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getData();
+            }
+
+            @Override
+            public boolean set(Object instance, byte[] value) {
+                PacketPlayOutMapChunkHandle.createHandle(instance).setData(value);
+                return true;
+            }
+        };
+        public final FieldAccessor<List<CommonTagCompound>> tags = new SafeDirectField<List<CommonTagCompound>>() {
+            @Override
+            public List<CommonTagCompound> get(Object instance) {
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getTags();
+            }
+
+            @Override
+            public boolean set(Object instance, List<CommonTagCompound> value) {
+                if (PacketPlayOutMapChunkHandle.T.tags.isAvailable()) {
+                    PacketPlayOutMapChunkHandle.createHandle(instance).setTags(value);
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        public final FieldAccessor<Boolean> hasBiomeData = PacketPlayOutMapChunkHandle.T.hasBiomeData.toFieldAccessor();
 
         public CommonPacket newInstance(Chunk chunk) {
             return newInstance(chunk, 0xFFFF);
         }
 
         public CommonPacket newInstance(Chunk chunk, int sectionsMask) {
-            return constructor1.newInstance(Conversion.toChunkHandle.convert(chunk), sectionsMask);
-        }
-
-        public CommonPacket newInstance(Object chunk) {
-            return newInstance(chunk, 0xFFFF);
-        }
-
-        public CommonPacket newInstance(Object chunk, int sectionsMask) {
-            return constructor1.newInstance(chunk, sectionsMask);
+            return new CommonPacket(PacketPlayOutMapChunkHandle.createNew(chunk, sectionsMask).getRaw());
         }
     }
     
     public static class NMSPacketPlayOutMount extends NMSPacket {
-        
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<int[]> mountedEntityIds = nextFieldSignature("private int[] b");
+
+        public final FieldAccessor<Integer> entityId = PacketPlayOutMountHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<int[]> mountedEntityIds = PacketPlayOutMountHandle.T.mountedEntityIds.toFieldAccessor();
 
         public CommonPacket newInstanceHandles(org.bukkit.entity.Entity entity, List<EntityHandle> passengers) {
             int[] passengerIds = new int[passengers.size()];
             for (int i = 0; i < passengerIds.length; i++) {
                 passengerIds[i] = passengers.get(i).getId();
             }
-
-            CommonPacket packet = this.newInstance();
-            packet.write(entityId, entity.getEntityId());
-            packet.write(mountedEntityIds, passengerIds);
-            return packet;
+            return PacketPlayOutMountHandle.createNew(entity.getEntityId(), passengerIds).toCommonPacket();
         }
 
         public CommonPacket newInstance(org.bukkit.entity.Entity entity, List<org.bukkit.entity.Entity> passengers) {
@@ -914,11 +995,7 @@ public class NMSPacketClasses {
             for (int i = 0; i < passengerIds.length; i++) {
                 passengerIds[i] = passengers.get(i).getEntityId();
             }
-
-            CommonPacket packet = this.newInstance();
-            packet.write(entityId, entity.getEntityId());
-            packet.write(mountedEntityIds, passengerIds);
-            return packet;
+            return PacketPlayOutMountHandle.createNew(entity.getEntityId(), passengerIds).toCommonPacket();
         }
     }
 
@@ -957,13 +1034,37 @@ public class NMSPacketClasses {
    
     public static class NMSPacketPlayOutNamedSoundEffect extends NMSPacket {
 
-        public final FieldAccessor<Object> sound = nextField("private SoundEffect a");
-        public final FieldAccessor<Object> category = nextFieldSignature("private SoundCategory b");
-        public final FieldAccessor<Integer> x = nextFieldSignature("private int c");
-        public final FieldAccessor<Integer> y = nextFieldSignature(" private int d");
-        public final FieldAccessor<Integer> z = nextFieldSignature("private int e");
-        public final FieldAccessor<Float> volume = nextFieldSignature("private float f");
-        public final FieldAccessor<Float> pitch = nextFieldSignature("private float g");
+        // Only used >= MC 1.10.2 to denote the sound bank name
+        public final FieldAccessor<String> category = new SafeDirectField<String>() {
+            @Override
+            public String get(Object instance) {
+                return PacketPlayOutNamedSoundEffectHandle.createHandle(instance).getCategory();
+            }
+
+            @Override
+            public boolean set(Object instance, String value) {
+                PacketPlayOutNamedSoundEffectHandle.createHandle(instance).setCategory(value);
+                return true;
+            }
+        };
+
+        public final FieldAccessor<ResourceKey> sound = PacketPlayOutNamedSoundEffectHandle.T.sound.toFieldAccessor();
+        public final FieldAccessor<Integer> x = PacketPlayOutNamedSoundEffectHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Integer> y = PacketPlayOutNamedSoundEffectHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Integer> z = PacketPlayOutNamedSoundEffectHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> volume = PacketPlayOutNamedSoundEffectHandle.T.volume.toFieldAccessor();
+        public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutNamedSoundEffectHandle.createHandle(instance).getPitch();
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayOutNamedSoundEffectHandle.createHandle(instance).setPitch(value.floatValue());
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutOpenSignEditor extends NMSPacket {
@@ -994,13 +1095,24 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutPosition extends NMSPacket {
 
-        public final FieldAccessor<Double> x = nextField("private double a");
-        public final FieldAccessor<Double> y = nextFieldSignature("private double b");
-        public final FieldAccessor<Double> z = nextFieldSignature("private double c");
-        public final FieldAccessor<Float> yaw = nextFieldSignature("private float d");
-        public final FieldAccessor<Float> pitch = nextFieldSignature("private float e");
-        public final FieldAccessor<Set<?>> teleportFlags = nextFieldSignature("private Set<EnumPlayerTeleportFlags> f");
-        public final FieldAccessor<Integer> unknown1 = nextFieldSignature("private int g");
+        public final FieldAccessor<Double> x = PacketPlayOutPositionHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Double> y = PacketPlayOutPositionHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Double> z = PacketPlayOutPositionHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> yaw = PacketPlayOutPositionHandle.T.yaw.toFieldAccessor();
+        public final FieldAccessor<Float> pitch = PacketPlayOutPositionHandle.T.pitch.toFieldAccessor();
+        public final FieldAccessor<Set<?>> teleportFlags = PacketPlayOutPositionHandle.T.teleportFlags.toFieldAccessor();
+        public final FieldAccessor<Integer> unknown1 = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutPositionHandle.createHandle(instance).getTeleportWaitTimer();
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutPositionHandle.createHandle(instance).setTeleportWaitTimer(value.intValue());
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {

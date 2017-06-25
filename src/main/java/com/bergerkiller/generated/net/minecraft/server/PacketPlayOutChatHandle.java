@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutChatHandle extends Template.Handle {
+public class PacketPlayOutChatHandle extends PacketHandle {
     /** @See {@link PacketPlayOutChatClass} */
     public static final PacketPlayOutChatClass T = new PacketPlayOutChatClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutChatHandle.class, "net.minecraft.server.PacketPlayOutChat");

@@ -1,0 +1,29 @@
+package net.minecraft.server;
+
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+
+optional class SoundCategory {
+    public String getName:a();
+
+    public static (SoundCategoryHandle) SoundCategory byName:a(String name);
+}
+
+optional class SoundEffectType {
+    public (SoundEffectHandle) SoundEffect getDefault:e();
+}
+
+optional class SoundEffect {
+    public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
+    private final (MinecraftKeyHandle) MinecraftKey name:b;
+
+    public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
+}
+
+optional class SoundEffects {
+    public static final (ResourceKey) SoundEffect EXTINGUISH_FIRE:bQ;
+}

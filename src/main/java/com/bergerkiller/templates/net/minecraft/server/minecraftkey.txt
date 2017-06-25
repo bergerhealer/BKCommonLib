@@ -20,18 +20,3 @@ class MinecraftKey {
     }
     </code>
 }
-
-optional class SoundEffectType {
-    public (SoundEffectHandle) SoundEffect getDefault:e();
-}
-
-optional class SoundEffect {
-    public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
-    private final (MinecraftKeyHandle) MinecraftKey name:b;
-
-    public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
-}
-
-optional class SoundEffects {
-    public static final (ResourceKey) SoundEffect EXTINGUISH_FIRE:bQ;
-}

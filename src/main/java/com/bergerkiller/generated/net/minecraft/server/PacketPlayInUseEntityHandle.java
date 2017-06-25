@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInUseEntityHandle extends Template.Handle {
+public class PacketPlayInUseEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseEntityClass} */
     public static final PacketPlayInUseEntityClass T = new PacketPlayInUseEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity");

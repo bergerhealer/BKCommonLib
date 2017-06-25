@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutWindowItemsHandle extends Template.Handle {
+public class PacketPlayOutWindowItemsHandle extends PacketHandle {
     /** @See {@link PacketPlayOutWindowItemsClass} */
     public static final PacketPlayOutWindowItemsClass T = new PacketPlayOutWindowItemsClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWindowItemsHandle.class, "net.minecraft.server.PacketPlayOutWindowItems");

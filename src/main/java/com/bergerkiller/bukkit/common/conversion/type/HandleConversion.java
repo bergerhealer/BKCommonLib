@@ -42,6 +42,7 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -355,4 +356,17 @@ public class HandleConversion {
         return minecraftKeyHandle.toString();
     }
 
+    @ConverterMethod(input="net.minecraft.server.SoundCategory", optional=true)
+    public static String getNameFromSoundCategory(Object soundCategoryHandle) {
+        return SoundCategoryHandle.T.getName.invoke(soundCategoryHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.SoundCategory", optional=true)
+    public static Object getSoundCategoryFromName(String soundCategoryName) {
+        Object result = SoundCategoryHandle.T.byName.raw.invokeVA(soundCategoryName);
+        if (result == null) {
+            result = SoundCategoryHandle.T.byName.raw.invokeVA("master");
+        }
+        return result;
+    }
 }

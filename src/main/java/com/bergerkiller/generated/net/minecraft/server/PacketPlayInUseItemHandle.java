@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInUseItemHandle extends Template.Handle {
+public class PacketPlayInUseItemHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseItemClass} */
     public static final PacketPlayInUseItemClass T = new PacketPlayInUseItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseItemHandle.class, "net.minecraft.server.PacketPlayInUseItem");

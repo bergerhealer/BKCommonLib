@@ -2,24 +2,44 @@ package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle.ChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
-class PacketPlayOutScoreboardScore {
+class Packet {
+    <code>
+    public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
+        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(instance);
+    }
+    </code>
+}
+
+class PacketPlayOutScoreboardScore extends Packet {
     class PacketPlayOutScoreboardScore.EnumScoreboardAction {
         enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction CHANGE;
         enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction REMOVE;
     }
 }
 
-class PacketPlayInUseEntity {
+class PacketPlayInUseEntity extends Packet {
     private int usedEntityId:a;
     private (UseAction) PacketPlayInUseEntity.EnumEntityUseAction action;
     private (org.bukkit.util.Vector) Vec3D offset:c;
@@ -36,7 +56,7 @@ class PacketPlayInUseEntity {
     }
 }
 
-class PacketPlayInUseItem {
+class PacketPlayInUseItem extends Packet {
     private (IntVector3) BlockPosition position:a;
     private (Object) EnumDirection direction:b;
 #if version >= 1.10.2
@@ -50,7 +70,7 @@ class PacketPlayInUseItem {
     public long timestamp;
 }
 
-class PacketPlayOutTitle {
+class PacketPlayOutTitle extends Packet {
     class PacketPlayOutTitle.EnumTitleAction {
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TITLE;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction SUBTITLE;
@@ -61,7 +81,7 @@ class PacketPlayOutTitle {
     }
 }
 
-class PacketPlayOutChat {
+class PacketPlayOutChat extends Packet {
     private (ChatText) IChatBaseComponent text:a;
     public (Object[]) net.md_5.bungee.api.chat.BaseComponent[] components;
 #if version >= 1.12
@@ -71,7 +91,7 @@ class PacketPlayOutChat {
 #endif
 }
 
-class PacketPlayOutCollect {
+class PacketPlayOutCollect extends Packet {
     private int collectedItemId:a;
     private int collectorEntityId:b;
 
@@ -79,7 +99,7 @@ class PacketPlayOutCollect {
     private optional int unknown:c;
 }
 
-class PacketPlayOutWindowItems {
+class PacketPlayOutWindowItems extends Packet {
     private int windowId:a;
 
 #if version >= 1.11.2
@@ -89,7 +109,7 @@ class PacketPlayOutWindowItems {
 #endif
 }
 
-class PacketPlayInArmAnimation {
+class PacketPlayInArmAnimation extends Packet {
 #if version >= 1.10.2
     private optional (Object) EnumHand enumHand:a;
 #else
@@ -97,7 +117,7 @@ class PacketPlayInArmAnimation {
 #endif
 }
 
-class PacketPlayInBlockPlace {
+class PacketPlayInBlockPlace extends Packet {
 #if version >= 1.10.2
     private optional (Object) EnumHand enumHand:a;
 #else
@@ -106,7 +126,7 @@ class PacketPlayInBlockPlace {
     public long timestamp;
 }
 
-class PacketPlayOutRemoveEntityEffect {
+class PacketPlayOutRemoveEntityEffect extends Packet {
     private int entityId:a;
 
 #if version >= 1.10.2
@@ -118,4 +138,444 @@ class PacketPlayOutRemoveEntityEffect {
 
     public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect(int entityId, (MobEffectListHandle) MobEffect mobeffectlist);
 #endif
+}
+
+class PacketPlayOutLogin extends Packet {
+    private int playerId:a;
+    private boolean hardcore:b;
+    private (org.bukkit.GameMode) EnumGamemode gameMode:c;
+    private int dimension:d;
+    private (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
+    private int maxPlayers:f;
+    private (org.bukkit.WorldType) WorldType worldType:g;
+    private boolean unknown1:h;
+}
+
+class PacketPlayOutMap extends Packet {
+    private int itemId:a;
+    private byte scale:b;
+
+#if version >= 1.10.2
+    private optional boolean track:c;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
+    private int xmin:e;
+    private int ymin:f;
+    private int width:g;
+    private int height:h;
+    private byte[] pixels:i;
+#else
+    private optional boolean track:???;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
+    private int xmin:d;
+    private int ymin:e;
+    private int width:f;
+    private int height:g;
+    private byte[] pixels:h;
+#endif
+}
+
+class PacketPlayOutMapChunk extends Packet {
+    private int x:a;
+    private int z:b;
+
+#if version >= 1.10.2
+    private optional int sectionsMask:c;
+    private optional byte[] data:d;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:???;
+    private boolean hasBiomeData:f;
+#else
+    private optional int sectionsMask:???;
+    private optional byte[] data:???;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:???;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:c;
+    private boolean hasBiomeData:d;
+#endif
+
+    <code>
+    public int getSectionsMask() {
+        if (T.sectionsMask.isAvailable()) {
+            return T.sectionsMask.get(instance);
+        } else {
+            return T.chunkInfo.get(instance).getSectionsMask();
+        }
+    }
+
+    public void setSectionsMask(int sectionsMask) {
+        if (T.sectionsMask.isAvailable()) {
+            T.sectionsMask.set(instance, sectionsMask);
+        } else {
+            T.chunkInfo.get(instance).setSectionsMask(sectionsMask);
+        }
+    }
+
+    public byte[] getData() {
+        if (T.data.isAvailable()) {
+            return T.data.get(instance);
+        } else {
+            return T.chunkInfo.get(instance).getData();
+        }
+    }
+    
+    public void setData(byte[] data) {
+        if (T.data.isAvailable()) {
+            T.data.set(instance, data);
+        } else {
+            T.chunkInfo.get(instance).setData(data);
+        }
+    }
+
+    public List<CommonTagCompound> getTags() {
+        if (T.tags.isAvailable()) {
+            return T.tags.get(instance);
+        } else {
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    public void setTags(List<CommonTagCompound> tags) {
+        if (T.tags.isAvailable()) {
+            T.tags.set(instance, tags);
+        } else {
+            // Unsupported. Do nothing.
+        }
+    }
+    </code>
+
+    // MC 1.8.8
+    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk(Chunk chunk, boolean flag, int sectionsMask);
+
+    // MC >= 1.10.2
+    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, int sectionsMask);
+
+    <code>
+    public static PacketPlayOutMapChunkHandle createNew(org.bukkit.Chunk chunk, int sectionsMask) {
+        if (T.constr_chunk_sectionsMask.isAvailable()) {
+            return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
+        } else {
+            boolean flag = WorldHandle.fromBukkit(chunk.getWorld()).getWorldProvider().isDarkWorld();
+            return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
+        }
+    }
+    </code>
+
+    // MC 1.8.8 only
+    optional class PacketPlayOutMapChunk.ChunkMap {
+        public byte[] data:a;
+        public int sectionsMask:b;
+    }
+}
+
+class PacketPlayOutNamedSoundEffect extends Packet {
+#if version >= 1.10.2
+    private (ResourceKey) SoundEffect sound:a;
+    private optional (String) SoundCategory category_1_10_2:b;
+    private int x:c;
+    private int y:d;
+    private int z:e;
+    private float volume:f;
+    private optional int pitch_1_8_8:???;
+    private optional float pitch_1_10_2:g;
+#else
+    private (ResourceKey) String sound:a;
+    private optional (String) SoundCategory category_1_10_2:???;
+    private int x:b;
+    private int y:c;
+    private int z:d;
+    private float volume:e;
+    private optional int pitch_1_8_8:f;
+    private optional float pitch_1_10_2:???;
+#endif
+
+    // Accessor functions for pitch
+    <code>
+    public float getPitch() {
+        if (T.pitch_1_10_2.isAvailable()) {
+            return T.pitch_1_10_2.getFloat(instance);
+        } else {
+            return (float) T.pitch_1_8_8.getInteger(instance) / 63.0f;
+        }
+    }
+
+    public void setPitch(float pitch) {
+        if (T.pitch_1_10_2.isAvailable()) {
+            T.pitch_1_10_2.setFloat(instance, pitch);
+        } else {
+            T.pitch_1_8_8.setInteger(instance, (int) (pitch * 63.0f));
+        }
+    }
+    </code>
+
+    // Accessor function for sound category (by name)
+    // On MC 1.8.8 this does nothing (always returns "master")
+    <code>
+    public String getCategory() {
+        if (T.category_1_10_2.isAvailable()) {
+            return T.category_1_10_2.get(instance);
+        } else {
+            return "master";
+        }
+    }
+
+    public void setCategory(String categoryName) {
+        if (T.category_1_10_2.isAvailable()) {
+            T.category_1_10_2.set(instance, categoryName);
+        } else {
+            // Do nothing, unused
+        }
+    }
+    </code>
+
+}
+
+// Since MC 1.10.2
+optional class PacketPlayOutCustomSoundEffect extends Packet {
+    private (ResourceKey) String sound:a;
+    private (String) SoundCategory category:b;
+    private int x:c;
+    private int y:d;
+    private int z:e;
+    private float volume:f;
+    private float pitch:g;
+}
+
+class PacketPlayOutPosition extends Packet {
+    private double x:a;
+    private double y:b;
+    private double z:c;
+    private float yaw:d;
+    private float pitch:e;
+    private (Set<?>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:f;
+
+    // >= MC 1.10.2
+    private optional int teleportWaitTimer:g;
+
+    <code>
+    public int getTeleportWaitTimer() {
+        if (T.teleportWaitTimer.isAvailable()) {
+            return T.teleportWaitTimer.getInteger(instance);
+        } else {
+            return 0;
+        }
+    }
+
+    public void setTeleportWaitTimer(int ticks) {
+        if (T.teleportWaitTimer.isAvailable()) {
+            T.teleportWaitTimer.setInteger(instance, ticks);
+        }
+    }
+    </code>
+}
+
+// Available >= MC 1.10.2
+optional class PacketPlayOutBoss extends Packet {
+    private UUID entityUUID:a;
+    private (Object) PacketPlayOutBoss.Action action:b;
+    private (Object) IChatBaseComponent chat:c;
+    private float progress:d;
+    private (Object) BossBattle.BarColor bossBarColor:e;
+    private (Object) BossBattle.BarStyle bossBarStyle:f;
+    private boolean unknown1:g;
+    private boolean unknown2:h;
+    private boolean unknown3:i;
+}
+
+class PacketPlayOutAttachEntity extends Packet {
+#if version >= 1.10.2
+    private optional int leashId:???;
+    private int passengerId:a;
+    private int vehicleId:b;
+#else
+    private optional int leashId:a;
+    private int passengerId:b;
+    private int vehicleId:c;
+#endif
+
+    // MC 1.8.8
+    public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity(int leashId, (org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
+
+    // >= MC 1.10.2
+    public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
+
+    <code>
+    public static PacketPlayOutAttachEntityHandle createNew(org.bukkit.entity.Entity passengerEntity, org.bukkit.entity.Entity vehicleEntity) {
+        if (T.constr_passengerEntity_vehicleEntity.isAvailable()) {
+            return T.constr_passengerEntity_vehicleEntity.newInstance(passengerEntity, vehicleEntity);
+        } else {
+            return T.constr_leashId_passengerEntity_vehicleEntity.newInstance(0, passengerEntity, vehicleEntity);
+        }
+    }
+    </code>
+}
+
+class PacketPlayOutEntityEquipment extends Packet {
+    private int entityId:a;
+#if version >= 1.10.2
+    private (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot:b;
+#else
+    private (org.bukkit.inventory.EquipmentSlot) int slot:b;
+#endif
+    private (org.bukkit.inventory.ItemStack) ItemStack itemStack:c;
+
+#if version >= 1.10.2
+    public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
+#else
+    public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
+#endif
+}
+
+class PacketPlayOutEntity extends Packet {
+    protected int entityId:a;
+#if version >= 1.10.2
+    protected optional byte dx_1_8_8:???;
+    protected optional byte dy_1_8_8:???;
+    protected optional byte dz_1_8_8:???;
+    protected optional int dx_1_10_2:b;
+    protected optional int dy_1_10_2:c;
+    protected optional int dz_1_10_2:d;
+#else
+    protected optional byte dx_1_8_8:b;
+    protected optional byte dy_1_8_8:c;
+    protected optional byte dz_1_8_8:d;
+    protected optional int dx_1_10_2:???;
+    protected optional int dy_1_10_2:???;
+    protected optional int dz_1_10_2:???;
+#endif
+    protected optional byte dyaw_raw:e;
+    protected optional byte dpitch_raw:f;
+    protected boolean onGround:g;
+    protected unknown boolean hasMovement:h;
+
+    // A whole bunch of accessor functions that help translating the protocol / actual values
+    <code>
+    public double getDeltaX() {
+        if (T.dx_1_10_2.isAvailable()) {
+            return (double) T.dx_1_10_2.getInteger(instance) / 4096.0;
+        } else {
+            return (double) T.dx_1_8_8.getByte(instance) / 32.0;
+        }
+    }
+
+    public double getDeltaY() {
+        if (T.dy_1_10_2.isAvailable()) {
+            return (double) T.dy_1_10_2.getInteger(instance) / 4096.0;
+        } else {
+            return (double) T.dy_1_8_8.getByte(instance) / 32.0;
+        }
+    }
+
+    public double getDeltaZ() {
+        if (T.dz_1_10_2.isAvailable()) {
+            return (double) T.dz_1_10_2.getInteger(instance) / 4096.0;
+        } else {
+            return (double) T.dz_1_8_8.getByte(instance) / 32.0;
+        }
+    }
+
+    public void setDeltaX(double dx) {
+        if (T.dx_1_10_2.isAvailable()) {
+            T.dx_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 4096.0));
+        } else {
+            T.dx_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 32.0));
+        }
+    }
+
+    public void setDeltaY(double dy) {
+        if (T.dy_1_10_2.isAvailable()) {
+            T.dy_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 4096.0));
+        } else {
+            T.dy_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 32.0));
+        }
+    }
+
+    public void setDeltaZ(double dz) {
+        if (T.dz_1_10_2.isAvailable()) {
+            T.dz_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 4096.0));
+        } else {
+            T.dz_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 32.0));
+        }
+    }
+
+    public float getDeltaYaw() {
+        return (float) T.dyaw_raw.getByte(instance) * 360.0f / 256.0f;
+    }
+
+    public float getDeltaPitch() {
+        return (float) T.dpitch_raw.getByte(instance) * 360.0f / 256.0f;
+    }
+
+    public void setDeltaYaw(float deltaYaw) {
+        T.dyaw_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaYaw * 256.0f / 360.0f));
+    }
+
+    public void setDeltaPitch(float deltaPitch) {
+        T.dpitch_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaPitch * 256.0f / 360.0f));
+    }
+    </code>
+
+    class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
+        public (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook();
+
+        <code>
+        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
+            PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
+            handle.setEntityId(entityId);
+            handle.setDeltaYaw(deltaYaw);
+            handle.setDeltaPitch(deltaPitch);
+            handle.setOnGround(onGround);
+            return handle;
+        }
+        </code>
+    }
+
+    class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
+        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove();
+
+        <code>
+        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
+            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = createNew();
+            handle.setEntityId(entityId);
+            handle.setDeltaX(dx);
+            handle.setDeltaY(dy);
+            handle.setDeltaZ(dz);
+            handle.setOnGround(onGround);
+            return handle;
+        }
+        </code>
+    }
+
+    class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
+        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();
+
+        <code>
+        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
+            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
+            handle.setEntityId(entityId);
+            handle.setDeltaX(dx);
+            handle.setDeltaY(dy);
+            handle.setDeltaZ(dz);
+            handle.setDeltaYaw(deltaYaw);
+            handle.setDeltaPitch(deltaPitch);
+            handle.setOnGround(onGround);
+            return handle;
+        }
+        </code>
+    }
+}
+
+// Only available >= MC 1.10.2
+optional class PacketPlayOutMount extends Packet {
+    private int entityId:a;
+    private int[] mountedEntityIds:b;
+
+    public (PacketPlayOutMountHandle) PacketPlayOutMount();
+
+    <code>
+    public static PacketPlayOutMountHandle createNew(int entityId, int[] mountedEntityIds) {
+        PacketPlayOutMountHandle handle = createNew();
+        handle.setEntityId(entityId);
+        handle.setMountedEntityIds(mountedEntityIds);
+        return handle;
+    }
+    </code>
 }
