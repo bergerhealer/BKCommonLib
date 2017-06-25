@@ -154,28 +154,12 @@ public class WorldHandle extends Template.Handle {
         T.worldProvider.set(instance, value);
     }
 
-    public Object getNavigationListener() {
-        return T.navigationListener.get(instance);
-    }
-
-    public void setNavigationListener(Object value) {
-        T.navigationListener.set(instance, value);
-    }
-
     public List<IWorldAccessHandle> getAccessList() {
         return T.accessList.get(instance);
     }
 
     public void setAccessList(List<IWorldAccessHandle> value) {
         T.accessList.set(instance, value);
-    }
-
-    public Object getChunkProvider() {
-        return T.chunkProvider.get(instance);
-    }
-
-    public void setChunkProvider(Object value) {
-        T.chunkProvider.set(instance, value);
     }
 
     public MethodProfilerHandle getMethodProfiler() {
@@ -213,9 +197,11 @@ public class WorldHandle extends Template.Handle {
         public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
+        @Template.Optional
         public final Template.Field.Converted<Object> navigationListener = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<List<IWorldAccessHandle>> accessList = new Template.Field.Converted<List<IWorldAccessHandle>>();
-        public final Template.Field.Converted<Object> chunkProvider = new Template.Field.Converted<Object>();
+        @Template.Optional
+        public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();
         public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
@@ -225,6 +211,8 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
+        @Template.Optional
+        public final Template.Method.Converted<Object> getChunkProvider = new Template.Method.Converted<Object>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
         @Template.Optional

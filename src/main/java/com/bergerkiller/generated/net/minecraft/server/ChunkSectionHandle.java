@@ -53,20 +53,20 @@ public class ChunkSectionHandle extends Template.Handle {
         T.setBlockData.invoke(instance, x, y, z, data);
     }
 
-    public int getSkyLight(int x, int y, int z) {
-        return T.getSkyLight.invoke(instance, x, y, z);
-    }
-
     public void setSkyLight(int x, int y, int z, int level) {
         T.setSkyLight.invoke(instance, x, y, z, level);
     }
 
-    public int getBlockLight(int x, int y, int z) {
-        return T.getBlockLight.invoke(instance, x, y, z);
-    }
-
     public void setBlockLight(int x, int y, int z, int level) {
         T.setBlockLight.invoke(instance, x, y, z, level);
+    }
+
+    public int getSkyLight(int x, int y, int z) {
+        return T.getSkyLight.invoke(instance, x, y, z);
+    }
+
+    public int getBlockLight(int x, int y, int z) {
+        return T.getBlockLight.invoke(instance, x, y, z);
     }
 
     public NibbleArrayHandle getBlockLight() {
@@ -101,10 +101,10 @@ public class ChunkSectionHandle extends Template.Handle {
         public final Template.Method.Converted<DataPaletteBlockHandle> getBlockPalette = new Template.Method.Converted<DataPaletteBlockHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();
-        public final Template.Method<Integer> getSkyLight = new Template.Method<Integer>();
         public final Template.Method<Void> setSkyLight = new Template.Method<Void>();
-        public final Template.Method<Integer> getBlockLight = new Template.Method<Integer>();
         public final Template.Method<Void> setBlockLight = new Template.Method<Void>();
+        public final Template.Method<Integer> getSkyLight = new Template.Method<Integer>();
+        public final Template.Method<Integer> getBlockLight = new Template.Method<Integer>();
 
     }
 

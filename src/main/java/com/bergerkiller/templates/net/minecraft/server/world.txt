@@ -32,9 +32,12 @@ class World {
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;
-    protected (Object) NavigationListener navigationListener:t;
+
+    // Only available >= MC 1.10.2
+    protected optional (Object) NavigationListener navigationListener:t;
+
     protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:u;
-    protected (Object) IChunkProvider chunkProvider;
+    protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
     public final (MethodProfilerHandle) MethodProfiler methodProfiler;
 
     private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld bukkitWorld:world;
@@ -49,6 +52,8 @@ class World {
     public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
 
     public long getTime();
+
+    public optional (Object) IChunkProvider getChunkProvider();
 
     // >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
@@ -67,8 +72,10 @@ class World {
 
 #if version >= 1.11.2
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
-#else
+#elseif version >= 1.10.2
     public boolean isBurnArea:f((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#else
+    public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #endif
 
     public void removeEntity((EntityHandle) Entity entity);
@@ -121,15 +128,40 @@ class WorldServer extends World {
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMapField:manager;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
+    public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
+
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 
-    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
+    // Only available >= MC 1.10.2
+    // For MC 1.8.8, we use field access
+    public optional (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
 
     public void saveLevel();
 
     <code>
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+
+    public ChunkProviderServerHandle getChunkProviderServer() {
+        if (T.getChunkProviderServer.isAvailable()) {
+            return T.getChunkProviderServer.invoke(instance);
+        } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
+            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(instance));
+        } else if (T.field_chunkProviderServer.isAvailable()) {
+            return T.field_chunkProviderServer.get(instance);   
+        } else {
+            throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
+        }
+    }
+
+    public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
+        if (T.field_chunkProviderServer.isAvailable()) {
+            T.field_chunkProviderServer.set(instance, chunkProviderServerHandle);
+        }
+        if (WorldHandle.T.field_chunkProvider.isAvailable()) {
+            WorldHandle.T.field_chunkProvider.set(instance, chunkProviderServerHandle.getRaw());
+        }
     }
     </code>
 }
@@ -138,7 +170,15 @@ class ChunkProviderServer {
     private final (Object) IChunkLoader chunkLoader;
     public final (WorldServerHandle) WorldServer world;
 
+#if version >= 1.10.2
     public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
+
+    public boolean isLoaded(int cx, int cz);
+#else
+    public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:getMobsFor((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
+
+    public boolean isLoaded:isChunkLoaded(int cx, int cz);
+#endif
 
     public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
 
@@ -146,7 +186,6 @@ class ChunkProviderServer {
 
     public void saveChunk((ChunkHandle) Chunk chunk);
 
-    public boolean isLoaded(int cx, int cz);
 }
 
 class PlayerChunkMap {
@@ -164,7 +203,11 @@ class WorldType {
 }
 
 class WorldProvider {
+#if version >= 1.10.2
     public boolean int_skyLightProperty:m();
+#else
+    public boolean int_skyLightProperty:o();
+#endif
 
 <code>
     private static final boolean _darkInverted = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");

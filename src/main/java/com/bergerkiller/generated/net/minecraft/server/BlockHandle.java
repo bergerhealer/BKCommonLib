@@ -51,28 +51,8 @@ public class BlockHandle extends Template.Handle {
         T.entityHitVertical.invoke(instance, world, entity);
     }
 
-    public int getOpacity(IBlockDataHandle iblockdata) {
-        return T.getOpacity.invoke(instance, iblockdata);
-    }
-
-    public int getEmission(IBlockDataHandle iblockdata) {
-        return T.getEmission.invoke(instance, iblockdata);
-    }
-
-    public boolean isOccluding(IBlockDataHandle iblockdata) {
-        return T.isOccluding.invoke(instance, iblockdata);
-    }
-
-    public boolean isPowerSource(IBlockDataHandle iblockdata) {
-        return T.isPowerSource.invoke(instance, iblockdata);
-    }
-
     public float getDamageResillience(Entity entity) {
         return T.getDamageResillience.invoke(instance, entity);
-    }
-
-    public SoundEffectTypeHandle getStepSound() {
-        return T.getStepSound.invoke(instance);
     }
 
     public void dropNaturally(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, float yield, int chance) {
@@ -99,6 +79,47 @@ public class BlockHandle extends Template.Handle {
         return T.toLegacyData.invoke(instance, iblockdata);
     }
 
+
+    public int getOpacity(IBlockDataHandle iblockdata) {
+        if (T.bydata_getOpacity.isAvailable()) {
+            return T.bydata_getOpacity.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_getOpacity.invoke(instance);
+        }
+    }
+
+    public int getEmission(IBlockDataHandle iblockdata) {
+        if (T.bydata_getEmission.isAvailable()) {
+            return T.bydata_getEmission.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_getEmission.invoke(instance);
+        }
+    }
+
+    public boolean isOccluding(IBlockDataHandle iblockdata) {
+        if (T.bydata_isOccluding.isAvailable()) {
+            return T.bydata_isOccluding.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_isOccluding.invoke(instance);
+        }
+    }
+
+    public boolean isPowerSource(IBlockDataHandle iblockdata) {
+        if (T.bydata_isPowerSource.isAvailable()) {
+            return T.bydata_isPowerSource.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_isPowerSource.invoke(instance);
+        }
+    }
+
+
+    public SoundEffectTypeHandle getStepSound() {
+        if (T.getStepSound.isAvailable()) {
+            return T.getStepSound.invoke(instance);
+        } else {
+            return T.opt_1_8_8_stepSound.get(instance);
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.server.Block</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -109,17 +130,33 @@ public class BlockHandle extends Template.Handle {
         @SuppressWarnings("rawtypes")
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
+        @Template.Optional
+        public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_stepSound = new Template.Field.Converted<SoundEffectTypeHandle>();
+
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
         public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
         public final Template.StaticMethod.Converted<BlockHandle> getById = new Template.StaticMethod.Converted<BlockHandle>();
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();
-        public final Template.Method.Converted<Integer> getEmission = new Template.Method.Converted<Integer>();
-        public final Template.Method.Converted<Boolean> isOccluding = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Integer> bydata_getOpacity = new Template.Method.Converted<Integer>();
+        @Template.Optional
+        public final Template.Method.Converted<Integer> bydata_getEmission = new Template.Method.Converted<Integer>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> bydata_isOccluding = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> bydata_isPowerSource = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method<Integer> noargs_getOpacity = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Integer> noargs_getEmission = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Boolean> noargs_isOccluding = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method<Boolean> noargs_isPowerSource = new Template.Method<Boolean>();
         public final Template.Method.Converted<Float> getDamageResillience = new Template.Method.Converted<Float>();
+        @Template.Optional
         public final Template.Method.Converted<SoundEffectTypeHandle> getStepSound = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();

@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
@@ -52,11 +53,17 @@ class EntityLiving extends Entity {
 
 #if version >= 1.11.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
-#else
+#elseif version >= 1.10.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
+#else
+    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:c;
 #endif
 
-    public final (Map<Object, Object>) Map<MobEffectList, MobEffect> mobEffects:effects;
+#if version >= 1.10.2
+    public final (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> mobEffects:effects;
+#else
+    public final (Map<MobEffectListHandle, MobEffectHandle>) Map<Integer, MobEffect> mobEffects:effects;
+#endif
 
     public float lastDamage;
 #if version >= 1.11.2
@@ -75,7 +82,11 @@ class EntityLiving extends Entity {
 
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
 
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot)
+#if version >= 1.10.2
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
+#else
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
+#endif
 
     protected void resetAttributes:initAttributes();
 
@@ -86,6 +97,12 @@ class EntityLiving extends Entity {
     public final float getHealth();
 
     public final float getMaxHealth();
+
+    <code>
+    public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(livingEntity));
+    }
+    </code>
 }
 
 class EntityHuman extends EntityLiving {
@@ -100,7 +117,11 @@ class EntityHuman extends EntityLiving {
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
     public boolean sleeping;
+#if version >= 1.10.2
     public (IntVector3) BlockPosition bedPosition;
+#else
+    public (IntVector3) BlockPosition bedPosition:bx;
+#endif
     public int sleepTicks;
 
 #if version >= 1.12
@@ -114,12 +135,18 @@ class EntityHuman extends EntityLiving {
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
-#else
+#elseif version >= 1.10.2
     public unknown float bJ;
     public unknown float bK;
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
+#else
+    public unknown float by;
+    public unknown float bz;
+    private (IntVector3) BlockPosition spawnCoord:c;
+    private boolean spawnForced:d;
+    private unknown BlockPosition e;
 #endif
 
     public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
@@ -137,12 +164,20 @@ class EntityHuman extends EntityLiving {
     protected unknown float bP;
     private unknown int bR;
     private final com.mojang.authlib.GameProfile gameProfile:bS;
-#else
+#elseif version >= 1.10.2
     private unknown int h;
     protected unknown float bP;
     protected unknown float bQ;
     private unknown int bS;
     private final com.mojang.authlib.GameProfile gameProfile:bT;
+#else
+    private unknown int f;
+    private unknown ItemStack g;
+    private unknown int h;
+    protected unknown float bE;
+    protected unknown float bF;
+    private unknown int i;
+    private final com.mojang.authlib.GameProfile gameProfile:bH;
 #endif
 
     public String spawnWorld;
@@ -178,12 +213,30 @@ class EntityHanging extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
-    private static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:d;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:e;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:f;
+#if version >= 1.10.2
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:d;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:e;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:f;
+#else
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:???;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:???;
+#endif
+
+    <code>
+    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.fromTemplate(T.DATA_SHAKING_FACTOR, 17, int.class);
+    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.fromTemplate(T.DATA_SHAKING_DIRECTION, 18, int.class);
+    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.fromTemplate(T.DATA_SHAKING_DAMAGE, 19, float.class);
+    public static final Key<Integer> DATA_BLOCK_TYPE = Key.fromTemplate(T.DATA_BLOCK_TYPE, 20, int.class);
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.fromTemplate(T.DATA_BLOCK_OFFSET, 21, int.class);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.fromTemplate(T.DATA_BLOCK_VISIBLE, 22, byte.class);
+    </code>
 
     public float getDamage();
     public void setDamage(float damage);
@@ -196,8 +249,22 @@ class EntityMinecartRideable extends EntityMinecartAbstract {
 }
 
 class EntityMinecartFurnace extends EntityMinecartAbstract {
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
+#if version >= 1.10.2
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
+#else
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:???;
+#endif
+
+    <code>
+    public static final Key<Boolean> DATA_SMOKING = Key.fromTemplate(T.DATA_SMOKING, 16, byte.class);
+    </code>
+
+#if version >= 1.10.2
     private int fuel:d;
+#else
+    private int fuel:c;
+#endif
+
     public double pushForceX:a;
     public double pushForceZ:b;
 }
@@ -207,18 +274,30 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 
 #if version >= 1.12
     public boolean suckItems:H();
-#else
+#elseif version >= 1.10.2
     public boolean suckItems:I();
+#else
+    public boolean suckItems:D();
 #endif
 
+#if version >= 1.10.2
     public boolean isSuckingEnabled:isEnabled();
     public void setSuckingEnabled:setEnabled(boolean enabled);
+#else
+    public boolean isSuckingEnabled:y();
+    public void setSuckingEnabled:i(boolean enabled);
+#endif
 }
 
 class EntityMinecartTNT extends EntityMinecartAbstract {
     private int fuse:a;
 
+#if version >= 1.10.2
     protected void explode:c(double damage);
+#else
+    protected void explode:b(double damage);
+#endif
+
     public void prime:j();
 }
 

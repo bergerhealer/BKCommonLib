@@ -1,8 +1,21 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class MobEffect {
+    private final (MobEffectListHandle) MobEffectList effectList:b;
+    private int duration;
+    private int amplification;
+    private boolean splash;
+    private boolean ambient;
+    private boolean particles:h;
+
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
+}
+
+class MobEffectList {
+    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+    public static (MobEffectListHandle) MobEffectList fromId(int id);
 }

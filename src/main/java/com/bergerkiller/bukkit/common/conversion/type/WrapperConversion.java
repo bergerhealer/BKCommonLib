@@ -473,6 +473,16 @@ public class WrapperConversion {
         return EnumItemSlotHandle.createHandle(enumItemSlotHandle).toBukkit();
     }
 
+    @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
+    public static int enumItemSlotToIndex(Object nmsEnumItemSlot) {
+        return EnumItemSlotHandle.T.getIndex.invoke(nmsEnumItemSlot);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
+    public static Object enumItemSlotFromIndex(int legacyEquipmentIndex) {
+        return EnumItemSlotHandle.fromIndexRaw(legacyEquipmentIndex);
+    }
+
     @ConverterMethod(input="net.minecraft.server.ChatMessageType", optional=true)
     public static ChatMessageType toChatMessageType(Object nmsChatMessageType) {
         return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoke(nmsChatMessageType).byteValue());

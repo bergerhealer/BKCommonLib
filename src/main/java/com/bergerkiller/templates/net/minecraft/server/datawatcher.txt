@@ -17,19 +17,45 @@ class DataWatcher {
      *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
      *  } else {
      */
+#if version >= 1.10.2
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:b();
+#else
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> unwatchAndReturnAllWatched:b();
+#endif
 
     /*
      * Same signature as unwatchAndReturnAllWatched, find other function that matches
      */
+#if version >= 1.10.2
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:c();
+#else
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();
+#endif
 
+#if version >= 1.10.2
     private void watch:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 
-    public T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+    public optional T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
     public void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
+#else
+    public void watch:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
+
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
+
+    public optional T get:???((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
+    public void set:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
+#endif
+    <code>
+    public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
+        if (T.get.isAvailable()) {
+            return T.get.invoke(instance, key);
+        } else {
+            return this.read(key).getValue();
+        }
+    }
+    </code>
 
     public boolean isChanged:a();
     public boolean isEmpty:d();
@@ -42,5 +68,7 @@ class DataWatcher {
 }
 
 class DataWatcherObject {
-
+    // Only used on MC 1.8.8 and defined in the proxy, to allow for backwards compatibility
+    public optional (DataWatcherObjectHandle) DataWatcherObject(int index);
+    public optional int getId();
 }

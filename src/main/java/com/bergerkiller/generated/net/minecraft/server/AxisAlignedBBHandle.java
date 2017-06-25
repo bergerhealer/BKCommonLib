@@ -32,14 +32,6 @@ public class AxisAlignedBBHandle extends Template.Handle {
         return T.grow.invoke(instance, sx, sy, sz);
     }
 
-    public AxisAlignedBBHandle growUniform(double size) {
-        return T.growUniform.invoke(instance, size);
-    }
-
-    public AxisAlignedBBHandle shrinkUniform(double size) {
-        return T.shrinkUniform.invoke(instance, size);
-    }
-
     public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
         return T.transformB.invoke(instance, lx, ly, lz);
     }
@@ -64,6 +56,14 @@ public class AxisAlignedBBHandle extends Template.Handle {
         return T.calcSomeZ.invoke(instance, paramAxisAlignedBB, paramDouble);
     }
 
+
+    public AxisAlignedBBHandle growUniform(double size) {
+        return grow(size, size, size);
+    }
+
+    public AxisAlignedBBHandle shrinkUniform(double size) {
+        return growUniform(-size);
+    }
     public double getMinX() {
         return T.minX.getDouble(instance);
     }
@@ -127,8 +127,6 @@ public class AxisAlignedBBHandle extends Template.Handle {
         public final Template.Field.Double maxZ = new Template.Field.Double();
 
         public final Template.Method.Converted<AxisAlignedBBHandle> grow = new Template.Method.Converted<AxisAlignedBBHandle>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> growUniform = new Template.Method.Converted<AxisAlignedBBHandle>();
-        public final Template.Method.Converted<AxisAlignedBBHandle> shrinkUniform = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> transformB = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> translate = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<Boolean> bbTransformA = new Template.Method.Converted<Boolean>();

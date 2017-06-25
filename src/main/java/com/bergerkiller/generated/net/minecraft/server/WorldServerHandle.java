@@ -31,10 +31,6 @@ public class WorldServerHandle extends WorldHandle {
         return T.getPlayerChunkMap.invoke(instance);
     }
 
-    public ChunkProviderServerHandle getChunkProviderServer() {
-        return T.getChunkProviderServer.invoke(instance);
-    }
-
     public void saveLevel() {
         T.saveLevel.invoke(instance);
     }
@@ -42,6 +38,27 @@ public class WorldServerHandle extends WorldHandle {
 
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+
+    public ChunkProviderServerHandle getChunkProviderServer() {
+        if (T.getChunkProviderServer.isAvailable()) {
+            return T.getChunkProviderServer.invoke(instance);
+        } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
+            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(instance));
+        } else if (T.field_chunkProviderServer.isAvailable()) {
+            return T.field_chunkProviderServer.get(instance);   
+        } else {
+            throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
+        }
+    }
+
+    public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
+        if (T.field_chunkProviderServer.isAvailable()) {
+            T.field_chunkProviderServer.set(instance, chunkProviderServerHandle);
+        }
+        if (WorldHandle.T.field_chunkProvider.isAvailable()) {
+            WorldHandle.T.field_chunkProvider.set(instance, chunkProviderServerHandle.getRaw());
+        }
     }
     public MinecraftServerHandle getMinecraftServer() {
         return T.minecraftServer.get(instance);
@@ -84,8 +101,11 @@ public class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<EntityTracker> entityTracker = new Template.Field.Converted<EntityTracker>();
         public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMapField = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
+        @Template.Optional
+        public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
+        @Template.Optional
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 

@@ -173,13 +173,39 @@ public class Common {
             }
         });
 
-        // Botched deobfuscation of class names on 1.8.8
+        // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (Common.MC_VERSION.equals("1.8.8")) {
             Resolver.registerClassResolver(new ClassPathResolver() {
                 @Override
                 public String resolveClassPath(String classPath) {
                     if (classPath.equals("net.minecraft.server.v1_8_R3.MobSpawnerData")) {
                         return "net.minecraft.server.v1_8_R3.MobSpawnerAbstract$a";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.SoundEffectType")) {
+                        return "net.minecraft.server.v1_8_R3.Block.StepSound"; // workaround
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcher$Item")) {
+                        return "net.minecraft.server.v1_8_R3.DataWatcher$WatchableObject";
+                    }
+
+                    // We proxy a bunch of classes, because they don't exist in 1.8.8
+                    // Writing custom wrappers with switches would be too tiresome
+                    // This allows continued use of the same API without trouble
+                    // Converters take care to convert between the Class and Id used internally
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.EnumItemSlot")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataPaletteBlock")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcherObject")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.EnumGamemode")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.EnumGamemode";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.MobEffectList")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList";
                     }
                     return classPath;
                 }

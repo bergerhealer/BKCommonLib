@@ -2,7 +2,6 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -22,44 +21,12 @@ public class NMSChunkSection {
     public static final MethodAccessor<Object> getSkyLightNibble   = ChunkSectionHandle.T.getSkyLightArray.raw.toMethodAccessor();
     public static final MethodAccessor<Object> getBlockPalette     = ChunkSectionHandle.T.getBlockPalette.raw.toMethodAccessor();
 
-    /**
-     * Converts the block data in a Chunk Section into raw data
-     * 
-     * @param section to read block data from
-     * @return chunk section data
-     */
-    public static ChunkSectionBlockData exportBlockData(Object section) {
-        ChunkSectionBlockData data = new ChunkSectionBlockData();
-        exportBlockData(section, data);
-        return data;
-    }
-
     public static BlockData getBlockData(Object section, int x, int y, int z) {
         return ChunkSectionHandle.T.getBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf);
     }
 
     public static void setBlockData(Object section, int x, int y, int z, BlockData data) {
         ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
-    }
-
-    /**
-     * Converts th block data in a Chunk Section into raw data
-     * 
-     * @param section to read block data from
-     * @param data to write the data to
-     */
-    public static void exportBlockData(Object section, ChunkSectionBlockData data) {
-        ChunkSectionHandle.T.getBlockPalette.invoke(section).exportData(data.blockIds, data.blockData);
-    }
-
-    public static class ChunkSectionBlockData {
-        public final byte[] blockIds;
-        public final NibbleArrayHandle blockData;
-
-        public ChunkSectionBlockData() {
-            this.blockIds = new byte[4096];
-            this.blockData = NibbleArrayHandle.createNew();
-        }
     }
 
     public static int getSkyLight(Object section, int x, int y, int z) {

@@ -4,9 +4,13 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
 
 class PacketPlayOutScoreboardScore {
     class PacketPlayOutScoreboardScore.EnumScoreboardAction {
@@ -100,4 +104,18 @@ class PacketPlayInBlockPlace {
     private optional (Object) EnumHand enumHand:???;
 #endif
     public long timestamp;
+}
+
+class PacketPlayOutRemoveEntityEffect {
+    private int entityId:a;
+
+#if version >= 1.10.2
+    private (MobEffectListHandle) MobEffectList effectList:b;
+
+    public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect(int entityId, (MobEffectListHandle) MobEffectList mobeffectlist);
+#else
+    private (MobEffectListHandle) int effectList:b;
+
+    public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect(int entityId, (MobEffectListHandle) MobEffect mobeffectlist);
+#endif
 }

@@ -12,25 +12,102 @@ import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
     public static final rawtype (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
+
+#if version >= 1.10.2
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
+    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_stepSound:???;
+#else
+    public static final rawtype (Iterable) RegistryID<IBlockData> REGISTRY_ID:d;
+    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_stepSound:stepSound;
+#endif
 
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 
-    public int getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
-    public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
-    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata);
-    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+#if version >= 1.10.2
+    // On later versions, it has an IBlockData argument
+    public optional int bydata_getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
+    public optional int bydata_getEmission:o((IBlockDataHandle) IBlockData iblockdata);
+    public optional boolean bydata_isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public optional boolean bydata_isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+    // No-args does not exist
+    public optional int noargs_getOpacity:???();
+    public optional int noargs_getEmission:???();
+    public optional boolean noargs_isOccluding:???();
+    public optional boolean noargs_isPowerSource:???();
+#else
+    // On MC 1.8.8 and earlier, there was no block data that changes these values
+    public optional int noargs_getOpacity:p();
+    public optional int noargs_getEmission:r();
+    public optional boolean noargs_isOccluding:isOccluding();
+    public optional boolean noargs_isPowerSource:isPowerSource();
+    // By IBlockData does not exist
+    public optional int bydata_getOpacity:???((IBlockDataHandle) IBlockData iblockdata);
+    public optional int bydata_getEmission:???((IBlockDataHandle) IBlockData iblockdata);
+    public optional boolean bydata_isOccluding:???((IBlockDataHandle) IBlockData iblockdata);
+    public optional boolean bydata_isPowerSource:???((IBlockDataHandle) IBlockData iblockdata);
+#endif
+    <code>
+    public int getOpacity(IBlockDataHandle iblockdata) {
+        if (T.bydata_getOpacity.isAvailable()) {
+            return T.bydata_getOpacity.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_getOpacity.invoke(instance);
+        }
+    }
+
+    public int getEmission(IBlockDataHandle iblockdata) {
+        if (T.bydata_getEmission.isAvailable()) {
+            return T.bydata_getEmission.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_getEmission.invoke(instance);
+        }
+    }
+
+    public boolean isOccluding(IBlockDataHandle iblockdata) {
+        if (T.bydata_isOccluding.isAvailable()) {
+            return T.bydata_isOccluding.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_isOccluding.invoke(instance);
+        }
+    }
+
+    public boolean isPowerSource(IBlockDataHandle iblockdata) {
+        if (T.bydata_isPowerSource.isAvailable()) {
+            return T.bydata_isPowerSource.invoke(instance, iblockdata);
+        } else {
+            return T.noargs_isPowerSource.invoke(instance);
+        }
+    }
+    </code>
+
+
     public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
 
 #if version >= 1.11.2
-    public (SoundEffectTypeHandle) SoundEffectType getStepSound();
+    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound();
+#elseif version >= 1.10.2
+    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
 #else
-    public (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
+    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:???();
 #endif
+    <code>
+    public SoundEffectTypeHandle getStepSound() {
+        if (T.getStepSound.isAvailable()) {
+            return T.getStepSound.invoke(instance);
+        } else {
+            return T.opt_1_8_8_stepSound.get(instance);
+        }
+    }
+    </code>
 
     public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
     public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);
+
+#if version >= 1.10.2
     public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
+#else
+    public void stepOn:a((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
+#endif
 
     public final (IBlockDataHandle) IBlockData getBlockData();
 

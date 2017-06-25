@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.util.List;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -11,7 +10,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -28,7 +26,7 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         if (hook == null) {
             hook = new ChunkProviderServerHook();
             cps = hook.hook(cps);
-            setCPS(world, cps);
+            setCPS(world, ChunkProviderServerHandle.createHandle(cps));
         }
     }
 
@@ -37,7 +35,7 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         ChunkProviderServerHook hook = ChunkProviderServerHook.get(cps, ChunkProviderServerHook.class);
         if (hook != null) {
             cps = ChunkProviderServerHook.unhook(cps);
-            setCPS(world, cps);
+            setCPS(world, ChunkProviderServerHandle.createHandle(cps));
         }
     }
 
@@ -45,8 +43,8 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
-    private static void setCPS(org.bukkit.World world, Object cps) {
-        WorldHandle.T.chunkProvider.raw.set(Conversion.toWorldHandle.convert(world), cps);
+    private static void setCPS(org.bukkit.World world, ChunkProviderServerHandle cps) {
+        WorldServerHandle.fromBukkit(world).setChunkProviderServer(cps);
     }
 
     private final org.bukkit.World getWorld() {

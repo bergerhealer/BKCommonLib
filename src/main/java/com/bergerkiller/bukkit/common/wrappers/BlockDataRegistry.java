@@ -85,6 +85,16 @@ public class BlockDataRegistry {
     }
 
     /**
+     * Obtains immutable BlockData information by Block type Id
+     * 
+     * @param typeId input
+     * @return Immutable BlockData
+     */
+    public static BlockData fromTypeId(int typeId) {
+        return BlockDataImpl.BY_ID[typeId & BlockDataImpl.ID_MASK];
+    }
+
+    /**
      * Obtains immutable BlockData information by Block type Id and its data
      * 
      * @param typeId input

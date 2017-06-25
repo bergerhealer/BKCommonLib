@@ -29,11 +29,66 @@ public class MobEffectHandle extends Template.Handle {
         return T.fromNBT.invokeVA(compound);
     }
 
+    public MobEffectListHandle getEffectList() {
+        return T.effectList.get(instance);
+    }
+
+    public void setEffectList(MobEffectListHandle value) {
+        T.effectList.set(instance, value);
+    }
+
+    public int getDuration() {
+        return T.duration.getInteger(instance);
+    }
+
+    public void setDuration(int value) {
+        T.duration.setInteger(instance, value);
+    }
+
+    public int getAmplification() {
+        return T.amplification.getInteger(instance);
+    }
+
+    public void setAmplification(int value) {
+        T.amplification.setInteger(instance, value);
+    }
+
+    public boolean isSplash() {
+        return T.splash.getBoolean(instance);
+    }
+
+    public void setSplash(boolean value) {
+        T.splash.setBoolean(instance, value);
+    }
+
+    public boolean isAmbient() {
+        return T.ambient.getBoolean(instance);
+    }
+
+    public void setAmbient(boolean value) {
+        T.ambient.setBoolean(instance, value);
+    }
+
+    public boolean isParticles() {
+        return T.particles.getBoolean(instance);
+    }
+
+    public void setParticles(boolean value) {
+        T.particles.setBoolean(instance, value);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.MobEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
+        public final Template.Field.Converted<MobEffectListHandle> effectList = new Template.Field.Converted<MobEffectListHandle>();
+        public final Template.Field.Integer duration = new Template.Field.Integer();
+        public final Template.Field.Integer amplification = new Template.Field.Integer();
+        public final Template.Field.Boolean splash = new Template.Field.Boolean();
+        public final Template.Field.Boolean ambient = new Template.Field.Boolean();
+        public final Template.Field.Boolean particles = new Template.Field.Boolean();
+
         public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
 
     }

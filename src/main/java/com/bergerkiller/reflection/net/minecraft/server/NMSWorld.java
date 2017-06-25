@@ -29,8 +29,13 @@ public class NMSWorld {
     public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(DuplexConversion.intHashMap);
 
     public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
-    public static final FieldAccessor<Object> navigationListener = WorldHandle.T.navigationListener.raw.toFieldAccessor();
     public static final FieldAccessor<List<Object>> accessList = (FieldAccessor) WorldHandle.T.accessList.raw.toFieldAccessor();
+
+    /**
+     * This field is only available >= MC 1.10.2
+     */
+    @Deprecated
+    public static final FieldAccessor<Object> navigationListener = WorldHandle.T.navigationListener.raw.toFieldAccessor();
 
     public static final FieldAccessor<List<Object>> players = (FieldAccessor) WorldHandle.T.players.raw.toFieldAccessor();
 

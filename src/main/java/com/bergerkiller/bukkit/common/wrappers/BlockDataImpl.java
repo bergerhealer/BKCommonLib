@@ -20,6 +20,7 @@ public class BlockDataImpl extends BlockData {
     public static final int DATA_BITS = 4;
 
     public static final int ID_SIZE = (1 << ID_BITS);
+    public static final int ID_MASK = (ID_SIZE - 1);
     public static final int DATA_SIZE = (1 << DATA_BITS);
     public static final int DATA_MASK = (DATA_SIZE - 1);
 

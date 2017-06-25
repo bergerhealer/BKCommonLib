@@ -47,18 +47,21 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
 public class NMSPacketClasses {
 
@@ -998,12 +1001,12 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Object> effectList = nextFieldSignature("private MobEffectList b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, CommonUtil.getNMSClass("MobEffectList"));
+        public final FieldAccessor<Integer> entityId = PacketPlayOutRemoveEntityEffectHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<MobEffectListHandle> effectList = PacketPlayOutRemoveEntityEffectHandle.T.effectList.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, Object mobEffectList) {
-            return constructor1.newInstance(entityId, mobEffectList);
+            Handle packetHandle = PacketPlayOutRemoveEntityEffectHandle.T.constr_entityId_mobeffectlist.newInstance(entityId, mobEffectList);
+            return new CommonPacket(packetHandle.getRaw());
         }
     }
 

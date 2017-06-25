@@ -47,10 +47,6 @@ public class DataWatcherHandle extends Template.Handle {
         return T.read.invoke(instance, key);
     }
 
-    public Object get(Key<?> key) {
-        return T.get.invoke(instance, key);
-    }
-
     public void set(Key<?> key, Object value) {
         T.set.invoke(instance, key, value);
     }
@@ -63,6 +59,14 @@ public class DataWatcherHandle extends Template.Handle {
         return T.isEmpty.invoke(instance);
     }
 
+
+    public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
+        if (T.get.isAvailable()) {
+            return T.get.invoke(instance, key);
+        } else {
+            return this.read(key).getValue();
+        }
+    }
     public EntityHandle getOwner() {
         return T.owner.get(instance);
     }
@@ -84,6 +88,7 @@ public class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<Void> watch = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
+        @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<Void> set = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();

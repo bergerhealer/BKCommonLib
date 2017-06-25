@@ -25,10 +25,6 @@ public class DataPaletteBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public NibbleArrayHandle exportData(byte[] abyte, NibbleArrayHandle nibblearray) {
-        return T.exportData.invoke(instance, abyte, nibblearray);
-    }
-
     public BlockData getBlockData(int x, int y, int z) {
         return T.getBlockData.invoke(instance, x, y, z);
     }
@@ -42,7 +38,6 @@ public class DataPaletteBlockHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DataPaletteBlockClass extends Template.Class<DataPaletteBlockHandle> {
-        public final Template.Method.Converted<NibbleArrayHandle> exportData = new Template.Method.Converted<NibbleArrayHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();
 

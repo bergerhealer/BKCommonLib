@@ -14,7 +14,6 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     public static final EntityMinecartFurnaceClass T = new EntityMinecartFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace");
 
-    public static final Key<Boolean> DATA_SMOKING = T.DATA_SMOKING.getSafe();
     /* ============================================================================== */
 
     public static EntityMinecartFurnaceHandle createHandle(Object handleInstance) {
@@ -26,6 +25,8 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
 
     /* ============================================================================== */
 
+
+    public static final Key<Boolean> DATA_SMOKING = Key.fromTemplate(T.DATA_SMOKING, 16, byte.class);
     public int getFuel() {
         return T.fuel.getInteger(instance);
     }
@@ -55,6 +56,7 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartFurnaceClass extends Template.Class<EntityMinecartFurnaceHandle> {
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_SMOKING = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Integer fuel = new Template.Field.Integer();

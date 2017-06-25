@@ -10,7 +10,11 @@ class TileEntity {
 
     public (BlockPositionHandle) BlockPosition getPosition();
 
+#if version >= 1.10.2
     public (org.bukkit.Material) Block getType:getBlock();
+#else
+    public (org.bukkit.Material) Block getType:w();
+#endif
 
 #if version >= 1.11.2
     public int getRawData:v();

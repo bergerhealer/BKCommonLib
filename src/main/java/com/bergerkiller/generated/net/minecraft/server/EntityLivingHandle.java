@@ -63,6 +63,11 @@ public class EntityLivingHandle extends EntityHandle {
     public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7, int.class);
     public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8, byte.class);
     public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9, byte.class);
+
+
+    public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(livingEntity));
+    }
     public AttributeMapServerHandle getAttributeMapField() {
         return T.attributeMapField.get(instance);
     }
@@ -71,11 +76,11 @@ public class EntityLivingHandle extends EntityHandle {
         T.attributeMapField.set(instance, value);
     }
 
-    public Map<Object, Object> getMobEffects() {
+    public Map<MobEffectListHandle, MobEffectHandle> getMobEffects() {
         return T.mobEffects.get(instance);
     }
 
-    public void setMobEffects(Map<Object, Object> value) {
+    public void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value) {
         T.mobEffects.set(instance, value);
     }
 
@@ -120,7 +125,7 @@ public class EntityLivingHandle extends EntityHandle {
         public final Template.StaticField.Converted<Key<Integer>> DATA_ARROWCOUNT = new Template.StaticField.Converted<Key<Integer>>();
 
         public final Template.Field.Converted<AttributeMapServerHandle> attributeMapField = new Template.Field.Converted<AttributeMapServerHandle>();
-        public final Template.Field.Converted<Map<Object, Object>> mobEffects = new Template.Field.Converted<Map<Object, Object>>();
+        public final Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>> mobEffects = new Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>>();
         public final Template.Field.Float lastDamage = new Template.Field.Float();
         public final Template.Field.Float forwardMovement = new Template.Field.Float();
         public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();

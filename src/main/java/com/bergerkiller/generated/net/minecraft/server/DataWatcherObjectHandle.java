@@ -29,6 +29,12 @@ public class DataWatcherObjectHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DataWatcherObjectClass extends Template.Class<DataWatcherObjectHandle> {
+        @Template.Optional
+        public final Template.Constructor.Converted<DataWatcherObjectHandle> constr_index = new Template.Constructor.Converted<DataWatcherObjectHandle>();
+
+        @Template.Optional
+        public final Template.Method<Integer> getId = new Template.Method<Integer>();
+
     }
 
 }

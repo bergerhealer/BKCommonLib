@@ -24,6 +24,19 @@ public class EnumItemSlotHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public int getIndex() {
+        return T.getIndex.invoke(instance);
+    }
+
+
+    public static Object fromIndexRaw(int index) {
+        for (Object value : T.getType().getEnumConstants()) {
+            if (T.getIndex.invoke(value).intValue() == index) {
+                return value;
+            }
+        }
+        return null;
+    }
 
     public org.bukkit.inventory.EquipmentSlot toBukkit() {
         return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) instance).ordinal()];
@@ -41,6 +54,8 @@ public class EnumItemSlotHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumItemSlotClass extends Template.Class<EnumItemSlotHandle> {
+        public final Template.Method<Integer> getIndex = new Template.Method<Integer>();
+
     }
 
 }

@@ -19,7 +19,18 @@ class EnumDifficulty {
 }
 
 class EnumItemSlot {
+    public int getIndex:c();
+
     <code>
+    public static Object fromIndexRaw(int index) {
+        for (Object value : T.getType().getEnumConstants()) {
+            if (T.getIndex.invoke(value).intValue() == index) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     public org.bukkit.inventory.EquipmentSlot toBukkit() {
         return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) instance).ordinal()];
     }

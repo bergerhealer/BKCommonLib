@@ -61,10 +61,6 @@ public class ChunkHandle extends Template.Handle {
         T.addEntities.invoke(instance);
     }
 
-    public void loadNearby(Object iChunkProviderRaw, Object chunkGeneratorRaw, boolean newChunk) {
-        T.loadNearby.invoke(instance, iChunkProviderRaw, chunkGeneratorRaw, newChunk);
-    }
-
     public boolean checkCanSave(boolean isNotAutosave) {
         return T.checkCanSave.invoke(instance, isNotAutosave);
     }
@@ -154,7 +150,6 @@ public class ChunkHandle extends Template.Handle {
         public final Template.Method<Integer> getTopSliceY = new Template.Method<Integer>();
         public final Template.Method<byte[]> getBiomeIndex = new Template.Method<byte[]>();
         public final Template.Method<Void> addEntities = new Template.Method<Void>();
-        public final Template.Method.Converted<Void> loadNearby = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> checkCanSave = new Template.Method<Boolean>();
 
     }

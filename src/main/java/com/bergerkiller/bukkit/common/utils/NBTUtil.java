@@ -31,8 +31,8 @@ public class NBTUtil {
      * @param compound to read a mob effect from
      * @return Loaded MobEffect
      */
-    public static Object loadMobEffect(CommonTagCompound compound) {
-        return MobEffectHandle.fromNBT(compound).getRaw();
+    public static MobEffectHandle loadMobEffect(CommonTagCompound compound) {
+        return MobEffectHandle.fromNBT(compound);
     }
 
     /**

@@ -27,7 +27,6 @@ public class NMSChunk {
 
     public static final MethodAccessor<byte[]> biomeData = ChunkHandle.T.getBiomeIndex.toMethodAccessor();
     private static final MethodAccessor<Void> addEntities = ChunkHandle.T.addEntities.toMethodAccessor();
-    private static final MethodAccessor<Void> loadNeighbours = ChunkHandle.T.loadNearby.raw.toMethodAccessor();
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();
 
     public static final TranslatorFieldAccessor<World> world = ChunkHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
@@ -55,10 +54,6 @@ public class NMSChunk {
 
     public static final int XZ_MASK = 0xf;
     public static final int Y_MASK = 0xff;
-
-    public static void loadNeighbours(Object chunkHandle, Object chunkProvider1, Object chunkProvider2, int x, int z) {
-        loadNeighbours.invoke(chunkHandle, chunkProvider1, chunkProvider2, x, z);
-    }
 
     public static void addEntities(Object chunkHandle) {
         addEntities.invoke(chunkHandle);

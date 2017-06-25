@@ -31,6 +31,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
         return T.getBiomeSpawnInfo.invoke(instance, enumcreaturetype, position);
     }
 
+    public boolean isLoaded(int cx, int cz) {
+        return T.isLoaded.invoke(instance, cx, cz);
+    }
+
     public ChunkHandle getChunkIfLoaded(int cx, int cz) {
         return T.getChunkIfLoaded.invoke(instance, cx, cz);
     }
@@ -41,10 +45,6 @@ public class ChunkProviderServerHandle extends Template.Handle {
 
     public void saveChunk(ChunkHandle chunk) {
         T.saveChunk.invoke(instance, chunk);
-    }
-
-    public boolean isLoaded(int cx, int cz) {
-        return T.isLoaded.invoke(instance, cx, cz);
     }
 
     public Object getChunkLoader() {
@@ -72,10 +72,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
         public final Template.Method.Converted<List<BiomeMetaHandle>> getBiomeSpawnInfo = new Template.Method.Converted<List<BiomeMetaHandle>>();
+        public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();
-        public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
 
     }
 

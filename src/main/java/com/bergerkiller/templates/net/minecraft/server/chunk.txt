@@ -37,8 +37,6 @@ class Chunk {
 
     public void addEntities();
 
-    public void loadNearby((Object) IChunkProvider iChunkProviderRaw, (Object) ChunkGenerator chunkGeneratorRaw, boolean newChunk);
-
     public boolean checkCanSave:a(boolean isNotAutosave);
 
     <code>
@@ -62,22 +60,40 @@ class ChunkSection {
 
     public (NibbleArrayHandle) NibbleArray getBlockLightArray:getEmittedLightArray();
     public (NibbleArrayHandle) NibbleArray getSkyLightArray:getSkyLightArray();
+
+#if version >= 1.10.2
     public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
+#else
+    // For MC 1.8.8 we do some conversion magic to expose the same API
+    // DataPaletteBlock doesn't actually exist, it is emulated by BKCommonLib
+    public (DataPaletteBlockHandle) char[] getBlockPalette:getIdArray();
+#endif
 
     public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
     public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
 
-    public int getSkyLight:b(int x, int y, int z);
     public void setSkyLight:a(int x, int y, int z, int level);
-    public int getBlockLight:c(int x, int y, int z);
     public void setBlockLight:b(int x, int y, int z, int level);
+
+#if version >= 1.10.2
+    public int getSkyLight:b(int x, int y, int z);
+    public int getBlockLight:c(int x, int y, int z);
+#else
+    public int getSkyLight:d(int x, int y, int z);
+    public int getBlockLight:e(int x, int y, int z);
+#endif
+
 }
 
 class DataPaletteBlock {
-    public (NibbleArrayHandle) NibbleArray exportData(byte[] abyte, (NibbleArrayHandle) NibbleArray nibblearray);
-
+#if version >= 1.10.2
     public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
-    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data) {
+    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
+#else
+    // Emulated on MC 1.8.8
+    public BlockData getBlockData(int x, int y, int z);
+    public void setBlockData(int x, int y, int z, BlockData data);
+#endif
 }
 
 class EnumSkyBlock {

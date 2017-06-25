@@ -14,12 +14,6 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
     public static final EntityMinecartAbstractClass T = new EntityMinecartAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartAbstractHandle.class, "net.minecraft.server.EntityMinecartAbstract");
 
-    public static final Key<Integer> DATA_SHAKING_FACTOR = T.DATA_SHAKING_FACTOR.getSafe();
-    public static final Key<Integer> DATA_SHAKING_DIRECTION = T.DATA_SHAKING_DIRECTION.getSafe();
-    public static final Key<Float> DATA_SHAKING_DAMAGE = T.DATA_SHAKING_DAMAGE.getSafe();
-    public static final Key<Integer> DATA_BLOCK_TYPE = T.DATA_BLOCK_TYPE.getSafe();
-    public static final Key<Integer> DATA_BLOCK_OFFSET = T.DATA_BLOCK_OFFSET.getSafe();
-    public static final Key<Boolean> DATA_BLOCK_VISIBLE = T.DATA_BLOCK_VISIBLE.getSafe();
     /* ============================================================================== */
 
     public static EntityMinecartAbstractHandle createHandle(Object handleInstance) {
@@ -47,16 +41,29 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
         T.activate.invoke(instance, x, y, z, active);
     }
 
+
+    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.fromTemplate(T.DATA_SHAKING_FACTOR, 17, int.class);
+    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.fromTemplate(T.DATA_SHAKING_DIRECTION, 18, int.class);
+    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.fromTemplate(T.DATA_SHAKING_DAMAGE, 19, float.class);
+    public static final Key<Integer> DATA_BLOCK_TYPE = Key.fromTemplate(T.DATA_BLOCK_TYPE, 20, int.class);
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.fromTemplate(T.DATA_BLOCK_OFFSET, 21, int.class);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.fromTemplate(T.DATA_BLOCK_VISIBLE, 22, byte.class);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartAbstractClass extends Template.Class<EntityMinecartAbstractHandle> {
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_SHAKING_FACTOR = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_SHAKING_DIRECTION = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Float>> DATA_SHAKING_DAMAGE = new Template.StaticField.Converted<Key<Float>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_BLOCK_TYPE = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_BLOCK_OFFSET = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_BLOCK_VISIBLE = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Method<Float> getDamage = new Template.Method<Float>();
