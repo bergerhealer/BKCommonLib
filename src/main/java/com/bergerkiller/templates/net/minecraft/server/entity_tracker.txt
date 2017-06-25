@@ -207,7 +207,11 @@ class EntityTrackerEntry {
 
     public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
 
+#if version >= 1.10.2
     private (CommonPacket) Packet<?> getSpawnPacket:e();
+#else
+    private (CommonPacket) Packet getSpawnPacket:c();
+#endif
 
     <code>
     public java.util.Collection<org.bukkit.entity.Player> getViewers() {

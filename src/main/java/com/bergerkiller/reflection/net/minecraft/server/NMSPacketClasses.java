@@ -1303,7 +1303,7 @@ public class NMSPacketClasses {
 
         public CommonPacket newInstance(String name, int count, double x, double y, double z, double rx, double ry, double rz, double speed) {
             final CommonPacket packet = newInstance();
-            packet.write(this.particle, EnumParticleHandle.getRaw(EnumParticleHandle.byName(name)));
+            packet.write(this.particle, EnumParticleHandle.getRaw(EnumParticleHandle.getByName(name)));
             packet.write(this.particleCount, count);
             packet.write(this.x, (float) x);
             packet.write(this.y, (float) y);

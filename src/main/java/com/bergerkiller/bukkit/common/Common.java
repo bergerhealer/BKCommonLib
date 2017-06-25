@@ -173,6 +173,19 @@ public class Common {
             }
         });
 
+        // Botched deobfuscation of class names on 1.8.8
+        if (Common.MC_VERSION.equals("1.8.8")) {
+            Resolver.registerClassResolver(new ClassPathResolver() {
+                @Override
+                public String resolveClassPath(String classPath) {
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.MobSpawnerData")) {
+                        return "net.minecraft.server.v1_8_R3.MobSpawnerAbstract$a";
+                    }
+                    return classPath;
+                }
+            });
+        }
+
         // This must be initialized AFTER we have registered the Class path resolvers!
         TEMPLATE_RESOLVER.load();
         Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);

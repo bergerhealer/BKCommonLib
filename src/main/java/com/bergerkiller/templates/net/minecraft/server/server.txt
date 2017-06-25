@@ -24,7 +24,12 @@ class PlayerList {
 
     public void savePlayers();
 
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet<?> packet)
+#if version >= 1.10.2
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet<?> packet);
+#else
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet packet);
+#endif
+
 }
 
 class DedicatedPlayerList extends PlayerList {

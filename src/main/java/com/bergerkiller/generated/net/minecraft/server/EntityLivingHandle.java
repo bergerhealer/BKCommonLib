@@ -18,11 +18,6 @@ public class EntityLivingHandle extends EntityHandle {
     public static final EntityLivingClass T = new EntityLivingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityLivingHandle.class, "net.minecraft.server.EntityLiving");
 
-    public static final Key<Byte> DATA_LIVING_FLAGS = T.DATA_LIVING_FLAGS.getSafe();
-    public static final Key<Float> DATA_HEALTH = T.DATA_HEALTH.getSafe();
-    public static final Key<Integer> DATA_PARTICLES_TIMER = T.DATA_PARTICLES_TIMER.getSafe();
-    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = T.DATA_PARTICLES_HIDDEN.getSafe();
-    public static final Key<Integer> DATA_UNKNOWN1 = T.DATA_UNKNOWN1.getSafe();
     /* ============================================================================== */
 
     public static EntityLivingHandle createHandle(Object handleInstance) {
@@ -62,6 +57,12 @@ public class EntityLivingHandle extends EntityHandle {
         return T.getMaxHealth.invoke(instance);
     }
 
+
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.fromTemplate(T.DATA_LIVING_FLAGS, -1, byte.class);
+    public static final Key<Float> DATA_HEALTH = Key.fromTemplate(T.DATA_HEALTH, 6, float.class);
+    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7, int.class);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8, byte.class);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9, byte.class);
     public AttributeMapServerHandle getAttributeMapField() {
         return T.attributeMapField.get(instance);
     }
@@ -107,11 +108,16 @@ public class EntityLivingHandle extends EntityHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityLivingClass extends Template.Class<EntityLivingHandle> {
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Byte>> DATA_LIVING_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Float>> DATA_HEALTH = new Template.StaticField.Converted<Key<Float>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Integer>> DATA_PARTICLES_TIMER = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_PARTICLES_HIDDEN = new Template.StaticField.Converted<Key<Boolean>>();
-        public final Template.StaticField.Converted<Key<Integer>> DATA_UNKNOWN1 = new Template.StaticField.Converted<Key<Integer>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Integer>> DATA_ARROWCOUNT = new Template.StaticField.Converted<Key<Integer>>();
 
         public final Template.Field.Converted<AttributeMapServerHandle> attributeMapField = new Template.Field.Converted<AttributeMapServerHandle>();
         public final Template.Field.Converted<Map<Object, Object>> mobEffects = new Template.Field.Converted<Map<Object, Object>>();

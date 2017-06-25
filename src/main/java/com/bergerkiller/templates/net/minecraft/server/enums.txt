@@ -70,7 +70,30 @@ optional class EnumMoveType {
 }
 
 class EnumParticle {
-    public static (EnumParticleHandle) EnumParticle byName:a(String name);
+#if version >= 1.10.2
+    public static optional (EnumParticleHandle) EnumParticle byName:a(String name);
+#else
+    public static optional (EnumParticleHandle) EnumParticle byName:???(String name);
+#endif
+
+    public String getName:b();
+
+    public int getId:c();
+
+    <code>
+    public static EnumParticleHandle getByName(String name) {
+        if (T.byName.isAvailable()) {
+            return T.byName.invokeVA(name);
+        } else {
+            for (Object enumValue : T.getType().getEnumConstants()) {
+                if (T.getName.invoke(enumValue).equals(name)) {
+                    return createHandle(enumValue);
+                }
+            }
+            return null;
+        }
+    }
+    </code>
 }
 
 class EnumGamemode {

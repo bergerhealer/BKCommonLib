@@ -17,7 +17,9 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 class Entity {
+#if version >= 1.10.2
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
+#endif
     private static int entityCount;
     private int idField:id;
 
@@ -260,20 +262,12 @@ class Entity {
 
     public boolean valid;
 
-    public (EntityHandle) Entity((WorldHandle) World world);
+// For some reason was down here on 1.8.8 and earlier
+#if version <= 1.8.8
+    protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
+#endif
 
-    /*
-     * protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
-     *     if (flag) {
-     *         if (this.fallDistance > 0.0F) {
-     *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
-     *         }
-     *         ...
-     *     }
-     *     ...
-     * }
-     */
-    protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+    public (EntityHandle) Entity((WorldHandle) World world);
 
     /*
      # protected void ##METHODNAME##() {
@@ -373,8 +367,10 @@ class Entity {
      */
 #if version >= 1.12
     public boolean isInWaterUpdate:aq();
-#else
+#elseif version >= 1.10.2
     public boolean isInWaterUpdate:ak();
+#else
+    public boolean isInWaterUpdate:W();
 #endif
 
     /*
@@ -382,7 +378,11 @@ class Entity {
      *     return this.inWater;
      * }
      */
+#if version >= 1.10.2
     public boolean isInWater();
+#else
+    public boolean isInWater:V();
+#endif
 
     /*
      * public void move(double d0, double d1, double d2) {
@@ -403,7 +403,11 @@ class Entity {
      *     }
      * }
      */
+#if version >= 1.10.2
     protected boolean hasMovementSound:playStepSound();
+#else
+    protected boolean hasMovementSound:s_();
+#endif
 
     /*
      # protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
@@ -418,7 +422,11 @@ class Entity {
      *     }
      * }
      */
-    protected void doFallUpdate:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition blockposition);
+#if version >= 1.10.2
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+#else
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
+#endif
 
     /*
      * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
@@ -472,19 +480,43 @@ class Entity {
 
 #if version >= 1.12
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
-#else
+#elseif version >= 1.10.2
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
 #endif
 
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
 
+#if version >= 1.10.2
+    public optional boolean isVehicle();
+    public optional boolean isPassenger();
     public void recalcPosition();
+#else
+    public optional boolean isVehicle:???();
+    public optional boolean isPassenger:???();
+    private void recalcPosition();
+#endif
+
+    <code>
+    public boolean isPassenger() {
+        if (T.isPassenger.isAvailable()) {
+            return T.isPassenger.invoke(instance);
+        } else {
+            return T.vehicle.raw.get(instance) != null;
+        }
+    }
+
+    public boolean isVehicle() {
+        if (T.isVehicle.isAvailable()) {
+            return T.isVehicle.invoke(instance);
+        } else {
+            return T.opt_passenger.get(instance) != null;
+        }
+    }
+    </code>
 
     public boolean isBurning();
-
-    public boolean isPassenger();
-
-    public boolean isVehicle();
 
     public void setOnFire(int numSeconds);
 
@@ -505,29 +537,47 @@ class Entity {
 #if version >= 1.12
     public boolean isWet:an();
 
-#if pre
-    // This was on the pre-release version
-    public (EntityHandle) Entity getDriverEntity:bC();
-#else
-    // Official 1.12
-    public (EntityHandle) Entity getDriverEntity:bE();
-#endif
+    #if pre
+        // This was on the pre-release version
+        public optional (EntityHandle) Entity getDriverEntity:bC();
+    #else
+        // Official 1.12
+        public optional (EntityHandle) Entity getDriverEntity:bE();
+    #endif
 
-    public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
-#else
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.10.2
     public boolean isWet:ai();
 
-    public (EntityHandle) Entity getDriverEntity:bw();
+    public optional (EntityHandle) Entity getDriverEntity:bw();
 
-    public (CommonTagCompound) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#else
+    public boolean isWet:U();
+
+    public optional (EntityHandle) Entity getDriverEntity:???();
+
+    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #endif
+
+    <code>
+    public EntityHandle getDriverEntity() {
+        if (T.getDriverEntity.isAvailable()) {
+            return T.getDriverEntity.invoke(instance);
+        } else {
+            return null; // driver feature not a thing on this server
+        }
+    }
+    </code>
 
 #if version >= 1.12
     public void onTick:B_();
 #else if version >= 1.11.2
     public void onTick:A_();
-#else
+#elseif version >= 1.10.2
     public void onTick:m();
+#else
+    public void onTick:t_();
 #endif
 
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
@@ -538,7 +588,20 @@ class Entity {
 
     public boolean isSneaking();
 
-    public boolean isInSameVehicle:x((EntityHandle) Entity entity);
+#if vehicle >= 1.10.2
+    public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
+#else
+    public optional boolean isInSameVehicle:???((EntityHandle) Entity entity);
+#endif
+    <code>
+    public boolean isInSameVehicle(EntityHandle entity) {
+        if (T.isInSameVehicle.isAvailable()) {
+            return T.isInSameVehicle.invoke(instance, entity);
+        } else {
+            return T.vehicle.raw.get(this.instance) == T.vehicle.raw.get(entity.instance);
+        }
+    }
+    </code>
 
     public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
 

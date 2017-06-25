@@ -13,25 +13,42 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 
 class EntityLiving extends Entity {
-#if version >= 1.12
-    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
-    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:br;
-#elseif version >= 1.11.2
-    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
-    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:bq;
+#if version >= 1.10.2
+    #if version >= 1.12
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
+    #elseif version >= 1.11.2
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bq;
+    #else
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
+        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    #endif
 #else
-    protected static final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
-    public static final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
-    private static final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
-    private static final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_UNKNOWN1:h;
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:???;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:???;
 #endif
+
+    <code>
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.fromTemplate(T.DATA_LIVING_FLAGS, -1, byte.class);
+    public static final Key<Float> DATA_HEALTH = Key.fromTemplate(T.DATA_HEALTH, 6, float.class);
+    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7, int.class);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8, byte.class);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9, byte.class);
+    </code>
+
 
 #if version >= 1.11.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;

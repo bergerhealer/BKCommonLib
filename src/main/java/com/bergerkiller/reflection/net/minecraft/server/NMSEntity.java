@@ -219,7 +219,7 @@ public class NMSEntity {
      *     }
      * }
      */
-    public static final MethodAccessor<Void> doFallUpdate = EntityHandle.T.doFallUpdate.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> doFallUpdate = EntityHandle.T.updateFalling.raw.toMethodAccessor();
 
     /*
      * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {

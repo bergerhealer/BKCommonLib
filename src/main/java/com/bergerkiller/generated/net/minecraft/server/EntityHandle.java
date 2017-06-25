@@ -49,10 +49,6 @@ public class EntityHandle extends Template.Handle {
         T.entityCount.setInteger(value);
     }
 
-    public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
-        T.updateFalling.invoke(instance, d0, flag, blockData, position);
-    }
-
     public void updateBlockCollision() {
         T.updateBlockCollision.invoke(instance);
     }
@@ -97,8 +93,8 @@ public class EntityHandle extends Template.Handle {
         return T.hasMovementSound.invoke(instance);
     }
 
-    public void doFallUpdate(double d0, boolean flag, BlockData blockData, IntVector3 blockposition) {
-        T.doFallUpdate.invoke(instance, d0, flag, blockData, blockposition);
+    public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
+        T.updateFalling.invoke(instance, d0, flag, blockData, position);
     }
 
     public void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData) {
@@ -157,14 +153,6 @@ public class EntityHandle extends Template.Handle {
         return T.isBurning.invoke(instance);
     }
 
-    public boolean isPassenger() {
-        return T.isPassenger.invoke(instance);
-    }
-
-    public boolean isVehicle() {
-        return T.isVehicle.invoke(instance);
-    }
-
     public void setOnFire(int numSeconds) {
         T.setOnFire.invoke(instance, numSeconds);
     }
@@ -173,12 +161,8 @@ public class EntityHandle extends Template.Handle {
         return T.isWet.invoke(instance);
     }
 
-    public EntityHandle getDriverEntity() {
-        return T.getDriverEntity.invoke(instance);
-    }
-
-    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
-        return T.saveToNBT.invoke(instance, compound);
+    public void saveToNBT(CommonTagCompound compound) {
+        T.saveToNBT.invoke(instance, compound);
     }
 
     public void onTick() {
@@ -199,10 +183,6 @@ public class EntityHandle extends Template.Handle {
 
     public boolean isSneaking() {
         return T.isSneaking.invoke(instance);
-    }
-
-    public boolean isInSameVehicle(EntityHandle entity) {
-        return T.isInSameVehicle.invoke(instance, entity);
     }
 
     public void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails) {
@@ -295,6 +275,23 @@ public class EntityHandle extends Template.Handle {
     public static final int DATA_FLAG_FLYING = (1 << 7);
 
 
+    public boolean isPassenger() {
+        if (T.isPassenger.isAvailable()) {
+            return T.isPassenger.invoke(instance);
+        } else {
+            return T.vehicle.raw.get(instance) != null;
+        }
+    }
+
+    public boolean isVehicle() {
+        if (T.isVehicle.isAvailable()) {
+            return T.isVehicle.invoke(instance);
+        } else {
+            return T.opt_passenger.get(instance) != null;
+        }
+    }
+
+
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
             return T.prop_getMaxFireTicks.invoke(instance);
@@ -302,6 +299,24 @@ public class EntityHandle extends Template.Handle {
             return T.field_maxFireTicks.getInteger(instance);
         } else {
             throw new UnsupportedOperationException("Max Fire Ticks can not be read");
+        }
+    }
+
+
+    public EntityHandle getDriverEntity() {
+        if (T.getDriverEntity.isAvailable()) {
+            return T.getDriverEntity.invoke(instance);
+        } else {
+            return null; // driver feature not a thing on this server
+        }
+    }
+
+
+    public boolean isInSameVehicle(EntityHandle entity) {
+        if (T.isInSameVehicle.isAvailable()) {
+            return T.isInSameVehicle.invoke(instance, entity);
+        } else {
+            return T.vehicle.raw.get(this.instance) == T.vehicle.raw.get(entity.instance);
         }
     }
 
@@ -775,7 +790,6 @@ public class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
-        public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
@@ -787,7 +801,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isInWaterUpdate = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasMovementSound = new Template.Method<Boolean>();
-        public final Template.Method.Converted<Void> doFallUpdate = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> doStepSoundUpdate = new Template.Method.Converted<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
@@ -800,21 +814,25 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
+        @Template.Optional
+        public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
         public final Template.Method<Void> recalcPosition = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
-        public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
-        public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
         public final Template.Method<Void> setOnFire = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
         public final Template.Method<Boolean> isWet = new Template.Method<Boolean>();
+        @Template.Optional
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
-        public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
+        public final Template.Method.Converted<Void> saveToNBT = new Template.Method.Converted<Void>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
+        @Template.Optional
         public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();

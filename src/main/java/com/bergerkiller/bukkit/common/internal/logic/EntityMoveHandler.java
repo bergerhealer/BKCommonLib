@@ -500,7 +500,7 @@ public class EntityMoveHandler {
                 }
             }
 
-            that.doFallUpdate(d1, that.isOnGround(), iblockdata, blockposition);
+            that.updateFalling(d1, that.isOnGround(), iblockdata, blockposition);
 
             if (d7 != d0) {
                 that.setMotX(0.0);

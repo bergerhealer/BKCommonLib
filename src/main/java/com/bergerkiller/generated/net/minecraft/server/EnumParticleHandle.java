@@ -24,16 +24,37 @@ public class EnumParticleHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static EnumParticleHandle byName(String name) {
-        return T.byName.invokeVA(name);
+    public String getName() {
+        return T.getName.invoke(instance);
     }
 
+    public int getId() {
+        return T.getId.invoke(instance);
+    }
+
+
+    public static EnumParticleHandle getByName(String name) {
+        if (T.byName.isAvailable()) {
+            return T.byName.invokeVA(name);
+        } else {
+            for (Object enumValue : T.getType().getEnumConstants()) {
+                if (T.getName.invoke(enumValue).equals(name)) {
+                    return createHandle(enumValue);
+                }
+            }
+            return null;
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.server.EnumParticle</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumParticleClass extends Template.Class<EnumParticleHandle> {
+        @Template.Optional
         public final Template.StaticMethod.Converted<EnumParticleHandle> byName = new Template.StaticMethod.Converted<EnumParticleHandle>();
+
+        public final Template.Method<String> getName = new Template.Method<String>();
+        public final Template.Method<Integer> getId = new Template.Method<Integer>();
 
     }
 
