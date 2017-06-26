@@ -28,11 +28,11 @@ class Entity {
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
     public optional (EntityHandle) Entity opt_passenger:???;
     protected unknown int j;
-    private (EntityHandle) net.minecraft.server.Entity vehicle:au;
+    private (EntityHandle) Entity vehicle:au;
 #else
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:???;
-    public optional (EntityHandle) Entity opt_passenger;
-    private (EntityHandle) net.minecraft.server.Entity vehicle;
+    public optional (EntityHandle) Entity opt_passenger:passenger;
+    private (EntityHandle) Entity vehicle;
 #endif
 
     <code>
@@ -598,7 +598,10 @@ class Entity {
         if (T.isInSameVehicle.isAvailable()) {
             return T.isInSameVehicle.invoke(instance, entity);
         } else {
-            return T.vehicle.raw.get(this.instance) == T.vehicle.raw.get(entity.instance);
+            Object rawPassenger = T.opt_passenger.raw.get(this.instance);
+            Object rawVehicle = T.vehicle.raw.get(this.instance);
+            Object rawEntity = entity.getRaw();
+            return rawEntity == rawPassenger || rawEntity == rawVehicle;
         }
     }
     </code>

@@ -6,9 +6,19 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHan
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 
 class DataWatcher {
-    private final (EntityHandle) Entity owner:c
+#if version >= 1.10.2
+    private final (EntityHandle) Entity owner:c;
+#else
+    private final (EntityHandle) Entity owner:a;
+#endif
 
-    public (DataWatcherHandle) DataWatcher((EntityHandle) Entity entity);
+    public (DataWatcherHandle) DataWatcher((EntityHandle) Entity owner);
+
+    <code>
+    public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
+        return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
+    }
+    </code>
 
     /*
      *  } else if (this.d.containsKey(Integer.valueOf(i))) {
@@ -33,19 +43,19 @@ class DataWatcher {
 #endif
 
 #if version >= 1.10.2
-    private void watch:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
+    private void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 
     public optional T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
     public void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
 #else
-    public void watch:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
+    public void register:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 
     public optional T get:???((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
-    public void set:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
+    public void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
 #endif
     <code>
     public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {

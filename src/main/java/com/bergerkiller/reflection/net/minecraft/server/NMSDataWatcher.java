@@ -21,7 +21,7 @@ public class NMSDataWatcher {
 
     public static final TranslatorFieldAccessor<Entity> owner = DataWatcherHandle.T.owner.raw.toFieldAccessor().translate(DuplexConversion.entity);
 
-    public static final MethodAccessor<Void> watch = DataWatcherHandle.T.watch.raw.toMethodAccessor();
+    public static final MethodAccessor<Void> watch = DataWatcherHandle.T.register.raw.toMethodAccessor();
 
     /*
      *  } else if (this.d.containsKey(Integer.valueOf(i))) {

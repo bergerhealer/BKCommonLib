@@ -316,7 +316,10 @@ public class EntityHandle extends Template.Handle {
         if (T.isInSameVehicle.isAvailable()) {
             return T.isInSameVehicle.invoke(instance, entity);
         } else {
-            return T.vehicle.raw.get(this.instance) == T.vehicle.raw.get(entity.instance);
+            Object rawPassenger = T.opt_passenger.raw.get(this.instance);
+            Object rawVehicle = T.vehicle.raw.get(this.instance);
+            Object rawEntity = entity.getRaw();
+            return rawEntity == rawPassenger || rawEntity == rawVehicle;
         }
     }
 

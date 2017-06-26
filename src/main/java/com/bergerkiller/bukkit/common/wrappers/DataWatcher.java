@@ -14,7 +14,6 @@ import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -27,7 +26,7 @@ import java.util.logging.Level;
 public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
-        this(NMSDataWatcher.constructor1.newInstance(Conversion.toEntityHandle.convert(entityOwner)));
+        setHandle(DataWatcherHandle.createNew(entityOwner));
     }
 
     /**
@@ -81,7 +80,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
      * @param defaultValue of the watched item
      */
     public <T> void watch(Key<T> key, T defaultValue) {
-        handle.watch(key, defaultValue);
+        handle.register(key, defaultValue);
     }
 
     /**
@@ -266,11 +265,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
      */
     public static class EntityItem<V> {
         private final ExtendedEntity<?> owner;
-        private final Object keyHandle;
+        private final Key<?> key;
 
         public EntityItem(ExtendedEntity<?> owner, Key<V> key) {
             this.owner = owner;
-            this.keyHandle = (key == null) ? null : key.getRawHandle();
+            this.key = key;
         }
 
         /**
@@ -280,8 +279,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          */
         @SuppressWarnings("unchecked")
         public V get() {
-            Object watcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
-            return (V) NMSDataWatcher.get.invoke(watcher, keyHandle);
+            Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
+            return (V) DataWatcherHandle.createHandle(dataWatcher).get(this.key);
         }
 
         /**
@@ -290,8 +289,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          * @param value to set to
          */
         public void set(V value) {
-            Object watcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
-            NMSDataWatcher.set.invoke(watcher, keyHandle, value);
+            Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
+            DataWatcherHandle.createHandle(dataWatcher).set(this.key, value);
         }
 
         /**

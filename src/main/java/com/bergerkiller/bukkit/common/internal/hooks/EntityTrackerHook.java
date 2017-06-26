@@ -9,7 +9,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
     private EntityNetworkController<?> controller;
@@ -31,14 +30,14 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
     public void track(List<?> list) {
         Object handle = instance();
         updateTrackers(list);
-        NMSEntityTrackerEntry.timeSinceLocationSync.set(handle, NMSEntityTrackerEntry.timeSinceLocationSync.get(handle) + 1);
+        EntityTrackerEntryHandle.T.timeSinceLocationSync.setInteger(handle, EntityTrackerEntryHandle.T.timeSinceLocationSync.getInteger(handle) + 1);
         try {
             controller.onSync();
         } catch (Throwable t) {
             Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
             t.printStackTrace();
         }
-        NMSEntityTrackerEntry.tickCounter.set(handle, NMSEntityTrackerEntry.tickCounter.get(handle) + 1);
+        EntityTrackerEntryHandle.T.tickCounter.setInteger(handle, EntityTrackerEntryHandle.T.tickCounter.getInteger(handle) + 1);
     }
 
     @HookMethod("public void hideForAll:???()")

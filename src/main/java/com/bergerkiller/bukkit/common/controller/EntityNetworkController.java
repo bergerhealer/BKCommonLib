@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.FloatAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
-import com.bergerkiller.bukkit.common.bases.mutable.ObjectAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
@@ -28,7 +27,6 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -294,20 +292,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             return this;
         }
     };
-    /**
-     * Obtains a list of (passenger) Entities as the clients know it,
-     * allowing it to be read from or written to
-     */
-    public ObjectAbstract<List<Entity>> passengersSynched = new ObjectAbstract<List<Entity>>() {
-        public List<Entity> get() {
-            return handle.getPassengers();
-        }
-
-        public ObjectAbstract<List<Entity>> set(List<Entity> value) {
-            handle.setPassengers(value);
-            return this;
-        }
-    };
 
     public int getViewDistance() {
         return handle.getViewDistance();
@@ -559,9 +543,21 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         if (entity.isInsideVehicle()) {
             Logging.LOGGER_DEBUG.warnOnce("is it required to send a separate vehicle packet?");
         }
-        List<org.bukkit.entity.Entity> passengers = this.passengersSynched.get();
-        if (!passengers.isEmpty()) {
-            PacketUtil.sendPacket(viewer, getMountPacket(passengers));
+
+        // On >= MC 1.10.2 we must update the passengers of this Entity
+        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            List<org.bukkit.entity.Entity> passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            if (!passengers.isEmpty()) {
+                PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), passengers));
+            }
+        }
+
+        // On <= MC 1.8.8 we must update the vehicle of this Entity
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            org.bukkit.entity.Entity vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
+            if (vehicle != null) {
+                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle));
+            }
         }
 
         // Potential leash
@@ -700,6 +696,37 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
+     * Checks whether there are any passenger changes pending.<br>
+     * <br>
+     * Checks whether passengers have changed since the last sync. On MC 1.8.8, this method
+     * checks whether the vehicle of this Entity has changed instead.
+     * 
+     * @return True if changed, False if not
+     */
+    public boolean isPassengersChanged() {
+        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            List<Entity> old_passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            List<Entity> new_passengers = this.entity.getPassengers();
+            if (old_passengers.size() != new_passengers.size()) {
+                return true;
+            }
+            for (int i = 0; i < old_passengers.size(); i++) {
+                if (old_passengers.get(i).getEntityId() != new_passengers.get(i).getEntityId()) {
+                    return true;
+                }
+            }
+        }
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            Entity old_vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
+            Entity new_vehicle = this.entity.getVehicle();
+            if (old_vehicle != new_vehicle) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks whether one of the position (protocol) component differences
      * between live and synched exceed the minimum change provided. In short, it
      * checks whether the position changed.
@@ -781,45 +808,34 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * changes.
      */
     public void syncPassengers() {
-        syncPassengers(entity.getPassengers());
-    }
-
-    /**
-     * Checks whether passengers have changed since the last sync
-     * 
-     * @param passengers that are expected
-     * @return True if changed, False if not
-     */
-    public boolean isPassengersChanged() {
-        return isPassengersChanged(entity.getPassengers());
-    }
-
-    /**
-     * Checks whether passengers have changed since the last sync
-     * 
-     * @param passengers that are expected
-     * @return True if changed, False if not
-     */
-    public boolean isPassengersChanged(List<org.bukkit.entity.Entity> passengers) {
-        List<Entity> syncPassengers = this.passengersSynched.get();
-        boolean passengersDifferent = (passengers.size() != syncPassengers.size());
-        if (!passengersDifferent) {
-            for (int i = 0; i < syncPassengers.size() && !passengersDifferent; i++) {
-                passengersDifferent = (syncPassengers.get(i).getEntityId() != passengers.get(i).getEntityId());
+        // On MC >= 1.10.2 we must update passengers of this Entity
+        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            List<Entity> old_passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            List<Entity> new_passengers = entity.getPassengers();
+            boolean passengersDifferent = (old_passengers.size() != new_passengers.size());
+            if (!passengersDifferent) {
+                for (int i = 0; i < old_passengers.size(); i++) {
+                    if (old_passengers.get(i).getEntityId() != new_passengers.get(i).getEntityId()) {
+                        passengersDifferent = true;
+                        break;
+                    }
+                }
+            }
+            if (passengersDifferent) {
+                old_passengers.clear();
+                old_passengers.addAll(new_passengers);
+                broadcast(PacketType.OUT_MOUNT.newInstance(this.entity.getEntity(), old_passengers));
             }
         }
-        return passengersDifferent;
-    }
 
-    /**
-     * Synchronizes the entity Vehicle
-     *
-     * @param vehicle to synchronize, NULL for no Vehicle
-     */
-    public void syncPassengers(List<org.bukkit.entity.Entity> passengers) {
-        if (isPassengersChanged(passengers)) {
-            this.passengersSynched.set(new ArrayList<Entity>(passengers));
-            broadcast(getMountPacket(passengers));
+        // On MC <= 1.8.8 we must update the vehicle of this Entity
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            Entity old_vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
+            Entity new_vehicle = this.entity.getVehicle();
+            if (old_vehicle != new_vehicle) {
+                EntityTrackerEntryHandle.T.opt_vehicle.set(getHandle(), new_vehicle);
+                broadcast(PacketType.OUT_ENTITY_ATTACH.newInstance(this.entity.getEntity(), new_vehicle));
+            }
         }
     }
 
@@ -1064,16 +1080,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             handle.setPitch(locSynched.getPitch());
         }
         return packet;
-    }
-
-    /**
-     * Gets a new packet with vehicle information for this Entity
-     *
-     * @param vehicle this Entity is now a passenger of
-     * @return packet with vehicle information
-     */
-    public CommonPacket getMountPacket(List<Entity> passengers) {
-        return PacketType.OUT_MOUNT.newInstance(entity.getEntity(), passengers);
     }
 
     /**

@@ -194,37 +194,12 @@ class EntityTrackerEntry {
     private int timeSinceLocationSync:v;
 
 #if version >= 1.10.2
-    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengerList:w;
-    private optional (org.bukkit.entity.Entity) Entity opt_passenger:???;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:w;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:???;
 #else
-    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengerList:???;
-    private optional (org.bukkit.entity.Entity) Entity opt_passenger:w;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:???;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:w;
 #endif
-
-    <code>
-    public List<org.bukkit.entity.Entity> getPassengers() {
-        if (T.opt_passengerList.isAvailable()) {
-            return T.opt_passengerList.get(instance);
-        } else {
-            org.bukkit.entity.Entity passenger = T.opt_passenger.get(instance);
-            if (passenger == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return java.util.Arrays.asList(passenger);
-            }
-        }
-    }
-
-    public void setPassengers(List<org.bukkit.entity.Entity> passengers) {
-        if (T.opt_passengerList.isAvailable()) {
-            T.opt_passengerList.set(instance, passengers);
-        } else if (passengers.size() == 0) {
-            T.opt_passenger.set(instance, null);
-        } else {
-            T.opt_passenger.set(instance, passengers.get(0));
-        }
-    }
-    </code>
 
     // Note: on PaperSpigot trackedPlayers is a HashMap instead
     public optional (Map<org.bukkit.entity.Player, Boolean>) Map<EntityPlayer, Boolean> viewersMap:trackedPlayerMap;

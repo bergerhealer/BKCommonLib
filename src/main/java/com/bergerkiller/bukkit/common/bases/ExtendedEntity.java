@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -912,15 +913,47 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         // Update the passengers field
         this.handle.setPassengers(newPassengerHandles);
 
-        // Send packets to refresh passenger information
-        CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, newPassengerHandles);
-        PacketUtil.broadcastEntityPacket(entity, packet);
+        // On >= MC 1.10.2 we must synchronize the passengers of this Entity
+        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            // Send packets to refresh passenger information
+            CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, newPassengerHandles);
+            PacketUtil.broadcastEntityPacket(entity, packet);
 
-        // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
-        EntityTrackerEntryHandle entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
-        if (entry != null) {
-            entry.setPassengers(newPassengers);
+            // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
+            EntityTrackerEntryHandle entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
+            if (entry != null) {
+                EntityTrackerEntryHandle.T.opt_passengers.set(entry.getRaw(), newPassengers);
+            }
         }
+
+        // On <= MC 1.8.8 we must synchronize the vehicle of this Entity
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            // Detach all removed passengers
+            for (EntityHandle passengerHandle : removedPassengers) {
+                Entity passenger = passengerHandle.getBukkitEntity();
+                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, null));
+
+                // Make sure the entity tracker does not synchronize a second time
+                EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);
+                if (entry != null) {
+                    EntityTrackerEntryHandle.T.opt_vehicle.set(entry.getRaw(), null);
+                }
+            }
+
+            // Attach the new passengers
+            // Note that only a single passenger per vehicle is supported
+            if (!newPassengers.isEmpty()) {
+                Entity passenger = newPassengers.get(0);
+                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, this.entity));
+
+                // Make sure the entity tracker does not synchronize a second time
+                EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);
+                if (entry != null) {
+                    EntityTrackerEntryHandle.T.opt_vehicle.set(entry.getRaw(), this.entity);
+                }
+            }
+        }
+
     }
 
     /**

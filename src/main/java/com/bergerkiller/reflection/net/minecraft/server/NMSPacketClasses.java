@@ -1059,12 +1059,12 @@ public class NMSPacketClasses {
             return PacketPlayOutMountHandle.createNew(entity.getEntityId(), passengerIds).toCommonPacket();
         }
 
-        public CommonPacket newInstance(org.bukkit.entity.Entity entity, List<org.bukkit.entity.Entity> passengers) {
+        public CommonPacket newInstance(org.bukkit.entity.Entity vehicle, List<org.bukkit.entity.Entity> passengers) {
             int[] passengerIds = new int[passengers.size()];
             for (int i = 0; i < passengerIds.length; i++) {
                 passengerIds[i] = passengers.get(i).getEntityId();
             }
-            return PacketPlayOutMountHandle.createNew(entity.getEntityId(), passengerIds).toCommonPacket();
+            return PacketPlayOutMountHandle.createNew(vehicle.getEntityId(), passengerIds).toCommonPacket();
         }
     }
 

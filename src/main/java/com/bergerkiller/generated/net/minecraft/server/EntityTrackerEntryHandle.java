@@ -150,30 +150,6 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     }
 
 
-    public List<org.bukkit.entity.Entity> getPassengers() {
-        if (T.opt_passengerList.isAvailable()) {
-            return T.opt_passengerList.get(instance);
-        } else {
-            org.bukkit.entity.Entity passenger = T.opt_passenger.get(instance);
-            if (passenger == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return java.util.Arrays.asList(passenger);
-            }
-        }
-    }
-
-    public void setPassengers(List<org.bukkit.entity.Entity> passengers) {
-        if (T.opt_passengerList.isAvailable()) {
-            T.opt_passengerList.set(instance, passengers);
-        } else if (passengers.size() == 0) {
-            T.opt_passenger.set(instance, null);
-        } else {
-            T.opt_passenger.set(instance, passengers.get(0));
-        }
-    }
-
-
     public java.util.Collection<org.bukkit.entity.Player> getViewers() {
         if (T.viewersMap.isAvailable()) {
             return T.viewersMap.get(instance).keySet();
@@ -372,9 +348,9 @@ public class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
-        public final Template.Field.Converted<List<Entity>> opt_passengerList = new Template.Field.Converted<List<Entity>>();
+        public final Template.Field.Converted<List<Entity>> opt_passengers = new Template.Field.Converted<List<Entity>>();
         @Template.Optional
-        public final Template.Field.Converted<Entity> opt_passenger = new Template.Field.Converted<Entity>();
+        public final Template.Field.Converted<Entity> opt_vehicle = new Template.Field.Converted<Entity>();
         @Template.Optional
         public final Template.Field.Converted<Map<Player, Boolean>> viewersMap = new Template.Field.Converted<Map<Player, Boolean>>();
         @Template.Optional

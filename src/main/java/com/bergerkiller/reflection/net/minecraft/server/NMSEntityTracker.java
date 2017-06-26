@@ -3,9 +3,9 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -131,9 +131,19 @@ public class NMSEntityTracker {
             createdEntry = NMSEntityTrackerEntry.createNew(entity, 80, (Bukkit.getViewDistance()-1) * 16, 3, true); // defaults
         }
 
+        // Only on MC >= 1.10.2
         // Bugfix: Add all current passengers to the passengers field right now
         // We must do this so that the next updatePlayer() update is properly synchronized
-        NMSEntityTrackerEntry.passengers.set(createdEntry, (new ExtendedEntity<Entity>(entity)).getPassengers());
+        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            EntityTrackerEntryHandle.T.opt_passengers.set(createdEntry, (new ExtendedEntity<Entity>(entity)).getPassengers());
+        }
+
+        // Only on MC <= 1.8.8
+        // Bugfix: Add the current vehicle to the vehicle field right now
+        // We must do this so that the next updatePlayer() update is properly synchronized
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            EntityTrackerEntryHandle.T.opt_vehicle.set(createdEntry, entity.getVehicle());
+        }
 
         return createdEntry;
     }

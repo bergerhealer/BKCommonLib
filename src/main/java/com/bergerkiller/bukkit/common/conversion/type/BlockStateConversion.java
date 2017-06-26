@@ -102,6 +102,13 @@ public class BlockStateConversion {
                             return input_state.rawData;
                         }
                     };
+                } else if (name.equals("getLightLevel")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return input_state.block.getLightLevel();
+                        }
+                    };
                 } else if (name.equals("getX")) {
                     return new Invokable() {
                         @Override

@@ -40,18 +40,6 @@ public class NMSEntityTrackerEntry {
     public static final FieldAccessor<Boolean> synched = EntityTrackerEntryHandle.T.synched.toFieldAccessor();
     public static final FieldAccessor<Boolean> isMobile = EntityTrackerEntryHandle.T.isMobile.toFieldAccessor();
     public static final FieldAccessor<Integer> timeSinceLocationSync = EntityTrackerEntryHandle.T.timeSinceLocationSync.toFieldAccessor();
-    public static final FieldAccessor<List<Entity>> passengers = new SafeDirectField<List<Entity>>() {
-        @Override
-        public List<Entity> get(Object instance) {
-            return EntityTrackerEntryHandle.createHandle(instance).getPassengers();
-        }
-
-        @Override
-        public boolean set(Object instance, List<Entity> value) {
-            EntityTrackerEntryHandle.createHandle(instance).setPassengers(value);
-            return true;
-        }
-    };
 
     public static final FieldAccessor<Collection<Player>> viewers = new SafeDirectField<Collection<Player>>() {
         @Override

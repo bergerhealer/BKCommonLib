@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.util.logging.Level;
 
-import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -193,16 +192,6 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public Entity teleportTo(org.bukkit.Location exit, boolean portal)")
-    public Object teleportTo(Location exit, boolean portal) {
-        return base.teleportTo(exit, portal);
-    }
-
-    @HookMethod("public NBTTagCompound saveToNBT:???(NBTTagCompound nbttagcompound)")
-    public Object saveEntity(Object nbtTag) {
-        return base.saveEntity(nbtTag);
-    }
-
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
     public boolean c(Object tag) {
         Object handle = this.instance();
@@ -211,7 +200,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
 
         CommonTagCompound.create(tag).putValue("id", getSavedName());
-        saveEntity(tag);
+        EntityHandle.T.saveToNBT.invoke(handle, tag);
         return true;
     }
 
@@ -227,7 +216,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             }
 
             CommonTagCompound.create(tag).putValue("id", getSavedName());
-            saveEntity(tag);
+            EntityHandle.T.saveToNBT.invoke(handle, tag);
             return true;
         } catch (Throwable t) {
             t.printStackTrace();

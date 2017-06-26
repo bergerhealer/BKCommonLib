@@ -25,8 +25,8 @@ public class DataWatcherHandle extends Template.Handle {
         return handle;
     }
 
-    public static final DataWatcherHandle createNew(EntityHandle entity) {
-        return T.constr_entity.newInstance(entity);
+    public static final DataWatcherHandle createNew(EntityHandle owner) {
+        return T.constr_owner.newInstance(owner);
     }
 
     /* ============================================================================== */
@@ -39,8 +39,8 @@ public class DataWatcherHandle extends Template.Handle {
         return T.returnAllWatched.invoke(instance);
     }
 
-    public void watch(Key<?> key, Object defaultValue) {
-        T.watch.invoke(instance, key, defaultValue);
+    public void register(Key<?> key, Object defaultValue) {
+        T.register.invoke(instance, key, defaultValue);
     }
 
     public Item<Object> read(Key<?> key) {
@@ -57,6 +57,11 @@ public class DataWatcherHandle extends Template.Handle {
 
     public boolean isEmpty() {
         return T.isEmpty.invoke(instance);
+    }
+
+
+    public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
+        return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
     }
 
 
@@ -80,13 +85,13 @@ public class DataWatcherHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DataWatcherClass extends Template.Class<DataWatcherHandle> {
-        public final Template.Constructor.Converted<DataWatcherHandle> constr_entity = new Template.Constructor.Converted<DataWatcherHandle>();
+        public final Template.Constructor.Converted<DataWatcherHandle> constr_owner = new Template.Constructor.Converted<DataWatcherHandle>();
 
         public final Template.Field.Converted<EntityHandle> owner = new Template.Field.Converted<EntityHandle>();
 
         public final Template.Method.Converted<List<Item<?>>> unwatchAndReturnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
-        public final Template.Method.Converted<Void> watch = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
