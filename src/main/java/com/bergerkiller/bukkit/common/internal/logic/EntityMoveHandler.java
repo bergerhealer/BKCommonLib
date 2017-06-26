@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Resources;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
@@ -42,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumA
  */
 public class EntityMoveHandler {
     private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
+    private static boolean loggedEntityCollisionUndoFailure = false;
 
     EntityController<?> controller;
     CommonEntity<?> entity;
@@ -49,6 +52,23 @@ public class EntityMoveHandler {
 
     public EntityMoveHandler(EntityController<?> theController) {
         controller = theController;
+    }
+
+    private void removeFromList(List<AxisAlignedBBHandle> bounds, AxisAlignedBBHandle toRemove) {
+        ListIterator<AxisAlignedBBHandle> iter = bounds.listIterator(bounds.size());
+        while (iter.hasPrevious()) {
+            AxisAlignedBBHandle b = iter.previous();
+            if (b.getMinX() == toRemove.getMinX() && b.getMinY() == toRemove.getMinY() && b.getMinZ() == toRemove.getMinZ() &&
+                    b.getMaxX() == toRemove.getMaxX() && b.getMaxY() == toRemove.getMaxY() && b.getMaxZ() == toRemove.getMaxZ())
+            {
+                iter.remove();
+                return; // success
+            }
+        }
+        if (!loggedEntityCollisionUndoFailure) {
+            loggedEntityCollisionUndoFailure = true;
+            Logging.LOGGER_DEBUG.severe("EntityMoveHandler failed to undo Entity Collision");
+        }
     }
 
     private boolean world_getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle bounds, boolean flag) {
@@ -69,17 +89,16 @@ public class EntityMoveHandler {
             List<EntityHandle> list = entity.getWorld().getEntities(entity, bounds.growUniform(0.25D));
             for (int i = 0; i < list.size(); i++) {
                 EntityHandle entity1 = list.get(i);
-
                 if (!entity.isInSameVehicle(entity1)) {
                     // BKCommonLib start: block collision event handler
                     AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(bounds)) {
-                        foundBounds.remove(axisalignedbb1);
+                        removeFromList(foundBounds, axisalignedbb1);
                     }
 
                     axisalignedbb1 = entity.getEntityBoundingBox(entity1);
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(bounds)) {
-                        foundBounds.remove(axisalignedbb1);
+                        removeFromList(foundBounds, axisalignedbb1);
                     }
 
                     /*

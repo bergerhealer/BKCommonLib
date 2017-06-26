@@ -588,7 +588,7 @@ class Entity {
 
     public boolean isSneaking();
 
-#if vehicle >= 1.10.2
+#if version >= 1.10.2
     public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
 #else
     public optional boolean isInSameVehicle:???((EntityHandle) Entity entity);
