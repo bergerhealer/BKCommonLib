@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.map.MapCursor;
@@ -19,6 +20,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
@@ -27,6 +29,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
@@ -40,6 +43,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
@@ -306,6 +310,15 @@ public class WrapperConversion {
         return HumanHand.fromMainHand(mainHand);
     }
 
+    @ConverterMethod(input="net.minecraft.server.EnumMainHand", optional=true)
+    public static HumanHand humanHandToEnumMainHandHandle(Object nmsEnumMainHandHandle) {
+        if (nmsEnumMainHandHandle == EnumMainHandHandle.LEFT.getRaw()) {
+            return HumanHand.LEFT;
+        } else {
+            return HumanHand.RIGHT;
+        }
+    }
+
     @ConverterMethod(input="net.minecraft.server.Packet")
     public static CommonPacket toCommonPacket(Object nmsPacketHandle) {
         return new CommonPacket(nmsPacketHandle);
@@ -477,6 +490,11 @@ public class WrapperConversion {
         return ChatText.fromComponent(iChatBaseComponentHandle);
     }
 
+    @ConverterMethod
+    public static ChatText fromMessageToChatText(String message) {
+        return ChatText.fromMessage(message);
+    }
+
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
         return EnumItemSlotHandle.createHandle(enumItemSlotHandle).toBukkit();
@@ -557,4 +575,35 @@ public class WrapperConversion {
         return ResourceKey.fromPath(path);
     }
 
+    @ConverterMethod(input="net.minecraft.server.InventoryClickType", optional=true)
+    public static InventoryClickType inventoryClickTypeFromHandle(Object nmsInventoryClickType) {
+        return InventoryClickType.byId(((Enum<?>) nmsInventoryClickType).ordinal());
+    }
+
+    @ConverterMethod
+    public static InventoryClickType inventoryClickTypeFromId(int id) {
+        return InventoryClickType.byId(id);
+    }
+
+    private static final BlockFace[] enumDirectionValues = { BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST };
+
+    @ConverterMethod(input="net.minecraft.server.EnumDirection")
+    public static BlockFace blockFaceFromEnumDirection(Object nmsEnumDirectionHandle) {
+        return enumDirectionValues[((Enum<?>) nmsEnumDirectionHandle).ordinal()];
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EnumDirection")
+    public static Object blockFaceToEnumDirection(BlockFace direction) {
+        Class<?> enumClass = CommonUtil.getNMSClass("EnumDirection");
+        if (enumClass != null) {
+            Object[] values = enumClass.getEnumConstants();
+            for (int i = 0; i < enumDirectionValues.length; i++) {
+                if (enumDirectionValues[i] == direction) {
+                    return values[i];
+                }
+            }
+            return values[2]; // default NORTH
+        }
+        return null;
+    }
 }

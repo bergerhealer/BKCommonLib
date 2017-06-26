@@ -18,6 +18,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -1020,9 +1021,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @return a packet with absolute position information
      */
     public CommonPacket getLocationPacket(double posX, double posY, double posZ, float yaw, float pitch) {
-        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, 
-                (byte) EntityTrackerEntryHandle.getProtocolRotation(yaw),
-                (byte) EntityTrackerEntryHandle.getProtocolRotation(pitch), true);
+        return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, yaw, pitch, true);
     }
 
     /**
@@ -1050,17 +1049,19 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // NMS error: They are not using the position, but the live position
             // This has some big issues when new players join...
 
+            PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+
             // Motion
-            packet.write(PacketType.OUT_ENTITY_SPAWN.motX, protMot(velSynched.getX()));
-            packet.write(PacketType.OUT_ENTITY_SPAWN.motY, protMot(velSynched.getY()));
-            packet.write(PacketType.OUT_ENTITY_SPAWN.motZ, protMot(velSynched.getZ()));
+            handle.setMotX(velSynched.getX());
+            handle.setMotY(velSynched.getY());
+            handle.setMotZ(velSynched.getZ());
             // Position
-            packet.write(PacketType.OUT_ENTITY_SPAWN.x, locSynched.getX());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
-            packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
+            handle.setPosX(locSynched.getX());
+            handle.setPosY(locSynched.getY());
+            handle.setPosZ(locSynched.getZ());
             // Rotation
-            packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, EntityTrackerEntryHandle.getProtocolRotation(locSynched.getYaw()));
-            packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, EntityTrackerEntryHandle.getProtocolRotation(locSynched.getPitch()));
+            handle.setYaw(locSynched.getYaw());
+            handle.setPitch(locSynched.getPitch());
         }
         return packet;
     }
@@ -1086,13 +1087,4 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         return PacketType.OUT_ENTITY_HEAD_ROTATION.newInstance(entity.getEntity(), (byte) prot);
     }
 
-    /**
-     * Converts motion information into a protocol int value
-     * 
-     * @param mot motion input
-     * @return protocol value
-     */
-    private static int protMot(double mot) {
-        return ((int)(MathUtil.clamp(mot, -3.9, 3.9) * 8000.0D));
-    }
 }

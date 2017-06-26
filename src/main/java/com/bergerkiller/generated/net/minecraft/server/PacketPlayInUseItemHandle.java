@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 public class PacketPlayInUseItemHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseItemClass} */
     public static final PacketPlayInUseItemClass T = new PacketPlayInUseItemClass();
@@ -39,6 +40,14 @@ public class PacketPlayInUseItemHandle extends PacketHandle {
 
     public void setDirection(Object value) {
         T.direction.set(instance, value);
+    }
+
+    public Object getEnumHand() {
+        return T.enumHand.get(instance);
+    }
+
+    public void setEnumHand(Object value) {
+        T.enumHand.set(instance, value);
     }
 
     public float getUnknown1() {
@@ -80,7 +89,6 @@ public class PacketPlayInUseItemHandle extends PacketHandle {
     public static final class PacketPlayInUseItemClass extends Template.Class<PacketPlayInUseItemHandle> {
         public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Converted<Object> direction = new Template.Field.Converted<Object>();
-        @Template.Optional
         public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
         public final Template.Field.Float unknown1 = new Template.Field.Float();
         public final Template.Field.Float unknown2 = new Template.Field.Float();

@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
@@ -45,10 +46,16 @@ class EnumItemSlot {
     </code>
 }
 
-// Since 1.10.2
+// Since MC 1.10.2
 optional class EnumHand {
     enum (EnumHandHandle) EnumHand MAIN_HAND;
     enum (EnumHandHandle) EnumHand OFF_HAND;
+}
+
+// Since MC 1.10.2
+optional class EnumMainHand {
+    enum (EnumMainHandHandle) EnumMainHand LEFT;
+    enum (EnumMainHandHandle) EnumMainHand RIGHT;
 }
 
 class EnumDirection {

@@ -22,12 +22,19 @@ public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
         return handle;
     }
 
-    public static final PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, MobEffectListHandle mobeffectlist) {
-        return T.constr_entityId_mobeffectlist.newInstance(entityId, mobeffectlist);
+    public static final PacketPlayOutRemoveEntityEffectHandle createNew() {
+        return T.constr.newInstance();
     }
 
     /* ============================================================================== */
 
+
+    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, MobEffectListHandle mobEffectList) {
+        PacketPlayOutRemoveEntityEffectHandle handle = createNew();
+        handle.setEntityId(entityId);
+        handle.setEffectList(mobEffectList);
+        return handle;
+    }
     public int getEntityId() {
         return T.entityId.getInteger(instance);
     }
@@ -49,7 +56,7 @@ public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutRemoveEntityEffectClass extends Template.Class<PacketPlayOutRemoveEntityEffectHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle> constr_entityId_mobeffectlist = new Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle>();
+        public final Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle> constr = new Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         public final Template.Field.Converted<MobEffectListHandle> effectList = new Template.Field.Converted<MobEffectListHandle>();

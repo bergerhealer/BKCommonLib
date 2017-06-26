@@ -26,67 +26,43 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
 
 
     public double getDeltaX() {
-        if (T.dx_1_10_2.isAvailable()) {
-            return (double) T.dx_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dx_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dx_1_8_8, T.dx_1_10_2);
     }
 
     public double getDeltaY() {
-        if (T.dy_1_10_2.isAvailable()) {
-            return (double) T.dy_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dy_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dy_1_8_8, T.dy_1_10_2);
     }
 
     public double getDeltaZ() {
-        if (T.dz_1_10_2.isAvailable()) {
-            return (double) T.dz_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dz_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dz_1_8_8, T.dz_1_10_2);
     }
 
     public void setDeltaX(double dx) {
-        if (T.dx_1_10_2.isAvailable()) {
-            T.dx_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 4096.0));
-        } else {
-            T.dx_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 32.0));
-        }
+        setProtocolPosition(T.dx_1_8_8, T.dx_1_10_2, dx);
     }
 
     public void setDeltaY(double dy) {
-        if (T.dy_1_10_2.isAvailable()) {
-            T.dy_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 4096.0));
-        } else {
-            T.dy_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 32.0));
-        }
+        setProtocolPosition(T.dy_1_8_8, T.dy_1_10_2, dy);
     }
 
     public void setDeltaZ(double dz) {
-        if (T.dz_1_10_2.isAvailable()) {
-            T.dz_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 4096.0));
-        } else {
-            T.dz_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 32.0));
-        }
+        setProtocolPosition(T.dz_1_8_8, T.dz_1_10_2, dz);
     }
 
     public float getDeltaYaw() {
-        return (float) T.dyaw_raw.getByte(instance) * 360.0f / 256.0f;
+        return deserializeRotation(T.dyaw_raw.getByte(instance));
     }
 
     public float getDeltaPitch() {
-        return (float) T.dpitch_raw.getByte(instance) * 360.0f / 256.0f;
+        return deserializeRotation(T.dpitch_raw.getByte(instance));
     }
 
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaYaw * 256.0f / 360.0f));
+        T.dyaw_raw.setByte(instance, (byte) serializeRotation(deltaYaw));
     }
 
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaPitch * 256.0f / 360.0f));
+        T.dpitch_raw.setByte(instance, (byte) serializeRotation(deltaPitch));
     }
     public int getEntityId() {
         return T.entityId.getInteger(instance);

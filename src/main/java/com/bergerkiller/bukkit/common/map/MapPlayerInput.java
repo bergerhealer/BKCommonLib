@@ -435,11 +435,11 @@ public class MapPlayerInput {
 
                 CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId, this._fakeMountId);
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityUUID, UUID.randomUUID());
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityType, (int) EntityType.PIG.getTypeId());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.x, loc.getX());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.y, loc.getY() - 0.28);
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.z, loc.getZ());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.UUID, UUID.randomUUID());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posX, loc.getX());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posY, loc.getY() - 0.28);
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posZ, loc.getZ());
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.dataWatcher, data);
                 PacketUtil.sendPacket(player, packet);
             }

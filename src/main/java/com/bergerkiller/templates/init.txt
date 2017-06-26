@@ -19,6 +19,8 @@
 #include /net/minecraft/server/minecraftkey.txt
 #include /net/minecraft/server/nonnulllist.txt
 #include /net/minecraft/server/packets.txt
+#include /net/minecraft/server/packets_movement.txt
+#include /net/minecraft/server/packets_spawn.txt
 #include /net/minecraft/server/mobspawner.txt
 #include /net/minecraft/server/inthashmap.txt
 #include /net/minecraft/server/window.txt

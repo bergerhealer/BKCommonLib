@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -24,6 +25,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -36,6 +38,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
@@ -182,6 +185,15 @@ public class HandleConversion {
         return hand.toMainHand();
     }
 
+    @ConverterMethod(output="net.minecraft.server.EnumMainHand", optional=true)
+    public static Object humanHandToEnumMainHandHandle(HumanHand hand) {
+        if (hand == HumanHand.LEFT) {
+            return EnumMainHandHandle.LEFT.getRaw();
+        } else {
+            return EnumMainHandHandle.RIGHT.getRaw();
+        }
+    }
+
     @ConverterMethod(output="net.minecraft.server.WorldType")
     public static Object toWorldTypeHandle(org.bukkit.WorldType worldType) {
         return NMSWorldType.getType.invoke(null, worldType.getName());
@@ -300,6 +312,11 @@ public class HandleConversion {
         return text.getRawHandle();
     }
 
+    @ConverterMethod
+    public static String getChatTextMessage(ChatText text) {
+        return text.getMessage();
+    }
+
     @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
     public static Object toEnumItemSlotHandle(EquipmentSlot equipmentSlot) {
         return EnumItemSlotHandle.fromBukkitRaw(equipmentSlot);
@@ -368,5 +385,25 @@ public class HandleConversion {
             result = SoundCategoryHandle.T.byName.raw.invokeVA("master");
         }
         return result;
+    }
+
+    @ConverterMethod(output="net.minecraft.server.InventoryClickType", optional=true)
+    public static Object inventoryClickTypeToHandle(InventoryClickType inventoryClickType) {
+        Class<?> type = CommonUtil.getNMSClass("InventoryClickType");
+        if (type != null) {
+            Object[] values = type.getEnumConstants();
+            int id = inventoryClickType.getId();
+            if (id >= 0 && id < values.length) {
+                return values[id];
+            } else {
+                return values[0]; // fallback
+            }
+        }
+        return null;
+    }
+
+    @ConverterMethod
+    public static int inventoryClickTypeToId(InventoryClickType inventoryClickType) {
+        return inventoryClickType.getId();
     }
 }

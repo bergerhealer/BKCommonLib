@@ -1,0 +1,107 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
+
+// Only >= MC 1.10.2
+optional class PacketPlayInVehicleMove extends Packet {
+    private double posX:a;
+    private double posY:b;
+    private double posZ:c;
+    private float yaw:d;
+    private float pitch:e;
+}
+
+// Only >= MC 1.10.2
+optional class PacketPlayOutVehicleMove extends Packet {
+    private double posX:a;
+    private double posY:b;
+    private double posZ:c;
+    private float yaw:d;
+    private float pitch:e;
+}
+
+class PacketPlayOutEntityTeleport extends Packet {
+    private int entityId:a;
+#if version >= 1.10.2
+    private optional int posX_1_8_8:???;
+    private optional int posY_1_8_8:???;
+    private optional int posZ_1_8_8:???;
+    private optional double posX_1_10_2:b;
+    private optional double posY_1_10_2:c;
+    private optional double posZ_1_10_2:d;
+#else
+    private optional int posX_1_8_8:b;
+    private optional int posY_1_8_8:c;
+    private optional int posZ_1_8_8:d;
+    private optional double posX_1_10_2:???;
+    private optional double posY_1_10_2:???;
+    private optional double posZ_1_10_2:???;
+#endif
+    private optional byte yaw_raw:e;
+    private optional byte pitch_raw:f;
+    private boolean onGround:g;
+
+    public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport();
+
+    public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport((org.bukkit.entity.Entity) Entity entity);
+
+    <code>
+    public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
+        PacketPlayOutEntityTeleportHandle handle = createNew();
+        handle.setEntityId(entityId);
+        handle.setPosX(posX);
+        handle.setPosY(posY);
+        handle.setPosZ(posZ);
+        handle.setYaw(yaw);
+        handle.setPitch(pitch);
+        handle.setOnGround(onGround);
+        return handle;
+    }
+
+    public double getPosX() {
+        return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
+    }
+
+    public double getPosY() {
+        return getProtocolPosition(T.posY_1_8_8, T.posY_1_10_2);
+    }
+
+    public double getPosZ() {
+        return getProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2);
+    }
+
+    public void setPosX(double posX) {
+        setProtocolPosition(T.posX_1_8_8, T.posX_1_10_2, posX);
+    }
+
+    public void setPosY(double posY) {
+        setProtocolPosition(T.posY_1_8_8, T.posY_1_10_2, posY);
+    }
+
+    public void setPosZ(double posZ) {
+        setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
+    }
+
+    public float getYaw() {
+        return getProtocolRotation(T.yaw_raw);
+    }
+
+    public float getPitch() {
+        return getProtocolRotation(T.pitch_raw);
+    }
+
+    public void setYaw(float yaw) {
+        setProtocolRotation(T.yaw_raw, yaw);
+    }
+
+    public void setPitch(float pitch) {
+        setProtocolRotation(T.pitch_raw, pitch);
+    }
+    </code>
+}
+
+// Only >= MC 1.10.2
+optional class PacketPlayInBoatMove {
+    private boolean rightPaddle:a;
+    private boolean leftPaddle:b;
+}

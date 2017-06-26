@@ -3,6 +3,8 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
@@ -23,11 +25,87 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle
 
 class Packet {
     <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(instance);
+    }
+    </code>
+
+    // Protocol translation functions
+    <code>
+    protected static final int serializeVelocity(double velocity) {
+        return (int) (com.bergerkiller.bukkit.common.utils.MathUtil.clamp(velocity, 3.9) * 8000.0);
+    }
+
+    protected static final double deserializeVelocity(int protVelocity) {
+        return (double) protVelocity / 8000.0;
+    }
+
+    protected static final int serializePosition_1_8_8(double position) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 32.0);
+    }
+
+    protected static final double deserializePosition_1_8_8(int protPosition) {
+        return (double) protPosition / 32.0;
+    }
+
+    protected static final int serializePosition_1_10_2(double position) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 4096.0);
+    }
+
+    protected static final double deserializePosition_1_10_2(int protPosition) {
+        return (double) protPosition / 4096.0;
+    }
+
+    protected static final int serializeRotation(float rotation) {
+        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(rotation * 256.0f / 360.0f);
+    }
+
+    protected static final float deserializeRotation(int protRotation) {
+        return (float) protRotation * 360.0f / 256.0f;
+    }
+
+    protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
+        if (field_1_10_2.isAvailable()) {
+            return deserializePosition_1_10_2(field_1_10_2.getInteger(instance));
+        } else {
+            return deserializePosition_1_8_8((int) field_1_8_8.getByte(instance));
+        }
+    }
+
+    protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2, double position) {
+        if (field_1_10_2.isAvailable()) {
+            field_1_10_2.setInteger(instance, serializePosition_1_10_2(position));
+        } else {
+            field_1_8_8.setByte(instance, (byte) serializePosition_1_8_8(position));
+        }
+    }
+
+    protected final double getProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2) {
+        if (field_1_10_2.isAvailable()) {
+            return field_1_10_2.getDouble(instance);
+        } else {
+            return deserializePosition_1_8_8(field_1_8_8.getInteger(instance));
+        }
+    }
+
+    protected final void setProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2, double position) {
+        if (field_1_10_2.isAvailable()) {
+            field_1_10_2.setDouble(instance, position);
+        } else {
+            field_1_8_8.setInteger(instance, serializePosition_1_8_8(position));
+        }
+    }
+
+    protected final float getProtocolRotation(Template.Field.Byte field) {
+        return deserializeRotation((int) field.getByte(instance));
+    }
+
+    protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
+        field.setByte(instance, (byte) serializeRotation(rotation));
     }
     </code>
 }
@@ -56,14 +134,10 @@ class PacketPlayInUseEntity extends Packet {
     }
 }
 
-class PacketPlayInUseItem extends Packet {
+optional class PacketPlayInUseItem extends Packet {
     private (IntVector3) BlockPosition position:a;
     private (Object) EnumDirection direction:b;
-#if version >= 1.10.2
-    private optional (Object) EnumHand enumHand:c;
-#else
-    private optional (Object) EnumHand enumHand:???;
-#endif
+    private (Object) EnumHand enumHand:c;
     private float unknown1:d;
     private float unknown2:e;
     private float unknown3:f;
@@ -128,16 +202,22 @@ class PacketPlayInBlockPlace extends Packet {
 
 class PacketPlayOutRemoveEntityEffect extends Packet {
     private int entityId:a;
-
 #if version >= 1.10.2
     private (MobEffectListHandle) MobEffectList effectList:b;
-
-    public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect(int entityId, (MobEffectListHandle) MobEffectList mobeffectlist);
 #else
     private (MobEffectListHandle) int effectList:b;
-
-    public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect(int entityId, (MobEffectListHandle) MobEffect mobeffectlist);
 #endif
+
+    public (PacketPlayOutRemoveEntityEffectHandle) PacketPlayOutRemoveEntityEffect();
+
+    <code>
+    public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, MobEffectListHandle mobEffectList) {
+        PacketPlayOutRemoveEntityEffectHandle handle = createNew();
+        handle.setEntityId(entityId);
+        handle.setEffectList(mobEffectList);
+        return handle;
+    }
+    </code>
 }
 
 class PacketPlayOutLogin extends Packet {
@@ -264,6 +344,12 @@ class PacketPlayOutMapChunk extends Packet {
         public byte[] data:a;
         public int sectionsMask:b;
     }
+}
+
+// Only >= MC 1.10.2 (MC 1.8.8 relies on clients themselves to unload as needed, for some reason)
+optional class PacketPlayOutUnloadChunk extends Packet {
+    private int cx:a;
+    private int cz:b;
 }
 
 class PacketPlayOutNamedSoundEffect extends Packet {
@@ -449,67 +535,43 @@ class PacketPlayOutEntity extends Packet {
     // A whole bunch of accessor functions that help translating the protocol / actual values
     <code>
     public double getDeltaX() {
-        if (T.dx_1_10_2.isAvailable()) {
-            return (double) T.dx_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dx_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dx_1_8_8, T.dx_1_10_2);
     }
 
     public double getDeltaY() {
-        if (T.dy_1_10_2.isAvailable()) {
-            return (double) T.dy_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dy_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dy_1_8_8, T.dy_1_10_2);
     }
 
     public double getDeltaZ() {
-        if (T.dz_1_10_2.isAvailable()) {
-            return (double) T.dz_1_10_2.getInteger(instance) / 4096.0;
-        } else {
-            return (double) T.dz_1_8_8.getByte(instance) / 32.0;
-        }
+        return getProtocolPosition(T.dz_1_8_8, T.dz_1_10_2);
     }
 
     public void setDeltaX(double dx) {
-        if (T.dx_1_10_2.isAvailable()) {
-            T.dx_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 4096.0));
-        } else {
-            T.dx_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx * 32.0));
-        }
+        setProtocolPosition(T.dx_1_8_8, T.dx_1_10_2, dx);
     }
 
     public void setDeltaY(double dy) {
-        if (T.dy_1_10_2.isAvailable()) {
-            T.dy_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 4096.0));
-        } else {
-            T.dy_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy * 32.0));
-        }
+        setProtocolPosition(T.dy_1_8_8, T.dy_1_10_2, dy);
     }
 
     public void setDeltaZ(double dz) {
-        if (T.dz_1_10_2.isAvailable()) {
-            T.dz_1_10_2.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 4096.0));
-        } else {
-            T.dz_1_8_8.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz * 32.0));
-        }
+        setProtocolPosition(T.dz_1_8_8, T.dz_1_10_2, dz);
     }
 
     public float getDeltaYaw() {
-        return (float) T.dyaw_raw.getByte(instance) * 360.0f / 256.0f;
+        return deserializeRotation(T.dyaw_raw.getByte(instance));
     }
 
     public float getDeltaPitch() {
-        return (float) T.dpitch_raw.getByte(instance) * 360.0f / 256.0f;
+        return deserializeRotation(T.dpitch_raw.getByte(instance));
     }
 
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaYaw * 256.0f / 360.0f));
+        T.dyaw_raw.setByte(instance, (byte) serializeRotation(deltaYaw));
     }
 
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(instance, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(deltaPitch * 256.0f / 360.0f));
+        T.dpitch_raw.setByte(instance, (byte) serializeRotation(deltaPitch));
     }
     </code>
 
@@ -578,4 +640,126 @@ optional class PacketPlayOutMount extends Packet {
         return handle;
     }
     </code>
+}
+
+class PacketPlayOutCombatEvent {
+    public (Object) PacketPlayOutCombatEvent.EnumCombatEventType eventType:a;");
+    public int entityId1:b;
+    public int entityId2:c;
+    public int tickDuration:d;
+#if version >= 1.10.2
+    public (ChatText) IChatBaseComponent message:e;
+#else
+    public (ChatText) String message:e;
+#endif
+}
+
+// Only >= MC 1.10.2
+optional class PacketPlayOutSetCooldown extends Packet {
+    private (org.bukkit.Material) Item material:a;
+    private int cooldown:b;
+}
+
+class PacketPlayOutScoreboardTeam extends Packet {
+    private String name:a;
+    private String displayName:b;
+    private String prefix:c;
+    private String suffix:d;
+    private String visibility:e;
+#if version >= 1.10.2
+    private optional String collisionRule:f;
+    private int chatFormat:g;
+    private final Collection<String> players:h;
+    private int mode:i;
+    private int friendlyFire:j;
+#else
+    private optional String collisionRule:???;
+    private int chatFormat:f;
+    private final Collection<String> players:g;
+    private int mode:h;
+    private int friendlyFire:i;
+#endif
+}
+
+class PacketPlayInSettings extends Packet {
+    private String lang:a;
+    private int view:b;
+    private (Object) EntityHuman.EnumChatVisibility chatVisibility:c;
+    private boolean enableColors:d;
+    private int modelPartFlags:e;
+    private optional (HumanHand) EnumMainHand mainHand:f;
+
+    <code>
+    public HumanHand getMainHand() {
+        if (T.mainHand.isAvailable()) {
+            return T.mainHand.get(instance);
+        } else {
+            return HumanHand.RIGHT;
+        }
+    }
+
+    public void setMainHand(HumanHand mainHand) {
+        if (T.mainHand.isAvailable()) {
+            T.mainHand.set(instance, mainHand);
+        }
+    }
+    </code>
+}
+
+class PacketPlayInTabComplete extends Packet {
+    private String text:a;
+#if version >= 1.10.2
+    private optional boolean assumeCommand:b;
+    private (IntVector3) BlockPosition position:c;
+#else
+    private optional boolean assumeCommand:???;
+    private (IntVector3) BlockPosition position:b;
+#endif
+}
+
+class PacketPlayInResourcePackStatus extends Packet {
+    private optional String message:a;
+#if version >= 1.10.2
+    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status;
+#else
+    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:b;
+#endif
+}
+
+class PacketPlayOutEntityMetadata extends Packet {
+    private int entityId:a;
+#if version >= 1.10.2
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> metadataItems:b;
+#else
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> metadataItems:b;
+#endif
+
+    public (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher, boolean includeUnchangedData);
+}
+
+class PacketPlayInUpdateSign extends Packet {
+    private (IntVector3) BlockPosition position:a;
+#if version >= 1.10.2
+    private (ChatText[]) String[] lines:b;
+#else
+    private (ChatText[]) IChatBaseComponent[] lines:b;
+#endif
+}
+
+class PacketPlayInWindowClick extends Packet {
+    private int windowId:a;
+    private int slot;
+    private int button;
+    private short action:d;
+    private (org.bukkit.inventory.ItemStack) ItemStack item;
+#if version >= 1.10.2
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:shift;
+#else
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
+#endif
+}
+
+// Since MC 1.10.2
+optional class PacketPlayInTeleportAccept extends Packet {
+    private int teleportId:a;
 }
