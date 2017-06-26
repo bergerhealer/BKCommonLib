@@ -84,7 +84,21 @@ public abstract class InventoryBase implements Inventory {
 
     @Override
     public void setContents(ItemStack[] items) {
-        this.cbProxy.setContents(items);
+        // On MC 1.8.8 this function bugs out, because they don't use setItem
+        //this.cbProxy.setContents(items);
+
+        // Instead, rely on copying known working code
+        if (getSize() < items.length) {
+            throw new IllegalArgumentException("Invalid inventory size; expected " + getSize() + " or less");
+        }
+
+        for (int i = 0; i < getSize(); i++) {
+            if (i >= items.length) {
+                setItem(i, null);
+            } else {
+                setItem(i, items[i]);
+            }
+        }
     }
 
     @Override
