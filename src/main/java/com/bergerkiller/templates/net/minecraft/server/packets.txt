@@ -20,10 +20,6 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHand
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle.ChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle
 
@@ -510,121 +506,6 @@ class PacketPlayOutEntityEquipment extends Packet {
 #endif
 }
 
-class PacketPlayOutEntity extends Packet {
-    protected int entityId:a;
-#if version >= 1.10.2
-    protected optional byte dx_1_8_8:???;
-    protected optional byte dy_1_8_8:???;
-    protected optional byte dz_1_8_8:???;
-    protected optional int dx_1_10_2:b;
-    protected optional int dy_1_10_2:c;
-    protected optional int dz_1_10_2:d;
-#else
-    protected optional byte dx_1_8_8:b;
-    protected optional byte dy_1_8_8:c;
-    protected optional byte dz_1_8_8:d;
-    protected optional int dx_1_10_2:???;
-    protected optional int dy_1_10_2:???;
-    protected optional int dz_1_10_2:???;
-#endif
-    protected optional byte dyaw_raw:e;
-    protected optional byte dpitch_raw:f;
-    protected boolean onGround:g;
-    protected unknown boolean hasMovement:h;
-
-    // A whole bunch of accessor functions that help translating the protocol / actual values
-    <code>
-    public double getDeltaX() {
-        return getProtocolPosition(T.dx_1_8_8, T.dx_1_10_2);
-    }
-
-    public double getDeltaY() {
-        return getProtocolPosition(T.dy_1_8_8, T.dy_1_10_2);
-    }
-
-    public double getDeltaZ() {
-        return getProtocolPosition(T.dz_1_8_8, T.dz_1_10_2);
-    }
-
-    public void setDeltaX(double dx) {
-        setProtocolPosition(T.dx_1_8_8, T.dx_1_10_2, dx);
-    }
-
-    public void setDeltaY(double dy) {
-        setProtocolPosition(T.dy_1_8_8, T.dy_1_10_2, dy);
-    }
-
-    public void setDeltaZ(double dz) {
-        setProtocolPosition(T.dz_1_8_8, T.dz_1_10_2, dz);
-    }
-
-    public float getDeltaYaw() {
-        return deserializeRotation(T.dyaw_raw.getByte(instance));
-    }
-
-    public float getDeltaPitch() {
-        return deserializeRotation(T.dpitch_raw.getByte(instance));
-    }
-
-    public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(instance, (byte) serializeRotation(deltaYaw));
-    }
-
-    public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(instance, (byte) serializeRotation(deltaPitch));
-    }
-    </code>
-
-    class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook();
-
-        <code>
-        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
-            handle.setEntityId(entityId);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
-            handle.setOnGround(onGround);
-            return handle;
-        }
-        </code>
-    }
-
-    class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove();
-
-        <code>
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = createNew();
-            handle.setEntityId(entityId);
-            handle.setDeltaX(dx);
-            handle.setDeltaY(dy);
-            handle.setDeltaZ(dz);
-            handle.setOnGround(onGround);
-            return handle;
-        }
-        </code>
-    }
-
-    class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();
-
-        <code>
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
-            PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
-            handle.setEntityId(entityId);
-            handle.setDeltaX(dx);
-            handle.setDeltaY(dy);
-            handle.setDeltaZ(dz);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
-            handle.setOnGround(onGround);
-            return handle;
-        }
-        </code>
-    }
-}
-
 // Only available >= MC 1.10.2
 optional class PacketPlayOutMount extends Packet {
     private int entityId:a;
@@ -643,7 +524,7 @@ optional class PacketPlayOutMount extends Packet {
 }
 
 class PacketPlayOutCombatEvent {
-    public (Object) PacketPlayOutCombatEvent.EnumCombatEventType eventType:a;");
+    public (Object) PacketPlayOutCombatEvent.EnumCombatEventType eventType:a;
     public int entityId1:b;
     public int entityId2:c;
     public int tickDuration:d;
