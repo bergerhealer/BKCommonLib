@@ -258,12 +258,12 @@ public class EntityHandle extends Template.Handle {
     }
 
 
-    public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.fromTemplate(T.DATA_FLAGS, 0);
-    public static DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.fromTemplate(T.DATA_AIR_TICKS, 1);
-    public static DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME, 2);
-    public static DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.fromTemplate(T.DATA_CUSTOM_NAME_VISIBLE, 3);
-    public static DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.fromTemplate(T.DATA_SILENT, 4);
-    public static DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.fromTemplate(T.DATA_NO_GRAVITY, -1);
+    public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
+    public static DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.Type.INTEGER.createKey(T.DATA_AIR_TICKS, 1);
+    public static DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.Type.STRING.createKey(T.DATA_CUSTOM_NAME, 2);
+    public static DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_CUSTOM_NAME_VISIBLE, 3);
+    public static DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_SILENT, 4);
+    public static DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_NO_GRAVITY, -1);
 
     public static final int DATA_FLAG_ON_FIRE = (1 << 0);
     public static final int DATA_FLAG_SNEAKING = (1 << 1);

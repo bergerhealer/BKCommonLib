@@ -5,12 +5,18 @@ package com.bergerkiller.bukkit.common.internal.proxy;
  */
 public class DataWatcherObject<T> {
     private final int id;
+    private final Object serializer;
 
-    public DataWatcherObject(int id) {
+    public DataWatcherObject(int id, Object serializer) {
         this.id = id;
+        this.serializer = serializer;
     }
 
     public int getId() {
         return this.id;
+    }
+
+    public Object getSerializer() {
+        return this.serializer;
     }
 }

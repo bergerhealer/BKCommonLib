@@ -43,11 +43,11 @@ class EntityLiving extends Entity {
 #endif
 
     <code>
-    public static final Key<Byte> DATA_LIVING_FLAGS = Key.fromTemplate(T.DATA_LIVING_FLAGS, -1);
-    public static final Key<Float> DATA_HEALTH = Key.fromTemplate(T.DATA_HEALTH, 6);
-    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.fromTemplate(T.DATA_PARTICLES_TIMER, 7);
-    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.fromTemplate(T.DATA_PARTICLES_HIDDEN, 8);
-    public static final Key<Integer> DATA_UNKNOWN1 = Key.fromTemplate(T.DATA_ARROWCOUNT, 9);
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
+    public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
+    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.Type.INTEGER.createKey(T.DATA_PARTICLES_TIMER, 7);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
     </code>
 
 
@@ -230,12 +230,12 @@ class EntityMinecartAbstract extends Entity {
 #endif
 
     <code>
-    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.fromTemplate(T.DATA_SHAKING_FACTOR, 17);
-    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.fromTemplate(T.DATA_SHAKING_DIRECTION, 18);
-    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.fromTemplate(T.DATA_SHAKING_DAMAGE, 19);
-    public static final Key<Integer> DATA_BLOCK_TYPE = Key.fromTemplate(T.DATA_BLOCK_TYPE, 20);
-    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.fromTemplate(T.DATA_BLOCK_OFFSET, 21);
-    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.fromTemplate(T.DATA_BLOCK_VISIBLE, 22);
+    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
+    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
+    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+    public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
     </code>
 
     public float getDamage();
@@ -256,7 +256,7 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 #endif
 
     <code>
-    public static final Key<Boolean> DATA_SMOKING = Key.fromTemplate(T.DATA_SMOKING, 16);
+    public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     </code>
 
 #if version >= 1.10.2
@@ -309,14 +309,14 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
     #else
         public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:a;
     #endif
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_COMMAND:b;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:b;
 #else
     // Int keys are used on MC 1.8.8
     public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:???;
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_COMMAND:???;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:???;
 #endif
     <code>
-    public static final Key<String> DATA_COMMAND = Key.fromTemplate(T.DATA_COMMAND, 23);
-    public static final Key<Object> DATA_PREVIOUS_COMMAND = Key.fromTemplate(T.DATA_PREVIOUS_COMMAND, 24);
+    public static final Key<String> DATA_COMMAND = Key.Type.STRING.createKey(T.DATA_COMMAND, 23);
+    public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_PREVIOUS_OUTPUT = Key.Type.CHAT_TEXT.createKey(T.DATA_PREVIOUS_OUTPUT, 24);
     </code>
 }

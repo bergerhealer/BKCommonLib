@@ -13,11 +13,6 @@ public class MC1_8_8_Conversion {
     }
 
     @ConverterMethod()
-    public static com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<?> dataWatcherObjectFromId(int id) {
-        return new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<Object>(id);
-    }
-
-    @ConverterMethod()
     public static com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock createProxyDataPaletteBlock(char[] data) {
         return new com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock(data);
     }

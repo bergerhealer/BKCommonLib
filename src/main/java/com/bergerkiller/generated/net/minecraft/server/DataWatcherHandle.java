@@ -39,16 +39,8 @@ public class DataWatcherHandle extends Template.Handle {
         return T.returnAllWatched.invoke(instance);
     }
 
-    public void register(Key<?> key, Object defaultValue) {
-        T.register.invoke(instance, key, defaultValue);
-    }
-
     public Item<Object> read(Key<?> key) {
         return T.read.invoke(instance, key);
-    }
-
-    public void set(Key<?> key, Object value) {
-        T.set.invoke(instance, key, value);
     }
 
     public boolean isChanged() {
@@ -65,12 +57,22 @@ public class DataWatcherHandle extends Template.Handle {
     }
 
 
-    public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
+    public <T> void register(Key<T> key, T defaultValue) {
+        T.register.invoke(instance, key, key.getType().getConverter().convertReverse(defaultValue));
+    }
+
+    public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
+        T.set.invoke(instance, key, key.getType().getConverter().convertReverse(value));
+    }
+
+    public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
+        Object rawValue;
         if (T.get.isAvailable()) {
-            return T.get.invoke(instance, key);
+            rawValue = T.get.invoke(instance, key);
         } else {
-            return this.read(key).getValue();
+            rawValue = this.read(key).getValue();
         }
+        return key.getType().getConverter().convert(rawValue);
     }
     public EntityHandle getOwner() {
         return T.owner.get(instance);
@@ -91,10 +93,12 @@ public class DataWatcherHandle extends Template.Handle {
 
         public final Template.Method.Converted<List<Item<?>>> unwatchAndReturnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
+        @Template.Optional
         public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
+        @Template.Optional
         public final Template.Method.Converted<Void> set = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
@@ -123,14 +127,6 @@ public class DataWatcherHandle extends Template.Handle {
 
         /* ============================================================================== */
 
-        public Key<?> getKey() {
-            return T.key.get(instance);
-        }
-
-        public void setKey(Key<?> value) {
-            T.key.set(instance, value);
-        }
-
         public Object getValue() {
             return T.value.get(instance);
         }
@@ -154,6 +150,9 @@ public class DataWatcherHandle extends Template.Handle {
         public static final class ItemClass extends Template.Class<ItemHandle> {
             @Template.Optional
             public final Template.Field.Integer typeId = new Template.Field.Integer();
+            @Template.Optional
+            public final Template.Field.Integer keyId = new Template.Field.Integer();
+            @Template.Optional
             public final Template.Field.Converted<Key<?>> key = new Template.Field.Converted<Key<?>>();
             public final Template.Field<Object> value = new Template.Field<Object>();
             public final Template.Field.Boolean changed = new Template.Field.Boolean();

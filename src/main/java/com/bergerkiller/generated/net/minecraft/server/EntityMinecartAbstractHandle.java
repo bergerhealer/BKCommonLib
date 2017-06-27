@@ -42,12 +42,12 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
     }
 
 
-    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.fromTemplate(T.DATA_SHAKING_FACTOR, 17);
-    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.fromTemplate(T.DATA_SHAKING_DIRECTION, 18);
-    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.fromTemplate(T.DATA_SHAKING_DAMAGE, 19);
-    public static final Key<Integer> DATA_BLOCK_TYPE = Key.fromTemplate(T.DATA_BLOCK_TYPE, 20);
-    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.fromTemplate(T.DATA_BLOCK_OFFSET, 21);
-    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.fromTemplate(T.DATA_BLOCK_VISIBLE, 22);
+    public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
+    public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);
+    public static final Key<Float> DATA_SHAKING_DAMAGE = Key.Type.FLOAT.createKey(T.DATA_SHAKING_DAMAGE, 19);
+    public static final Key<Integer> DATA_BLOCK_TYPE = Key.Type.INTEGER.createKey(T.DATA_BLOCK_TYPE, 20);
+    public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
+    public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

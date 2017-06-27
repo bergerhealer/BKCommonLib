@@ -26,7 +26,7 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /* ============================================================================== */
 
 
-    public static final Key<Boolean> DATA_SMOKING = Key.fromTemplate(T.DATA_SMOKING, 16);
+    public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     public int getFuel() {
         return T.fuel.getInteger(instance);
     }

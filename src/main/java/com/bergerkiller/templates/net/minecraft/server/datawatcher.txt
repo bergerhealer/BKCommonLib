@@ -43,27 +43,37 @@ class DataWatcher {
 #endif
 
 #if version >= 1.10.2
-    private void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
+    private optional void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 
     public optional T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
-    public void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
+    public optional void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
 #else
-    public void register:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
+    public optional void register:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 
     public optional T get:???((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
-    public void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
+    public optional void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
 #endif
     <code>
-    public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
+    public <T> void register(Key<T> key, T defaultValue) {
+        T.register.invoke(instance, key, key.getType().getConverter().convertReverse(defaultValue));
+    }
+
+    public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
+        T.set.invoke(instance, key, key.getType().getConverter().convertReverse(value));
+    }
+
+    public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
+        Object rawValue;
         if (T.get.isAvailable()) {
-            return T.get.invoke(instance, key);
+            rawValue = T.get.invoke(instance, key);
         } else {
-            return this.read(key).getValue();
+            rawValue = this.read(key).getValue();
         }
+        return key.getType().getConverter().convert(rawValue);
     }
     </code>
 
@@ -73,12 +83,14 @@ class DataWatcher {
     class DataWatcher.Item {
 #if version >= 1.10.2
         private optional final int typeId:???;
-        private final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
+        private optional final int keyId:???;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
         private T value:b;
         private boolean changed:c;
 #else
         private optional final int typeId:a;
-        private final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key:b;
+        private optional final int keyId:b;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:???;
         private Object value:c;
         private boolean changed:d;
 #endif
@@ -88,10 +100,10 @@ class DataWatcher {
 class DataWatcherObject {
 #if version >= 1.10.2
     public int getId:a();
-    public optional (Object) DataWatcherSerializer<T> getSerializer:b()
+    public (Object) DataWatcherSerializer<T> getSerializer:b()
 #else
     public int getId();
-    public optional (Object) DataWatcherSerializer<T> getSerializer:???()
+    public (Object) Object getSerializer:getSerializer()
 #endif
 
     public optional (DataWatcherObjectHandle) DataWatcherObject(int index);

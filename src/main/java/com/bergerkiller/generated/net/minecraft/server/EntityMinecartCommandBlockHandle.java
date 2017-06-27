@@ -26,8 +26,8 @@ public class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHand
     /* ============================================================================== */
 
 
-    public static final Key<String> DATA_COMMAND = Key.fromTemplate(T.DATA_COMMAND, 23);
-    public static final Key<Object> DATA_PREVIOUS_COMMAND = Key.fromTemplate(T.DATA_PREVIOUS_COMMAND, 24);
+    public static final Key<String> DATA_COMMAND = Key.Type.STRING.createKey(T.DATA_COMMAND, 23);
+    public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_PREVIOUS_OUTPUT = Key.Type.CHAT_TEXT.createKey(T.DATA_PREVIOUS_OUTPUT, 24);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartCommandBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,7 +36,7 @@ public class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHand
         @Template.Optional
         public final Template.StaticField.Converted<Key<String>> DATA_COMMAND = new Template.StaticField.Converted<Key<String>>();
         @Template.Optional
-        public final Template.StaticField.Converted<Key<Object>> DATA_PREVIOUS_COMMAND = new Template.StaticField.Converted<Key<Object>>();
+        public final Template.StaticField.Converted<Key<Object>> DATA_PREVIOUS_OUTPUT = new Template.StaticField.Converted<Key<Object>>();
 
     }
 
