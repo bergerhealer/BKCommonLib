@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.mutable.FloatAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
@@ -27,6 +28,7 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -822,9 +824,20 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 }
             }
             if (passengersDifferent) {
-                old_passengers.clear();
-                old_passengers.addAll(new_passengers);
-                broadcast(PacketType.OUT_MOUNT.newInstance(this.entity.getEntity(), old_passengers));
+                // Update the raw List. This prevents converters being used in the final List.
+                List<Object> newList = CommonUtil.unsafeCast(EntityTrackerEntryHandle.T.opt_passengers.raw.get(getHandle()));
+                if (newList instanceof ArrayList) {
+                    newList.clear();
+                } else {
+                    newList = new ArrayList<Object>(new_passengers.size());
+                    EntityTrackerEntryHandle.T.opt_passengers.raw.set(getHandle(), newList);
+                }
+                for (Entity e : new_passengers) {
+                    newList.add(HandleConversion.toEntityHandle(e));
+                }
+
+                // Send update packet for the new passengers
+                broadcast(PacketType.OUT_MOUNT.newInstance(this.entity.getEntity(), new_passengers));
             }
         }
 
