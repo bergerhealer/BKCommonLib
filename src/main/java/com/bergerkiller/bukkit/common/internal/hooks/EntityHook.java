@@ -199,8 +199,9 @@ public class EntityHook extends ClassHook<EntityHook> {
             return false;
         }
 
-        CommonTagCompound.create(tag).putValue("id", getSavedName());
-        EntityHandle.T.saveToNBT.invoke(handle, tag);
+        CommonTagCompound commonTag = CommonTagCompound.create(tag);
+        commonTag.putValue("id", getSavedName());
+        EntityHandle.T.saveToNBT.invoke(handle, commonTag);
         return true;
     }
 
@@ -215,8 +216,9 @@ public class EntityHook extends ClassHook<EntityHook> {
                 return false;
             }
 
-            CommonTagCompound.create(tag).putValue("id", getSavedName());
-            EntityHandle.T.saveToNBT.invoke(handle, tag);
+            CommonTagCompound commonTag = CommonTagCompound.create(tag);
+            commonTag.putValue("id", getSavedName());
+            EntityHandle.T.saveToNBT.invoke(handle, commonTag);
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
