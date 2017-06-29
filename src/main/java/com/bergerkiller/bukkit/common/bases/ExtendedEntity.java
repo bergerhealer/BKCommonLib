@@ -911,8 +911,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         // Update the passengers field
         this.handle.setPassengers(newPassengerHandles);
 
-        // On >= MC 1.10.2 we must synchronize the passengers of this Entity
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            // On >= MC 1.10.2 we must synchronize the passengers of this Entity
+
             // Send packets to refresh passenger information
             CommonPacket packet = PacketType.OUT_MOUNT.newInstanceHandles(entity, newPassengerHandles);
             PacketUtil.broadcastEntityPacket(entity, packet);
@@ -922,10 +923,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             if (entry != null) {
                 EntityTrackerEntryHandle.T.opt_passengers.set(entry.getRaw(), newPassengers);
             }
-        }
+        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            // On <= MC 1.8.8 we must synchronize the vehicle of this Entity
 
-        // On <= MC 1.8.8 we must synchronize the vehicle of this Entity
-        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             // Detach all removed passengers
             for (EntityHandle passengerHandle : removedPassengers) {
                 Entity passenger = passengerHandle.getBukkitEntity();

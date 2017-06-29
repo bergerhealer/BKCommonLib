@@ -193,7 +193,7 @@ class EntityTrackerEntry {
     private final boolean isMobile:u;
     private int timeSinceLocationSync:v;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:w;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:???;
 #else

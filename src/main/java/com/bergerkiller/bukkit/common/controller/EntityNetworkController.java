@@ -541,21 +541,14 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_VELOCITY.newInstance(entity.getEntityId(), this.velSynched.vector()));
         }
 
-        // Passenger/Vehicle information
-        if (entity.isInsideVehicle()) {
-            Logging.LOGGER_DEBUG.warnOnce("is it required to send a separate vehicle packet?");
-        }
-
-        // On >= MC 1.10.2 we must update the passengers of this Entity
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            // On >= MC 1.10.2 we must update the passengers of this Entity
             List<org.bukkit.entity.Entity> passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
             if (!passengers.isEmpty()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), passengers));
             }
-        }
-
-        // On <= MC 1.8.8 we must update the vehicle of this Entity
-        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            // On <= MC 1.8.8 we must update the vehicle of this Entity
             org.bukkit.entity.Entity vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
             if (vehicle != null) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle));
@@ -717,8 +710,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                     return true;
                 }
             }
-        }
-        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             Entity old_vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
             Entity new_vehicle = this.entity.getVehicle();
             if (old_vehicle != new_vehicle) {
@@ -810,8 +802,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * changes.
      */
     public void syncPassengers() {
-        // On MC >= 1.10.2 we must update passengers of this Entity
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            // On MC >= 1.10.2 we must update passengers of this Entity
+
             List<Entity> old_passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
             List<Entity> new_passengers = entity.getPassengers();
             boolean passengersDifferent = (old_passengers.size() != new_passengers.size());
@@ -839,10 +832,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 // Send update packet for the new passengers
                 broadcast(PacketType.OUT_MOUNT.newInstance(this.entity.getEntity(), new_passengers));
             }
-        }
+        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+            // On MC <= 1.8.8 we must update the vehicle of this Entity
 
-        // On MC <= 1.8.8 we must update the vehicle of this Entity
-        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             Entity old_vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
             Entity new_vehicle = this.entity.getVehicle();
             if (old_vehicle != new_vehicle) {
