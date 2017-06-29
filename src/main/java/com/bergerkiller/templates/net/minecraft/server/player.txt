@@ -106,10 +106,10 @@ class PlayerChunkMap {
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
 #if version >= 1.10.2
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
+    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:getChunk(int x, int z);
 #else
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:???(int x, int z);
 #endif
     <code>

@@ -91,8 +91,8 @@ class DataPaletteBlock {
     public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
 #else
     // Emulated on MC 1.8.8
-    public BlockData getBlockData(int x, int y, int z);
-    public void setBlockData(int x, int y, int z, BlockData data);
+    public (BlockData) BlockData getBlockData(int x, int y, int z);
+    public void setBlockData(int x, int y, int z, (BlockData) BlockData data);
 #endif
 }
 

@@ -39,7 +39,7 @@ public class DataWatcherHandle extends Template.Handle {
         return T.returnAllWatched.invoke(instance);
     }
 
-    public Item<Object> read(Key<?> key) {
+    public Item<?> read(Key<?> key) {
         return T.read.invoke(instance, key);
     }
 
@@ -95,7 +95,7 @@ public class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         @Template.Optional
         public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
+        public final Template.Method.Converted<Item<?>> read = new Template.Method.Converted<Item<?>>();
         @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         @Template.Optional
