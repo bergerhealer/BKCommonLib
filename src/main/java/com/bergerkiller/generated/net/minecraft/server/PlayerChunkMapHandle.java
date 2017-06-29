@@ -51,8 +51,8 @@ public class PlayerChunkMapHandle extends Template.Handle {
 
 
     public PlayerChunkHandle getChunk(int x, int z) {
-        if (T.getChunk_1_10_2.isAvailable()) {
-            return T.getChunk_1_10_2.invoke(instance, x, z);
+        if (T.getChunk_1_9.isAvailable()) {
+            return T.getChunk_1_9.invoke(instance, x, z);
         } else {
             return T.getChunk_1_8_8.invoke(instance, x, z, false);
         }
@@ -94,7 +94,7 @@ public class PlayerChunkMapHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_8_8 = new Template.Method.Converted<PlayerChunkHandle>();
         @Template.Optional
-        public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_10_2 = new Template.Method.Converted<PlayerChunkHandle>();
+        public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_9 = new Template.Method.Converted<PlayerChunkHandle>();
         public final Template.Method.Converted<Void> flagDirty = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
 

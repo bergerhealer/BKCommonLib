@@ -5,6 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -89,6 +92,27 @@ public class TemplateTest {
         assertNotNull(EnumAxisHandle.X);
     }
 
+    // Tests optional fields/methods to make sure they exist when needed
+    @Test
+    public void testOptionalMembers() {
+        assertAvailable(PlayerChunkMapHandle.T.getChunk_1_8_8, PlayerChunkMapHandle.T.getChunk_1_9);
+        assertAvailable(EntityTrackerEntryHandle.T.opt_passengers, EntityTrackerEntryHandle.T.opt_vehicle);
+        if (Common.evaluateMCVersion(">=", "1.9")) {
+            assertAvailable(EntityHandle.T.DATA_FLAGS);
+            assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);
+            assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME_VISIBLE);
+        }
+    }
+
+    private void assertAvailable(Template.TemplateElement<?>... elements) {
+        for (Template.TemplateElement<?> e : elements) {
+            if (e.isAvailable()) {
+                return;
+            }
+        }
+        throw new IllegalStateException("None of these optional template members could be found");
+    }
+    
     private String trimAfter(String path, String prefix) {
         int idx = path.indexOf(prefix);
         if (idx != -1) {

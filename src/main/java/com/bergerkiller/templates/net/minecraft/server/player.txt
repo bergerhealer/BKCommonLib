@@ -105,17 +105,20 @@ class PlayerChunkMap {
 
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
-#if version >= 1.9
+#if version >= 1.10.2
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:getChunk(int x, int z);
-#else
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:getChunk(int x, int z);
+#elseif version >= 1.9
+    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:b(int x, int z);
+#elseif version >= 1.8.8
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:???(int x, int z);
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:???(int x, int z);
 #endif
     <code>
     public PlayerChunkHandle getChunk(int x, int z) {
-        if (T.getChunk_1_10_2.isAvailable()) {
-            return T.getChunk_1_10_2.invoke(instance, x, z);
+        if (T.getChunk_1_9.isAvailable()) {
+            return T.getChunk_1_9.invoke(instance, x, z);
         } else {
             return T.getChunk_1_8_8.invoke(instance, x, z, false);
         }

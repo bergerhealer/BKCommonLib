@@ -35,8 +35,8 @@ public class NMSPlayerChunkMap {
     public static final MethodAccessor<Object> getChunk = new SafeDirectMethod<Object>() {
         @Override
         public Object invoke(Object instance, Object... args) {
-            if (PlayerChunkMapHandle.T.getChunk_1_10_2.isAvailable()) {
-                return PlayerChunkMapHandle.T.getChunk_1_10_2.raw.invokeVA(instance, args);
+            if (PlayerChunkMapHandle.T.getChunk_1_9.isAvailable()) {
+                return PlayerChunkMapHandle.T.getChunk_1_9.raw.invokeVA(instance, args);
             } else {
                 return PlayerChunkMapHandle.T.getChunk_1_8_8.raw.invoke(instance, args[0], args[1], false);
             }
