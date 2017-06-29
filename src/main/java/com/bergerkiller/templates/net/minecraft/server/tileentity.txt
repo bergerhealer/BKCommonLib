@@ -16,7 +16,7 @@ class TileEntity {
 
     public (BlockPositionHandle) BlockPosition getPosition();
 
-#if version >= 1.11.2
+#if version >= 1.11
     public int getRawData:v();
 #else
     public int getRawData:u();

@@ -176,7 +176,7 @@ class PacketPlayOutCollect extends Packet {
 class PacketPlayOutWindowItems extends Packet {
     private int windowId:a;
 
-#if version >= 1.11.2
+#if version >= 1.11
     private (List<org.bukkit.inventory.ItemStack>) List<ItemStack> items:b;
 #else
     private (List<org.bukkit.inventory.ItemStack>) ItemStack[] items:b;

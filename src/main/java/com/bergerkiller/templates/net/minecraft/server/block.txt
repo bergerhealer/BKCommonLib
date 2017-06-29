@@ -83,7 +83,7 @@ class Block {
 
     public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
 
-#if version >= 1.11.2
+#if version >= 1.11
     public optional (SoundEffectTypeHandle) SoundEffectType getStepSound();
 #elseif version >= 1.9
     public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:w();

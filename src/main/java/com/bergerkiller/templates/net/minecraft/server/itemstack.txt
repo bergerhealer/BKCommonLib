@@ -5,7 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 
 class ItemStack {
-#if version >= 1.11.2
+#if version >= 1.11
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:a;
 #else
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:???;
@@ -36,7 +36,7 @@ class ItemStack {
 
     public String getName();
 
-#if version >= 1.11.2
+#if version >= 1.11
     public (ItemStackHandle) ItemStack setName:g(String s);
 #else
     public (ItemStackHandle) ItemStack setName:c(String s);

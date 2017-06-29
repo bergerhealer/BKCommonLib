@@ -21,7 +21,7 @@ class EntityLiving extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
-#elseif version >= 1.11.2
+#elseif version >= 1.11
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
@@ -62,7 +62,7 @@ class EntityLiving extends Entity {
     </code>
 
 
-#if version >= 1.11.2
+#if version >= 1.11
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
 #elseif version >= 1.10.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
@@ -81,7 +81,7 @@ class EntityLiving extends Entity {
 #endif
 
     public float lastDamage;
-#if version >= 1.11.2
+#if version >= 1.11
     protected unknown boolean bd;
     public unknown float be;
     public float forwardMovement:bf;
@@ -159,7 +159,7 @@ class EntityHuman extends EntityLiving {
     public unknown float bN;
     private (IntVector3) BlockPosition spawnCoord:d;
     private boolean spawnForced:e;
-#elseif version >= 1.11.2
+#elseif version >= 1.11
     public unknown float bI;
     public unknown float bJ;
     private (IntVector3) BlockPosition spawnCoord:e;
@@ -200,7 +200,7 @@ class EntityHuman extends EntityLiving {
     protected unknown float bT = 0.02F;
     private unknown int f;
     private final com.mojang.authlib.GameProfile gameProfile:g;
-#elseif version >= 1.11.2
+#elseif version >= 1.11
     private unknown int h;
     protected unknown float bO;
     protected unknown float bP;
@@ -361,7 +361,7 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
 class EntityMinecartCommandBlock extends EntityMinecartAbstract {
 #if version >= 1.9
     // DataWatcherObject constants are available
-    #if version >= 1.11.2
+    #if version >= 1.11
         public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:COMMAND;
     #else
         public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:a;

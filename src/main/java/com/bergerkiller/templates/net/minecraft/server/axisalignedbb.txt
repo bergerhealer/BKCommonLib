@@ -24,7 +24,7 @@ class AxisAlignedBB {
     }
     </code>
 
-#if version >= 1.11.2
+#if version >= 1.11
     public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
 
     public (AxisAlignedBBHandle) AxisAlignedBB translate:d(double dx, double dy, double dz);

@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -173,6 +174,7 @@ public class ItemMaterialTest {
             .check(Material.DIODE_BLOCK_ON, true)
             .check(Material.REDSTONE_COMPARATOR_ON, true)
             .check(Material.REDSTONE_COMPARATOR_OFF, true)
+            .check(ParseUtil.parseMaterial("OBSERVER", null), true)
             .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
             .checkOthers(false)
             .done();
@@ -300,6 +302,9 @@ public class ItemMaterialTest {
         }
 
         public PropertyTest<T> check(Material m, T value) {
+            if (m == null) {
+                return this; // ignore
+            }
             T real = prop.get(m);
             not_handled.remove(m);
             if (!real.equals(value)) {

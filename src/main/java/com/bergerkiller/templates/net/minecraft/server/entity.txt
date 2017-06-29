@@ -184,7 +184,7 @@ class Entity {
 
 #if version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
-    #if version >= 1.11.2
+    #if version >= 1.11
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
     #elseif version >= 1.10.2
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
@@ -245,7 +245,7 @@ class Entity {
     public static final int DATA_FLAG_FLYING = (1 << 7);
     </code>
 
-#if version >= 1.11.2
+#if version >= 1.11
     public boolean isLoaded:aa;
     public int chunkX:ab;
     public int chunkY:ac;
@@ -279,7 +279,7 @@ class Entity {
 
     public int portalCooldown;
 
-#if version >= 1.11.2
+#if version >= 1.11
     protected boolean allowTeleportation:ak;
     protected unknown int al;
 #elseif version >= 1.10.2
@@ -631,7 +631,7 @@ class Entity {
 
 #if version >= 1.12
     public void onTick:B_();
-#else if version >= 1.11.2
+#else if version >= 1.11
     public void onTick:A_();
 #elseif version >= 1.9
     public void onTick:m();
@@ -673,7 +673,7 @@ class Entity {
 
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
-#if version >= 1.11.2
+#if version >= 1.11
     public void onPush:f(double d0, double d1, double d2);
 #else
     public void onPush:g(double d0, double d1, double d2);

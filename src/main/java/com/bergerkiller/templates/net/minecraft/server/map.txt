@@ -4,7 +4,7 @@ import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle;
 
 class MapIcon {
-#if version >= 1.11.2
+#if version >= 1.11
     public (MapIconHandle) MapIcon((byte) MapIcon.Type type, byte x, byte y, byte direction);
 #else
     public (MapIconHandle) MapIcon(byte type, byte x, byte y, byte direction);

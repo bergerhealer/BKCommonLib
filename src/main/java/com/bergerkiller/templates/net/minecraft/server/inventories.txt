@@ -22,7 +22,7 @@ interface IInventory {
     public abstract void setProperty:b(int key, int value);
 #endif
 
-#if version >= 1.11.2
+#if version >= 1.11
     public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
 
     public abstract int someFunction:h();
@@ -38,7 +38,7 @@ interface IInventory {
 
 #if version >= 1.12
     public optional abstract boolean someFunction2:x_();
-#elseif version >= 1.11.2
+#elseif version >= 1.11
     public optional abstract boolean someFunction2:w_();
 #else
     public optional abstract boolean someFunction2:???();
@@ -54,7 +54,7 @@ class PlayerInventory extends IInventory {
 class InventoryEnderChest extends IInventory {
    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 
-#if version >= 1.11.2
+#if version >= 1.11
    public (CommonTagList) NBTTagList saveToNBT:i()
 #else
    public (CommonTagList) NBTTagList saveToNBT:h()

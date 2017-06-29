@@ -57,7 +57,7 @@ class World {
 
     // >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
-    // <= 1.10.2
+    // <= 1.1
     public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getBlockAndEntityCollisions:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -90,7 +90,7 @@ class World {
 
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
 
-    // >= 1.11.2 (has 'self' option)
+    // >= 1.11 (has 'self' option)
     public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
 
     // <= 1.10.2 (lacks 'self' option)

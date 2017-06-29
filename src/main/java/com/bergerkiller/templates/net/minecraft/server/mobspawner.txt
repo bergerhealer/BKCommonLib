@@ -24,7 +24,7 @@ class MobSpawnerAbstract {
 
     public void onTick:c();
 
-#if version >= 1.11.2
+#if version >= 1.11
     public (MinecraftKeyHandle) MinecraftKey getMobName();
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey);
 #else
