@@ -319,7 +319,7 @@ class PacketPlayOutMapChunk extends Packet {
     </code>
 
     // MC 1.8.8
-    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk(Chunk chunk, boolean flag, int sectionsMask);
+    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, boolean flag, int sectionsMask);
 
     // MC >= 1.10.2
     public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, int sectionsMask);
@@ -643,4 +643,11 @@ class PacketPlayInWindowClick extends Packet {
 // Since MC 1.10.2
 optional class PacketPlayInTeleportAccept extends Packet {
     private int teleportId:a;
+}
+
+// Only <= MC 1.8.8
+optional class PacketPlayOutUpdateSign {
+    private (org.bukkit.World) World world:a;
+    private (IntVector3) BlockPosition position:b;
+    private (ChatText[]) IChatBaseComponent[] lines:c;
 }

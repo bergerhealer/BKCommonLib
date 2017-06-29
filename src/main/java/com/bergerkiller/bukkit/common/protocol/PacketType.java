@@ -105,6 +105,9 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutMount OUT_MOUNT = new NMSPacketPlayOutMount();
     public static final NMSPacketPlayOutVehicleMove OUT_VEHICLE_MOVE = new NMSPacketPlayOutVehicleMove();
 
+    // MC 1.8.8 only
+    public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
+
     /*
      * ========================
      * === Incoming packets ===

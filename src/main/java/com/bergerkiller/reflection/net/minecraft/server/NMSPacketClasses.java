@@ -91,6 +91,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityL
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityPaintingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityWeatherHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
@@ -1813,6 +1814,11 @@ public class NMSPacketClasses {
 
     //////////////////////////////////////////////////////////////////////
 
+    public static class NMSPacketPlayOutUpdateSign extends NMSPacket {
 
+        public final FieldAccessor<World> world = PacketPlayOutUpdateSignHandle.T.world.toFieldAccessor();
+        public final FieldAccessor<IntVector3> position = PacketPlayOutUpdateSignHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<ChatText[]> lines = PacketPlayOutUpdateSignHandle.T.lines.toFieldAccessor();
+    }
 
 }
