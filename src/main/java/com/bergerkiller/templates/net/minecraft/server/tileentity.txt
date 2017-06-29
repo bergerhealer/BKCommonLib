@@ -22,7 +22,7 @@ class TileEntity {
     public int getRawData:u();
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9.4
     public (org.bukkit.Material) Block getType:getBlock();
     public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
     public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);

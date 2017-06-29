@@ -170,7 +170,7 @@ class ChunkProviderServer {
     private final (Object) IChunkLoader chunkLoader;
     public final (WorldServerHandle) WorldServer world;
 
-#if version >= 1.10.2
+#if version >= 1.9.4
     public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
 
     public boolean isLoaded(int cx, int cz);

@@ -258,7 +258,7 @@ class PacketPlayOutMapChunk extends Packet {
     private int x:a;
     private int z:b;
 
-#if version >= 1.10.2
+#if version >= 1.9.4
     private optional int sectionsMask:c;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;

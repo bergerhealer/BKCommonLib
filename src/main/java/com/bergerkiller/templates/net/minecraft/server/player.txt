@@ -105,7 +105,7 @@ class PlayerChunkMap {
 
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
-#if version >= 1.10.2
+#if version >= 1.9.4
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:getChunk(int x, int z);
 #elseif version >= 1.9

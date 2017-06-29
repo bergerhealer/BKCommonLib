@@ -35,6 +35,8 @@ class Entity {
 
 #if version >= 1.10.2
     private (EntityHandle) Entity vehicle:au;
+#elseif version >= 1.9.4
+    private (EntityHandle) Entity vehicle:at;
 #elseif version >= 1.9
     private (EntityHandle) Entity vehicle:as;
 #else
@@ -120,6 +122,8 @@ class Entity {
 
 #if version >= 1.10.2
     private unknown boolean aw;
+#elseif version >= 1.9.4
+    private unknown boolean av;
 #elseif version >= 1.9
     private unknown boolean au;
 #else
@@ -144,6 +148,8 @@ class Entity {
 
 #if version >= 1.10.2
     private int stepCounter:ax;
+#elseif version >= 1.9.4
+    private int stepCounter:aw;
 #elseif version >= 1.9
     private int stepCounter:av;
 #else
@@ -182,6 +188,8 @@ class Entity {
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
     #elseif version >= 1.10.2
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    #elseif version >= 1.9.4
+        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ay;
     #else
         private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
     #endif
@@ -197,6 +205,12 @@ class Entity {
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+    #elseif version >= 1.9.4
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
     #else
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:ay;
         private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:az;
@@ -271,9 +285,6 @@ class Entity {
 #elseif version >= 1.10.2
     protected boolean allowTeleportation:al;
     protected unknown int am;
-#elseif version >= 1.9
-    protected boolean allowTeleportation:ak;
-    protected unknown int al;
 #else
     protected boolean allowTeleportation:ak;
     protected unknown int al;
@@ -586,6 +597,12 @@ class Entity {
     public boolean isWet:ai();
 
     public optional (EntityHandle) Entity getDriverEntity:bw();
+
+    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.9.4
+    public boolean isWet:ah();
+
+    public optional (EntityHandle) Entity getDriverEntity:bu();
 
     public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9

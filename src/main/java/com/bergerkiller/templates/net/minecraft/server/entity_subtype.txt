@@ -33,6 +33,12 @@ class EntityLiving extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+#elseif version >= 1.9.4
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
 #elseif version >= 1.9
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:as;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
@@ -60,6 +66,8 @@ class EntityLiving extends Entity {
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
 #elseif version >= 1.10.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
+#elseif version >= 1.9.4
+    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:bq;
 #elseif version >= 1.9
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:bp;
 #else
@@ -83,6 +91,11 @@ class EntityLiving extends Entity {
     public unknown float bf;
     public float forwardMovement:bg;
     public unknown float bh;
+#elseif version >= 1.9.4
+    protected unknown boolean bd;
+    public unknown float be;
+    public float forwardMovement:bf;
+    public unknown float bg;
 #elseif version >= 1.9
     protected unknown boolean bc;
     public unknown float bd;
@@ -158,6 +171,12 @@ class EntityHuman extends EntityLiving {
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
+#elseif version >= 1.9.4
+    public unknown float bI;
+    public unknown float bJ;
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+    private unknown BlockPosition g;    
 #elseif version >= 1.9
     public unknown float bH;
     public unknown float bI;
@@ -193,6 +212,12 @@ class EntityHuman extends EntityLiving {
     protected unknown float bQ;
     private unknown int bS;
     private final com.mojang.authlib.GameProfile gameProfile:bT;
+#elseif version >= 1.9.4
+    private unknown int h;
+    protected unknown float bO;
+    protected unknown float bP;
+    private unknown int bR;
+    private final com.mojang.authlib.GameProfile gameProfile:bS;
 #elseif version >= 1.9
     private unknown int h;
     protected unknown float bN;
@@ -309,7 +334,7 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
     public boolean suckItems:D();
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9.4
     public boolean isSuckingEnabled:isEnabled();
     public void setSuckingEnabled:setEnabled(boolean enabled);
 #elseif version >= 1.9
