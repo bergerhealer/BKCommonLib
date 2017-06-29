@@ -174,7 +174,7 @@ public class Common {
         });
 
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
-        if (CommonUtil.getNMSClass("net.minecraft.server.EnumGamemode") == null) {
+        if (CommonUtil.getNMSClass("EnumGamemode") == null) {
             final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");
             final String eg_path_proxy = Resolver.resolveClassPath("net.minecraft.server.WorldSettings$EnumGamemode");
             Resolver.registerClassResolver(new ClassPathResolver() {
