@@ -124,7 +124,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final Object newEntry;
         if (controller instanceof DefaultEntityNetworkController) {
             // Assign the default Entity Tracker Entry
-            if (NMSEntityTrackerEntry.T.isType(storedEntry)) {
+            if (EntityTrackerEntryHandle.T.isType(storedEntry)) {
                 // Nothing to be done here
                 newEntry = storedEntry;
             } else {
@@ -145,7 +145,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else if (hook != null) {
             // Use the previous hooked entry - hotswap the controller
             newEntry = storedEntry;
-            NMSEntityTrackerEntry.viewers.get(newEntry).clear();
+            if (EntityTrackerEntryHandle.T.viewersMap.isAvailable()) {
+                EntityTrackerEntryHandle.T.viewersMap.get(newEntry).clear();
+            } else {
+                EntityTrackerEntryHandle.T.viewersSet.get(newEntry).clear();
+            }
         } else if (storedEntry != null) {
             // Convert the original entry into a hooked entry
             newEntry = new EntityTrackerHook().hook(storedEntry);
@@ -162,7 +166,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             tracker.setEntry(entity, EntityTrackerEntryHandle.createHandle(newEntry));
 
             // Make sure to update the viewers
-            NMSEntityTrackerEntry.scanPlayers(newEntry, getWorld().getPlayers());
+            EntityTrackerEntryHandle.T.scanPlayers.invoke(newEntry, getWorld().getPlayers());
         }
     }
 

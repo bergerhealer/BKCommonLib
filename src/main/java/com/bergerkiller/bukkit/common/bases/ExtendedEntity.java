@@ -44,7 +44,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 /**
  * Extends the methods provided by the Entity Bukkit class.
@@ -574,8 +573,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
 
         // Fallback for older version of Bukkit
-        @SuppressWarnings("deprecation")
-        org.bukkit.entity.Entity p = entity.getPassenger();
+        org.bukkit.entity.Entity p = com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassenger.invoke(entity);
         if (p == null) {
             return Collections.emptyList();
         } else {

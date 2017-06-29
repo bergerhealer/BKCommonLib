@@ -10,6 +10,9 @@ class Entity {
     public optional boolean addPassenger:???(Entity passenger);
     public optional boolean removePassenger:???(Entity passenger);
 #endif
+
+    // Note: this may stop being supported at some point
+    public Entity getPassenger();
 }
 
 class HumanEntity extends Entity {

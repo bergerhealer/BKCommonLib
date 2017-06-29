@@ -13,7 +13,9 @@ import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
@@ -21,7 +23,6 @@ import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
 /**
  * Specialized utility class that deals with conversion from TileEntity to its respective
@@ -147,13 +148,13 @@ public class BlockStateConversion {
             nmsTileEntity = cache.tileEntityField.get(state);
         }
         if (nmsTileEntity == null) {
-            nmsTileEntity = NMSTileEntity.getFromWorld(state.getBlock());
+            nmsTileEntity = getTileEntityFromWorld(state.getBlock());
         }
         return nmsTileEntity;
     }
 
     public static BlockState blockToBlockState(Block block) {
-        Object tileEntity = NMSTileEntity.getFromWorld(block);
+        Object tileEntity = getTileEntityFromWorld(block);
         if (tileEntity != null) {
             return tileEntityToBlockState(block, tileEntity);
         } else {
@@ -162,10 +163,16 @@ public class BlockStateConversion {
     }
 
     public static BlockState tileEntityToBlockState(Object nmsTileEntity) {
-        if (nmsTileEntity == null || !NMSTileEntity.hasWorld(nmsTileEntity)) {
-            throw new IllegalArgumentException("Tile Entity is null or has no world set");
+        if (nmsTileEntity == null) {
+            throw new IllegalArgumentException("Tile Entity is null");
         }
-        return tileEntityToBlockState(NMSTileEntity.getBlock(nmsTileEntity), nmsTileEntity);
+        Object world = TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntity);
+        if (world == null) {
+            throw new IllegalArgumentException("Tile Entity has no world set");
+        }
+        BlockPositionHandle pos = TileEntityHandle.T.getPosition.invoke(nmsTileEntity);
+        Block block = WrapperConversion.toWorld(world).getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+        return tileEntityToBlockState(block, nmsTileEntity);
     }
 
     public static BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
@@ -195,6 +202,14 @@ public class BlockStateConversion {
         } finally {
             input_state = old_state;
         }
+    }
+
+    public static Object getTileEntityFromWorld(Block block) {
+        return getTileEntityFromWorld(block.getWorld(), HandleConversion.toBlockPositionHandle(block));
+    }
+
+    public static Object getTileEntityFromWorld(World world, Object blockPosition) {
+        return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
     private static final class TileState {

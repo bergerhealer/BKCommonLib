@@ -26,6 +26,10 @@ public class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public Entity getPassenger() {
+        return T.getPassenger.invoke(instance);
+    }
+
     /**
      * Stores class members for <b>org.bukkit.entity.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -37,6 +41,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> addPassenger = new Template.Method<Boolean>();
         @Template.Optional
         public final Template.Method<Boolean> removePassenger = new Template.Method<Boolean>();
+        public final Template.Method<Entity> getPassenger = new Template.Method<Entity>();
 
     }
 

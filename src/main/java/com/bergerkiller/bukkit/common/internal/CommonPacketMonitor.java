@@ -12,7 +12,10 @@ import java.util.logging.Level;
 /**
  * Packet listener of BKCommonLib to keep track of send chunks. This is used to
  * keep the 'chunks a player can see' up-to-date.
+ * 
+ * NO LONGER USED. NONE OF THESE CALLBACKS WILL EVER FIRE!!!
  */
+@Deprecated
 class CommonPacketMonitor implements PacketMonitor {
 
     public static final PacketType[] TYPES = {PacketType.OUT_MAP_CHUNK, PacketType.OUT_UNLOAD_CHUNK, PacketType.OUT_RESPAWN};

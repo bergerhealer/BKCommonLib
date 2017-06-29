@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Difficulty;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
@@ -217,6 +218,11 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.BlockPosition")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
         return NMSVector.newPosition(intVector3.x, intVector3.y, intVector3.z);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.BlockPosition")
+    public static Object toBlockPositionHandle(Block block) {
+        return NMSVector.newPosition(block.getX(), block.getY(), block.getZ());
     }
 
     @ConverterMethod(output="net.minecraft.server.Vec3D")

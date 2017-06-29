@@ -180,7 +180,7 @@ public class PlayerUtil extends EntityUtil {
 
     /**
      * Checks whether a given chunk is visible to the client of a player. This
-     * actually checks whether the chunk data had been sent, it doesn't do a
+     * actually checks whether the player subscribed to the chunk data, it doesn't do a
      * distance check.
      *
      * @param player to check
@@ -188,12 +188,12 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the chunk is visible to the player, False if not
      */
     public static boolean isChunkVisible(Player player, Chunk chunk) {
-        return isChunkVisible(player, chunk.getX(), chunk.getZ());
+        return player.getWorld() == chunk.getWorld() && isChunkVisible(player, chunk.getX(), chunk.getZ());
     }
 
     /**
      * Checks whether a given chunk is visible to the client of a player. This
-     * actually checks whether the chunk data had been sent, it doesn't do a
+     * actually checks whether the player subscribed to the chunk data, it doesn't do a
      * distance check.
      *
      * @param player to check
@@ -202,35 +202,24 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the chunk is visible to the player, False if not
      */
     public static boolean isChunkVisible(Player player, int chunkX, int chunkZ) {
-        return CommonPlugin.getInstance().getPlayerMeta(player).isChunkVisible(chunkX, chunkZ);
-    }
-
-    /**
-     * Checks whether a given chunk has been 'entered' by a player. An entered
-     * chunk is liable for updates to the client. Note that this does not check
-     * whether the chunk is actually sent.
-     *
-     * @param player to check
-     * @param chunkX of the chunk to check
-     * @param chunkZ of the chunk to check
-     * @return True if the player entered the chunk, False if not
-     */
-    public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
         final EntityPlayerHandle ep = CommonNMS.getHandle(player);
         return ep.getWorldServer().getPlayerChunkMap().isChunkEntered(ep, chunkX, chunkZ);
     }
 
     /**
-     * Checks whether a given chunk has been 'entered' by a player. An entered
-     * chunk is liable for updates to the client. Note that this does not check
-     * whether the chunk is actually sent.
-     *
-     * @param player to check
-     * @param chunk to check
-     * @return True if the player entered the chunk, False if not
+     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, chunkX, chunkZ)} instead
      */
+    @Deprecated
+    public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
+        return isChunkVisible(player, chunkX, chunkZ);
+    }
+
+    /**
+     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, chunk)} instead
+     */
+    @Deprecated
     public static boolean isChunkEntered(Player player, Chunk chunk) {
-        return isChunkEntered(player, chunk.getX(), chunk.getZ());
+        return isChunkVisible(player, chunk);
     }
 
     /**

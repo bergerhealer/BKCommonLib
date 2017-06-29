@@ -53,18 +53,24 @@ public class CommonPlayerMeta {
         return playerRef.get();
     }
 
+    @Deprecated
     public void clearVisibleChunks() {
         synchronized (visibleChunks) {
             visibleChunks.clear();
         }
     }
 
+    /**
+     * This stuff no longer works now!
+     */
+    @Deprecated
     public boolean isChunkVisible(int chunkX, int chunkZ) {
         synchronized (visibleChunks) {
             return visibleChunks.contains(chunkX, chunkZ);
         }
     }
 
+    @Deprecated
     public void setChunksAsVisible(int[] chunkX, int[] chunkZ) {
         if (chunkX.length != chunkZ.length) {
             throw new IllegalArgumentException("Chunk X and Z coordinate count is not the same");
@@ -76,6 +82,7 @@ public class CommonPlayerMeta {
         }
     }
 
+    @Deprecated
     public void setChunkVisible(int chunkX, int chunkZ, boolean visible) {
         synchronized (visibleChunks) {
             if (visible) {
