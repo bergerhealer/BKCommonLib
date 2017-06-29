@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.UUID;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -34,6 +35,15 @@ public class MapPlayerInput {
     public MapPlayerInput(Player player) {
         this.player = player;
         reset();
+    }
+
+    /**
+     * Gets whether a fake mount is currently spawned and mounted by the player to intercept input
+     * 
+     * @return True if the fake mount is shown, False if not.
+     */
+    public final boolean isFakeMountShown() {
+        return this._fakeMountShown;
     }
 
     /**
@@ -400,8 +410,13 @@ public class MapPlayerInput {
 
         // Verify the player isn't flying, it results in a kick
         if (!player.isFlying() && !EntityHandle.T.onGround.get(Conversion.toEntityHandle.convert(player))) {
-            updateInputInterception(false);
-            return;
+            // Not standing on the ground, but we may be hovering really close above the floor instead
+            // This happens when the player is mounted due to the offset, which causes rapid oscillation of onGround
+            Block below = player.getLocation().add(0.0, -0.5, 0.0).getBlock();
+            if (!below.getType().isSolid()) {
+                updateInputInterception(false);
+                return;
+            }
         }
 
         // Allowed
@@ -436,18 +451,25 @@ public class MapPlayerInput {
                 CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId, this._fakeMountId);
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityUUID, UUID.randomUUID());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityType, (int) EntityType.PIG.getTypeId());
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityType, (int) EntityType.CHICKEN.getTypeId());
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posX, loc.getX());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posY, loc.getY() - 0.28);
+                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posY, loc.getY() - 0.15);
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posZ, loc.getZ());
                 packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.dataWatcher, data);
                 PacketUtil.sendPacket(player, packet);
             }
             {
-                CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
-                packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
-                packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
-                PacketUtil.sendPacket(player, packet);
+                if (PacketType.OUT_MOUNT.getType() != null) {
+                    CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
+                    packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
+                    packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
+                    PacketUtil.sendPacket(player, packet);
+                } else {
+                    CommonPacket packet = PacketType.OUT_ENTITY_ATTACH.newInstance();
+                    packet.write(PacketType.OUT_ENTITY_ATTACH.vehicleId, this._fakeMountId);
+                    packet.write(PacketType.OUT_ENTITY_ATTACH.passengerId, player.getEntityId());
+                    PacketUtil.sendPacket(player, packet);
+                }
             }
             return;
         }

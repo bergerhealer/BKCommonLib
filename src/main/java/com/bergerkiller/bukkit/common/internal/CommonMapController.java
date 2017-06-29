@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -55,7 +54,6 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
 
 public class CommonMapController implements PacketListener, Listener {
     private final IntHashMap<MapDisplayInfo> maps = new IntHashMap<MapDisplayInfo>();
