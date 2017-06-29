@@ -96,6 +96,14 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract int getCombinedId();
 
     /**
+     * Gets a combined char Id, used on MC 1.8.8 in By Id data
+     * 
+     * @return combined ID. Only used internally.
+     */
+    @Deprecated
+    public abstract int getCombinedId_1_8_8();
+
+    /**
      * Gets the Material Type of the Block
      * 
      * @return Block Material Type

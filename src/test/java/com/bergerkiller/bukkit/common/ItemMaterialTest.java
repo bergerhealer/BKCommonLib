@@ -29,6 +29,16 @@ public class ItemMaterialTest {
     }
 
     @Test
+    public void testBlockDataLookup() {
+        for (Material material : Material.values()) {
+            if (!material.isBlock()) continue;
+            
+            BlockData data = BlockData.fromTypeId(material.getId());
+            assertEquals(material, data.getType());
+        }
+    }
+
+    @Test
     public void testMaterialProperties() {
         testProperty(MaterialUtil.ISSOLID, "ISSOLID")
             .check(Material.STONE, true)

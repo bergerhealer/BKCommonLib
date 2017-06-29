@@ -46,7 +46,6 @@ public class BlockDataImpl extends BlockData {
         }
 
         // Cache a mapping of all possible IBlockData instances
-        RegistryBlockIDHandle idReg = RegistryBlockIDHandle.createHandle(BlockHandle.REGISTRY_ID);
         for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
             IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
             BlockDataConstant block_const = BY_ID[BlockHandle.getId(blockData.getBlock())];
@@ -54,16 +53,7 @@ public class BlockDataImpl extends BlockData {
                 block_const = new BlockDataConstant(blockData);
             }
             BY_BLOCK_DATA.put(rawIBlockData, block_const);
-
-            int id;
-            if (RegistryBlockIDHandle.T.isAssignableFrom(BlockHandle.REGISTRY_ID)) {
-                // >= MC 1.10.2
-                id = RegistryBlockIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, rawIBlockData);
-            } else {
-                // <= MC 1.8.8
-                id = RegistryIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, rawIBlockData);
-            }
-            BY_ID_AND_DATA[id] = block_const;
+            BY_ID_AND_DATA[block_const.getCombinedId_1_8_8()] = block_const;
         }
 
         BY_BLOCK_DATA.put(null, AIR);
@@ -158,6 +148,17 @@ public class BlockDataImpl extends BlockData {
     @Override
     public final int getCombinedId() {
         return BlockHandle.getCombinedId(this.data);
+    }
+
+    @Override
+    public final int getCombinedId_1_8_8() {
+        if (RegistryBlockIDHandle.T.isAssignableFrom(BlockHandle.REGISTRY_ID)) {
+            // >= MC 1.10.2
+            return RegistryBlockIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
+        } else {
+            // <= MC 1.8.8
+            return RegistryIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
+        }
     }
 
     /* ====================================================================== */

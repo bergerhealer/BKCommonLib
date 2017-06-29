@@ -95,6 +95,17 @@ public class BlockDataRegistry {
     }
 
     /**
+     * This function is only used internally on MC 1.8.8 to translate from char[] block Ids to BlockData.
+     * 
+     * @param typeId
+     * @return block data
+     */
+    @Deprecated
+    public static BlockData fromCombinedId_1_8_8(int combinedId) {
+        return BlockDataImpl.BY_ID_AND_DATA[combinedId & BlockDataImpl.REGISTRY_MASK];
+    }
+
+    /**
      * Obtains immutable BlockData information by Block type Id and its data
      * 
      * @param typeId input
