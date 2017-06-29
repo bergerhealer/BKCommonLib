@@ -21,7 +21,7 @@ public class ChatTextTest {
         assertEquals(msg, text.getMessage());
 
         String expected;
-        if (Common.evaluateMCVersion(">=", "1.10.2")) {
+        if (Common.evaluateMCVersion(">=", "1.9")) {
             expected = "{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
         } else {
             expected = "{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";

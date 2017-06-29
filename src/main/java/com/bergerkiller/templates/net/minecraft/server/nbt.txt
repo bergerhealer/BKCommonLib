@@ -15,7 +15,7 @@ class NBTTagList extends NBTBase {
     public int size();
 #if version >= 1.12
     public (NBTBaseHandle) NBTBase get:i(int index);
-#elseif version >= 1.10.2
+#elseif version >= 1.9
     public (NBTBaseHandle) NBTBase get:h(int index);
 #else
     public (NBTBaseHandle) NBTBase get:g(int index);

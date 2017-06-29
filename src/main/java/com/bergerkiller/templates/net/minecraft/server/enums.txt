@@ -46,13 +46,13 @@ class EnumItemSlot {
     </code>
 }
 
-// Since MC 1.10.2
+// Since MC 1.9
 optional class EnumHand {
     enum (EnumHandHandle) EnumHand MAIN_HAND;
     enum (EnumHandHandle) EnumHand OFF_HAND;
 }
 
-// Since MC 1.10.2
+// Since MC 1.9
 optional class EnumMainHand {
     enum (EnumMainHandHandle) EnumMainHand LEFT;
     enum (EnumMainHandHandle) EnumMainHand RIGHT;
@@ -88,7 +88,7 @@ optional class EnumMoveType {
 }
 
 class EnumParticle {
-#if version >= 1.10.2
+#if version >= 1.9
     public static optional (EnumParticleHandle) EnumParticle byName:a(String name);
 #else
     public static optional (EnumParticleHandle) EnumParticle byName:???(String name);
@@ -125,6 +125,8 @@ class EnumProtocol {
 
 #if version >= 1.10.2
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
+#elseif version >= 1.9
+    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:j;
 #else
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:j;
 #endif

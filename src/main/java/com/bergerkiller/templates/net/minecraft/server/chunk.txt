@@ -61,7 +61,7 @@ class ChunkSection {
     public (NibbleArrayHandle) NibbleArray getBlockLightArray:getEmittedLightArray();
     public (NibbleArrayHandle) NibbleArray getSkyLightArray:getSkyLightArray();
 
-#if version >= 1.10.2
+#if version >= 1.9
     public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
 #else
     // For MC 1.8.8 we do some conversion magic to expose the same API
@@ -75,7 +75,7 @@ class ChunkSection {
     public void setSkyLight:a(int x, int y, int z, int level);
     public void setBlockLight:b(int x, int y, int z, int level);
 
-#if version >= 1.10.2
+#if version >= 1.9
     public int getSkyLight:b(int x, int y, int z);
     public int getBlockLight:c(int x, int y, int z);
 #else
@@ -86,7 +86,7 @@ class ChunkSection {
 }
 
 class DataPaletteBlock {
-#if version >= 1.10.2
+#if version >= 1.9
     public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
     public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
 #else

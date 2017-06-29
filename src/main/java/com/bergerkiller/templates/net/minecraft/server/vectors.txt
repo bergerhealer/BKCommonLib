@@ -23,7 +23,7 @@ class BlockPosition extends BaseBlockPosition {
 }
 
 class Vec3D {
-#if version >= 1.10.2
+#if version >= 1.9
     public final double x;
     public final double y;
     public final double z;

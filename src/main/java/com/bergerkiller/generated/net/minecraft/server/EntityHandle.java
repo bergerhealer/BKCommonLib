@@ -338,6 +338,14 @@ public class EntityHandle extends Template.Handle {
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
     }
+    public Entity getBukkitEntityField() {
+        return T.bukkitEntityField.get(instance);
+    }
+
+    public void setBukkitEntityField(Entity value) {
+        T.bukkitEntityField.set(instance, value);
+    }
+
     public int getIdField() {
         return T.idField.getInteger(instance);
     }
@@ -706,14 +714,6 @@ public class EntityHandle extends Template.Handle {
         T.valid.setBoolean(instance, value);
     }
 
-    public Entity getBukkitEntityField() {
-        return T.bukkitEntityField.get(instance);
-    }
-
-    public void setBukkitEntityField(Entity value) {
-        T.bukkitEntityField.set(instance, value);
-    }
-
     /**
      * Stores class members for <b>net.minecraft.server.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -735,6 +735,7 @@ public class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
+        public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Converted<List<EntityHandle>> opt_passengers = new Template.Field.Converted<List<EntityHandle>>();
@@ -791,7 +792,6 @@ public class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
-        public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
 
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
@@ -845,7 +845,7 @@ public class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_8_8 = new Template.Method.Converted<Boolean>();
         @Template.Optional
-        public final Template.Method.Converted<Boolean> onInteractBy_1_10_2 = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> onInteractBy_1_9 = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();

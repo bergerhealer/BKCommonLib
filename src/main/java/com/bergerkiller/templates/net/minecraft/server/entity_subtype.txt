@@ -14,26 +14,31 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 
 class EntityLiving extends Entity {
-#if version >= 1.10.2
-    #if version >= 1.12
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
-        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
-    #elseif version >= 1.11.2
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
-        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bq;
-    #else
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
-        public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
-        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
-    #endif
+
+#if version >= 1.12
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
+#elseif version >= 1.11.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bq;
+#elseif version >= 1.10.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+#elseif version >= 1.9
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:as;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
 #else
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:???;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:???;
@@ -55,11 +60,13 @@ class EntityLiving extends Entity {
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
 #elseif version >= 1.10.2
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
+#elseif version >= 1.9
+    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:bp;
 #else
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:c;
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9
     public final (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> mobEffects:effects;
 #else
     public final (Map<MobEffectListHandle, MobEffectHandle>) Map<Integer, MobEffect> mobEffects:effects;
@@ -71,18 +78,28 @@ class EntityLiving extends Entity {
     public unknown float be;
     public float forwardMovement:bf;
     public unknown float bg;
-#else
+#elseif version >= 1.10.2
     protected unknown boolean be;
     public unknown float bf;
     public float forwardMovement:bg;
     public unknown float bh;
+#elseif version >= 1.9
+    protected unknown boolean bc;
+    public unknown float bd;
+    public float forwardMovement:be;
+    public unknown float bf;
+#else
+    protected unknown boolean aY;
+    public unknown float aZ;
+    public float forwardMovement:ba;
+    protected unknown float bb;
 #endif
 
     public boolean updateEffects;
 
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
 
-#if version >= 1.10.2
+#if version >= 1.9
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
 #else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
@@ -117,7 +134,7 @@ class EntityHuman extends EntityLiving {
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
     public boolean sleeping;
-#if version >= 1.10.2
+#if version >= 1.9
     public (IntVector3) BlockPosition bedPosition;
 #else
     public (IntVector3) BlockPosition bedPosition:bx;
@@ -138,6 +155,12 @@ class EntityHuman extends EntityLiving {
 #elseif version >= 1.10.2
     public unknown float bJ;
     public unknown float bK;
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+    private unknown BlockPosition g;
+#elseif version >= 1.9
+    public unknown float bH;
+    public unknown float bI;
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
@@ -170,6 +193,12 @@ class EntityHuman extends EntityLiving {
     protected unknown float bQ;
     private unknown int bS;
     private final com.mojang.authlib.GameProfile gameProfile:bT;
+#elseif version >= 1.9
+    private unknown int h;
+    protected unknown float bN;
+    protected unknown float bO;
+    private unknown int bQ;
+    private final com.mojang.authlib.GameProfile gameProfile:bR;
 #else
     private unknown int f;
     private unknown ItemStack g;
@@ -213,7 +242,7 @@ class EntityHanging extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-#if version >= 1.10.2
+#if version >= 1.9
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;
@@ -249,7 +278,7 @@ class EntityMinecartRideable extends EntityMinecartAbstract {
 }
 
 class EntityMinecartFurnace extends EntityMinecartAbstract {
-#if version >= 1.10.2
+#if version >= 1.9
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
 #else
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:???;
@@ -259,7 +288,7 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     </code>
 
-#if version >= 1.10.2
+#if version >= 1.9
     private int fuel:d;
 #else
     private int fuel:c;
@@ -274,7 +303,7 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 
 #if version >= 1.12
     public boolean suckItems:H();
-#elseif version >= 1.10.2
+#elseif version >= 1.9
     public boolean suckItems:I();
 #else
     public boolean suckItems:D();
@@ -283,6 +312,9 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 #if version >= 1.10.2
     public boolean isSuckingEnabled:isEnabled();
     public void setSuckingEnabled:setEnabled(boolean enabled);
+#elseif version >= 1.9
+    public boolean isSuckingEnabled:C();
+    public void setSuckingEnabled:k(boolean enabled);
 #else
     public boolean isSuckingEnabled:y();
     public void setSuckingEnabled:i(boolean enabled);
@@ -292,7 +324,7 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 class EntityMinecartTNT extends EntityMinecartAbstract {
     private int fuse:a;
 
-#if version >= 1.10.2
+#if version >= 1.9
     protected void explode:c(double damage);
 #else
     protected void explode:b(double damage);
@@ -302,7 +334,7 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
 }
 
 class EntityMinecartCommandBlock extends EntityMinecartAbstract {
-#if version >= 1.10.2
+#if version >= 1.9
     // DataWatcherObject constants are available
     #if version >= 1.11.2
         public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:COMMAND;

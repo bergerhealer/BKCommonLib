@@ -16,7 +16,7 @@ interface IInventory {
 
     public abstract int getProperty(int key);
 
-#if version >= 1.10.2
+#if version >= 1.9
     public abstract void setProperty(int key, int value);
 #else
     public abstract void setProperty:b(int key, int value);

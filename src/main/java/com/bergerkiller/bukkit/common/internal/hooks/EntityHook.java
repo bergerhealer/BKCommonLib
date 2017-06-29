@@ -43,7 +43,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         Object entityHumanHandle = HandleConversion.toEntityHandle(humanEntity);
         if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
             return base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity));
-        } else if (EntityHandle.T.onInteractBy_1_10_2.isAvailable()) {
+        } else if (EntityHandle.T.onInteractBy_1_9.isAvailable()) {
             Object item = HandleConversion.toItemStackHandle(HumanHand.getHeldItem(humanEntity, humanHand));
             return base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSEnumHand(humanEntity));
         } else if (EntityHandle.T.onInteractBy_1_8_8.isAvailable()) {
@@ -60,7 +60,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @Deprecated
-    @HookMethod(value="public boolean onInteractBy_1_10_2:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)", optional=true)
+    @HookMethod(value="public boolean onInteractBy_1_9:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)", optional=true)
     public boolean onInteractBy_1_10_2(Object entityHuman, Object itemstack, Object enumHand) {
         return onInteractBy_1_11_2(entityHuman, enumHand);
     }

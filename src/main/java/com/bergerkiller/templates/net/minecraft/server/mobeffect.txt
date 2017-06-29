@@ -5,7 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class MobEffect {
-#if version >= 1.10.2
+#if version >= 1.9
     private final (MobEffectListHandle) MobEffectList effectList:b;
 #else
     private (MobEffectListHandle) int effectList:effectId;
@@ -16,7 +16,7 @@ class MobEffect {
     private boolean splash;
     private boolean ambient;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private boolean particles:h;
 #else
     private boolean particles:particles;

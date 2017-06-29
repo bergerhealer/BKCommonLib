@@ -13,7 +13,7 @@ import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 class Block {
     public static final rawtype (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
     public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_stepSound:???;
 #else
@@ -23,7 +23,7 @@ class Block {
 
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 
-#if version >= 1.10.2
+#if version >= 1.9
     // On later versions, it has an IBlockData argument
     public optional int bydata_getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
     public optional int bydata_getEmission:o((IBlockDataHandle) IBlockData iblockdata);
@@ -85,7 +85,7 @@ class Block {
 
 #if version >= 1.11.2
     public optional (SoundEffectTypeHandle) SoundEffectType getStepSound();
-#elseif version >= 1.10.2
+#elseif version >= 1.9
     public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
 #else
     public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:???();
@@ -103,7 +103,7 @@ class Block {
     public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
     public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);
 
-#if version >= 1.10.2
+#if version >= 1.9
     public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
 #else
     public void stepOn:a((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);

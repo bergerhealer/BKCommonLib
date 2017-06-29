@@ -395,7 +395,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> unknown1 = PacketPlayInUseItemHandle.T.unknown1.toFieldAccessor();
         public final FieldAccessor<Float> unknown2 = PacketPlayInUseItemHandle.T.unknown2.toFieldAccessor();
         public final FieldAccessor<Float> unknown3 = PacketPlayInUseItemHandle.T.unknown3.toFieldAccessor();
-        public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor();
+        public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
 
         /**
          * Sets the hand that used the item

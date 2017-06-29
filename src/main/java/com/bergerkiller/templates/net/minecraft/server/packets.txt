@@ -117,7 +117,7 @@ class PacketPlayInUseEntity extends Packet {
     private int usedEntityId:a;
     private (UseAction) PacketPlayInUseEntity.EnumEntityUseAction action;
     private (org.bukkit.util.Vector) Vec3D offset:c;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (Object) EnumHand enumHand:d;
 #else
     private optional (Object) EnumHand enumHand:???;
@@ -137,7 +137,11 @@ optional class PacketPlayInUseItem extends Packet {
     private float unknown1:d;
     private float unknown2:e;
     private float unknown3:f;
-    public long timestamp;
+#if version >= 1.10.2
+    public optional long timestamp;
+#else
+    public optional long timestamp:???;
+#endif
 }
 
 class PacketPlayOutTitle extends Packet {
@@ -180,7 +184,7 @@ class PacketPlayOutWindowItems extends Packet {
 }
 
 class PacketPlayInArmAnimation extends Packet {
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (Object) EnumHand enumHand:a;
 #else
     private optional (Object) EnumHand enumHand:???;
@@ -188,7 +192,7 @@ class PacketPlayInArmAnimation extends Packet {
 }
 
 class PacketPlayInBlockPlace extends Packet {
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (Object) EnumHand enumHand:a;
 #else
     private optional (Object) EnumHand enumHand:???;
@@ -198,7 +202,7 @@ class PacketPlayInBlockPlace extends Packet {
 
 class PacketPlayOutRemoveEntityEffect extends Packet {
     private int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private (MobEffectListHandle) MobEffectList effectList:b;
 #else
     private (MobEffectListHandle) int effectList:b;
@@ -231,7 +235,7 @@ class PacketPlayOutMap extends Packet {
     private int itemId:a;
     private byte scale:b;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional boolean track:c;
     private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
     private int xmin:e;
@@ -260,6 +264,12 @@ class PacketPlayOutMapChunk extends Packet {
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:???;
     private boolean hasBiomeData:f;
+#elseif version >= 1.9
+    private optional int sectionsMask:c;
+    private optional byte[] data:d;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:???;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:???;
+    private boolean hasBiomeData:e;
 #else
     private optional int sectionsMask:???;
     private optional byte[] data:???;
@@ -321,7 +331,7 @@ class PacketPlayOutMapChunk extends Packet {
     // MC 1.8.8
     public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, boolean flag, int sectionsMask);
 
-    // MC >= 1.10.2
+    // MC >= 1.9
     public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, int sectionsMask);
 
     <code>
@@ -342,14 +352,14 @@ class PacketPlayOutMapChunk extends Packet {
     }
 }
 
-// Only >= MC 1.10.2 (MC 1.8.8 relies on clients themselves to unload as needed, for some reason)
+// Only >= MC 1.9 (MC 1.8.8 relies on clients themselves to unload as needed, for some reason)
 optional class PacketPlayOutUnloadChunk extends Packet {
     private int cx:a;
     private int cz:b;
 }
 
 class PacketPlayOutNamedSoundEffect extends Packet {
-#if version >= 1.10.2
+#if version >= 1.9
     private (ResourceKey) SoundEffect sound:a;
     private optional (String) SoundCategory category_1_10_2:b;
     private int x:c;
@@ -410,7 +420,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
 }
 
-// Since MC 1.10.2
+// Since MC 1.9
 optional class PacketPlayOutCustomSoundEffect extends Packet {
     private (ResourceKey) String sound:a;
     private (String) SoundCategory category:b;
@@ -429,7 +439,7 @@ class PacketPlayOutPosition extends Packet {
     private float pitch:e;
     private (Set<?>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:f;
 
-    // >= MC 1.10.2
+    // >= MC 1.9
     private optional int teleportWaitTimer:g;
 
     <code>
@@ -449,7 +459,7 @@ class PacketPlayOutPosition extends Packet {
     </code>
 }
 
-// Available >= MC 1.10.2
+// Available >= MC 1.9
 optional class PacketPlayOutBoss extends Packet {
     private UUID entityUUID:a;
     private (Object) PacketPlayOutBoss.Action action:b;
@@ -463,7 +473,7 @@ optional class PacketPlayOutBoss extends Packet {
 }
 
 class PacketPlayOutAttachEntity extends Packet {
-#if version >= 1.10.2
+#if version >= 1.9
     private optional int leashId:???;
     private int passengerId:a;
     private int vehicleId:b;
@@ -476,7 +486,7 @@ class PacketPlayOutAttachEntity extends Packet {
     // MC 1.8.8
     public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity(int leashId, (org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
 
-    // >= MC 1.10.2
+    // >= MC 1.9
     public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
 
     <code>
@@ -492,21 +502,21 @@ class PacketPlayOutAttachEntity extends Packet {
 
 class PacketPlayOutEntityEquipment extends Packet {
     private int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot:b;
 #else
     private (org.bukkit.inventory.EquipmentSlot) int slot:b;
 #endif
     private (org.bukkit.inventory.ItemStack) ItemStack itemStack:c;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
 #else
     public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
 #endif
 }
 
-// Only available >= MC 1.10.2
+// Only available >= MC 1.9
 optional class PacketPlayOutMount extends Packet {
     private int entityId:a;
     private int[] mountedEntityIds:b;
@@ -528,14 +538,14 @@ class PacketPlayOutCombatEvent {
     public int entityId1:b;
     public int entityId2:c;
     public int tickDuration:d;
-#if version >= 1.10.2
+#if version >= 1.9
     public (ChatText) IChatBaseComponent message:e;
 #else
     public (ChatText) String message:e;
 #endif
 }
 
-// Only >= MC 1.10.2
+// Only >= MC 1.9
 optional class PacketPlayOutSetCooldown extends Packet {
     private (org.bukkit.Material) Item material:a;
     private int cooldown:b;
@@ -547,7 +557,7 @@ class PacketPlayOutScoreboardTeam extends Packet {
     private String prefix:c;
     private String suffix:d;
     private String visibility:e;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional String collisionRule:f;
     private int chatFormat:g;
     private final Collection<String> players:h;
@@ -589,7 +599,7 @@ class PacketPlayInSettings extends Packet {
 
 class PacketPlayInTabComplete extends Packet {
     private String text:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional boolean assumeCommand:b;
     private (IntVector3) BlockPosition position:c;
 #else
@@ -600,7 +610,7 @@ class PacketPlayInTabComplete extends Packet {
 
 class PacketPlayInResourcePackStatus extends Packet {
     private optional String message:a;
-#if version >= 1.10.2
+#if version >= 1.9
     public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status;
 #else
     public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:b;
@@ -609,7 +619,7 @@ class PacketPlayInResourcePackStatus extends Packet {
 
 class PacketPlayOutEntityMetadata extends Packet {
     private int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> metadataItems:b;
 #else
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> metadataItems:b;
@@ -620,7 +630,7 @@ class PacketPlayOutEntityMetadata extends Packet {
 
 class PacketPlayInUpdateSign extends Packet {
     private (IntVector3) BlockPosition position:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private (ChatText[]) String[] lines:b;
 #else
     private (ChatText[]) IChatBaseComponent[] lines:b;
@@ -633,14 +643,14 @@ class PacketPlayInWindowClick extends Packet {
     private int button;
     private short action:d;
     private (org.bukkit.inventory.ItemStack) ItemStack item;
-#if version >= 1.10.2
+#if version >= 1.9
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:shift;
 #else
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
 #endif
 }
 
-// Since MC 1.10.2
+// Since MC 1.9
 optional class PacketPlayInTeleportAccept extends Packet {
     private int teleportId:a;
 }

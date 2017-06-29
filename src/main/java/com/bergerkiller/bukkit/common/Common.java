@@ -173,6 +173,21 @@ public class Common {
             }
         });
 
+        // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
+        if (Common.evaluateMCVersion("<=", "1.9")) {
+            final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");
+            final String eg_path_proxy = Resolver.resolveClassPath("net.minecraft.server.WorldSettings$EnumGamemode");
+            Resolver.registerClassResolver(new ClassPathResolver() {
+                @Override
+                public String resolveClassPath(String classPath) {
+                    if (classPath.equals(eg_path)) {
+                        return eg_path_proxy;
+                    }
+                    return classPath;
+                }
+            });
+        }
+
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (Common.MC_VERSION.equals("1.8.8")) {
             Resolver.registerClassResolver(new ClassPathResolver() {
@@ -190,9 +205,6 @@ public class Common {
                     if (classPath.equals("net.minecraft.server.v1_8_R3.PlayerChunk")) {
                         return "net.minecraft.server.v1_8_R3.PlayerChunkMap$PlayerChunk"; // nested on 1.8.8
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.EnumGamemode")) {
-                        return "net.minecraft.server.v1_8_R3.WorldSettings$EnumGamemode";
-                    }
 
                     // We proxy a bunch of classes, because they don't exist in 1.8.8
                     // Writing custom wrappers with switches would be too tiresome
@@ -206,9 +218,6 @@ public class Common {
                     }
                     if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcherObject")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject";
-                    }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.EnumGamemode")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.EnumGamemode";
                     }
                     if (classPath.equals("net.minecraft.server.v1_8_R3.MobEffectList")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList";

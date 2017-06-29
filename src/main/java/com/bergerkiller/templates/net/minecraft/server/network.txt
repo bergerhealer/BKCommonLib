@@ -6,7 +6,7 @@ class NetworkManager {
     private final unknown EnumProtocolDirection h;
     public io.netty.channel.Channel channel;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public boolean isConnected();
 #else
     public boolean isConnected:g();
@@ -16,7 +16,7 @@ class NetworkManager {
 class PlayerConnection {
     public final (Object) NetworkManager networkManager;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public void sendPacket((CommonPacket) Packet<?> packet);
 #else
     public void sendPacket((CommonPacket) Packet packet);

@@ -8,6 +8,8 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 class DataWatcher {
 #if version >= 1.10.2
     private final (EntityHandle) Entity owner:c;
+#elseif version >= 1.9
+    private final (EntityHandle) Entity owner:b;
 #else
     private final (EntityHandle) Entity owner:a;
 #endif
@@ -27,7 +29,7 @@ class DataWatcher {
      *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
      *  } else {
      */
-#if version >= 1.10.2
+#if version >= 1.9
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:b();
 #else
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> unwatchAndReturnAllWatched:b();
@@ -36,13 +38,13 @@ class DataWatcher {
     /*
      * Same signature as unwatchAndReturnAllWatched, find other function that matches
      */
-#if version >= 1.10.2
+#if version >= 1.9
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:c();
 #else
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
@@ -81,7 +83,7 @@ class DataWatcher {
     public boolean isEmpty:d();
 
     class DataWatcher.Item {
-#if version >= 1.10.2
+#if version >= 1.9
         private optional final int typeId:???;
         private optional final int keyId:???;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
@@ -98,7 +100,7 @@ class DataWatcher {
 }
 
 class DataWatcherObject {
-#if version >= 1.10.2
+#if version >= 1.9
     public int getId:a();
     public (Object) DataWatcherSerializer<T> getSerializer:b()
 #else

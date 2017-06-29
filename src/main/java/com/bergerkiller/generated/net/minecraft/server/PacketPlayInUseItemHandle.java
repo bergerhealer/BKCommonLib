@@ -74,14 +74,6 @@ public class PacketPlayInUseItemHandle extends PacketHandle {
         T.unknown3.setFloat(instance, value);
     }
 
-    public long getTimestamp() {
-        return T.timestamp.getLong(instance);
-    }
-
-    public void setTimestamp(long value) {
-        T.timestamp.setLong(instance, value);
-    }
-
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInUseItem</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -93,6 +85,7 @@ public class PacketPlayInUseItemHandle extends PacketHandle {
         public final Template.Field.Float unknown1 = new Template.Field.Float();
         public final Template.Field.Float unknown2 = new Template.Field.Float();
         public final Template.Field.Float unknown3 = new Template.Field.Float();
+        @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
 
     }

@@ -10,7 +10,7 @@ class EntityTracker {
     public final (com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>) IntHashMap<EntityTrackerEntry> trackedEntities;
     private int viewDistance:e;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
 #else
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet packet);
@@ -18,7 +18,7 @@ class EntityTracker {
 }
 
 class EntityTrackerEntry {
-#if version >= 1.10.2
+#if version >= 1.9
     private final (EntityHandle) Entity tracker;
 
     private final int viewDistance:e;
@@ -66,7 +66,7 @@ class EntityTrackerEntry {
     public int tickCounter:m;
 #endif
 
-    // Constructors, with a helper method to choose the right one (difference between MC 1.8.8 and 1.10.2 onwards)
+    // Constructors, with a helper method to choose the right one (difference between MC 1.8.8 and 1.9 onwards)
     // On MC 1.8.8, the playerViewDistance field is ignored.
     public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile);
     public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int updateInterval, boolean isMobile);
@@ -212,7 +212,7 @@ class EntityTrackerEntry {
     public void scanPlayers((List<org.bukkit.entity.Player>) List<EntityHuman> playerList);
     public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
 
-#if version >= 1.10.2
+#if version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();

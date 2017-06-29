@@ -540,7 +540,7 @@ public class WrapperConversion {
         return new CraftInputSlot(RecipeItemStackHandle.T.choices.get(recipeItemStackHandle));
     }
 
-    // 1.10.2 =>
+    // 1.9 =>
     @ConverterMethod(input="net.minecraft.server.SoundEffect", optional=true)
     public static ResourceKey soundEffectToResourceKey(Object nmsSoundEffectHandle) {
         if (SoundEffectHandle.T.isAvailable()) {
@@ -550,7 +550,7 @@ public class WrapperConversion {
         }
     }
 
-    // 1.10.2 =>
+    // 1.9 =>
     @ConverterMethod(output="net.minecraft.server.SoundEffect", optional=true)
     public static Object soundEffectFromResourceKey(ResourceKey soundKey) {
         if (SoundEffectHandle.T.isAvailable()) {

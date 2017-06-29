@@ -21,7 +21,7 @@ class PlayerAbilities {
 }
 
 class PlayerChunk {
-#if version >= 1.10.2
+#if version >= 1.9
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
     public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
 #else
@@ -30,7 +30,7 @@ class PlayerChunk {
 
     private final (IntVector2) ChunkCoordIntPair location;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:chunk;
     private int dirtyCount;
     private int dirtySectionMask:h;
@@ -49,7 +49,7 @@ class PlayerChunk {
     public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);
     public void removePlayer:b((org.bukkit.entity.Player) EntityPlayer player);
 
-#if version >= 1.10.2
+#if version >= 1.9
     public void sendChunk((org.bukkit.entity.Player) EntityPlayer player);
 #else
     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
@@ -75,7 +75,7 @@ class PlayerChunk {
 class PlayerChunkMap {
     private final (List<org.bukkit.entity.Player>) List<EntityPlayer> managedPlayers;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:???;
     private final unknown Set<PlayerChunk> dirtyBlockChunks:f;
     private final unknown List<PlayerChunk> g;
@@ -88,7 +88,7 @@ class PlayerChunkMap {
     private int radius:g;
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9
     public optional void markForUpdate_1_10_2:a((PlayerChunkHandle) PlayerChunk playerchunk);
 #else
     public optional void markForUpdate_1_10_2:???((PlayerChunkHandle) PlayerChunk playerchunk);
@@ -105,7 +105,7 @@ class PlayerChunkMap {
 
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_10_2:getChunk(int x, int z);
 #else

@@ -6,7 +6,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 
-// Only >= MC 1.10.2
+// Only >= MC 1.9
 optional class PacketPlayInVehicleMove extends Packet {
     private double posX:a;
     private double posY:b;
@@ -15,7 +15,7 @@ optional class PacketPlayInVehicleMove extends Packet {
     private float pitch:e;
 }
 
-// Only >= MC 1.10.2
+// Only >= MC 1.9
 optional class PacketPlayOutVehicleMove extends Packet {
     private double posX:a;
     private double posY:b;
@@ -26,7 +26,7 @@ optional class PacketPlayOutVehicleMove extends Packet {
 
 class PacketPlayOutEntityTeleport extends Packet {
     private int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional int posX_1_8_8:???;
     private optional int posY_1_8_8:???;
     private optional int posZ_1_8_8:???;
@@ -104,7 +104,7 @@ class PacketPlayOutEntityTeleport extends Packet {
     </code>
 }
 
-// Only >= MC 1.10.2
+// Only >= MC 1.9
 optional class PacketPlayInBoatMove {
     private boolean rightPaddle:a;
     private boolean leftPaddle:b;
@@ -112,7 +112,7 @@ optional class PacketPlayInBoatMove {
 
 class PacketPlayOutEntity extends Packet {
     protected int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     protected optional byte dx_1_8_8:???;
     protected optional byte dy_1_8_8:???;
     protected optional byte dz_1_8_8:???;

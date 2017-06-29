@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
-#if version >= 1.10.2
+#if version >= 1.9
     private int entityId:a;
     private optional UUID entityUUID:b;
     private optional int posX_1_8_8:???;
@@ -109,7 +109,7 @@ class PacketPlayOutSpawnEntity extends Packet {
 class PacketPlayOutNamedEntitySpawn extends Packet {
     private int entityId:a;
     private UUID entityUUID:b;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional int posX_1_8_8:???;
     private optional int posY_1_8_8:???;
     private optional int posZ_1_8_8:???;
@@ -127,7 +127,7 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private optional byte yaw_raw:f;
     private optional byte pitch_raw:g;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional (org.bukkit.Material) int heldItem:???;
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:h;
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> dataWatcherItems:i;
@@ -197,7 +197,7 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 class PacketPlayOutSpawnEntityLiving extends Packet {
     private int entityId:a;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional UUID entityUUID:b;
     private int entityTypeId:c;
     private optional int posX_1_8_8:???;
@@ -314,7 +314,7 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 
 class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
     private int entityId:a;
-#if version >= 1.10.2
+#if version >= 1.9
     private optional int posX_1_8_8:???;
     private optional int posY_1_8_8:???;
     private optional int posZ_1_8_8:???;
@@ -361,7 +361,7 @@ class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
 class PacketPlayOutSpawnEntityPainting extends Packet {
     private int entityId:a;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional UUID entityUUID:entityUUID:b;
     private (IntVector3) BlockPosition position:c;
     private (BlockFace) EnumDirection facing:d;
@@ -377,7 +377,7 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
 class PacketPlayOutSpawnEntityWeather extends Packet {
     private int entityId:a;
 
-#if version >= 1.10.2
+#if version >= 1.9
     private optional int posX_1_8_8:???;
     private optional int posY_1_8_8:???;
     private optional int posZ_1_8_8:???;

@@ -140,14 +140,6 @@ public class BlockHandle extends Template.Handle {
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         @Template.Optional
-        public final Template.Method<Integer> noargs_getOpacity = new Template.Method<Integer>();
-        @Template.Optional
-        public final Template.Method<Integer> noargs_getEmission = new Template.Method<Integer>();
-        @Template.Optional
-        public final Template.Method<Boolean> noargs_isOccluding = new Template.Method<Boolean>();
-        @Template.Optional
-        public final Template.Method<Boolean> noargs_isPowerSource = new Template.Method<Boolean>();
-        @Template.Optional
         public final Template.Method.Converted<Integer> bydata_getOpacity = new Template.Method.Converted<Integer>();
         @Template.Optional
         public final Template.Method.Converted<Integer> bydata_getEmission = new Template.Method.Converted<Integer>();
@@ -155,6 +147,14 @@ public class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> bydata_isOccluding = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> bydata_isPowerSource = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method<Integer> noargs_getOpacity = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Integer> noargs_getEmission = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Boolean> noargs_isOccluding = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method<Boolean> noargs_isPowerSource = new Template.Method<Boolean>();
         public final Template.Method.Converted<Float> getDamageResillience = new Template.Method.Converted<Float>();
         @Template.Optional
         public final Template.Method.Converted<SoundEffectTypeHandle> getStepSound = new Template.Method.Converted<SoundEffectTypeHandle>();

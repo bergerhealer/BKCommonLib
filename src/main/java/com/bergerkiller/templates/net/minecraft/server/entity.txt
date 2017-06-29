@@ -17,21 +17,27 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 
 class Entity {
-#if version >= 1.10.2
+#if version >= 1.9
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
     private static int entityCount;
     private int idField:id;
 
     /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
-#if version >= 1.10.2
+#if version >= 1.9
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
     public optional (EntityHandle) Entity opt_passenger:???;
     protected unknown int j;
-    private (EntityHandle) Entity vehicle:au;
 #else
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:???;
     public optional (EntityHandle) Entity opt_passenger:passenger;
+#endif
+
+#if version >= 1.10.2
+    private (EntityHandle) Entity vehicle:au;
+#elseif version >= 1.9
+    private (EntityHandle) Entity vehicle:as;
+#else
     private (EntityHandle) Entity vehicle;
 #endif
 
@@ -100,17 +106,23 @@ class Entity {
     public boolean onGround;
     public boolean horizontalMovementImpaired:positionChanged;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public boolean verticalMovementImpaired:B;
     public boolean movementImpaired:C;
     public boolean velocityChanged;
     protected boolean justLanded:E;
-    private unknown boolean aw;
 #else
     public boolean verticalMovementImpaired:E;
     public boolean movementImpaired:F;
     public boolean velocityChanged;
     protected boolean justLanded:H;
+#endif
+
+#if version >= 1.10.2
+    private unknown boolean aw;
+#elseif version >= 1.9
+    private unknown boolean au;
+#else
     private unknown boolean g;
 #endif
 
@@ -118,7 +130,7 @@ class Entity {
     public float width;
     public float length;
 
-#if version >= 1.10.2
+#if version >= 1.9
     public unknown float I;
     public float walkedDistanceXZ:J;
     public float walkedDistanceXYZ:K;
@@ -132,6 +144,8 @@ class Entity {
 
 #if version >= 1.10.2
     private int stepCounter:ax;
+#elseif version >= 1.9
+    private int stepCounter:av;
 #else
     private int stepCounter:h;
 #endif
@@ -140,7 +154,7 @@ class Entity {
     private unknown float ay;
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.9
     public unknown double M;
     public unknown double N;
     public unknown double O;
@@ -162,12 +176,14 @@ class Entity {
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
-#if version >= 1.10.2
-    /* === MC 1.10.2 and onwards has constants like these for datawatcher keys === */
+#if version >= 1.9
+    /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
     #if version >= 1.11.2
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
-    #else
+    #elseif version >= 1.10.2
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    #else
+        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
     #endif
     #if version >= 1.12
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
@@ -175,12 +191,18 @@ class Entity {
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aD;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aE;
-    #else
+    #elseif version >= 1.10.2
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
         private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+    #else
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:ay;
+        private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:az;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
     #endif
 #else
     /* === MC 1.8.8: These constants do not exist == */
@@ -223,6 +245,13 @@ class Entity {
     public int chunkZ:ae;
     public unknown boolean ai;
     public boolean positionChanged:impulse;
+#elseif version >= 1.9
+    public boolean isLoaded:aa;
+    public int chunkX:ab;
+    public int chunkY:ac;
+    public int chunkZ:ad;
+    public unknown boolean ah;
+    public boolean positionChanged:impulse;
 #else
     private unknown double ar;
     private unknown double as;
@@ -242,6 +271,9 @@ class Entity {
 #elseif version >= 1.10.2
     protected boolean allowTeleportation:al;
     protected unknown int am;
+#elseif version >= 1.9
+    protected boolean allowTeleportation:ak;
+    protected unknown int al;
 #else
     protected boolean allowTeleportation:ak;
     protected unknown int al;
@@ -332,7 +364,7 @@ class Entity {
      */
 #if version >= 1.12
     protected (ResourceKey) SoundEffect getSwimSound:ae();
-#elseif version >= 1.10.2
+#elseif version >= 1.9
     protected (ResourceKey) SoundEffect getSwimSound:aa();
 #else
     protected (ResourceKey) String getSwimSound:P();
@@ -350,7 +382,7 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.10.2
+#if version >= 1.9
     public void makeSound:a((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
 #else
     public void makeSound:makeSound((ResourceKey) String soundeffect, float volume, float pitch);
@@ -369,6 +401,8 @@ class Entity {
     public boolean isInWaterUpdate:aq();
 #elseif version >= 1.10.2
     public boolean isInWaterUpdate:ak();
+#elseif version >= 1.9
+    public boolean isInWaterUpdate:aj();
 #else
     public boolean isInWaterUpdate:W();
 #endif
@@ -378,7 +412,7 @@ class Entity {
      *     return this.inWater;
      * }
      */
-#if version >= 1.10.2
+#if version >= 1.9
     public boolean isInWater();
 #else
     public boolean isInWater:V();
@@ -403,7 +437,7 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.10.2
+#if version >= 1.9
     protected boolean hasMovementSound:playStepSound();
 #else
     protected boolean hasMovementSound:s_();
@@ -422,7 +456,7 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.10.2
+#if version >= 1.9
     protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
 #else
     protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
@@ -482,13 +516,15 @@ class Entity {
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
 #elseif version >= 1.10.2
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
+#elseif version >= 1.9
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:af();
 #else
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
 #endif
 
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
 
-#if version >= 1.10.2
+#if version >= 1.9
     public optional boolean isVehicle();
     public optional boolean isPassenger();
     public void recalcPosition();
@@ -552,6 +588,12 @@ class Entity {
     public optional (EntityHandle) Entity getDriverEntity:bw();
 
     public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.9
+    public boolean isWet:ah();
+
+    public optional (EntityHandle) Entity getDriverEntity:bt();
+
+    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #else
     public boolean isWet:U();
 
@@ -574,7 +616,7 @@ class Entity {
     public void onTick:B_();
 #else if version >= 1.11.2
     public void onTick:A_();
-#elseif version >= 1.10.2
+#elseif version >= 1.9
     public void onTick:m();
 #else
     public void onTick:t_();
@@ -588,7 +630,7 @@ class Entity {
 
     public boolean isSneaking();
 
-#if version >= 1.10.2
+#if version >= 1.9
     public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
 #else
     public optional boolean isInSameVehicle:???((EntityHandle) Entity entity);
@@ -623,8 +665,8 @@ class Entity {
     // Since MC 1.8.8
     public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
 
-    // Since MC 1.10.2
-    public optional boolean onInteractBy_1_10_2:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    // Since MC 1.9
+    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
     // Since MC 1.11.2
     public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);

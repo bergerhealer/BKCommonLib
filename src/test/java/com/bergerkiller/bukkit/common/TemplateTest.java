@@ -32,13 +32,17 @@ public class TemplateTest {
             genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
             genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
 
+            // <= MC 1.9 class translation fixes
+            if (Common.evaluateMCVersion("<=", "1.9")) {
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WorldSettingsHandle.EnumGamemodeHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle";
+                }
+            }
+            
             // MC 1.8.8 class translation fixes
             if (Common.evaluateMCVersion("<=", "1.8.8")) {
                 if (genClassPath.startsWith("com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.proxy")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server." + genClassPath.substring(73);
-                }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WorldSettingsHandle.EnumGamemodeHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle.a")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";
