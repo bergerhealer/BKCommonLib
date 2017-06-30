@@ -259,8 +259,6 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return entity maximum portal cooldown ticks
      */
     public static int getPortalCooldownMaximum(Entity entity) {
-    	//TODO: Broken!!!!
-    	return 0;
-        //return CommonNMS.getNative(entity).aC();
+        return EntityHandle.T.getPortalCooldownMaximum.invoke(h(entity));
     }
 }

@@ -679,6 +679,23 @@ class Entity {
     public void onPush:g(double d0, double d1, double d2);
 #endif
 
+    /*
+     * Entity class:
+     *
+     * public int ##METHODNAME##() {
+     *     return 300;
+     * }
+     */
+#if version >= 1.12
+    public int getPortalCooldownMaximum:aM();
+#elseif version >= 1.10.2
+    public int getPortalCooldownMaximum:aE();
+#elseif version >= 1.9
+    public int getPortalCooldownMaximum:aC();
+#else
+    public int getPortalCooldownMaximum:aq();
+#endif
+
     // Since MC 1.8.8
     public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
 

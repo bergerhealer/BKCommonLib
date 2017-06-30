@@ -205,6 +205,10 @@ public class EntityHandle extends Template.Handle {
         T.onPush.invoke(instance, d0, d1, d2);
     }
 
+    public int getPortalCooldownMaximum() {
+        return T.getPortalCooldownMaximum.invoke(instance);
+    }
+
     public void collide(EntityHandle entity) {
         T.collide.invoke(instance, entity);
     }
@@ -842,6 +846,7 @@ public class EntityHandle extends Template.Handle {
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
         public final Template.Method.Converted<DataWatcher> getDataWatcher = new Template.Method.Converted<DataWatcher>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
+        public final Template.Method<Integer> getPortalCooldownMaximum = new Template.Method<Integer>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_8_8 = new Template.Method.Converted<Boolean>();
         @Template.Optional
