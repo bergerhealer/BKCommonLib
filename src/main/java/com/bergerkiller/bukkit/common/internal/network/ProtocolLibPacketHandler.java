@@ -250,8 +250,13 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 if ((!type.isOutGoing()) != receiving) {
                     continue;
                 }
+                if (type.getType() == null) {
+                    continue;
+                }
                 com.comphenix.protocol.PacketType comType = getPacketType(type);
-                comTypes.add(comType);
+                if (comType != null) {
+                    comTypes.add(comType);
+                }
             }
 
             return ListeningWhitelist.newBuilder().priority(priority).types(comTypes)
