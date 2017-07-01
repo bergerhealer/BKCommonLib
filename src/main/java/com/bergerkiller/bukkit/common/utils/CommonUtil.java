@@ -38,6 +38,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -514,6 +515,40 @@ public class CommonUtil {
             return type.cast(object);
         } else {
             return def;
+        }
+    }
+
+    /**
+     * Executes a runnable on the main thread in the next tick.
+     * When this method is called from the main thread, the runnable
+     * is executed right away. This method blocks the calling thread until
+     * the runnable is successfully executed.
+     * 
+     * @param runnable to execute on the main thread
+     */
+    public static void syncTick(final Runnable runnable) {
+        // Simplified logic when called from the main thread
+        if (Thread.currentThread() == MAIN_THREAD) {
+            runnable.run();
+            return;
+        }
+
+        // Lock object that keeps us waiting
+        final CountDownLatch lock = new CountDownLatch(1);
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } finally {
+                    lock.countDown();
+                }
+            }
+        };
+        nextTick(r);
+        try {
+            lock.await();
+        } catch (InterruptedException e) {
         }
     }
 

@@ -183,13 +183,13 @@ public class PacketType extends ClassTemplate<Object> {
         this.setClass((Class<Object>) packetClass);
 
         // Obtain ID and determine in/outgoing
-        Integer tmpId;
-        if ((tmpId = NMSEnumProtocol.getPacketIdIn(getType())) != null) {
+        int tmpId;
+        if ((tmpId = NMSEnumProtocol.getPacketIdIn(getType())) != -1) {
             this.outgoing = false;
-            this.id = tmpId.intValue();
-        } else if ((tmpId = NMSEnumProtocol.getPacketIdOut(getType())) != null) {
+            this.id = tmpId;
+        } else if ((tmpId = NMSEnumProtocol.getPacketIdOut(getType())) != -1) {
             this.outgoing = true;
-            this.id = tmpId.intValue();
+            this.id = tmpId;
         } else {
             this.outgoing = false;
             this.id = -1;

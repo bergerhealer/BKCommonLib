@@ -258,9 +258,8 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                     comTypes.add(comType);
                 }
             }
-
             return ListeningWhitelist.newBuilder().priority(priority).types(comTypes)
-                    .gamePhase(GamePhase.PLAYING).options(new ListenerOptions[0]).build();
+                    .gamePhase(GamePhase.PLAYING).options(new ListenerOptions[] { ListenerOptions.ASYNC } ).build();
         }
 
         @Override

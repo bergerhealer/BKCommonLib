@@ -12,26 +12,22 @@ public class NMSEnumProtocol {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol");
 
     private static final Object PLAY = EnumProtocolHandle.PLAY.getRaw();
-
-    static class Direction {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocolDirection");
-        public static final Object CLIENTBOUND = EnumProtocolDirectionHandle.CLIENTBOUND.getRaw();
-        public static final Object SERVERBOUND = T.selectStaticValue("public static final EnumProtocolDirection SERVERBOUND");
-    }
+    private static final Object CLIENTBOUND = EnumProtocolDirectionHandle.CLIENTBOUND.getRaw();
+    private static final Object SERVERBOUND = EnumProtocolDirectionHandle.SERVERBOUND.getRaw();
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static final FieldAccessor<Map<Object, BiMap<Integer, Class<?>>>> packetMap = (FieldAccessor) EnumProtocolHandle.T.packetMap.raw.toFieldAccessor();
 
     public static Class<?> getPacketClassIn(Integer id) {
-        return packetMap.get(PLAY).get(Direction.CLIENTBOUND).get(id);
+        return packetMap.get(PLAY).get(SERVERBOUND).get(id);
     }
 
     public static Class<?> getPacketClassOut(Integer id) {
-        return packetMap.get(PLAY).get(Direction.SERVERBOUND).get(id);
+        return packetMap.get(PLAY).get(CLIENTBOUND).get(id);
     }
 
-    public static Integer getPacketIdIn(Class<?> packetClass) {
-        BiMap<Integer, Class<?>> map = packetMap.get(PLAY).get(Direction.CLIENTBOUND);
+    public static int getPacketIdIn(Class<?> packetClass) {
+        BiMap<Integer, Class<?>> map = packetMap.get(PLAY).get(SERVERBOUND);
         for (Integer i : map.keySet()) {
             if (map.get(i).equals(packetClass)) {
                 return i;
@@ -40,8 +36,8 @@ public class NMSEnumProtocol {
         return -1;
     }
 
-    public static Integer getPacketIdOut(Class<?> packetClass) {
-        BiMap<Integer, Class<?>> map = packetMap.get(PLAY).get(Direction.SERVERBOUND);
+    public static int getPacketIdOut(Class<?> packetClass) {
+        BiMap<Integer, Class<?>> map = packetMap.get(PLAY).get(CLIENTBOUND);
         for (Integer i : map.keySet()) {
             if (map.get(i).equals(packetClass)) {
                 return i;
@@ -54,17 +50,17 @@ public class NMSEnumProtocol {
      * Tries to obtain the Packet ID to which a specific packet is mapped.
      *
      * @param packetClass to get
-     * @return id to which it is mapped, or null if not found
+     * @return id to which it is mapped, or -1 if not found
      */
-    public static Integer getPacketId(Class<?> packetClass) {
-        Integer id = getPacketIdIn(packetClass);
-        if (id != null) {
-            return id.intValue();
+    public static int getPacketId(Class<?> packetClass) {
+        int id = getPacketIdIn(packetClass);
+        if (id != -1) {
+            return id;
         }
         id = getPacketIdOut(packetClass);
-        if (id != null) {
-            return id.intValue();
+        if (id != -1) {
+            return id;
         }
-        return null;
+        return -1;
     }
 }

@@ -76,10 +76,13 @@ public class CommonMapController implements PacketListener, Listener {
      * @return player input
      */
     public MapPlayerInput getPlayerInput(Player player) {
-        MapPlayerInput input = playerInputs.get(player);
-        if (input == null) {
-            input = new MapPlayerInput(player);
-            playerInputs.put(player, input);
+        MapPlayerInput input;
+        synchronized (playerInputs) {
+            input = playerInputs.get(player);
+            if (input == null) {
+                input = new MapPlayerInput(player);
+                playerInputs.put(player, input);
+            }
         }
         return input;
     }
@@ -146,7 +149,10 @@ public class CommonMapController implements PacketListener, Listener {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {
             int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
-            MapDisplayInfo info = maps.get(itemid);
+            MapDisplayInfo info;
+            synchronized (maps) {
+                info = maps.get(itemid);
+            }
             if (info != null && !info.sessions.isEmpty()) {
                 event.setCancelled(true);
             }
@@ -158,7 +164,10 @@ public class CommonMapController implements PacketListener, Listener {
         // Handle input coming from the player for the map
         if (event.getType() == PacketType.IN_STEER_VEHICLE) {
             Player p = event.getPlayer();
-            MapPlayerInput input = playerInputs.get(p);
+            MapPlayerInput input;
+            synchronized (playerInputs) {
+                input = playerInputs.get(p);
+            }
             if (input != null) {
                 CommonPacket packet = event.getPacket();
                 int dx = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.sideways));
@@ -181,9 +190,11 @@ public class CommonMapController implements PacketListener, Listener {
     protected void onPlayerJoin(PlayerJoinEvent event) {
         // Let everyone know we got a player over here!
         Player player = event.getPlayer();
-        for (MapDisplayInfo map : this.maps.values()) {
-            for (MapSession session : map.sessions) {
-                session.updatePlayerOnline(player);
+        synchronized (maps) {
+            for (MapDisplayInfo map : this.maps.values()) {
+                for (MapSession session : map.sessions) {
+                    session.updatePlayerOnline(player);
+                }
             }
         }
     }
@@ -514,12 +525,14 @@ public class CommonMapController implements PacketListener, Listener {
 
         public void add() {
             if (this.displayInfo == null && lastMapId != -1) {
-                this.displayInfo = maps.get(lastMapId);
-                if (this.displayInfo == null) {
-                    this.displayInfo = new MapDisplayInfo(lastMapId);
-                    maps.put(lastMapId, this.displayInfo);
+                synchronized (maps) {
+                    this.displayInfo = maps.get(lastMapId);
+                    if (this.displayInfo == null) {
+                        this.displayInfo = new MapDisplayInfo(lastMapId);
+                        maps.put(lastMapId, this.displayInfo);
+                    }
+                    this.displayInfo.itemFrames.add(this);
                 }
-                this.displayInfo.itemFrames.add(this);
             }
         }
     }
