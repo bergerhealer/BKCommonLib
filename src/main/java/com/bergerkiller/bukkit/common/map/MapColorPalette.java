@@ -20,8 +20,19 @@ public class MapColorPalette {
     public static final byte[] COLOR_MAP_SUBTRACT = new byte[0x10000];
     public static final byte[] COLOR_MAP_MULTIPLY = new byte[0x10000];
 
+    // List of colors with their closest matching palette entry
     public static final byte COLOR_TRANSPARENT = 0;
+    public static final byte COLOR_BLACK = 119;
     public static final byte COLOR_WHITE = 34;
+    public static final byte COLOR_RED = 18;
+    public static final byte COLOR_GREEN = 30;
+    public static final byte COLOR_BLUE = 50;
+    public static final byte COLOR_CYAN = 126;
+    public static final byte COLOR_YELLOW = 122;
+    public static final byte COLOR_ORANGE = 62;
+    public static final byte COLOR_BROWN = 42;
+    public static final byte COLOR_PURPLE = 66;
+    public static final byte COLOR_PINK = 82;
 
     static {
         // Ugh.
