@@ -15,6 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>1.12</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
+        <project.mountiplexversion>1.4-SNAPSHOT</project.mountiplexversion>
         <junit.version>4.11</junit.version>
         <project.cibuild/>
     </properties>
@@ -103,7 +104,7 @@
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>${project.mountiplexversion}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -179,7 +180,7 @@
             <plugin>
                 <groupId>com.bergerkiller.mountiplex</groupId>
                 <artifactId>Mountiplex</artifactId>
-                <version>1.3-SNAPSHOT</version>
+                <version>${project.mountiplexversion}</version>
                 <executions>
                     <execution>
                         <id>Generate reflection templates</id>
