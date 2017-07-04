@@ -18,10 +18,17 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
-    public Throwable stack;
+    private Throwable stack = null;
 
-    public EntityHook() {
-        this.stack = new Throwable();
+    public void setStack(Throwable t) {
+        this.stack = t;
+    }
+
+    private Throwable getStack() {
+        if (this.stack == null) {
+            this.stack = new Throwable();
+        }
+        return this.stack;
     }
 
     public boolean hasController() {
@@ -261,10 +268,10 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     private boolean checkController() {
         if (controller == null) {
-            Logging.LOGGER.once(Level.SEVERE , "Incorrect state: no controller assigned! Creator:", stack);
+            Logging.LOGGER.once(Level.SEVERE , "Incorrect state: no controller assigned! Creator:", getStack());
             return false;
         } else if (controller.getEntity() == null) {
-            Logging.LOGGER.once(Level.SEVERE, "Incorrect state: controller " + controller.getClass().getName() + " has no entity bound to it! Creator:", stack);
+            Logging.LOGGER.once(Level.SEVERE, "Incorrect state: controller " + controller.getClass().getName() + " has no entity bound to it! Creator:", getStack());
             return false;
         } else {
             return true;

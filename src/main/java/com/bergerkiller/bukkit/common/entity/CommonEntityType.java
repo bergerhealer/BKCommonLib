@@ -178,6 +178,7 @@ public class CommonEntityType {
 
     public <T extends Entity> CommonEntity<T> createCommonEntityNull() {
         EntityHook hook = new EntityHook();
+        hook.setStack(new Throwable());
         Object handle = hook.createInstance(this.nmsType.getType());
 
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
@@ -200,6 +201,7 @@ public class CommonEntityType {
         double z = location.getZ();
 
         EntityHook hook = new EntityHook();
+        hook.setStack(new Throwable());
         Object handle = hook.constructInstance(this.nmsType.getType(), 
                 new Class<?>[] {NMSWorld.T.getType(), double.class, double.class, double.class},
                 new Object[] { Conversion.toWorldHandle.convert(world), x, y, z });
@@ -215,6 +217,7 @@ public class CommonEntityType {
 
     public Object createNMSHookFromEntity(CommonEntity<?> entity) {
         EntityHook hook = new EntityHook();
+        hook.setStack(new Throwable());
         return hook.hook(entity.getHandle());
     }
 
