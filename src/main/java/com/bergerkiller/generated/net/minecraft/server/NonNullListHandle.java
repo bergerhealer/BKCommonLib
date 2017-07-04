@@ -27,7 +27,7 @@ public class NonNullListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static List<?> create() {
-        return T.create.invokeVA();
+        return T.create.invoke();
     }
 
     /**

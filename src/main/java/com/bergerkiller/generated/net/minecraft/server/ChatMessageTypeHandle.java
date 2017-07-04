@@ -26,7 +26,7 @@ public class ChatMessageTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object getRawById(byte id) {
-        return T.getRawById.invokeVA(id);
+        return T.getRawById.invoke(id);
     }
 
     public byte getId() {

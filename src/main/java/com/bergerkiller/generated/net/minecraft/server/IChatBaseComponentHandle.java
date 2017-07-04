@@ -54,11 +54,11 @@ public class IChatBaseComponentHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static String chatComponentToJson(IChatBaseComponentHandle chatComponent) {
-            return T.chatComponentToJson.invokeVA(chatComponent);
+            return T.chatComponentToJson.invoke(chatComponent);
         }
 
         public static IChatBaseComponentHandle jsonToChatComponent(String jsonString) {
-            return T.jsonToChatComponent.invokeVA(jsonString);
+            return T.jsonToChatComponent.invoke(jsonString);
         }
 
         /**

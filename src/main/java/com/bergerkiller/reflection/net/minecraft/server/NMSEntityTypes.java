@@ -39,9 +39,9 @@ public class NMSEntityTypes {
      */
     public static void register(int entityId, String entityKey, Class<?> entityClass, String entityName) {
         if (EntityTypesHandle.T.register.isAvailable()) {
-            EntityTypesHandle.T.register.invokeVA(entityId, entityKey, entityClass, entityName);
+            EntityTypesHandle.T.register.invoke(entityId, entityKey, entityClass, entityName);
         } else if (EntityTypesHandle.T.register_old.isAvailable()) {
-            EntityTypesHandle.T.register_old.invokeVA(entityClass, entityName, entityId);
+            EntityTypesHandle.T.register_old.invoke(entityClass, entityName, entityId);
         } else {
             throw new UnsupportedOperationException("Entity Registration is not supported on this server");
         }
@@ -55,10 +55,10 @@ public class NMSEntityTypes {
      */
     public static String getName(Class<?> type) {
         if (EntityTypesHandle.T.getName.isAvailable()) {
-            Object mcKey = EntityTypesHandle.T.getName.invokeVA(type);
+            Object mcKey = EntityTypesHandle.T.getName.invoke(type);
             return (mcKey == null) ? null : mcKey.toString();
         } else if (EntityTypesHandle.T.getName_old.isAvailable()) {
-            return EntityTypesHandle.T.getName_old.invokeVA(type);
+            return EntityTypesHandle.T.getName_old.invoke(type);
         } else {
             throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
         }

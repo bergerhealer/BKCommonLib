@@ -26,7 +26,7 @@ public class MobEffectHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MobEffectHandle fromNBT(CommonTagCompound compound) {
-        return T.fromNBT.invokeVA(compound);
+        return T.fromNBT.invoke(compound);
     }
 
     public MobEffectListHandle getEffectList() {

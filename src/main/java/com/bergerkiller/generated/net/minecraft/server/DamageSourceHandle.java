@@ -30,35 +30,35 @@ public class DamageSourceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DamageSourceHandle mobAttack(LivingEntity livingEntity) {
-        return T.mobAttack.invokeVA(livingEntity);
+        return T.mobAttack.invoke(livingEntity);
     }
 
     public static DamageSourceHandle playerAttack(HumanEntity humanEntity) {
-        return T.playerAttack.invokeVA(humanEntity);
+        return T.playerAttack.invoke(humanEntity);
     }
 
     public static DamageSourceHandle arrowHit(Arrow arrow, Entity damager) {
-        return T.arrowHit.invokeVA(arrow, damager);
+        return T.arrowHit.invoke(arrow, damager);
     }
 
     public static DamageSourceHandle fireballHit(Fireball fireball, Entity damager) {
-        return T.fireballHit.invokeVA(fireball, damager);
+        return T.fireballHit.invoke(fireball, damager);
     }
 
     public static DamageSourceHandle thrownHit(Entity projectile, Entity damager) {
-        return T.thrownHit.invokeVA(projectile, damager);
+        return T.thrownHit.invoke(projectile, damager);
     }
 
     public static DamageSourceHandle magicHit(Entity magicEntity, Entity damager) {
-        return T.magicHit.invokeVA(magicEntity, damager);
+        return T.magicHit.invoke(magicEntity, damager);
     }
 
     public static DamageSourceHandle thorns(Entity entity) {
-        return T.thorns.invokeVA(entity);
+        return T.thorns.invoke(entity);
     }
 
     public static DamageSourceHandle explosion(ExplosionHandle explosion) {
-        return T.explosion.invokeVA(explosion);
+        return T.explosion.invoke(explosion);
     }
 
     public boolean isExplosion() {

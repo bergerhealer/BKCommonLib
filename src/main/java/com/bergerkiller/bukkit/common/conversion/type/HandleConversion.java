@@ -168,7 +168,7 @@ public class HandleConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.server.EnumGamemode")
     public static Object toEnumGamemodeHandle(org.bukkit.GameMode gameMode) {
-        return EnumGamemodeHandle.T.getById.raw.invokeVA(gameMode.getValue());
+        return EnumGamemodeHandle.T.getById.raw.invoke(gameMode.getValue());
     }
 
     @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.server.EnumHand", optional=true)
@@ -257,13 +257,13 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Integer difficultyId) {
-        return EnumDifficultyHandle.T.getById.raw.invokeVA(difficultyId);
+        return EnumDifficultyHandle.T.getById.raw.invoke(difficultyId);
     }
 
     @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.server.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Difficulty difficulty) {
-        return EnumDifficultyHandle.T.getById.raw.invokeVA(difficulty.getValue());
+        return EnumDifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
     }
 
     @ConverterMethod(output="net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction")
@@ -281,7 +281,7 @@ public class HandleConversion {
         @SuppressWarnings("deprecation")
         int id = potionEffectType.getId();
 
-        return MobEffectListHandle.T.fromId.invokeVA(id);
+        return MobEffectListHandle.T.fromId.invoke(id);
     }
 
     @ConverterMethod(output="net.minecraft.server.MobEffect")
@@ -386,9 +386,9 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.SoundCategory", optional=true)
     public static Object getSoundCategoryFromName(String soundCategoryName) {
-        Object result = SoundCategoryHandle.T.byName.raw.invokeVA(soundCategoryName);
+        Object result = SoundCategoryHandle.T.byName.raw.invoke(soundCategoryName);
         if (result == null) {
-            result = SoundCategoryHandle.T.byName.raw.invokeVA("master");
+            result = SoundCategoryHandle.T.byName.raw.invoke("master");
         }
         return result;
     }

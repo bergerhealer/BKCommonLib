@@ -26,19 +26,19 @@ public class CraftMagicNumbersHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Material getMaterialFromBlock(Object nmsBlock) {
-        return T.getMaterialFromBlock.invokeVA(nmsBlock);
+        return T.getMaterialFromBlock.invoke(nmsBlock);
     }
 
     public static Material getMaterialFromItem(Object nmsItem) {
-        return T.getMaterialFromItem.invokeVA(nmsItem);
+        return T.getMaterialFromItem.invoke(nmsItem);
     }
 
     public static Object getItemFromMaterial(Material material) {
-        return T.getItemFromMaterial.invokeVA(material);
+        return T.getItemFromMaterial.invoke(material);
     }
 
     public static Object getBlockFromMaterial(Material material) {
-        return T.getBlockFromMaterial.invokeVA(material);
+        return T.getBlockFromMaterial.invoke(material);
     }
 
     /**

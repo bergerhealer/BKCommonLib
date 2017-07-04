@@ -440,7 +440,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
-        int id = MobEffectListHandle.T.getId.invokeVA(nmsMobEffectListHandle);
+        int id = MobEffectListHandle.T.getId.invoke(nmsMobEffectListHandle);
 
         @SuppressWarnings("deprecation")
         PotionEffectType type = PotionEffectType.getById(id);
@@ -479,7 +479,7 @@ public class WrapperConversion {
     @ConverterMethod(output="net.minecraft.server.MapIcon.Type", optional=true)
     public static Object mapIconTypeIdToEnum(byte typeId) {
         if (MapIconHandle.TypeHandle.T.isValid()) {
-            return MapIconHandle.TypeHandle.T.fromId.raw.invokeVA(typeId);
+            return MapIconHandle.TypeHandle.T.fromId.raw.invoke(typeId);
         } else {
             throw new UnsupportedOperationException("Map Icon Type enum not supported");
         }

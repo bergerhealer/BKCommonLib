@@ -25,7 +25,7 @@ public class CrashReportHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CrashReportHandle create(Throwable throwable, String message) {
-        return T.create.invokeVA(throwable, message);
+        return T.create.invoke(throwable, message);
     }
 
     public CrashReportSystemDetailsHandle getSystemDetails(String message) {

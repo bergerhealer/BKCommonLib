@@ -25,11 +25,11 @@ public class MobEffectListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static int getId(MobEffectListHandle mobeffectlist) {
-        return T.getId.invokeVA(mobeffectlist);
+        return T.getId.invoke(mobeffectlist);
     }
 
     public static MobEffectListHandle fromId(int id) {
-        return T.fromId.invokeVA(id);
+        return T.fromId.invoke(id);
     }
 
     /**

@@ -25,7 +25,7 @@ public class EnumGamemodeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumGamemodeHandle getById(int id) {
-        return T.getById.invokeVA(id);
+        return T.getById.invoke(id);
     }
 
     public int getId() {

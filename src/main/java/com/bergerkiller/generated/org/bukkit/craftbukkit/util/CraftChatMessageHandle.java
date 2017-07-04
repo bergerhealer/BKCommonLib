@@ -26,11 +26,11 @@ public class CraftChatMessageHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static String fromComponent(IChatBaseComponentHandle component) {
-        return T.fromComponent.invokeVA(component);
+        return T.fromComponent.invoke(component);
     }
 
     public static IChatBaseComponentHandle[] fromString(String message) {
-        return T.fromString.invokeVA(message);
+        return T.fromString.invoke(message);
     }
 
     /**

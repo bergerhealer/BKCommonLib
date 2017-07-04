@@ -125,6 +125,6 @@ public class BlockDataRegistry {
      */
     @Deprecated
     public static BlockData fromCombinedId(int combinedId) {
-        return fromBlockData(BlockHandle.T.getByCombinedId.raw.invokeVA(combinedId));
+        return fromBlockData(BlockHandle.T.getByCombinedId.raw.invoke(combinedId));
     }
 }

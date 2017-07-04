@@ -26,15 +26,15 @@ public class CraftItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object asNMSCopy(ItemStack original) {
-        return T.asNMSCopy.invokeVA(original);
+        return T.asNMSCopy.invoke(original);
     }
 
     public static ItemStack asCraftCopy(ItemStack original) {
-        return T.asCraftCopy.invokeVA(original);
+        return T.asCraftCopy.invoke(original);
     }
 
     public static ItemStack asCraftMirror(Object nmsItemStack) {
-        return T.asCraftMirror.invokeVA(nmsItemStack);
+        return T.asCraftMirror.invoke(nmsItemStack);
     }
 
     public Object getHandle() {

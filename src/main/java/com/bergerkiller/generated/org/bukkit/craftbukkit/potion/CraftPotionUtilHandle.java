@@ -26,11 +26,11 @@ public class CraftPotionUtilHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PotionEffect toBukkit(Object nmsMobEffect) {
-        return T.toBukkit.invokeVA(nmsMobEffect);
+        return T.toBukkit.invoke(nmsMobEffect);
     }
 
     public static Object fromBukkit(PotionEffect effect) {
-        return T.fromBukkit.invokeVA(effect);
+        return T.fromBukkit.invoke(effect);
     }
 
     /**

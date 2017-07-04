@@ -328,7 +328,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          */
         public int getSerializerId() {
             Object rawSerializer = this.handle.getSerializer();
-            return DataWatcherRegistryHandle.T.getSerializerId.invokeVA(rawSerializer);
+            return DataWatcherRegistryHandle.T.getSerializerId.invoke(rawSerializer);
         }
 
         /**

@@ -27,7 +27,7 @@ public class RecipesFurnaceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RecipesFurnaceHandle getInstance() {
-        return T.getInstance.invokeVA();
+        return T.getInstance.invoke();
     }
 
     public ItemStackHandle getResult(ItemStackHandle itemstack) {

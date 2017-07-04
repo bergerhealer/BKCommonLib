@@ -26,7 +26,7 @@ public class CraftSoundHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static String getSoundName(Sound sound) {
-        return T.getSoundName.invokeVA(sound);
+        return T.getSoundName.invoke(sound);
     }
 
     /**

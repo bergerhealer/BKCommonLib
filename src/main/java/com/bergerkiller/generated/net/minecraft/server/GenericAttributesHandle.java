@@ -28,11 +28,11 @@ public class GenericAttributesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static void loadFromNBT(AttributeMapServerHandle attributemapbase, CommonTagList nbttaglist) {
-        T.loadFromNBT.invokeVA(attributemapbase, nbttaglist);
+        T.loadFromNBT.invoke(attributemapbase, nbttaglist);
     }
 
     public static CommonTagList saveToNBT(AttributeMapServerHandle attributemapbase) {
-        return T.saveToNBT.invokeVA(attributemapbase);
+        return T.saveToNBT.invoke(attributemapbase);
     }
 
     /**

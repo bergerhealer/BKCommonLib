@@ -26,7 +26,7 @@ public class DataWatcherRegistryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static int getSerializerId(Object paramDataWatcherSerializer) {
-        return T.getSerializerId.invokeVA(paramDataWatcherSerializer);
+        return T.getSerializerId.invoke(paramDataWatcherSerializer);
     }
 
     /**

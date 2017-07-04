@@ -26,7 +26,7 @@ public class SoundCategoryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SoundCategoryHandle byName(String name) {
-        return T.byName.invokeVA(name);
+        return T.byName.invoke(name);
     }
 
     public String getName() {

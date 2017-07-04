@@ -32,19 +32,19 @@ public class BlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static int getCombinedId(IBlockDataHandle iblockdata) {
-        return T.getCombinedId.invokeVA(iblockdata);
+        return T.getCombinedId.invoke(iblockdata);
     }
 
     public static int getId(BlockHandle block) {
-        return T.getId.invokeVA(block);
+        return T.getId.invoke(block);
     }
 
     public static BlockHandle getById(int id) {
-        return T.getById.invokeVA(id);
+        return T.getById.invoke(id);
     }
 
     public static IBlockDataHandle getByCombinedId(int combinedId) {
-        return T.getByCombinedId.invokeVA(combinedId);
+        return T.getByCombinedId.invoke(combinedId);
     }
 
     public void entityHitVertical(WorldHandle world, EntityHandle entity) {

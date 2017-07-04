@@ -25,7 +25,7 @@ public class RecipeUtil {
     static {
         for (Material material : Material.values()) {
             Object item = NMSItemStack.newInstance(material, 0, 1);
-            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invokeVA(item)).intValue();
+            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item)).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);
             }

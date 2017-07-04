@@ -35,7 +35,7 @@ public class EnumParticleHandle extends Template.Handle {
 
     public static EnumParticleHandle getByName(String name) {
         if (T.byName.isAvailable()) {
-            return T.byName.invokeVA(name);
+            return T.byName.invoke(name);
         } else {
             for (Object enumValue : T.getType().getEnumConstants()) {
                 if (T.getName.invoke(enumValue).equals(name)) {

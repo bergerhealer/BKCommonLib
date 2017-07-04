@@ -82,7 +82,7 @@ public class MapIconHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static TypeHandle fromId(byte id) {
-            return T.fromId.invokeVA(id);
+            return T.fromId.invoke(id);
         }
 
         /**
