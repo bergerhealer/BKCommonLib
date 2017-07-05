@@ -171,6 +171,32 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
     }
 
     /**
+     * Gets the Entity Controller currently assigned to this Entity, checking to make sure
+     * the controller is of a certain Class type. When no custom controller is set, or the current
+     * controller can not be assigned to the type specified, <i>null</i> is returned instead.<br>
+     * <br>
+     * This method offers performance benefits over {@link #getController()} by not instantiating a new
+     * default controller when no controller is set.
+     * 
+     * @param controllerType to get
+     * @return the controller of controllerType, or <i>null</i> if not found
+     */
+    @SuppressWarnings("unchecked")
+    public <C extends EntityController<?>> C getController(Class<? extends C> controllerType) {
+        EntityHook hook = EntityHook.get(getHandle(), EntityHook.class);
+        if (hook == null || !hook.hasController()) {
+            return null;
+        }
+
+        EntityController<?> controller = hook.getController();
+        if (controllerType.isAssignableFrom(controller.getClass())) {
+            return (C) controller;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Gets the Entity Controller currently assigned to this Entity. If no
      * custom controller is set, this method returns a new
      * {@link DefaultEntityController} instance.
