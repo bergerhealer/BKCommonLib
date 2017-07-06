@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.entity;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.*;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
@@ -414,7 +414,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final int chunkX = newInstance.getChunkX();
         final int chunkY = newInstance.getChunkY();
         final int chunkZ = newInstance.getChunkZ();
-        Object chunkHandle = Conversion.toChunkHandle.convert(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
+        Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
         if (chunkHandle != null) {
             final List<?>[] entitySlices = (List<?>[]) ChunkHandle.T.entitySlices.raw.get(chunkHandle);
             if (!replaceInList(entitySlices[chunkY], newInstance)) {
@@ -541,9 +541,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
         // Preparations prior to teleportation
         final Location oldLocation = entity.getLocation();
-        final EntityHandle entityHandle = EntityHandle.createHandle(Conversion.toEntityHandle.convert(this.entity));
+        final EntityHandle entityHandle = EntityHandle.createHandle(this.getHandle());
         final List<org.bukkit.entity.Entity> passengers = getPassengers();
-        final WorldHandle newworld = WorldHandle.createHandle(Conversion.toWorldHandle.convert(location.getWorld()));
+        final WorldHandle newworld = WorldHandle.fromBukkit(location.getWorld());
         final boolean isWorldChange = !entityHandle.getWorld().equals(newworld);
         final EntityNetworkController<?> oldNetworkController = getNetworkController();
         final boolean hasNetworkController = !(oldNetworkController instanceof DefaultEntityNetworkController);
@@ -771,7 +771,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (entity == null) {
             return null;
         }
-        final Object handle = Conversion.toEntityHandle.convert(entity);
+        final Object handle = HandleConversion.toEntityHandle(entity);
         if (handle == null) {
             return null;
         }
