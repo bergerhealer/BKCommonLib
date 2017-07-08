@@ -51,6 +51,22 @@ public class BlockHandle extends Template.Handle {
         T.entityHitVertical.invoke(instance, world, entity);
     }
 
+    public int getOpacity(IBlockDataHandle iblockdata) {
+        return T.getOpacity.invoke(instance, iblockdata);
+    }
+
+    public int getEmission(IBlockDataHandle iblockdata) {
+        return T.getEmission.invoke(instance, iblockdata);
+    }
+
+    public boolean isOccluding(IBlockDataHandle iblockdata) {
+        return T.isOccluding.invoke(instance, iblockdata);
+    }
+
+    public boolean isPowerSource(IBlockDataHandle iblockdata) {
+        return T.isPowerSource.invoke(instance, iblockdata);
+    }
+
     public float getDamageResillience(Entity entity) {
         return T.getDamageResillience.invoke(instance, entity);
     }
@@ -80,39 +96,6 @@ public class BlockHandle extends Template.Handle {
     }
 
 
-    public int getOpacity(IBlockDataHandle iblockdata) {
-        if (T.bydata_getOpacity.isAvailable()) {
-            return T.bydata_getOpacity.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_getOpacity.invoke(instance);
-        }
-    }
-
-    public int getEmission(IBlockDataHandle iblockdata) {
-        if (T.bydata_getEmission.isAvailable()) {
-            return T.bydata_getEmission.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_getEmission.invoke(instance);
-        }
-    }
-
-    public boolean isOccluding(IBlockDataHandle iblockdata) {
-        if (T.bydata_isOccluding.isAvailable()) {
-            return T.bydata_isOccluding.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_isOccluding.invoke(instance);
-        }
-    }
-
-    public boolean isPowerSource(IBlockDataHandle iblockdata) {
-        if (T.bydata_isPowerSource.isAvailable()) {
-            return T.bydata_isPowerSource.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_isPowerSource.invoke(instance);
-        }
-    }
-
-
     public SoundEffectTypeHandle getStepSound() {
         if (T.getStepSound.isAvailable()) {
             return T.getStepSound.invoke(instance);
@@ -139,22 +122,10 @@ public class BlockHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
-        @Template.Optional
-        public final Template.Method.Converted<Integer> bydata_getOpacity = new Template.Method.Converted<Integer>();
-        @Template.Optional
-        public final Template.Method.Converted<Integer> bydata_getEmission = new Template.Method.Converted<Integer>();
-        @Template.Optional
-        public final Template.Method.Converted<Boolean> bydata_isOccluding = new Template.Method.Converted<Boolean>();
-        @Template.Optional
-        public final Template.Method.Converted<Boolean> bydata_isPowerSource = new Template.Method.Converted<Boolean>();
-        @Template.Optional
-        public final Template.Method<Integer> noargs_getOpacity = new Template.Method<Integer>();
-        @Template.Optional
-        public final Template.Method<Integer> noargs_getEmission = new Template.Method<Integer>();
-        @Template.Optional
-        public final Template.Method<Boolean> noargs_isOccluding = new Template.Method<Boolean>();
-        @Template.Optional
-        public final Template.Method<Boolean> noargs_isPowerSource = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();
+        public final Template.Method.Converted<Integer> getEmission = new Template.Method.Converted<Integer>();
+        public final Template.Method.Converted<Boolean> isOccluding = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Float> getDamageResillience = new Template.Method.Converted<Float>();
         @Template.Optional
         public final Template.Method.Converted<SoundEffectTypeHandle> getStepSound = new Template.Method.Converted<SoundEffectTypeHandle>();

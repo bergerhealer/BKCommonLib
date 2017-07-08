@@ -25,61 +25,25 @@ class Block {
 
 #if version >= 1.9
     // On later versions, it has an IBlockData argument
-    public optional int bydata_getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
-    public optional int bydata_getEmission:o((IBlockDataHandle) IBlockData iblockdata);
-    public optional boolean bydata_isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
-    public optional boolean bydata_isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    // No-args does not exist
-    public optional int noargs_getOpacity:???();
-    public optional int noargs_getEmission:???();
-    public optional boolean noargs_isOccluding:???();
-    public optional boolean noargs_isPowerSource:???();
+    public int getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
+    public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #else
-    // On MC 1.8.8 and earlier, there was no block data that changes these values
-    public optional int noargs_getOpacity:p();
-    public optional int noargs_getEmission:r();
-    public optional boolean noargs_isOccluding:isOccluding();
-    public optional boolean noargs_isPowerSource:isPowerSource();
-    // By IBlockData does not exist
-    public optional int bydata_getOpacity:???((IBlockDataHandle) IBlockData iblockdata);
-    public optional int bydata_getEmission:???((IBlockDataHandle) IBlockData iblockdata);
-    public optional boolean bydata_isOccluding:???((IBlockDataHandle) IBlockData iblockdata);
-    public optional boolean bydata_isPowerSource:???((IBlockDataHandle) IBlockData iblockdata);
+    // By IBlockData does not exist; proxy to the empty args version
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.p();
+    }
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.r();
+    }
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.isOccluding();
+    }
+    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.isPowerSource();
+    }
 #endif
-    <code>
-    public int getOpacity(IBlockDataHandle iblockdata) {
-        if (T.bydata_getOpacity.isAvailable()) {
-            return T.bydata_getOpacity.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_getOpacity.invoke(instance);
-        }
-    }
-
-    public int getEmission(IBlockDataHandle iblockdata) {
-        if (T.bydata_getEmission.isAvailable()) {
-            return T.bydata_getEmission.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_getEmission.invoke(instance);
-        }
-    }
-
-    public boolean isOccluding(IBlockDataHandle iblockdata) {
-        if (T.bydata_isOccluding.isAvailable()) {
-            return T.bydata_isOccluding.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_isOccluding.invoke(instance);
-        }
-    }
-
-    public boolean isPowerSource(IBlockDataHandle iblockdata) {
-        if (T.bydata_isPowerSource.isAvailable()) {
-            return T.bydata_isPowerSource.invoke(instance, iblockdata);
-        } else {
-            return T.noargs_isPowerSource.invoke(instance);
-        }
-    }
-    </code>
-
 
     public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
 
