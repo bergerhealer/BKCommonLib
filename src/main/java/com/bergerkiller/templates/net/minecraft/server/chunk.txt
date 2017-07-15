@@ -11,6 +11,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
 class Chunk {
     private final (ChunkSectionHandle[]) ChunkSection[] sections;
@@ -18,7 +19,11 @@ class Chunk {
     public final int locX;
     public final int locZ;
     public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
-    public final (Object) List<Entity>[] entitySlices;
+#if spigot
+    public final (List<Object>[]) List<Entity>[] entitySlices;
+#else
+    public final (List<Object>[]) EntitySlice<Entity>[] entitySlices;
+#endif
     public org.bukkit.Chunk bukkitChunk;
 
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
@@ -83,6 +88,18 @@ class ChunkSection {
     public int getBlockLight:e(int x, int y, int z);
 #endif
 
+}
+
+// This is only used on CraftBukkit servers
+// Spigot uses a simplified List<Entity>
+optional class EntitySlice {
+    private final List<T> listValues:e;
+
+    public (EntitySliceHandle) EntitySlice((Class<?>) Class<T> oclass);
+
+    public boolean add(T value);
+
+    public boolean remove(Object value);
 }
 
 class DataPaletteBlock {

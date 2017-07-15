@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -113,11 +114,11 @@ public class ChunkHandle extends Template.Handle {
         T.tileEntities.set(instance, value);
     }
 
-    public Object getEntitySlices() {
+    public List<Object>[] getEntitySlices() {
         return T.entitySlices.get(instance);
     }
 
-    public void setEntitySlices(Object value) {
+    public void setEntitySlices(List<Object>[] value) {
         T.entitySlices.set(instance, value);
     }
 
@@ -139,7 +140,7 @@ public class ChunkHandle extends Template.Handle {
         public final Template.Field.Integer locX = new Template.Field.Integer();
         public final Template.Field.Integer locZ = new Template.Field.Integer();
         public final Template.Field.Converted<Map<IntVector3, BlockState>> tileEntities = new Template.Field.Converted<Map<IntVector3, BlockState>>();
-        public final Template.Field.Converted<Object> entitySlices = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<List<Object>[]> entitySlices = new Template.Field.Converted<List<Object>[]>();
         public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();

@@ -89,6 +89,25 @@ public class CollectionBasics {
     }
 
     /**
+     * A basic addAll implementation. (does not call collection.addAll) Calls
+     * {@link List#add(index, Object)} for all elements in the elements
+     * collection specified
+     * 
+     * @param list to add to
+     * @param index to start adding at
+     * @param elements to add
+     * @return True if the list changed, False if not
+     */
+    public static <T> boolean addAll(List<T> list, int index, Collection<? extends T> elements) {
+        boolean changed = false;
+        for (T value : elements) {
+            list.add(index++, value);
+            changed = true;
+        }
+        return changed;
+    }
+
+    /**
      * A basic retainAll implementation. (does not call collection.retainAll)
      * After this call all elements not contained in elements are removed.
      * Essentially all elements are removed except those contained in the

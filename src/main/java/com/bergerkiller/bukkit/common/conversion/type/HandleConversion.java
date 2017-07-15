@@ -14,6 +14,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -36,6 +37,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
@@ -411,5 +413,22 @@ public class HandleConversion {
     @ConverterMethod
     public static int inventoryClickTypeToId(InventoryClickType inventoryClickType) {
         return inventoryClickType.getId();
+    }
+
+    @ConverterMethod(input="net.minecraft.server.EntitySlice<T>", optional=true)
+    public static <T> List<T> cbEntitySliceToList(Object nmsEntitySliceHandle) {
+        return new EntitySliceProxy<T>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.server.Entity>", optional=true)
+    public static <T> Object cbListToEntitySlice(List<T> entitySliceList) {
+        if (entitySliceList instanceof EntitySliceProxy) {
+            return ((EntitySliceProxy<T>) entitySliceList).getHandle().getRaw();
+        }
+        EntitySliceHandle entitySlice = EntitySliceHandle.createNew(EntityHandle.T.getType());
+        for (Object value : entitySliceList) {
+            entitySlice.add(value);
+        }
+        return entitySlice.getRaw();
     }
 }

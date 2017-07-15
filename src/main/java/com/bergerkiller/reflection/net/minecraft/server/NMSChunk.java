@@ -16,7 +16,6 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.World;
 
-import java.util.List;
 import java.util.Map;
 
 public class NMSChunk {
@@ -33,10 +32,6 @@ public class NMSChunk {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static final FieldAccessor<Map<?, ?>> tileEntities = (FieldAccessor) ChunkHandle.T.tileEntities.raw.toFieldAccessor();
-
-    // Note: on Spigot it is a List[], on CraftBukkit it is a EntitySlice[]!!!
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static final FieldAccessor<List<Object>[]> entitySlices = (FieldAccessor) ChunkHandle.T.entitySlices.raw.toFieldAccessor();
 
     public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
     public static final FieldAccessor<Boolean> hasSkyLight = new SafeDirectField<Boolean>() {

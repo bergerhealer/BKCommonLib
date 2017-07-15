@@ -46,6 +46,9 @@ public class TemplateResolver implements ClassDeclarationResolver {
             if (pre_version != null) {
                 variables.put("pre", pre_version);
             }
+            if (Common.IS_SPIGOT_SERVER) {
+                variables.put("spigot", "true");
+            }
 
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);

@@ -172,7 +172,7 @@ public class ChunkUtil {
      * @return Live collection of entities in the chunk
      */
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.Chunk chunk) {
-        List<Object>[] entitySlices = NMSChunk.entitySlices.get(Conversion.toChunkHandle.convert(chunk));
+        List<Object>[] entitySlices = ChunkHandle.fromBukkit(chunk).getEntitySlices();
         if (entitySlices == null || entitySlices.length == 0) {
             return Collections.emptyList();
         }
@@ -310,9 +310,9 @@ public class ChunkUtil {
      * @return True if the entity has been removed, False if not (not found)
      */
     public static boolean removeEntity(org.bukkit.Chunk chunk, org.bukkit.entity.Entity entity) {
-        final List<?>[] slices = (List<?>[]) CommonNMS.getHandle(chunk).getEntitySlices();
+        final List<Object>[] slices = CommonNMS.getHandle(chunk).getEntitySlices();
         final int sliceY = MathUtil.clamp(MathUtil.toChunk(EntityUtil.getLocY(entity)), 0, slices.length - 1);
-        final Object handle = Conversion.toEntityHandle.convert(entity);
+        final Object handle = HandleConversion.toEntityHandle(entity);
         if (slices[sliceY].remove(handle)) {
             return true;
         } else {

@@ -416,7 +416,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final int chunkZ = newInstance.getChunkZ();
         Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
         if (chunkHandle != null) {
-            final List<?>[] entitySlices = (List<?>[]) ChunkHandle.T.entitySlices.raw.get(chunkHandle);
+            final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
             if (!replaceInList(entitySlices[chunkY], newInstance)) {
                 for (int y = 0; y < entitySlices.length; y++) {
                     if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
