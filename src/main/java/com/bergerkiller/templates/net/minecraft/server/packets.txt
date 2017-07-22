@@ -157,7 +157,10 @@ class PacketPlayOutTitle extends Packet {
 
 class PacketPlayOutChat extends Packet {
     private (ChatText) IChatBaseComponent text:a;
-    public (Object[]) net.md_5.bungee.api.chat.BaseComponent[] components;
+
+    // Spigot only
+    public optional (Object[]) net.md_5.bungee.api.chat.BaseComponent[] components;
+
 #if version >= 1.12
     private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) ChatMessageType type:b;
 #else
@@ -197,7 +200,9 @@ class PacketPlayInBlockPlace extends Packet {
 #else
     private optional (Object) EnumHand enumHand:???;
 #endif
-    public long timestamp;
+
+    // Spigot only
+    public optional long timestamp;
 }
 
 class PacketPlayOutRemoveEntityEffect extends Packet {

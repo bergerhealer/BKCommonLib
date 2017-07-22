@@ -34,14 +34,6 @@ public class PacketPlayOutChatHandle extends PacketHandle {
         T.text.set(instance, value);
     }
 
-    public Object[] getComponents() {
-        return T.components.get(instance);
-    }
-
-    public void setComponents(Object[] value) {
-        T.components.set(instance, value);
-    }
-
     public ChatMessageType getType() {
         return T.type.get(instance);
     }
@@ -56,6 +48,7 @@ public class PacketPlayOutChatHandle extends PacketHandle {
      */
     public static final class PacketPlayOutChatClass extends Template.Class<PacketPlayOutChatHandle> {
         public final Template.Field.Converted<ChatText> text = new Template.Field.Converted<ChatText>();
+        @Template.Optional
         public final Template.Field.Converted<Object[]> components = new Template.Field.Converted<Object[]>();
         public final Template.Field.Converted<ChatMessageType> type = new Template.Field.Converted<ChatMessageType>();
 

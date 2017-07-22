@@ -49,6 +49,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
@@ -186,7 +187,7 @@ public class NMSPacketClasses {
     
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
 
-        public final FieldAccessor<Long> timestamp = PacketPlayInBlockPlaceHandle.T.timestamp.toFieldAccessor();
+        public final FieldAccessor<Long> timestamp = PacketPlayInBlockPlaceHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
 
         /**
          * Sets the hand that placed the block
@@ -538,9 +539,16 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutChat extends NMSPacket {
-        public final FieldAccessor<Object> chatComponent = PacketPlayOutChatHandle.T.text.raw.toFieldAccessor();
-        public final FieldAccessor<Object[]> components = PacketPlayOutChatHandle.T.components.toFieldAccessor();
+        public final FieldAccessor<ChatText> text = PacketPlayOutChatHandle.T.text.toFieldAccessor();
         public final FieldAccessor<ChatMessageType> type = PacketPlayOutChatHandle.T.type.toFieldAccessor();
+
+        /** Deprecated: use {@link #text} instead */
+        @Deprecated
+        public final FieldAccessor<Object> chatComponent = PacketPlayOutChatHandle.T.text.raw.toFieldAccessor();
+
+        /** Deprecated: this is only available on Spigot servers, and acts as a proxy of {@link #text} */
+        @Deprecated
+        public final FieldAccessor<Object[]> components = PacketPlayOutChatHandle.T.components.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutCloseWindow extends NMSPacket {
@@ -738,7 +746,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Byte> effectAmplifier = nextFieldSignature("private byte c");
         public final FieldAccessor<Integer> effectDuration = nextFieldSignature("private int d");
         public final FieldAccessor<Byte> effectFlags = nextFieldSignature("private byte e");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, NMSMobEffect.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, MobEffectHandle.T.getType());
 
         public CommonPacket newInstance(int entityId, Object mobEffect) {
             return constructor1.newInstance(entityId,  Conversion.toMobEffect.convert(mobEffect));

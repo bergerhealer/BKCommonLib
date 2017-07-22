@@ -24,14 +24,6 @@ public class PacketPlayInBlockPlaceHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public long getTimestamp() {
-        return T.timestamp.getLong(instance);
-    }
-
-    public void setTimestamp(long value) {
-        T.timestamp.setLong(instance, value);
-    }
-
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInBlockPlace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -39,6 +31,7 @@ public class PacketPlayInBlockPlaceHandle extends PacketHandle {
     public static final class PacketPlayInBlockPlaceClass extends Template.Class<PacketPlayInBlockPlaceHandle> {
         @Template.Optional
         public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
+        @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
 
     }
