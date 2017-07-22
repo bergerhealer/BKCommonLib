@@ -428,7 +428,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        // DebugUtil.logInstances(oldInstance.getRaw());
+        //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldInstance.getRaw());
     }
 
     private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {

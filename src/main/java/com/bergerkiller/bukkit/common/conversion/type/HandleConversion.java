@@ -415,15 +415,15 @@ public class HandleConversion {
         return inventoryClickType.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.server.EntitySlice<T>", optional=true)
-    public static <T> List<T> cbEntitySliceToList(Object nmsEntitySliceHandle) {
-        return new EntitySliceProxy<T>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+    @ConverterMethod(input="net.minecraft.server.EntitySlice<?>", optional=true)
+    public static List<Object> cbEntitySliceToList(Object nmsEntitySliceHandle) {
+        return new EntitySliceProxy<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
     }
 
     @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.server.Entity>", optional=true)
-    public static <T> Object cbListToEntitySlice(List<T> entitySliceList) {
+    public static Object cbListToEntitySlice(List<?> entitySliceList) {
         if (entitySliceList instanceof EntitySliceProxy) {
-            return ((EntitySliceProxy<T>) entitySliceList).getHandle().getRaw();
+            return ((EntitySliceProxy<?>) entitySliceList).getHandle().getRaw();
         }
         EntitySliceHandle entitySlice = EntitySliceHandle.createNew(EntityHandle.T.getType());
         for (Object value : entitySliceList) {
