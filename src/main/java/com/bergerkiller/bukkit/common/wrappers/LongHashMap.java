@@ -1,11 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-
-import gnu.trove.map.hash.TLongObjectHashMap;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A wrapper around the internal LongHashMap implementation. This type of
@@ -16,10 +15,10 @@ import java.util.Collection;
  * @param <V> - Value type
  */
 @SuppressWarnings("unchecked")
-public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
+public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
 
     public LongHashMap() {
-        this(new TLongObjectHashMap<V>());
+        this(LongObjectHashMapHandle.createNew());
     }
 
     /**
@@ -28,11 +27,11 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
      * @param initialCapacity for the new LongHashMap
      */
     public LongHashMap(int initialCapacity) {
-        this(new TLongObjectHashMap<V>(initialCapacity));
+        this(LongObjectHashMapHandle.createNew());
     }
 
     public LongHashMap(Object handle) {
-        this.setHandle(Template.Handle.createHandle(handle));
+        this.setHandle(LongObjectHashMapHandle.createHandle(handle));
     }
 
     /**
@@ -41,7 +40,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
      * @return size
      */
     public int size() {
-        return ((TLongObjectHashMap<V>) getRawHandle()).size();
+        return handle.size();
     }
 
     /**
@@ -58,7 +57,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public boolean contains(long key) {
-        return ((TLongObjectHashMap<V>) getRawHandle()).containsKey(key);
+        return handle.containsKey(key);
     }
 
     /**
@@ -75,7 +74,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public V get(long key) {
-        return ((TLongObjectHashMap<V>) getRawHandle()).get(key);
+        return (V) handle.get(key);
     }
 
     /**
@@ -93,7 +92,7 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public V remove(long key) {
-        return ((TLongObjectHashMap<V>) getRawHandle()).remove(key);
+        return (V) handle.remove(key);
     }
 
     /**
@@ -110,14 +109,21 @@ public class LongHashMap<V> extends BasicWrapper<Template.Handle> {
     }
 
     public void put(long key, V value) {
-        ((TLongObjectHashMap<V>) getRawHandle()).put(key, value);
+        handle.put(key, value);
     }
 
     public Collection<V> getValues() {
-        return ((TLongObjectHashMap<V>) getRawHandle()).valueCollection();
+        return (Collection<V>) handle.values();
     }
 
     public long[] getKeys() {
-        return ((TLongObjectHashMap<V>) getRawHandle()).keySet().toArray(new long[0]);
+        Set<Long> keys = handle.keySet();
+        long[] result = new long[keys.size()];
+        int i = 0;
+        for (Long key : keys) {
+            result[i++] = key.longValue();
+        }
+        return result;
+        //return ((TLongObjectHashMap<V>) getRawHandle()).keySet().toArray(new long[0]);
     }
 }

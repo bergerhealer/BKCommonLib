@@ -2,8 +2,15 @@ package org.bukkit.craftbukkit.util;
 
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
 class LongObjectHashMap {
+    public (LongObjectHashMapHandle) LongObjectHashMap();
+
+    public int size();
+
+    public boolean containsKey(long key);
+
     public V get(long key);
 
     public V remove(long key);
@@ -11,6 +18,8 @@ class LongObjectHashMap {
     public V put(long key, V value);
 
     public Collection<V> values();
+
+    public Set<Long> keySet();
 }
 
 class LongHashSet {
