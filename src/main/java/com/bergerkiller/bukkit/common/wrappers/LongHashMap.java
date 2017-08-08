@@ -17,8 +17,11 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
 
+    /**
+     * Constructs a new LongHashMap
+     */
     public LongHashMap() {
-        this(LongObjectHashMapHandle.createNew());
+        this.setHandle(LongObjectHashMapHandle.createNew());
     }
 
     /**
@@ -27,7 +30,7 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
      * @param initialCapacity for the new LongHashMap
      */
     public LongHashMap(int initialCapacity) {
-        this(LongObjectHashMapHandle.createNew());
+        this.setHandle(LongObjectHashMapHandle.createNew());
     }
 
     public LongHashMap(Object handle) {
