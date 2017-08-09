@@ -227,17 +227,20 @@ public class Common {
             });
         }
 
-        // This must be initialized AFTER we have registered the Class path resolvers!
-        TEMPLATE_RESOLVER.load();
-        Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);
+        // Only do these things when we are compatible
+        if (Common.IS_COMPATIBLE) {
+            // This must be initialized AFTER we have registered the Class path resolvers!
+            TEMPLATE_RESOLVER.load();
+            Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);
 
-        // Conversion types registration
-        try {
-            CommonUtil.loadClass(CommonConverters.class);
-            CommonUtil.loadClass(Conversion.class);
-            CommonUtil.loadClass(DuplexConversion.class);
-        } catch (Throwable t) {
-            Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+            // Conversion types registration
+            try {
+                CommonUtil.loadClass(CommonConverters.class);
+                CommonUtil.loadClass(Conversion.class);
+                CommonUtil.loadClass(DuplexConversion.class);
+            } catch (Throwable t) {
+                Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+            }
         }
     }
 
