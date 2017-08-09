@@ -953,5 +953,4 @@ public abstract class PluginBase extends JavaPlugin {
     public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
     }
 
-;
 }
