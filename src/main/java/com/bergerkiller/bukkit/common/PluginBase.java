@@ -279,7 +279,7 @@ public abstract class PluginBase extends JavaPlugin {
      * @param permissionDefaults class
      */
     public final void loadPermissions(Class<? extends IPermissionDefault> permissionDefaults) {
-        for (IPermissionDefault def : CommonUtil.getClassConstants(permissionDefaults)) {
+        for (IPermissionDefault def : CommonUtil.getClassConstants(permissionDefaults, IPermissionDefault.class)) {
             this.loadPermission(def);
         }
     }
@@ -620,10 +620,11 @@ public abstract class PluginBase extends JavaPlugin {
         for (ConfigurationNode subNode : node.getNodes()) {
             setPermissions(subNode);
         }
+
         PermissionDefault def = node.get("default", PermissionDefault.class);
         String desc = node.get("description", String.class);
         if (def != null || desc != null) {
-            Permission permission = getPermission(node.getPath().toLowerCase());
+            Permission permission = getPermission(node.getPath().toLowerCase(Locale.ENGLISH));
             if (def != null) {
                 permission.setDefault(def);
             }
@@ -695,10 +696,12 @@ public abstract class PluginBase extends JavaPlugin {
 
         // Load permission configuration
         this.permissionconfig = new FileConfiguration(this, "PermissionDefaults.yml");
+
         // load
         if (this.permissionconfig.exists()) {
             this.loadPermissions();
         }
+
         // header
         this.permissionconfig.setHeader("Below are the default permissions set for plugin '" + this.getName() + "'.");
         this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
@@ -750,6 +753,7 @@ public abstract class PluginBase extends JavaPlugin {
 
         // ==== Permissions ====
         this.permissions();
+
         // Load all nodes from the permissions config
         setPermissions(this.permissionconfig);
         if (!this.permissionconfig.isEmpty()) {
