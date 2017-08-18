@@ -11,6 +11,7 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -21,7 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+
+import org.bukkit.inventory.ItemStack;
 
 /**
  * This class is a wrapper of the DataWatcher class from CraftBukkit<br>
@@ -164,8 +166,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
      */
     public static class Item<V> extends BasicWrapper<DataWatcherHandle.ItemHandle> {
 
-        public Item(Object handle) {
-            setHandle(DataWatcherHandle.ItemHandle.createHandle(handle));
+        public Item(DataWatcherHandle.ItemHandle handle) {
+            setHandle(handle);
         }
 
         /**
@@ -202,6 +204,13 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
         public void setValue(V value, boolean changed) {
             this.handle.setValue(value);
             this.handle.setChanged(true);
+        }
+
+        /**
+         * Clones this DataWatcher Item, making sure changes to it does not affect the DataWatcher
+         */
+        public Item<V> clone() {
+            return new Item<V>(this.handle.cloneHandle());
         }
 
         @Override
@@ -382,9 +391,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
             public static final Type<Integer> INTEGER = getForType(Integer.class);
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
-            public static final Type<UUID> UUID = getForType(UUID.class);
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
+            public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
 
             @SuppressWarnings("unchecked")
             private Type(Class<?> internalType, Class<T> externalType) {
@@ -521,7 +530,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
                 register(Integer.class, 2);
                 register(Float.class, 3);
                 register(String.class, 4);
-                register(UUID.class, 5);
+                register(ItemStackHandle.T.getType(), 5);
                 register(BlockPositionHandle.T.getType(), 6);
                 register(CommonUtil.getNMSClass("Vector3f"), 7);
 
@@ -542,6 +551,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
 
             // IntVector3 -> BlockPosition
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
+            // Bukkit ItemStack -> nms ItemStack
+            typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
         }
 
         private static void register(Class<?> type, Object token) {

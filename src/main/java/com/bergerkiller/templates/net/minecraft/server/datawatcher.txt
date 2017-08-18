@@ -96,6 +96,28 @@ class DataWatcher {
         private Object value:c;
         private boolean changed:d;
 #endif
+
+        // constructor for 1.9
+        public optional (DataWatcherHandle.ItemHandle) DataWatcher.Item((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
+
+        // constructor for 1.8.8
+        public optional (DataWatcherHandle.ItemHandle) DataWatcher.Item(int typeId, int keyId, Object value);
+
+        <code>
+        public DataWatcherHandle.ItemHandle cloneHandle() {
+            Object clone;
+            if (T.constr_key_value.isAvailable()) {
+                Object rawKey = T.key.raw.get(instance);
+                clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
+            } else {
+                int typeId = T.typeId.getInteger(instance);
+                int keyId = T.keyId.getInteger(instance);
+                clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
+            }
+            T.changed.copy(instance, clone);
+            return createHandle(clone);
+        }
+        </code>
     }
 }
 

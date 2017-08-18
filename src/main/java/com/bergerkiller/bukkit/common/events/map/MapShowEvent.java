@@ -7,6 +7,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.internal.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -32,7 +33,7 @@ public class MapShowEvent extends Event {
 
     public MapShowEvent(Player player, ItemFrame itemFrame) {
         this.player = player;
-        this.mapItem = itemFrame.getItem();
+        this.mapItem = CommonMapController.getItemFrameItem(itemFrame);
         this.itemFrame = itemFrame;
         this.hand = null;
     }

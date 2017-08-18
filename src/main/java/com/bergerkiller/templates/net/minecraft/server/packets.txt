@@ -622,12 +622,17 @@ class PacketPlayInResourcePackStatus extends Packet {
 #endif
 }
 
+class PacketPlayInSetCreativeSlot extends Packet {
+    private int slot;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:b;
+}
+
 class PacketPlayOutEntityMetadata extends Packet {
     private int entityId:a;
 #if version >= 1.9
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> metadataItems:b;
 #else
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.WatchableObject> metadataItems:b;
 #endif
 
     public (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher, boolean includeUnchangedData);

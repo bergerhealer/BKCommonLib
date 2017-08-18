@@ -55,6 +55,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBoatMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSettingsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInTabCompleteHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInTeleportAcceptHandle;
@@ -288,8 +289,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInSetCreativeSlot extends NMSPacket {
 
-        public final FieldAccessor<Integer> slot = nextField("private int slot");
-        public final FieldAccessor<Object> item = nextFieldSignature("private ItemStack b");
+        public final FieldAccessor<Integer> slot = PacketPlayInSetCreativeSlotHandle.T.slot.toFieldAccessor();
+        public final FieldAccessor<ItemStack> item = PacketPlayInSetCreativeSlotHandle.T.item.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInSettings extends NMSPacket {
@@ -782,7 +783,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityMetadata extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutEntityMetadataHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<List<DataWatcher.Item<?>>> watchedObjects = PacketPlayOutEntityMetadataHandle.T.metadataItems.toFieldAccessor();
+        public final FieldAccessor<List<DataWatcher.Item<Object>>> watchedObjects = PacketPlayOutEntityMetadataHandle.T.metadataItems.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
             return PacketPlayOutEntityMetadataHandle.createNew(entityId, dataWatcher, sendUnchangedData).toCommonPacket();

@@ -66,7 +66,7 @@ public class EntityLivingHandle extends EntityHandle {
 
 
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
-        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(livingEntity));
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
     }
     public AttributeMapServerHandle getAttributeMapField() {
         return T.attributeMapField.get(instance);

@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Random;
@@ -81,6 +82,10 @@ public class WorldHandle extends Template.Handle {
 
     public boolean addEntity(EntityHandle entity) {
         return T.addEntity.invoke(instance, entity);
+    }
+
+    public Entity getEntityById(int entityId) {
+        return T.getEntityById.invoke(instance, entityId);
     }
 
     public IDataManagerHandle getDataManager() {
@@ -225,6 +230,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
         public final Template.Method.Converted<IDataManagerHandle> getDataManager = new Template.Method.Converted<IDataManagerHandle>();
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();

@@ -453,7 +453,7 @@ public class ItemUtil {
      * @return Cloned item stack
      */
     public static org.bukkit.inventory.ItemStack cloneItem(org.bukkit.inventory.ItemStack stack) {
-        return LogicUtil.clone(stack);
+        return stack == null ? null : stack.clone();
     }
 
     /**
@@ -629,8 +629,10 @@ public class ItemUtil {
                 NMSItemStack.tag.set(handle, tag);
             }
             return tag;
-        } else {
+        } else if (create) {
             throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+        } else {
+            return null; // no tags are stored in Bukkit ItemStacks
         }
     }
 

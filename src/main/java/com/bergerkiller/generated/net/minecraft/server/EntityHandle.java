@@ -336,11 +336,11 @@ public class EntityHandle extends Template.Handle {
     }
 
     public org.bukkit.entity.Entity toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.Conversion.toEntity.convert(instance);
+        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(instance);
     }
 
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
-        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(entity));
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
     public Entity getBukkitEntityField() {
         return T.bukkitEntityField.get(instance);

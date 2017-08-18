@@ -39,11 +39,11 @@ public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
         T.entityId.setInteger(instance, value);
     }
 
-    public List<Item<?>> getMetadataItems() {
+    public List<Item<Object>> getMetadataItems() {
         return T.metadataItems.get(instance);
     }
 
-    public void setMetadataItems(List<Item<?>> value) {
+    public void setMetadataItems(List<Item<Object>> value) {
         T.metadataItems.set(instance, value);
     }
 
@@ -55,7 +55,7 @@ public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
         public final Template.Constructor.Converted<PacketPlayOutEntityMetadataHandle> constr_entityId_datawatcher_includeUnchangedData = new Template.Constructor.Converted<PacketPlayOutEntityMetadataHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        public final Template.Field.Converted<List<Item<?>>> metadataItems = new Template.Field.Converted<List<Item<?>>>();
+        public final Template.Field.Converted<List<Item<Object>>> metadataItems = new Template.Field.Converted<List<Item<Object>>>();
 
     }
 

@@ -12,6 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 
 class EntityLiving extends Entity {
 
@@ -130,7 +131,7 @@ class EntityLiving extends Entity {
 
     <code>
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
-        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toEntityHandle.convert(livingEntity));
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
     }
     </code>
 }
@@ -375,5 +376,27 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
     <code>
     public static final Key<String> DATA_COMMAND = Key.Type.STRING.createKey(T.DATA_COMMAND, 23);
     public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_PREVIOUS_OUTPUT = Key.Type.CHAT_TEXT.createKey(T.DATA_PREVIOUS_OUTPUT, 24);
+    </code>
+}
+
+class EntityItemFrame extends Entity {
+#if version >= 1.9
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+#else
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:???;
+#endif
+
+    <code>
+    public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
+    </code>
+
+    public (org.bukkit.inventory.ItemStack) ItemStack getItem();
+
+    public void setItem((org.bukkit.inventory.ItemStack) ItemStack newItemStack);
+
+    <code>
+    public static EntityItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(itemFrame));
+    }
     </code>
 }

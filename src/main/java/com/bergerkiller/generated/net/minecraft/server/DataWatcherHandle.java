@@ -127,6 +127,20 @@ public class DataWatcherHandle extends Template.Handle {
 
         /* ============================================================================== */
 
+
+        public DataWatcherHandle.ItemHandle cloneHandle() {
+            Object clone;
+            if (T.constr_key_value.isAvailable()) {
+                Object rawKey = T.key.raw.get(instance);
+                clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
+            } else {
+                int typeId = T.typeId.getInteger(instance);
+                int keyId = T.keyId.getInteger(instance);
+                clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
+            }
+            T.changed.copy(instance, clone);
+            return createHandle(clone);
+        }
         public Object getValue() {
             return T.value.get(instance);
         }
@@ -148,6 +162,11 @@ public class DataWatcherHandle extends Template.Handle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class ItemClass extends Template.Class<ItemHandle> {
+            @Template.Optional
+            public final Template.Constructor.Converted<ItemHandle> constr_key_value = new Template.Constructor.Converted<ItemHandle>();
+            @Template.Optional
+            public final Template.Constructor.Converted<ItemHandle> constr_typeId_keyId_value = new Template.Constructor.Converted<ItemHandle>();
+
             @Template.Optional
             public final Template.Field.Integer typeId = new Template.Field.Integer();
             @Template.Optional

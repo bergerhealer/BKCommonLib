@@ -955,7 +955,7 @@ public class MapDisplay {
      * @return map item
      */
     public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
-        ItemStack mapItem = ItemUtil.createItem(Material.MAP, 1, 1);
+        ItemStack mapItem = ItemUtil.createItem(Material.MAP, 0, 1);
         CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);
         tag.putValue("mapDisplayPlugin", plugin.getName());
         tag.putValue("mapDisplayClass", mapDisplayClass.getName());

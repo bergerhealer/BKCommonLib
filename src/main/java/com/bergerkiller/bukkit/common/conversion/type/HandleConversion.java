@@ -292,12 +292,12 @@ public class HandleConversion {
     }
 
     @ConverterMethod(output="net.minecraft.server.DataWatcherObject<V>")
-    public static <V> Object toDataWatcherObjectHandle(DataWatcher.Key<V> keyWrapper) {
+    public static Object toDataWatcherObjectHandle(DataWatcher.Key<?> keyWrapper) {
         return keyWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.DataWatcher.Item<V>")
-    public static <V> Object toDataWatcherItemHandle(DataWatcher.Item<V> itemWrapper) {
+    public static Object toDataWatcherItemHandle(DataWatcher.Item<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }
 

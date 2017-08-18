@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
 public class CommonMapUUIDStore {
 
     /**
-     * Internal use only! Obtains the unique Id of a map item. Returns -1 when the item is not a valid map.
+     * Internal use only! Obtains the unique Id of a map item. Returns null when the item is not a valid map.
      * This function may be subject to change and should not be depended on.
      * 
      * @param item to get the Map Id for

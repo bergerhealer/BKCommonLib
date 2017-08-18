@@ -70,6 +70,10 @@ public class ItemStackHandle extends Template.Handle {
         return T.cloneAndSubtract.invoke(instance, n);
     }
 
+    public ItemStackHandle cloneItemStack() {
+        return T.cloneItemStack.invoke(instance);
+    }
+
 
     public static final ItemStackHandle EMPTY_ITEM;
     static {
@@ -148,6 +152,7 @@ public class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<CommonTagCompound> getTag = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
+        public final Template.Method.Converted<ItemStackHandle> cloneItemStack = new Template.Method.Converted<ItemStackHandle>();
 
     }
 
