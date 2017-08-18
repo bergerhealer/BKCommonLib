@@ -5,17 +5,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
+import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -153,6 +159,14 @@ public class MapDisplay {
      */
     public boolean isRunning() {
         return updateTaskId != -1;
+    }
+
+    /**
+     * Invalidates the entire view area of this MapDisplay, causing the display contents
+     * to be re-sent to all viewers.
+     */
+    public void invalidate() {
+        this.clip.markEverythingDirty();
     }
 
     /**
@@ -417,9 +431,11 @@ public class MapDisplay {
     }
 
     private CommonPacket createPacket(MapClip clip) {
+        short mapId = CommonPlugin.getInstance().getMapController().getMapId(this.info.uuid);
+
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
         mapUpdate.write(PacketType.OUT_MAP.cursors, new MapCursor[0]);
-        mapUpdate.write(PacketType.OUT_MAP.itemId, this.info.id);
+        mapUpdate.write(PacketType.OUT_MAP.itemId, (int) mapId);
         mapUpdate.write(PacketType.OUT_MAP.scale, (byte) 1);
         mapUpdate.write(PacketType.OUT_MAP.track, false);
         if (clip == null || clip.everything) {
@@ -914,4 +930,36 @@ public class MapDisplay {
      * @param event
      */
     public void onRightClick(MapClickEvent event) {}
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed
+     * 
+     * @param mapDisplayClass from a Java Plugin (jar)
+     * @return map item
+     */
+    public static ItemStack createMapItem(Class<? extends MapDisplay> mapDisplayClass) {
+        Plugin plugin = CommonUtil.getPluginByClass(mapDisplayClass);
+        if (plugin == null) {
+            throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not belong to a Java Plugin");
+        }
+        return createMapItem(plugin, mapDisplayClass);
+    }
+
+    /**
+     * Creates a new Map Display item that will automatically initialize a particular Map Display class
+     * when viewed
+     * 
+     * @param plugin owner of the display
+     * @param mapDisplayClass
+     * @return map item
+     */
+    public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
+        ItemStack mapItem = ItemUtil.createItem(Material.MAP, 1, 1);
+        CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);
+        tag.putValue("mapDisplayPlugin", plugin.getName());
+        tag.putValue("mapDisplayClass", mapDisplayClass.getName());
+        tag.putUUID("mapDisplay", CommonMapUUIDStore.generateDynamicMapUUID());
+        return mapItem;
+    }
 }

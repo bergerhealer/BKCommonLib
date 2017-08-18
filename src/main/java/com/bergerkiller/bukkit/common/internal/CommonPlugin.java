@@ -421,7 +421,7 @@ public class CommonPlugin extends PluginBase {
         PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
 
         register(mapController = new CommonMapController());
-        PacketUtil.addPacketListener(this, mapController, PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE);
+        PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
         mapController.startTasks(this, startedTasks);
 
         startedTasks.add(new NextTickHandler(this).start(1, 1));

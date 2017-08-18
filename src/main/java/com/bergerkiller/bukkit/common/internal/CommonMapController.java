@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,6 +43,7 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapSession;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -48,6 +51,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -56,16 +60,26 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 
 public class CommonMapController implements PacketListener, Listener {
-    private final IntHashMap<MapDisplayInfo> maps = new IntHashMap<MapDisplayInfo>();
+    private final IntHashMap<UUID> mapUUIDById = new IntHashMap<UUID>();
+    private final HashMap<UUID, Short> mapIdByUUID = new HashMap<UUID, Short>();
+    private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
     private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     private final HashMap<ItemFrame, ItemFrameInfo> itemFrames = new HashMap<ItemFrame, ItemFrameInfo>();
 
     /**
-     * Gets a list of all maps available on the server that may store map displays
-     * 
-     * @return list of map display info
+     * These packet types are listened to handle the virtualized Map Display API
      */
-    public List<MapDisplayInfo> getMaps() {
+    public static final PacketType[] PACKET_TYPES = {
+            PacketType.OUT_MAP, PacketType.IN_STEER_VEHICLE, 
+            PacketType.OUT_WINDOW_ITEMS, PacketType.OUT_WINDOW_SET_SLOT
+    };
+
+    /**
+     * Gets all maps available on the server that may store map displays
+     * 
+     * @return collection of map display info
+     */
+    public Collection<MapDisplayInfo> getMaps() {
         return this.maps.values();
     }
 
@@ -75,14 +89,12 @@ public class CommonMapController implements PacketListener, Listener {
      * @param player
      * @return player input
      */
-    public MapPlayerInput getPlayerInput(Player player) {
+    public synchronized MapPlayerInput getPlayerInput(Player player) {
         MapPlayerInput input;
-        synchronized (playerInputs) {
-            input = playerInputs.get(player);
-            if (input == null) {
-                input = new MapPlayerInput(player);
-                playerInputs.put(player, input);
-            }
+        input = playerInputs.get(player);
+        if (input == null) {
+            input = new MapPlayerInput(player);
+            playerInputs.put(player, input);
         }
         return input;
     }
@@ -95,16 +107,16 @@ public class CommonMapController implements PacketListener, Listener {
      * @param itemFrame to get the map information for
      * @return map display info
      */
-    public MapDisplayInfo getInfo(ItemFrame itemFrame) {
+    public synchronized MapDisplayInfo getInfo(ItemFrame itemFrame) {
         ItemFrameInfo frameInfo = itemFrames.get(itemFrame);
         if (frameInfo != null) {
-            if (frameInfo.lastMapId == -1) {
+            if (frameInfo.lastMapUUID == null) {
                 return null;
             }
-            MapDisplayInfo info = maps.get(frameInfo.lastMapId);
+            MapDisplayInfo info = maps.get(frameInfo.lastMapUUID);
             if (info == null) {
-                info = new MapDisplayInfo(frameInfo.lastMapId);
-                maps.put(frameInfo.lastMapId, info);
+                info = new MapDisplayInfo(frameInfo.lastMapUUID);
+                maps.put(frameInfo.lastMapUUID, info);
             }
             return info;
         }
@@ -119,18 +131,24 @@ public class CommonMapController implements PacketListener, Listener {
      * @param mapItem to get the map information for
      * @return map display info
      */
-    public MapDisplayInfo getInfo(ItemStack mapItem) {
-        int id = getMapId(mapItem);
-        if (id == -1) {
-            return null;
-        } else {
-            MapDisplayInfo info = maps.get(id);
-            if (info == null) {
-                info = new MapDisplayInfo(id);
-                maps.put(id, info);
-            }
-            return info;
+    public synchronized MapDisplayInfo getInfo(ItemStack mapItem) {
+        UUID uuid = CommonMapUUIDStore.getMapUUID(mapItem);
+        return (uuid == null) ? null : getInfo(uuid);
+    }
+
+    /**
+     * Gets the Map display information for a certain map item UUID.
+     * 
+     * @param mapUUID of the map
+     * @return display info for this UUID
+     */
+    public synchronized MapDisplayInfo getInfo(UUID mapUUID) {
+        MapDisplayInfo info = maps.get(mapUUID);
+        if (info == null) {
+            info = new MapDisplayInfo(mapUUID);
+            maps.put(mapUUID, info);
         }
+        return info;
     }
 
     /**
@@ -144,30 +162,157 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
     }
 
-    @Override
-    public void onPacketSend(PacketSendEvent event) {
-        // Check if any virtual single maps are attached to this map
-        if (event.getType() == PacketType.OUT_MAP) {
-            int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
-            MapDisplayInfo info;
-            synchronized (maps) {
-                info = maps.get(itemid);
+    /**
+     * Adjusts the internal remapping from UUID to Map Id taking into account the new item
+     * being synchronized to the player. If the item is that of a virtual map, the map Id
+     * of the item is updated.
+     * 
+     * @param item
+     * @return True if the item was changed and needs to be updated in the packet
+     */
+    public ItemStack handleItemSync(ItemStack item) {
+        if (item == null || item.getType() != Material.MAP) {
+            return null;
+        }
+
+        // When a map UUID is specified, use that to dynamically allocate a map Id to use
+        CommonTagCompound tag = ItemUtil.getMetaTag(item, false);
+        if (tag != null) {
+            UUID mapUUID = tag.getUUID("mapDisplay");
+            if (mapUUID != null) {
+                short id = getMapId(mapUUID);
+                if (item.getDurability() != id) {
+                    item = ItemUtil.cloneItem(item);
+                    item.setDurability(id);
+                    return item; // Id changed
+                } else {
+                    return null; // no change in Id
+                }
             }
-            if (info != null && !info.sessions.isEmpty()) {
+        }
+
+        // Static map Id MUST be enforced
+        storeStaticMapId(item.getDurability());
+        return null;
+    }
+
+    /**
+     * Obtains the Map Id used for displaying a particular map UUID
+     * 
+     * @param mapUUID to be displayed
+     * @return map Id
+     */
+    public synchronized short getMapId(UUID mapUUID) {
+        // Obtain from cache
+        Short storedMapId = mapIdByUUID.get(mapUUID);
+        if (storedMapId != null) {
+            return storedMapId.shortValue();
+        }
+
+        // If the UUID is that of a static UUID, we must make sure to store it as such
+        // We may have to remap the old Map Id to free up the Id slot we need
+        short mapId = CommonMapUUIDStore.getStaticMapId(mapUUID);
+        if (mapId != -1) {
+            storeStaticMapId(mapId);
+            return mapId;
+        }
+
+        // Store a new map
+        return storeDynamicMapId(mapUUID);
+    }
+
+    /**
+     * Forces a particular map Id to stay static (unchanging) and stores it
+     * as such in the mappings.
+     * 
+     * @param mapId
+     */
+    private synchronized void storeStaticMapId(short mapId) {
+        if (storeDynamicMapId(mapUUIDById.get(mapId)) != mapId) {
+            UUID mapUUID = CommonMapUUIDStore.getStaticMapUUID(mapId);
+            mapUUIDById.put(mapId, mapUUID);
+            mapIdByUUID.put(mapUUID, mapId);
+        }
+    }
+
+    /**
+     * Figures out a new Map Id and prepares the display of a map with this new Id.
+     * This method is only suitable for dynamically generated map Ids.
+     * 
+     * @param mapUUID to store
+     * @return map Id that was assigned
+     */
+    private synchronized short storeDynamicMapId(UUID mapUUID) {
+        // Null safety check
+        if (mapUUID == null) {
+            return -1;
+        }
+
+        // If the UUID is static, do not store anything and return the static Id instead
+        short staticMapid = CommonMapUUIDStore.getStaticMapId(mapUUID);
+        if (staticMapid != -1) {
+            return staticMapid;
+        }
+
+        // Figure out a free Map Id we can use
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            if (!mapUUIDById.contains(i)) {
+                // Store in mapping
+                mapUUIDById.put(i, mapUUID);
+                mapIdByUUID.put(mapUUID, Short.valueOf((short) i));
+
+                // Invalidate display if it exists
+                MapDisplayInfo mapInfo = maps.get(mapUUID);
+                if (mapInfo != null) {
+                    for (MapSession session : mapInfo.sessions) {
+                        session.display.invalidate();
+                    }
+                }
+                return (short) i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public synchronized void onPacketSend(PacketSendEvent event) {
+        // Check if any virtual single maps are attached to this map
+        if (event.getType() == PacketType.OUT_MAP) {    
+            int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
+            UUID mapUUID = mapUUIDById.get(itemid);
+            if (mapUUID == null) {
+                this.storeStaticMapId((short) itemid);
+            } else if (CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
                 event.setCancelled(true);
+            }
+        }
+
+        // Correct Map ItemStacks as they are sent to the clients (virtual)
+        if (event.getType() == PacketType.OUT_WINDOW_ITEMS) {
+            List<ItemStack> items = event.getPacket().read(PacketType.OUT_WINDOW_ITEMS.items);
+            ListIterator<ItemStack> iter = items.listIterator();
+            while (iter.hasNext()) {
+                ItemStack newItem = this.handleItemSync(iter.next());
+                if (newItem != null) {
+                    iter.set(newItem);
+                }
+            }
+        }
+        if (event.getType() == PacketType.OUT_WINDOW_SET_SLOT) {
+            ItemStack oldItem = event.getPacket().read(PacketType.OUT_WINDOW_SET_SLOT.item);
+            ItemStack newItem = this.handleItemSync(oldItem);
+            if (newItem != null) {
+                event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
             }
         }
     }
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public synchronized void onPacketReceive(PacketReceiveEvent event) {
         // Handle input coming from the player for the map
         if (event.getType() == PacketType.IN_STEER_VEHICLE) {
             Player p = event.getPlayer();
-            MapPlayerInput input;
-            synchronized (playerInputs) {
-                input = playerInputs.get(p);
-            }
+            MapPlayerInput input = playerInputs.get(p);
             if (input != null) {
                 CommonPacket packet = event.getPacket();
                 int dx = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.sideways));
@@ -187,20 +332,18 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    protected void onPlayerJoin(PlayerJoinEvent event) {
+    protected synchronized void onPlayerJoin(PlayerJoinEvent event) {
         // Let everyone know we got a player over here!
         Player player = event.getPlayer();
-        synchronized (maps) {
-            for (MapDisplayInfo map : this.maps.values()) {
-                for (MapSession session : map.sessions) {
-                    session.updatePlayerOnline(player);
-                }
+        for (MapDisplayInfo map : this.maps.values()) {
+            for (MapSession session : map.sessions) {
+                session.updatePlayerOnline(player);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void onEntityAdded(EntityAddEvent event) {
+    protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
             itemFrames.put(frame, new ItemFrameInfo(frame));
@@ -208,7 +351,7 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void onEntityRemoved(EntityRemoveEvent event) {
+    protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
             ItemFrameInfo info = itemFrames.get(frame);
@@ -379,7 +522,7 @@ public class CommonMapController implements PacketListener, Listener {
      * Maintains the metadata information for a map
      */
     public class MapDisplayInfo {
-        public final int id; /* map id */
+        public final UUID uuid; /* map UUID */
 
         // Maintains information about the item frames that show this map, and what players
         // can see this map on the item frames
@@ -393,8 +536,8 @@ public class CommonMapController implements PacketListener, Listener {
         // Maps the display view stack by player
         public final HashMap<Player, ViewStack> views = new HashMap<Player, ViewStack>();
 
-        public MapDisplayInfo(int id) {
-            this.id = id;
+        public MapDisplayInfo(UUID uuid) {
+            this.uuid = uuid;
         }
 
         /**
@@ -404,7 +547,7 @@ public class CommonMapController implements PacketListener, Listener {
          * @return True if the item contains this map
          */
         public boolean isMap(ItemStack item) {
-            return getMapId(item) == id;
+            return this.uuid.equals(CommonMapUUIDStore.getMapUUID(item));
         }
 
         /**
@@ -495,7 +638,7 @@ public class CommonMapController implements PacketListener, Listener {
     public class ItemFrameInfo {
         public final ItemFrame itemFrame;
         public final ArrayList<Player> viewers;
-        public int lastMapId;
+        public UUID lastMapUUID;
         public boolean removed;
         public MapDisplayInfo displayInfo;
 
@@ -503,7 +646,7 @@ public class CommonMapController implements PacketListener, Listener {
             this.itemFrame = itemFrame;
             this.viewers = new ArrayList<Player>();
             this.removed = false;
-            this.lastMapId = -1;
+            this.lastMapUUID = null;
             this.displayInfo = null;
         }
 
@@ -520,19 +663,13 @@ public class CommonMapController implements PacketListener, Listener {
                 //}
                 viewers.clear();
             }
-            this.lastMapId = -1;
+            this.lastMapUUID = null;
         }
 
         public void add() {
-            if (this.displayInfo == null && lastMapId != -1) {
-                synchronized (maps) {
-                    this.displayInfo = maps.get(lastMapId);
-                    if (this.displayInfo == null) {
-                        this.displayInfo = new MapDisplayInfo(lastMapId);
-                        maps.put(lastMapId, this.displayInfo);
-                    }
-                    this.displayInfo.itemFrames.add(this);
-                }
+            if (this.displayInfo == null && this.lastMapUUID != null) {
+                this.displayInfo = getInfo(this.lastMapUUID);
+                this.displayInfo.itemFrames.add(this);
             }
         }
     }
@@ -566,17 +703,17 @@ public class CommonMapController implements PacketListener, Listener {
                 }
 
                 // Handle changes in map item shown in item frames
-                int mapId = getMapId(info.itemFrame.getItem());
-                if (mapId != info.lastMapId) {
+                UUID mapUUID = CommonMapUUIDStore.getMapUUID(info.itemFrame.getItem());
+                if (mapUUID != info.lastMapUUID) {
                     info.remove();
-                    if (mapId != -1) {
-                        info.lastMapId = mapId;
+                    if (mapUUID != null) {
+                        info.lastMapUUID = mapUUID;
                         info.add();
                     }
                 }
 
                 // Update list of players for item frames showing maps
-                if (info.lastMapId != -1) {
+                if (info.lastMapUUID != null) {
                     Collection<Player> liveViewers = trackerEntry.getViewers();
                     boolean changes = LogicUtil.synchronizeList(info.viewers, liveViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
                         @Override
@@ -696,14 +833,4 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    /**
-     * Internal use only! Obtains the unique Id of a map item. Returns -1 when the item is not a valid map.
-     * This function may be subject to change and should not be depended on.
-     * 
-     * @param item to get the Map Id for
-     * @return map id
-     */
-    public static int getMapId(ItemStack item) {
-        return (item == null || item.getType() != Material.MAP) ? -1 : item.getDurability(); 
-    }
 }
