@@ -1,9 +1,15 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
+import com.bergerkiller.bukkit.common.map.util.Matrix3f;
+import com.bergerkiller.bukkit.common.map.util.Matrix4f;
+import com.bergerkiller.bukkit.common.map.util.Quad;
+import com.bergerkiller.bukkit.common.map.util.Vector2f;
+import com.bergerkiller.bukkit.common.map.util.Vector3f;
 
 /**
  * A base implementation canvas for performing drawing operations on.
@@ -527,6 +533,76 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Draws a pseudo-3D quad onto this canvas, using the 4 2D coordinates of the quad points
+     * to define the projection transformation that is applied.
+     * 
+     * @param canvas to draw onto this canvas
+     * @param quad to draw
+     * @return view
+     */
+    public final MapCanvas drawQuad(MapCanvas canvas, Quad quad) {
+        return this.drawQuad(canvas,
+                quad.p0.toVector2f(),
+                quad.p1.toVector2f(),
+                quad.p2.toVector2f(),
+                quad.p3.toVector2f());
+    }
+
+    /**
+     * Draws a pseudo-3D quad onto this canvas, using the 4 2D coordinates of the quad points
+     * to define the projection transformation that is applied.
+     * 
+     * @param canvas to draw onto this canvas
+     * @param p0 the top-left first point of the quad
+     * @param p1 the top-right second point of the quad
+     * @param p2 the bottom-right third point of the quad
+     * @param p3 the bottom-left fourth point of the quad
+     * @return view
+     */
+    public final MapCanvas drawQuad(MapCanvas canvas, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3) {
+        Vector2f ip0 = new Vector2f(0, 0);
+        Vector2f ip1 = new Vector2f(0, canvas.getHeight());
+        Vector2f ip2 = new Vector2f(canvas.getWidth(), canvas.getHeight());
+        Vector2f ip3 = new Vector2f(canvas.getWidth(), 0);
+
+        Matrix3f m = Matrix3f.computeProjectionMatrix(
+            new Vector2f[] {  p0,  p1,  p2,  p3 },
+            new Vector2f[] { ip0, ip1, ip2, ip3 });
+        
+        return drawQuad(canvas, m);
+    }
+
+    /**
+     * Draws a pseudo-3D quad onto this canvas, using the projection matrix to define the
+     * projection transformation that is applied.
+     * 
+     * @param canvas to draw onto this canvas
+     * @param projectionMatrix to use for the transformation
+     * @return view
+     */
+    public final MapCanvas drawQuad(MapCanvas canvas, Matrix3f projectionMatrix) {
+        Matrix3f mInv = new Matrix3f(projectionMatrix);
+        mInv.invert();
+        Vector2f p = new Vector2f();
+        for (int y = 0; y < getHeight(); y++)
+        {
+            for (int x = 0; x < getWidth(); x++)
+            {
+                p.x = x;
+                p.y = y;
+                mInv.transform(p);
+                if (p.x >= 0.0f && p.y >= 0.0f && p.x <= (canvas.getWidth()) && p.y <= (canvas.getHeight())) {
+                    byte color = canvas.readPixel((int)p.x, (int)p.y);
+                    if (color != MapColorPalette.COLOR_TRANSPARENT) {
+                        writePixel(x, y, color);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
      * Obtains a view into this canvas for a viewport area
      * 
      * @param x - coordinate of the top-left corner of the viewport
@@ -559,6 +635,21 @@ public abstract class MapCanvas {
     @Override
     public final MapTexture clone() {
         return MapTexture.fromRawData(this.getWidth(), this.getHeight(), this.readPixels());
+    }
+
+    /**
+     * Converts all pixel contents of this Map Canvas to a standard RGB Java Buffered Image
+     * 
+     * @return image
+     */
+    public final BufferedImage toJavaImage() {
+        BufferedImage result = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < this.getWidth(); x++) {
+            for (int y = 0; y < this.getHeight(); y++) {
+                result.setRGB(x, y, MapColorPalette.getRealColor(this.readPixel(x, y)).getRGB());
+            }
+        }
+        return result;
     }
 
     /**
