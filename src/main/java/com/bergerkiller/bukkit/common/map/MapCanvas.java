@@ -6,10 +6,8 @@ import java.util.Arrays;
 
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
 import com.bergerkiller.bukkit.common.map.util.Matrix3f;
-import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.map.util.Vector2f;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
 
 /**
  * A base implementation canvas for performing drawing operations on.
@@ -29,6 +27,12 @@ public abstract class MapCanvas {
     private int fontSpacing = 0;
     private MapFont.Alignment fontAlignment = MapFont.Alignment.LEFT;
     private MapBlendMode blendMode = MapBlendMode.NONE;
+    private short[] depthBuffer = null;
+    private byte[] maskBuffer = null;
+    private int mask_w, mask_h;
+    private short currentDepthZ = 0;
+    private boolean hasDepthHoles = false;
+    public static final int MAX_DEPTH = Short.MAX_VALUE;
 
     /**
      * Gets the width of this canvas
@@ -69,7 +73,8 @@ public abstract class MapCanvas {
     public abstract byte readPixel(int x, int y);
 
     /**
-     * Updates the pixel color of a single pixel
+     * Updates the pixel color of a single pixel. No color blending or
+     * depth buffering logic is performed.
      * 
      * @param x - coordinate of the pixel
      * @param y - coordinate of the pixel
@@ -122,6 +127,7 @@ public abstract class MapCanvas {
     /**
      * Writes raw pixel color data to a rectangular area in this canvas.
      * No color blending is performed and any original pixels are replaced.
+     * No depth buffering is performed, either.
      * This data must be formatted in such a way that:
      * <ul>
      * <li>The first color in the array is pixel (0, 0)</li>
@@ -153,6 +159,7 @@ public abstract class MapCanvas {
     /**
      * Fills a rectangular area in this canvas with a single color.
      * No color blending is performed and any original pixels are replaced.
+     * No depth buffering is performed, either.
      * 
      * @param x - coordinate of the top-left corner of the area
      * @param y - coordinate of the top-left corner of the area
@@ -198,8 +205,11 @@ public abstract class MapCanvas {
     /**
      * Writes raw pixel color data to a rectangular area in this canvas.
      * If a blend mode is set for this canvas, it is used to perform pixel color blending.
-     * A color factor can be specified. All the color data is multiplied with that factor.
-     * This data must be formatted in such a way that:
+     * If a depth value is set for this canvas, depth buffering logic will be performed on the data.
+     * A color factor can be specified; all the color data is multiplied with that factor.
+     * When <i>null</i> data is specified, the area is filled with the colorFactor color instead.<br>
+     * <br>
+     * The colorData buffer must be formatted such that:
      * <ul>
      * <li>The first color in the array is pixel (0, 0)</li>
      * <li>Satisfies condition <b>index = x + y * width</b></li>
@@ -210,21 +220,125 @@ public abstract class MapCanvas {
      * @param y - coordinate of the top-left corner of the area
      * @param w - width of the area
      * @param h - height of the area
-     * @param colorData to write
+     * @param colorData to write, <i>null</i> to fill with the colorFactor color
      * @param colorFactor to apply, 0 for no factor
      */
     public final MapCanvas drawRawData(int x, int y, int w, int h, byte[] colorData, byte colorFactor) {
-        if (colorFactor != 0) {
-            colorData = colorData.clone();
-            MapBlendMode.MULTIPLY.process(colorFactor, colorData);
+        // Shortcut when no special functions are used to fill an area quickly
+        if (colorData == null && this.depthBuffer == null && this.blendMode == MapBlendMode.NONE && this.depthBuffer == null && this.maskBuffer == null) {
+            return this.writePixelsFill(x, y, w, h, colorFactor);
         }
-        if (this.blendMode == MapBlendMode.NONE) {
-            return this.writePixels(x, y, w, h, colorData);
+
+        if (colorData == null) {
+            // No data, fill with the color
+            //TODO: Make this more efficient without a new array allocation!
+            colorData = new byte[w * h];
+            Arrays.fill(colorData, colorFactor);
         } else {
-            byte[] pixels = this.readPixels(x, y, w, h);
-            this.blendMode.process(colorData, pixels);
-            return this.writePixels(x, y, w, h, pixels);
+            // Apply color factor to a copy of the data
+            if (colorFactor != 0) {
+                colorData = colorData.clone();
+                MapBlendMode.MULTIPLY.process(colorFactor, colorData);
+            }
         }
+
+        if (this.depthBuffer == null) {
+            // Simple logic: no depth buffering is required
+            if (this.blendMode == MapBlendMode.NONE && this.maskBuffer == null) {
+                return this.writePixels(x, y, w, h, colorData);
+            } else {
+                byte[] pixels = this.readPixels(x, y, w, h);
+                if (this.maskBuffer != null) {
+                    // Create a temporary buffer to process the pixels
+                    byte[] pixels_old = pixels.clone();
+                    this.blendMode.process(colorData, pixels);
+
+                    // Restore all pixels that are unmasked
+                    int colorIndex = 0;
+                    int maskIndex = 0;
+                    for (int dy = 0; dy < h; dy++) {
+                        // Restore lines outside of the mask range
+                        if (dy >= this.mask_h) {
+                            System.arraycopy(pixels_old, colorIndex, pixels, colorIndex, w);
+                            colorIndex += w;
+                            continue;
+                        }
+
+                        // Process lines
+                        maskIndex = dy * this.mask_w;
+                        for (int dx = 0; dx < w; dx++) {
+                            // Restore end of lines out of range of mask
+                            if (dx >= this.mask_w) {
+                                System.arraycopy(pixels_old, colorIndex, pixels, colorIndex, w - dx);
+                                colorIndex += w - dx;
+                                break;
+                            }
+
+                            // If mask says no, restore the pixel
+                            if (this.maskBuffer[maskIndex] == 0) {
+                                pixels[colorIndex] = pixels_old[colorIndex];
+                            }
+                            maskIndex++;
+                            colorIndex++;
+                        }
+                    }
+                } else {
+                    this.blendMode.process(colorData, pixels);
+                }
+                return this.writePixels(x, y, w, h, pixels);
+            }
+        } else {
+            // Complex logic: only draw pixels that are visible according to the depth buffer
+            // When pixels are turned from solid to transparent, they will be marked for deeper drawing (hasMoreDepth())
+            //byte[] pixels = this.readPixels(x, y, w, h);
+
+            int colorDataIdx = -1;
+            int maskIndex = 0;
+            for (int dy = 0; dy < h; dy++) {
+                for (int dx = 0; dx < w; dx++) {
+                    colorDataIdx++;
+
+                    // Check if not masked out
+                    if (this.maskBuffer != null) {
+                        if (dx >= this.mask_w || dy >= this.mask_h || (this.maskBuffer[maskIndex++] == 0)) {
+                            continue;
+                        }
+                    }
+
+                    int depthIndex = (x + dx) + this.getWidth() * (y + dy);
+                    short depth = this.depthBuffer[depthIndex];
+
+                    // Only contents on the same or lower depth level are visible
+                    if (this.currentDepthZ <= depth) {
+                        byte color = colorData[colorDataIdx];
+                        if (this.currentDepthZ == depth) {
+                            // Re-drawing pixels on the current depth level
+                            // If transparent, the contents behind will have to be re-drawn.
+                            // If non-transparent, pixel is updated and depth does not change
+                            if (color == MapColorPalette.COLOR_TRANSPARENT) {
+                                this.writePixel(x + dx, y + dy, MapColorPalette.COLOR_TRANSPARENT);
+                                this.depthBuffer[depthIndex] = MAX_DEPTH;
+                                this.hasDepthHoles = true;
+                            } else {
+                                this.writePixel(x + dx, y + dy, color);
+                            }
+                        } else if (color != MapColorPalette.COLOR_TRANSPARENT) {
+                            // Drawing in front of what is already there
+                            // If transparent, nothing is drawn and depth is not updated
+                            // If non-transparent, depth buffer is updated
+                            this.writePixel(x + dx, y + dy, color);
+                            this.depthBuffer[depthIndex] = this.currentDepthZ;
+                        } else if (depth == MAX_DEPTH) {
+                            // If a depth 'hole' existed at a transparent pixel, mark it as such
+                            this.hasDepthHoles = true;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+        
     }
 
     /**
@@ -350,7 +464,11 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas clearRectangle(int x, int y, int w, int h) {
-        return this.writePixelsFill(x, y, w, h, (byte) 0);
+        MapBlendMode oldMode = this.blendMode;
+        this.blendMode = MapBlendMode.NONE;
+        this.fillRectangle(x, y, w, h, MapColorPalette.COLOR_TRANSPARENT);
+        this.blendMode = oldMode;
+        return this;
     }
 
     /**
@@ -365,13 +483,7 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas fillRectangle(int x, int y, int w, int h, byte color) {
-        if (this.blendMode == MapBlendMode.NONE) {
-            return this.writePixelsFill(x, y, w, h, color);
-        } else {
-            byte[] pixels = this.readPixels(x, y, w, h);
-            this.blendMode.process(color, pixels);
-            return this.writePixels(x, y, w, h, pixels);
-        }
+        return this.drawRawData(x, y, w, h, null, color);
     }
 
     /**
@@ -381,7 +493,11 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas clear() {
-        return this.writePixelsFill(0, 0, getWidth(), getHeight(), (byte) 0);
+        MapBlendMode oldMode = this.blendMode;
+        this.blendMode = MapBlendMode.NONE;
+        this.fill(MapColorPalette.COLOR_TRANSPARENT);
+        this.blendMode = oldMode;
+        return this;
     }
 
     /**
@@ -397,6 +513,76 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Sets a mask defining the draw-relative pixels that are drawn. Non-transparent pixels in the mask
+     * will be drawn onto this canvas for all drawing operations. Transparent pixels in the mask
+     * will not be drawn at all, and also skip depth buffer tests and blend modes.
+     * 
+     * @param mask to apply, <i>null</i> to disable the mask
+     * @return this canvas
+     */
+    public final MapCanvas setBrushMask(MapCanvas mask) {
+        if (mask == null) {
+            this.maskBuffer = null;
+        } else {
+            this.maskBuffer = mask.getBuffer();
+            this.mask_w = mask.getWidth();
+            this.mask_h = mask.getHeight();
+        }
+        return this;
+    }
+
+    /**
+     * Sets a depth value that will be used when performing the following drawing operations.
+     * The depth buffer will allow for different drawn areas to overlap each other correctly
+     * in the third dimension (z).<br>
+     * <br>
+     * Higher depth values correspond to contents 'deeper' into
+     * this canvas. In other words, as depth increases, objects are further away.<br>
+     * <br>
+     * When clearing areas, be aware that the contents behind it have to be re-drawn.
+     * Every call to {@link #setDrawDepth(int)} will reset {@link #hasMoreDepth()}, which
+     * allows you to check after drawing is completed whether deeper areas need to be re-drawn.
+     * 
+     * @param depth to set to
+     * @return this canvas
+     */
+    public final MapCanvas setDrawDepth(int depth) {
+        this.currentDepthZ = (short) depth;
+        this.hasDepthHoles = false;
+        if (this.depthBuffer == null) {
+            this.depthBuffer = new short[this.getWidth() * this.getHeight()];
+            Arrays.fill(this.depthBuffer, (short) MAX_DEPTH);
+        }
+        return this;
+    }
+
+    /**
+     * Gets whether the previous drawing operations resulted in holes in the depth buffer,
+     * requiring deeper layers to be re-drawn.
+     * 
+     * @return True if deeper areas need to be re-drawn as a result of previous drawing operations
+     */
+    public final boolean hasMoreDepth() {
+        return this.hasDepthHoles;
+    }
+
+    /**
+     * Gets the depth of a pixel drawn on this canvas with the depthbuffer enabled.
+     * Returns {@link #MAX_DEPTH} when the pixel has no contents drawn there.
+     *  
+     * @param x - coordinate of the pixel
+     * @param y - coordinate of the pixel
+     * @return depth of the pixel
+     */
+    public final int getDepth(int x, int y) {
+        if (this.depthBuffer == null) {
+            return MAX_DEPTH;
+        } else {
+            return this.depthBuffer[y * this.getWidth() + x];
+        }
+    }
+
+    /**
      * Sets the amount of pixels between each drawn character of a font.
      * By default a spacing of 0 is used. Text fonts will have a default spacing set.
      * Negative values are allowed to make spacing smaller.
@@ -404,7 +590,7 @@ public abstract class MapCanvas {
      * @param spacing to use, 0 for none
      * @return this canvas
      */
-    public MapCanvas setSpacing(int spacing) {
+    public final MapCanvas setSpacing(int spacing) {
         this.fontSpacing = spacing;
         return this;
     }
@@ -422,7 +608,7 @@ public abstract class MapCanvas {
      * @param alignment to set
      * @return this canvas
      */
-    public MapCanvas setAlignment(MapFont.Alignment alignment) {
+    public final MapCanvas setAlignment(MapFont.Alignment alignment) {
         this.fontAlignment = alignment;
         return this;
     }
@@ -440,7 +626,7 @@ public abstract class MapCanvas {
      * @param blendMode
      * @return this canvas
      */
-    public MapCanvas setBlendMode(MapBlendMode blendMode) {
+    public final MapCanvas setBlendMode(MapBlendMode blendMode) {
         this.blendMode = blendMode;
         return this;
     }
@@ -451,7 +637,7 @@ public abstract class MapCanvas {
      * 
      * @return color blending mode
      */
-    public MapBlendMode getBlendMode() {
+    public final MapBlendMode getBlendMode() {
         return this.blendMode;
     }
 
