@@ -26,6 +26,7 @@ public class MapResourcePack {
     private final MapResourcePack baseTexturePack;
     private final ZipFile archive;
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
+    private final Map<String, Model> modelCache = new HashMap<String, Model>();
 
     public MapResourcePack(String texturePackFilePath) {
         this(null, texturePackFilePath);
@@ -51,7 +52,7 @@ public class MapResourcePack {
                 result = MapTexture.fromStream(inputStream);
             }
             if (result == null) {
-                System.out.println("Failed to load texture: " + path);
+                //System.out.println("Failed to load texture: " + path);
                 result = MapTexture.createEmpty(16, 16);
                 result.fill(MapColorPalette.COLOR_PURPLE);
                 result.fillRectangle(0, 0, 8, 8, MapColorPalette.COLOR_BLUE);
@@ -63,6 +64,11 @@ public class MapResourcePack {
     }
 
     public Model getModel(String path) {
+        Model model = modelCache.get(path);
+        if (model != null) {
+            return model;
+        }
+
         InputStream inputStream = openFileStream(ResourceType.MODELS, path);
         if (inputStream == null) {
             return null;
@@ -75,7 +81,7 @@ public class MapResourcePack {
                 gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
                 gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
                 Gson gson = gsonBuilder.create();
-                Model model = gson.fromJson(reader, Model.class);
+                model = gson.fromJson(reader, Model.class);
                 if (model == null) {
                     return null;
                 }
@@ -91,6 +97,9 @@ public class MapResourcePack {
 
                 // Make all texture paths absolute
                 model.build(this);
+
+                // Store for later (re-)use
+                modelCache.put(path, model);
 
                 return model;
             } finally {

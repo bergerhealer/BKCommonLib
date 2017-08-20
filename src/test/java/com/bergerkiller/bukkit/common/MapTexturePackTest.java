@@ -113,41 +113,16 @@ class Pseudo3DImagePanel extends JPanel
         MapTexture image = MapTexture.createEmpty(512, 512);
         image.setBlendMode(MapBlendMode.OVERLAY);
         //image.draw(background, 0, 0);
-                
-        
+
         // Draws a 3D quad
         float scale = 8.0f;
         float yaw = p1.x - 128;
         float pitch = p1.y - 128;
-        
-        Matrix4f translation = new Matrix4f();
-        translation.set(scale, new Vector3f(p0.x, 0.0f, p0.y));
-        
+
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
-        
-        Matrix4f rotationPitch = new Matrix4f();
-        rotationPitch.rotateX(pitch);
-        
-        Matrix4f rotationYaw = new Matrix4f();
-        rotationYaw.rotateY(yaw);
 
-        Matrix4f transform = new Matrix4f();
-        transform.setIdentity();
-        transform.multiply(translation);
-        transform.multiply(rotationPitch);
-        transform.multiply(rotationYaw);
-
-        Model model = textures.getModel("block/dropper");
-        List<Quad> quads = model.buildQuads();
-
-        for (Quad quad : quads) {
-            quad.transform(transform);
-        }
-
-        Collections.sort(quads);
-        for (Quad quad : quads) {
-            image.drawQuad(quad.texture, quad);
-        }
+        Model model = textures.getModel("block/repeater_on_4tick");
+        image.drawModel(model, scale, (int) p0.x, (int) p0.y, yaw, pitch);
 
         g.drawImage(image.toJavaImage(), 0, 0, null);
 

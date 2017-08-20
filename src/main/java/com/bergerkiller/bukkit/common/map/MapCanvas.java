@@ -3,11 +3,16 @@ package com.bergerkiller.bukkit.common.map;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
 import com.bergerkiller.bukkit.common.map.util.Matrix3f;
+import com.bergerkiller.bukkit.common.map.util.Matrix4f;
+import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.map.util.Vector2f;
+import com.bergerkiller.bukkit.common.map.util.Vector3f;
 
 /**
  * A base implementation canvas for performing drawing operations on.
@@ -719,15 +724,67 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Draws a 3D model onto this canvas, using the position, rotation and scale parameters
+     * 
+     * @param model to draw
+     * @param scale to draw the model at
+     * @param x - position of the model origin on the canvas
+     * @param y - position of the model origin on the canvas
+     * @param yaw rotation
+     * @param pitch rotation
+     * @return this canvas
+     */
+    public final MapCanvas drawModel(Model model, float scale, int x, int y, float yaw, float pitch) {
+        Matrix4f translation = new Matrix4f();
+        translation.set(scale, new Vector3f(x, 0.0f, y));
+
+        Matrix4f rotationPitch = new Matrix4f();
+        rotationPitch.rotateX(pitch);
+
+        Matrix4f rotationYaw = new Matrix4f();
+        rotationYaw.rotateY(yaw);
+
+        Matrix4f transform = new Matrix4f();
+        transform.setIdentity();
+        transform.multiply(translation);
+        transform.multiply(rotationPitch);
+        transform.multiply(rotationYaw);
+
+        return drawModel(model, transform);
+    }
+
+    /**
+     * Draws a 3D model onto this canvas, using the transform matrix for the positioning
+     * of the model on the canvas.
+     * 
+     * @param model to draw
+     * @param transform for drawing the model
+     * @return this canvas
+     */
+    public final MapCanvas drawModel(Model model, Matrix4f transform) {
+        if (model == null) {
+            throw new IllegalArgumentException("Model is null");
+        }
+        List<Quad> quads = model.buildQuads();
+        for (Quad quad : quads) {
+            quad.transform(transform);
+        }
+        Collections.sort(quads);
+        for (Quad quad : quads) {
+            drawQuad(quad);
+        }
+        return this;
+    }
+
+    /**
      * Draws a pseudo-3D quad onto this canvas, using the 4 2D coordinates of the quad points
      * to define the projection transformation that is applied.
      * 
-     * @param canvas to draw onto this canvas
      * @param quad to draw
-     * @return view
+     * @return this canvas
      */
-    public final MapCanvas drawQuad(MapCanvas canvas, Quad quad) {
-        return this.drawQuad(canvas,
+    public final MapCanvas drawQuad(Quad quad) {
+        return this.drawQuad(quad.texture,
                 quad.p0.toVector2f(),
                 quad.p1.toVector2f(),
                 quad.p2.toVector2f(),
@@ -754,7 +811,7 @@ public abstract class MapCanvas {
         Matrix3f m = Matrix3f.computeProjectionMatrix(
             new Vector2f[] {  p0,  p1,  p2,  p3 },
             new Vector2f[] { ip0, ip1, ip2, ip3 });
-        
+
         return drawQuad(canvas, m);
     }
 

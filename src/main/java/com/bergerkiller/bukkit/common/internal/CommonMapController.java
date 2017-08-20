@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -639,6 +640,39 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
+    private void handleMapShowEvent(MapShowEvent event) {
+        // When defined in the NBT of the item, construct the Map Display automatically
+        CommonTagCompound tag = ItemUtil.getMetaTag(event.getMapItem(), false);
+        if (tag != null) {
+            String pluginName = tag.getValue("mapDisplayPlugin", String.class);
+            String displayClassName = tag.getValue("mapDisplayClass", String.class);
+            if (pluginName != null && displayClassName != null) {
+                Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+                Class<?> displayClass = null;
+                if (plugin != null) {
+                    try {
+                        displayClass = plugin.getClass().getClassLoader().loadClass(displayClassName);
+                        if (!MapDisplay.class.isAssignableFrom(displayClass)) {
+                            displayClass = null;
+                        }
+                    } catch (ClassNotFoundException e) {
+                        
+                    }
+                }
+                if (displayClass != null) {
+                    try {
+                        MapDisplay display = (MapDisplay) displayClass.newInstance();
+                        event.setDisplay((JavaPlugin) plugin, display);;
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        CommonUtil.callEvent(event);
+    }
+
     /**
      * Maintains the metadata information for a map
      */
@@ -916,7 +950,7 @@ public class CommonMapController implements PacketListener, Listener {
 
                         @Override
                         public Player onAdded(Player player) {
-                            CommonUtil.callEvent(new MapShowEvent(player, info.itemFrame));
+                            handleMapShowEvent(new MapShowEvent(player, info.itemFrame));
                             return player;
                         }
 
@@ -1002,13 +1036,13 @@ public class CommonMapController implements PacketListener, Listener {
                         && !mapEquals(currLeftHand, lastLeftHand) 
                         && !mapEquals(currLeftHand, lastRightHand)) {
                     // Left hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapShowEvent(player, HumanHand.LEFT, currLeftHand));
+                    handleMapShowEvent(new MapShowEvent(player, HumanHand.LEFT, currLeftHand));
                 }
                 if (isMap(currRightHand) 
                         && !mapEquals(currRightHand, lastRightHand) 
                         && !mapEquals(currRightHand, lastLeftHand)) {
                     // Right hand now has a map! We did not swap hands, either.
-                    CommonUtil.callEvent(new MapShowEvent(player, HumanHand.RIGHT, currRightHand));
+                    handleMapShowEvent(new MapShowEvent(player, HumanHand.RIGHT, currRightHand));
                 }
 
                 lastLeftHand = currLeftHand;

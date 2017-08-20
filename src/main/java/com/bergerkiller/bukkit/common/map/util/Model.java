@@ -187,9 +187,12 @@ public class Model {
                     int index = 0;
                     for (int y = uv[1]; y != uv[3]; y += sy) {
                         for (int x = uv[0]; x != uv[2]; x += sx) {
-                            buffer[index] = this.texture.readPixel(x - ox, y - oy);
-                            if (buffer[index] == 0) {
+                            int px = x - ox;
+                            int py = y - oy;
+                            if (px < 0 || py < 0 || px >= this.texture.getWidth() || py >= this.texture.getHeight()) {
                                 buffer[index] = MapColorPalette.COLOR_GREEN;
+                            } else {
+                                buffer[index] = this.texture.readPixel(x - ox, y - oy);
                             }
                             index++;
                         }
