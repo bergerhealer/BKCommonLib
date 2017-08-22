@@ -31,10 +31,11 @@ import com.bergerkiller.bukkit.common.map.util.Vector3f;
 public abstract class MapCanvas {
     private int fontSpacing = 0;
     private MapFont.Alignment fontAlignment = MapFont.Alignment.LEFT;
-    private MapBlendMode blendMode = MapBlendMode.NONE;
+    private MapBlendMode blendMode = MapBlendMode.OVERLAY;
     private short[] depthBuffer = null;
     private byte[] maskBuffer = null;
     private int mask_w, mask_h;
+    private boolean maskRelative = false;
     private short currentDepthZ = 0;
     private boolean hasDepthHoles = false;
     public static final int MAX_DEPTH = Short.MAX_VALUE;
@@ -261,6 +262,7 @@ public abstract class MapCanvas {
                     // Restore all pixels that are unmasked
                     int colorIndex = 0;
                     int maskIndex = 0;
+                    int maskEndIndex;
                     for (int dy = 0; dy < h; dy++) {
                         // Restore lines outside of the mask range
                         if (dy >= this.mask_h) {
@@ -270,10 +272,17 @@ public abstract class MapCanvas {
                         }
 
                         // Process lines
-                        maskIndex = dy * this.mask_w;
+                        if (this.maskRelative) {
+                            maskIndex = dy * this.mask_w;
+                            maskEndIndex = maskIndex + this.mask_w;
+                        } else {
+                            maskIndex = (y + dy) * this.mask_w;
+                            maskEndIndex = maskIndex + this.mask_w;
+                            maskIndex += x;
+                        }
                         for (int dx = 0; dx < w; dx++) {
                             // Restore end of lines out of range of mask
-                            if (dx >= this.mask_w) {
+                            if (maskIndex >= maskEndIndex) {
                                 System.arraycopy(pixels_old, colorIndex, pixels, colorIndex, w - dx);
                                 colorIndex += w - dx;
                                 break;
@@ -298,15 +307,23 @@ public abstract class MapCanvas {
             //byte[] pixels = this.readPixels(x, y, w, h);
 
             int colorDataIdx = -1;
-            int maskIndex = 0;
             for (int dy = 0; dy < h; dy++) {
                 for (int dx = 0; dx < w; dx++) {
                     colorDataIdx++;
 
+                    int px = x + dx;
+                    int py = y + dy;
+
                     // Check if not masked out
                     if (this.maskBuffer != null) {
-                        if (dx >= this.mask_w || dy >= this.mask_h || (this.maskBuffer[maskIndex++] == 0)) {
-                            continue;
+                        if (this.maskRelative) {
+                            if (dx >= this.mask_w || dy >= this.mask_h || (this.maskBuffer[dy * this.mask_w + dx] == 0)) {
+                                continue;
+                            }
+                        } else {
+                            if ((x + dx) >= this.mask_w || (y + dy) >= this.mask_h || (this.maskBuffer[py * this.mask_w + px] == 0)) {
+                                continue;
+                            }
                         }
                     }
 
@@ -518,9 +535,10 @@ public abstract class MapCanvas {
     }
 
     /**
-     * Sets a mask defining the draw-relative pixels that are drawn. Non-transparent pixels in the mask
+     * Sets a mask defining the pixels that are drawn. Non-transparent pixels in the mask
      * will be drawn onto this canvas for all drawing operations. Transparent pixels in the mask
-     * will not be drawn at all, and also skip depth buffer tests and blend modes.
+     * will not be drawn at all, and also skip depth buffer tests and blend modes. It is recommended
+     * that the mask is the same size as this canvas, since the mask is applied relative to (0, 0).
      * 
      * @param mask to apply, <i>null</i> to disable the mask
      * @return this canvas
@@ -532,10 +550,31 @@ public abstract class MapCanvas {
             this.maskBuffer = mask.getBuffer();
             this.mask_w = mask.getWidth();
             this.mask_h = mask.getHeight();
+            this.maskRelative = false;
         }
         return this;
     }
 
+    /**
+     * Sets a mask defining the draw-relative pixels that are drawn. Non-transparent pixels in the mask
+     * will be drawn onto this canvas for all drawing operations. Transparent pixels in the mask
+     * will not be drawn at all, and also skip depth buffer tests and blend modes.
+     * 
+     * @param mask to apply, <i>null</i> to disable the mask
+     * @return this canvas
+     */
+    public final MapCanvas setRelativeBrushMask(MapCanvas mask) {
+        if (mask == null) {
+            this.maskBuffer = null;
+        } else {
+            this.maskBuffer = mask.getBuffer();
+            this.mask_w = mask.getWidth();
+            this.mask_h = mask.getHeight();
+            this.maskRelative = true;
+        }
+        return this;
+    }
+    
     /**
      * Sets a depth value that will be used when performing the following drawing operations.
      * The depth buffer will allow for different drawn areas to overlap each other correctly
@@ -827,6 +866,12 @@ public abstract class MapCanvas {
         Matrix3f mInv = new Matrix3f(projectionMatrix);
         mInv.invert();
         Vector2f p = new Vector2f();
+        MapTexture temp = MapTexture.createEmpty(this.getWidth(), this.getHeight());
+        int minX = this.getWidth();
+        int minY = this.getHeight();
+        int maxX = 0;
+        int maxY = 0;
+
         for (int y = 0; y < getHeight(); y++)
         {
             for (int x = 0; x < getWidth(); x++)
@@ -835,12 +880,20 @@ public abstract class MapCanvas {
                 p.y = y;
                 mInv.transform(p);
                 if (p.x >= 0.0f && p.y >= 0.0f && p.x <= (canvas.getWidth()) && p.y <= (canvas.getHeight())) {
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+
                     byte color = canvas.readPixel((int)p.x, (int)p.y);
                     if (color != MapColorPalette.COLOR_TRANSPARENT) {
-                        writePixel(x, y, color);
+                        temp.writePixel(x, y, color);
                     }
                 }
             }
+        }
+        if (minX != this.getWidth()) {
+            this.draw(temp.getView(minX, minY, maxX - minX + 1, maxY - minY + 1), minX, minY);
         }
         return this;
     }

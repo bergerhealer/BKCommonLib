@@ -267,6 +267,28 @@ public class Matrix4f {
     this.m33 = (float) 1.0;
 }
     
+    public final void set(Vector3f scale, Vector3f translation) {
+        this.m00 = scale.x;
+        this.m01 = (float) 0.0;
+        this.m02 = (float) 0.0;
+        this.m03 = translation.x;
+
+        this.m10 = (float) 0.0;
+        this.m11 = scale.y;
+        this.m12 = (float) 0.0;
+        this.m13 = translation.y;
+
+        this.m20 = (float) 0.0;
+        this.m21 = (float) 0.0;
+        this.m22 = scale.z;
+        this.m23 = translation.z;
+
+        this.m30 = (float) 0.0;
+        this.m31 = (float) 0.0;
+        this.m32 = (float) 0.0;
+        this.m33 = (float) 1.0;
+    }
+    
     /**
      * Sets the value of this matrix to the result of multiplying itself
      * with matrix m1.
