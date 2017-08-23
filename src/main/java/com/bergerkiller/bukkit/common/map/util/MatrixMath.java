@@ -133,7 +133,12 @@ public class MatrixMath {
                 row_perm[j] = imax;
 
                 // Is the matrix singular
-                if (matrix0[(mtx + (4*j) + j)] == 0.0) {
+                // Was:
+                //   matrix0[(mtx + (4*j) + j)] == 0.0
+                // Changed it because of float range issues
+                final double SINGULAR_EP = 0.00001;
+                double v = matrix0[(mtx + (4*j) + j)];
+                if (v >= -SINGULAR_EP && v <= SINGULAR_EP) {
                     return false;
                 }
 

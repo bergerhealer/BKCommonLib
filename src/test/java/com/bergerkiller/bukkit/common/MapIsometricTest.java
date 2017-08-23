@@ -105,5 +105,9 @@ public class MapIsometricTest {
             tile.draw(sprite, dx + i * sprite.getWidth() - sprite.getWidth() / 2, dy + 3 * stepY);
         }
         */
+        
+        for (int i = 0; i < 4; i++) {
+            tile.draw(sprite, dx + i * sprite.getWidth(), dy + 4 * stepY);
+        }
     }
 }

@@ -108,9 +108,9 @@ class Pseudo3DImagePanel extends JPanel
         float yaw = p1.x - 128;
         float pitch = p1.y - 128;
 
-        System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
+        //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        Model model = textures.getModel("block/repeater_on_4tick");
+        Model model = textures.getModel("block/cactus");
         image.drawModel(model, scale, (int) p0.x, (int) p0.y, yaw, pitch);
 
         g.drawImage(image.toJavaImage(), 0, 0, null);

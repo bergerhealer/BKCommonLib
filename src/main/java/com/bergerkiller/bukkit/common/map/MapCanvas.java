@@ -797,10 +797,12 @@ public abstract class MapCanvas {
         for (Quad quad : quads) {
             transform.transformQuad(quad);
         }
+
         Collections.sort(quads);
         for (Quad quad : quads) {
             drawQuad(quad);
         }
+
         return this;
     }
 
@@ -848,6 +850,7 @@ public abstract class MapCanvas {
         }
 
         m0.multiply(canvas.projMatrix);
+
         return drawQuad(canvas, m0);
     }
 
@@ -860,9 +863,24 @@ public abstract class MapCanvas {
      * @return view
      */
     public final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix) {
-        Matrix4f mInv = new Matrix4f();
-        mInv.set(projectionMatrix);
+        Matrix4f mInv = new Matrix4f(projectionMatrix);
         mInv.invert();
+
+        Vector3f ip0 = new Vector3f(0, 0, 0);
+        Vector3f ip1 = new Vector3f(0, 0, canvas.getHeight());
+        Vector3f ip2 = new Vector3f(canvas.getWidth(), 0,  canvas.getHeight());
+        projectionMatrix.transformPoint(ip0);
+        projectionMatrix.transformPoint(ip1);
+        projectionMatrix.transformPoint(ip2);
+
+        Vector3f v1 = Vector3f.subtract(ip0, ip1);
+        Vector3f v2 = Vector3f.subtract(ip2, ip1);
+        Vector3f cross = Vector3f.cross(v1, v2).normalize();
+
+        if (cross.y < 0.0f) {
+            cross = cross.negate();
+        }
+
         Vector3f p = new Vector3f();
         MapTexture temp = MapTexture.createEmpty(this.getWidth(), this.getHeight());
         int minX = this.getWidth();
@@ -870,19 +888,21 @@ public abstract class MapCanvas {
         int maxX = 0;
         int maxY = 0;
 
+        float specular = 0.3f * cross.x; //todo: settings.
+
         for (int y = 0; y < getHeight(); y++)
         {
             for (int x = 0; x < getWidth(); x++)
             {
                 p.x = x;
-                p.y = y;
-                p.z = 1.0f;
+                p.z = y;
+                p.y = 1.0f;
                 mInv.transformPoint(p);
 
                 float ax = p.x;
-                float ay = p.y;
-                float az = p.z;
-                
+                float ay = p.z;
+                float depth = p.y;
+
                 if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
                     if (y < minY) minY = y;
                     if (y > maxY) maxY = y;
@@ -892,7 +912,7 @@ public abstract class MapCanvas {
                     byte color = canvas.readPixel((int) ax, (int) ay);
                     if (color != MapColorPalette.COLOR_TRANSPARENT) {
                         // Shows specular brightness based on distance from camera (debug)
-                        //color = MapColorPalette.getSpecular(color, 0.005f * -az);
+                        color = MapColorPalette.getSpecular(color, specular);
 
                         temp.writePixel(x, y, color);
                     }

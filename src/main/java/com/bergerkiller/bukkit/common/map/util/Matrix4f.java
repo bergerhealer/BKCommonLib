@@ -415,18 +415,20 @@ public class Matrix4f {
     {
         Matrix4f m = new Matrix4f(
                 p[0].x, p[1].x, p[2].x, 0.0f,
-                p[0].z, p[1].z, p[2].z, 0.0f,
                 p[0].y, p[1].y, p[2].y, 1.0f,
+                p[0].z, p[1].z, p[2].z, 0.0f,
                 1, 1, 1, 0);
 
-        Vector4f p3 = new Vector4f(p[3].x, p[3].z, p[3].y + 0.001f, 1.0f);
-        Matrix4f mInv = new Matrix4f();
-        mInv.set(m);
-
+        //TODO: For some reason we need to add a very small value to p[3].y to avoid glitching out
+        // Any reason why? Should this value be calculated from somewhere? View clipping plane?
+        // Or maybe the matrix inversion simply cannot handle an y value without it.
+        Vector4f p3 = new Vector4f(p[3].x, p[3].y + 0.001f, p[3].z, 1.0f);
+        Matrix4f mInv = new Matrix4f(m);
         if (!mInv.invert()) {
             return null;
         }
         mInv.transformPoint(p3);
+
         m.m00 *= p3.x;
         m.m01 *= p3.y;
         m.m02 *= p3.z;
@@ -446,7 +448,7 @@ public class Matrix4f {
         m.m31 *= p3.y;
         m.m32 *= p3.z;
         m.m33 *= p3.w;
+
         return m;
     }
-
 }

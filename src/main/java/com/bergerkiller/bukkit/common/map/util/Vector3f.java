@@ -35,6 +35,16 @@ public class Vector3f {
         return new Vector3f(-x, -y, -z);
     }
 
+    /**
+     * Returns a new normalized vector of this vector (length = 1)
+     * 
+     * @return normalized vector
+     */
+    public Vector3f normalize() {
+        double len = Math.sqrt(x*x+y*y+z*z);
+        return new Vector3f((float) (x/len), (float) (y/len), (float) (z/len));
+    }
+
     @Override
     public Vector3f clone() {
         return new Vector3f(x, y, z);
@@ -43,5 +53,35 @@ public class Vector3f {
     @Override
     public String toString() {
         return "{x=" + x + ", y=" + y + ", z=" + z + "}";
+    }
+
+    /**
+     * Returns the cross product of two vectors
+     * 
+     * @param v1 first vector
+     * @param v2 second vector
+     * @return cross product
+     */
+    public static Vector3f cross(Vector3f v1, Vector3f v2) {
+        return new Vector3f(
+                v1.y*v2.z - v1.z*v2.y,
+                v2.x*v1.z - v2.z*v1.x,
+                v1.x*v2.y - v1.y*v2.x
+        );
+    }
+
+    /**
+     * Returns the vector subtraction of two vectors (v1 - v2)
+     * 
+     * @param v1
+     * @param v2
+     * @return subtracted vector
+     */
+    public static Vector3f subtract(Vector3f v1, Vector3f v2) {
+        return new Vector3f(
+                v1.x - v2.x,
+                v1.y - v2.y,
+                v1.z - v2.z
+        );
     }
 }

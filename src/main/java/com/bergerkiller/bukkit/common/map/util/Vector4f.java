@@ -20,4 +20,9 @@ public class Vector4f {
         this.z = z;
         this.w = w;
     }
+
+    @Override
+    public String toString() {
+        return "{x=" + x + ", y=" + y + ", z=" + z + ", w=" + w + "}";
+    }
 }
