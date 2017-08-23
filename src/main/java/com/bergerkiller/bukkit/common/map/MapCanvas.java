@@ -7,11 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
-import com.bergerkiller.bukkit.common.map.util.Matrix3f;
 import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Quad;
-import com.bergerkiller.bukkit.common.map.util.Vector2f;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
 
 /**
@@ -38,6 +36,7 @@ public abstract class MapCanvas {
     private boolean maskRelative = false;
     private short currentDepthZ = 0;
     private boolean hasDepthHoles = false;
+    private Matrix4f projMatrix = null;
     public static final int MAX_DEPTH = Short.MAX_VALUE;
 
     /**
@@ -774,21 +773,11 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas drawModel(Model model, float scale, int x, int y, float yaw, float pitch) {
-        Matrix4f translation = new Matrix4f();
-        translation.set(scale, new Vector3f(x, 0.0f, y));
-
-        Matrix4f rotationPitch = new Matrix4f();
-        rotationPitch.rotateX(pitch);
-
-        Matrix4f rotationYaw = new Matrix4f();
-        rotationYaw.rotateY(yaw);
-
         Matrix4f transform = new Matrix4f();
-        transform.setIdentity();
-        transform.multiply(translation);
-        transform.multiply(rotationPitch);
-        transform.multiply(rotationYaw);
-
+        transform.translate(x, 0.0f, y);
+        transform.scale(scale);
+        transform.rotateX(pitch);
+        transform.rotateY(yaw);
         return drawModel(model, transform);
     }
 
@@ -806,7 +795,7 @@ public abstract class MapCanvas {
         }
         List<Quad> quads = model.buildQuads();
         for (Quad quad : quads) {
-            quad.transform(transform);
+            transform.transformQuad(quad);
         }
         Collections.sort(quads);
         for (Quad quad : quads) {
@@ -824,14 +813,14 @@ public abstract class MapCanvas {
      */
     public final MapCanvas drawQuad(Quad quad) {
         return this.drawQuad(quad.texture,
-                quad.p0.toVector2f(),
-                quad.p1.toVector2f(),
-                quad.p2.toVector2f(),
-                quad.p3.toVector2f());
+                quad.p0,
+                quad.p1,
+                quad.p2,
+                quad.p3);
     }
 
     /**
-     * Draws a pseudo-3D quad onto this canvas, using the 4 2D coordinates of the quad points
+     * Draws a pseudo-3D quad onto this canvas, using the 4 3D coordinates of the quad points
      * to define the projection transformation that is applied.
      * 
      * @param canvas to draw onto this canvas
@@ -841,17 +830,25 @@ public abstract class MapCanvas {
      * @param p3 the bottom-left fourth point of the quad
      * @return view
      */
-    public final MapCanvas drawQuad(MapCanvas canvas, Vector2f p0, Vector2f p1, Vector2f p2, Vector2f p3) {
-        Vector2f ip0 = new Vector2f(0, 0);
-        Vector2f ip1 = new Vector2f(0, canvas.getHeight());
-        Vector2f ip2 = new Vector2f(canvas.getWidth(), canvas.getHeight());
-        Vector2f ip3 = new Vector2f(canvas.getWidth(), 0);
+    public final MapCanvas drawQuad(MapCanvas canvas, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3) {
+        // This matrix can be cached, saving a precious matrix inversion
+        if (canvas.projMatrix == null) {
+            Vector3f ip0 = new Vector3f(0, 0, 0);
+            Vector3f ip1 = new Vector3f(0, 0, canvas.getHeight());
+            Vector3f ip2 = new Vector3f(canvas.getWidth(), 0,  canvas.getHeight());
+            Vector3f ip3 = new Vector3f(canvas.getWidth(), 0,  0);
 
-        Matrix3f m = Matrix3f.computeProjectionMatrix(
-            new Vector2f[] {  p0,  p1,  p2,  p3 },
-            new Vector2f[] { ip0, ip1, ip2, ip3 });
+            canvas.projMatrix = Matrix4f.computeProjectionMatrix(new Vector3f[] { ip0, ip1, ip2, ip3 });
+            canvas.projMatrix.invert();
+        }
 
-        return drawQuad(canvas, m);
+        Matrix4f m0 = Matrix4f.computeProjectionMatrix(new Vector3f[] {  p0,  p1,  p2,  p3 });
+        if (m0 == null) {
+            return this;
+        }
+
+        m0.multiply(canvas.projMatrix);
+        return drawQuad(canvas, m0);
     }
 
     /**
@@ -862,10 +859,11 @@ public abstract class MapCanvas {
      * @param projectionMatrix to use for the transformation
      * @return view
      */
-    public final MapCanvas drawQuad(MapCanvas canvas, Matrix3f projectionMatrix) {
-        Matrix3f mInv = new Matrix3f(projectionMatrix);
+    public final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix) {
+        Matrix4f mInv = new Matrix4f();
+        mInv.set(projectionMatrix);
         mInv.invert();
-        Vector2f p = new Vector2f();
+        Vector3f p = new Vector3f();
         MapTexture temp = MapTexture.createEmpty(this.getWidth(), this.getHeight());
         int minX = this.getWidth();
         int minY = this.getHeight();
@@ -878,15 +876,24 @@ public abstract class MapCanvas {
             {
                 p.x = x;
                 p.y = y;
-                mInv.transform(p);
-                if (p.x >= 0.0f && p.y >= 0.0f && p.x <= (canvas.getWidth()) && p.y <= (canvas.getHeight())) {
+                p.z = 1.0f;
+                mInv.transformPoint(p);
+
+                float ax = p.x;
+                float ay = p.y;
+                float az = p.z;
+                
+                if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
                     if (y < minY) minY = y;
                     if (y > maxY) maxY = y;
                     if (x < minX) minX = x;
                     if (x > maxX) maxX = x;
 
-                    byte color = canvas.readPixel((int)p.x, (int)p.y);
+                    byte color = canvas.readPixel((int) ax, (int) ay);
                     if (color != MapColorPalette.COLOR_TRANSPARENT) {
+                        // Shows specular brightness based on distance from camera (debug)
+                        //color = MapColorPalette.getSpecular(color, 0.005f * -az);
+
                         temp.writePixel(x, y, color);
                     }
                 }

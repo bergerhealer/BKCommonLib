@@ -5,7 +5,6 @@ import java.awt.Image;
 
 import org.bukkit.map.MapPalette;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 
 /**
@@ -19,6 +18,7 @@ public class MapColorPalette {
     public static final byte[] COLOR_MAP_ADD      = new byte[0x10000];
     public static final byte[] COLOR_MAP_SUBTRACT = new byte[0x10000];
     public static final byte[] COLOR_MAP_MULTIPLY = new byte[0x10000];
+    public static final byte[] COLOR_MAP_SPECULAR = new byte[0x10000];
 
     // List of colors with their closest matching palette entry
     public static final byte COLOR_TRANSPARENT = 0;
@@ -44,6 +44,11 @@ public class MapColorPalette {
             initTransparent(b, (byte) b, false);
         }
 
+        // All specular colors for the transparent color are transparent
+        for (int b = 0; b < 256; b++) {
+            COLOR_MAP_SPECULAR[b] = COLOR_TRANSPARENT;
+        }
+
         // Generate the blend map
         for (int a = 1; a < COLOR_COUNT; a++) {
             int index = (a * 256);
@@ -55,10 +60,17 @@ public class MapColorPalette {
                         color_a.getRed(), color_a.getGreen(), color_a.getBlue(),
                         color_b.getRed(), color_b.getGreen(), color_b.getBlue());
             }
-        }
 
-        // Verify color constants (debug)
-        verifyColor("COLOR_WHITE", new Color(255, 255, 255));
+            // Create 128 darker and 128 lighter specular colors
+            index = (a * 256);
+            for (int b = 0; b < 256; b++) {
+                int f = (b - 128) * 2;
+                int sr = color_a.getRed() + f;
+                int sg = color_a.getGreen() + f;
+                int sb = color_a.getBlue() + f;
+                COLOR_MAP_SPECULAR[index++] = getColor(sr, sg, sb);
+            }
+        }
     }
 
     private static void initTransparent(int index, byte color, boolean is_second) {
@@ -83,15 +95,6 @@ public class MapColorPalette {
         if (b < 0x00) b = 0x00;
         if (b > 0xFF) b = 0xFF;
         array[index] = MapPalette.matchColor(r, g, b);
-    }
-
-    private static void verifyColor(String constantName, Color expected) {
-        byte color = SafeField.get(MapColorPalette.class, constantName, byte.class);
-        Color c = getRealColor(color);
-        if (!c.equals(expected)) {
-            Logging.LOGGER.warning("Color constant " + constantName + "[" + (int) color + "] has an invalid color: " +
-                                   "color=" + c.toString() + ", expected=" + expected.toString());
-        }
     }
 
     public static void remapColors(byte input, byte[] output, byte[] remapArray) {
@@ -125,6 +128,22 @@ public class MapColorPalette {
      * @return minecraft color
      */
     public static byte getColor(int r, int g, int b) {
+        // This helps prevent dumb exceptions.
+        // Nobody likes random exceptions when all you're doing is color calculations
+        if (r < 0)
+            r = 0;
+        else if (r > 255)
+            r = 255;
+        if (g < 0)
+            g = 0;
+        else if (g > 255)
+            g = 255;
+        if (b < 0)
+            b = 0;
+        else if (b > 255)
+            b = 255;
+
+        // Uses Bukkit's API. For so long it works, anyway.
         return MapPalette.matchColor(r, g, b);
     }
 
@@ -157,5 +176,23 @@ public class MapColorPalette {
      */
     public static final Color getRealColor(byte color) {
         return COLOR_MAP[color & 0xFF];
+    }
+
+    /**
+     * Makes a color darker or brighter based on a specular float value.
+     * 
+     * @param color to transform
+     * @param lightness factor. 0 is no change, -1 is black, 1 is white.
+     * @return specular color
+     */
+    public static byte getSpecular(byte color, float lightness) {
+        int index = (int) (128.0f * lightness) + 128;
+        if (index < 0) {
+            return COLOR_BLACK;
+        } else if (index >= 256) {
+            return COLOR_WHITE;
+        } else {
+            return COLOR_MAP_SPECULAR[((color & 0xFF) << 8) + index];
+        }
     }
 }

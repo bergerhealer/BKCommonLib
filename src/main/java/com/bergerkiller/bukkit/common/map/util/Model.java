@@ -109,36 +109,20 @@ public class Model {
             }
 
             if (rotation != null) {
-
-
-                Matrix4f m_rotation = new Matrix4f();
-                if (rotation.axis.equals("x")) {
-                    m_rotation.rotateX(rotation.angle);
-                } else if (rotation.axis.equals("y")) {
-                    m_rotation.rotateY(rotation.angle);
-                } else if (rotation.axis.equals("z")) {
-                    m_rotation.rotateZ(rotation.angle);
-                }
-
-                Matrix4f m_a = new Matrix4f();
-                m_a.set(new Vector3f(rotation.origin.x, rotation.origin.y, rotation.origin.z));
-                
-                Matrix4f m_b = new Matrix4f();
-                m_b.set(new Vector3f(-rotation.origin.x, -rotation.origin.y, -rotation.origin.z));
-                
                 Matrix4f transform = new Matrix4f();
-                transform.setIdentity();
-                
-                transform.multiply(m_a);
-                transform.multiply(m_rotation);
-                
-                
-                transform.multiply(m_b);
+                transform.translate(rotation.origin);
+                if (rotation.axis.equals("x")) {
+                    transform.rotateX(rotation.angle);
+                } else if (rotation.axis.equals("y")) {
+                    transform.rotateY(rotation.angle);
+                } else if (rotation.axis.equals("z")) {
+                    transform.rotateZ(rotation.angle);
+                }
+                transform.translate(rotation.origin.negate());
 
                 for (Quad quad : result) {
-                    quad.transform(transform);
+                    transform.transformQuad(quad);
                 }
-                
             }
 
             return result;

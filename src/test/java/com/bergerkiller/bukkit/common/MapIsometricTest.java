@@ -56,8 +56,9 @@ public class MapIsometricTest {
        }
         
         Matrix4f translation = new Matrix4f();
-        translation.set(new Vector3f(1.45f, 1.0f, 1.71f), new Vector3f(map.getWidth(), 0.0f, map.getWidth() - 1));
-
+        translation.translate(map.getWidth(), 0.0f, map.getWidth() - 1);
+        translation.scale(1.45f, 1.0f, 1.71f);
+        
         Matrix4f rotationPitch = new Matrix4f();
         rotationPitch.rotateX(-45.0f);
 

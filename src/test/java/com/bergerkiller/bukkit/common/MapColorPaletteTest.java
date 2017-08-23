@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
 
 import javax.imageio.ImageIO;
 
@@ -14,8 +12,15 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 
-public class MapDisplayTest {
+public class MapColorPaletteTest {
+
+    @Test
+    public void testColorPaletteColors() {
+        verifyColor("COLOR_WHITE", new Color(255, 255, 255));
+        verifyColor("COLOR_BLACK", new Color(13, 13, 13));
+    }
 
     //@Test
     public void createColorPaletteFieldImage() {
@@ -24,7 +29,6 @@ public class MapDisplayTest {
             // This helps to verify correct functioning of color to colormap index conversion
             BufferedImage img = new BufferedImage(4096, 4096, BufferedImage.TYPE_INT_RGB);
             {
-                HashSet<Integer> coll = new HashSet<Integer>();
                 for (int y = 0; y < 4096; y++) {
                     for (int x = 0; x < 4096; x++) {
                         int r = (x & 0xFF);
@@ -110,5 +114,15 @@ public class MapDisplayTest {
         }
         b.append("<td bgcolor=\"").append(hex).append("\">").append(f).append(name).append("</font></td>");
         b.append("<td bgcolor=\"").append(hex).append("\">").append(f).append(i).append("</font></td>");
+    }
+
+    private void verifyColor(String constantName, Color expected) {
+        byte color = SafeField.get(MapColorPalette.class, constantName, byte.class);
+        Color c = MapColorPalette.getRealColor(color);
+        if (!c.equals(expected)) {
+            throw new RuntimeException(
+                    "Color constant " + constantName + "[" + (int) color + "] has an invalid color: " +
+                    "color=" + c.toString() + ", expected=" + expected.toString());
+        }
     }
 }

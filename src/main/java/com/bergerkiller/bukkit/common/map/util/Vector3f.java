@@ -18,8 +18,21 @@ public class Vector3f {
         this.z = z;
     }
 
-    public Vector2f toVector2f() {
+    public Vector2f getXY() {
+        return new Vector2f(x, y);
+    }
+    
+    public Vector2f getXZ() {
         return new Vector2f(x, z);
+    }
+
+    /**
+     * Returns a new vector with the x/y/z values inverted.
+     * 
+     * @return negated vector
+     */
+    public Vector3f negate() {
+        return new Vector3f(-x, -y, -z);
     }
 
     @Override

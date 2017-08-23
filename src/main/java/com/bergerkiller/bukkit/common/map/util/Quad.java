@@ -118,13 +118,6 @@ public class Quad implements Comparable<Quad> {
         }
     }
 
-    public void transform(Matrix4f m) {
-        m.transform(p0, p0);
-        m.transform(p1, p1);
-        m.transform(p2, p2);
-        m.transform(p3, p3);
-    }
-
     public float depth() {
         float d = p0.y;
         if (p1.y < d) d = p1.y;

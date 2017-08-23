@@ -3,43 +3,31 @@ package com.bergerkiller.bukkit.common;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
-import org.bukkit.block.BlockFace;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
-import com.bergerkiller.bukkit.common.map.util.Matrix3f;
-import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
-import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.map.util.Vector2f;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
-import com.bergerkiller.bukkit.common.utils.FaceUtil;
 
 public class MapTexturePackTest
 {
-    
+
     //@Test
     public void test3DRender() {
         
@@ -81,6 +69,7 @@ public class MapTexturePackTest
 class Pseudo3DImagePanel extends JPanel
     implements MouseListener, MouseMotionListener
 {
+    private static final long serialVersionUID = 1L;
     private final BufferedImage inputBufferedImage;
     private final MapTexture background;
     private final MapResourcePack textures;
@@ -127,7 +116,7 @@ class Pseudo3DImagePanel extends JPanel
         g.drawImage(image.toJavaImage(), 0, 0, null);
 
         int r = 8;
-        g.setColor(Color.RED);
+        g.setColor(Color.BLUE);
         g.fillOval((int)p0.x-r, (int)p0.y-r, r+r, r+r);
         g.fillOval((int)p1.x-r, (int)p1.y-r, r+r, r+r);
         g.fillOval((int)p2.x-r, (int)p2.y-r, r+r, r+r);
