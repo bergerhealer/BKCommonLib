@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -14,13 +16,18 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.Vector3fDeserializer;
+import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
+import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Retrieves Block model textures from a Minecraft jar or zip texture pack archive
@@ -31,6 +38,12 @@ public class MapResourcePack {
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockData, Model> blockModelCache = new HashMap<BlockData, Model>();
+    public static final MapResourcePack VANILLA;
+
+    static {
+        //TODO: Configurable Minecraft client location / automatic download?
+        VANILLA = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
+    }
 
     public MapResourcePack(String texturePackFilePath) {
         this(null, texturePackFilePath);
@@ -139,13 +152,58 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadBlockModel(BlockData blockData) {
-        Model blockModel = this.loadModel("block/" + blockData.getBlockName());
-        if (blockModel == null) {
-            return null;
+        if (blockData.getType() == Material.AIR) {
+            return new Model(); // air. No model.
         }
 
-        //TODO: block variants!
-        return blockModel;
+        Map<String, String> options = blockData.getDataOptions();
+        String blockName = BlockModelNameLookup.lookup(blockData, options);
+
+        // Find the blockstate
+        BlockModelState state = this.openGsonObject(BlockModelState.class, ResourceType.BLOCKSTATES, blockName);
+
+        // Find out the variant that is used
+        List<BlockModelState.Variant> variants;
+        if (state != null) {
+            // Figure out from the blockstate what variant to use
+            variants = state.findVariants(options);
+        } else {
+            // Default variant based on block name
+            BlockModelState.Variant variant = new BlockModelState.Variant();
+            variant.modelName = blockName;
+            variants = Arrays.asList(variant);
+        }
+
+        // If no variants are found, render nothing (AIR)
+        if (variants.isEmpty()) {
+            return new Model();
+        }
+
+        // Not multipart, then simply load the one variant
+        if (variants.size() == 1) {
+            return this.loadBlockVariant(variants.get(0));
+        }
+
+        // Add all variant elements to the model
+        Model result = new Model();
+        boolean succ = true;
+        for (BlockModelState.Variant variant : variants) {
+            Model subModel = this.loadBlockVariant(variant);
+            if (subModel != null) {
+                result.elements.addAll(subModel.elements);
+            } else {
+                succ = false;
+            }
+        }
+        if (!succ && result.elements.isEmpty()) {
+            return null;
+        } else {
+            return result;
+        }
+    }
+
+    private Model loadBlockVariant(BlockModelState.Variant variant) {
+        return this.loadModel("block/" + variant.modelName);
     }
 
     /**
@@ -155,44 +213,24 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadModel(String path) {
-        InputStream inputStream = openFileStream(ResourceType.MODELS, path);
-        if (inputStream == null) {
-            return null; // not found
+        Model model = openGsonObject(Model.class, ResourceType.MODELS, path);
+        if (model == null) {
+            return null;
         }
 
-        try {
-            try {
-                Reader reader = new InputStreamReader(inputStream, "UTF-8");
-
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
-                gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
-                Gson gson = gsonBuilder.create();
-                Model model = gson.fromJson(reader, Model.class);
-                if (model == null) {
-                    throw new IOException("Model " + path + " could not be parsed from JSON");
-                }
-
-                // Insert the parent model as required
-                if (model.getParentName() != null) {
-                    Model parentModel = getModel(model.getParentName());
-                    if (parentModel == null) {
-                        throw new IOException("Parent of model " + path + 
-                                " not found: " + model.getParentName());
-                    }
-                    model.loadParent(parentModel);
-                }
-
-                // Make all texture paths absolute
-                model.build(this);
-                return model;
-            } finally {
-                inputStream.close();
+        // Insert the parent model as required
+        if (model.getParentName() != null) {
+            Model parentModel = getModel(model.getParentName());
+            if (parentModel == null) {
+                System.out.println("Parent of model " + path + " not found: " + model.getParentName());
+                return null;
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            model.loadParent(parentModel);
         }
-        return null; // error
+
+        // Make all texture paths absolute
+        model.build(this);
+        return model;
     }
 
     /**
@@ -208,6 +246,7 @@ public class MapResourcePack {
         for (BlockFace face : FaceUtil.BLOCK_SIDES) {
             element.faces.put(face, createPlaceholderFace());
         }
+        model.placeholder = true;
         model.elements.add(element);
         return model;
     }
@@ -254,10 +293,49 @@ public class MapResourcePack {
     }
 
     /**
+     * Attempts to open and load a JSON file, deserializing it into a certain class type
+     * 
+     * @param objectType to deserialize the JSON as
+     * @param type of resource
+     * @param path of the resource
+     * @return loaded Gson object, or <i>null</i> if not found or loadable
+     */
+    protected final <T> T openGsonObject(Class<T> objectType, ResourceType type, String path) {
+        InputStream inputStream = this.openFileStream(type, path);
+        if (inputStream == null) {
+            return null;
+        }
+        try {
+            try {
+                Reader reader = new InputStreamReader(inputStream, "UTF-8");
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
+                gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
+                gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
+                gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
+                Gson gson = gsonBuilder.create();
+                T result = gson.fromJson(reader, objectType);
+                if (result == null) {
+                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName() + " at " + path);
+                }
+                return result;
+            } finally {
+                inputStream.close();
+            }
+        } catch (JsonSyntaxException ex) {
+            System.out.println("Failed to parse GSON for " + objectType.getSimpleName() + " at " + path + ": " + ex.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
      * A type of resource that can be read from a Resource Pack
      */
     public static enum ResourceType {
         MODELS("assets/minecraft/models/", ".json"),
+        BLOCKSTATES("assets/minecraft/blockstates/", ".json"),
         TEXTURES("assets/minecraft/textures/", ".png");
 
         private final String root;

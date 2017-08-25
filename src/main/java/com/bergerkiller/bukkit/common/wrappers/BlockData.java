@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -94,6 +96,22 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return block name
      */
     public abstract String getBlockName();
+
+    /**
+     * Gets the key:value pairs set for this BlockData as a single token String.
+     * See also the {@link #getDataOptions()} method.
+     * 
+     * @return data options token
+     */
+    public abstract String getDataOptionsToken();
+
+    /**
+     * Gets a mapping of key:value pairs for all the data-encoded options set for this BlockData.
+     * For example, torches will add the <i>facing: west</i> key-value pair.
+     * 
+     * @return data options
+     */
+    public abstract Map<String, String> getDataOptions();
 
     /**
      * Gets the ID of the Block, ranging 0 - 255

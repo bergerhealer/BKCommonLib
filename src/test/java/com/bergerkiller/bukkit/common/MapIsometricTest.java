@@ -26,16 +26,17 @@ public class MapIsometricTest {
     //@Test
     public void testIsometric() {
         // Load the source textures
-        MapResourcePack texturePack = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
+        MapResourcePack texturePack = MapResourcePack.VANILLA;
 
-        MapTexture cactus = renderSprite(texturePack.getBlockModel(Material.SAND));
-        MapTexture dispenser = renderSprite(texturePack.getBlockModel(Material.STONE));
+        MapTexture sprite1 = renderSprite(texturePack.getBlockModel(Material.DIRT));
+        MapTexture sprite2 = renderSprite(texturePack.getBlockModel(Material.GRASS));
+        MapTexture sprite3 = renderSprite(texturePack.getBlockModel(Material.RAILS));
 
         MapTexture tile = MapTexture.createEmpty(128, 128);
         //tile.fill(MapColorPalette.COLOR_RED);
-        renderTile(tile, dispenser, 0, 18);
-        renderTile(tile, cactus, 0, 0);
-        renderTile(tile, cactus, 0, -18);
+        renderTile(tile, sprite1, 0, 18);
+        renderTile(tile, sprite2, 0, 0);
+        renderTile(tile, sprite3, 0, -18);
         
         // Show a 2x2 map display
         MapTexture tile2x2 = MapTexture.createEmpty(256, 256);

@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 import org.bukkit.Material;
 
@@ -167,6 +170,50 @@ public class BlockDataImpl extends BlockData {
     public String getBlockName() {
         Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.REGISTRY, this.getBlockRaw());
         return MinecraftKeyHandle.T.name.get(minecraftKey);
+    }
+
+    @Override
+    public String getDataOptionsToken() {
+        String name = this.data.getRaw().toString();
+        int dataIndex = name.indexOf('[');
+        if ((dataIndex != -1) && (name.charAt(name.length() - 1) == ']')) {
+            return name.substring(dataIndex + 1, name.length() - 1);
+        } else {
+            return "";
+        }
+    }
+
+    @Override
+    public Map<String, String> getDataOptions() {
+        String token = this.getDataOptionsToken();
+        if (token.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        HashMap<String, String> result = new HashMap<String, String>(2);
+        int index = 0;
+        do {
+            // Find next pair (key=value)
+            String pair;
+            int endIndex = token.indexOf(',', index);
+            if (endIndex == -1) {
+                pair = token.substring(index);
+                index = -1;
+            } else {
+                pair = token.substring(index, endIndex);
+                index = endIndex + 1;
+            }
+
+            // Decode pair and store in map
+            int pairSep = pair.indexOf('=');
+            if (pairSep != -1) {
+                result.put(pair.substring(0, pairSep), pair.substring(pairSep + 1));
+            } else {
+                result.put(pair, "");
+            }
+        } while (index != -1);
+
+        return result;
     }
 
     /* ====================================================================== */

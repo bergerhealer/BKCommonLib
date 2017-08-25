@@ -19,7 +19,7 @@ public class MapDepthTest {
         MapTexture map = MapTexture.createEmpty(64, 64);
         
         // Load the source textures
-        MapResourcePack texturePack = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
+        MapResourcePack texturePack = MapResourcePack.VANILLA;
 
         // Test brush masks with depth buffer
         //map.setBrushMask(texturePack.getTexture("blocks/vine"));
@@ -56,7 +56,7 @@ public class MapDepthTest {
         MapTexture map = MapTexture.createEmpty(64, 64);
 
         // Load the source textures
-        MapResourcePack texturePack = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
+        MapResourcePack texturePack = MapResourcePack.VANILLA;
 
         map.setBrushMask(texturePack.getTexture("blocks/ladder"));
         map.fill(MapColorPalette.COLOR_RED);

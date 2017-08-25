@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.Collection;
+
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 
@@ -126,5 +129,14 @@ public class BlockDataRegistry {
     @Deprecated
     public static BlockData fromCombinedId(int combinedId) {
         return fromBlockData(BlockHandle.T.getByCombinedId.raw.invoke(combinedId));
+    }
+
+    /**
+     * Obtains an immutable collection containing all possible BlockData values
+     * 
+     * @return all BlockData values
+     */
+    public static Collection<BlockData> values() {
+        return CommonUtil.unsafeCast(BlockDataImpl.BY_BLOCK_DATA.values());
     }
 }

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
@@ -15,6 +17,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Model {
     private String parent = null;
+    public transient boolean placeholder = false;
     public boolean ambientocclusion = true;
     public Map<String, Display> display = new HashMap<String, Display>();
     public Map<String, String> textures = new HashMap<String, String>();
@@ -149,8 +152,9 @@ public class Model {
         public static class Face {
             @SerializedName("texture")
             private String textureName = "";
-            private int[] uv = null;
+            private float[] uv = null;
             public transient MapTexture texture = null;
+            public int tintindex = -1;
             public BlockFace cullface;
 
             public void build(MapResourcePack resourcePack, Map<String, String> textures) {
@@ -162,8 +166,13 @@ public class Model {
                 }
                 this.texture = resourcePack.getTexture(this.textureName);
                 if (uv != null) {
-                    int dx = uv[2] - uv[0];
-                    int dy = uv[3] - uv[1];
+                    int[] i_uv = new int[uv.length];
+                    for (int i = 0; i < uv.length; i++) {
+                        i_uv[i] = (int) Math.ceil(uv[i]);
+                    }
+
+                    int dx = i_uv[2] - i_uv[0];
+                    int dy = i_uv[3] - i_uv[1];
                     int sx = (dx >= 1) ? 1 : -1;
                     int sy = (dy >= 1) ? 1 : -1;
                     int ox = (dx >= 1) ? 0 : 1;
@@ -171,8 +180,8 @@ public class Model {
                     MapTexture texture_uv = MapTexture.createEmpty(Math.abs(dx), Math.abs(dy));
                     byte[] buffer = texture_uv.getBuffer();
                     int index = 0;
-                    for (int y = uv[1]; y != uv[3]; y += sy) {
-                        for (int x = uv[0]; x != uv[2]; x += sx) {
+                    for (int y = i_uv[1]; y != i_uv[3]; y += sy) {
+                        for (int x = i_uv[0]; x != i_uv[2]; x += sx) {
                             int px = x - ox;
                             int py = y - oy;
                             if (px < 0 || py < 0 || px >= this.texture.getWidth() || py >= this.texture.getHeight()) {
@@ -185,6 +194,14 @@ public class Model {
                     }
                     this.texture = texture_uv;
                 }
+
+                // This is used for biome colors and such
+                // For now I hardcode it by overlaying a green factor color
+                if (this.tintindex != -1) {
+                    this.texture = this.texture.clone();
+                    byte[] buffer = this.texture.getBuffer();
+                    MapBlendMode.MULTIPLY.process((byte) 79, buffer);
+                }
             }
 
             @Override
@@ -194,6 +211,7 @@ public class Model {
                 clone.textureName = this.textureName;
                 clone.texture = this.texture.clone();
                 clone.cullface = this.cullface;
+                clone.tintindex = this.tintindex;
                 return clone;
             }
         }

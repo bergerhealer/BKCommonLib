@@ -31,12 +31,8 @@ public class MapTexturePackTest
 
     //@Test
     public void test3DRender() {
-        
-        // Load the source texture
-        MapResourcePack texturePack = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
 
-        
-        createAndShowGUI(texturePack);
+        createAndShowGUI(MapResourcePack.VANILLA);
     
         while (true) {
             AsyncTask.sleep(5000);
