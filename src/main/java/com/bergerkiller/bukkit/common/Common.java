@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.conversion.CommonConverters;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -240,6 +241,11 @@ public class Common {
                 CommonUtil.loadClass(DuplexConversion.class);
             } catch (Throwable t) {
                 Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
+            }
+
+            // On the test server, automatically load the Minecraft client jar
+            if (IS_TEST_MODE) {
+                MapResourcePack.VANILLA.load();
             }
         }
     }

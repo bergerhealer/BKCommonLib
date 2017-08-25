@@ -9,12 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
@@ -22,6 +24,7 @@ import com.bergerkiller.bukkit.common.map.gson.Vector3fDeserializer;
 import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
+import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -30,35 +33,67 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 /**
- * Retrieves Block model textures from a Minecraft jar or zip texture pack archive
+ * Resource Management class that loads models and textures from the Vanilla Minecraft jar or zip resource pack archives.<br>
+ * <br>
+ * <b>Before using, call {@link VanillaResourcePack#load() VANILLA.load()} when enabling your plugin to download
+ * and install this Minecraft client jar. This downloading is only performed once.</b><br>
+ * <br>
+ * The Minecraft client resources are owned by Mojang. These assets are installed separately from BKCommonLib.
+ * BKCommonLib, nor its developers, distribute (illegal) copies of the Minecraft client.
+ * We assume you have already accepted the Minecraft EULA to run the server. If you have not,
+ * please read <a href="https://account.mojang.com/documents/minecraft_eula">https://account.mojang.com/documents/minecraft_eula.</a>
  */
 public class MapResourcePack {
-    private final MapResourcePack baseTexturePack;
-    private final ZipFile archive;
+    /**
+     * The default VANILLA resource pack consists of the default Minecraft
+     * models and textures. These resources are provided by the Minecraft client jar.
+     * Resource packs extend or override these default resources.<br>
+     * <br>
+     * <b>Before using, call {@link VanillaResourcePack#load() VANILLA.load()} when enabling your plugin to download
+     * and install this Minecraft client jar. This downloading is only performed once.</b><br>
+     * <br>
+     * The Minecraft client resources are owned by Mojang. These assets are installed separately from BKCommonLib.
+     * BKCommonLib, nor its developers, distribute (illegal) copies of the Minecraft client.
+     * We assume you have already accepted the Minecraft EULA to run the server. If you have not,
+     * please read <a href="https://account.mojang.com/documents/minecraft_eula">https://account.mojang.com/documents/minecraft_eula.</a>
+     */
+    public static final VanillaResourcePack VANILLA = new VanillaResourcePack();
+
+    private final MapResourcePack baseResourcePack;
+    protected ZipFile archive;
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockData, Model> blockModelCache = new HashMap<BlockData, Model>();
-    public static final MapResourcePack VANILLA;
 
-    static {
-        //TODO: Configurable Minecraft client location / automatic download?
-        VANILLA = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
+    /**
+     * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
+     * 
+     * @param resourcePackFilePath of the resource pack to load
+     */
+    public MapResourcePack(String resourcePackFilePath) {
+        this(VANILLA, resourcePackFilePath);
     }
 
-    public MapResourcePack(String texturePackFilePath) {
-        this(null, texturePackFilePath);
-    }
-
-    public MapResourcePack(MapResourcePack baseTexturePack, String texturePackFilePath) {
-        this.baseTexturePack = baseTexturePack;
-        
+    /**
+     * Loads a new resource pack, extending another one
+     * 
+     * @param baseResourcePack to extend
+     * @param resourcePackFilePath of the resource pack to load
+     */
+    public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackFilePath) {
+        this.baseResourcePack = baseResourcePack;
         try {
-            JarFile jarFile = new JarFile(texturePackFilePath);
-            
-            archive = jarFile;
+            this.archive = new JarFile(resourcePackFilePath);
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            this.archive = null;
+            Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack", ex);
         }
+    }
+
+    // constructor only used by the Vanilla texture pack
+    protected MapResourcePack() {
+        this.baseResourcePack = null;
+        this.archive = null;
     }
 
     /**
@@ -277,7 +312,10 @@ public class MapResourcePack {
      * @param path of the resource (relative)
      * @return InputStream to read the file from, null if not found
      */
-    protected final InputStream openFileStream(ResourceType type, String path) {
+    protected InputStream openFileStream(ResourceType type, String path) {
+        if (this.archive == null) {
+            return null; // failed to load resource pack file
+        }
         try {
             ZipEntry entry = this.archive.getEntry(type.getRoot() + path + type.getExtension());
             if (entry != null) {
@@ -285,8 +323,8 @@ public class MapResourcePack {
             }
         } catch (IOException ex) {
         }
-        if (this.baseTexturePack != null) {
-            return this.baseTexturePack.openFileStream(type, path);
+        if (this.baseResourcePack != null) {
+            return this.baseResourcePack.openFileStream(type, path);
         } else {
             return null;
         }

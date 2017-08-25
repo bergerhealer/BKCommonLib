@@ -3,6 +3,9 @@
 .project
 .settings/
 
+# Minecraft client cache folder
+minecraft/
+
 # netbeans
 nbproject/
 nbactions.xml
