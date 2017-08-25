@@ -64,10 +64,13 @@ public class MapColorPalette {
             // Create 128 darker and 128 lighter specular colors
             index = (a * 256);
             for (int b = 0; b < 256; b++) {
-                int f = (b - 128) * 2;
-                int sr = color_a.getRed() + f;
-                int sg = color_a.getGreen() + f;
-                int sb = color_a.getBlue() + f;
+                // 0.0 = black
+                // 1.0 = natural color
+                // 2.0 = white
+                float f = (float) b / 128.0f;
+                int sr = (int) ((float) color_a.getRed() * f);
+                int sg = (int) ((float) color_a.getGreen() * f);
+                int sb = (int) ((float) color_a.getBlue() * f);
                 COLOR_MAP_SPECULAR[index++] = getColor(sr, sg, sb);
             }
         }
@@ -186,11 +189,11 @@ public class MapColorPalette {
      * @return specular color
      */
     public static byte getSpecular(byte color, float lightness) {
-        int index = (int) (128.0f * lightness) + 128;
+        int index = (int) (128.0f * lightness);
         if (index < 0) {
             return COLOR_BLACK;
         } else if (index >= 256) {
-            return COLOR_WHITE;
+            return COLOR_MAP_SPECULAR[((color & 0xFF) << 8) + 255];
         } else {
             return COLOR_MAP_SPECULAR[((color & 0xFF) << 8) + index];
         }

@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Vector2f;
+import com.bergerkiller.bukkit.common.map.util.Vector3f;
 
 public class MapTexturePackTest
 {
@@ -101,6 +102,7 @@ class Pseudo3DImagePanel extends JPanel
 
         MapTexture image = MapTexture.createEmpty(512, 512);
         image.setBlendMode(MapBlendMode.OVERLAY);
+        image.setLightOptions(0.0f, 1.0f, new Vector3f(-1.0f, 1.0f, -1.0f));
         //image.draw(background, 0, 0);
 
         // Draws a 3D quad
@@ -110,7 +112,7 @@ class Pseudo3DImagePanel extends JPanel
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        Model model = textures.getModel("block/cactus");
+        Model model = textures.getModel("block/dispenser");
         image.drawModel(model, scale, (int) p0.x, (int) p0.y, yaw, pitch);
 
         g.drawImage(image.toJavaImage(), 0, 0, null);

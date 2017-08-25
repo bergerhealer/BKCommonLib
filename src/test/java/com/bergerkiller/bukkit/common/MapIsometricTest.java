@@ -3,31 +3,36 @@ package com.bergerkiller.bukkit.common;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import org.bukkit.Material;
 import org.junit.Test;
 
-import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Tests isometric rendering of blocks
  */
 public class MapIsometricTest {
 
+    static {
+        CommonUtil.bootstrap();
+    }
+
     //@Test
     public void testIsometric() {
         // Load the source textures
         MapResourcePack texturePack = new MapResourcePack("C:\\Users\\QT\\Desktop\\TexturePack\\1.12.1.jar");
 
-        MapTexture dispenser = renderSprite(texturePack.getModel("block/sand"));
-        MapTexture cactus = renderSprite(texturePack.getModel("block/cactus"));
+        MapTexture cactus = renderSprite(texturePack.getBlockModel(Material.SAND));
+        MapTexture dispenser = renderSprite(texturePack.getBlockModel(Material.STONE));
 
         MapTexture tile = MapTexture.createEmpty(128, 128);
-        tile.fill(MapColorPalette.COLOR_RED);
+        //tile.fill(MapColorPalette.COLOR_RED);
         renderTile(tile, dispenser, 0, 18);
         renderTile(tile, cactus, 0, 0);
         renderTile(tile, cactus, 0, -18);
@@ -72,6 +77,7 @@ public class MapIsometricTest {
         transform.multiply(rotationYaw);
         
         //map.fill(MapColorPalette.COLOR_RED);
+        map.setLightOptions(0.2f, 0.8f, new Vector3f(-1.0f, 1.0f, -1.0f));
         map.drawModel(model, transform);
 
         return map;

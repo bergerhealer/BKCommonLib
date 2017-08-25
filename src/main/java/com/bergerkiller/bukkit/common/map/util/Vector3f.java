@@ -84,4 +84,15 @@ public class Vector3f {
                 v1.z - v2.z
         );
     }
+
+    /**
+     * Returns the vector dot product of two vectors (v1 . v2)
+     * 
+     * @param v1
+     * @param v2
+     * @return vector dot product
+     */
+    public static float dot(Vector3f v1, Vector3f v2) {
+        return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
+    }
 }

@@ -28,12 +28,17 @@ public class RegistryMaterialsHandle extends Template.Handle {
         return T.get.invoke(instance, key);
     }
 
+    public Object getKey(Object value) {
+        return T.getKey.invoke(instance, value);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.RegistryMaterials</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RegistryMaterialsClass extends Template.Class<RegistryMaterialsHandle> {
         public final Template.Method<Object> get = new Template.Method<Object>();
+        public final Template.Method<Object> getKey = new Template.Method<Object>();
 
     }
 

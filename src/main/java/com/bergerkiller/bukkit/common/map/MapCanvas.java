@@ -37,6 +37,9 @@ public abstract class MapCanvas {
     private short currentDepthZ = 0;
     private boolean hasDepthHoles = false;
     private Matrix4f projMatrix = null;
+    private Vector3f directionalLightVec = null;
+    private float directionalLightFact = 0.0f;
+    private float ambientLightFact = 1.0f;
     public static final int MAX_DEPTH = Short.MAX_VALUE;
 
     /**
@@ -534,6 +537,31 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Sets the ambient and directional light source options:
+     * <ul>
+     * <li>Ambient light is how lit the model is regardless of its orientation.
+     * This light level can be considered a baseline of minimal illumination.
+     * It is important to have some ambient light to avoid extremely dark surfaces.</lI>
+     * <li>Directional light is light that depends on the orientation of the model surface.
+     * When facing into the light direction, the light level is fully applied resulting in a lit surface.
+     * When facing away this light level is not applied, resulting in a dark surface.
+     * To display realistic-looking models, some directional light helps to differentiate the
+     * distinguish different orientations.
+     * </ul>
+     * 
+     * @param ambientLightFactor - amount of ambient light emitted
+     * @param directionalLightFactor - amount of directional light emitted
+     * @param directionVector - direction of the directional light
+     * @return this canvas
+     */
+    public final MapCanvas setLightOptions(float ambientLightFactor, float directionalLightFactor, Vector3f directionVector) {
+        this.ambientLightFact = ambientLightFactor;
+        this.directionalLightFact = (directionVector == null) ? 0.0f : directionalLightFactor;
+        this.directionalLightVec = (directionVector == null) ? null : directionVector.normalize();
+        return this;
+    }
+
+    /**
      * Sets a mask defining the pixels that are drawn. Non-transparent pixels in the mask
      * will be drawn onto this canvas for all drawing operations. Transparent pixels in the mask
      * will not be drawn at all, and also skip depth buffer tests and blend modes. It is recommended
@@ -888,7 +916,15 @@ public abstract class MapCanvas {
         int maxX = 0;
         int maxY = 0;
 
-        float specular = 0.3f * cross.x; //todo: settings.
+        float light = this.ambientLightFact;
+        if (this.directionalLightVec != null) {
+            float dot = Vector3f.dot(cross.normalize(), this.directionalLightVec);
+
+            // Change -1.0...1.0 to 0...1
+            dot = (dot + 1.0f) / 2.0f;
+
+            light += this.directionalLightFact * dot;
+        }
 
         for (int y = 0; y < getHeight(); y++)
         {
@@ -901,7 +937,7 @@ public abstract class MapCanvas {
 
                 float ax = p.x;
                 float ay = p.z;
-                float depth = p.y;
+                //float depth = p.y;
 
                 if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
                     if (y < minY) minY = y;
@@ -912,7 +948,7 @@ public abstract class MapCanvas {
                     byte color = canvas.readPixel((int) ax, (int) ay);
                     if (color != MapColorPalette.COLOR_TRANSPARENT) {
                         // Shows specular brightness based on distance from camera (debug)
-                        color = MapColorPalette.getSpecular(color, specular);
+                        color = MapColorPalette.getSpecular(color, light);
 
                         temp.writePixel(x, y, color);
                     }

@@ -15,4 +15,10 @@ class RegistryID {
 
 class RegistryMaterials {
     public V get(K key);
+
+#if version >= 1.9
+    public K getKey:b(V value);
+#else
+    public K getKey:c(V value);
+#endif
 }

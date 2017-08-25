@@ -32,10 +32,14 @@ public class Model {
         }
         for (Map.Entry<String, Display> displayEntry : parentModel.display.entrySet()) {
             if (!this.display.containsKey(displayEntry.getKey())) {
-                this.display.put(displayEntry.getKey(), displayEntry.getValue());
+                this.display.put(displayEntry.getKey(), displayEntry.getValue().clone());
             }
         }
-        this.elements.addAll(0, parentModel.elements);
+
+        int elementIdx = 0;
+        for (Element element : parentModel.elements) {
+            this.elements.add(elementIdx++, element.clone());
+        }
     }
 
     public void build(MapResourcePack resourcePack) {
@@ -97,15 +101,15 @@ public class Model {
         public Map<BlockFace, Face> faces = new EnumMap<BlockFace, Face>(BlockFace.class);
 
         public void build(MapResourcePack resourcePack, Map<String, String> textures) {
-            for (Map.Entry<BlockFace, Face> faceEntry : faces.entrySet()) {
-                faceEntry.getValue().build(faceEntry.getKey(), resourcePack, textures);
+            for (Face face : faces.values()) {
+                face.build(resourcePack, textures);
             }
         }
 
         public List<Quad> buildQuads() {
             ArrayList<Quad> result = new ArrayList<Quad>();
-            for (Face face : faces.values()) {
-                result.add(new Quad(face.face, from.clone(), to.clone(), face.texture));
+            for (Map.Entry<BlockFace, Face> faceEntry : faces.entrySet()) {
+                result.add(new Quad(faceEntry.getKey(), from.clone(), to.clone(), faceEntry.getValue().texture));
             }
 
             if (rotation != null) {
@@ -146,12 +150,10 @@ public class Model {
             @SerializedName("texture")
             private String textureName = "";
             private int[] uv = null;
-            public transient BlockFace face;
             public transient MapTexture texture = null;
             public BlockFace cullface;
 
-            public void build(BlockFace face, MapResourcePack resourcePack, Map<String, String> textures) {
-                this.face = face;
+            public void build(MapResourcePack resourcePack, Map<String, String> textures) {
                 if (this.textureName.startsWith("#")) {
                     String texture = textures.get(this.textureName.substring(1));
                     if (texture != null) {
@@ -188,7 +190,6 @@ public class Model {
             @Override
             public Face clone() {
                 Face clone = new Face();
-                clone.face = this.face;
                 clone.uv = (this.uv == null) ? null : this.uv.clone();
                 clone.textureName = this.textureName;
                 clone.texture = this.texture.clone();

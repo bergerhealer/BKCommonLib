@@ -10,8 +10,10 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 public class BlockDataImpl extends BlockData {
     private BlockHandle block;
@@ -159,6 +161,12 @@ public class BlockDataImpl extends BlockData {
             // <= MC 1.8.8
             return RegistryIDHandle.T.getId.invoke(BlockHandle.REGISTRY_ID, this.data.getRaw());
         }
+    }
+
+    @Override
+    public String getBlockName() {
+        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.REGISTRY, this.getBlockRaw());
+        return MinecraftKeyHandle.T.name.get(minecraftKey);
     }
 
     /* ====================================================================== */

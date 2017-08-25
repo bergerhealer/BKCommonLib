@@ -66,10 +66,34 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract Object getData();
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o instanceof BlockData) {
+            BlockData data = (BlockData) o;
+            return data.getCombinedId() == this.getCombinedId();
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getCombinedId();
+    }
+
+    @Override
     public String toString() {
         Object b = getData();
         return (b == null) ? "[null]" : b.toString();
     }
+
+    /**
+     * Gets the name of this Block
+     * 
+     * @return block name
+     */
+    public abstract String getBlockName();
 
     /**
      * Gets the ID of the Block, ranging 0 - 255
