@@ -659,7 +659,7 @@ public class CommonMapController implements PacketListener, Listener {
                         
                     }
                 }
-                if (displayClass != null) {
+                if (displayClass != null && !event.hasDisplay()) {
                     try {
                         MapDisplay display = (MapDisplay) displayClass.newInstance();
                         event.setDisplay((JavaPlugin) plugin, display);;
