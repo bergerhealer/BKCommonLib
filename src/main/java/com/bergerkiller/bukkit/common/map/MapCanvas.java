@@ -323,13 +323,17 @@ public abstract class MapCanvas {
                                 continue;
                             }
                         } else {
-                            if ((x + dx) >= this.mask_w || (y + dy) >= this.mask_h || (this.maskBuffer[py * this.mask_w + px] == 0)) {
+                            if (px >= this.mask_w || py >= this.mask_h || (this.maskBuffer[py * this.mask_w + px] == 0)) {
                                 continue;
                             }
                         }
                     }
 
-                    int depthIndex = (x + dx) + this.getWidth() * (y + dy);
+                    if (px < 0 || py < 0 || px >= this.getWidth() || py >= this.getHeight()) {
+                        continue;
+                    }
+                    
+                    int depthIndex = px + this.getWidth() * py;
                     short depth = this.depthBuffer[depthIndex];
 
                     // Only contents on the same or lower depth level are visible
@@ -340,17 +344,17 @@ public abstract class MapCanvas {
                             // If transparent, the contents behind will have to be re-drawn.
                             // If non-transparent, pixel is updated and depth does not change
                             if (color == MapColorPalette.COLOR_TRANSPARENT) {
-                                this.writePixel(x + dx, y + dy, MapColorPalette.COLOR_TRANSPARENT);
+                                this.writePixel(px, py, MapColorPalette.COLOR_TRANSPARENT);
                                 this.depthBuffer[depthIndex] = MAX_DEPTH;
                                 this.hasDepthHoles = true;
                             } else {
-                                this.writePixel(x + dx, y + dy, color);
+                                this.writePixel(px, py, color);
                             }
                         } else if (color != MapColorPalette.COLOR_TRANSPARENT) {
                             // Drawing in front of what is already there
                             // If transparent, nothing is drawn and depth is not updated
                             // If non-transparent, depth buffer is updated
-                            this.writePixel(x + dx, y + dy, color);
+                            this.writePixel(px, py, color);
                             this.depthBuffer[depthIndex] = this.currentDepthZ;
                         } else if (depth == MAX_DEPTH) {
                             // If a depth 'hole' existed at a transparent pixel, mark it as such
@@ -545,8 +549,7 @@ public abstract class MapCanvas {
      * <li>Directional light is light that depends on the orientation of the model surface.
      * When facing into the light direction, the light level is fully applied resulting in a lit surface.
      * When facing away this light level is not applied, resulting in a dark surface.
-     * To display realistic-looking models, some directional light helps to differentiate the
-     * distinguish different orientations.
+     * To display realistic-looking models, some directional light helps to distinguish different orientations.
      * </ul>
      * 
      * @param ambientLightFactor - amount of ambient light emitted
@@ -601,7 +604,20 @@ public abstract class MapCanvas {
         }
         return this;
     }
-    
+
+    /**
+     * Clears the draw depth buffer, causing any previous contents to be erased
+     * when drawing in those areas.
+     * 
+     * @return this canvas
+     */
+    public final MapCanvas clearDepthBuffer() {
+        if (this.depthBuffer != null) {
+            Arrays.fill(this.depthBuffer, (short) MAX_DEPTH);
+        }
+        return this;
+    }
+
     /**
      * Sets a depth value that will be used when performing the following drawing operations.
      * The depth buffer will allow for different drawn areas to overlap each other correctly
@@ -622,7 +638,7 @@ public abstract class MapCanvas {
         this.hasDepthHoles = false;
         if (this.depthBuffer == null) {
             this.depthBuffer = new short[this.getWidth() * this.getHeight()];
-            Arrays.fill(this.depthBuffer, (short) MAX_DEPTH);
+            clearDepthBuffer();
         }
         return this;
     }
