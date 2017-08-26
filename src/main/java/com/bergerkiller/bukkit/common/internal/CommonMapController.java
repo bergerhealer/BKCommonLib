@@ -182,6 +182,7 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
+        startedTasks.add(new MapInputUpdater(plugin).start(1, 1));
     }
 
     /**
@@ -898,6 +899,23 @@ public class CommonMapController implements PacketListener, Listener {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Refreshes the input state of maps every tick, when input is intercepted
+     */
+    public class MapInputUpdater extends Task {
+
+        public MapInputUpdater(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            for (MapPlayerInput input : playerInputs.values()) {
+                input.onTick();
             }
         }
     }

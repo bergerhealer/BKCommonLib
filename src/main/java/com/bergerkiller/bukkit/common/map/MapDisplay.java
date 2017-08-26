@@ -3,11 +3,13 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapCursor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -264,6 +266,32 @@ public class MapDisplay {
     }
 
     /**
+     * Updates the item associated with the map. All players and item frame holding this map item 
+     * that display this Map Display will have their items swapped. If the new item is not a map item,
+     * then this display session is terminated.
+     * 
+     * @param item to set to
+     */
+    public void setMapItem(ItemStack item) {
+        UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(this._item);
+        if (oldMapUUID != null) {
+            // Change in the inventories of all player owners
+            for (Player player : this.getOwners()) {
+                PlayerInventory inv = player.getInventory();
+                for (int i = 0; i < inv.getSize(); i++) {
+                    UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
+                    if (oldMapUUID.equals(mapUUID)) {
+                        inv.setItem(i, item);
+                    }
+                }
+            }
+
+            //TODO: Item Frames!
+        }
+        this._item = item;
+    }
+
+    /**
      * Gets the input controller for an owner of this display. If the player is not an owner,
      * null is returned instead.
      * 
@@ -389,7 +417,7 @@ public class MapDisplay {
             if (!inputWhenHolding) {
                 // Release everyone we may have set as holding before
                 for (MapSession.Owner owner : this.session.onlineOwners) {
-                    owner.input.doTick(this, false);
+                    owner.input.handleDisplayUpdate(this, false);
                 }
             }
         }
@@ -516,7 +544,7 @@ public class MapDisplay {
             if (this.updateTaskId != -1) {
                 // Disable input interception for owners still lingering
                 for (MapSession.Owner owner : this.session.onlineOwners) {
-                    owner.input.doTick(this, false);
+                    owner.input.handleDisplayUpdate(this, false);
                 }
 
                 // Handle onDetached

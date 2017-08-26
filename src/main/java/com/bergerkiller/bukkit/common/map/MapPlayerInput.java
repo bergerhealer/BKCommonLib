@@ -30,6 +30,7 @@ public class MapPlayerInput {
     private int _fakeMountId = -1;
     private boolean _fakeMountShown = false;
     private boolean _isIntercepting = false;
+    private boolean _newInterceptState = false;
     public final Player player;
 
     public MapPlayerInput(Player player) {
@@ -315,15 +316,19 @@ public class MapPlayerInput {
     }
 
     /**
-     * Performs a tick update on the input interception and event handling
+     * Updates the internal input state.
      */
-    public void doTick(MapDisplay display, boolean interceptInput) {
-        this._isIntercepting = interceptInput;
+    public void onTick() {
+        this._isIntercepting = this._newInterceptState;
+        this._newInterceptState = false; // any displays intercepting will set it back True
         if (this.player.isOnline()) {
-            updateInterception(interceptInput);
+            updateInterception(this._isIntercepting);
             if (!player.isInsideVehicle() && !_fakeMountShown) {
                 receiveInput(0, 0, 0);
             }
+
+            // Every tick the state is updated
+            // We must make sure to do this only every tick!
             last_dx = curr_dx;
             last_dy = curr_dy;
             last_dz = curr_dz;
@@ -333,6 +338,17 @@ public class MapPlayerInput {
         } else {
             reset();
         }
+    }
+
+    /**
+     * Refreshes a recipient display, calling key events on the display when
+     * input is intercepted.
+     * 
+     * @param display to update
+     * @param interceptInput whether input is intercepted
+     */
+    public void handleDisplayUpdate(MapDisplay display, boolean interceptInput) {
+        this._newInterceptState |= interceptInput;
 
         // Check if there are any receiving displays at all
         if (!interceptInput) {

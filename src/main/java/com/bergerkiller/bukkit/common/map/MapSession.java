@@ -51,7 +51,7 @@ public class MapSession {
                 Owner owner = onlineIter.next();
 
                 // Update input
-                owner.input.doTick(this.display, owner.interceptInput);
+                owner.input.handleDisplayUpdate(this.display, owner.interceptInput);
 
                 // Check if online. Remove offline players if not set FOREVER
                 if (!owner.player.isOnline()) {
@@ -159,7 +159,7 @@ public class MapSession {
             if (!views.stack.isEmpty() && views.stack.getLast() == this.display) {
                 // Stop intercepting input
                 owner.interceptInput = false;
-                owner.input.doTick(this.display, false);
+                owner.input.handleDisplayUpdate(this.display, false);
 
                 // Remove self
                 views.stack.removeLast();
