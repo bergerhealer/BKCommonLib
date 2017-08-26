@@ -48,7 +48,7 @@ public class BlockModelNameLookup {
             name = color + "_" + name;
         }
 
-        // Rolls down stairs, come over in pairs, rolls over your neighbor's dog!
+        // Rolls down stairs, alone or in pairs, rolls over your neighbor's dog!
         if (name.equals("log2")) {
             if (variant == null) {
                 variant = "oak";
