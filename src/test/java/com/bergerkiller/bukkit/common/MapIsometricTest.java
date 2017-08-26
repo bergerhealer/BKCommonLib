@@ -50,16 +50,11 @@ public class MapIsometricTest {
 
     private MapTexture renderSprite(Model model) {
         MapTexture map = null;
-        try {
-            MapTexture mask = MapTexture.fromStream(new FileInputStream("C:\\Users\\QT\\Desktop\\TexturePack\\mask2.png"));
-            map = MapTexture.createEmpty(32, 43);
-            //map.setBrushMask(mask);
-            //map.fill(MapColorPalette.COLOR_RED);
-            //map.setBrushMask(null);
-       } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-       }
+        MapTexture mask = MapTexture.fromImageFile("C:\\Users\\QT\\Desktop\\TexturePack\\mask2.png");
+        map = MapTexture.createEmpty(32, 43);
+        //map.setBrushMask(mask);
+        //map.fill(MapColorPalette.COLOR_RED);
+        //map.setBrushMask(null);
         
         Matrix4f translation = new Matrix4f();
         translation.translate(map.getWidth(), 0.0f, map.getWidth() - 1);

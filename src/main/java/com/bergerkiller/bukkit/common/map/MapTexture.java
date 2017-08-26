@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.awt.Image;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -82,6 +83,19 @@ public final class MapTexture extends MapCanvas {
             return fromStream(imageResourceURL.openStream());
         } catch (IOException e) {
             throw new RuntimeException("Failed to open image resource stream", e);
+        }
+    }
+
+    public static MapTexture fromImageFile(String filePath) {
+        try {
+            FileInputStream stream = new FileInputStream(filePath);
+            try {
+                return fromStream(stream);
+            } finally {
+                stream.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to open image file", e);
         }
     }
 
