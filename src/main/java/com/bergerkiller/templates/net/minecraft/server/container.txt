@@ -1,0 +1,18 @@
+package net.minecraft.server;
+
+import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
+
+class Container {
+#if version >= 1.11
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:b;
+#else
+    public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> oldItems:b;
+#endif
+    public (List<SlotHandle>) List<Slot> slots:c;
+
+    public abstract org.bukkit.inventory.InventoryView getBukkitView();
+}
+
+class Slot {
+    public (org.bukkit.inventory.ItemStack) ItemStack getItem();
+}
