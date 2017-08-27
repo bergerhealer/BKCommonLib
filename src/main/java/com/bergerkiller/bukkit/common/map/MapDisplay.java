@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -301,7 +302,12 @@ public class MapDisplay {
                 }
             }
 
-            //TODO: Item Frames!
+            // All item frames that show this same map
+            for (ItemFrameInfo itemFrameInfo : CommonPlugin.getInstance().getMapController().getItemFrames()) {
+                if (oldMapUUID.equals(itemFrameInfo.lastMapUUID)) {
+                    CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, item);
+                }
+            }
         }
 
         if (itemUnchanged) {

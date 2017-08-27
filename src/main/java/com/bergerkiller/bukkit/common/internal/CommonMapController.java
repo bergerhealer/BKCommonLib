@@ -110,6 +110,15 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
+     * Gets all item frames that are tracked
+     * 
+     * @return item frames
+     */
+    public List<ItemFrameInfo> getItemFrames() {
+        return itemFrames.values();
+    }
+
+    /**
      * Gets the Player Input controller for a certain player
      * 
      * @param player
@@ -1117,6 +1126,18 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public static ItemStack getItemFrameItem(ItemFrame itemFrame) {
         return EntityItemFrameHandle.fromBukkit(itemFrame).getItem();
+    }
+
+    /**
+     * Sets the item displayed in an ItemFrame. Bukkit discards NBT Metadata, which is pretty annoying.
+     * Always use this method instead.
+     * 
+     * @param itemFrame to set the item for
+     * @param item to set
+     */
+    public static void setItemFrameItem(ItemFrame itemFrame, ItemStack item) {
+        EntityItemFrameHandle handle = EntityItemFrameHandle.fromBukkit(itemFrame);
+        handle.setItem(item);
     }
 
     /**
