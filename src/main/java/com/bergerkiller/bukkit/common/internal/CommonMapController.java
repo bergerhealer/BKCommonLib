@@ -85,6 +85,11 @@ public class CommonMapController implements PacketListener, Listener {
     // This is required, otherwise we can run out of the 32K map Ids we have available given enough uptime
     private static final int GENERATION_COUNTER_CLEANUP_INTERVAL = 1000;
     private int idGenerationCounter = 0;
+    // When items are updated we sometimes wish to do so silently, without refreshing the client
+    // This prevents the client hiding and re-showing the map when data is updated
+    private static final ThreadLocal<Boolean> disableMapItemChanges = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() { return false; }
+    };
 
     /**
      * These packet types are listened to handle the virtualized Map Display API
@@ -186,9 +191,19 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
+     * Enables or disables all item changes that involve map items (for a short period of time).
+     * This is merely used to prevent player's map from closing/re-opening rapidly when changing item metadata.
+     * 
+     * @param disabled whether item changes are disabled
+     */
+    public void setDisableMapItemChanges(boolean disabled) {
+        disableMapItemChanges.set(disabled);
+    }
+
+    /**
      * Adjusts the internal remapping from UUID to Map Id taking into account the new item
      * being synchronized to the player. If the item is that of a virtual map, the map Id
-     * of the item is updated.
+     * of the item is updated. NBT data that should not be synchronized is dropped.
      * 
      * @param item
      * @return True if the item was changed and needs to be updated in the packet
@@ -203,14 +218,9 @@ public class CommonMapController implements PacketListener, Listener {
         if (tag != null) {
             UUID mapUUID = tag.getUUID("mapDisplay");
             if (mapUUID != null) {
-                short id = getMapId(mapUUID);
-                if (item.getDurability() != id) {
-                    item = ItemUtil.cloneItem(item);
-                    item.setDurability(id);
-                    return item; // Id changed
-                } else {
-                    return null; // no change in Id
-                }
+                item = trimExtraData(item);
+                item.setDurability(getMapId(mapUUID));
+                return item;
             }
         }
 
@@ -336,7 +346,11 @@ public class CommonMapController implements PacketListener, Listener {
             ItemStack oldItem = event.getPacket().read(PacketType.OUT_WINDOW_SET_SLOT.item);
             ItemStack newItem = this.handleItemSync(oldItem);
             if (newItem != null) {
-                event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
+                if (disableMapItemChanges.get()) {
+                    event.setCancelled(true);
+                } else {
+                    event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
+                }
             }
         }
  
@@ -411,10 +425,25 @@ public class CommonMapController implements PacketListener, Listener {
             ItemStack item = event.getPacket().read(PacketType.IN_SET_CREATIVE_SLOT.item);
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
             if (mapUUID != null && CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
-                // Dynamic Id. Force a durability value of 0 to prevent creation of new World Map instances
-                item = ItemUtil.cloneItem(item);
-                item.setDurability((short) 0);
-                event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
+                // Dynamic Id map. Since we do not refresh NBT data over the network, this packet contains incorrect data
+                // Find the original item the player took (by UUID). If it exists, merge its NBT data with this item.
+                ItemStack originalMapItem = null;
+                for (ItemStack oldItem : event.getPlayer().getInventory()) {
+                    if (mapUUID.equals(CommonMapUUIDStore.getMapUUID(oldItem))) {
+                        originalMapItem = oldItem.clone();
+                        break;
+                    }
+                }
+
+                if (originalMapItem != null) {
+                    // Original item was found. Restore all properties of that item.
+                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, originalMapItem);
+                } else {
+                    // Dynamic Id. Force a durability value of 0 to prevent creation of new World Map instances
+                    item = ItemUtil.cloneItem(item);
+                    item.setDurability((short) 0);
+                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
+                }
             }
         }
     }
@@ -1088,5 +1117,42 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public static ItemStack getItemFrameItem(ItemFrame itemFrame) {
         return EntityItemFrameHandle.fromBukkit(itemFrame).getItem();
+    }
+
+    /**
+     * Removes all NBT data for map items that is unimportant for clients to know
+     * 
+     * @param item
+     * @return new item copy with metadata trimmed
+     */
+    public static ItemStack trimExtraData(ItemStack item) {
+        // If null, return null. Simples.
+        if (item == null) {
+            return null;
+        }
+
+        // Get rid of all custom metadata from the item
+        // Only Minecraft items are interesting (because its the Minecraft client)
+        CommonTagCompound oldTag = ItemUtil.getMetaTag(item, false);
+        CommonTagCompound newTag = new CommonTagCompound();
+        final String[] nbt_filter = {
+                "ench", "display", "RepairCost",
+                "AttributeModifiers", "CanDestroy",
+                "CanPlaceOn", "Unbreakable",
+
+                // Also keep Map Display specific tags alive
+                // This is important to prevent potential corruption
+                "mapDisplayUUIDMost", "mapDisplayUUIDLeast",
+                "mapDisplayPlugin", "mapDisplayClass"
+        };
+        for (String filter : nbt_filter) {
+            if (oldTag.containsKey(filter)) {
+                newTag.put(filter, oldTag.get(filter));
+            }
+        }
+
+        item = ItemUtil.cloneItem(item);
+        ItemUtil.setMetaTag(item, newTag);
+        return item;
     }
 }

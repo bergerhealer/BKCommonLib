@@ -18,12 +18,15 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.internal.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -273,6 +276,15 @@ public class MapDisplay {
      * @param item to set to
      */
     public void setMapItem(ItemStack item) {
+        ItemStack trimmed_old_item = CommonMapController.trimExtraData(this._item);
+        ItemStack trimmed_new_item = CommonMapController.trimExtraData(item);
+        boolean itemUnchanged = LogicUtil.bothNullOrEqual(trimmed_old_item, trimmed_new_item);
+
+        if (itemUnchanged) {
+            CommonPlugin.getInstance().getMapController().setDisableMapItemChanges(true);
+        }
+
+        this._item = item;
         UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(this._item);
         if (oldMapUUID != null) {
             // Change in the inventories of all player owners
@@ -282,13 +294,19 @@ public class MapDisplay {
                     UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
                     if (oldMapUUID.equals(mapUUID)) {
                         inv.setItem(i, item);
+                        if (itemUnchanged) {
+                            PlayerUtil.markItemUnchanged(player, i);
+                        }
                     }
                 }
             }
 
             //TODO: Item Frames!
         }
-        this._item = item;
+
+        if (itemUnchanged) {
+            CommonPlugin.getInstance().getMapController().setDisableMapItemChanges(false);
+        }
     }
 
     /**

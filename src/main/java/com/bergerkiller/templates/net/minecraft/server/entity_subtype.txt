@@ -13,6 +13,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
+import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 
 class EntityLiving extends Entity {
 
@@ -144,7 +145,7 @@ class EntityHuman extends EntityLiving {
     private (Object) InventoryEnderChest enderChestRaw:enderChest;
 #endif
     public unknown Container defaultContainer;
-    public unknown Container activeContainer;
+    public (ContainerHandle) Container activeContainer;
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
     public boolean sleeping;

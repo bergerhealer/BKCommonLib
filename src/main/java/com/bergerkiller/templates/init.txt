@@ -23,7 +23,6 @@
 #include /net/minecraft/server/packets_spawn.txt
 #include /net/minecraft/server/mobspawner.txt
 #include /net/minecraft/server/inthashmap.txt
-#include /net/minecraft/server/window.txt
 #include /net/minecraft/server/travelagent.txt
 #include /net/minecraft/server/vectors.txt
 #include /net/minecraft/server/methodprofiler.txt
@@ -50,6 +49,7 @@
 #include /net/minecraft/server/block_subtype.txt
 #include /net/minecraft/server/datawatcher.txt
 #include /net/minecraft/server/inventories.txt
+#include /net/minecraft/server/container.txt
 #include /net/minecraft/server/itemstack.txt
 #include /net/minecraft/server/tileentity.txt
 #include /net/minecraft/server/tileentity_subtype.txt

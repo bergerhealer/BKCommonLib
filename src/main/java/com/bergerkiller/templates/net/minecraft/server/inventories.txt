@@ -49,6 +49,8 @@ class PlayerInventory extends IInventory {
     public (CommonTagList) NBTTagList saveToNBT:a((CommonTagList) NBTTagList nbttaglist);
 
     public void loadFromNBT:b((CommonTagList) NBTTagList nbttaglist);
+
+    public static int getHotbarSize();
 }
 
 class InventoryEnderChest extends IInventory {

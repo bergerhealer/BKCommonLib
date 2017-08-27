@@ -43,6 +43,14 @@ public class EntityHumanHandle extends EntityLivingHandle {
         T.enderChestRaw.set(instance, value);
     }
 
+    public ContainerHandle getActiveContainer() {
+        return T.activeContainer.get(instance);
+    }
+
+    public void setActiveContainer(ContainerHandle value) {
+        T.activeContainer.set(instance, value);
+    }
+
     public Object getFoodDataRaw() {
         return T.foodDataRaw.get(instance);
     }
@@ -146,6 +154,7 @@ public class EntityHumanHandle extends EntityLivingHandle {
     public static final class EntityHumanClass extends Template.Class<EntityHumanHandle> {
         public final Template.Field.Converted<Object> inventoryRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<Object> enderChestRaw = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<ContainerHandle> activeContainer = new Template.Field.Converted<ContainerHandle>();
         public final Template.Field.Converted<Object> foodDataRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Boolean sleeping = new Template.Field.Boolean();
         public final Template.Field.Converted<IntVector3> bedPosition = new Template.Field.Converted<IntVector3>();

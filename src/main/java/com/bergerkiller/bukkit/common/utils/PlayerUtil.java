@@ -1,14 +1,18 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
@@ -242,5 +246,44 @@ public class PlayerUtil extends EntityUtil {
      */
     public static ItemStack getItemInHand(Player player, HumanHand hand) {
         return HumanHand.getHeldItem(player, hand);
+    }
+
+    /**
+     * Gets the slot index of an item in a player inventory. These indices differ!
+     * NB: Taken over from CraftPlayerInventory source. There is no exposed function for it.
+     * 
+     * @param playerInventoryIndex to convert
+     * @return index of the item slot in the player inventory window
+     */
+    public static int getInventorySlotIndex(int playerInventoryIndex) {
+        int index = playerInventoryIndex;
+        if (index < PlayerInventoryHandle.getHotbarSize()) {
+            index += 36;
+        } else if (index > 39 && Common.evaluateMCVersion(">=", "1.9.2")) {
+            index += 5; // Off hand (1.9.2 and onwards only)
+        } else if (index > 35) {
+            index = 8 - (index - 36);
+        }
+        return index;
+    }
+
+    /**
+     * Marks a certain item in a Player's inventory as unchanged, preventing the item
+     * from being synchronized to the Player.
+     * 
+     * @param player to affect
+     * @param index of the item in the player's inventory
+     */
+    @SuppressWarnings("unchecked")
+    public static void markItemUnchanged(Player player, int index) {
+        Object rawContainer = CommonNMS.getHandle(player).getActiveContainer().getRaw();
+        List<Object> rawOldItems = (List<Object>) ContainerHandle.T.oldItems.raw.get(rawContainer);
+        List<Object> rawSlots = (List<Object>) ContainerHandle.T.slots.raw.get(rawContainer);
+
+        index = getInventorySlotIndex(index); // conversion is needed
+
+        if (index >= 0 && index < rawOldItems.size() && index < rawSlots.size()) {
+            rawOldItems.set(index, SlotHandle.T.getItem.raw.invoke(rawSlots.get(index)));
+        }
     }
 }
