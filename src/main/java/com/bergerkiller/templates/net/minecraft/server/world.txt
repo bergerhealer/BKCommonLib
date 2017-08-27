@@ -216,7 +216,7 @@ class WorldProvider {
 #endif
 
 <code>
-    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
+    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
 
     public boolean hasSkyLight() {
         return T.int_skyLightProperty.invoke(instance).booleanValue() != _darkInverted;

@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.Resources;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -89,7 +90,7 @@ public class EntityMoveHandler {
             List<EntityHandle> list = entity.getWorld().getEntities(entity, bounds.growUniform(0.25D));
             for (int i = 0; i < list.size(); i++) {
                 EntityHandle entity1 = list.get(i);
-                if (!entity.isInSameVehicle(entity1)) {
+                if (CommonCapabilities.VEHICLES_COLLIDE_WITH_PASSENGERS || !entity.isInSameVehicle(entity1)) {
                     // BKCommonLib start: block collision event handler
                     AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
                     if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(bounds)) {
@@ -244,7 +245,7 @@ public class EntityMoveHandler {
             // CraftBukkit end
 
             // This logic is only >= 1.11.2
-            if (EntityHandle.IS_NEW_MOVE_FUNCTION && movetype == MoveType.PISTON) {
+            if (CommonCapabilities.ENTITY_MOVE_VER2 && movetype == MoveType.PISTON) {
                 long i = world.getTime();
 
                 final double[] that_aI = EntityHandle.T.move_SomeArray.get(entity.getHandle());

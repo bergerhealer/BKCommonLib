@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -259,7 +260,7 @@ public class PlayerUtil extends EntityUtil {
         int index = playerInventoryIndex;
         if (index < PlayerInventoryHandle.getHotbarSize()) {
             index += 36;
-        } else if (index > 39 && Common.evaluateMCVersion(">=", "1.9.2")) {
+        } else if (index > 39 && CommonCapabilities.PLAYER_OFF_HAND) {
             index += 5; // Off hand (1.9.2 and onwards only)
         } else if (index > 35) {
             index = 8 - (index - 36);

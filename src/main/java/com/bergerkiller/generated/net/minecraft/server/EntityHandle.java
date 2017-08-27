@@ -328,9 +328,6 @@ public class EntityHandle extends Template.Handle {
     }
 
 
-    public static final boolean IS_NEW_MOVE_FUNCTION = com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.11.2");
-
-
     public WorldServerHandle getWorldServer() {
         return WorldServerHandle.createHandle(T.world.raw.get(instance));
     }

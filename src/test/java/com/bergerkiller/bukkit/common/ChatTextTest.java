@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.bukkit.ChatColor;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
@@ -21,7 +22,7 @@ public class ChatTextTest {
         assertEquals(msg, text.getMessage());
 
         String expected;
-        if (Common.evaluateMCVersion(">=", "1.9")) {
+        if (CommonCapabilities.CHAT_TEXT_JSON_VER2) {
             expected = "{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
         } else {
             expected = "{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";

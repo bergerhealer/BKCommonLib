@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
@@ -149,13 +150,13 @@ public class EntityHook extends ClassHook<EntityHook> {
     public void onMove(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {
-                if (EntityHandle.IS_NEW_MOVE_FUNCTION) {
+                if (CommonCapabilities.ENTITY_MOVE_VER2) {
                     controller.onMove(MoveType.getFromHandle(enumMoveType), dx, dy, dz);
                 } else {
                     controller.onMove(MoveType.SELF, dx, dy, dz);
                 }
             } else {
-                if (EntityHandle.IS_NEW_MOVE_FUNCTION) {
+                if (CommonCapabilities.ENTITY_MOVE_VER2) {
                     base.onMove(enumMoveType, dx, dy, dz);
                 } else {
                     base.onMove_old(dx, dy, dz);
