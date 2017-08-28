@@ -27,4 +27,10 @@ class EntityTypes {
     public static optional String getName_old:getName((Class<?>) Class<? extends Entity> oclass);
 #endif
 
+#if version <= 1.8.8
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_8_8:d;
+#else
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_8_8:???;
+#endif
+
 }

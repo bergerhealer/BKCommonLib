@@ -59,6 +59,8 @@ public class NMSEntityTypes {
             return (mcKey == null) ? null : mcKey.toString();
         } else if (EntityTypesHandle.T.getName_old.isAvailable()) {
             return EntityTypesHandle.T.getName_old.invoke(type);
+        } else if (EntityTypesHandle.T.entityNamesMap_1_8_8.isAvailable()) {
+            return EntityTypesHandle.T.entityNamesMap_1_8_8.get().get(type);
         } else {
             throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
         }

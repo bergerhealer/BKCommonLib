@@ -34,6 +34,8 @@ public class EntityTypesHandle extends Template.Handle {
         public final Template.StaticField.Converted<Object> opt_entityRegistry = new Template.StaticField.Converted<Object>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<String, Class<?>>> opt_entityMap = new Template.StaticField.Converted<Map<String, Class<?>>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Map<Class<?>, String>> entityNamesMap_1_8_8 = new Template.StaticField.Converted<Map<Class<?>, String>>();
 
         @Template.Optional
         public final Template.StaticMethod.Converted<Void> register = new Template.StaticMethod.Converted<Void>();
