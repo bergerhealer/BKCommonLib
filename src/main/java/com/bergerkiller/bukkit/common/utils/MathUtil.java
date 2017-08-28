@@ -337,6 +337,48 @@ public class MathUtil {
     }
 
     /**
+     * Returns the floor modulus of the int arguments
+     * 
+     * @param x the dividend
+     * @param y the divisor
+     * @returnthe floor modulus x
+     */
+    public static int floorMod(int x, int y) {
+        return Math.floorMod(x, y);
+    }
+
+    /**
+     * Returns the floor modulus of the long arguments
+     * 
+     * @param x the dividend
+     * @param y the divisor
+     * @returnthe floor modulus x
+     */
+    public static long floorMod(long x, long y) {
+        return Math.floorMod(x, y);
+    }
+
+    /**
+     * Returns the floor division of the int arguments
+     * @param x the dividend
+     * @param y the divisor
+     * @return floor division x
+     */
+    public static int floorDiv(int x, int y) {
+        return Math.floorDiv(x, y);
+    }
+
+    /**
+     * Returns the floor division of the long arguments
+     * @param x the dividend
+     * @param y the divisor
+     * @return floor division x
+     */
+    public static long floorDiv(long x, long y) {
+        return Math.floorDiv(x, y);
+    }
+
+    /**
      * Rounds the specified value to the amount of decimals specified
      *
      * @param value to round
