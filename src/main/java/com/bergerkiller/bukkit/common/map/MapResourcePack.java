@@ -14,6 +14,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -21,13 +23,14 @@ import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.Vector3fDeserializer;
-import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -63,7 +66,7 @@ public class MapResourcePack {
     protected ZipFile archive;
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
-    private final Map<BlockData, Model> blockModelCache = new HashMap<BlockData, Model>();
+    private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
 
     /**
      * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
@@ -97,43 +100,79 @@ public class MapResourcePack {
     }
 
     /**
-     * Loads the model for a particular Block, specific to that Block's data value.
+     * Obtains the model for a particular Block in the World. Block-specific rendering
+     * options are efficiently handled here.
+     * 
+     * @param block
+     * @return block model
+     */
+    public final Model getBlockModel(Block block) {
+        return getBlockModel(WorldUtil.getBlockData(block).getRenderOptions(block));
+    }
+
+    /**
+     * Obtains the model for a particular Block in the World. Block-specific rendering
+     * options are efficiently handled here.
+     * 
+     * @param world of the block
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
+     * @return block model
+     */
+    public final Model getBlockModel(World world, int x, int y, int z) {
+        return getBlockModel(WorldUtil.getBlockData(world, x, y, z).getRenderOptions(world, x, y, z));
+    }
+
+    /**
+     * Obtains the model for a particular Block by Block Material Data, specific to that Block's data value.
      * 
      * @param blockMaterial of the block
      * @return block model
      */
-    public Model getBlockModel(Material blockMaterial) {
+    public final Model getBlockModel(Material blockMaterial) {
         return getBlockModel(BlockData.fromMaterial(blockMaterial));
     }
 
     /**
-     * Loads the model for a particular Block, specific to that Block's data value.
+     * Obtains the model for a particular Block by Block Material Data, specific to that Block's data value.
      * 
      * @param blockMaterial of the block
      * @param data of the block
      * @return block model
      */
     @SuppressWarnings("deprecation")
-    public Model getBlockModel(Material blockMaterial, int data) {
+    public final Model getBlockModel(Material blockMaterial, int data) {
         return getBlockModel(BlockData.fromMaterialData(blockMaterial, data));
     }
 
     /**
-     * Loads the model for a particular Block, specific to that Block's data value.
+     * Obtains the model for a particular Block by Block Material Data, specific to that Block's data value.
      * 
      * @param blockData of the block
      * @return block model
      */
     public Model getBlockModel(BlockData blockData) {
-        Model model = blockModelCache.get(blockData);
+        return getBlockModel(blockData.getDefaultRenderOptions());
+    }
+
+    /**
+     * Obtains the model for a particular Block, specific to that Block's data value and render options.
+     * This is the method of choice for fastest lookup.
+     * 
+     * @param blockRenderOptions
+     * @return block model
+     */
+    public Model getBlockModel(BlockRenderOptions blockRenderOptions) {
+        Model model = blockModelCache.get(blockRenderOptions);
         if (model == null) {
-            if (blockData != null) {
-                model = this.loadBlockModel(blockData);
+            if (blockRenderOptions.getBlockData() != null) {
+                model = this.loadBlockModel(blockRenderOptions);
             }
             if (model == null) {
                 model = this.createPlaceholderModel();
             }
-            blockModelCache.put(blockData, model);
+            blockModelCache.put(blockRenderOptions, model);
         }
         return model;
     }
@@ -183,16 +222,15 @@ public class MapResourcePack {
     /**
      * Loads a block model, always fetching it from the resource pack instead of the cache
      * 
-     * @param blockData of the block
+     * @param blockRenderOptions of the block
      * @return the model, or <i>null</i> if not found
      */
-    protected final Model loadBlockModel(BlockData blockData) {
-        if (blockData.getType() == Material.AIR) {
+    protected final Model loadBlockModel(BlockRenderOptions blockRenderOptions) {
+        if (blockRenderOptions.getBlockData().getType() == Material.AIR) {
             return new Model(); // air. No model.
         }
 
-        Map<String, String> options = blockData.getDataOptions();
-        String blockName = BlockModelNameLookup.lookup(blockData, options);
+        String blockName = blockRenderOptions.lookupModelName();
 
         // Find the blockstate
         BlockModelState state = this.openGsonObject(BlockModelState.class, ResourceType.BLOCKSTATES, blockName);
@@ -201,7 +239,7 @@ public class MapResourcePack {
         List<BlockModelState.Variant> variants;
         if (state != null) {
             // Figure out from the blockstate what variant to use
-            variants = state.findVariants(options);
+            variants = state.findVariants(blockRenderOptions);
         } else {
             // Default variant based on block name
             BlockModelState.Variant variant = new BlockModelState.Variant();
@@ -238,7 +276,9 @@ public class MapResourcePack {
     }
 
     private Model loadBlockVariant(BlockModelState.Variant variant) {
-        return this.loadModel("block/" + variant.modelName);
+        Model model = this.loadModel("block/" + variant.modelName);
+        variant.update(model);
+        return model;
     }
 
     /**
@@ -392,4 +432,5 @@ public class MapResourcePack {
             return this.ext;
         }
     }
+
 }

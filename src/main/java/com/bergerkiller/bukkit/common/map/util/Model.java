@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.map.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -71,10 +70,10 @@ public class Model {
         ArrayList<Quad> result = new ArrayList<Quad>();
         for (Element element : this.elements) {
             List<Quad> elementQuads = element.buildQuads();
-            
-            
+       
             result.addAll(elementQuads);
         }
+
         return result;
     }
 
@@ -102,6 +101,7 @@ public class Model {
         public Vector3f to;
         public Rotation rotation = null;
         public Map<BlockFace, Face> faces = new EnumMap<BlockFace, Face>(BlockFace.class);
+        public transient Matrix4f transform = null;
 
         public void build(MapResourcePack resourcePack, Map<String, String> textures) {
             for (Face face : faces.values()) {
@@ -129,6 +129,14 @@ public class Model {
 
                 for (Quad quad : result) {
                     transform.transformQuad(quad);
+                }
+            }
+
+            // If set, this transforms the entire model is desired
+            // Used by variants, but could be used for other things, too
+            if (this.transform != null) {
+                for (Quad quad : result) {
+                    this.transform.transformQuad(quad);
                 }
             }
 

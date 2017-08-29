@@ -202,6 +202,20 @@ public class Matrix4f {
     }
 
     /**
+     * Multiplies this matrix with a rotation transformation around an origin
+     * 
+     * @param origin to rotate 'around'
+     * @param rotation x/y/z angles in degrees
+     */
+    public final void rotateOrigin(Vector3f origin, Vector3f rotation) {
+        this.translate(origin);
+        this.rotateX(rotation.x);
+        this.rotateY(rotation.y);
+        this.rotateZ(rotation.z);
+        this.translate(-origin.x, -origin.y, -origin.z);
+    }
+
+    /**
      * Multiplies this matrix with a rotation transformation about the X-axis
      * 
      * @param angle the angle to rotate about the X axis in degrees

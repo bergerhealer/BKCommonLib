@@ -1,18 +1,25 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.material.Attachable;
+import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
@@ -21,6 +28,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 public class BlockDataImpl extends BlockData {
     private BlockHandle block;
     private IBlockDataHandle data;
+    private MaterialData materialData;
 
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
@@ -109,18 +117,21 @@ public class BlockDataImpl extends BlockData {
     public BlockDataImpl(BlockHandle block, IBlockDataHandle data) {
         this.block = block;
         this.data = data;
+        this.materialData = null;
     }
 
     @Override
     public void loadBlock(Object block) {
         this.block = BlockHandle.createHandle(block);
         this.data = this.block.getBlockData();
+        this.materialData = null;
     }
 
     @Override
     public void loadBlockData(Object iBlockData) {
         this.data = IBlockDataHandle.createHandle(iBlockData);
         this.block = this.data.getBlock();
+        this.materialData = null;
     }
 
     @Override
@@ -128,6 +139,7 @@ public class BlockDataImpl extends BlockData {
     public void loadMaterialData(Material material, int data) {
         this.block = BlockHandle.getById(material.getId());
         this.data = this.block.fromLegacyData(data);
+        this.materialData = null;
     }
 
     @Override
@@ -138,6 +150,36 @@ public class BlockDataImpl extends BlockData {
     @Override
     public final Object getData() {
         return this.data.getRaw();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public final MaterialData getMaterialData() {
+        if (this.materialData == null) {
+            Material type = this.getType();
+
+            // Null: return AIR
+            if (type == null) {
+                return new MaterialData(0, (byte) 0);
+            }
+
+            // Create new MaterialData + some fixes.
+            if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
+                // Bukkit bugfix.
+                this.materialData = new org.bukkit.material.PressurePlate(type, (byte) this.getRawData());
+            } else {
+                this.materialData = type.getNewData((byte) this.getRawData());
+            }
+
+            // Fix attachable face returning NULL sometimes
+            if (this.materialData instanceof Attachable) {
+                Attachable att = (Attachable) this.materialData;
+                if (att.getAttachedFace() == null) {
+                    att.setFacingDirection(BlockFace.NORTH);
+                }
+            }
+        }
+        return this.materialData;
     }
 
     @Override
@@ -173,47 +215,45 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public String getDataOptionsToken() {
-        String name = this.data.getRaw().toString();
-        int dataIndex = name.indexOf('[');
-        if ((dataIndex != -1) && (name.charAt(name.length() - 1) == ']')) {
-            return name.substring(dataIndex + 1, name.length() - 1);
+    public BlockRenderOptions getRenderOptions(World world, int x, int y, int z) {
+        Object stateData;
+        if (world == null) {
+            //TODO: We should call updateState() with an IBlockAccess that returns all Air.
+            // Right now, it will return the options of the last-modified block
+            stateData = this.data.getRaw();
         } else {
-            return "";
-        }
-    }
-
-    @Override
-    public Map<String, String> getDataOptions() {
-        String token = this.getDataOptionsToken();
-        if (token.isEmpty()) {
-            return Collections.emptyMap();
+            // This refreshes the state (cached) to reflect a particular Block
+            stateData = BlockHandle.T.updateState.raw.invoke(
+                    this.block.getRaw(),
+                    this.data.getRaw(),
+                    HandleConversion.toWorldHandle(world),
+                    BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z)
+            );
         }
 
-        HashMap<String, String> result = new HashMap<String, String>(2);
-        int index = 0;
-        do {
-            // Find next pair (key=value)
-            String pair;
-            int endIndex = token.indexOf(',', index);
-            if (endIndex == -1) {
-                pair = token.substring(index);
-                index = -1;
-            } else {
-                pair = token.substring(index, endIndex);
-                index = endIndex + 1;
-            }
+        // Not sure if this can happen; but we handle it!
+        if (stateData == null) {
+            return new BlockRenderOptions(this, new HashMap<String, String>(0));
+        }
 
-            // Decode pair and store in map
-            int pairSep = pair.indexOf('=');
-            if (pairSep != -1) {
-                result.put(pair.substring(0, pairSep), pair.substring(pairSep + 1));
-            } else {
-                result.put(pair, "");
-            }
-        } while (index != -1);
+        // Serialize all tokens into String key-value pairs
+        Map<Object, Object> states = IBlockDataHandle.T.getStates.invoke(stateData);
+        Map<String, String> statesStr = new HashMap<String, String>(states.size());
+        for (Map.Entry<Object, Object> state : states.entrySet()) {
+            String key = IBlockStateHandle.T.getKeyToken.invoke(state.getKey());
+            String value = IBlockStateHandle.T.getValueToken.invoke(state.getKey(), state.getValue());
+            statesStr.put(key, value);
+        }
+        BlockRenderOptions options = new BlockRenderOptions(this, statesStr);
 
-        return result;
+        // Add additional options not provided by the server
+        // This handles the display parameters for blocks like Water and Lava
+        BlockRenderProvider renderProvider = BlockRenderProvider.get(this);
+        if (renderProvider != null) {
+            renderProvider.addOptions(options, world, x, y, z);
+        }
+
+        return options;
     }
 
     /* ====================================================================== */

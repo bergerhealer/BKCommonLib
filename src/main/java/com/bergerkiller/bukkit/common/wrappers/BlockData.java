@@ -1,13 +1,11 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.Map;
-
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.material.Attachable;
+import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -98,20 +96,40 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract String getBlockName();
 
     /**
-     * Gets the key:value pairs set for this BlockData as a single token String.
-     * See also the {@link #getDataOptions()} method.
+     * Gets a mapping of key:value pairs for all the default data-encoded render options set for this BlockData.
+     * For example, stairs will add the <i>facing: west</i> key-value pair.
+     * The returned options are as if the Block is free-standing in an empty void of Air.
      * 
-     * @return data options token
+     * @return default render options
      */
-    public abstract String getDataOptionsToken();
+    public final BlockRenderOptions getDefaultRenderOptions() {
+        return getRenderOptions(null, 0, 0, 0);
+    }
 
     /**
-     * Gets a mapping of key:value pairs for all the data-encoded options set for this BlockData.
-     * For example, torches will add the <i>facing: west</i> key-value pair.
+     * Gets a mapping of key:value pairs for all the data-encoded render options set for this BlockData.
+     * For example, stairs will add the <i>facing: west</i> key-value pair.
+     * The returned object can be safely changed (mutable).
      * 
-     * @return data options
+     * @param block
+     * @return data options (mutable)
      */
-    public abstract Map<String, String> getDataOptions();
+    public final BlockRenderOptions getRenderOptions(Block block) {
+        return getRenderOptions(block.getWorld(), block.getX(), block.getY(), block.getZ());
+    }
+
+    /**
+     * Gets a mapping of key:value pairs for all the data-encoded render options set for this BlockData.
+     * For example, stairs will add the <i>facing: west</i> key-value pair.
+     * The returned object can be safely changed (mutable).
+     * 
+     * @param world the block is at
+     * @param x - coordinate of the block
+     * @param y - coordinate of the block
+     * @param z - coordinate of the block
+     * @return data options (mutable)
+     */
+    public abstract BlockRenderOptions getRenderOptions(World world, int x, int y, int z);
 
     /**
      * Gets the ID of the Block, ranging 0 - 255
@@ -158,34 +176,35 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Creates a new MaterialData instance appropriate for this Block
      * 
-     * @return Block Material Data
+     * @return new Block Material Data <b>(mutable)</b>
      */
-    @SuppressWarnings("deprecation")
     public final MaterialData newMaterialData() {
-        Material type = this.getType();
+        return this.getMaterialData().clone();
+    }
 
-        // Null: return AIR
-        if (type == null) {
-            return new MaterialData(0, (byte) 0);
-        }
+    /**
+     * Gets the MaterialData information for this Block.
+     * This Object is not mutable and should not be changed!
+     * Read-only access only.
+     * 
+     * @return material data <b>(immutable)</b>
+     */
+    public abstract MaterialData getMaterialData();
 
-        // Create new MaterialData + some fixes.
-        final MaterialData mdata;
-        if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
-            // Bukkit bugfix.
-            mdata = new org.bukkit.material.PressurePlate(type, (byte) this.getRawData());
+    /**
+     * Gets the facing direction for this Block Data.
+     * If this Block is directional, the result of {@link Directional#getFacing()} is returned.
+     * If it is not, by default {@link BlockFace#NORTH} is returned.
+     * 
+     * @return facing direction
+     */
+    public BlockFace getFacingDirection() {
+        MaterialData data = this.getMaterialData();
+        if (data instanceof Directional) {
+            return ((Directional) data).getFacing();
         } else {
-            mdata = type.getNewData((byte) this.getRawData());
+            return BlockFace.NORTH;
         }
-
-        // Fix attachable face returning NULL sometimes
-        if (mdata instanceof Attachable) {
-            Attachable att = (Attachable) mdata;
-            if (att.getAttachedFace() == null) {
-                att.setFacingDirection(BlockFace.NORTH);
-            }
-        }
-        return mdata;
     }
 
     /**

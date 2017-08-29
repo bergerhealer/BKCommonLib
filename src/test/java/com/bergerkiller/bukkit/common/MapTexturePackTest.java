@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
@@ -16,19 +17,30 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.bukkit.Material;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
+import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Vector2f;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 public class MapTexturePackTest
 {
 
+    public static final int RES_WIDTH = 1280;
+    public static final int RES_HEIGHT = 720;
+
+    static {
+        CommonUtil.bootstrap();
+    }
+    
     //@Test
     public void test3DRender() {
 
@@ -47,16 +59,15 @@ public class MapTexturePackTest
         BufferedImage image = null;
         try
         {
-            image = ImageIO.read(new File("C:\\Users\\QT\\Desktop\\lena512color.png"));
+            image = ImageIO.read(new File("misc/map_test_bg.jpg"));
         }
         catch (IOException e)
         {
             e.printStackTrace();
             return;
         }
-        f.getContentPane().setLayout(new GridLayout(1,2));
-        f.getContentPane().add(new JLabel(new ImageIcon(image)));
         f.getContentPane().add(new Pseudo3DImagePanel(image, texture));
+        f.setMinimumSize(new Dimension(RES_WIDTH + 16, RES_HEIGHT + 38));
         f.pack();
         f.setLocationRelativeTo(null);
         f.setVisible(true);
@@ -81,8 +92,8 @@ class Pseudo3DImagePanel extends JPanel
         this.inputBufferedImage = inputImage;
         this.textures = textures;
         this.background = MapTexture.fromImage(inputImage);
-        this.background.setBlendMode(MapBlendMode.MULTIPLY);
-        this.background.fill(MapColorPalette.COLOR_BLUE);
+        //this.background.setBlendMode(MapBlendMode.MULTIPLY);
+        //this.background.fill(MapColorPalette.COLOR_BLUE);
         this.p0 = new Vector2f(256,256);
         this.p1 = new Vector2f(128,128);
         this.p2 = new Vector2f(0,0);
@@ -96,20 +107,27 @@ class Pseudo3DImagePanel extends JPanel
     {
         super.paintComponent(g);
 
-        MapTexture image = MapTexture.createEmpty(512, 512);
+        MapTexture image = MapTexture.createEmpty(MapTexturePackTest.RES_WIDTH, MapTexturePackTest.RES_HEIGHT);
+        image.draw(background, 0, 0);
         image.setBlendMode(MapBlendMode.OVERLAY);
         image.setLightOptions(0.0f, 1.0f, new Vector3f(-1.0f, 1.0f, -1.0f));
-        //image.draw(background, 0, 0);
 
         // Draws a 3D quad
-        float scale = 8.0f;
+        float scale = 16.0f;
         float yaw = p1.x - 128;
         float pitch = p1.y - 128;
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        Model model = textures.getModel("block/dispenser");
-        image.drawModel(model, scale, (int) p0.x, (int) p0.y, yaw, pitch);
+        Model model = textures.getBlockModel(BlockData.fromMaterialData(Material.WOOD_STAIRS, 2));
+        Matrix4f transform = new Matrix4f();
+
+        transform.translate(p0.x, 0.0f, p0.y);
+        transform.scale(scale);
+        transform.rotateX(pitch);
+        transform.rotateY(yaw);
+        transform.translate(-8, -8, -8);
+        image.drawModel(model, transform);
 
         g.drawImage(image.toJavaImage(), 0, 0, null);
 

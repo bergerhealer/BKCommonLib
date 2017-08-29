@@ -10,16 +10,10 @@ import java.net.URL;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 
-import org.bukkit.block.BlockFace;
-
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
-import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.Vector3fDeserializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

@@ -1,8 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import org.bukkit.Material;
 import org.junit.Test;
 
@@ -56,22 +53,18 @@ public class MapIsometricTest {
         //map.fill(MapColorPalette.COLOR_RED);
         //map.setBrushMask(null);
         
-        Matrix4f translation = new Matrix4f();
-        translation.translate(map.getWidth(), 0.0f, map.getWidth() - 1);
-        translation.scale(1.45f, 1.0f, 1.71f);
-        
-        Matrix4f rotationPitch = new Matrix4f();
-        rotationPitch.rotateX(-45.0f);
-
-        Matrix4f rotationYaw = new Matrix4f();
-        rotationYaw.rotateY(225.0f);
-
         Matrix4f transform = new Matrix4f();
-        transform.setIdentity();
-        transform.multiply(translation);
-        transform.multiply(rotationPitch);
-        transform.multiply(rotationYaw);
+
+        //transform.rotateOrigin(new Vector3f(8,8,8), new Vector3f(180, 0, 0));
+
+        transform.translate(map.getWidth(), 0.0f, map.getWidth() - 1);
+        transform.scale(1.45f, 1.0f, 1.71f);
+
+        transform.rotateX(-45.0f); // pitch
+        transform.rotateY(225.0f); // yaw
         
+        //transform.rotateOrigin(new Vector3f(8,8,8), new Vector3f(0, 0, 0));
+
         //map.fill(MapColorPalette.COLOR_RED);
         map.setLightOptions(0.2f, 0.8f, new Vector3f(-1.0f, 1.0f, -1.0f));
         map.drawModel(model, transform);

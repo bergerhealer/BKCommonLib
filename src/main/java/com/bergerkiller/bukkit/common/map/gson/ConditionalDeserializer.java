@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -23,36 +25,16 @@ public class ConditionalDeserializer implements JsonDeserializer<BlockModelState
         result.conditions = new ArrayList<BlockModelState.Condition>(1);
 
         if (jsonElement.isJsonPrimitive()) {
-            // If the element is a single String token, parse it as key=value pairs separated by ,
-            String token = jsonElement.getAsString();
-            int index = 0;
-            do {
-                // Find next pair (key=value)
-                String pair;
-                int endIndex = token.indexOf(',', index);
-                if (endIndex == -1) {
-                    pair = token.substring(index);
-                    index = -1;
-                } else {
-                    pair = token.substring(index, endIndex);
-                    index = endIndex + 1;
-                }
-
-                // Decode pair and store in map
+            // Options stored in a single String token
+            Map<String, String> options = new BlockRenderOptions(BlockData.AIR, jsonElement.getAsString());
+            for (Map.Entry<String, String> option : options.entrySet()) {
                 BlockModelState.Condition condition = new BlockModelState.Condition();
                 condition.mode = BlockModelState.Condition.Mode.SELF;
                 condition.conditions = Collections.emptyList();
-                int pairSep = pair.indexOf('=');
-                if (pairSep != -1) {
-                    condition.key = pair.substring(0, pairSep);
-                    condition.value = pair.substring(pairSep + 1);
-                } else {
-                    condition.key = pair;
-                    condition.value = "";
-                }
+                condition.key = option.getKey();
+                condition.value = option.getValue();
                 result.conditions.add(condition);
-            } while (index != -1);
-
+            }
         } else {
             // Handle operator types in the condition structure
             JsonObject obj = jsonElement.getAsJsonObject();

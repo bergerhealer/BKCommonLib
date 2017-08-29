@@ -11,6 +11,8 @@ import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 
 public class BlockDataRegistry {
 
+    public static final BlockData AIR = fromMaterial(Material.AIR);
+
     /**
      * Creates an empty uninitialized BlockData object that can be set to a new state using the
      * apply* methods. By default the created object stored the information of AIR.

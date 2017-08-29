@@ -1,5 +1,8 @@
 package net.minecraft.server;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Function;
+
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
@@ -73,6 +76,8 @@ class Block {
     public void stepOn:a((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
 #endif
 
+    public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (Object) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+
     public final (IBlockDataHandle) IBlockData getBlockData();
 
     public (IBlockDataHandle) IBlockData fromLegacyData(int data);
@@ -90,4 +95,12 @@ class Blocks {
 
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
+
+    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
+}
+
+interface IBlockState {
+    public abstract String getKeyToken:a();
+
+    public abstract String getValueToken:a(T value);
 }

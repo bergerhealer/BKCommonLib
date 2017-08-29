@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -23,7 +24,7 @@ public class BlockModelState {
      * @param options of the block
      * @return variants that are displayed
      */
-    public VariantList findVariants(Map<String, String> options) {
+    public VariantList findVariants(BlockRenderOptions options) {
         VariantList result = new VariantList();
         if (this.multipart != null) {
             for (Multipart part : multipart) {
@@ -60,6 +61,18 @@ public class BlockModelState {
         public float rotationZ = 0.0f;
 
         public boolean uvlock = false;
+
+        public void update(Model model) {
+            if (this.rotationX != 0.0f || this.rotationY != 0.0f || this.rotationZ != 0.0f) {
+                for (Model.Element element : model.elements) {
+                    if (element.transform == null) {
+                        element.transform = new Matrix4f();
+                    }
+                    element.transform.rotateOrigin(new Vector3f(8,8,8), 
+                            new Vector3f(-this.rotationX, -this.rotationY, -this.rotationZ));
+                }
+            }
+        }
     }
 
     public static class VariantList extends ArrayList<Variant> {
@@ -117,8 +130,31 @@ public class BlockModelState {
                 return option != null && option.equals(this.value);
             }
         }
-        
-        public enum Mode {
+
+        @Override
+        public String toString() {
+            if (this.mode == Mode.SELF) {
+                return "{" + this.key + "=" + this.value + "}";
+            } else {
+                StringBuilder result = new StringBuilder();
+                result.append("{");
+                boolean first = true;
+                for (Condition condition : this.conditions) {
+                    if (first) {
+                        first = false;
+                    } else if (this.mode == Mode.OR) {
+                        result.append(" OR ");
+                    } else {
+                        result.append(" AND ");
+                    }
+                    result.append(condition.toString());
+                }
+                result.append("{");
+                return result.toString();
+            }
+        }
+
+        public static enum Mode {
             SELF, AND, OR
         }
     }

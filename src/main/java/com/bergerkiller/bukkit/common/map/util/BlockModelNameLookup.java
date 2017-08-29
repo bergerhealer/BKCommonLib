@@ -1,16 +1,14 @@
 package com.bergerkiller.bukkit.common.map.util;
 
-import java.util.Map;
-
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
 /**
  * This is needed because Minecraft is really stupid sometimes
  */
 public class BlockModelNameLookup {
 
-    public static String lookup(BlockData blockData, Map<String, String> options) {
-        String name = blockData.getBlockName();
+    public static String lookup(BlockRenderOptions options) {
+        String name = options.getBlockData().getBlockName();
         String variant = options.get("variant");
 
         // Not all slabs are equal

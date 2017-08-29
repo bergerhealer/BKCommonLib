@@ -83,6 +83,10 @@ public class BlockHandle extends Template.Handle {
         T.stepOn.invoke(instance, world, blockposition, entity);
     }
 
+    public IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition) {
+        return T.updateState.invoke(instance, iblockdata, iblockaccess, blockposition);
+    }
+
     public IBlockDataHandle getBlockData() {
         return T.getBlockData.invoke(instance);
     }
@@ -132,6 +136,7 @@ public class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<IBlockDataHandle> updateState = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<IBlockDataHandle> getBlockData = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<IBlockDataHandle> fromLegacyData = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<Integer> toLegacyData = new Template.Method.Converted<Integer>();
