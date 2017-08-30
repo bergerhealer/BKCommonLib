@@ -837,7 +837,7 @@ public abstract class MapCanvas {
         if (model == null) {
             throw new IllegalArgumentException("Model is null");
         }
-        List<Quad> quads = model.buildQuads();
+        List<Quad> quads = model.getQuads();
         for (Quad quad : quads) {
             transform.transformQuad(quad);
         }
@@ -858,11 +858,7 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas drawQuad(Quad quad) {
-        return this.drawQuad(quad.texture,
-                quad.p0,
-                quad.p1,
-                quad.p2,
-                quad.p3);
+        return this.drawQuad(quad.texture, quad.p0, quad.p1, quad.p2, quad.p3);
     }
 
     /**
@@ -877,6 +873,35 @@ public abstract class MapCanvas {
      * @return view
      */
     public final MapCanvas drawQuad(MapCanvas canvas, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3) {
+        Vector3f fp3 = Vector3f.add(p2, Vector3f.subtract(p0, p1));
+        if (fp3.distanceSquared(p3) > 0.0001f) {
+            // Split into two separate triangle draw calls
+            // We can draw the entire Quad in one go
+            // Triangle drawing logic? Lol, I'll just draw one half of a quad.
+            // Really though, this shit needs to be optimized :(
+            this.drawQuad(canvas, p0, p1, p2, fp3, 1);
+            Vector3f fp1 = Vector3f.add(p2, Vector3f.subtract(p0, p3));
+            this.drawQuad(canvas, p0, fp1, p2, p3, -1);
+        } else {
+            // We can draw the entire Quad in one go
+            this.drawQuad(canvas, p0, p1, p2, p3, 0);
+        }
+        return this;
+    }
+
+    /**
+     * Draws a pseudo-3D quad onto this canvas, using the projection matrix to define the
+     * projection transformation that is applied.
+     * 
+     * @param canvas to draw onto this canvas
+     * @param projectionMatrix to use for the transformation
+     * @return view
+     */
+    public final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix) {
+        return drawQuad(canvas, projectionMatrix, 0);
+    }
+
+    private final MapCanvas drawQuad(MapCanvas canvas, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3, int half) {
         // This matrix can be cached, saving a precious matrix inversion
         if (canvas.projMatrix == null) {
             Vector3f ip0 = new Vector3f(0, 0, 0);
@@ -895,18 +920,10 @@ public abstract class MapCanvas {
 
         m0.multiply(canvas.projMatrix);
 
-        return drawQuad(canvas, m0);
+        return drawQuad(canvas, m0, half);
     }
 
-    /**
-     * Draws a pseudo-3D quad onto this canvas, using the projection matrix to define the
-     * projection transformation that is applied.
-     * 
-     * @param canvas to draw onto this canvas
-     * @param projectionMatrix to use for the transformation
-     * @return view
-     */
-    public final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix) {
+    private final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix, int half) {
         Matrix4f mInv = new Matrix4f(projectionMatrix);
         mInv.invert();
 
@@ -953,6 +970,12 @@ public abstract class MapCanvas {
 
                 float ax = p.x;
                 float ay = p.z;
+
+                // Half parameter makes it draw only one half (triangle)
+                if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {
+                    continue;
+                }
+
                 //float depth = p.y;
 
                 if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
@@ -976,7 +999,7 @@ public abstract class MapCanvas {
         }
         return this;
     }
-
+    
     /**
      * Obtains a view into this canvas for a viewport area
      * 

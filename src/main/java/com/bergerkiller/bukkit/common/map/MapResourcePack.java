@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
@@ -230,6 +231,12 @@ public class MapResourcePack {
             return new Model(); // air. No model.
         }
 
+        // Some blocks are handled by providers
+        BlockRenderProvider provider = BlockRenderProvider.get(blockRenderOptions.getBlockData());
+        if (provider != null) {
+            return provider.createModel(this, blockRenderOptions);
+        }
+
         String blockName = blockRenderOptions.lookupModelName();
 
         // Find the blockstate
@@ -278,6 +285,7 @@ public class MapResourcePack {
     private Model loadBlockVariant(BlockModelState.Variant variant) {
         Model model = this.loadModel("block/" + variant.modelName);
         variant.update(model);
+        model.buildQuads();
         return model;
     }
 
@@ -316,11 +324,10 @@ public class MapResourcePack {
     protected final Model createPlaceholderModel() {
         Model model = new Model();
         Model.Element element = new Model.Element();
-        element.from = new Vector3f(0, 0, 0);
-        element.to = new Vector3f(16, 16, 16);
         for (BlockFace face : FaceUtil.BLOCK_SIDES) {
             element.faces.put(face, createPlaceholderFace());
         }
+        element.buildQuads();
         model.placeholder = true;
         model.elements.add(element);
         return model;

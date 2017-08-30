@@ -45,6 +45,13 @@ public class Vector3f {
         return new Vector3f((float) (x/len), (float) (y/len), (float) (z/len));
     }
 
+    public float distanceSquared(Vector3f v) {
+        float dx = (this.x - v.x);
+        float dy = (this.y - v.y);
+        float dz = (this.z - v.z);
+        return (dx * dx) + (dy * dy) + (dz * dz);
+    }
+
     @Override
     public Vector3f clone() {
         return new Vector3f(x, y, z);
@@ -53,6 +60,10 @@ public class Vector3f {
     @Override
     public String toString() {
         return "{x=" + x + ", y=" + y + ", z=" + z + "}";
+    }
+
+    public boolean equals(Vector3f p) {
+        return p.x == x && p.y == y && p.z == z;
     }
 
     /**
@@ -82,6 +93,29 @@ public class Vector3f {
                 v1.x - v2.x,
                 v1.y - v2.y,
                 v1.z - v2.z
+        );
+    }
+
+    public static Vector3f add(Vector3f v1, Vector3f v2) {
+        return new Vector3f(
+                v1.x + v2.x,
+                v1.y + v2.y,
+                v1.z + v2.z
+        );
+    }
+    
+    /**
+     * Returns the vector average of two vectors ((v1 + v2) / 2)
+     * 
+     * @param v1
+     * @param v2
+     * @return average vector
+     */
+    public static Vector3f average(Vector3f v1, Vector3f v2) {
+        return new Vector3f(
+                (v1.x + v2.x) / 2.0f,
+                (v1.y + v2.y) / 2.0f,
+                (v1.z + v2.z) / 2.0f
         );
     }
 

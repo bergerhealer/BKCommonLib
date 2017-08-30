@@ -4,19 +4,34 @@ import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.map.MapTexture;
 
-public class Quad implements Comparable<Quad> {
-    public Vector3f p0 = new Vector3f();
-    public Vector3f p1 = new Vector3f();
-    public Vector3f p2 = new Vector3f();
-    public Vector3f p3 = new Vector3f();
-    public boolean set = false;
+/**
+ * A four-side four-cornered polygon that represents a rectangle with a texture applied to it
+ */
+public class Quad implements Comparable<Quad>, Cloneable {
+    public Vector3f p0, p1, p2, p3;
     public BlockFace face;
-    public MapTexture texture = null;
+    public MapTexture texture;
 
     public Quad() {
+        this.p0 = new Vector3f();
+        this.p1 = new Vector3f();
+        this.p2 = new Vector3f();
+        this.p3 = new Vector3f();
+        this.face = BlockFace.UP;
+        this.texture = null;
+    }
+
+    protected Quad(Quad quad) {
+        this.p0 = quad.p0.clone();
+        this.p1 = quad.p1.clone();
+        this.p2 = quad.p2.clone();
+        this.p3 = quad.p3.clone();
+        this.face = quad.face;
+        this.texture = quad.texture;
     }
 
     public Quad(BlockFace face, Vector3f from, Vector3f to, MapTexture texture) {
+        this();
         this.texture = texture;
         this.face = face;
         if (face == BlockFace.UP) {
@@ -33,7 +48,6 @@ public class Quad implements Comparable<Quad> {
             p0.z = from.z;
             
             p0.y = p1.y = p2.y = p3.y = to.y;
-            set = true;
         }
         if (face == BlockFace.DOWN) {
             p1.x = from.x;
@@ -50,7 +64,6 @@ public class Quad implements Comparable<Quad> {
             
             
             p0.y = p1.y = p2.y = p3.y = from.y;
-            set = true;
         }
         if (face == BlockFace.SOUTH) {
             p1.x = from.x;
@@ -66,7 +79,6 @@ public class Quad implements Comparable<Quad> {
             p0.y = to.y;
 
             p0.z = p1.z = p2.z = p3.z = to.z;
-            set = true;
         }
         if (face == BlockFace.NORTH) {
             p1.x = to.x;
@@ -82,7 +94,6 @@ public class Quad implements Comparable<Quad> {
             p0.y = to.y;
 
             p0.z = p1.z = p2.z = p3.z = from.z;
-            set = true;
         }
         if (face == BlockFace.EAST) {
             p1.y = from.y;
@@ -98,7 +109,6 @@ public class Quad implements Comparable<Quad> {
             p0.z = to.z;
 
             p0.x = p1.x = p2.x = p3.x = to.x;
-            set = true;
         }
         if (face == BlockFace.WEST) {
             p1.y = from.y;
@@ -114,8 +124,27 @@ public class Quad implements Comparable<Quad> {
             p0.z = from.z;
 
             p0.x = p1.x = p2.x = p3.x = from.x;
-            set = true;
         }
+    }
+
+    /**
+     * Replaces points that equal points in this quad with the one of another quad.
+     * By merging the 6 quads of a cube can be manipulated with just 8 points.
+     * 
+     * @param quad to merge points with
+     */
+    public final void mergePoints(Quad quad) {
+        mergePoint(quad.p0);
+        mergePoint(quad.p1);
+        mergePoint(quad.p2);
+        mergePoint(quad.p3);
+    }
+
+    private final void mergePoint(Vector3f p) {
+        if (p0.equals(p)) p0 = p;
+        if (p1.equals(p)) p1 = p;
+        if (p2.equals(p)) p2 = p;
+        if (p3.equals(p)) p3 = p;
     }
 
     public float depth() {
@@ -131,5 +160,10 @@ public class Quad implements Comparable<Quad> {
     @Override
     public int compareTo(Quad o) {
         return Float.compare(this.depth(), o.depth());
+    }
+
+    @Override
+    public Quad clone() {
+        return new Quad(this);
     }
 }

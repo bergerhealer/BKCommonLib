@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
-public class Matrix4f {
+public class Matrix4f implements Cloneable {
     public float m00;
     public float m01;
     public float m02;
@@ -209,8 +209,8 @@ public class Matrix4f {
      */
     public final void rotateOrigin(Vector3f origin, Vector3f rotation) {
         this.translate(origin);
-        this.rotateX(rotation.x);
         this.rotateY(rotation.y);
+        this.rotateX(rotation.x);
         this.rotateZ(rotation.z);
         this.translate(-origin.x, -origin.y, -origin.z);
     }
@@ -422,6 +422,11 @@ public class Matrix4f {
         transformPoint(quad.p1);
         transformPoint(quad.p2);
         transformPoint(quad.p3);
+    }
+
+    @Override
+    public Matrix4f clone() {
+        return new Matrix4f(this);
     }
 
     // From https://math.stackexchange.com/questions/296794

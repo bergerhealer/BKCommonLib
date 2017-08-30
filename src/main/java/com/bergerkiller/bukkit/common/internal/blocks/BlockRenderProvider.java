@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.internal.blocks.type.WaterRenderingProvider;
+import com.bergerkiller.bukkit.common.map.MapResourcePack;
+import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
@@ -38,6 +40,15 @@ public abstract class BlockRenderProvider {
     public static BlockRenderProvider get(BlockData blockData) {
         return providers.get(blockData.getType());
     }
+
+    /**
+     * Creates the displayed Block Model for certain block render options
+     * 
+     * @param resources from which model dependencies (textures, other models) can be loaded
+     * @param options for rendering the block model
+     * @return block model
+     */
+    public abstract Model createModel(MapResourcePack resources, BlockRenderOptions options);
 
     /**
      * Adds options specific to the provider

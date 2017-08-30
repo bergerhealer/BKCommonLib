@@ -12,10 +12,12 @@ import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
+import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.google.gson.annotations.SerializedName;
 
 public class Model {
     private String parent = null;
+    private int totalQuadCount = 0;
     public transient boolean placeholder = false;
     public boolean ambientocclusion = true;
     public Map<String, Display> display = new HashMap<String, Display>();
@@ -66,14 +68,23 @@ public class Model {
         }
     }
 
-    public List<Quad> buildQuads() {
-        ArrayList<Quad> result = new ArrayList<Quad>();
+    /**
+     * Builds the quads for all elements of this Model. See also: {@link Element#buildQuads()}
+     */
+    public void buildQuads() {
         for (Element element : this.elements) {
-            List<Quad> elementQuads = element.buildQuads();
-       
-            result.addAll(elementQuads);
+            element.buildQuads();
         }
+    }
 
+    public List<Quad> getQuads() {
+        ArrayList<Quad> result = new ArrayList<Quad>(this.totalQuadCount);
+        for (Element element : this.elements) {
+            for (Face face : element.faces.values()) {
+                result.add(face.quad.clone());
+            }
+        }
+        this.totalQuadCount = result.size();
         return result;
     }
 
@@ -97,8 +108,8 @@ public class Model {
      * A square element in the model
      */
     public static class Element {
-        public Vector3f from;
-        public Vector3f to;
+        public Vector3f from = new Vector3f(0.0f, 0.0f, 0.0f);
+        public Vector3f to = new Vector3f(16.0f, 16.0f, 16.0f);
         public Rotation rotation = null;
         public Map<BlockFace, Face> faces = new EnumMap<BlockFace, Face>(BlockFace.class);
         public transient Matrix4f transform = null;
@@ -107,12 +118,18 @@ public class Model {
             for (Face face : faces.values()) {
                 face.build(resourcePack, textures);
             }
+            this.buildQuads();
         }
 
-        public List<Quad> buildQuads() {
-            ArrayList<Quad> result = new ArrayList<Quad>();
+        /**
+         * Uses this Model's size (from/to), rotation and transform to build the {@link Face#quad}
+         * field for all faces of this Element. After changing properties of this Model,
+         * this function should be called again.
+         */
+        public void buildQuads() {
             for (Map.Entry<BlockFace, Face> faceEntry : faces.entrySet()) {
-                result.add(new Quad(faceEntry.getKey(), from.clone(), to.clone(), faceEntry.getValue().texture));
+                Face face = faceEntry.getValue();
+                face.quad = new Quad(faceEntry.getKey(), from.clone(), to.clone(), face.texture);
             }
 
             if (rotation != null) {
@@ -127,20 +144,28 @@ public class Model {
                 }
                 transform.translate(rotation.origin.negate());
 
-                for (Quad quad : result) {
-                    transform.transformQuad(quad);
+                for (Face face : faces.values()) {
+                    transform.transformQuad(face.quad);
                 }
             }
 
             // If set, this transforms the entire model is desired
             // Used by variants, but could be used for other things, too
             if (this.transform != null) {
-                for (Quad quad : result) {
-                    this.transform.transformQuad(quad);
+                for (Face face : faces.values()) {
+                    this.transform.transformQuad(face.quad);
                 }
             }
 
-            return result;
+            // Merge quad vector instances when they have the same values
+            // This makes manipulation much easier
+            for (Face face : faces.values()) {
+                for (Face otherFace : faces.values()) {
+                    if (face != otherFace) {
+                        face.quad.mergePoints(otherFace.quad);
+                    }
+                }
+            }
         }
 
         @Override
@@ -148,6 +173,8 @@ public class Model {
             Element clone = new Element();
             clone.from = this.from.clone();
             clone.to = this.to.clone();
+            clone.transform = (this.transform == null) ? null : this.transform.clone();
+            clone.rotation = (this.rotation == null) ? null : this.rotation.clone();
             for (Map.Entry<BlockFace, Face> face : this.faces.entrySet()) {
                 clone.faces.put(face.getKey(), face.getValue().clone());
             }
@@ -164,6 +191,7 @@ public class Model {
             public transient MapTexture texture = null;
             public int tintindex = -1;
             public BlockFace cullface;
+            public transient Quad quad = null;
 
             public void build(MapResourcePack resourcePack, Map<String, String> textures) {
                 if (this.textureName.startsWith("#")) {
@@ -195,7 +223,16 @@ public class Model {
                             if (px < 0 || py < 0 || px >= this.texture.getWidth() || py >= this.texture.getHeight()) {
                                 buffer[index] = MapColorPalette.COLOR_GREEN;
                             } else {
-                                buffer[index] = this.texture.readPixel(x - ox, y - oy);
+                                int a = x - ox;
+                                int b = y - oy;
+                                if (sx == -1) {
+                                    a = texture.getWidth() - a - 1;
+                                }
+                                if (sy == -1) {
+                                    b = texture.getHeight() - b - 1;
+                                }
+                                
+                                buffer[index] = this.texture.readPixel(a, b);
                             }
                             index++;
                         }
@@ -220,6 +257,7 @@ public class Model {
                 clone.texture = this.texture.clone();
                 clone.cullface = this.cullface;
                 clone.tintindex = this.tintindex;
+                clone.quad = this.quad.clone();
                 return clone;
             }
         }
@@ -227,10 +265,19 @@ public class Model {
         /**
          * The rotation of a model element
          */
-        public static class Rotation {
+        public static class Rotation implements Cloneable {
             public Vector3f origin = new Vector3f();
             public String axis = "y";
             public float angle = 0.0f;
+
+            @Override
+            public Rotation clone() {
+                Rotation rotation = new Rotation();
+                rotation.origin = this.origin.clone();
+                rotation.axis = this.axis;
+                rotation.angle = this.angle;
+                return rotation;
+            }
         }
     }
 
