@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
@@ -34,15 +35,37 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
 public class BlockStateConversion {
     private static TileState input_state;
     private static final World proxy_world;
+    private static final Chunk proxy_chunk;
     private static final Block proxy_block;
     private static final Invokable non_instrumented_invokable = new Invokable() {
         @Override
         public Object invoke(Object instance, Object... args) {
-            throw new UnsupportedOperationException("Method not instrumented by the CraftWorld proxy");
+            String name = instance.getClass().getSuperclass().getSimpleName();
+            throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
         }
     };
 
     static {
+        // Create a CraftChunk proxy that only supports the following calls:
+        // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
+        proxy_chunk = (Chunk) new ClassInterceptor() {
+            @Override
+            protected Invokable getCallback(Method method) {
+                // Gets the proxy world
+                if (method.getName().equals("getCraftWorld")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return proxy_world;
+                        }
+                    };
+                }
+
+                // All other method calls fail
+                return non_instrumented_invokable;
+            }
+        }.createInstance(CraftChunkHandle.T.getType());
+
         // Create a CraftWorld proxy that only supports the following calls:
         // - getTileEntityAt(x, y, z) to return our requested entity
         // All other methods will fail.
@@ -139,6 +162,7 @@ public class BlockStateConversion {
                 return non_instrumented_invokable;
             }
         }.createInstance(CraftBlockHandle.T.getType());
+        CraftBlockHandle.T.chunk.set(proxy_block, proxy_chunk);
     }
 
     public static Object blockStateToTileEntity(BlockState state) {
