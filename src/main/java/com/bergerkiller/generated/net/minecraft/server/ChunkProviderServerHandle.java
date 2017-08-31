@@ -43,10 +43,14 @@ public class ChunkProviderServerHandle extends Template.Handle {
         return T.getChunkAt.invoke(instance, cx, cz);
     }
 
-    public void saveChunk(ChunkHandle chunk) {
-        T.saveChunk.invoke(instance, chunk);
-    }
 
+    public void saveLoadedChunk(ChunkHandle chunk) {
+        if (T.saveChunk_new.isAvailable()) {
+            T.saveChunk_new.invoke(instance, chunk);
+        } else {
+            T.saveChunk_old.invoke(instance, chunk, false);
+        }
+    }
     public Object getChunkLoader() {
         return T.chunkLoader.get(instance);
     }
@@ -75,7 +79,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
-        public final Template.Method.Converted<Void> saveChunk = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> saveChunk_old = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> saveChunk_new = new Template.Method.Converted<Void>();
 
     }
 

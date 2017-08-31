@@ -194,8 +194,19 @@ class ChunkProviderServer {
 
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 
-    public void saveChunk((ChunkHandle) Chunk chunk);
+    // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
+    public optional void saveChunk_old:saveChunk((ChunkHandle) Chunk chunk);
+    public optional void saveChunk_new:saveChunk((ChunkHandle) Chunk chunk, boolean unloaded);
 
+    <code>
+    public void saveLoadedChunk(ChunkHandle chunk) {
+        if (T.saveChunk_new.isAvailable()) {
+            T.saveChunk_new.invoke(instance, chunk);
+        } else {
+            T.saveChunk_old.invoke(instance, chunk, false);
+        }
+    }
+    </code>
 }
 
 class WorldData {

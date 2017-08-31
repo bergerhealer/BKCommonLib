@@ -264,12 +264,14 @@ public class ChunkUtil {
     }
 
     /**
-     * Saves a single chunk to disk
+     * Saves a single chunk to disk.
+     * This method is only valid for chunks that are loaded.
+     * Unloaded chunks should not be saved (again).
      *
      * @param chunk to save
      */
     public static void saveChunk(org.bukkit.Chunk chunk) {
-        CommonNMS.getHandle(chunk.getWorld()).getChunkProviderServer().saveChunk(CommonNMS.getHandle(chunk));
+        CommonNMS.getHandle(chunk.getWorld()).getChunkProviderServer().saveLoadedChunk(CommonNMS.getHandle(chunk));
     }
 
     /**

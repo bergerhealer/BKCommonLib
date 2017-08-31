@@ -7,6 +7,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
@@ -98,6 +99,7 @@ public class TemplateTest {
     public void testOptionalMembers() {
         assertAvailable(PlayerChunkMapHandle.T.getChunk_1_8_8, PlayerChunkMapHandle.T.getChunk_1_9);
         assertAvailable(EntityTrackerEntryHandle.T.opt_passengers, EntityTrackerEntryHandle.T.opt_vehicle);
+        assertAvailable(ChunkProviderServerHandle.T.saveChunk_old, ChunkProviderServerHandle.T.saveChunk_new);
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {
             assertAvailable(EntityHandle.T.DATA_FLAGS);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);
