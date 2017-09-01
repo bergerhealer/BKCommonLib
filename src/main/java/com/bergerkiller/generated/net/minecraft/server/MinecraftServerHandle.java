@@ -25,6 +25,10 @@ public class MinecraftServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public boolean isRunning() {
+        return T.isRunning.invoke(instance);
+    }
+
 
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
@@ -43,6 +47,8 @@ public class MinecraftServerHandle extends Template.Handle {
      */
     public static final class MinecraftServerClass extends Template.Class<MinecraftServerHandle> {
         public final Template.Field.Converted<List<WorldServerHandle>> worlds = new Template.Field.Converted<List<WorldServerHandle>>();
+
+        public final Template.Method<Boolean> isRunning = new Template.Method<Boolean>();
 
     }
 

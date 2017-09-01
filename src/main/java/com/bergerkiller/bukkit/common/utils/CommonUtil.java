@@ -74,6 +74,17 @@ public class CommonUtil {
     }
 
     /**
+     * Gets whether the Minecraft server is currently in the process of shutting down.
+     * This method can be used to check whether the server is shutting down, or reloading,
+     * when plugins are disabled.
+     * 
+     * @return True if the server is shutting down
+     */
+    public static boolean isShuttingDown() {
+        return !CommonNMS.getMCServer().isRunning();
+    }
+
+    /**
      * Gets a mapping of all commands available on the server, so they can be
      * obtained and executed (dispatched)
      *

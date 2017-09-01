@@ -10,6 +10,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 class MinecraftServer {
     public (List<WorldServerHandle>) List<WorldServer> worlds;
 
+    public boolean isRunning();
+
     <code>
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
