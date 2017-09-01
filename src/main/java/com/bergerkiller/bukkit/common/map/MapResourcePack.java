@@ -284,6 +284,9 @@ public class MapResourcePack {
 
     private Model loadBlockVariant(BlockModelState.Variant variant) {
         Model model = this.loadModel("block/" + variant.modelName);
+        if (model == null) {
+            return null;
+        }
         variant.update(model);
         model.buildQuads();
         return model;
@@ -298,14 +301,15 @@ public class MapResourcePack {
     protected final Model loadModel(String path) {
         Model model = openGsonObject(Model.class, ResourceType.MODELS, path);
         if (model == null) {
+            Logging.LOGGER_MAPDISPLAY.warning("Failed to load model " + path);
             return null;
         }
 
         // Insert the parent model as required
         if (model.getParentName() != null) {
             Model parentModel = getModel(model.getParentName());
-            if (parentModel == null) {
-                System.out.println("Parent of model " + path + " not found: " + model.getParentName());
+            if (parentModel == null || parentModel.placeholder) {
+                Logging.LOGGER_MAPDISPLAY.warning("Parent of model " + path + " not found: " + model.getParentName());
                 return null;
             }
             model.loadParent(parentModel);

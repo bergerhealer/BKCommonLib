@@ -11,4 +11,5 @@ public class Logging {
     public static final ModuleLogger LOGGER_TIMINGS = LOGGER.getModule("Timings");
     public static final ModuleLogger LOGGER_PERMISSIONS = LOGGER.getModule("Permissions");
     public static final ModuleLogger LOGGER_REGISTRY = LOGGER.getModule("Registry");
+    public static final ModuleLogger LOGGER_MAPDISPLAY = LOGGER.getModule("Maps");
 }
