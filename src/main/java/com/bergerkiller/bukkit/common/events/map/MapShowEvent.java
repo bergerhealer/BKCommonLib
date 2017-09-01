@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.events.map;
 
+import java.util.UUID;
+
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -8,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -73,6 +76,15 @@ public class MapShowEvent extends Event {
      */
     public ItemStack getMapItem() {
         return this.mapItem;
+    }
+
+    /**
+     * Gets the unique Id of the map item
+     * 
+     * @return map unique id
+     */
+    public UUID getMapUUID() {
+        return CommonMapUUIDStore.getMapUUID(this.mapItem);
     }
 
     /**

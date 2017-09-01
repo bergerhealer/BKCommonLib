@@ -178,6 +178,9 @@ public class CommonMapController implements PacketListener, Listener {
      * @return display info for this UUID
      */
     public synchronized MapDisplayInfo getInfo(UUID mapUUID) {
+        if (mapUUID == null) {
+            return null;
+        }
         MapDisplayInfo info = maps.get(mapUUID);
         if (info == null) {
             info = new MapDisplayInfo(mapUUID);
@@ -679,10 +682,24 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private void handleMapShowEvent(MapShowEvent event) {
+    private synchronized void handleMapShowEvent(MapShowEvent event) {
+        // Check if there are other map displays that should be shown to the player automatically
+        // This uses the 'isGlobal()' property of the display
+        MapDisplayInfo info = CommonMapController.this.getInfo(event.getMapUUID());
+        boolean hasDisplay = false;
+        if (info != null) {
+            for (MapSession session : info.sessions) {
+                if (session.display.isGlobal()) {
+                    session.display.addOwner(event.getPlayer());
+                    hasDisplay = true;
+                    break;
+                }
+            }
+        }
+
         // When defined in the NBT of the item, construct the Map Display automatically
         CommonTagCompound tag = ItemUtil.getMetaTag(event.getMapItem(), false);
-        if (tag != null) {
+        if (tag != null && !hasDisplay) {
             String pluginName = tag.getValue("mapDisplayPlugin", String.class);
             String displayClassName = tag.getValue("mapDisplayClass", String.class);
             if (pluginName != null && displayClassName != null) {

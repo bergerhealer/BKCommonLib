@@ -61,6 +61,7 @@ public class MapDisplay {
     private final MapClip clip = new MapClip();
     private boolean _updateWhenNotViewing = false;
     private boolean _receiveInputWhenHolding = false;
+    private boolean _global = true;
     private int updateTaskId = -1;
     private ItemStack _item = null;
     protected MapDisplayInfo info = null;
@@ -165,6 +166,29 @@ public class MapDisplay {
      */
     public boolean isRunning() {
         return updateTaskId != -1;
+    }
+
+    /**
+     * Gets whether this Map Display is global. New players that view this map will
+     * automatically see the contents of this Map Display if global. By default this is set to true.
+     * 
+     * @return True if this Map Display is visible to all players
+     */
+    public boolean isGlobal() {
+        return this._global;
+    }
+
+    /**
+     * Sets whether this Map Display is global. New players that view this this map will
+     * automatically see the contents of this Map Display if global. By default this is set to true.<br>
+     * <br>
+     * If it is important that players can not see the contents maps that other players see,
+     * this should be set to false.
+     * 
+     * @param global option to set to
+     */
+    public void setGlobal(boolean global) {
+        this._global = global;
     }
 
     /**
