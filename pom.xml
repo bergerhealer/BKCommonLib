@@ -171,6 +171,8 @@
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.txt</include>
+                    <include>**/*.json</include>
+                    <include>**/*.png</include>
                 </includes>
             </resource>
         </resources>

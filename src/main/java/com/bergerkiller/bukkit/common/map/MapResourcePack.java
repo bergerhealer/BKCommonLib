@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
@@ -68,6 +69,7 @@ public class MapResourcePack {
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
+    private BlockRenderProvider currProvider = null;
 
     /**
      * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
@@ -231,54 +233,62 @@ public class MapResourcePack {
             return new Model(); // air. No model.
         }
 
-        // Some blocks are handled by providers
-        BlockRenderProvider provider = BlockRenderProvider.get(blockRenderOptions.getBlockData());
-        if (provider != null) {
-            return provider.createModel(this, blockRenderOptions);
-        }
-
-        String blockName = blockRenderOptions.lookupModelName();
-
-        // Find the blockstate
-        BlockModelState state = this.openGsonObject(BlockModelState.class, ResourceType.BLOCKSTATES, blockName);
-
-        // Find out the variant that is used
-        List<BlockModelState.Variant> variants;
-        if (state != null) {
-            // Figure out from the blockstate what variant to use
-            variants = state.findVariants(blockRenderOptions);
-        } else {
-            // Default variant based on block name
-            BlockModelState.Variant variant = new BlockModelState.Variant();
-            variant.modelName = blockName;
-            variants = Arrays.asList(variant);
-        }
-
-        // If no variants are found, render nothing (AIR)
-        if (variants.isEmpty()) {
-            return new Model();
-        }
-
-        // Not multipart, then simply load the one variant
-        if (variants.size() == 1) {
-            return this.loadBlockVariant(variants.get(0));
-        }
-
-        // Add all variant elements to the model
-        Model result = new Model();
-        boolean succ = true;
-        for (BlockModelState.Variant variant : variants) {
-            Model subModel = this.loadBlockVariant(variant);
-            if (subModel != null) {
-                result.elements.addAll(subModel.elements);
-            } else {
-                succ = false;
+        BlockRenderProvider oldProvider = this.currProvider;
+        try {
+            // Some blocks are handled by providers
+            this.currProvider = BlockRenderProvider.get(blockRenderOptions.getBlockData());
+            if (this.currProvider != null) {
+                Model model = this.currProvider.createModel(this, blockRenderOptions);
+                if (model != null) {
+                    return model;
+                }
             }
-        }
-        if (!succ && result.elements.isEmpty()) {
-            return null;
-        } else {
-            return result;
+
+            String blockName = blockRenderOptions.lookupModelName();
+
+            // Find the blockstate
+            BlockModelState state = this.openGsonObject(BlockModelState.class, ResourceType.BLOCKSTATES, blockName);
+
+            // Find out the variant that is used
+            List<BlockModelState.Variant> variants;
+            if (state != null) {
+                // Figure out from the blockstate what variant to use
+                variants = state.findVariants(blockRenderOptions);
+            } else {
+                // Default variant based on block name
+                BlockModelState.Variant variant = new BlockModelState.Variant();
+                variant.modelName = blockName;
+                variants = Arrays.asList(variant);
+            }
+
+            // If no variants are found, render nothing (AIR)
+            if (variants.isEmpty()) {
+                return new Model();
+            }
+
+            // Not multipart, then simply load the one variant
+            if (variants.size() == 1) {
+                return this.loadBlockVariant(variants.get(0));
+            }
+
+            // Add all variant elements to the model
+            Model result = new Model();
+            boolean succ = true;
+            for (BlockModelState.Variant variant : variants) {
+                Model subModel = this.loadBlockVariant(variant);
+                if (subModel != null) {
+                    result.elements.addAll(subModel.elements);
+                } else {
+                    succ = false;
+                }
+            }
+            if (!succ && result.elements.isEmpty()) {
+                return null;
+            } else {
+                return result;
+            }
+        } finally {
+            this.currProvider = oldProvider; // restore
         }
     }
 
@@ -364,21 +374,43 @@ public class MapResourcePack {
      * @return InputStream to read the file from, null if not found
      */
     protected InputStream openFileStream(ResourceType type, String path) {
-        if (this.archive == null) {
-            return null; // failed to load resource pack file
-        }
-        try {
-            ZipEntry entry = this.archive.getEntry(type.getRoot() + path + type.getExtension());
-            if (entry != null) {
-                return this.archive.getInputStream(entry);
+        // =null: failed to load resource pack file
+        if (this.archive != null) {
+            try {
+                ZipEntry entry = this.archive.getEntry(type.makePath(path));
+                if (entry != null) {
+                    InputStream stream = this.archive.getInputStream(entry);
+                    if (stream != null) {
+                        return stream;
+                    }
+                }
+            } catch (IOException ex) {
             }
-        } catch (IOException ex) {
+            if (this.baseResourcePack != null) {
+                InputStream stream =  this.baseResourcePack.openFileStream(type, path);
+                if (stream != null) {
+                    return stream;
+                }
+            }
         }
-        if (this.baseResourcePack != null) {
-            return this.baseResourcePack.openFileStream(type, path);
-        } else {
-            return null;
+
+        // Fallback: ask provider (if available)
+        if (this.currProvider != null) {
+            try {
+                return this.currProvider.openResource(type, path);
+            } catch (IOException ex) {
+            }
         }
+
+        // Fallback: load from BKCommonLib built-in resources
+        // This handles many block models such as signs
+        InputStream bkc_stream = Common.class.getResourceAsStream(type.makeBKCPath(path));
+        if (bkc_stream != null) {
+            return bkc_stream;
+        }
+
+        // FAILED
+        return null;
     }
 
     /**
@@ -423,9 +455,9 @@ public class MapResourcePack {
      * A type of resource that can be read from a Resource Pack
      */
     public static enum ResourceType {
-        MODELS("assets/minecraft/models/", ".json"),
-        BLOCKSTATES("assets/minecraft/blockstates/", ".json"),
-        TEXTURES("assets/minecraft/textures/", ".png");
+        MODELS("models/", ".json"),
+        BLOCKSTATES("blockstates/", ".json"),
+        TEXTURES("textures/", ".png");
 
         private final String root;
         private final String ext;
@@ -441,6 +473,14 @@ public class MapResourcePack {
 
         public String getExtension() {
             return this.ext;
+        }
+
+        public String makePath(String path) {
+            return "assets/minecraft/" + this.root + path + this.ext;
+        }
+
+        public String makeBKCPath(String path) {
+            return "/com/bergerkiller/bukkit/common/internal/resources/" + this.root + path + this.ext;
         }
     }
 

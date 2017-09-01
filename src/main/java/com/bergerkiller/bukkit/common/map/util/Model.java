@@ -188,6 +188,7 @@ public class Model {
             @SerializedName("texture")
             private String textureName = "";
             private float[] uv = null;
+            private int uvrot = 0;
             public transient MapTexture texture = null;
             public int tintindex = -1;
             public BlockFace cullface;
@@ -240,6 +241,13 @@ public class Model {
                     this.texture = texture_uv;
                 }
 
+                // uvrot is a custom BKCommonLib property to rotate the texture increments of 90 degrees
+                // This helps to deal with odd texture positions not handled right with the uv parameter
+                // If a 'notchian' way to do this exists, please replace it with that then
+                if (this.uvrot != 0) {
+                    this.texture = MapTexture.rotate(this.texture, this.uvrot);
+                }
+
                 // This is used for biome colors and such
                 // For now I hardcode it by overlaying a green factor color
                 if (this.tintindex != -1) {
@@ -253,6 +261,7 @@ public class Model {
             public Face clone() {
                 Face clone = new Face();
                 clone.uv = (this.uv == null) ? null : this.uv.clone();
+                clone.uvrot = this.uvrot;
                 clone.textureName = this.textureName;
                 clone.texture = this.texture.clone();
                 clone.cullface = this.cullface;
