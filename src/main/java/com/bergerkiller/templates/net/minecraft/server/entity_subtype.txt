@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
@@ -201,31 +203,31 @@ class EntityHuman extends EntityLiving {
     protected unknown int bS;
     protected unknown float bT = 0.02F;
     private unknown int f;
-    private final com.mojang.authlib.GameProfile gameProfile:g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:g;
 #elseif version >= 1.11
     private unknown int h;
     protected unknown float bO;
     protected unknown float bP;
     private unknown int bR;
-    private final com.mojang.authlib.GameProfile gameProfile:bS;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bS;
 #elseif version >= 1.10.2
     private unknown int h;
     protected unknown float bP;
     protected unknown float bQ;
     private unknown int bS;
-    private final com.mojang.authlib.GameProfile gameProfile:bT;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bT;
 #elseif version >= 1.9.4
     private unknown int h;
     protected unknown float bO;
     protected unknown float bP;
     private unknown int bR;
-    private final com.mojang.authlib.GameProfile gameProfile:bS;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bS;
 #elseif version >= 1.9
     private unknown int h;
     protected unknown float bN;
     protected unknown float bO;
     private unknown int bQ;
-    private final com.mojang.authlib.GameProfile gameProfile:bR;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bR;
 #else
     private unknown int f;
     private unknown ItemStack g;
@@ -233,7 +235,7 @@ class EntityHuman extends EntityLiving {
     protected unknown float bE;
     protected unknown float bF;
     private unknown int i;
-    private final com.mojang.authlib.GameProfile gameProfile:bH;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bH;
 #endif
 
     public String spawnWorld;

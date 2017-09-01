@@ -5,13 +5,15 @@ import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.Converter;
-import com.mojang.authlib.GameProfile;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -139,24 +141,24 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     public static final PropertyConverter<UUID> toGameProfileId = new PropertyConverter<UUID>(UUID.class) {
         @Override
         public UUID convertInput(Object value) {
-            if (value instanceof GameProfile) {
-                return ((GameProfile) value).getId();
+            if (GameProfileHandle.T.isAssignableFrom(value)) {
+                return GameProfileHandle.T.getId.invoke(value);
             } else {
                 return null;
             }
         }
     };
-    public static final PropertyConverter<Object> toGameProfileFromId = new PropertyConverter<Object>(GameProfile.class) {
+    public static final PropertyConverter<Object> toGameProfileFromId = new PropertyConverter<Object>(GameProfileHandle.T.getType()) {
         @Override
         public Object convertInput(Object value) {
             if (value instanceof String) {
                 String name = (String) value;
-                return CommonUtil.getGameProfile(name);
+                return Handle.getRaw(CommonUtil.getGameProfile(name));
             } else if (value instanceof UUID) {
                 UUID uuid = (UUID) value;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getUniqueId().equals(uuid)) {
-                        return PlayerUtil.getGameProfile(player);
+                        return Handle.getRaw(PlayerUtil.getGameProfile(player));
                     }
                 }
 

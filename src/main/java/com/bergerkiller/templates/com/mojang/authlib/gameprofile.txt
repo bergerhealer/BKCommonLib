@@ -1,0 +1,10 @@
+package com.mojang.authlib;
+
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+
+class GameProfile {
+    public (GameProfileHandle) GameProfile(UUID uuid, String name);
+
+    public UUID getId();
+    public String getName();
+}

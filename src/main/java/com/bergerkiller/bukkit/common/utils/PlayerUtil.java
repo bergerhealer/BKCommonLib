@@ -1,13 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
@@ -17,7 +18,6 @@ import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
-import com.mojang.authlib.GameProfile;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -179,8 +179,8 @@ public class PlayerUtil extends EntityUtil {
      * @param player to get game profile from
      * @return The player's GameProfile
      */
-    public static GameProfile getGameProfile(Player player) {
-        return EntityHumanHandle.T.gameProfile.get(Conversion.toEntityHandle.convert(player));
+    public static GameProfileHandle getGameProfile(Player player) {
+        return EntityHumanHandle.T.gameProfile.get(HandleConversion.toEntityHandle(player));
     }
 
     /**

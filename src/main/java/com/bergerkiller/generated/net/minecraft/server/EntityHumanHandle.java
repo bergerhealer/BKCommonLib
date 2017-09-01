@@ -4,7 +4,7 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.mojang.authlib.GameProfile;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityHuman</b>.
@@ -131,11 +131,11 @@ public class EntityHumanHandle extends EntityLivingHandle {
         T.exp.setFloat(instance, value);
     }
 
-    public GameProfile getGameProfile() {
+    public GameProfileHandle getGameProfile() {
         return T.gameProfile.get(instance);
     }
 
-    public void setGameProfile(GameProfile value) {
+    public void setGameProfile(GameProfileHandle value) {
         T.gameProfile.set(instance, value);
     }
 
@@ -165,7 +165,7 @@ public class EntityHumanHandle extends EntityLivingHandle {
         public final Template.Field.Integer expLevel = new Template.Field.Integer();
         public final Template.Field.Integer expTotal = new Template.Field.Integer();
         public final Template.Field.Float exp = new Template.Field.Float();
-        public final Template.Field<GameProfile> gameProfile = new Template.Field<GameProfile>();
+        public final Template.Field.Converted<GameProfileHandle> gameProfile = new Template.Field.Converted<GameProfileHandle>();
         public final Template.Field<String> spawnWorld = new Template.Field<String>();
 
     }

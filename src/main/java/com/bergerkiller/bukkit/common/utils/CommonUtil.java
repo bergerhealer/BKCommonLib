@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
@@ -14,7 +15,6 @@ import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
 import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager;
 import com.google.common.base.Charsets;
-import com.mojang.authlib.GameProfile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -254,7 +254,7 @@ public class CommonUtil {
      * @return Player's GameProfile, OfflinePlayer profile used if player not
      * found.
      */
-    public static GameProfile getGameProfile(String name) {
+    public static GameProfileHandle getGameProfile(String name) {
         Player player = Bukkit.getPlayer(name);
         if (player != null) {
             //The right way
@@ -262,7 +262,7 @@ public class CommonUtil {
         }
 
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
-        return new GameProfile(uuid, name);
+        return GameProfileHandle.createNew(uuid, name);
     }
 
     /**

@@ -3,11 +3,11 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
-import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.HumanEntity;
 
 /**
@@ -34,7 +34,7 @@ public class NMSEntityHuman extends NMSEntityLiving {
     public static final FieldAccessor<Integer> expTotal = EntityHumanHandle.T.expTotal.toFieldAccessor();
     public static final FieldAccessor<Float> exp = EntityHumanHandle.T.exp.toFieldAccessor();
 
-    public static final FieldAccessor<GameProfile> gameProfile = EntityHumanHandle.T.gameProfile.toFieldAccessor();
+    public static final FieldAccessor<GameProfileHandle> gameProfile = EntityHumanHandle.T.gameProfile.toFieldAccessor();
 
     public static final FieldAccessor<String> spawnWorld = EntityHumanHandle.T.spawnWorld.toFieldAccessor();
 
