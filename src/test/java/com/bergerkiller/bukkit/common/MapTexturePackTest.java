@@ -30,6 +30,7 @@ import com.bergerkiller.bukkit.common.map.util.Vector2f;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
 public class MapTexturePackTest
 {
@@ -119,7 +120,10 @@ class Pseudo3DImagePanel extends JPanel
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        Model model = textures.getBlockModel(BlockData.fromMaterialData(Material.WOOD_STAIRS, 2));
+        BlockRenderOptions opt = BlockData.fromMaterialData(Material.RAILS, 6).getDefaultRenderOptions();
+        
+        
+        Model model = textures.getBlockModel(opt);
         Matrix4f transform = new Matrix4f();
 
         transform.translate(p0.x, 0.0f, p0.y);

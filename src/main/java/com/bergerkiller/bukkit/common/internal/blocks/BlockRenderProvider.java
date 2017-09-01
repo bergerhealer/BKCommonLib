@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.internal.blocks.type.WaterRenderingProvider;
+import com.bergerkiller.bukkit.common.internal.blocks.type.FluidRenderingProvider;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -22,7 +22,8 @@ public abstract class BlockRenderProvider {
     private static final Map<Material, BlockRenderProvider> providers = new HashMap<Material, BlockRenderProvider>();
 
     static {
-        register(new WaterRenderingProvider());
+        register(new FluidRenderingProvider("blocks/water_overlay", "blocks/water_still", Material.WATER, Material.STATIONARY_WATER));
+        register(new FluidRenderingProvider("blocks/lava_still", "blocks/lava_still", Material.LAVA, Material.STATIONARY_LAVA));
     }
 
     private static void register(BlockRenderProvider provider) {

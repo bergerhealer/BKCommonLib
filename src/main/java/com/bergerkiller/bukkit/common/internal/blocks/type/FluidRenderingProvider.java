@@ -2,8 +2,7 @@ package com.bergerkiller.bukkit.common.internal.blocks.type;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Locale;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -14,20 +13,19 @@ import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
-public class WaterRenderingProvider extends BlockRenderProvider {
+public class FluidRenderingProvider extends BlockRenderProvider {
+    private final List<Material> fluidMaterials;
+    private final String fluidTexture1, fluidTexture2;
 
-    private final HashSet<Material> _waterTypes;
-
-    public WaterRenderingProvider() {
-        _waterTypes = new HashSet<Material>();
-        _waterTypes.addAll(Arrays.asList(Material.WATER, Material.STATIONARY_WATER));
+    public FluidRenderingProvider(String texture1, String texture2, Material... fluidMaterials) {
+        this.fluidTexture1 = texture1;
+        this.fluidTexture2 = texture2;
+        this.fluidMaterials = Arrays.asList(fluidMaterials);
     }
 
     @Override
@@ -45,31 +43,31 @@ public class WaterRenderingProvider extends BlockRenderProvider {
 
     @Override
     public Collection<Material> getTypes() {
-        return _waterTypes;
+        return this.fluidMaterials;
     }
 
     @Override
     public Model createModel(MapResourcePack resources, BlockRenderOptions options) {
         // Read all water blocks from options
-        WaterBlock self = getWaterBlock(options.getBlockData());
-        WaterBlock neigh_nn = readWaterBlock(options, "neigh_nn");
-        WaterBlock neigh_ne = readWaterBlock(options, "neigh_ne");
-        WaterBlock neigh_ee = readWaterBlock(options, "neigh_ee");
-        WaterBlock neigh_se = readWaterBlock(options, "neigh_se");
-        WaterBlock neigh_ss = readWaterBlock(options, "neigh_ss");
-        WaterBlock neigh_sw = readWaterBlock(options, "neigh_sw");
-        WaterBlock neigh_ww = readWaterBlock(options, "neigh_ww");
-        WaterBlock neigh_nw = readWaterBlock(options, "neigh_nw");
+        FluidBlock self = getFluidBlock(options.getBlockData());
+        FluidBlock neigh_nn = readFluidBlock(options, "neigh_nn");
+        FluidBlock neigh_ne = readFluidBlock(options, "neigh_ne");
+        FluidBlock neigh_ee = readFluidBlock(options, "neigh_ee");
+        FluidBlock neigh_se = readFluidBlock(options, "neigh_se");
+        FluidBlock neigh_ss = readFluidBlock(options, "neigh_ss");
+        FluidBlock neigh_sw = readFluidBlock(options, "neigh_sw");
+        FluidBlock neigh_ww = readFluidBlock(options, "neigh_ww");
+        FluidBlock neigh_nw = readFluidBlock(options, "neigh_nw");
 
         Model model = new Model();
         Model.Element water = new Model.Element();
 
         // This is the 'side' of the water where no water animations show
-        MapTexture waterSide = resources.getTexture("blocks/water_overlay");
+        MapTexture waterSide = resources.getTexture(this.fluidTexture1);
 
         // Cut out only the first animation block from the texture
         // For now, we don't do animations in this renderer.
-        MapTexture waterTexture = resources.getTexture("blocks/water_still");
+        MapTexture waterTexture = resources.getTexture(this.fluidTexture2);
         waterTexture = waterTexture.getView(0, 0, waterTexture.getWidth(), waterTexture.getWidth()).clone();
 
         for (BlockFace blockFace : FaceUtil.BLOCK_SIDES) {
@@ -87,7 +85,7 @@ public class WaterRenderingProvider extends BlockRenderProvider {
 
         // Calculate the water levels of the 4 corners
         // Only do this when not flowing down
-        if ((options.getBlockData().getRawData() & 0x8) != 0x8) {
+        if (!isFlowingDown(options.getBlockData())) {
             Face topFace = water.faces.get(BlockFace.UP);
             topFace.quad.p0.y = calcLevel(self, neigh_ww, neigh_nw, neigh_nn);
             topFace.quad.p1.y = calcLevel(self, neigh_ss, neigh_sw, neigh_ww);
@@ -99,64 +97,70 @@ public class WaterRenderingProvider extends BlockRenderProvider {
         return model;
     }
 
-    private final float dist(float aa, float ab) {
-        float a = (aa - ab);
-        return (a * a);
-    }
-
-    private final float calcLevel(WaterBlock... blocks) {
+    private final float calcLevel(FluidBlock... blocks) {
         float weight = 0.0f;
         float level = 0.0f;
-        for (WaterBlock block : blocks) {
+        for (FluidBlock block : blocks) {
             level += block.level;
             weight += block.weight;
         }
         return level / weight;
     }
 
-    private static void storeWaterBlock(BlockRenderOptions options, String name, World world, int x, int y, int z, BlockFace face) {
-        options.put(name, getWaterBlock(WorldUtil.getBlockData(world, x + face.getModX(), y, z + face.getModZ())).name());
+    private void storeWaterBlock(BlockRenderOptions options, String name, World world, int x, int y, int z, BlockFace face) {
+        options.put(name, getFluidBlock(WorldUtil.getBlockData(world, x + face.getModX(), y, z + face.getModZ())).name());
     }
 
-    private static WaterBlock readWaterBlock(BlockRenderOptions options, String name) {
+    private static FluidBlock readFluidBlock(BlockRenderOptions options, String name) {
         String valueStr = options.get(name);
         if (valueStr != null) {
-            for (WaterBlock block : WaterBlock.values()) {
+            for (FluidBlock block : FluidBlock.values()) {
                 if (valueStr.equals(block.name())) {
                     return block;
                 }
             }
         }
-        return WaterBlock.AIR;
+        return FluidBlock.AIR;
     }
 
-    private static WaterBlock getWaterBlock(BlockData blockData) {
+    @SuppressWarnings("deprecation")
+    private FluidBlock getFluidBlock(BlockData blockData) {
         Material mat = blockData.getType();
-        if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
-            return WaterBlock.L_VALUES[blockData.getRawData() & 0x7];
-        } else if (mat.isSolid()) {
-            return WaterBlock.SOLID;
+        for (Material f : this.fluidMaterials) {
+            if (mat == f) {
+                return FluidBlock.L_VALUES[blockData.getRawData() & 0x7];
+            }
+        }
+
+        if (mat.isSolid()) {
+            return FluidBlock.SOLID;
         } else {
-            return WaterBlock.AIR;
+            return FluidBlock.AIR;
         }
     }
 
-    private static enum WaterBlock {
-        L0(14.0f), L1(11.5f), L2(10.8f), L3(9.0f), L4(7f), L5(5.7f), L6(3.8f), L7(2.0f),
-        SOLID(0.0f, 0.0f), AIR(0.0f, 1.0f);
+    @SuppressWarnings("deprecation")
+    private boolean isFlowingDown(BlockData blockData) {
+        return (blockData.getRawData() & 0x8) == 0x8;
+    }
 
-        public static final WaterBlock[] L_VALUES = {L0,L1,L2,L3,L4,L5,L6,L7};
+    private static enum FluidBlock {
+        L0(14.0f), L1(11.5f), L2(10.8f), L3(9.0f), L4(7f), L5(5.7f), L6(3.8f), L7(2.0f),
+        SOLID(0.0f, 0.0f), AIR(0.0f, 0.5f);
+
+        public static final FluidBlock[] L_VALUES = {L0,L1,L2,L3,L4,L5,L6,L7};
 
         public final float level;
         public final float weight;
 
-        private WaterBlock(float level) {
+        private FluidBlock(float level) {
             this(level, 1.0f);
         }
 
-        private WaterBlock(float level, float weight) {
+        private FluidBlock(float level, float weight) {
             this.level = level;
             this.weight = weight;
         }
     }
+
 }
