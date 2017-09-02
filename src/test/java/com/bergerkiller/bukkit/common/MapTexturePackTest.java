@@ -120,8 +120,8 @@ class Pseudo3DImagePanel extends JPanel
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterialData(Material.RAILS, 6).getDefaultRenderOptions();
-        
+        BlockRenderOptions opt = BlockData.fromMaterialData(Material.CHEST, 0).getDefaultRenderOptions();
+        System.out.println(opt);
         
         Model model = textures.getBlockModel(opt);
         Matrix4f transform = new Matrix4f();
@@ -132,6 +132,10 @@ class Pseudo3DImagePanel extends JPanel
         transform.rotateY(yaw);
         transform.translate(-8, -8, -8);
         image.drawModel(model, transform);
+
+        transform.translate(20, 0 ,0);
+        
+        image.drawModel(textures.getBlockModel(Material.FURNACE), transform);
 
         g.drawImage(image.toJavaImage(), 0, 0, null);
 

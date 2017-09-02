@@ -1,0 +1,1484 @@
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EnumDifficulty -> org.bukkit.Difficulty]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EnumItemSlot -> org.bukkit.inventory.EquipmentSlot]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardTeam]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Entity -> org.bukkit.entity.Player]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.nbt.CommonTagCompound -> net.minecraft.server.NBTTagCompound]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) MinecraftKey -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityLiving -> com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInSettings -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInSettingsHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataWatcherRegistry -> com.bergerkiller.generated.net.minecraft.server.DataWatcherRegistryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<EnumProtocolDirectionHandle, BiMap> -> (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftSound]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.TileEntityHopper -> com.bergerkiller.generated.net.minecraft.server.TileEntityHopperHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ExplosionHandle -> net.minecraft.server.v1_12_R1.Explosion]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle -> net.minecraft.server.v1_12_R1.MobSpawnerAbstract]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutMount]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.FoodMetaDataHandle -> net.minecraft.server.v1_12_R1.FoodMetaData]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle.ChatSerializerHandle -> net.minecraft.server.v1_12_R1.IChatBaseComponent.ChatSerializer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle -> net.minecraft.server.v1_12_R1.WeightedRandom]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.TileEntityFurnace -> com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntityTeleport]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Container -> com.bergerkiller.generated.net.minecraft.server.ContainerHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) IChunkProvider -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle -> net.minecraft.server.v1_12_R1.ShapedRecipes]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, org.bukkit.Chunk -> (org.bukkit.Chunk) org.bukkit.craftbukkit.CraftChunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle -> net.minecraft.server.v1_12_R1.PacketPlayInUseItem]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.bases.IntVector2 -> net.minecraft.server.ChunkCoordIntPair]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle -> net.minecraft.server.v1_12_R1.WorldType]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.IntHashMap<?> -> (com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>) IntHashMap<EntityTrackerEntry>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NBTBase -> com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityLiving -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataWatcher.Item -> com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.Block]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInVehicleMoveHandle -> net.minecraft.server.v1_12_R1.PacketPlayInVehicleMove]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.CraftChunk -> com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle -> net.minecraft.server.v1_12_R1.MinecraftKey]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegionFileCache -> com.bergerkiller.generated.net.minecraft.server.RegionFileCacheHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ItemStack -> com.bergerkiller.generated.net.minecraft.server.ItemStackHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle -> net.minecraft.server.v1_12_R1.WorldProvider]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.IBlockData -> com.bergerkiller.bukkit.common.wrappers.BlockData]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity -> com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCustomSoundEffectHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle -> net.minecraft.server.v1_12_R1.CraftingManager]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WeightedRandom -> com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.Inventory) CraftInventory -> org.bukkit.inventory.Inventory]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInBlockPlace -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInWindowClickHandle -> net.minecraft.server.v1_12_R1.PacketPlayInWindowClick]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<Object, Object> -> (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.WorldType -> org.bukkit.WorldType]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutVehicleMove -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetCooldownHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSetCooldown]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IPlayerFileData -> com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle -> net.minecraft.server.v1_12_R1.EnumProtocolDirection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, Iterable -> (Iterable) RegistryBlockID<IBlockData>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BlockCobbleWall -> com.bergerkiller.generated.net.minecraft.server.BlockCobbleWallHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlocksHandle -> net.minecraft.server.v1_12_R1.Blocks]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>> -> (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutNamedEntitySpawn]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<TileEntityHandle>) List<TileEntity> -> List<TileEntityHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle -> net.minecraft.server.v1_12_R1.IBlockData]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityItemHandle -> net.minecraft.server.v1_12_R1.EntityItem]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<org.bukkit.entity.Entity> -> List<net.minecraft.server.v1_12_R1.Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Chunk -> org.bukkit.Chunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutWindowItems]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Float>) DataWatcherObject<Float>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.ChunkSection -> com.bergerkiller.bukkit.common.wrappers.ChunkSection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.World -> net.minecraft.server.WorldServer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<BiomeMetaHandle> -> (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) FoodMetaData -> Object]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PlayerInventory -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutChat -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.Difficulty -> net.minecraft.server.EnumDifficulty]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryBrewer -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, List<?> -> com.bergerkiller.bukkit.common.nbt.CommonTagList]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Chunk -> com.bergerkiller.generated.net.minecraft.server.ChunkHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutNamedEntitySpawn -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInUpdateSign -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInUpdateSignHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle -> net.minecraft.server.v1_12_R1.EntityMinecartFurnace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle -> net.minecraft.server.v1_12_R1.EnumDirection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle -> org.bukkit.inventory.MainHand]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Packet -> com.bergerkiller.bukkit.common.protocol.CommonPacket]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ShapelessRecipes -> com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutCollect -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInBoatMoveHandle -> net.minecraft.server.v1_12_R1.PacketPlayInBoatMove]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryCrafting -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IChatBaseComponent.ChatSerializer -> com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle.ChatSerializerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<CommonTagCompound>) List<NBTTagCompound> -> List<CommonTagCompound>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.ChatMessageType -> com.bergerkiller.bukkit.common.wrappers.ChatMessageType]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object[]) net.md_5.bungee.api.chat.BaseComponent[] -> Object[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, List<Object>[] -> (List<Object>[]) List<Entity>[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, Class<?> -> (Class<?>) Class<? extends Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityHanging -> com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.ChainConverter[cost=2, org.bukkit.entity.Entity -> (org.bukkit.entity.Entity) CraftEntity] {
+  -> com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.Entity]
+  -> com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Entity -> (org.bukkit.entity.Entity) CraftEntity]
+}
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<MobEffectListHandle, MobEffectHandle> -> (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle -> net.minecraft.server.v1_12_R1.EntitySlice]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RecipeItemStack -> com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumDirection.EnumAxis -> com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.block.CraftBlockState -> com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle -> net.minecraft.server.v1_12_R1.IChatBaseComponent]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) DataWatcherSerializer<T> -> Object]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) ChatMessageType -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) net.minecraft.server.ItemStack -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutChatHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutChat]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutEntityLook -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityTracker -> com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle -> net.minecraft.server.v1_12_R1.EnumGamemode]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.CrashReport -> com.bergerkiller.generated.net.minecraft.server.CrashReportHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutNamedSoundEffect -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerChunk -> com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle -> net.minecraft.server.v1_12_R1.MinecraftServer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle -> net.minecraft.server.v1_12_R1.IDataManager]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.MerchantInventory) CraftInventoryMerchant -> org.bukkit.inventory.MerchantInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, String -> com.bergerkiller.bukkit.common.wrappers.ResourceKey]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerAbilities -> com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.entity.EntityHandle -> org.bukkit.entity.Entity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryMerchant]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> -> net.minecraft.server.DataWatcher.Item<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.inventory.ItemStack -> net.minecraft.server.ItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<CommonTagCompound> -> (List<CommonTagCompound>) List<NBTTagCompound>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle -> net.minecraft.server.v1_12_R1.AttributeInstance]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> (org.bukkit.entity.Fireball) EntityFireball]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (Collection<Object>) Collection<AttributeInstance> -> Collection<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.inventory.MainHand -> net.minecraft.server.EnumHand]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle -> net.minecraft.server.v1_12_R1.RegistryID]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardTeam -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, int[] -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle -> net.minecraft.server.v1_12_R1.IWorldAccess]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle -> net.minecraft.server.v1_12_R1.PacketPlayInBlockPlace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<WorldServerHandle>) List<WorldServer> -> List<WorldServerHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BlockFence -> com.bergerkiller.generated.net.minecraft.server.BlockFenceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle -> net.minecraft.server.v1_12_R1.EntityTracker]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle -> org.bukkit.inventory.Inventory]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumSkyBlock -> com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MobEffectList -> com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.inventory.EquipmentSlot -> net.minecraft.server.EnumItemSlot]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.InventoryEnderChestHandle -> net.minecraft.server.v1_12_R1.InventoryEnderChest]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle -> net.minecraft.server.v1_12_R1.SoundEffectType]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle -> net.minecraft.server.v1_12_R1.RegistryMaterials]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> -> java.lang.Class<?>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) EnumDirection -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ReportedException -> com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumItemSlot -> com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IBlockAccess]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutPosition -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, Object[] -> (Object[]) net.md_5.bungee.api.chat.BaseComponent[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle -> net.minecraft.server.v1_12_R1.EnumItemSlot]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.BlockPosition -> com.bergerkiller.bukkit.common.bases.IntVector3]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle -> net.minecraft.server.v1_12_R1.AttributeMapServer]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartAbstract -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$4$1[cost=1, List<org.bukkit.inventory.ItemStack> -> net.minecraft.server.v1_12_R1.ItemStack[]]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegistryID -> com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, org.bukkit.map.MapCursor[] -> net.minecraft.server.v1_12_R1.MapIcon[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Set<org.bukkit.entity.Player> -> Set<net.minecraft.server.v1_12_R1.EntityPlayer>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumProtocol -> com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle -> net.minecraft.server.v1_12_R1.EnumMainHand]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.Entity]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (List<?>) List<T extends Entity> -> List<?>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.SoundEffect -> com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.InventoryClickType -> net.minecraft.server.InventoryClickType]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityPainting -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityPaintingHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item -> net.minecraft.server.DataWatcher.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryBeacon -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumProtocolDirection -> com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IChunkLoader]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WorldServer -> com.bergerkiller.generated.net.minecraft.server.WorldServerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.util.LongObjectHashMap -> com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> -> Map<java.io.File, RegionFileHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle -> org.bukkit.inventory.PlayerInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle -> net.minecraft.server.v1_12_R1.SoundCategory]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.World -> com.bergerkiller.generated.net.minecraft.server.WorldHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle -> net.minecraft.server.v1_12_R1.EnumDifficulty]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IBlockData -> com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MobEffectHandle -> net.minecraft.server.v1_12_R1.MobEffect]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityExperienceOrb -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrbHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ResourceKey -> net.minecraft.server.SoundEffect]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartCommandBlock -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle -> net.minecraft.server.v1_12_R1.PlayerConnection]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumGamemode -> com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Double -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MinecraftServer -> com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Item -> org.bukkit.Material]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutNamedSoundEffect]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle -> org.bukkit.craftbukkit.v1_12_R1.potion.CraftPotionUtil]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.SoundCategory -> com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NonNullList -> com.bergerkiller.generated.net.minecraft.server.NonNullListHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerList -> com.bergerkiller.generated.net.minecraft.server.PlayerListHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityPaintingHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityPainting]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MapIcon -> com.bergerkiller.generated.net.minecraft.server.MapIconHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ItemStackHandle -> net.minecraft.server.v1_12_R1.ItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<String>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PortalTravelAgent -> com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, net.minecraft.server.v1_12_R1.IChatBaseComponent[] -> com.bergerkiller.bukkit.common.wrappers.ChatText[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldServerHandle -> net.minecraft.server.v1_12_R1.WorldServer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.plugin.SimplePluginManagerHandle -> org.bukkit.plugin.SimplePluginManager]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PacketPlayOutBoss.Action -> Object]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) net.minecraft.server.Block -> Object]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) EnumHand -> Object]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.BeaconInventory) CraftInventoryBeacon -> org.bukkit.inventory.BeaconInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IHopper]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockFenceHandle -> net.minecraft.server.v1_12_R1.BlockFence]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle -> org.bukkit.entity.HumanEntity]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.plugin.SimplePluginManager -> com.bergerkiller.generated.org.bukkit.plugin.SimplePluginManagerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) BossBattle.BarColor]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<org.bukkit.inventory.ItemStack> -> List<net.minecraft.server.v1_12_R1.ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<IntVector3, org.bukkit.block.BlockState> -> (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> -> List<AxisAlignedBBHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<Object> -> List<Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle -> net.minecraft.server.v1_12_R1.PlayerInventory]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock -> com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle -> net.minecraft.server.v1_12_R1.SoundEffect]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.entity.HumanEntity -> com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.InventoryClickType -> com.bergerkiller.bukkit.common.wrappers.InventoryClickType]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.plugin.RegisteredListener -> com.bergerkiller.generated.org.bukkit.plugin.RegisteredListenerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.VoidTypeConverter$1[cost=1, Object -> void]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.TileEntityHandle -> net.minecraft.server.v1_12_R1.TileEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.GameMode -> net.minecraft.server.EnumGamemode]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<Entity> -> List<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Boolean>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInSettingsHandle -> net.minecraft.server.v1_12_R1.PacketPlayInSettings]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMove -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle -> net.minecraft.server.v1_12_R1.DataWatcherObject]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EnumDirection -> org.bukkit.block.BlockFace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, (java.util.Iterator<Long>) java.util.Iterator -> java.util.Iterator<Long>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.PlayerInventory) CraftInventoryPlayer -> org.bukkit.inventory.PlayerInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle -> net.minecraft.server.v1_12_R1.MobSpawnerData]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<EntityHumanHandle> -> (List<EntityHumanHandle>) List<EntityHuman>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (BlockFace) EnumDirection]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.CraftTravelAgent -> com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.Block]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (Set<EntityTrackerEntryHandle>) Set<EntityTrackerEntry> -> Set<EntityTrackerEntryHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MobSpawnerData -> com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerInventory -> com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.IChatBaseComponent -> com.bergerkiller.bukkit.common.wrappers.ChatText]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> -> List<org.bukkit.inventory.ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityTypes -> com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> -> Map<java.util.UUID, EntityHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, Iterable -> (Iterable) RegistryBlocks<MinecraftKey, Block>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.MobEffect]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) NavigationAbstract -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, (Set<?>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> -> Set<?>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) EntityHuman.EnumChatVisibility -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.CrashReportSystemDetails -> com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BaseBlockPositionHandle -> net.minecraft.server.v1_12_R1.BaseBlockPosition]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutMap -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) EntityHuman.EnumChatVisibility]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.UseAction -> net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IChunkProvider]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ContainerHandle -> net.minecraft.server.v1_12_R1.Container]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NetworkManager -> com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerListHandle -> net.minecraft.server.v1_12_R1.PlayerList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ItemHandle -> net.minecraft.server.v1_12_R1.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.PlayerAbilities -> net.minecraft.server.PlayerAbilities]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, org.bukkit.World -> (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle -> net.minecraft.server.v1_12_R1.EntityMinecartTNT]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MobSpawnerAbstract -> com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.InventoryCrafting]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle -> net.minecraft.server.v1_12_R1.EntityLiving]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle -> net.minecraft.server.v1_12_R1.BlockPosition]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<SlotHandle> -> (List<SlotHandle>) List<Slot>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle -> net.minecraft.server.v1_12_R1.ChunkSection]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<CraftInputSlot> -> (List<CraftInputSlot>) NonNullList<RecipeItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BiomeBase.BiomeMeta -> com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.InventoryMerchant]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<IWorldAccessHandle> -> (List<IWorldAccessHandle>) List<IWorldAccess>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.IBlockData]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.Chunk) org.bukkit.craftbukkit.CraftChunk -> org.bukkit.Chunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, net.minecraft.server.v1_12_R1.ChunkSection[] -> com.bergerkiller.bukkit.common.wrappers.ChunkSection[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle -> net.minecraft.server.v1_12_R1.EntityHuman]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WorldType -> com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutWindowItems -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.block.BlockState) CraftBlockState -> org.bukkit.block.BlockState]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle -> net.minecraft.server.v1_12_R1.PlayerAbilities]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutMount -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DataWatcherRegistryHandle -> net.minecraft.server.v1_12_R1.DataWatcherRegistry]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) NetworkManager -> Object]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.ChainConverter[cost=2, (List<org.bukkit.inventory.ItemStack>) ItemStack[] -> List<org.bukkit.inventory.ItemStack>] {
+  -> com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, (List<org.bukkit.inventory.ItemStack>) ItemStack[] -> org.bukkit.inventory.ItemStack[]]
+  -> com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$1[cost=1, org.bukkit.inventory.ItemStack[] -> List<org.bukkit.inventory.ItemStack>]
+}
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<EntityHandle> -> (List<EntityHandle>) List<Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<MobSpawnerDataHandle> -> (List<MobSpawnerDataHandle>) List<MobSpawnerData>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryPlayer -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryPlayerHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) NavigationListener -> Object]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Long -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (Collection<MobEffectHandle>) Collection<MobEffect> -> Collection<MobEffectHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle -> net.minecraft.server.v1_12_R1.NibbleArray]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.v1_12_R1.EntityHuman]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChunkCoordIntPair -> com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<net.minecraft.server.v1_12_R1.DataWatcher.Item> -> List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WorldProvider -> com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegionFileHandle -> net.minecraft.server.v1_12_R1.RegionFile]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<TileEntityHandle> -> (List<TileEntityHandle>) List<TileEntity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftTravelAgent]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInTeleportAcceptHandle -> net.minecraft.server.v1_12_R1.PacketPlayInTeleportAccept]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutCustomSoundEffect -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCustomSoundEffectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Object>) DataWatcherObject<ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<String, NBTBaseHandle> -> (Map<String, NBTBaseHandle>) Map<String, NBTBase>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutMap]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutPosition]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, Set<?> -> (Set<?>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.Material -> net.minecraft.server.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.v1_12_R1.EntityPlayer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) FoodMetaData]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle -> net.minecraft.server.v1_12_R1.NBTTagList]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) IAttribute -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Block -> org.bukkit.Material]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) net.minecraft.server.Chunk -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.FoodMetaData -> com.bergerkiller.generated.net.minecraft.server.FoodMetaDataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.potion.CraftPotionUtil -> com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher -> com.bergerkiller.bukkit.common.wrappers.DataWatcher]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Item -> com.bergerkiller.generated.net.minecraft.server.ItemHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutBoss -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutBossHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, Collection<net.minecraft.server.v1_12_R1.Chunk> -> Collection<org.bukkit.Chunk>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInTabCompleteHandle -> net.minecraft.server.v1_12_R1.PacketPlayInTabComplete]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.TileEntityHopperHandle -> net.minecraft.server.v1_12_R1.TileEntityHopper]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> IBlockState<?>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutUnloadChunk -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumHand -> com.bergerkiller.generated.net.minecraft.server.EnumHandHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChatMessageType -> com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle -> net.minecraft.server.v1_12_R1.IBlockState]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumMainHand -> com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle -> net.minecraft.server.v1_12_R1.IPlayerFileData]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Float -> Float]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Packet -> com.bergerkiller.generated.net.minecraft.server.PacketHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) PacketPlayOutBoss.Action]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.TileEntity -> com.bergerkiller.generated.net.minecraft.server.TileEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BaseBlockPosition -> com.bergerkiller.generated.net.minecraft.server.BaseBlockPositionHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Integer -> Integer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Entity -> org.bukkit.entity.Player]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockHandle -> net.minecraft.server.v1_12_R1.Block]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<ItemStackHandle>) List<ItemStack> -> List<ItemStackHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.util.LongHashSet -> com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) IChunkLoader -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WorldNBTStorage -> com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutRemoveEntityEffect]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<NBTBaseHandle> -> (List<NBTBaseHandle>) List<NBTBase>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, org.bukkit.Server -> (org.bukkit.Server) CraftServer]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.plugin.PluginDescriptionFile -> com.bergerkiller.generated.org.bukkit.plugin.PluginDescriptionFileHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle -> net.minecraft.server.v1_12_R1.BiomeBase.BiomeMeta]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle -> net.minecraft.server.v1_12_R1.BiomeBase]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Collection<MobEffectHandle> -> (Collection<MobEffectHandle>) Collection<MobEffect>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartTNT -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle -> net.minecraft.server.v1_12_R1.TileEntityFurnace]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ShapedRecipes -> com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Byte -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EntitySlice<?> -> List<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.IInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle -> net.minecraft.server.v1_12_R1.ChunkProviderServer]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Short -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle -> net.minecraft.server.v1_12_R1.EntityMinecartRideable]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle -> net.minecraft.server.v1_12_R1.RecipeItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.SoundEffect -> com.bergerkiller.bukkit.common.wrappers.ResourceKey]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle -> net.minecraft.server.v1_12_R1.ShapelessRecipes]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Float -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IAttribute]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EntityTracker -> com.bergerkiller.bukkit.common.wrappers.EntityTracker]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.InventoryEnderChest -> com.bergerkiller.generated.net.minecraft.server.InventoryEnderChestHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntity -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryFurnaceHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryFurnace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>> -> (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Slot -> com.bergerkiller.generated.net.minecraft.server.SlotHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInArmAnimation -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.BrewerInventory) CraftInventoryBrewer -> org.bukkit.inventory.BrewerInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, String -> com.bergerkiller.bukkit.common.wrappers.ChatText]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.Vec3DHandle -> net.minecraft.server.v1_12_R1.Vec3D]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle -> net.minecraft.server.v1_12_R1.PacketPlayInSetCreativeSlot]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInResourcePackStatus -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.block.BlockState -> net.minecraft.server.TileEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EnumMainHand -> com.bergerkiller.bukkit.common.wrappers.HumanHand]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Iterable) RegistryBlocks<MinecraftKey, Block> -> Iterable]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle -> net.minecraft.server.v1_12_R1.DataWatcher.Item]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutCombatEvent -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCombatEventHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, List<?> -> net.minecraft.server.EntitySlice<net.minecraft.server.Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSetCooldown -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetCooldownHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) PlayerConnection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle -> org.bukkit.craftbukkit.v1_12_R1.block.CraftBlockState]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntity]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityTrackerEntry -> com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher -> net.minecraft.server.DataWatcher]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.ItemStack) CraftItemStack -> org.bukkit.inventory.ItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, Set<net.minecraft.server.v1_12_R1.EntityPlayer> -> Set<org.bukkit.entity.Player>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, (ChunkSectionHandle[]) ChunkSection[] -> ChunkSectionHandle[]]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld -> org.bukkit.World]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) net.minecraft.server.WorldServer -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<java.util.UUID, EntityHandle> -> (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerConnection -> com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IDataManager -> com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.md_5.bungee.api.chat.BaseComponent]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Packet -> com.bergerkiller.bukkit.common.protocol.CommonPacket]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.ChunkCoordIntPair -> com.bergerkiller.bukkit.common.bases.IntVector2]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle -> net.minecraft.server.v1_12_R1.ReportedException]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutEntityLook]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.SlotHandle -> net.minecraft.server.v1_12_R1.Slot]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage -> com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryPlayerHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryPlayer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack> -> (Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack>) Map<ItemStack, ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction -> com.bergerkiller.bukkit.common.wrappers.UseAction]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.Chunk -> net.minecraft.server.Chunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) Item -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) PacketPlayOutCombatEvent.EnumCombatEventType]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, (List<Object>[]) List<Entity>[] -> List<Object>[]]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.inventory.PlayerInventory -> com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.IntHashMap<?> -> com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutLogin -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutLoginHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Entity -> com.bergerkiller.generated.net.minecraft.server.EntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.AttributeMapServer -> com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle -> net.minecraft.server.v1_12_R1.RecipesFurnace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Collection<org.bukkit.block.BlockState> -> Collection<net.minecraft.server.v1_12_R1.TileEntity>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle -> net.minecraft.server.v1_12_R1.EntityHanging]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, java.lang.Class<?> -> (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInUseItem -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle -> net.minecraft.server.v1_12_R1.EntityPlayer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<net.minecraft.server.v1_12_R1.Entity> -> List<org.bukkit.entity.Entity>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MovingObjectPosition -> com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, AttributeInstance -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.NBTTagList -> com.bergerkiller.bukkit.common.nbt.CommonTagList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Vec3D -> org.bukkit.util.Vector]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.IChatBaseComponent]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MobEffect -> com.bergerkiller.generated.net.minecraft.server.MobEffectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.TileEntityBeacon]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle -> net.minecraft.server.v1_12_R1.ChunkCoordIntPair]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, ChunkSectionHandle[] -> net.minecraft.server.v1_12_R1.ChunkSection[]]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) InventoryEnderChest -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle -> net.minecraft.server.v1_12_R1.EnumDirection.EnumAxis]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> -> List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.FurnaceInventory) CraftInventoryFurnace -> org.bukkit.inventory.FurnaceInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.WorldType -> net.minecraft.server.WorldType]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Iterable) RegistryMaterials<MinecraftKey, IRecipe> -> Iterable]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, com.bergerkiller.bukkit.common.wrappers.ChunkSection[] -> net.minecraft.server.v1_12_R1.ChunkSection[]]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.entity.Entity) CraftEntity -> org.bukkit.entity.Entity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutTitle.EnumTitleAction]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (org.bukkit.inventory.MainHand) EnumHand]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutAttachEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> -> Map<EnumProtocolDirectionHandle, BiMap>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) net.minecraft.server.MobEffect -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.SoundEffectType -> com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldDataHandle -> net.minecraft.server.v1_12_R1.WorldData]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle -> net.minecraft.server.v1_12_R1.EntityMinecartHopper]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, List<Object>[] -> net.minecraft.server.v1_12_R1.EntitySlice<net.minecraft.server.v1_12_R1.Entity>[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<String, NBTBaseHandle>) Map<String, NBTBase> -> Map<String, NBTBaseHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<net.minecraft.server.v1_12_R1.ItemStack> -> List<org.bukkit.inventory.ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) DataWatcherSerializer<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.util.Vector -> net.minecraft.server.Vec3D]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockFenceGateHandle -> net.minecraft.server.v1_12_R1.BlockFenceGate]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityWeatherHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityWeather]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle -> net.minecraft.server.v1_12_R1.NBTBase]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataWatcherObject -> com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher.Item<?> -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle -> net.minecraft.server.v1_12_R1.MapIcon.Type]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumDifficulty -> com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NonNullListHandle -> net.minecraft.server.v1_12_R1.NonNullList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ChatText -> net.minecraft.server.IChatBaseComponent]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMove]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<AxisAlignedBBHandle> -> (List<AxisAlignedBBHandle>) List<AxisAlignedBB>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<WorldServerHandle> -> (List<WorldServerHandle>) List<WorldServer>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DamageSource -> com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle -> net.minecraft.server.v1_12_R1.PacketPlayInArmAnimation]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Integer>) DataWatcherObject<Integer>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle -> net.minecraft.server.v1_12_R1.EntityMinecartCommandBlock]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInUpdateSignHandle -> net.minecraft.server.v1_12_R1.PacketPlayInUpdateSign]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.inventory.MainHand -> com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, com.mojang.authlib.GameProfile -> com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, Collection<net.minecraft.server.v1_12_R1.TileEntity> -> Collection<org.bukkit.block.BlockState>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) IChatBaseComponent -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityLiving]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.HumanHand -> net.minecraft.server.EnumMainHand]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NibbleArray -> com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MapIcon.Type -> com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, Iterable -> (Iterable) RegistryMaterials<MinecraftKey, IRecipe>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Explosion -> com.bergerkiller.generated.net.minecraft.server.ExplosionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntitySlice -> com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutLoginHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutLogin]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityPlayer -> com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryFurnace -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryFurnaceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IRecipeHandle -> net.minecraft.server.v1_12_R1.IRecipe]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle -> org.bukkit.craftbukkit.v1_12_R1.util.LongHashSet]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryCrafting]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityInsentient -> com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.v1_12_R1.EntityHuman]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.inventory.Inventory -> com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PlayerChunkMap -> com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle -> net.minecraft.server.v1_12_R1.DamageSource]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Collection<Object> -> (Collection<Object>) Collection<AttributeInstance>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WeightedRandom.WeightedRandomChoice -> com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.World -> org.bukkit.World]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle -> org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkHandle -> net.minecraft.server.v1_12_R1.Chunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Entity -> org.bukkit.entity.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) NavigationListener]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer -> org.bukkit.Server]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<SlotHandle>) List<Slot> -> List<SlotHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegistryMaterials -> com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityWeather -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityWeatherHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<org.bukkit.inventory.ItemStack> -> (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IntHashMap -> com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle -> net.minecraft.server.v1_12_R1.EntityMinecartAbstract]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle -> net.minecraft.server.v1_12_R1.DataPaletteBlock]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MethodProfiler -> com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<net.minecraft.server.v1_12_R1.DataWatcher> -> List<com.bergerkiller.bukkit.common.wrappers.DataWatcher>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IInventory -> com.bergerkiller.generated.net.minecraft.server.IInventoryHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.RecipeItemStack -> com.bergerkiller.bukkit.common.inventory.CraftInputSlot]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.Entity -> org.bukkit.entity.Entity]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityItem -> com.bergerkiller.generated.net.minecraft.server.EntityItemHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.bases.IntVector3 -> net.minecraft.server.BlockPosition]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Byte>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, net.minecraft.server.v1_12_R1.EntitySlice<net.minecraft.server.v1_12_R1.Entity>[] -> List<Object>[]]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Block -> com.bergerkiller.generated.net.minecraft.server.BlockHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle -> net.minecraft.server.v1_12_R1.EntityTypes]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IInventoryHandle -> net.minecraft.server.v1_12_R1.IInventory]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumMoveType -> com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DedicatedPlayerList -> com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, com.bergerkiller.bukkit.common.wrappers.ChatText[] -> net.minecraft.server.v1_12_R1.IChatBaseComponent[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntityEquipment]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle -> net.minecraft.server.v1_12_R1.ChatMessageType]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ChatMessageType -> net.minecraft.server.ChatMessageType]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) BossBattle.BarColor -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<String>) DataWatcherObject<String>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NBTTagCompound -> com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle -> net.minecraft.server.v1_12_R1.NBTTagCompound]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle -> net.minecraft.server.v1_12_R1.DedicatedPlayerList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> -> List<BiomeMetaHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle -> net.minecraft.server.v1_12_R1.ChunkRegionLoader]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntity -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ResourceKey -> String]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PlayerConnection -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RecipesFurnace -> com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegionFileCacheHandle -> net.minecraft.server.v1_12_R1.RegionFileCache]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<NBTBaseHandle>) List<NBTBase> -> List<NBTBaseHandle>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, PacketPlayOutPosition.EnumPlayerTeleportFlags -> ?]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Map<java.io.File, RegionFileHandle> -> (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.EntityTracker -> net.minecraft.server.EntityTracker]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Blocks -> com.bergerkiller.generated.net.minecraft.server.BlocksHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityHandle -> net.minecraft.server.v1_12_R1.Entity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.plugin.RegisteredListenerHandle -> org.bukkit.plugin.RegisteredListener]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting -> org.bukkit.inventory.CraftingInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftWorld]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.block.BlockFace -> net.minecraft.server.EnumDirection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.TileEntityFurnace]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle -> net.minecraft.server.v1_12_R1.MethodProfiler]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<IWorldAccessHandle>) List<IWorldAccess> -> List<IWorldAccessHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Vec3D -> com.bergerkiller.generated.net.minecraft.server.Vec3DHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle -> net.minecraft.server.v1_12_R1.DataWatcher]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegistryMaterials -> com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumDirection -> com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle -> org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) org.bukkit.inventory.MainHand -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChunkProviderServer -> com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle -> net.minecraft.server.v1_12_R1.RegistryBlockID]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher.Item<?> -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldHandle -> net.minecraft.server.v1_12_R1.World]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) InventoryEnderChest]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Class<?> -> (Class<?>) Class<T>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.map.MapCursor -> net.minecraft.server.MapIcon]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IWorldAccess -> com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.entity.Entity -> com.bergerkiller.generated.org.bukkit.entity.EntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle -> net.minecraft.server.v1_12_R1.AttributeMapServer]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChunkRegionLoader -> com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle -> net.minecraft.server.v1_12_R1.EntityTrackerEntry]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<ItemStackHandle> -> (List<ItemStackHandle>) List<ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.SoundCategory -> String]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle -> net.minecraft.server.v1_12_R1.PortalTravelAgent]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, byte[] -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> (org.bukkit.entity.Arrow) EntityArrow]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<org.bukkit.entity.Player> -> (List<org.bukkit.entity.Player>) List<EntityHuman>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher.Item<?> -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.MapIcon -> org.bukkit.map.MapCursor]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, String -> net.minecraft.server.SoundCategory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<EntityHandle>) List<Entity> -> List<EntityHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftServer]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<MobSpawnerDataHandle>) List<MobSpawnerData> -> List<MobSpawnerDataHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.CraftWorld -> com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.inventory.CraftInputSlot -> net.minecraft.server.RecipeItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegionFile -> com.bergerkiller.generated.net.minecraft.server.RegionFileHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Float>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutTitle -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.CraftSound -> com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.CraftingManager -> com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle -> net.minecraft.server.v1_12_R1.EnumParticle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Entity -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInUseEntity.EnumEntityUseAction -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCombatEventHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutCombatEvent]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartHopper -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumParticle -> com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryBeacon]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, byte -> net.minecraft.server.MapIcon.Type]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftChunk]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Byte -> Byte]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInTabComplete -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInTabCompleteHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.AttributeInstance -> com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> -> Map<IntVector3, org.bukkit.block.BlockState>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.World -> org.bukkit.World]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.RegistryBlockID -> com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntityTeleport -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BlockFenceGate -> com.bergerkiller.generated.net.minecraft.server.BlockFenceGateHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> -> Map<MobEffectListHandle, MobEffectHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BiomeBase -> com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Integer>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle -> net.minecraft.server.v1_12_R1.EnumMoveType]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockCobbleWallHandle -> net.minecraft.server.v1_12_R1.BlockCobbleWall]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityItemFrame -> com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> -> List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutCollectHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutCollect]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle -> com.mojang.authlib.GameProfile]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, String -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PacketPlayOutCombatEvent.EnumCombatEventType -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.protocol.CommonPacket -> (CommonPacket) Packet<?>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.AxisAlignedBB -> com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.GenericAttributes -> com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle -> net.minecraft.server.v1_12_R1.GenericAttributes]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInSetCreativeSlot -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle -> net.minecraft.server.v1_12_R1.EntityItemFrame]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle -> net.minecraft.server.v1_12_R1.RegistryMaterials]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartFurnace -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle -> net.minecraft.server.v1_12_R1.IntHashMap]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle -> net.minecraft.server.v1_12_R1.EnumSkyBlock]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, ChatText[] -> (ChatText[]) String[]]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInWindowClick -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInWindowClickHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> Comparable<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<EntityHumanHandle>) List<EntityHuman> -> List<EntityHumanHandle>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.WorldData -> com.bergerkiller.generated.net.minecraft.server.WorldDataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcherObject<?> -> DataWatcher.Key<Object>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInVehicleMove -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInVehicleMoveHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle -> net.minecraft.server.v1_12_R1.PlayerChunkMap]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutUnloadChunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Integer -> com.bergerkiller.bukkit.common.nbt.CommonTag]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle -> net.minecraft.server.v1_12_R1.MovingObjectPosition]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers -> com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) BossBattle.BarStyle -> Object]
+
+[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Map<?, ?> -> com.bergerkiller.bukkit.common.nbt.CommonTagCompound]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<org.bukkit.entity.Player> -> List<net.minecraft.server.v1_12_R1.EntityPlayer>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<net.minecraft.server.v1_12_R1.EntityPlayer> -> List<org.bukkit.entity.Player>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.ItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.CraftServer -> com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, BiMap<Integer, Class<? extends Packet<?>>> -> BiMap]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.TileEntity -> org.bukkit.block.BlockState]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle -> net.minecraft.server.v1_12_R1.MobEffectList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.CastingConverter[cost=1, BiMap -> BiMap<Integer, Class<? extends Packet<?>>>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ChatText -> String]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Set<EntityTrackerEntryHandle> -> (Set<EntityTrackerEntryHandle>) Set<EntityTrackerEntry>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.NBTTagCompound -> com.bergerkiller.bukkit.common.nbt.CommonTagCompound]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle -> org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.AttributeMapServer -> com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, IBlockState<?> -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> -> Map<Object, Object>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryBrewer]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.BlockPosition -> com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) BossBattle.BarStyle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInBoatMove -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInBoatMoveHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MinecraftKey -> com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IRecipe -> com.bergerkiller.generated.net.minecraft.server.IRecipeHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.MapConversion$MapConverter$ElementConverter[cost=1, (Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack>) Map<ItemStack, ItemStack> -> Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.CrashReportHandle -> net.minecraft.server.v1_12_R1.CrashReport]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, Collection<org.bukkit.Chunk> -> Collection<net.minecraft.server.v1_12_R1.Chunk>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle -> net.minecraft.server.v1_12_R1.NetworkManager]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, String -> String]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryMerchant -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntityEquipment -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IBlockState -> com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntityMetadata -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataPaletteBlock -> com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.NBTTagList -> com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityHuman -> com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle -> org.bukkit.craftbukkit.v1_12_R1.util.LongObjectHashMap]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle -> net.minecraft.server.v1_12_R1.CrashReportSystemDetails]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle -> net.minecraft.server.v1_12_R1.WeightedRandom.WeightedRandomChoice]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle -> net.minecraft.server.v1_12_R1.PacketPlayInUseEntity.EnumEntityUseAction]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MapIconHandle -> net.minecraft.server.v1_12_R1.MapIcon]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.nbt.CommonTagList -> net.minecraft.server.NBTTagList]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle -> net.minecraft.server.v1_12_R1.EnumProtocol]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutRemoveEntityEffect -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle -> net.minecraft.server.v1_12_R1.PacketPlayInResourcePackStatus]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataWatcher -> com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.Entity]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Iterable) RegistryBlockID<IBlockData> -> Iterable]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (List<?>) NonNullList<E> -> List<?>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrbHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityExperienceOrb]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> PacketPlayOutPosition.EnumPlayerTeleportFlags]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutEntityMetadata]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutVehicleMove]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutBossHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutBoss]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle -> net.minecraft.server.v1_12_R1.AxisAlignedBB]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle -> net.minecraft.server.v1_12_R1.PlayerChunk]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle -> net.minecraft.server.v1_12_R1.EntityInsentient]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.World -> net.minecraft.server.WorldServer]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.block.Block) CraftBlock -> org.bukkit.block.Block]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (List<CraftInputSlot>) NonNullList<RecipeItemStack> -> List<CraftInputSlot>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutTitle.EnumTitleAction -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketHandle -> net.minecraft.server.v1_12_R1.Packet]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) NetworkManager]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.plugin.PluginDescriptionFileHandle -> org.bukkit.plugin.PluginDescriptionFile]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, (ChatText[]) String[] -> com.bergerkiller.bukkit.common.wrappers.ChatText[]]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInTeleportAccept -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInTeleportAcceptHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle -> org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] -> IChatBaseComponentHandle[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher.Item -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutTitle]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Comparable<?> -> Object]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EntityMinecartRideable -> com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) EnumCreatureType]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.IChatBaseComponent -> com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle -> net.minecraft.server.v1_12_R1.PacketPlayInUseEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle -> net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntity]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> -> net.minecraft.server.DataWatcher.Item<?>]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayInUseEntity -> com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, net.minecraft.server.v1_12_R1.MapIcon[] -> org.bukkit.map.MapCursor[]]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.ChunkSection -> net.minecraft.server.ChunkSection]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle -> net.minecraft.server.v1_12_R1.WorldNBTStorage]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EnumGamemode -> org.bukkit.GameMode]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> -> (DataWatcher.Key<Byte>) DataWatcherObject<Byte>]
+
+[cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, Boolean -> Boolean]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item> -> List<net.minecraft.server.v1_12_R1.DataWatcher.Item>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> AttributeInstance]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle]
+
+[cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChunkSection -> com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<com.bergerkiller.bukkit.common.wrappers.DataWatcher> -> List<net.minecraft.server.v1_12_R1.DataWatcher>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.ItemStack -> org.bukkit.inventory.ItemStack]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) PlayerInventory]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, (List<org.bukkit.entity.Player>) List<EntityHuman> -> List<org.bukkit.entity.Player>]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EnumHandHandle -> net.minecraft.server.v1_12_R1.EnumHand]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.PlayerAbilities -> com.bergerkiller.bukkit.common.wrappers.PlayerAbilities]
+
+[cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> net.minecraft.server.v1_12_R1.EntityLiving]
+

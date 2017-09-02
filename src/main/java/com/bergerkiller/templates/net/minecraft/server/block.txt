@@ -96,7 +96,15 @@ class Blocks {
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
 
+#if version >= 1.12
     public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
+#elseif version >= 1.11
+    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();
+#elseif version >= 1.9
+    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:s();
+#else
+    public abstract (Map<Object, Object>) ImmutableMap<IBlockState, Comparable> getStates:b();
+#endif
 }
 
 interface IBlockState {

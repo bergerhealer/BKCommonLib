@@ -26,62 +26,72 @@ public class NBTConversion {
         return CommonTagCompound.create(nmsNBTTagCompoundHandle);
     }
 
+    @ConverterMethod(output="net.minecraft.server.NBTTagCompound")
+    public static Object toNBTTagHandle(CommonTagCompound commonTag) {
+        return commonTag.getRawHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.NBTTagList")
+    public static Object toNBTTagHandle(CommonTagList commonTag) {
+        return commonTag.getRawHandle();
+    }
+
     @ConverterMethod(output="T extends net.minecraft.server.NBTBase")
     public static Object toNBTTagHandle(CommonTag commonTag) {
         return commonTag.getRawHandle();
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTagCompound createCommonTag(Map<?, ?> mapData) {
         return (CommonTagCompound) CommonTag.createForData(mapData);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTagList createCommonTag(List<?> listData) {
         return (CommonTagList) CommonTag.createForData(listData);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Byte data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Short data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Integer data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Long data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Float data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(Double data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(byte[] data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(int[] data) {
         return CommonTag.createForData(data);
     }
 
-    @ConverterMethod
+    @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(String data) {
         return CommonTag.createForData(data);
     }

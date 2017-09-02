@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>1.12.1</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
-        <project.mountiplexversion>1.5-SNAPSHOT</project.mountiplexversion>
+        <project.mountiplexversion>1.7</project.mountiplexversion>
         <junit.version>4.11</junit.version>
         <project.cibuild/>
     </properties>
@@ -67,6 +67,11 @@
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
 
+        <repository>
+            <id>local-repo</id>
+            <url>file:///${project.parent.basedir}/lib</url>
+        </repository>
+
     </repositories>
 
     <pluginRepositories>
@@ -86,20 +91,38 @@
     </pluginRepositories>
 
     <dependencies>
+        <!-- Spigot API includes the Bukkit API and is what plugins generally use -->
+        <!-- We also depend on netty for the network logic, which is available in public repo -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>${project.cbversion}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.15.Final</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- The full server jar is only used during test; it should not be exposed as a dependency -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>${project.cbversion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
             <version>${project.cbversion}</version>
-            <scope>system</scope>
+            <scope>test</scope>
             <systemPath>${project.basedir}/lib/spigot-${project.cbversion}.jar</systemPath>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>
@@ -304,6 +327,21 @@
                     <showDeprecation>false</showDeprecation>
                 </configuration>
             </plugin>
+
+            <!-- Surefire plugin for running the PostTestHandler after running all the tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>com.bergerkiller.bukkit.common.PostTestHandler</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+
         </plugins>
 
         <!-- This section here is purely to stop lifecycle errors from happening in Eclipse IDE -->
