@@ -103,6 +103,15 @@ public class MapResourcePack {
     }
 
     /**
+     * Clears all cached models and textures, forcing a reload from the pack archive(s)
+     */
+    public void clearCache() {
+        textureCache.clear();
+        modelCache.clear();
+        blockModelCache.clear();
+    }
+
+    /**
      * Obtains the model for a particular Block in the World. Block-specific rendering
      * options are efficiently handled here.
      * 
