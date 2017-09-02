@@ -144,8 +144,6 @@
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryBrewer -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, List<?> -> com.bergerkiller.bukkit.common.nbt.CommonTagList]
-
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.Chunk -> com.bergerkiller.generated.net.minecraft.server.ChunkHandle]
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutNamedEntitySpawn -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle]
@@ -252,8 +250,6 @@
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle -> net.minecraft.server.v1_12_R1.RegistryID]
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardTeam -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle]
-
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, int[] -> com.bergerkiller.bukkit.common.nbt.CommonTag]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle -> net.minecraft.server.v1_12_R1.IWorldAccess]
 
@@ -362,8 +358,6 @@
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle -> net.minecraft.server.v1_12_R1.PlayerConnection]
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumGamemode -> com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle]
-
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Double -> com.bergerkiller.bukkit.common.nbt.CommonTag]
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MinecraftServer -> com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle]
 
@@ -578,8 +572,6 @@
 
 [cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) NavigationListener -> Object]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Long -> com.bergerkiller.bukkit.common.nbt.CommonTag]
-
 [cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, (Collection<MobEffectHandle>) Collection<MobEffect> -> Collection<MobEffectHandle>]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle -> net.minecraft.server.v1_12_R1.NibbleArray]
@@ -704,15 +696,11 @@
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ShapedRecipes -> com.bergerkiller.generated.net.minecraft.server.ShapedRecipesHandle]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Byte -> com.bergerkiller.bukkit.common.nbt.CommonTag]
-
 [cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.EntitySlice<?> -> List<Object>]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> net.minecraft.server.v1_12_R1.IInventory]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle -> net.minecraft.server.v1_12_R1.ChunkProviderServer]
-
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Short -> com.bergerkiller.bukkit.common.nbt.CommonTag]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle -> net.minecraft.server.v1_12_R1.EntityMinecartRideable]
 
@@ -721,8 +709,6 @@
 [cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.SoundEffect -> com.bergerkiller.bukkit.common.wrappers.ResourceKey]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ShapelessRecipesHandle -> net.minecraft.server.v1_12_R1.ShapelessRecipes]
-
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Float -> com.bergerkiller.bukkit.common.nbt.CommonTag]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) IAttribute]
 
@@ -1156,8 +1142,6 @@
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle -> net.minecraft.server.v1_12_R1.PortalTravelAgent]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, byte[] -> com.bergerkiller.bukkit.common.nbt.CommonTag]
-
 [cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, org.bukkit.entity.Entity -> (org.bukkit.entity.Arrow) EntityArrow]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.builtin.CollectionConversion$CollectionConverter$ElementConverter[cost=1, List<org.bukkit.entity.Player> -> (List<org.bukkit.entity.Player>) List<EntityHuman>]
@@ -1240,8 +1224,6 @@
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle -> com.mojang.authlib.GameProfile]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, String -> com.bergerkiller.bukkit.common.nbt.CommonTag]
-
 [cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) PacketPlayOutCombatEvent.EnumCombatEventType -> Object]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.protocol.CommonPacket -> (CommonPacket) Packet<?>]
@@ -1284,15 +1266,11 @@
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle -> org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack]
 
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Integer -> com.bergerkiller.bukkit.common.nbt.CommonTag]
-
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle -> net.minecraft.server.v1_12_R1.MovingObjectPosition]
 
 [cost=1] com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers -> com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle]
 
 [cost=0] com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (Object) BossBattle.BarStyle -> Object]
-
-[cost=2] com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=2, Map<?, ?> -> com.bergerkiller.bukkit.common.nbt.CommonTagCompound]
 
 [cost=1] com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, List<org.bukkit.entity.Player> -> List<net.minecraft.server.v1_12_R1.EntityPlayer>]
 

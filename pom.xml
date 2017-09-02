@@ -67,9 +67,10 @@
             <url>http://nexus.hc.to/content/repositories/pub_releases</url>
         </repository>
 
+        <!-- Local repository stores the server implementations for during test -->
         <repository>
             <id>local-repo</id>
-            <url>file:///${project.parent.basedir}/lib</url>
+            <url>file:///${project.basedir}/lib</url>
         </repository>
 
     </repositories>
