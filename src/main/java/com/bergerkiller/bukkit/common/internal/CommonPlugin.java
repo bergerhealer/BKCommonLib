@@ -307,7 +307,8 @@ public class CommonPlugin extends PluginBase {
             WorldListenerHook.unhook(world);
         }
         HandlerList.unregisterAll(listener);
-        this.unregister((PacketListener) this.mapController);
+        PacketUtil.removePacketListener(this.mapController);
+        PacketUtil.removePacketListener(this.tabController);
 
         // Clear running tasks
         for (Task task : startedTasks) {
