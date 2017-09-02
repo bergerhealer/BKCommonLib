@@ -88,11 +88,14 @@ public class MapResourcePack {
      */
     public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackFilePath) {
         this.baseResourcePack = baseResourcePack;
-        try {
-            this.archive = new JarFile(resourcePackFilePath);
-        } catch (IOException ex) {
-            this.archive = null;
-            Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack", ex);
+        this.archive = null;
+        if (resourcePackFilePath.length() > 0) {
+            try {
+                this.archive = new JarFile(resourcePackFilePath);
+            } catch (IOException ex) {
+                this.archive = null;
+                Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + resourcePackFilePath, ex);
+            }
         }
     }
 
@@ -395,11 +398,13 @@ public class MapResourcePack {
                 }
             } catch (IOException ex) {
             }
-            if (this.baseResourcePack != null) {
-                InputStream stream =  this.baseResourcePack.openFileStream(type, path);
-                if (stream != null) {
-                    return stream;
-                }
+        }
+
+        // Fallback: try the underlying resource pack (usually Vanilla)
+        if (this.baseResourcePack != null) {
+            InputStream stream =  this.baseResourcePack.openFileStream(type, path);
+            if (stream != null) {
+                return stream;
             }
         }
 

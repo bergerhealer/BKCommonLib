@@ -80,6 +80,10 @@ public final class MapTexture extends MapCanvas {
         return fromStream(plugin.getResource(filename));
     }
 
+    public static MapTexture loadResource(Class<?> ownerClass, String filename) {
+        return fromStream(ownerClass.getResourceAsStream(filename));
+    }
+
     public static MapTexture loadResource(URL imageResourceURL) {
         try {
             return fromStream(imageResourceURL.openStream());
