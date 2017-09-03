@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
@@ -15,6 +16,8 @@ import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.PlayerLoggedOutException;
 import com.comphenix.protocol.injector.packet.PacketRegistry;
+
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -55,6 +58,13 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
         this.monitors.clear();
         this.listeners.clear();
+        if (!CommonUtil.isShuttingDown()) {
+            Logging.LOGGER_NETWORK.warning("Reload detected! ProtocolLib does not officially support reloading the server!");
+            if (!Bukkit.getOnlinePlayers().isEmpty()) {
+                Logging.LOGGER_NETWORK.warning("Players are logged in. This is known to cause complete lock-out of the server!");
+                Logging.LOGGER_NETWORK.warning("If you must absolutely reload, do so from the server terminal with no players logged in");
+            }
+        }
         return true;
     }
 
