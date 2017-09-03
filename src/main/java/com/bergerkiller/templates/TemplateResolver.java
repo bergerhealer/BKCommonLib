@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassDeclarationResolver;
 
 public class TemplateResolver implements ClassDeclarationResolver {
-    private final HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
+    private HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
     private boolean classes_loaded = false;
 
     private final String[] supported_mc_versions = new String[] {
@@ -30,6 +30,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
      */
     public Collection<ClassDeclaration> all() {
         return classes.values();
+    }
+
+    /**
+     * Unloads all class declarations from the cache
+     */
+    public void unload() {
+        this.classes_loaded = false;
+        this.classes = new HashMap<Class<?>, ClassDeclaration>(0);
     }
 
     /**

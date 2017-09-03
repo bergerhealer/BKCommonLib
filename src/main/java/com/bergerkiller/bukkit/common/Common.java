@@ -248,6 +248,14 @@ public class Common {
                 MapResourcePack.VANILLA.load();
             }
         }
+
+        // This unloader takes care of de-referencing everything container in here
+        MountiplexUtil.registerUnloader(new Runnable() {
+            @Override
+            public void run() {
+                TEMPLATE_RESOLVER.unload();
+            }
+        });
     }
 
     /**

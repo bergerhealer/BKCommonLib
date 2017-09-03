@@ -25,6 +25,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -342,6 +343,7 @@ public class CommonPlugin extends PluginBase {
         Common.SERVER.disable(this);
 
         // Dereference
+        MountiplexUtil.unloadMountiplex();
         instance = null;
     }
 

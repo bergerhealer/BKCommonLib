@@ -47,6 +47,14 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public boolean onDisable() {
+        for (CommonPacketMonitor monitor : this.monitors) {
+            ProtocolLibrary.getProtocolManager().removePacketListener(monitor);
+        }
+        for (CommonPacketListener listener : this.listeners) {
+            ProtocolLibrary.getProtocolManager().removePacketListener(listener);
+        }
+        this.monitors.clear();
+        this.listeners.clear();
         return true;
     }
 
@@ -124,6 +132,22 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     @Override
     public void removePacketListeners(Plugin plugin) {
         ProtocolLibrary.getProtocolManager().removePacketListeners(plugin);
+
+        // Remove all listeners of this plugin
+        Iterator<CommonPacketListener> list_iter = listeners.iterator();
+        while (list_iter.hasNext()) {
+            if (list_iter.next().getPlugin() == plugin) {
+                list_iter.remove();
+            }
+        }
+
+        // Remove all monitors of this plugin
+        Iterator<CommonPacketMonitor> mon_iter = monitors.iterator();
+        while (mon_iter.hasNext()) {
+            if (mon_iter.next().getPlugin() == plugin) {
+                mon_iter.remove();
+            }
+        }
     }
 
     @Override
