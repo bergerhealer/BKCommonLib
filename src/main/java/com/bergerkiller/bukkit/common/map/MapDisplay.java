@@ -3,13 +3,11 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.map.MapCursor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,19 +16,12 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.internal.CommonMapController;
-import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -297,6 +288,16 @@ public class MapDisplay {
     }
 
     /**
+     * Sets the map item without refreshing it in any persistent way
+     * 
+     * @param item to set to
+     */
+    public void setMapItemSilently(ItemStack item) {
+        this._item = item;
+        this.onMapItemChanged();
+    }
+
+    /**
      * Updates the item associated with the map. All players and item frame holding this map item 
      * that display this Map Display will have their items swapped. If the new item is not a map item,
      * then this display session is terminated.
@@ -304,50 +305,7 @@ public class MapDisplay {
      * @param item to set to
      */
     public void setMapItem(ItemStack item) {
-        ItemStack trimmed_old_item = CommonMapController.trimExtraData(this._item);
-        ItemStack trimmed_new_item = CommonMapController.trimExtraData(item);
-        boolean itemUnchanged = LogicUtil.bothNullOrEqual(trimmed_old_item, trimmed_new_item);
-
-        if (itemUnchanged) {
-            CommonPlugin.getInstance().getMapController().setDisableMapItemChanges(true);
-        }
-
-        this._item = item;
-        UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(this._item);
-        if (oldMapUUID != null) {
-            // Change in the inventories of all player owners
-            for (Player player : this.getOwners()) {
-                PlayerInventory inv = player.getInventory();
-                for (int i = 0; i < inv.getSize(); i++) {
-                    UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
-                    if (oldMapUUID.equals(mapUUID)) {
-                        inv.setItem(i, item);
-                        if (itemUnchanged) {
-                            PlayerUtil.markItemUnchanged(player, i);
-                        }
-                    }
-                }
-            }
-
-            // All item frames that show this same map
-            for (ItemFrameInfo itemFrameInfo : CommonPlugin.getInstance().getMapController().getItemFrames()) {
-                if (oldMapUUID.equals(itemFrameInfo.lastMapUUID)) {
-                    if (itemUnchanged) {
-                        // When unchanged set the item in the metadata without causing a refresh
-                        DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
-                        DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
-                        dataItem.setValue(item, dataItem.isChanged());
-                    } else {
-                        // When changed, set it normally so the item is refreshed
-                        CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, item);
-                    }
-                }
-            }
-        }
-
-        if (itemUnchanged) {
-            CommonPlugin.getInstance().getMapController().setDisableMapItemChanges(false);
-        }
+        CommonPlugin.getInstance().getMapController().updateMapItem(this._item, item);
     }
 
     /**
@@ -1019,6 +977,11 @@ public class MapDisplay {
     public void onRightClick(MapClickEvent event) {}
 
     /**
+     * Callback function called when the map item of this Map Display changed
+     */
+    public void onMapItemChanged() {}
+
+    /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
      * when viewed
      * 
@@ -1048,5 +1011,15 @@ public class MapDisplay {
         tag.putValue("mapDisplayClass", mapDisplayClass.getName());
         tag.putUUID("mapDisplay", CommonMapUUIDStore.generateDynamicMapUUID());
         return mapItem;
+    }
+
+    /**
+     * Globally refreshes the contents of a particular map item
+     * 
+     * @param oldItem to be refreshed, can not be null
+     * @param newItem to set to, null to remove. Can be same as oldItem.
+     */
+    public static void updateMapItem(ItemStack oldItem, ItemStack newItem) {
+        CommonPlugin.getInstance().getMapController().updateMapItem(oldItem, newItem);
     }
 }

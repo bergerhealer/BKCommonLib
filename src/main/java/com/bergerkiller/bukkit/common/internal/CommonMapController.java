@@ -63,6 +63,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -186,6 +187,70 @@ public class CommonMapController implements PacketListener, Listener {
             maps.put(mapUUID, info);
         }
         return info;
+    }
+
+    /**
+     * Updates the information of a map item, refreshing all item frames
+     * and player inventories storing the item. Map displays are also
+     * updated.
+     * 
+     * @param oldItem that was changed
+     * @param newItem the old item was changed into
+     */
+    public synchronized void updateMapItem(ItemStack oldItem, ItemStack newItem) {
+        boolean unchanged = isItemUnchanged(oldItem, newItem);
+        UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(oldItem);
+        if (oldMapUUID != null) {
+            // Change in the inventories of all player owners
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                PlayerInventory inv = player.getInventory();
+                for (int i = 0; i < inv.getSize(); i++) {
+                    UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
+                    if (oldMapUUID.equals(mapUUID)) {
+                        if (unchanged) {
+                            setDisableMapItemChanges(true);
+                            inv.setItem(i, newItem);
+                            PlayerUtil.markItemUnchanged(player, i);
+                            setDisableMapItemChanges(false);
+                        } else {
+                            inv.setItem(i, newItem);
+                        }
+                    }
+                }
+            }
+
+            // All item frames that show this same map
+            for (ItemFrameInfo itemFrameInfo : CommonPlugin.getInstance().getMapController().getItemFrames()) {
+                if (oldMapUUID.equals(itemFrameInfo.lastMapUUID)) {
+                    if (unchanged) {
+                        // When unchanged set the item in the metadata without causing a refresh
+                        setDisableMapItemChanges(true);
+                        DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
+                        DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
+                        dataItem.setValue(newItem, dataItem.isChanged());
+                        setDisableMapItemChanges(false);
+                    } else {
+                        // When changed, set it normally so the item is refreshed
+                        CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, newItem);
+                    }
+                }
+            }
+
+            // All map displays showing this item
+            MapDisplayInfo info = maps.get(oldMapUUID);
+            if (info != null) {
+                for (MapSession session : info.sessions) {
+                    session.display.setMapItemSilently(newItem);
+                }
+            }
+        }
+
+    }
+
+    private boolean isItemUnchanged(ItemStack item1, ItemStack item2) {
+        ItemStack trimmed_old_item = CommonMapController.trimExtraData(item1);
+        ItemStack trimmed_new_item = CommonMapController.trimExtraData(item2);
+        return LogicUtil.bothNullOrEqual(trimmed_old_item, trimmed_new_item);
     }
 
     /**
