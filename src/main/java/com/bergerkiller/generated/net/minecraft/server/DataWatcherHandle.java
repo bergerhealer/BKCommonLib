@@ -70,7 +70,7 @@ public class DataWatcherHandle extends Template.Handle {
         if (T.get.isAvailable()) {
             rawValue = T.get.invoke(instance, key);
         } else {
-            rawValue = this.read(key).getValue();
+            rawValue = this.read(key).getRawValue();
         }
         return key.getType().getConverter().convert(rawValue);
     }

@@ -29,6 +29,9 @@ class ItemStack {
     }
     </code>
 
+    // available since MC 1.11
+    public optional boolean isEmpty();
+
     public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability);
     public optional (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);
 

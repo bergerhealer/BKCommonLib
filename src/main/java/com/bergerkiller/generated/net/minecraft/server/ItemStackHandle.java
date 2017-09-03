@@ -142,6 +142,8 @@ public class ItemStackHandle extends Template.Handle {
         public final Template.Field.Converted<CommonTagCompound> tagField = new Template.Field.Converted<CommonTagCompound>();
         public final Template.Field.Integer durabilityField = new Template.Field.Integer();
 
+        @Template.Optional
+        public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> getItem = new Template.Method.Converted<Object>();
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();

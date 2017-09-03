@@ -67,15 +67,31 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
     /**
      * Read an object from the watched objects
      *
-     * @param ket Object key
+     * @param key Object key
      * @return Object value at the key
      */
     public <V> V get(Key<V> key) {
-        Item<?> item = handle.read(key);
-        if (item == null) {
+        Object rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
-            return key.getType().getConverter().convert(item.getValue());
+            Object rawValue = DataWatcherHandle.ItemHandle.T.value.get(rawItem);
+            return key.getType().getConverter().convert(rawValue);
+        }
+    }
+
+    /**
+     * Gets the datawatcher item associated with a certain key
+     * 
+     * @param key Object key
+     * @return Object item at the key, <i>null</i> if not registered
+     */
+    public <V> Item<V> getItem(Key<V> key) {
+        Object rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        if (rawItem == null) {
+            return null;
+        } else {
+            return new Item<V>(key, DataWatcherHandle.ItemHandle.createHandle(rawItem));
         }
     }
 
@@ -165,9 +181,31 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
      * @param <V> value type of the item
      */
     public static class Item<V> extends BasicWrapper<DataWatcherHandle.ItemHandle> {
+        private Key<V> key;
+
+        protected Item(Key<V> key, DataWatcherHandle.ItemHandle handle) {
+            this.key = key;
+            this.setHandle(handle);
+        }
 
         public Item(DataWatcherHandle.ItemHandle handle) {
-            setHandle(handle);
+            this.key = null;
+            this.setHandle(handle);
+        }
+
+        /**
+         * Creates a new item referencing this item, but using a particular key
+         * for value translation. If the key specified does not equal the key
+         * of this Item, null is returned instead.
+         * 
+         * @param key of the item
+         * @return translated item
+         */
+        public <W> Item<W> translate(Key<W> key) {
+            if (!key.equals(this.getKey())) {
+                return null;
+            }
+            return new Item<W>(key, this.handle);
         }
 
         /**
@@ -179,17 +217,19 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          */
         @SuppressWarnings("unchecked")
         public Key<V> getKey() {
-            // This is for MC >= 1.10.2
-            if (DataWatcherHandle.ItemHandle.T.key.isAvailable())  {
+            if (this.key != null) {
+                return this.key;
+            } else if (DataWatcherHandle.ItemHandle.T.key.isAvailable())  {
+                // This is for MC >= 1.10.2
                 return (Key<V>) DataWatcherHandle.ItemHandle.T.key.get(this.handle.getRaw());
+            } else {
+                // This is for MC 1.8.8, where we use a proxy object storing typeId (serializer token) and keyId
+                int typeId = DataWatcherHandle.ItemHandle.T.typeId.getInteger(this.handle.getRaw());
+                int keyId = DataWatcherHandle.ItemHandle.T.keyId.getInteger(this.handle.getRaw());
+                Object token = Integer.valueOf(typeId);
+                Object handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<V>(keyId, token);
+                return new Key<V>(handle);
             }
-
-            // This is for MC 1.8.8, where we use a proxy object storing typeId (serializer token) and keyId
-            int typeId = DataWatcherHandle.ItemHandle.T.typeId.getInteger(this.handle.getRaw());
-            int keyId = DataWatcherHandle.ItemHandle.T.keyId.getInteger(this.handle.getRaw());
-            Object token = Integer.valueOf(typeId);
-            Object handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<V>(keyId, token);
-            return new Key<V>(handle);
         }
 
         public boolean isChanged() {
@@ -198,11 +238,27 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
 
         @SuppressWarnings("unchecked")
         public V getValue() {
-            return (V) this.handle.getValue();
+            if (this.key != null) {
+                return this.key.getType().getConverter().convert(this.handle.getValue());
+            } else {
+                return (V) this.handle.getValue();
+            }
+        }
+
+        public Object getRawValue() {
+            return this.handle.getValue();
+        }
+
+        public void setChanged(boolean changed) {
+            this.handle.setChanged(changed);
         }
 
         public void setValue(V value, boolean changed) {
-            this.handle.setValue(value);
+            if (this.key != null) {
+                this.handle.setValue(key.getType().getConverter().convertReverse(value));
+            } else {
+                this.handle.setValue(value);
+            }
             this.handle.setChanged(true);
         }
 
@@ -210,7 +266,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
          * Clones this DataWatcher Item, making sure changes to it does not affect the DataWatcher
          */
         public Item<V> clone() {
-            return new Item<V>(this.handle.cloneHandle());
+            return new Item<V>(this.key, this.handle.cloneHandle());
         }
 
         @Override
@@ -464,21 +520,21 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
             }
 
             /**
-             * Retrieves the Serializer that is used to internally store and restore a particular type
+             * Retrieves the Serializer that is used to externally expose a particular type.
              * 
-             * @param type that is being serialized/deserialized from/to.
+             * @param externalType that is being serialized/deserialized from/to.
              * @return serializer, or null if not found
              */
             @SuppressWarnings("unchecked")
-            public static <V> Type<V> getForType(Class<V> type) {
-                Type<?> result = byTypeMapping.get(type);
+            public static <V> Type<V> getForType(Class<V> externalType) {
+                Type<?> result = byTypeMapping.get(externalType);
                 if (result == null) {
-                    Class<?> internalType = DataSerializerRegistry.getInternalType(type);
+                    Class<?> internalType = DataSerializerRegistry.getInternalType(externalType);
                     if (internalType == null) {
-                        throw new IllegalArgumentException("Object of type " + type.getName() + " can not be stored in a DataWatcher");
+                        throw new IllegalArgumentException("Object of type " + externalType.getName() + " can not be stored in a DataWatcher");
                     }
-                    result = new Type<V>(internalType, type);
-                    byTypeMapping.put(type, result);
+                    result = new Type<V>(internalType, externalType);
+                    byTypeMapping.put(externalType, result);
                 }
                 return (Type<V>) result;
             }

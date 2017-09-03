@@ -46,4 +46,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.11.2 the World Provider 'isDarkWorld' boolean property was inverted.
      */
     public static final boolean WORLD_LIGHT_DARK_INVERTED = Common.evaluateMCVersion(">=", "1.11.2");
+
+    /**
+     * Since Minecraft 1.11 ItemStacks could be 'empty' using the empty constant introduced in 1.8.8.
+     * The player inventory 'dirty' state uses this new empty state, among others.
+     */
+    public static final boolean ITEMSTACK_EMPTY_STATE = Common.evaluateMCVersion(">=", "1.11");
 }

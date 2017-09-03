@@ -12,6 +12,7 @@ import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
@@ -284,7 +285,17 @@ public class PlayerUtil extends EntityUtil {
         index = getInventorySlotIndex(index); // conversion is needed
 
         if (index >= 0 && index < rawOldItems.size() && index < rawSlots.size()) {
-            rawOldItems.set(index, SlotHandle.T.getItem.raw.invoke(rawSlots.get(index)));
+            Object oldItem = SlotHandle.T.getItem.raw.invoke(rawSlots.get(index));
+            if (CommonNMS.isItemEmpty(oldItem)) {
+                if (CommonCapabilities.ITEMSTACK_EMPTY_STATE) {
+                    oldItem = ItemStackHandle.EMPTY_ITEM.getRaw(); // >= MC 1.11
+                } else {
+                    oldItem = null; // <= MC 1.10.2
+                }
+            } else {
+                oldItem = ItemStackHandle.T.cloneItemStack.raw.invoke(oldItem);
+            }
+            rawOldItems.set(index, oldItem);
         }
     }
 }

@@ -65,7 +65,6 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 public class CommonMapController implements PacketListener, Listener {
@@ -378,6 +377,10 @@ public class CommonMapController implements PacketListener, Listener {
             if (mapUUID == null) {
                 return; // not a map
             }
+            if (disableMapItemChanges.get()) {
+                event.setCancelled(true);
+                return; // map changes are suppressed
+            }
             short staticMapId = CommonMapUUIDStore.getStaticMapId(mapUUID);
             if (staticMapId != -1) {
                 this.storeStaticMapId(staticMapId);
@@ -388,22 +391,25 @@ public class CommonMapController implements PacketListener, Listener {
             // Avoid using any Bukkit or Wrapper types here for performance reasons
             short newMapId = this.getMapId(mapUUID);
             List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
-            ListIterator<DataWatcher.Item<Object>> itemsIter = items.listIterator();
-            while (itemsIter.hasNext()) {
-                DataWatcher.Item<Object> item = itemsIter.next();
-                if (!item.getKey().equals(EntityItemFrameHandle.DATA_ITEM)) {
-                    continue;
-                }
-                Object metaItem = item.getValue();
-                if (metaItem == null || ItemStackHandle.T.durabilityField.getInteger(metaItem) == newMapId) {
-                    continue;
-                }
+            if (items != null) {
+                ListIterator<DataWatcher.Item<Object>> itemsIter = items.listIterator();
+                while (itemsIter.hasNext()) {
+                    DataWatcher.Item<ItemStack> item = itemsIter.next().translate(EntityItemFrameHandle.DATA_ITEM);
+                    if (item == null) {
+                        continue;
+                    }
 
-                Object newMapItem = ItemStackHandle.T.cloneItemStack.raw.invoke(metaItem);
-                ItemStackHandle.T.durabilityField.setInteger(newMapItem, newMapId);
-                item = item.clone();
-                item.setValue(newMapItem, item.isChanged());
-                itemsIter.set(item);
+                    ItemStack metaItem = item.getValue();
+                    if (metaItem == null || metaItem.getDurability() == newMapId) {
+                        continue;
+                    }
+
+                    ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
+                    newMapItem.setDurability(newMapId);
+                    item = item.clone();
+                    item.setValue(newMapItem, item.isChanged());
+                    itemsIter.set(CommonUtil.unsafeCast(item));
+                }
             }
         }
     }

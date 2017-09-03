@@ -28,6 +28,9 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -329,7 +332,15 @@ public class MapDisplay {
             // All item frames that show this same map
             for (ItemFrameInfo itemFrameInfo : CommonPlugin.getInstance().getMapController().getItemFrames()) {
                 if (oldMapUUID.equals(itemFrameInfo.lastMapUUID)) {
-                    CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, item);
+                    if (itemUnchanged) {
+                        // When unchanged set the item in the metadata without causing a refresh
+                        DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
+                        DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
+                        dataItem.setValue(item, dataItem.isChanged());
+                    } else {
+                        // When changed, set it normally so the item is refreshed
+                        CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, item);
+                    }
                 }
             }
         }

@@ -34,6 +34,17 @@ import org.bukkit.entity.Player;
  */
 public class CommonNMS {
 
+    public static boolean isItemEmpty(Object rawItemStackHandle) {
+        if (rawItemStackHandle == null) {
+            return true;
+        }
+        if (ItemStackHandle.T.isEmpty.isAvailable()) {
+            return ItemStackHandle.T.isEmpty.invoke(rawItemStackHandle);
+        } else {
+            return false;
+        }
+    }
+
     public static ChunkHandle getHandle(org.bukkit.Chunk chunk) {
         return ChunkHandle.createHandle(HandleConversion.toChunkHandle(chunk));
     }
