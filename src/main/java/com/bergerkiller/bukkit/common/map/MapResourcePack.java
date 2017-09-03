@@ -70,6 +70,7 @@ public class MapResourcePack {
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
     private BlockRenderProvider currProvider = null;
+    private Gson gson = null;
 
     /**
      * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
@@ -443,13 +444,15 @@ public class MapResourcePack {
         try {
             try {
                 Reader reader = new InputStreamReader(inputStream, "UTF-8");
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
-                gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
-                gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
-                gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
-                Gson gson = gsonBuilder.create();
-                T result = gson.fromJson(reader, objectType);
+                if (this.gson == null) {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
+                    gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
+                    gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
+                    gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
+                    this.gson = gsonBuilder.create();
+                }
+                T result = this.gson.fromJson(reader, objectType);
                 if (result == null) {
                     throw new IOException("Failed to parse JSON for " + objectType.getSimpleName() + " at " + path);
                 }
