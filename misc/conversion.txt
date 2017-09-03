@@ -401,9 +401,9 @@ com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, 
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.BlockFenceHandle -> net.minecraft.server.v1_12_R1.BlockFence]
 
-com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle -> org.bukkit.entity.HumanEntity]
-
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.plugin.SimplePluginManager -> com.bergerkiller.generated.org.bukkit.plugin.SimplePluginManagerHandle]
+
+com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle -> org.bukkit.entity.HumanEntity]
 
 com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) BossBattle.BarColor]
 
@@ -640,9 +640,9 @@ com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, 
 
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.PacketPlayOutUnloadChunk -> com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle]
 
-com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChatMessageType -> com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle]
-
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumHand -> com.bergerkiller.generated.net.minecraft.server.EnumHandHandle]
+
+com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.ChatMessageType -> com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle]
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle -> net.minecraft.server.v1_12_R1.IBlockState]
 
@@ -846,9 +846,9 @@ com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, 
 
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.MobEffect -> com.bergerkiller.generated.net.minecraft.server.MobEffectHandle]
 
-com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.TileEntityBeacon]
-
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle -> net.minecraft.server.v1_12_R1.ChunkCoordIntPair]
+
+com.bergerkiller.mountiplex.conversion.Conversion$OutputConverterTree$1[cost=1, Object -> (Object) net.minecraft.server.TileEntityBeacon]
 
 com.bergerkiller.mountiplex.conversion.builtin.ArrayConversion$1$5$1[cost=1, ChunkSectionHandle[] -> net.minecraft.server.v1_12_R1.ChunkSection[]]
 
@@ -904,9 +904,9 @@ com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net
 
 com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, net.minecraft.server.DataWatcher.Item<?> -> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>]
 
-com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle -> net.minecraft.server.v1_12_R1.MapIcon.Type]
-
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.EnumDifficulty -> com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle]
+
+com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle -> net.minecraft.server.v1_12_R1.MapIcon.Type]
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.NonNullListHandle -> net.minecraft.server.v1_12_R1.NonNullList]
 
@@ -1084,9 +1084,9 @@ com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.EntityHandle -> net.minecraft.server.v1_12_R1.Entity]
 
-com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting -> org.bukkit.inventory.CraftingInventory]
-
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.plugin.RegisteredListenerHandle -> org.bukkit.plugin.RegisteredListener]
+
+com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.inventory.CraftingInventory) CraftInventoryCrafting -> org.bukkit.inventory.CraftingInventory]
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle -> org.bukkit.craftbukkit.v1_12_R1.CraftWorld]
 
