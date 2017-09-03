@@ -812,7 +812,7 @@ public abstract class PluginBase extends JavaPlugin {
         if (this.enableMessage != null) {
             log(Level.INFO, this.enableMessage);
         }
-        log(Level.INFO, this.getName() + " version " + this.getVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
+        log(Level.INFO, this.getName() + " version " + this.getDebugVersion() + " enabled! (" + MathUtil.round(0.001 * (System.currentTimeMillis() - startTime), 3) + "s)");
     }
 
     @Override
