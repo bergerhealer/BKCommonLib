@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MapCursor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +18,6 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 
@@ -46,13 +44,13 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
  * </ul>
  */
 public class MapDisplay {
-    private static final int RESOLUTION = 128;
-    private static final int BUFFER_SIZE = (RESOLUTION * RESOLUTION);
     private final MapSession session = new MapSession(this);
-    private final byte[] zbuffer = new byte[BUFFER_SIZE];
-    private final byte[] livebuffer = new byte[BUFFER_SIZE];
-    private Layer layerStack = new Layer(this);
+    private int width, height;
     private final MapClip clip = new MapClip();
+    private MapDisplayTile[] tiles = null;
+    private byte[] zbuffer = null;
+    private byte[] livebuffer = null;
+    private Layer layerStack;
     private boolean _updateWhenNotViewing = false;
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
@@ -89,7 +87,47 @@ public class MapDisplay {
             this.info = mapInfo;
             this._item = mapItem.clone();
         }
+        this.width = 128; //TODO!
+        this.height = 128; //TODO!
+        this.zbuffer = new byte[this.width * this.height];
+        this.livebuffer = new byte[this.width * this.height];
+        
+        //TODO: More than one tile!
+        this.tiles = new MapDisplayTile[1];
+        this.tiles[0] = new MapDisplayTile();
+        this.tiles[0].setDisplay(this, 0, 0);
+
+        this.layerStack = new Layer(this);
+
         this.setRunning(true);
+    }
+
+    /**
+     * Gets the total width of this map display
+     * 
+     * @return total width
+     */
+    public final int getWidth() {
+        return this.width;
+    }
+
+    /**
+     * Gets the total height of this map display
+     * 
+     * @return total height
+     */
+    public final int getHeight() {
+        return this.height;
+    }
+
+    /**
+     * Gets the backing pixel color buffer for all currently displayed colors of the map display.
+     * This is what is synchronized to the clients.
+     * 
+     * @return live display buffer
+     */
+    public final byte[] getLiveBuffer() {
+        return this.livebuffer;
     }
 
     /**
@@ -227,7 +265,7 @@ public class MapDisplay {
         if (this.clip.dirty) {
             // For all viewers watching, send map texture updates
             // For players that are in-sync, we can re-use the same packet
-            CommonPacket syncPacket = null;
+            List<CommonPacket> syncPackets = null;
             for (MapSession.Owner owner : this.session.onlineOwners) {
                 if (!owner.viewing) {
                     // Update dirty clip only
@@ -238,18 +276,20 @@ public class MapDisplay {
                 // When viewers have individual dirty areas, they need their own update packets
                 if (owner.clip.dirty) {
                     owner.clip.markDirty(this.clip);
-                    owner.updateMap(createPacket(owner.clip));
+                    owner.updateMap(this.getUpdatePackets(owner.clip));
                     continue;
                 }
 
                 // Viewers viewing for a while only need to have our own clip updated
                 // We can re-use the same update packet for all viewers
-                if (syncPacket == null) {
-                    syncPacket = createPacket(this.clip);
+                if (syncPackets == null) {
+                    syncPackets = this.getUpdatePackets(this.clip);
                 } else {
-                    syncPacket = syncPacket.clone();
+                    for (int i = 0; i < syncPackets.size(); i++) {
+                        syncPackets.set(i, syncPackets.get(i).clone());
+                    }
                 }
-                owner.updateMap(syncPacket);
+                owner.updateMap(syncPackets);
             }
 
             // Done updating, reset the dirty state
@@ -260,10 +300,18 @@ public class MapDisplay {
             // Send full changes to the dirty viewers
             for (MapSession.Owner owner : session.onlineOwners) {
                 if (owner.isNewViewer()) {
-                    owner.updateMap(createPacket(owner.clip));
+                    owner.updateMap(getUpdatePackets(owner.clip));
                 }
             }
         }
+    }
+
+    private final List<CommonPacket> getUpdatePackets(MapClip clip) {
+        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.length);
+        for (MapDisplayTile tile : this.tiles) {
+            tile.addUpdatePackets(packets, clip);
+        }
+        return packets;
     }
 
     /**
@@ -475,41 +523,6 @@ public class MapDisplay {
         throw new IllegalArgumentException("Player is not an owner of this display");
     }
 
-    private CommonPacket createPacket(MapClip clip) {
-        short mapId = CommonPlugin.getInstance().getMapController().getMapId(this.info.uuid);
-
-        CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
-        mapUpdate.write(PacketType.OUT_MAP.cursors, new MapCursor[0]);
-        mapUpdate.write(PacketType.OUT_MAP.itemId, (int) mapId);
-        mapUpdate.write(PacketType.OUT_MAP.scale, (byte) 1);
-        mapUpdate.write(PacketType.OUT_MAP.track, false);
-        if (clip == null || clip.everything) {
-            mapUpdate.write(PacketType.OUT_MAP.xmin, 0);
-            mapUpdate.write(PacketType.OUT_MAP.ymin, 0);
-            mapUpdate.write(PacketType.OUT_MAP.width, RESOLUTION);
-            mapUpdate.write(PacketType.OUT_MAP.height, RESOLUTION);
-            mapUpdate.write(PacketType.OUT_MAP.pixels, this.livebuffer.clone());
-        } else {
-            int w = clip.getWidth();
-            int h = clip.getHeight();
-            byte[] pixels = new byte[w * h];
-
-            int dst_index = 0;
-            for (int y = 0; y < h; y++) {
-                int src_index = ((y + clip.getY()) * 128) + clip.getX();
-                System.arraycopy(this.livebuffer, src_index, pixels, dst_index, w);
-                dst_index += w;
-            }
-
-            mapUpdate.write(PacketType.OUT_MAP.xmin, clip.getX());
-            mapUpdate.write(PacketType.OUT_MAP.ymin, clip.getY());
-            mapUpdate.write(PacketType.OUT_MAP.width, w);
-            mapUpdate.write(PacketType.OUT_MAP.height, h);
-            mapUpdate.write(PacketType.OUT_MAP.pixels, pixels);
-        }
-        return mapUpdate;
-    }
-
     /**
      * Retrieves the base layer at z-index 0.
      * Note that if layers at negative z-index exist, this is not the background.
@@ -597,19 +610,19 @@ public class MapDisplay {
         private final MapClip clip = new MapClip();
 
         private Layer(MapDisplay map) {
-            this.buffer = new byte[BUFFER_SIZE];
+            this.buffer = new byte[map.getWidth() * map.getHeight()];
             this.map = map;
             this.z_index = 0;
         }
 
         @Override
         public final int getWidth() {
-            return RESOLUTION;
+            return map.getWidth();
         }
 
         @Override
         public final int getHeight() {
-            return RESOLUTION;
+            return map.getHeight();
         }
 
         @Override
@@ -659,12 +672,12 @@ public class MapDisplay {
         @Override
         public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
             // Out of bounds
-            if (x >= RESOLUTION || y >= RESOLUTION) {
+            if (x >= this.getWidth() || y >= this.getHeight()) {
                 return this;
             }
 
             // First do some bounds checking on the rectangle
-            boolean is_entire_canvas = (x == 0 && y == 0 && w == RESOLUTION && h == RESOLUTION);
+            boolean is_entire_canvas = (x == 0 && y == 0 && w == this.getWidth() && h == this.getHeight());
             if (!is_entire_canvas) {
                 if (x < 0) {
                     w += x;
@@ -674,11 +687,11 @@ public class MapDisplay {
                     h += y;
                     y = 0;
                 }
-                if ((x + w) > RESOLUTION) {
-                    w = (RESOLUTION - x);
+                if ((x + w) > this.getWidth()) {
+                    w = (this.getWidth() - x);
                 }
-                if ((y + h) > RESOLUTION) {
-                    h = (RESOLUTION - y);
+                if ((y + h) > this.getHeight()) {
+                    h = (this.getHeight() - y);
                 }
             }
 
@@ -694,13 +707,13 @@ public class MapDisplay {
                     this.clip.dirty = false;
                 } else {
                     // entire pixel area dirty
-                    this.clip.markDirty(0, 0, RESOLUTION, RESOLUTION);
-                    this.map.clip.markDirty(0, 0, RESOLUTION, RESOLUTION);
+                    this.clip.markDirty(0, 0, this.getWidth(), this.getHeight());
+                    this.map.clip.markDirty(0, 0, this.getWidth(), this.getHeight());
                 }
             } else {
                 // Fill the pixel buffer in lines
                 for (int dy = 0; dy < h; dy++) {
-                    int idx = (x + ((y + dy) * RESOLUTION));
+                    int idx = (x + ((y + dy) * this.getWidth()));
                     Arrays.fill(this.buffer, idx, idx + w, color);
                 }
                 if (color == 0) {
@@ -729,7 +742,7 @@ public class MapDisplay {
                         // There is no layer below.
                         // Pixels at this z-index need to be copied to the live buffer
                         for (int dy = 0; dy < h; dy++) {
-                            int idx = (x + ((y + dy) * RESOLUTION));
+                            int idx = (x + ((y + dy) * this.getWidth()));
                             int idx_end = (idx + w);
                             while (idx < idx_end) {
                                 if (map.zbuffer[idx] == layer.z_index) {
@@ -742,7 +755,7 @@ public class MapDisplay {
                         // There is a layer below we can drop down to
                         final byte prev_z = layer.previous.z_index;
                         for (int dy = 0; dy < h; dy++) {
-                            int index = (x + ((y + dy) * RESOLUTION));
+                            int index = (x + ((y + dy) * this.getWidth()));
                             int index_end = (index + w);
                             while (index < index_end) {
                                 if (map.zbuffer[index] == layer.z_index) {
@@ -770,7 +783,7 @@ public class MapDisplay {
                     }
                 } else {
                     for (int dy = 0; dy < h; dy++) {
-                        int idx = (x + ((y + dy) * RESOLUTION));
+                        int idx = (x + ((y + dy) * this.getWidth()));
                         int idx_end = (idx + w);
                         while (idx < idx_end) {
                             if (this.map.zbuffer[idx] < this.z_index) {
@@ -787,10 +800,10 @@ public class MapDisplay {
         @Override
         public final void writePixel(int x, int y, byte color) {
             // Validate and obtain buffer index. The bounds check avoid bounds checks for the buffers
-            if (x < 0 || x >= RESOLUTION) {
+            if (x < 0 || x >= this.getWidth()) {
                 return;
             }
-            int index = x + (y * RESOLUTION);
+            int index = x + (y * this.getWidth());
             if (index < 0 || index >= buffer.length) {
                 return;
             }
@@ -830,8 +843,8 @@ public class MapDisplay {
 
         @Override
         public final byte readPixel(int x, int y) {
-            if (x >= 0 && y < RESOLUTION) {
-                int index = x + (y * RESOLUTION);
+            if (x >= 0 && y < this.getHeight()) {
+                int index = x + (y * this.getWidth());
                 if (index >= 0 || index < buffer.length) {
                     Layer layer = this;
                     byte color;
@@ -846,8 +859,8 @@ public class MapDisplay {
         }
 
         private final byte readBasePixel(int x, int y) {
-            if (x >= 0 && y < RESOLUTION) {
-                int index = x + (y * RESOLUTION);
+            if (x >= 0 && y < this.getHeight()) {
+                int index = x + (y * this.getWidth());
                 if (index >= 0 || index < buffer.length) {
                     return buffer[index];
                 }

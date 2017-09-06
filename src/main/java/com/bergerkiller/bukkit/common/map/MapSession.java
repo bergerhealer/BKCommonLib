@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -211,9 +212,11 @@ public class MapSession {
             return this.viewing && !this.wasViewing;
         }
 
-        public void updateMap(CommonPacket mapUpdatePacket) {
+        public void updateMap(List<CommonPacket> packets) {
             this.clip.clearDirty();
-            PacketUtil.sendPacket(this.player, mapUpdatePacket, false);
+            for (CommonPacket packet : packets) {
+                PacketUtil.sendPacket(this.player, packet, false);
+            }
         }
     }
 }

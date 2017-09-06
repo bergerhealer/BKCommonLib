@@ -60,7 +60,7 @@ com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net
 
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, net.minecraft.server.v1_12_R1.DataWatcher.Item -> com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle]
 
-com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.Block]
+com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.v1_12_R1.Block]
 
 com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConverter[cost=1, com.bergerkiller.generated.net.minecraft.server.PacketPlayInVehicleMoveHandle -> net.minecraft.server.v1_12_R1.PacketPlayInVehicleMove]
 
@@ -535,7 +535,7 @@ com.bergerkiller.mountiplex.conversion.type.DuplexConverter$ReverseDuplexConvert
 
 com.bergerkiller.mountiplex.reflection.declarations.Template$Class$1[cost=1, org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory -> com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle]
 
-com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.IBlockData]
+com.bergerkiller.mountiplex.conversion.type.AnnotatedConverter[cost=1, com.bergerkiller.bukkit.common.wrappers.BlockData -> net.minecraft.server.v1_12_R1.IBlockData]
 
 com.bergerkiller.mountiplex.conversion.type.NullConverter[cost=0, (org.bukkit.Chunk) org.bukkit.craftbukkit.CraftChunk -> org.bukkit.Chunk]
 

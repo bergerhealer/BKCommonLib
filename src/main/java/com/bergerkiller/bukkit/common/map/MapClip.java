@@ -144,4 +144,37 @@ public class MapClip {
         this.dirty = false;
         this.everything = false;
     }
+
+    /**
+     * Takes out the dirty pixels of a rectangular area
+     * 
+     * @param x - coordinate of the top-left corner of the area
+     * @param y - coordinate of the top-left corner of the area
+     * @param width of the area
+     * @param height of the area
+     * @return the area
+     */
+    public final MapClip getArea(int x, int y, int width, int height) {
+        MapClip result = new MapClip();
+        if (!this.dirty) {
+            result.clearDirty();
+        } else if (this.everything) {
+            result.markEverythingDirty();
+        } else if (this.dirty_x1 > (x + width) || this.dirty_y1 > (y + height)) {
+            // Dirty area is out of bounds (too far to the right)
+            result.clearDirty();
+        } else if (this.dirty_x2 < x || this.dirty_y2 < y) {
+            // Dirty area is out of bounds (too far to the left)
+            result.clearDirty();
+        } else {
+            // Crop out the area
+            result.dirty = true;
+            result.everything = false;
+            result.dirty_x1 = Math.max(this.dirty_x1, x) - x;
+            result.dirty_y1 = Math.max(this.dirty_y1, y) - y;
+            result.dirty_x2 = Math.min(this.dirty_x2, x + width - 1) - x;
+            result.dirty_y2 = Math.min(this.dirty_y2, y + height - 1) - y;
+        }
+        return result;
+    }
 }
