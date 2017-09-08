@@ -1082,7 +1082,6 @@ public class CommonMapController implements PacketListener, Listener {
                 displayInfo.hasFrameViewerChanges = true;
                 if (isDisplayTile && !displayInfo.sessions.isEmpty()) {
                     displayInfo.resetDisplayRequest = true;
-                    Thread.dumpStack();
                 }
                 displayInfo = null;
             }
@@ -1104,7 +1103,6 @@ public class CommonMapController implements PacketListener, Listener {
             }
             if (hadDisplay && this.isDisplayTile && !this.displayInfo.sessions.isEmpty()) {
                 this.displayInfo.resetDisplayRequest = true;
-                Thread.dumpStack();
             }
         }
     }
