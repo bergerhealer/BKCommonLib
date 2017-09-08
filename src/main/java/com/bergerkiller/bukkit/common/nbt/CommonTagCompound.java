@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.BlockLocation;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -48,7 +49,9 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
     }
 
     /**
-     * Removes and returns the value contained at a given key. Possible returned
+     * Removes and returns the value contained at a given key.<br>
+     * <br>
+     * Possible returned
      * types:<br>
      * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
      * float, double, byte[], int[], String</u>
@@ -78,25 +81,121 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
         return CommonTag.create(getRawData().remove(key.toString()));
     }
 
+    // implements get/put/remove with a simplified single implementation function
+    private final <T> T putGetRemove(PutGetRemoveOp op, String key, Class<T> type, T value) {
+        Object rawNBTResult = null;
+        if (type == UUID.class) {
+            // == UUID ==
+            UUID uuid = (UUID) value;
+            Long uuidMost = putGetRemove(op, key + "UUIDMost", Long.class, (uuid == null) ? null : uuid.getMostSignificantBits());
+            Long uuidLeast = putGetRemove(op, key + "UUIDLeast", Long.class, (uuid == null) ? null : uuid.getLeastSignificantBits());
+            if (uuidMost != null && uuidLeast != null) {
+                return (T) new UUID(uuidMost.longValue(), uuidLeast.longValue());
+            }
+        } else if (type == BlockLocation.class) {
+            // == BlockLocation ==
+            BlockLocation pos = (BlockLocation) value;
+            String world = putGetRemove(op, key + "World", String.class, (pos == null) ? null : pos.world);
+            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x);
+            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y);
+            Integer z = putGetRemove(op, key + "Z", Integer.class,  (pos == null) ? null : pos.z);
+            if (world != null && !world.isEmpty() && x != null && y != null && z != null) {
+                return (T) new BlockLocation(world, x.intValue(), y.intValue(), z.intValue());
+            }
+        } else if (type == IntVector3.class) {
+            // == IntVector3 ==
+            IntVector3 pos = (IntVector3) value;
+            Integer x = putGetRemove(op, key + "X", Integer.class, (pos == null) ? null : pos.x);
+            Integer y = putGetRemove(op, key + "Y", Integer.class, (pos == null) ? null : pos.y);
+            Integer z = putGetRemove(op, key + "Z", Integer.class, (pos == null) ? null : pos.z);
+            if (x != null && y != null && z != null) {
+                return (T) new IntVector3(x.intValue(), y.intValue(), z.intValue());
+            }
+        } else if (op == PutGetRemoveOp.GET) {
+            // Get other types of values
+            rawNBTResult = NMSNBT.Compound.get.invoke(getRawHandle(), key);
+        } else if (op == PutGetRemoveOp.REMOVE || (op == PutGetRemoveOp.PUT && value == null)) {
+            // Remove other types of values
+            rawNBTResult = getRawData().remove(key);
+        } else if (op == PutGetRemoveOp.PUT) {
+            // Put other types of values
+            Object elementHandle = commonToNbt(value);
+            if (!NMSNBT.Base.T.isInstance(elementHandle)) {
+                elementHandle = NMSNBT.createHandle(value);
+            }
+            rawNBTResult = getRawData().put(key, elementHandle);
+        }
+
+        // Failure fallback + convert raw NBT tags to their converted values
+        if (rawNBTResult == null) {
+            return null; // failure
+        } else {
+            Object nbtValue = nbtToCommon(NMSNBT.getData(rawNBTResult), false);
+            return (type == null) ? (T) nbtValue : Conversion.convert(nbtValue, type, null);
+        }
+    }
+
+    private static enum PutGetRemoveOp {
+        PUT, GET, REMOVE
+    }
+
+    /**
+     * Removes the value associated with a key. This returns the value of the tag, not
+     * the tag itself. Returns null if no tag was contained.<br>
+     * <br>
+     * Possible returned
+     * types:<br>
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * float, double, byte[], int[],
+     * String, UUID, BlockLocation, IntVector3, other**</u><br>
+     * <br>
+     * <i>** these types are serialized from/to a stored String type.</i>
+     *
+     * @param key to remove
+     * @param type to cast the value to (type of value to remove)
+     * @return value of the tag at the key, null if not contained
+     */
+    public <T> T removeValue(String key, Class<T> type) {
+        return putGetRemove(PutGetRemoveOp.REMOVE, key, type, null);
+    }
+
     /**
      * Sets the value of the element representing a given key. Use a data of
-     * null to remove the data at the key. Supported data types:<br>
+     * null to remove the data at the key.<br>
+     * <br>
+     * Supported data types:<br>
      * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte,
-     * short, int, long, float, double, byte[], int[], String</u>
+     * short, int, long, float, double, byte[], int[],
+     * String, UUID, BlockLocation, IntVector3, other**</u><br>
+     * <br>
+     * <i>** these types are serialized from/to a stored String type.</i>
+     *
+     * @param key of the element to set
+     * @param type of value to set
+     * @param value to assign to this key, null to remove it
+     */
+    public <T> T putValue(String key, Class<T> type, T value) {
+        return putGetRemove(PutGetRemoveOp.PUT, key, type, value);
+    }
+
+    /**
+     * Sets the value of the element representing a given key. Use a data of
+     * null to remove the data at the key.<br>
+     * <br>
+     * Supported data types:<br>
+     * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte,
+     * short, int, long, float, double, byte[], int[],
+     * String, UUID*, BlockLocation*, IntVector3*, other**</u><br>
+     * <br>
+     * <i>* these types do not support removing, use {@link #removeValue(key, type)}
+     * or {@link #putValue(String, Class, Object)} instead</i><br>
+     * <i>** these types are serialized from/to a stored String type.</i>
      *
      * @param key of the element to set
      * @param value to assign to this key
      */
     public void putValue(String key, Object value) {
-        if (value == null) {
-            NMSNBT.Compound.remove.invoke(getRawHandle(), key);
-        } else {
-            Object elementHandle = commonToNbt(value);
-            if (!NMSNBT.Base.T.isInstance(elementHandle)) {
-                elementHandle = NMSNBT.createHandle(value);
-            }
-            NMSNBT.Compound.set.invoke(getRawHandle(), key, elementHandle);
-        }
+        putGetRemove(PutGetRemoveOp.PUT, key, (value == null) ? null : (Class<Object>) value.getClass(), value);
     }
 
     /**
@@ -113,7 +212,29 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
 
     /**
      * Gets the value associated with a key. This is the value of the tag, not
-     * the tag itself. Possible returned types:<br>
+     * the tag itself. Returns null if no tag is contained.<br>
+     * <br>
+     * Possible returned
+     * types:<br>
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * float, double, byte[], int[],
+     * String, UUID, BlockLocation, IntVector3, other**</u><br>
+     * <br>
+     * <i>** these types are serialized from/to a stored String type.</i>
+     *
+     * @param key to get
+     * @param type to cast the value to (and type of value to get)
+     * @return value of the tag at the key
+     */
+    public <T> T getValue(String key, Class<T> type) {
+        return putGetRemove(PutGetRemoveOp.GET, key, type, null);
+    }
+
+    /**
+     * Gets the value associated with a key. This is the value of the tag, not
+     * the tag itself.<br>
+     * <br>
+     * Possible returned types:<br>
      * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
      * float, double, byte[], int[], String</u>
      *
@@ -121,48 +242,18 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public Object getValue(String key) {
-        if (key == null) {
-            return null;
-        }
-        return nbtToCommon(NMSNBT.getData(NMSNBT.Compound.get.invoke(getRawHandle(), key)), false);
+        return putGetRemove(PutGetRemoveOp.GET, key, null, null);
     }
 
     /**
      * Gets the value associated with a key. This is the value of the tag, not
-     * the tag itself. Returns the default value if no tag is contained.
+     * the tag itself. Returns the default value if no tag is contained.<br>
+     * <br>
      * Possible returned types:<br>
      * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
-     * float, double, byte[], int[], String</u>
-     *
-     * @param key to get
-     * @param def value to return when not found (can not be null)
-     * @return value of the tag at the key
-     */
-    public <T> T getValue(String key, T def) {
-        return Conversion.convert(getValue(key), def);
-    }
-
-    /**
-     * Gets the value associated with a key. This is the value of the tag, not
-     * the tag itself. Returns null if no tag is contained. Possible returned
-     * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
-     * float, double, byte[], int[], String</u>
-     *
-     * @param key to get
-     * @param type to case the value to
-     * @return value of the tag at the key
-     */
-    public <T> T getValue(String key, Class<T> type) {
-        return Conversion.convert(getValue(key), type, null);
-    }
-
-    /**
-     * Gets the value associated with a key. This is the value of the tag, not
-     * the tag itself. Returns the default value if no tag is contained.
-     * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
-     * float, double, byte[], int[], String</u>
+     * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
+     * <br>
+     * <i>** these types are serialized from/to a stored String type.</i>
      *
      * @param key to get
      * @param type to case the value to
@@ -170,7 +261,26 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value of the tag at the key
      */
     public <T> T getValue(String key, Class<T> type, T def) {
-        return Conversion.convert(getValue(key), type, def);
+        T result = putGetRemove(PutGetRemoveOp.GET, key, type, def);
+        return (result == null) ? def : result;
+    }
+
+    /**
+     * Gets the value associated with a key. This is the value of the tag, not
+     * the tag itself. Returns the default value if no tag is contained.<br>
+     * <br>
+     * Possible returned types:<br>
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
+     * <br>
+     * <i>** these types are serialized from/to a stored String type.</i>
+     *
+     * @param key to get
+     * @param def value to return when not found (can not be null)
+     * @return value of the tag at the key
+     */
+    public <T> T getValue(String key, T def) {
+        return getValue(key, (Class<T>) def.getClass(), def);
     }
 
     /**
@@ -199,13 +309,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value at the key
      */
     public UUID getUUID(String key) {
-        Object most = getValue(key + "UUIDMost");
-        Object least = getValue(key + "UUIDLeast");
-        if (most instanceof Long && least instanceof Long) {
-            return new UUID((Long) most, (Long) least);
-        } else {
-            return null;
-        }
+        return getValue(key, UUID.class);
     }
 
     /**
@@ -217,15 +321,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param data to put
      */
     public void putUUID(String key, UUID data) {
-        final Long most, least;
-        if (data == null) {
-            most = least = null;
-        } else {
-            most = data.getMostSignificantBits();
-            least = data.getLeastSignificantBits();
-        }
-        putValue(key + "UUIDMost", most);
-        putValue(key + "UUIDLeast", least);
+        putValue(key, UUID.class, data);
     }
 
     /**
@@ -237,16 +333,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @return value at the key
      */
     public BlockLocation getBlockLocation(String key) {
-        Object world = getValue(key + "World");
-        Object x = getValue(key + "X");
-        Object y = getValue(key + "Y");
-        Object z = getValue(key + "Z");
-        if (world instanceof String && !((String) world).isEmpty() && 
-                (x instanceof Integer && y instanceof Integer && z instanceof Integer)) {
-            return new BlockLocation((String) world, (Integer) x, (Integer) y, (Integer) z);
-        } else {
-            return null;
-        }
+        return getValue(key, BlockLocation.class);
     }
 
     /**
@@ -258,17 +345,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * @param location to put
      */
     public void putBlockLocation(String key, BlockLocation location) {
-        if (location == null) {
-            removeValue(key + "World");
-            removeValue(key + "X");
-            removeValue(key + "Y");
-            removeValue(key + "Z");
-        } else {
-            putValue(key + "World", location.world);
-            putValue(key + "X", location.x);
-            putValue(key + "Y", location.y);
-            putValue(key + "Z", location.z);
-        }
+        putValue(key, BlockLocation.class, location);
     }
 
     /**

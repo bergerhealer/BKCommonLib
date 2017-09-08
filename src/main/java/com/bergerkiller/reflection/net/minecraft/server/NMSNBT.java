@@ -141,6 +141,24 @@ public class NMSNBT {
         }
 
         /**
+         * Checks whether an NBT type can be stored
+         * 
+         * @param data to store
+         * @return True if the data can be stored
+         */
+        public static boolean canStore(Object data) {
+            if (data == null) {
+                return false; // null data can not be stored in a tag
+            } else if (data instanceof CommonTag) {
+                return true; // we support our own CommonTag type
+            } else if (NMSNBT.Base.T.isInstance(data)) {
+                return nbtTags.containsKey(data.getClass()); // check nbt base types
+            } else {
+                return dataTags.get(data.getClass()) != null; // raw data value types
+            }
+        }
+
+        /**
          * Finds the NBT Type used to store data
          * 
          * @param data to store

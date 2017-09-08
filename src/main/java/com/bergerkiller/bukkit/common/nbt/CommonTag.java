@@ -172,8 +172,15 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> {
                 tags.add(commonToNbt(value));
             }
             return tags;
-        } else {
+        } else if (NMSNBT.Type.canStore(data)) {
             return NMSNBT.createHandle(data);
+        } else {
+            String dataAsString = Conversion.toString.convert(data);
+            if (dataAsString == null) {
+                throw new IllegalArgumentException("Value of type " + data.getClass() +
+                        " can not be serialized as a String");
+            }
+            return NMSNBT.createHandle(dataAsString);
         }
     }
 
