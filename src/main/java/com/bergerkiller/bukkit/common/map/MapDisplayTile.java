@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.map.MapCursor;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 
@@ -15,16 +16,18 @@ public class MapDisplayTile {
     private static final int RESOLUTION = 128;
 
     private MapDisplay map;
-    private int tileX, tileY;
+    private MapUUID uuid;
+    public int tileX, tileY;
 
-    public void setDisplay(MapDisplay map, int tileX, int tileY) {
+    public MapDisplayTile(MapDisplay map, int tileX, int tileY) {
         this.map = map;
         this.tileX = tileX;
         this.tileY = tileY;
+        this.uuid = new MapUUID(map.getMapInfo().uuid, this.tileX, this.tileY);
     }
 
     public void addUpdatePackets(List<CommonPacket> packets, MapClip clip) {
-        short mapId = CommonPlugin.getInstance().getMapController().getMapId(this.map.getMapInfo().uuid);
+        short mapId = CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
 
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
         mapUpdate.write(PacketType.OUT_MAP.cursors, new MapCursor[0]);

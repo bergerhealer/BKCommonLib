@@ -48,6 +48,7 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapSession;
+import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -70,8 +71,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 public class CommonMapController implements PacketListener, Listener {
     // Bi-directional mapping between map UUID and Map (durability) Id
-    private final IntHashMap<UUID> mapUUIDById = new IntHashMap<UUID>();
-    private final HashMap<UUID, Short> mapIdByUUID = new HashMap<UUID, Short>();
+    private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
+    private final HashMap<MapUUID, Short> mapIdByUUID = new HashMap<MapUUID, Short>();
     // Stores Map Displays, mapped by Map UUID
     private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
     // Stores player map input (through Vehicle Steer packets)
@@ -282,9 +283,11 @@ public class CommonMapController implements PacketListener, Listener {
      * of the item is updated. NBT data that should not be synchronized is dropped.
      * 
      * @param item
+     * @param tileX the X-coordinate of the tile in which the item is displayed
+     * @param tileY the Y-coordinate of the tile in which the item is displayed
      * @return True if the item was changed and needs to be updated in the packet
      */
-    public ItemStack handleItemSync(ItemStack item) {
+    public ItemStack handleItemSync(ItemStack item, int tileX, int tileY) {
         if (item == null || item.getType() != Material.MAP) {
             return null;
         }
@@ -295,7 +298,7 @@ public class CommonMapController implements PacketListener, Listener {
             UUID mapUUID = tag.getUUID("mapDisplay");
             if (mapUUID != null) {
                 item = trimExtraData(item);
-                item.setDurability(getMapId(mapUUID));
+                item.setDurability(getMapId(new MapUUID(mapUUID, tileX, tileY)));
                 return item;
             }
         }
@@ -311,7 +314,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param mapUUID to be displayed
      * @return map Id
      */
-    public synchronized short getMapId(UUID mapUUID) {
+    public synchronized short getMapId(MapUUID mapUUID) {
         // Obtain from cache
         Short storedMapId = mapIdByUUID.get(mapUUID);
         if (storedMapId != null) {
@@ -320,7 +323,7 @@ public class CommonMapController implements PacketListener, Listener {
 
         // If the UUID is that of a static UUID, we must make sure to store it as such
         // We may have to remap the old Map Id to free up the Id slot we need
-        short mapId = CommonMapUUIDStore.getStaticMapId(mapUUID);
+        short mapId = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
         if (mapId != -1) {
             storeStaticMapId(mapId);
             return mapId;
@@ -332,13 +335,13 @@ public class CommonMapController implements PacketListener, Listener {
 
     /**
      * Forces a particular map Id to stay static (unchanging) and stores it
-     * as such in the mappings.
+     * as such in the mappings. No tiling is possible with static map Ids.
      * 
      * @param mapId
      */
     private synchronized void storeStaticMapId(short mapId) {
         if (storeDynamicMapId(mapUUIDById.get(mapId)) != mapId) {
-            UUID mapUUID = CommonMapUUIDStore.getStaticMapUUID(mapId);
+            MapUUID mapUUID = new MapUUID(CommonMapUUIDStore.getStaticMapUUID(mapId), 0, 0);
             mapUUIDById.put(mapId, mapUUID);
             mapIdByUUID.put(mapUUID, mapId);
         }
@@ -351,14 +354,14 @@ public class CommonMapController implements PacketListener, Listener {
      * @param mapUUID to store
      * @return map Id that was assigned
      */
-    private synchronized short storeDynamicMapId(UUID mapUUID) {
+    private synchronized short storeDynamicMapId(MapUUID mapUUID) {
         // Null safety check
         if (mapUUID == null) {
             return -1;
         }
 
         // If the UUID is static, do not store anything and return the static Id instead
-        short staticMapid = CommonMapUUIDStore.getStaticMapId(mapUUID);
+        short staticMapid = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
         if (staticMapid != -1) {
             return staticMapid;
         }
@@ -377,7 +380,7 @@ public class CommonMapController implements PacketListener, Listener {
                 mapIdByUUID.put(mapUUID, Short.valueOf((short) mapidValue));
 
                 // Invalidate display if it exists
-                MapDisplayInfo mapInfo = maps.get(mapUUID);
+                MapDisplayInfo mapInfo = maps.get(mapUUID.getUUID());
                 if (mapInfo != null) {
                     for (MapSession session : mapInfo.sessions) {
                         session.display.invalidate();
@@ -385,7 +388,7 @@ public class CommonMapController implements PacketListener, Listener {
                 }
 
                 if (idChanged) {
-                    dirtyMapUUIDSet.add(mapUUID);
+                    dirtyMapUUIDSet.add(mapUUID.getUUID());
                 }
 
                 return (short) mapidValue;
@@ -399,20 +402,21 @@ public class CommonMapController implements PacketListener, Listener {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {    
             int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
-            UUID mapUUID = mapUUIDById.get(itemid);
+            MapUUID mapUUID = mapUUIDById.get(itemid);
             if (mapUUID == null) {
                 this.storeStaticMapId((short) itemid);
-            } else if (CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
+            } else if (CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID()) == -1) {
                 event.setCancelled(true);
             }
         }
 
         // Correct Map ItemStacks as they are sent to the clients (virtual)
+        // This is always tile 0,0 (held map)
         if (event.getType() == PacketType.OUT_WINDOW_ITEMS) {
             List<ItemStack> items = event.getPacket().read(PacketType.OUT_WINDOW_ITEMS.items);
             ListIterator<ItemStack> iter = items.listIterator();
             while (iter.hasNext()) {
-                ItemStack newItem = this.handleItemSync(iter.next());
+                ItemStack newItem = this.handleItemSync(iter.next(), 0, 0);
                 if (newItem != null) {
                     iter.set(newItem);
                 }
@@ -420,7 +424,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
         if (event.getType() == PacketType.OUT_WINDOW_SET_SLOT) {
             ItemStack oldItem = event.getPacket().read(PacketType.OUT_WINDOW_SET_SLOT.item);
-            ItemStack newItem = this.handleItemSync(oldItem);
+            ItemStack newItem = this.handleItemSync(oldItem, 0, 0);
             if (newItem != null) {
                 if (disableMapItemChanges.get()) {
                     event.setCancelled(true);
@@ -437,8 +441,7 @@ public class CommonMapController implements PacketListener, Listener {
             if (!(entity instanceof ItemFrame)) {
                 return;
             }
-            ItemStack displayedItem = getItemFrameItem((ItemFrame) entity);
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(displayedItem);
+            MapUUID mapUUID = getItemFrameMapUUID((ItemFrame) entity);
             if (mapUUID == null) {
                 return; // not a map
             }
@@ -446,7 +449,7 @@ public class CommonMapController implements PacketListener, Listener {
                 event.setCancelled(true);
                 return; // map changes are suppressed
             }
-            short staticMapId = CommonMapUUIDStore.getStaticMapId(mapUUID);
+            short staticMapId = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
             if (staticMapId != -1) {
                 this.storeStaticMapId(staticMapId);
                 return; // static Id, not dynamic, no re-assignment
@@ -728,15 +731,15 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private synchronized void cleanupUnusedUUIDs(Set<UUID> existingMapUUIDs) {
-        HashSet<UUID> idsToRemove = new HashSet<UUID>(mapIdByUUID.keySet());
+    private synchronized void cleanupUnusedUUIDs(Set<MapUUID> existingMapUUIDs) {
+        HashSet<MapUUID> idsToRemove = new HashSet<MapUUID>(mapIdByUUID.keySet());
         idsToRemove.removeAll(existingMapUUIDs);
-        for (UUID toRemove : idsToRemove) {
+        for (MapUUID toRemove : idsToRemove) {
             // Clean up the map display information first
-            MapDisplayInfo displayInfo = maps.get(toRemove);
+            MapDisplayInfo displayInfo = maps.get(toRemove.getUUID());
             if (displayInfo != null) {
                 if (displayInfo.sessions.isEmpty()) {
-                    maps.remove(toRemove);
+                    maps.remove(toRemove.getUUID());
                 } else {
                     continue; // still has an active session; cannot remove
                 }
@@ -969,12 +972,11 @@ public class CommonMapController implements PacketListener, Listener {
                 idGenerationCounter = 0;
 
                 // Find all map UUIDs that exist on the server
-                HashSet<UUID> validUUIDs = new HashSet<UUID>();
+                HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
                 for (World world : Bukkit.getWorlds()) {
                     for (Entity entity : WorldUtil.getEntities(world)) {
                         if (entity instanceof ItemFrame) {
-                            ItemStack item = getItemFrameItem((ItemFrame) entity);
-                            UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
+                            MapUUID mapUUID = getItemFrameMapUUID((ItemFrame) entity);
                             if (mapUUID != null) {
                                 validUUIDs.add(mapUUID);
                             }
@@ -987,7 +989,7 @@ public class CommonMapController implements PacketListener, Listener {
                         ItemStack item = inv.getItem(i);
                         UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
                         if (mapUUID != null) {
-                            validUUIDs.add(mapUUID);
+                            validUUIDs.add(new MapUUID(mapUUID));
                         }
                     }
                 }
@@ -1202,6 +1204,29 @@ public class CommonMapController implements PacketListener, Listener {
                 UUID mapUUID2 = CommonMapUUIDStore.getMapUUID(item2);
                 return mapUUID1 != null && mapUUID2 != null && mapUUID1.equals(mapUUID2);
             }
+        }
+    }
+
+    /**
+     * Gets the item frame map UUID, also handling the tile information of the item frame
+     * 
+     * @param itemFrame to get the map UUID from
+     */
+    private static MapUUID getItemFrameMapUUID(ItemFrame itemFrame) {
+        if (itemFrame == null) {
+            return null;
+        } else {
+            ItemStack item = getItemFrameItem(itemFrame);
+            UUID uuid = CommonMapUUIDStore.getMapUUID(item);
+            if (uuid == null) {
+                return null;
+            }
+            if (CommonMapUUIDStore.getStaticMapId(uuid) != -1) {
+                return new MapUUID(uuid);
+            }
+
+            //TODO: Find out the tile coordinates of the item frame
+            return new MapUUID(uuid);
         }
     }
 

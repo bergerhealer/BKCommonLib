@@ -47,7 +47,7 @@ public class MapDisplay {
     private final MapSession session = new MapSession(this);
     private int width, height;
     private final MapClip clip = new MapClip();
-    private MapDisplayTile[] tiles = null;
+    private List<MapDisplayTile> tiles = new ArrayList<MapDisplayTile>();
     private byte[] zbuffer = null;
     private byte[] livebuffer = null;
     private Layer layerStack;
@@ -87,16 +87,29 @@ public class MapDisplay {
             this.info = mapInfo;
             this._item = mapItem.clone();
         }
-        this.width = 128; //TODO!
-        this.height = 128; //TODO!
+
+        //TODO: Dynamically find the tiles being used
+        this.tiles.add(new MapDisplayTile(this, 0, 0));
+
+        // Calculate the dimensions from the tiles and further initialize the buffers
+        int minTileX = Integer.MAX_VALUE;
+        int minTileY = Integer.MAX_VALUE;
+        int maxTileX = 0;
+        int maxTileY = 0;
+        for (MapDisplayTile tile : this.tiles) {
+            if (tile.tileX < minTileX)
+                minTileX = tile.tileX;
+            if (tile.tileX > maxTileX)
+                maxTileX = tile.tileX;
+            if (tile.tileY < minTileY)
+                minTileY = tile.tileY;
+            if (tile.tileY > maxTileY)
+                maxTileY = tile.tileY;
+        }
+        this.width = (maxTileX - minTileX + 1) * 128;
+        this.height = (maxTileY - minTileY + 1) * 128;
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
-        
-        //TODO: More than one tile!
-        this.tiles = new MapDisplayTile[1];
-        this.tiles[0] = new MapDisplayTile();
-        this.tiles[0].setDisplay(this, 0, 0);
-
         this.layerStack = new Layer(this);
 
         this.setRunning(true);
@@ -307,7 +320,7 @@ public class MapDisplay {
     }
 
     private final List<CommonPacket> getUpdatePackets(MapClip clip) {
-        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.length);
+        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.size());
         for (MapDisplayTile tile : this.tiles) {
             tile.addUpdatePackets(packets, clip);
         }
