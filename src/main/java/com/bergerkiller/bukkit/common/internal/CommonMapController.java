@@ -557,6 +557,20 @@ public class CommonMapController implements PacketListener, Listener {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
             itemFrames.put(frame.getEntityId(), new ItemFrameInfo(frame));
+
+            // Load the chunk to the left/right of this item frame
+            // If the display crosses chunk boundaries, this ensures those are loaded
+            // TODO: Is onEntityAdded really the right place for this? Could cause recursive loading.
+            BlockFace left_right = FaceUtil.rotate(frame.getFacing(), 2);
+            IntVector3 pos = new IntVector3(frame.getLocation());
+            IntVector3 pos_left = pos.add(left_right);
+            IntVector3 pos_right = pos.subtract(left_right);
+            if (pos.getChunkX() != pos_left.getChunkX() || pos.getChunkZ() != pos_left.getChunkZ()) {
+                frame.getWorld().getChunkAt(pos_left.getChunkX(), pos_left.getChunkZ());
+            }
+            if (pos.getChunkX() != pos_right.getChunkX() || pos.getChunkZ() != pos_right.getChunkZ()) {
+                frame.getWorld().getChunkAt(pos_right.getChunkX(), pos_right.getChunkZ());
+            }
         }
     }
 
@@ -1026,6 +1040,7 @@ public class CommonMapController implements PacketListener, Listener {
                 isTile = false;
             }
 
+            boolean hadDisplay = (lastMapUUID != null);
             boolean readd = (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID));
             if (readd) {
                 this.remove();
@@ -1038,7 +1053,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             if (readd) {
-                this.add();
+                this.add(hadDisplay);
             }
         }
 
@@ -1046,8 +1061,9 @@ public class CommonMapController implements PacketListener, Listener {
             if (displayInfo != null) {
                 displayInfo.itemFrames.remove(this);
                 displayInfo.hasFrameViewerChanges = true;
-                if (isDisplayTile) {
+                if (isDisplayTile && !displayInfo.sessions.isEmpty()) {
                     displayInfo.resetDisplayRequest = true;
+                    Thread.dumpStack();
                 }
                 displayInfo = null;
             }
@@ -1062,13 +1078,14 @@ public class CommonMapController implements PacketListener, Listener {
             this.isDisplayTile = false;
         }
 
-        public void add() {
+        public void add(boolean hadDisplay) {
             if (this.displayInfo == null && this.lastMapUUID != null) {
                 this.displayInfo = getInfo(this.lastMapUUID.getUUID());
                 this.displayInfo.itemFrames.add(this);
             }
-            if (this.isDisplayTile) {
+            if (hadDisplay && this.isDisplayTile && !this.displayInfo.sessions.isEmpty()) {
                 this.displayInfo.resetDisplayRequest = true;
+                Thread.dumpStack();
             }
         }
     }
