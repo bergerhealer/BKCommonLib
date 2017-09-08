@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -45,7 +46,7 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
  * <li>{@link #onRightClick(event)} is called when a player right-clicks on the map</li>
  * </ul>
  */
-public class MapDisplay {
+public class MapDisplay implements MapDisplayEvents {
     private final MapSession session = new MapSession(this);
     private int width, height;
     private final MapClip clip = new MapClip();
@@ -57,9 +58,11 @@ public class MapDisplay {
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
     private int updateTaskId = -1;
+    private ItemStack _oldItem = null;
     private ItemStack _item = null;
     protected MapDisplayInfo info = null;
     protected JavaPlugin plugin = null;
+    protected final MapDisplayProperties properties = new MapDisplayProperties(this);
 
     /**
      * Initializes this Map Display, setting the owner plugin and what map it represents.
@@ -88,6 +91,7 @@ public class MapDisplay {
             this.plugin = plugin;
             this.info = mapInfo;
             this._item = mapItem.clone();
+            this._oldItem = ItemUtil.cloneItem(this._item);
         }
         this.setRunning(true);
     }
@@ -307,6 +311,9 @@ public class MapDisplay {
             //StopWatch.instance.stop().log("VirtualMap onTick()");
         }
 
+        // Refresh item
+        this.refreshMapItem();
+
         // Synchronize the map information to the clients
         if (this.clip.dirty) {
             // For all viewers watching, send map texture updates
@@ -352,6 +359,12 @@ public class MapDisplay {
         }
     }
 
+    private final void refreshMapItem() {
+        if (!LogicUtil.bothNullOrEqual(this._oldItem, this._item)) {
+            CommonPlugin.getInstance().getMapController().updateMapItem(this._oldItem, this._item);
+        }
+    }
+
     private final List<CommonPacket> getUpdatePackets(MapClip clip) {
         List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.size());
         for (MapDisplayTile tile : this.tiles) {
@@ -388,6 +401,7 @@ public class MapDisplay {
      */
     public void setMapItemSilently(ItemStack item) {
         this._item = item;
+        this._oldItem = ItemUtil.cloneItem(item);
         this.onMapItemChanged();
     }
 
@@ -399,7 +413,7 @@ public class MapDisplay {
      * @param item to set to
      */
     public void setMapItem(ItemStack item) {
-        CommonPlugin.getInstance().getMapController().updateMapItem(this._item, item);
+        this._item = item;
     }
 
     /**
@@ -633,6 +647,7 @@ public class MapDisplay {
 
                 // Handle onDetached
                 this.onDetached();
+                this.refreshMapItem();
 
                 // Clean up
                 Bukkit.getScheduler().cancelTask(this.updateTaskId);
@@ -986,66 +1001,31 @@ public class MapDisplay {
         }
     }
 
-    /**
-     * Called right after this Map Display is bound to a plugin and map
-     */
+    @Override
     public void onAttached() {}
 
-    /**
-     * Called right before the map display is removed after the session ends
-     */
+    @Override
     public void onDetached() {}
 
-    /**
-     * Fired every tick to update this Virtual Map.
-     * This method can be overridden to dynamically update the map continuously.
-     * To optimize performance, only draw things in the map when they change.
-     */
+    @Override
     public void onTick() {}
 
-    /**
-     * Callback function called every tick while a key is pressed down.
-     * These callbacks are called before {@link #onTick()}.
-     * 
-     * @param event
-     */
+    @Override
     public void onKey(MapKeyEvent event) {}
 
-    /**
-     * Callback function called when a key changed from not-pressed to pressed down
-     * These callbacks are called before {@link #onTick()}.
-     * 
-     * @param event
-     */
+    @Override
     public void onKeyPressed(MapKeyEvent event) {}
 
-    /**
-     * Callback function called when a key changed from pressed to not pressed down
-     * These callbacks are called before {@link #onTick()}.
-     * 
-     * @param event
-     */
+    @Override
     public void onKeyReleased(MapKeyEvent event) {}
 
-    /**
-     * Callback function called when a player left-clicks the map held in an item frame
-     * showing this Map Display.
-     * 
-     * @param event
-     */
+    @Override
     public void onLeftClick(MapClickEvent event) {}
 
-    /**
-     * Callback function called when a player right-clicks the map held in an item frame
-     * showing this Map Display.
-     * 
-     * @param event
-     */
+    @Override
     public void onRightClick(MapClickEvent event) {}
 
-    /**
-     * Callback function called when the map item of this Map Display changed
-     */
+    @Override
     public void onMapItemChanged() {}
 
     /**
