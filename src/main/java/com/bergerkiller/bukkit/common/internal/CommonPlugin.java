@@ -279,6 +279,7 @@ public class CommonPlugin extends PluginBase {
         if (!enabled) {
             packetHandler.removePacketListeners(plugin);
         }
+        this.mapController.updateDependency(plugin, pluginName, enabled);
         this.entityBlacklist.updateDependency(plugin, pluginName, enabled);
         this.permissionHandler.updateDependency(plugin, pluginName, enabled);
         if (!this.updatePacketHandler()) {
@@ -303,6 +304,9 @@ public class CommonPlugin extends PluginBase {
 
     @Override
     public void disable() {
+        // Shut down map display controller
+        this.mapController.onDisable();
+
         // Disable listeners
         for (World world : Bukkit.getWorlds()) {
             WorldListenerHook.unhook(world);
@@ -425,7 +429,7 @@ public class CommonPlugin extends PluginBase {
 
         register(mapController = new CommonMapController());
         PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
-        mapController.startTasks(this, startedTasks);
+        mapController.onEnable(this, startedTasks);
 
         startedTasks.add(new NextTickHandler(this).start(1, 1));
         startedTasks.add(new MoveEventHandler(this).start(1, 1));

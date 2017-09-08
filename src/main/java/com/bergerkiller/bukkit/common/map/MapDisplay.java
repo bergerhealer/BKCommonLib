@@ -598,8 +598,14 @@ public class MapDisplay {
         return currentLayer;
     }
 
-    private void setRunning(boolean updating) {
-        if (updating) {
+    /**
+     * Starts or stops this map display. When started, it will be initialized and {@link #onAttached()}
+     * will be called. When stopped, the display session is terminated and {@link #onDetached()} is called.
+     * 
+     * @param running whether the map display is running
+     */
+    public final void setRunning(boolean running) {
+        if (running) {
             if (this.plugin != null && this.updateTaskId == -1) {
                 this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
                     @Override
@@ -1093,21 +1099,26 @@ public class MapDisplay {
     public static void restartDisplays(ItemStack mapItem) {
         MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
         if (mapInfo != null) {
-            restartDisplays(mapInfo);
+            for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
+                MapDisplay display = session.display;
+                display.setRunning(false);
+                display.setRunning(true);
+            }
         }
     }
 
     /**
-     * Restarts (detaches and re-attaches) all map displays bound to a particular item.
-     * This effectively resets the display, forcing a complete re-render and re-initialization.
+     * Terminates (detaches) all map displays bound to a particular item.
      * 
-     * @param mapInfo of the item
+     * @param mapItem
      */
-    public static void restartDisplays(MapDisplayInfo mapInfo) {
-        for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
-            MapDisplay display = session.display;
-            display.setRunning(false);
-            display.setRunning(true);
+    public static void stopDisplays(ItemStack mapItem) {
+        MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
+        if (mapInfo != null) {
+            for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
+                session.display.setRunning(false);
+            }
         }
     }
+
 }

@@ -210,10 +210,10 @@ public class CommonMapController implements PacketListener, Listener {
                     UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
                     if (oldMapUUID.equals(mapUUID)) {
                         if (unchanged) {
-                            setDisableMapItemChanges(true);
+                            disableMapItemChanges.set(true);
                             inv.setItem(i, newItem);
                             PlayerUtil.markItemUnchanged(player, i);
-                            setDisableMapItemChanges(false);
+                            disableMapItemChanges.set(false);
                         } else {
                             inv.setItem(i, newItem);
                         }
@@ -226,11 +226,11 @@ public class CommonMapController implements PacketListener, Listener {
                 if (itemFrameInfo.lastMapUUID != null && oldMapUUID.equals(itemFrameInfo.lastMapUUID.getUUID())) {
                     if (unchanged) {
                         // When unchanged set the item in the metadata without causing a refresh
-                        setDisableMapItemChanges(true);
+                        disableMapItemChanges.set(true);
                         DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
                         DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
                         dataItem.setValue(newItem, dataItem.isChanged());
-                        setDisableMapItemChanges(false);
+                        disableMapItemChanges.set(false);
                     } else {
                         // When changed, set it normally so the item is refreshed
                         CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, newItem);
@@ -261,7 +261,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param plugin
      * @param startedTasks
      */
-    public void startTasks(JavaPlugin plugin, List<Task> startedTasks) {
+    public void onEnable(JavaPlugin plugin, List<Task> startedTasks) {
         startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
@@ -269,13 +269,38 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
-     * Enables or disables all item changes that involve map items (for a short period of time).
-     * This is merely used to prevent player's map from closing/re-opening rapidly when changing item metadata.
-     * 
-     * @param disabled whether item changes are disabled
+     * Cleans up all running map displays and de-initializes all map display logic
      */
-    public void setDisableMapItemChanges(boolean disabled) {
-        disableMapItemChanges.set(disabled);
+    public void onDisable() {
+        for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
+            for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                session.display.setRunning(false);
+            }
+        }
+    }
+
+    /**
+     * Activates or de-activates all map items for a particular plugin
+     * 
+     * @param plugin
+     * @param pluginName
+     * @param enabled
+     */
+    public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
+        if (enabled) {
+            //TODO: Go through all items on the server, and if lacking a display,
+            // and set to use this plugin for it, re-create the display
+            // Not enabled right now because it is kind of slow.
+        } else {
+            // End all map display sessions for this plugin
+            for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
+                for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                    if (session.display.getPlugin() == plugin) {
+                        session.display.setRunning(false);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1271,7 +1296,11 @@ public class CommonMapController implements PacketListener, Listener {
                     }
 
                     // Restart all display sessions; their canvas changed resolution or has holes
-                    MapDisplay.restartDisplays(map);
+                    for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                        MapDisplay display = session.display;
+                        display.setRunning(false);
+                        display.setRunning(true);
+                    }
                 }
             }
         }
