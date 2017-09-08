@@ -14,7 +14,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -87,9 +89,26 @@ public class MapDisplay {
             this.info = mapInfo;
             this._item = mapItem.clone();
         }
+        this.setRunning(true);
+    }
 
-        //TODO: Dynamically find the tiles being used
-        this.tiles.add(new MapDisplayTile(this, 0, 0));
+    // called when setRunning(true) is called, right before onAttached
+    private void preRunInitialize() {
+        // Figure out what item frame tiles exist on the server
+        this.tiles.clear();
+        for (ItemFrameInfo itemFrame : this.info.itemFrames) {
+            MapUUID uuid = itemFrame.lastMapUUID;
+            if (uuid != null && (uuid.getTileX() != 0 || uuid.getTileY() != 0)) {
+                if (!this.containsTile(uuid.getTileX(), uuid.getTileY())) {
+                    this.tiles.add(new MapDisplayTile(this, uuid.getTileX(), uuid.getTileY()));
+                }
+            }
+        }
+
+        // Tile 0,0 always exists (held map)
+        if (!this.containsTile(0, 0)) {
+            this.tiles.add(0, new MapDisplayTile(this, 0, 0));
+        }
 
         // Calculate the dimensions from the tiles and further initialize the buffers
         int minTileX = Integer.MAX_VALUE;
@@ -111,8 +130,22 @@ public class MapDisplay {
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
         this.layerStack = new Layer(this);
+    }
 
-        this.setRunning(true);
+    /**
+     * Checks whether a particular map display tile exists displaying contents
+     * 
+     * @param tileX of the tile
+     * @param tileY of the tile
+     * @return True if the tile exists
+     */
+    public boolean containsTile(int tileX, int tileY) {
+        for (MapDisplayTile tile : this.tiles) {
+            if (tile.tileX == tileX && tile.tileY == tileY) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -576,6 +609,8 @@ public class MapDisplay {
                 }, 1, 1);
 
                 if (this.info != null) {
+                    this.preRunInitialize();
+
                     this.info.sessions.add(this.session);
                 }
 
@@ -1047,5 +1082,32 @@ public class MapDisplay {
      */
     public static void updateMapItem(ItemStack oldItem, ItemStack newItem) {
         CommonPlugin.getInstance().getMapController().updateMapItem(oldItem, newItem);
+    }
+
+    /**
+     * Restarts (detaches and re-attaches) all map displays bound to a particular item.
+     * This effectively resets the display, forcing a complete re-render and re-initialization.
+     * 
+     * @param mapItem
+     */
+    public static void restartDisplays(ItemStack mapItem) {
+        MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
+        if (mapInfo != null) {
+            restartDisplays(mapInfo);
+        }
+    }
+
+    /**
+     * Restarts (detaches and re-attaches) all map displays bound to a particular item.
+     * This effectively resets the display, forcing a complete re-render and re-initialization.
+     * 
+     * @param mapInfo of the item
+     */
+    public static void restartDisplays(MapDisplayInfo mapInfo) {
+        for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
+            MapDisplay display = session.display;
+            display.setRunning(false);
+            display.setRunning(true);
+        }
     }
 }

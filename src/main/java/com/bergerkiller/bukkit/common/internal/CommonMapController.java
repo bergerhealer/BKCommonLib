@@ -39,6 +39,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -149,10 +150,10 @@ public class CommonMapController implements PacketListener, Listener {
             if (frameInfo.lastMapUUID == null) {
                 return null;
             }
-            MapDisplayInfo info = maps.get(frameInfo.lastMapUUID);
+            MapDisplayInfo info = maps.get(frameInfo.lastMapUUID.getUUID());
             if (info == null) {
-                info = new MapDisplayInfo(frameInfo.lastMapUUID);
-                maps.put(frameInfo.lastMapUUID, info);
+                info = new MapDisplayInfo(frameInfo.lastMapUUID.getUUID());
+                maps.put(frameInfo.lastMapUUID.getUUID(), info);
             }
             return info;
         }
@@ -222,7 +223,7 @@ public class CommonMapController implements PacketListener, Listener {
 
             // All item frames that show this same map
             for (ItemFrameInfo itemFrameInfo : CommonPlugin.getInstance().getMapController().getItemFrames()) {
-                if (oldMapUUID.equals(itemFrameInfo.lastMapUUID)) {
+                if (itemFrameInfo.lastMapUUID != null && oldMapUUID.equals(itemFrameInfo.lastMapUUID.getUUID())) {
                     if (unchanged) {
                         // When unchanged set the item in the metadata without causing a refresh
                         setDisableMapItemChanges(true);
@@ -441,15 +442,21 @@ public class CommonMapController implements PacketListener, Listener {
             if (!(entity instanceof ItemFrame)) {
                 return;
             }
-            MapUUID mapUUID = getItemFrameMapUUID((ItemFrame) entity);
-            if (mapUUID == null) {
+            ItemFrameInfo frameInfo = this.itemFrames.get(entity.getEntityId());
+            if (frameInfo == null) {
+                return; // no information available
+            }
+
+            frameInfo.updateItem();
+            if (frameInfo.lastMapUUID == null) {
                 return; // not a map
             }
+            frameInfo.sentToPlayers = true;
             if (disableMapItemChanges.get()) {
                 event.setCancelled(true);
                 return; // map changes are suppressed
             }
-            short staticMapId = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
+            short staticMapId = CommonMapUUIDStore.getStaticMapId(frameInfo.lastMapUUID.getUUID());
             if (staticMapId != -1) {
                 this.storeStaticMapId(staticMapId);
                 return; // static Id, not dynamic, no re-assignment
@@ -457,7 +464,7 @@ public class CommonMapController implements PacketListener, Listener {
 
             // Map Id is dynamically assigned, adjust metadata items to use this new Id
             // Avoid using any Bukkit or Wrapper types here for performance reasons
-            short newMapId = this.getMapId(mapUUID);
+            short newMapId = this.getMapId(frameInfo.lastMapUUID);
             List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
             if (items != null) {
                 ListIterator<DataWatcher.Item<Object>> itemsIter = items.listIterator();
@@ -583,6 +590,13 @@ public class CommonMapController implements PacketListener, Listener {
         ViewStack stack = info.views.get(player);
         if (stack == null || stack.stack.isEmpty()) {
             return false; // no visible display for this player
+        }
+
+        // Adjust px/py based on item frame tile information
+        ItemFrameInfo frameInfo = this.itemFrames.get(itemFrame.getEntityId());
+        if (frameInfo != null && frameInfo.lastMapUUID != null) {
+            px += 128 * frameInfo.lastMapUUID.getTileX();
+            py += 128 * frameInfo.lastMapUUID.getTileY();
         }
 
         MapClickEvent event = new MapClickEvent(player, itemFrame, stack.stack.getLast(), action, px, py);
@@ -804,6 +818,25 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
+     * Gets the item frame map UUID, also handling the tile information of the item frame
+     * 
+     * @param itemFrame to get the map UUID from
+     */
+    private MapUUID getItemFrameMapUUID(ItemFrame itemFrame) {
+        if (itemFrame == null) {
+            return null;
+        } else {
+            ItemFrameInfo info = this.itemFrames.get(itemFrame.getEntityId());
+            if (info == null) {
+                return null;
+            } else {
+                info.updateItem();
+                return info.lastMapUUID;
+            }
+        }
+    }
+
+    /**
      * Maintains the metadata information for a map
      */
     public class MapDisplayInfo {
@@ -814,6 +847,7 @@ public class CommonMapController implements PacketListener, Listener {
         public final ArrayList<ItemFrameInfo> itemFrames = new ArrayList<ItemFrameInfo>();
         public final LinkedHashSet<Player> frameViewers = new LinkedHashSet<Player>();
         private boolean hasFrameViewerChanges = true;
+        private boolean resetDisplayRequest = false;
 
         // A list of all active running displays bound to this map
         public final ArrayList<MapSession> sessions = new ArrayList<MapSession>();
@@ -923,8 +957,11 @@ public class CommonMapController implements PacketListener, Listener {
     public class ItemFrameInfo {
         public final ItemFrame itemFrame;
         public final ArrayList<Player> viewers;
-        public UUID lastMapUUID;
-        public boolean removed;
+        public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
+        public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
+        public boolean isDisplayTile; // item frame is part of a larger set of tiles making up a map display
+        public boolean needsItemRefresh; // UUID was changed and item in the item frame needs refreshing
+        public boolean sentToPlayers; // players have received item information for this item frame
         public MapDisplayInfo displayInfo;
 
         public ItemFrameInfo(ItemFrame itemFrame) {
@@ -933,12 +970,85 @@ public class CommonMapController implements PacketListener, Listener {
             this.removed = false;
             this.lastMapUUID = null;
             this.displayInfo = null;
+            this.isDisplayTile = false;
+            this.needsItemRefresh = false;
+            this.sentToPlayers = false;
+        }
+
+        public void updateItem() {
+            // Handle changes in map item shown in item frames
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+            if (mapUUID == null) {
+                // Map was removed
+                this.sentToPlayers = false;
+                if (lastMapUUID != null) {
+                    remove();
+                }
+            } else if (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID)) {
+                // Map UUID was changed, or neighbours need to be re-calculated
+                recalculateUUID();
+            }
+        }
+
+        public void recalculateUUID() {
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+
+            // Find out the tile information of this item frame
+            // This is a slow and lengthy procedure; hopefully it does not happen too often
+            // What we do is: we add all neighbours, then find the most top-left item frame
+            // Subtracting coordinates will give us the tile x/y of this item frame
+            List<IntVector3> neighbours = findNeighbours(itemFrame);
+            MapUUID newMapUUID;
+            boolean isTile;
+            if (!neighbours.isEmpty()) {
+                IntVector3 selfPos = new IntVector3(itemFrame.getLocation());
+                BlockFace selfFacing = itemFrame.getFacing();
+                int tileX = 0;
+                int tileY = 0;
+                for (IntVector3 neighbour : neighbours) {
+                    int dx = selfFacing.getModX() * (selfPos.z - neighbour.z) -
+                             selfFacing.getModZ() * (selfPos.x - neighbour.x);
+                    int dy = selfPos.y - neighbour.y;
+                    if (dx < tileX) {
+                        tileX = dx;
+                    }
+                    if (dy < tileY) {
+                        tileY = dy;
+                    }
+                }
+                tileX = -tileX;
+                tileY = -tileY;
+
+                newMapUUID = new MapUUID(mapUUID, tileX, tileY);
+                isTile = true;
+            } else {
+                newMapUUID = new MapUUID(mapUUID, 0, 0);
+                isTile = false;
+            }
+
+            boolean readd = (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID));
+            if (readd) {
+                this.remove();
+            }
+
+            if (!newMapUUID.equals(lastMapUUID)) {
+                lastMapUUID = newMapUUID;
+                isDisplayTile = isTile;
+                needsItemRefresh = this.sentToPlayers;
+            }
+
+            if (readd) {
+                this.add();
+            }
         }
 
         public void remove() {
             if (displayInfo != null) {
                 displayInfo.itemFrames.remove(this);
                 displayInfo.hasFrameViewerChanges = true;
+                if (isDisplayTile) {
+                    displayInfo.resetDisplayRequest = true;
+                }
                 displayInfo = null;
             }
             if (!this.viewers.isEmpty()) {
@@ -949,12 +1059,16 @@ public class CommonMapController implements PacketListener, Listener {
                 viewers.clear();
             }
             this.lastMapUUID = null;
+            this.isDisplayTile = false;
         }
 
         public void add() {
             if (this.displayInfo == null && this.lastMapUUID != null) {
-                this.displayInfo = getInfo(this.lastMapUUID);
+                this.displayInfo = getInfo(this.lastMapUUID.getUUID());
                 this.displayInfo.itemFrames.add(this);
+            }
+            if (this.isDisplayTile) {
+                this.displayInfo.resetDisplayRequest = true;
             }
         }
     }
@@ -1075,15 +1189,8 @@ public class CommonMapController implements PacketListener, Listener {
                     continue;
                 }
 
-                // Handle changes in map item shown in item frames
-                UUID mapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(info.itemFrame));
-                if (!LogicUtil.bothNullOrEqual(mapUUID, info.lastMapUUID)) {
-                    info.remove();
-                    if (mapUUID != null) {
-                        info.lastMapUUID = mapUUID;
-                        info.add();
-                    }
-                }
+                // Refreshes cached information about this item frame's item
+                info.updateItem();
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
@@ -1111,6 +1218,14 @@ public class CommonMapController implements PacketListener, Listener {
                         info.displayInfo.hasFrameViewerChanges = true;
                     }
                 }
+
+                // Resend Item Frame item (metadata) when the UUID changes
+                // UUID can change when the relative tile displayed changes
+                // This happens when a new item frame is placed left/above a display
+                if (info.needsItemRefresh) {
+                    info.needsItemRefresh = false;
+                    setItemFrameItem(info.itemFrame, getItemFrameItem(info.itemFrame));
+                }
             }
 
             // Update the player viewers of all map displays
@@ -1128,6 +1243,18 @@ public class CommonMapController implements PacketListener, Listener {
                     //if (map.globalFramedDisplay != null) {
                         //map.globalFramedDisplay.setViewers(map.frameViewers);
                     //}
+                }
+                if (map.resetDisplayRequest) {
+                    map.resetDisplayRequest = false;
+
+                    // Refresh all item frames' items showing this map
+                    // It is possible their UUID changed as a result of the new tiling
+                    for (ItemFrameInfo itemFrame : map.itemFrames) {
+                        itemFrame.recalculateUUID();
+                    }
+
+                    // Restart all display sessions; their canvas changed resolution or has holes
+                    MapDisplay.restartDisplays(map);
                 }
             }
         }
@@ -1208,26 +1335,71 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
-     * Gets the item frame map UUID, also handling the tile information of the item frame
+     * Finds all connected neighbours of an item frame
      * 
-     * @param itemFrame to get the map UUID from
+     * @param itemFrame
      */
-    private static MapUUID getItemFrameMapUUID(ItemFrame itemFrame) {
-        if (itemFrame == null) {
-            return null;
-        } else {
-            ItemStack item = getItemFrameItem(itemFrame);
-            UUID uuid = CommonMapUUIDStore.getMapUUID(item);
-            if (uuid == null) {
-                return null;
-            }
-            if (CommonMapUUIDStore.getStaticMapId(uuid) != -1) {
-                return new MapUUID(uuid);
-            }
-
-            //TODO: Find out the tile coordinates of the item frame
-            return new MapUUID(uuid);
+    private static List<IntVector3> findNeighbours(ItemFrame itemFrame) {
+        HashSet<IntVector3> neighbours = new HashSet<IntVector3>();
+        BlockFace facing = itemFrame.getFacing();
+        IntVector3 itemFramePos = new IntVector3(itemFrame.getLocation());
+        UUID itemFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+        if (itemFrameMapUUID == null) {
+            return Collections.emptyList(); // no neighbours
         }
+
+        // Find all item frames that:
+        // - Are on the same world as this item frame
+        // - Facing the same way
+        // - Along the same x/z (facing)
+        // - Same ItemStack map UUID
+        for (Entity entity : WorldUtil.getEntities(itemFrame.getWorld())) {
+            if (!(entity instanceof ItemFrame) || entity == itemFrame) {
+                continue;
+            }
+            ItemFrame otherFrame = (ItemFrame) entity;
+            if (otherFrame.getFacing() != facing) {
+                continue;
+            }
+            IntVector3 otherFramePos = new IntVector3(otherFrame.getLocation());
+            if (FaceUtil.isAlongX(facing)) {
+                if (otherFramePos.x != itemFramePos.x) {
+                    continue;
+                }
+            } else {
+                if (otherFramePos.z != itemFramePos.z) {
+                    continue;
+                }
+            }
+            UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
+            if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                continue;
+            }
+            neighbours.add(otherFramePos);
+        }
+
+        // Make sure the neighbours result are a single contiguous blob
+        // Islands (can not reach the input item frame) are removed
+        BlockFace[] sides = {
+                BlockFace.UP, BlockFace.DOWN,
+                FaceUtil.rotate(facing, 2),
+                FaceUtil.rotate(facing, -2)
+        };
+        List<IntVector3> pendingList = new ArrayList<IntVector3>(5);
+        List<IntVector3> result = new ArrayList<IntVector3>(neighbours.size());
+        pendingList.add(itemFramePos);
+        do {
+            IntVector3 pending = pendingList.remove(pendingList.size() - 1);
+            for (BlockFace side : sides) {
+                IntVector3 sidePoint = pending.add(side);
+                if (neighbours.remove(sidePoint)) {
+                    pendingList.add(sidePoint);
+                    result.add(sidePoint);
+                }
+            }
+        } while (!pendingList.isEmpty());
+
+        return result;
     }
 
     /**
