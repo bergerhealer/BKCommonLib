@@ -14,6 +14,6 @@ public class PostTestHandler extends RunListener {
     @Override
     public void testRunFinished(Result result) throws Exception {
         // Called when all tests have finished
-        com.bergerkiller.mountiplex.conversion.Conversion.debugExportConverterTree("misc/conversion.txt");
+        //com.bergerkiller.mountiplex.conversion.Conversion.debugExportConverterTree("misc/conversion.txt");
     }
 }
