@@ -1121,4 +1121,19 @@ public class MapDisplay {
         }
     }
 
+    /**
+     * Terminates (detaches) all map displays registered by a certain plugin.
+     * 
+     * @param plugin owner of the displays
+     */
+    public static void stopDisplaysForPlugin(Plugin plugin) {
+        // End all map display sessions for this plugin
+        for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(CommonPlugin.getInstance().getMapController().getMaps())) {
+            for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                if (session.display.getPlugin() == plugin) {
+                    session.display.setRunning(false);
+                }
+            }
+        }
+    }
 }

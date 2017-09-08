@@ -293,13 +293,7 @@ public class CommonMapController implements PacketListener, Listener {
             // Not enabled right now because it is kind of slow.
         } else {
             // End all map display sessions for this plugin
-            for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
-                for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
-                    if (session.display.getPlugin() == plugin) {
-                        session.display.setRunning(false);
-                    }
-                }
-            }
+            MapDisplay.stopDisplaysForPlugin(plugin);
         }
     }
 
