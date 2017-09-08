@@ -650,6 +650,15 @@ public abstract class MapCanvas {
      * @return True if deeper areas need to be re-drawn as a result of previous drawing operations
      */
     public final boolean hasMoreDepth() {
+        if (!this.hasDepthHoles) {
+            // Check if any pixels on the display have depth holes
+            for (short d : this.depthBuffer) {
+                if (d == MAX_DEPTH) {
+                    this.hasDepthHoles = true;
+                    break;
+                }
+            }
+        }
         return this.hasDepthHoles;
     }
 
