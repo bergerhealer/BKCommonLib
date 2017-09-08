@@ -53,7 +53,7 @@ public class MapDisplay {
     private byte[] zbuffer = null;
     private byte[] livebuffer = null;
     private Layer layerStack;
-    private boolean _updateWhenNotViewing = false;
+    private boolean _updateWhenNotViewing = true;
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
     private int updateTaskId = -1;
@@ -505,7 +505,7 @@ public class MapDisplay {
 
     /**
      * Sets whether this Virtual Map's {@link #onTick()} method is called when no players
-     * are currently viewing this map. By default this is set to false.
+     * are currently viewing this map. By default this is set to true.
      * 
      * @param updateWithoutViewers option
      */
