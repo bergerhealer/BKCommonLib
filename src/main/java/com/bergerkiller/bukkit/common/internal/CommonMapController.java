@@ -1059,7 +1059,7 @@ public class CommonMapController implements PacketListener, Listener {
                 isTile = false;
             }
 
-            boolean hadDisplay = (lastMapUUID != null);
+            boolean isTiledDisplay = (isDisplayTile && lastMapUUID != null) || (!neighbours.isEmpty());
             boolean readd = (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID));
             if (readd) {
                 this.remove();
@@ -1072,7 +1072,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             if (readd) {
-                this.add(hadDisplay);
+                this.add(isTiledDisplay);
             }
         }
 
@@ -1096,12 +1096,12 @@ public class CommonMapController implements PacketListener, Listener {
             this.isDisplayTile = false;
         }
 
-        public void add(boolean hadDisplay) {
+        public void add(boolean isTiledDisplay) {
             if (this.displayInfo == null && this.lastMapUUID != null) {
                 this.displayInfo = getInfo(this.lastMapUUID.getUUID());
                 this.displayInfo.itemFrames.add(this);
             }
-            if (hadDisplay && this.isDisplayTile && !this.displayInfo.sessions.isEmpty()) {
+            if (isTiledDisplay && !this.displayInfo.sessions.isEmpty()) {
                 this.displayInfo.resetDisplayRequest = true;
             }
         }
