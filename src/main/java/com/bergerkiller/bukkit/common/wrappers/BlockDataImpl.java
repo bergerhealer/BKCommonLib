@@ -29,6 +29,7 @@ public class BlockDataImpl extends BlockData {
     private BlockHandle block;
     private IBlockDataHandle data;
     private MaterialData materialData;
+    private boolean hasRenderOptions;
 
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
@@ -118,6 +119,7 @@ public class BlockDataImpl extends BlockData {
         this.block = block;
         this.data = data;
         this.materialData = null;
+        this.hasRenderOptions = true;
     }
 
     @Override
@@ -125,6 +127,7 @@ public class BlockDataImpl extends BlockData {
         this.block = BlockHandle.createHandle(block);
         this.data = this.block.getBlockData();
         this.materialData = null;
+        this.hasRenderOptions = true;
     }
 
     @Override
@@ -132,6 +135,7 @@ public class BlockDataImpl extends BlockData {
         this.data = IBlockDataHandle.createHandle(iBlockData);
         this.block = this.data.getBlock();
         this.materialData = null;
+        this.hasRenderOptions = true;
     }
 
     @Override
@@ -140,6 +144,7 @@ public class BlockDataImpl extends BlockData {
         this.block = BlockHandle.getById(material.getId());
         this.data = this.block.fromLegacyData(data);
         this.materialData = null;
+        this.hasRenderOptions = true;
     }
 
     @Override
@@ -216,6 +221,10 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public BlockRenderOptions getRenderOptions(World world, int x, int y, int z) {
+        if (!this.hasRenderOptions) {
+            return new BlockRenderOptions(this, "");
+        }
+
         Object stateData;
         if (world == null) {
             //TODO: We should call updateState() with an IBlockAccess that returns all Air.
@@ -253,6 +262,12 @@ public class BlockDataImpl extends BlockData {
             if (renderProvider != null) {
                 renderProvider.addOptions(options, world, x, y, z);
             }
+        }
+
+        // When no options are being used, do not check for them again in the future
+        // This offers performance benefits
+        if (options.isEmpty()) {
+            this.hasRenderOptions = false;
         }
 
         return options;
