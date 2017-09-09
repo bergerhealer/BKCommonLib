@@ -34,6 +34,10 @@ public class ChunkHandle extends Template.Handle {
         return T.getBlockData.invoke(instance, blockposition);
     }
 
+    public BlockData getBlockDataAtCoord(int x, int y, int z) {
+        return T.getBlockDataAtCoord.invoke(instance, x, y, z);
+    }
+
     public BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata) {
         return T.setBlockData.invoke(instance, blockposition, iblockdata);
     }
@@ -144,6 +148,7 @@ public class ChunkHandle extends Template.Handle {
         public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method.Converted<BlockData> getBlockDataAtCoord = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> setBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> addEntity = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getHeight = new Template.Method<Integer>();

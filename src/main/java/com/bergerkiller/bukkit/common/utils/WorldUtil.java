@@ -12,7 +12,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -81,10 +80,14 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
+        return WorldHandle.T.getBlockDataAtCoord.invoke(HandleConversion.toWorldHandle(world), x, y, z);
+
+        /*
         Object worldHandleRaw = HandleConversion.toWorldHandle(world);
         Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
         Object iBlockData = WorldHandle.T.getBlockData.raw.invoke(worldHandleRaw, blockPos); 
         return BlockData.fromBlockData(iBlockData);
+        */
     }
 
     /**

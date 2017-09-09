@@ -57,13 +57,8 @@ public class BlockDataRegistry {
      * @param material input
      * @return Immutable BlockData
      */
-    @SuppressWarnings("deprecation")
     public static BlockData fromMaterial(Material material) {
-        if (material.isBlock()) {
-            return BlockDataImpl.BY_ID[material.getId()];
-        } else {
-            return BlockDataImpl.AIR;
-        }
+        return BlockDataImpl.BY_MATERIAL.get(material);
     }
 
     /**

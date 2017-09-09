@@ -10,7 +10,6 @@ import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle;
@@ -135,10 +134,14 @@ public class ChunkUtil {
      * @return block data information
      */
     public static BlockData getBlockData(org.bukkit.Chunk chunk, int x, int y, int z) {
+        return ChunkHandle.T.getBlockDataAtCoord.invoke(HandleConversion.toChunkHandle(chunk), x, y, z);
+
+        /*
         Object chunkHandleRaw = HandleConversion.toChunkHandle(chunk);
         Object blockPos = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
         Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
         return BlockData.fromBlockData(iBlockData);
+        */
     }
 
     /**

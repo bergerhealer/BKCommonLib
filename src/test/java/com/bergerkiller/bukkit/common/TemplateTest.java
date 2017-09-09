@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -11,6 +13,7 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -23,6 +26,7 @@ public class TemplateTest {
     @Test
     public void testTemplate() {
         boolean fullySuccessful = true;
+        ArrayList<Template.Class<?>> classes = new ArrayList<Template.Class<?>>();
         for (ClassDeclaration dec : Common.TEMPLATE_RESOLVER.all()) {
             String genClassPath = "com.bergerkiller.generated";
 
@@ -71,6 +75,7 @@ public class TemplateTest {
                     fail("Failed to find template field in type " + genClassPath);
                 }
                 Template.Class<?> c = (Template.Class<?>) f.get(null);
+                classes.add(c);
                 if (c == null) {
                     fail("Failed to initialize template class " + genClassPath);
                 }
@@ -84,6 +89,16 @@ public class TemplateTest {
         }
         if (!fullySuccessful) {
             fail("Some generated reflection template classes could not be loaded");
+        }
+
+        // Attempt to fully initialize all declarations
+        for (Template.Class<?> templateClass : classes) {
+            try {
+                templateClass.forceInitialization();
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.severe("Failed to initialize " + templateClass.getType());
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
         }
     }
 

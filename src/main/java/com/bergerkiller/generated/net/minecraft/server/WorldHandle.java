@@ -44,6 +44,10 @@ public class WorldHandle extends Template.Handle {
         return T.getBlockData.invoke(instance, blockposition);
     }
 
+    public BlockData getBlockDataAtCoord(int x, int y, int z) {
+        return T.getBlockDataAtCoord.invoke(instance, x, y, z);
+    }
+
     public boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags) {
         return T.setBlockData.invoke(instance, blockposition, iblockdata, updateFlags);
     }
@@ -214,6 +218,7 @@ public class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
         public final Template.Method.Converted<Server> getServer = new Template.Method.Converted<Server>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method<BlockData> getBlockDataAtCoord = new Template.Method<BlockData>();
         public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional

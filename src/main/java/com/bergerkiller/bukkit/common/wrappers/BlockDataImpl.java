@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
+@SuppressWarnings("deprecation")
 public class BlockDataImpl extends BlockData {
     private BlockHandle block;
     private IBlockDataHandle data;
@@ -43,6 +45,7 @@ public class BlockDataImpl extends BlockData {
     public static final int REGISTRY_MASK = (REGISTRY_SIZE - 1);
 
     public static final BlockDataConstant AIR = new BlockDataConstant(BlockHandle.getById(0));
+    public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
     public static final BlockDataConstant[] BY_ID = new BlockDataConstant[ID_SIZE];
     public static final BlockDataConstant[] BY_ID_AND_DATA = new BlockDataConstant[REGISTRY_SIZE];
     public static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
@@ -69,8 +72,12 @@ public class BlockDataImpl extends BlockData {
             BY_BLOCK_DATA.put(rawIBlockData, block_const);
             BY_ID_AND_DATA[block_const.getCombinedId_1_8_8()] = block_const;
         }
-
         BY_BLOCK_DATA.put(null, AIR);
+
+        // Cache all Material types in the Bukkit enum. Non-block types are stored as AIR.
+        for (Material material : Material.values()) {
+            BY_MATERIAL.put(material, material.isBlock() ? BY_ID[material.getId()] : AIR);
+        }
     }
 
     /**
@@ -139,7 +146,6 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void loadMaterialData(Material material, int data) {
         this.block = BlockHandle.getById(material.getId());
         this.data = this.block.fromLegacyData(data);
@@ -158,7 +164,6 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public final MaterialData getMaterialData() {
         if (this.materialData == null) {
             Material type = this.getType();

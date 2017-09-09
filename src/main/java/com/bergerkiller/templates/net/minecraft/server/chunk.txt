@@ -28,6 +28,15 @@ class Chunk {
 
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 
+#if version >= 1.9
+    public (BlockData) IBlockData getBlockDataAtCoord:a(int x, int y, int z);
+#else
+    // Fallback on 1.8.8: generated code
+    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getBlockData(new BlockPosition(x, y, z));
+    }
+#endif
+
     public (BlockData) IBlockData setBlockData:a((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata);
 
     public void addEntity:a((EntityHandle) Entity entity);
