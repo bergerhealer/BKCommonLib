@@ -679,6 +679,60 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Checks whether a rectangular area on this canvas has depth holes.
+     * A depth hole is where the depth is MAX_DEPTH, in other words, nothing is drawn.
+     * 
+     * @param x - coordinate of the rectangular area to check
+     * @param y - coordinate of the rectangular area to check
+     * @param width of the rectangular area to check
+     * @param height of the rectangular area to check
+     * @return True if the area has depth holes
+     */
+    public final boolean hasMoreDepth(int x, int y, int width, int height) {
+        if (this.depthBuffer == null) {
+            return true;
+        } else if (x >= this.getWidth() || y >= this.getHeight()) {
+            return false; // out of bounds
+        } else {
+            // Bring coordinates to within the canvas
+            if (x < 0) {
+                width += x;
+                x = 0;
+            }
+            if (y < 0) {
+                height += y;
+                y = 0;
+            }
+            if (width <= 0 || height <= 0) {
+                return false; // no area
+            }
+
+            // Clip width/height extending past the limit
+            int limWidth = this.getWidth() - x;
+            int limHeight = this.getHeight() - y;
+            if (width > limWidth) {
+                width = limWidth;
+            }
+            if (height > limHeight) {
+                height = limHeight;
+            }
+
+            // Finally actually do the checks
+            int depthIndexBase = (y * this.getWidth());
+            for (int dy = 0; dy < height; dy++) {
+                int depthIndex = depthIndexBase + x;
+                for (int dx = 0; dx < width; dx++) {
+                    if (this.depthBuffer[depthIndex++] == MAX_DEPTH) {
+                        return true;
+                    }
+                }
+                depthIndexBase += this.getWidth();
+            }
+            return false;
+        }
+    }
+
+    /**
      * Sets the amount of pixels between each drawn character of a font.
      * By default a spacing of 0 is used. Text fonts will have a default spacing set.
      * Negative values are allowed to make spacing smaller.
