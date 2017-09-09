@@ -32,7 +32,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
-public class MapTexturePackTest
+public class MapModelRenderTest
 {
 
     public static final int RES_WIDTH = 1280;
@@ -108,7 +108,7 @@ class Pseudo3DImagePanel extends JPanel
     {
         super.paintComponent(g);
 
-        MapTexture image = MapTexture.createEmpty(MapTexturePackTest.RES_WIDTH, MapTexturePackTest.RES_HEIGHT);
+        MapTexture image = MapTexture.createEmpty(MapModelRenderTest.RES_WIDTH, MapModelRenderTest.RES_HEIGHT);
         image.draw(background, 0, 0);
         image.setBlendMode(MapBlendMode.OVERLAY);
         image.setLightOptions(0.0f, 1.0f, new Vector3f(-1.0f, 1.0f, -1.0f));

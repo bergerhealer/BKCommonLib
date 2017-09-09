@@ -482,6 +482,54 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Moves all pixel information, including depth buffer data, with an offset.
+     * This enables quick movement of pixel data without re-drawing all the partss.
+     * 
+     * @param dx pixel offset
+     * @param dy pixel offset
+     * @return this canvas
+     */
+    public final MapCanvas movePixels(int dx, int dy) {
+        byte[] oldPixels = this.getBuffer();
+        short[] oldDepthBuffer = this.depthBuffer;
+
+        byte[] newPixels = new byte[oldPixels.length];
+        short[] newDepthBuffer = null;
+        if (this.depthBuffer != null) {
+            newDepthBuffer = new short[this.depthBuffer.length];
+            Arrays.fill(newDepthBuffer, (short) MAX_DEPTH);
+        }
+
+        int colorIndex = 0;
+        for (int y = 0; y < this.getHeight(); y++) {
+            for (int x = 0; x < this.getWidth(); x++) {
+                int sx = x + dx;
+                int sy = y + dy;
+
+                // Out of range
+                if (sx < 0 || sy < 0 || sx >= this.getWidth() || sy >= this.getHeight()) {
+                    colorIndex++;
+                    continue;
+                }
+
+                // Copy it
+                newPixels[sy * this.getWidth() + sx] = oldPixels[colorIndex];
+                if (newDepthBuffer != null) {
+                    newDepthBuffer[colorIndex] = oldDepthBuffer[colorIndex];
+                }
+                colorIndex++;
+            }
+        }
+
+        // Apply it
+        this.clearDepthBuffer();
+        this.writePixels(0, 0, this.getWidth(), this.getHeight(), newPixels);
+        this.depthBuffer = newDepthBuffer;
+
+        return this;
+    }
+
+    /**
      * Clears a rectangular area with transparent color. Layers below this rectangle
      * will show through.
      * 

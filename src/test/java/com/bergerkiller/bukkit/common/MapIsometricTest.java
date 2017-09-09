@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import org.bukkit.Material;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
@@ -20,7 +21,8 @@ public class MapIsometricTest {
         CommonUtil.bootstrap();
     }
 
-    //@Test
+    @Ignore
+    @Test
     public void testIsometric() {
         // Load the source textures
         MapResourcePack texturePack = MapResourcePack.VANILLA;
@@ -47,7 +49,6 @@ public class MapIsometricTest {
 
     private MapTexture renderSprite(Model model) {
         MapTexture map = null;
-        MapTexture mask = MapTexture.fromImageFile("C:\\Users\\QT\\Desktop\\TexturePack\\mask2.png");
         map = MapTexture.createEmpty(32, 43);
         //map.setBrushMask(mask);
         //map.fill(MapColorPalette.COLOR_RED);

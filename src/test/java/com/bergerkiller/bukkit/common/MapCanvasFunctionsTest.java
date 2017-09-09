@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
@@ -10,11 +11,26 @@ import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 
 /**
- * Tests the correct functioning of the Map Canvas depth buffer logic
+ * Tests the correct functioning of map canvas functions by visual inspection
  */
-public class MapDepthTest {
+public class MapCanvasFunctionsTest {
 
-    //@Test
+    @Ignore
+    @Test
+    public void testPixelMove() {
+        MapTexture map = MapTexture.createEmpty(200, 200);
+        map.fillRectangle(0, 0, 50, 50, MapColorPalette.COLOR_RED);
+        map.fillRectangle(20, 40, 100, 90, MapColorPalette.COLOR_BLUE);
+
+        MapDebugWindow.showMap(map);
+
+        map.movePixels(-10, -30);
+
+        MapDebugWindow.showMapForever(map);
+    }
+
+    @Ignore
+    @Test
     public void testDepthBuffer() {
         MapTexture map = MapTexture.createEmpty(64, 64);
         

@@ -185,7 +185,7 @@ public class MapColorPalette {
      * Makes a color darker or brighter based on a specular float value.
      * 
      * @param color to transform
-     * @param lightness factor. 0 is no change, -1 is black, 1 is white.
+     * @param lightness factor. 0 is darkest (black), 1 is normal, 2 is brightest (white).
      * @return specular color
      */
     public static byte getSpecular(byte color, float lightness) {
