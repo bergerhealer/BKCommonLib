@@ -501,6 +501,7 @@ public abstract class MapCanvas {
         }
 
         int colorIndex = 0;
+        int dstIndex = 0;
         for (int y = 0; y < this.getHeight(); y++) {
             for (int x = 0; x < this.getWidth(); x++) {
                 int sx = x + dx;
@@ -513,16 +514,16 @@ public abstract class MapCanvas {
                 }
 
                 // Copy it
-                newPixels[sy * this.getWidth() + sx] = oldPixels[colorIndex];
+                dstIndex = sy * this.getWidth() + sx;
+                newPixels[dstIndex] = oldPixels[colorIndex];
                 if (newDepthBuffer != null) {
-                    newDepthBuffer[colorIndex] = oldDepthBuffer[colorIndex];
+                    newDepthBuffer[dstIndex] = oldDepthBuffer[colorIndex];
                 }
                 colorIndex++;
             }
         }
 
         // Apply it
-        this.clearDepthBuffer();
         this.writePixels(0, 0, this.getWidth(), this.getHeight(), newPixels);
         this.depthBuffer = newDepthBuffer;
 
@@ -667,6 +668,54 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Clears the draw depth buffer in a rectangular area, causing any previous
+     * contents to be erased when drawing in those areas.
+     * 
+     * @param x - coordinate of the top-left point of the rectangle
+     * @param y - coordinate of the top-left point of the rectangle
+     * @param width of the rectangle
+     * @param height of the rectangle
+     * @return this canvas
+     */
+    public final MapCanvas clearDepthBuffer(int x, int y, int width, int height) {
+        if (this.depthBuffer != null) {
+            if (x >= this.getWidth() || y >= this.getHeight()) {
+                return this; // out of bounds
+            }
+
+            // Limit boundaries
+            if (x < 0) {
+                width += x;
+                x = 0;
+            }
+            if (y < 0) {
+                height += y;
+                y = 0;
+            }
+            int maxWidth = this.getWidth() - x;
+            int maxHeight = this.getHeight() - y;
+            if (width > maxWidth) {
+                width = maxWidth;
+            }
+            if (height > maxHeight) {
+                height = maxHeight;
+            }
+
+            if (width <= 0 || height <= 0) {
+                return this; // out of bounds
+            }
+
+            // Blit the areas to MAX_DEPTH where needed
+            int fromIndex = x + y * this.getWidth();
+            for (int dy = 0; dy < height; dy++) {
+                Arrays.fill(this.depthBuffer, fromIndex, fromIndex + width, (short) MAX_DEPTH);
+                fromIndex += this.getWidth();
+            }
+        }
+        return this;
+    }
+
+    /**
      * Sets a depth value that will be used when performing the following drawing operations.
      * The depth buffer will allow for different drawn areas to overlap each other correctly
      * in the third dimension (z).<br>
@@ -724,6 +773,23 @@ public abstract class MapCanvas {
         } else {
             return this.depthBuffer[y * this.getWidth() + x];
         }
+    }
+
+    /**
+     * Gets the mutable depth buffer of this canvas.
+     * The depth buffer dictates the depth value of every drawn pixel.
+     * If no depth buffer was used so far, this function returns <i>null</i>.
+     * This depth buffer data is formatted in such a way that:
+     * <ul>
+     * <li>The first depth value in the array is pixel (0, 0)</li>
+     * <li>Satisfies condition <b>index = x + y * width</b></li>
+     * <li>The size of the buffer equals (width * height)</li>
+     * </ul>
+     * 
+     * @return depth buffer
+     */
+    public final short[] getDepthBuffer() {
+        return this.depthBuffer;
     }
 
     /**
