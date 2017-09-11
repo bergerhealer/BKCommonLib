@@ -1087,6 +1087,9 @@ public abstract class MapCanvas {
             Vector3f ip3 = new Vector3f(canvas.getWidth(), 0,  0);
 
             canvas.projMatrix = Matrix4f.computeProjectionMatrix(new Vector3f[] { ip0, ip1, ip2, ip3 });
+            if (canvas.projMatrix == null) {
+                return this; // texture resolution is invalid (0x0?)
+            }
             canvas.projMatrix.invert();
         }
 
