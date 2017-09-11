@@ -33,6 +33,7 @@ public class BlockModelNameLookup {
         // Color me surprised
         if (
                 name.equals("wool") || 
+                name.equals("carpet") ||
                 name.equals("concrete") || 
                 name.equals("concrete_powder") ||
                 name.equals("stained_hardened_clay") ||

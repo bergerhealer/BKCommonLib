@@ -227,7 +227,9 @@ public class MapResourcePack {
                 result = MapTexture.fromStream(inputStream);
             }
             if (result == null) {
-                //System.out.println("Failed to load texture: " + path);
+                if (!path.startsWith("#")) {
+                    Logging.LOGGER_MAPDISPLAY.warning("Failed to load texture: " + path);
+                }
                 result = this.createPlaceholderTexture();
             }
             textureCache.put(path, result);

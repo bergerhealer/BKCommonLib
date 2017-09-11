@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,16 +11,14 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.bukkit.Material;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
-import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Matrix4f;
@@ -41,8 +38,9 @@ public class MapModelRenderTest
     static {
         CommonUtil.bootstrap();
     }
-    
-    //@Test
+
+    @Ignore
+    @Test
     public void test3DRender() {
 
         createAndShowGUI(MapResourcePack.VANILLA);
@@ -120,7 +118,7 @@ class Pseudo3DImagePanel extends JPanel
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterialData(Material.CHEST, 0).getDefaultRenderOptions();
+        BlockRenderOptions opt = BlockData.fromMaterialData(Material.CARPET, 6).getDefaultRenderOptions();
         System.out.println(opt);
         
         Model model = textures.getBlockModel(opt);
