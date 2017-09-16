@@ -69,6 +69,8 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
 public class CommonMapController implements PacketListener, Listener {
     // Bi-directional mapping between map UUID and Map (durability) Id
@@ -76,6 +78,8 @@ public class CommonMapController implements PacketListener, Listener {
     private final HashMap<MapUUID, Short> mapIdByUUID = new HashMap<MapUUID, Short>();
     // Stores Map Displays, mapped by Map UUID
     private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
+    // Stores Map Displays by their Type information
+    private final OutputTypeMap<MapDisplay> displays = new OutputTypeMap<MapDisplay>();
     // Stores player map input (through Vehicle Steer packets)
     private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     // Tracks all item frames loaded on the server
@@ -101,6 +105,26 @@ public class CommonMapController implements PacketListener, Listener {
             PacketType.OUT_WINDOW_ITEMS, PacketType.OUT_WINDOW_SET_SLOT,
             PacketType.OUT_ENTITY_METADATA, PacketType.IN_SET_CREATIVE_SLOT
     };
+
+    /**
+     * Gets all registered Map Displays of a particular type
+     * 
+     * @param type
+     * @return collection of map displays
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends MapDisplay> Collection<T> getDisplays(Class<T> type) {
+        return (Collection<T>) displays.getAll(TypeDeclaration.fromClass(type));
+    }
+
+    /**
+     * Gets a map of all displays
+     * 
+     * @return displays
+     */
+    public OutputTypeMap<MapDisplay> getDisplays() {
+        return displays;
+    }
 
     /**
      * Gets all maps available on the server that may store map displays

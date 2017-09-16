@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -628,6 +629,8 @@ public class MapDisplay implements MapDisplayEvents {
                     }
                 }, 1, 1);
 
+                CommonPlugin.getInstance().getMapController().getDisplays().add(getClass(), this);
+
                 if (this.info != null) {
                     this.preRunInitialize();
 
@@ -655,6 +658,7 @@ public class MapDisplay implements MapDisplayEvents {
                 if (this.info != null) {
                     this.info.sessions.remove(this.session);
                 }
+                CommonPlugin.getInstance().getMapController().getDisplays().remove(getClass(), this);
             }
         }
     }
@@ -1115,5 +1119,15 @@ public class MapDisplay implements MapDisplayEvents {
                 }
             }
         }
+    }
+
+    /**
+     * Gets all display instances of a certain type used on the server
+     * 
+     * @param displayClass type
+     * @return collection of Map Displays of this type (or an extended type of-)
+     */
+    public static <T extends MapDisplay> Collection<T> getAllDisplays(Class<T> displayClass) {
+        return CommonPlugin.getInstance().getMapController().getDisplays(displayClass);
     }
 }
