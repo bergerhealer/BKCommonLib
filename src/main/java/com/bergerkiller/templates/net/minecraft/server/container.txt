@@ -3,12 +3,19 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 
 class Container {
-#if version >= 1.11
+#if version >= 1.12.2
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:items;
+#elseif version >= 1.11
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:b;
 #else
     public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> oldItems:b;
 #endif
+
+#if version >= 1.12.2
+    public (List<SlotHandle>) List<Slot> slots:slots;
+#else
     public (List<SlotHandle>) List<Slot> slots:c;
+#endif
 
     public abstract org.bukkit.inventory.InventoryView getBukkitView();
 }
