@@ -106,6 +106,22 @@ class Packet {
     </code>
 }
 
+class PacketPlayInKeepAlive extends Packet {
+#if version >= 1.12.2
+    private (Long) long key:a;
+#else
+    private (Long) int key:a;
+#endif
+}
+
+class PacketPlayOutKeepAlive extends Packet {
+#if version >= 1.12.2
+    private (Long) long key:a;
+#else
+    private (Long) int key:a;
+#endif
+}
+
 class PacketPlayOutScoreboardScore extends Packet {
     class PacketPlayOutScoreboardScore.EnumScoreboardAction {
         enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction CHANGE;

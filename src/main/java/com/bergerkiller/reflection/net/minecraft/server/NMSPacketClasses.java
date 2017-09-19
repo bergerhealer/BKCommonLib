@@ -54,6 +54,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBoatMoveHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSettingsHandle;
@@ -74,6 +75,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipm
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
@@ -279,7 +281,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInKeepAlive extends NMSPacket {
 
-        public final FieldAccessor<Integer> key = nextField("private int a");
+        public final FieldAccessor<Long> key = PacketPlayInKeepAliveHandle.T.key.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInResourcePackStatus extends NMSPacket {
@@ -948,7 +950,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutKeepAlive extends NMSPacket {
 
-        public final FieldAccessor<Integer> key = getField("a", int.class);
+        public final FieldAccessor<Long> key = PacketPlayOutKeepAliveHandle.T.key.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
