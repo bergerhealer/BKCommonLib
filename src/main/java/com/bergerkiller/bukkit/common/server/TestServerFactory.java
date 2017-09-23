@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.server;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 

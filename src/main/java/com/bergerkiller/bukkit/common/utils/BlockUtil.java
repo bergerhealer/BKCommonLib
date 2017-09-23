@@ -19,12 +19,14 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
@@ -381,7 +383,8 @@ public class BlockUtil extends MaterialUtil {
      * @return update packet
      */
     public static CommonPacket getUpdatePacket(BlockState state) {
-        return NMSTileEntity.getUpdatePacket(Conversion.toTileEntityHandle.convert(state));
+        Object tileEntity = HandleConversion.toTileEntityHandle(state);
+        return (tileEntity == null) ? null : TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
 
     /**
@@ -480,7 +483,7 @@ public class BlockUtil extends MaterialUtil {
                 int zMax = z + radiusZ;
                 Object blockPosition;
                 for (Object tile : NMSWorld.getTileList(world)) {
-                    blockPosition = NMSTileEntity.position.getInternal(tile);
+                    blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
 
                     // Check again - security against ghost tiles
                     if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
@@ -495,9 +498,12 @@ public class BlockUtil extends MaterialUtil {
     }
 
     private static void offerTile(World world, Object blockPosition) {
-        BlockState state = Conversion.toBlockState.convert(NMSTileEntity.getFromWorld(world, blockPosition));
-        if (state != null) {
-            blockStateBuff.add(state);
+        Object tileEntityHandle = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
+        if (tileEntityHandle != null) {
+            BlockState state = WrapperConversion.toBlockState(tileEntityHandle);
+            if (state != null) {
+                blockStateBuff.add(state);
+            }
         }
     }
 
