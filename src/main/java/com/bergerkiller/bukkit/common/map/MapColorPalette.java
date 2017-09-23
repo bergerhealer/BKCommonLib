@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.util.Arrays;
 
 import org.bukkit.map.MapPalette;
 
@@ -39,51 +40,60 @@ public class MapColorPalette {
         COLOR_MAP = SafeField.create(MapPalette.class, "colors", Color[].class).get(null);
         COLOR_COUNT = COLOR_MAP.length;
 
-        // Transparent colors at (a==0)
-        for (int b = 1; b < COLOR_COUNT; b++) {
-            initTransparent(b, (byte) b, false);
-        }
-
-        // All specular colors for the transparent color are transparent
-        for (int b = 0; b < 256; b++) {
-            COLOR_MAP_SPECULAR[b] = COLOR_TRANSPARENT;
-        }
-
-        // Generate the blend map
-        for (int a = 1; a < COLOR_COUNT; a++) {
+        // Generate 256 lightness values for all colors
+        for (int a = 0; a < 256; a++) {
             int index = (a * 256);
             Color color_a = getRealColor((byte) a);
-            initTransparent(index++, (byte) a, true);
-            for (int b = 0; b < COLOR_COUNT; b++) {
-                Color color_b = getRealColor((byte) b);
-                initTable(index++,
-                        color_a.getRed(), color_a.getGreen(), color_a.getBlue(),
-                        color_b.getRed(), color_b.getGreen(), color_b.getBlue());
+            if (color_a.getAlpha() < 128) {
+                // All specular colors for the transparent color are transparent
+                Arrays.fill(COLOR_MAP_SPECULAR, index, index + 256, COLOR_TRANSPARENT);
+            } else {
+                for (int b = 0; b < 256; b++) {
+                    // 0.0 = black
+                    // 1.0 = natural color
+                    // 2.0 = white
+                    float f = (float) b / 128.0f;
+                    int sr = (int) ((float) color_a.getRed() * f);
+                    int sg = (int) ((float) color_a.getGreen() * f);
+                    int sb = (int) ((float) color_a.getBlue() * f);
+                    COLOR_MAP_SPECULAR[index++] = getColor(sr, sg, sb);
+                }
             }
+        }
 
-            // Create 128 darker and 128 lighter specular colors
-            index = (a * 256);
-            for (int b = 0; b < 256; b++) {
-                // 0.0 = black
-                // 1.0 = natural color
-                // 2.0 = white
-                float f = (float) b / 128.0f;
-                int sr = (int) ((float) color_a.getRed() * f);
-                int sg = (int) ((float) color_a.getGreen() * f);
-                int sb = (int) ((float) color_a.getBlue() * f);
-                COLOR_MAP_SPECULAR[index++] = getColor(sr, sg, sb);
+        // Initialize the color map tables for all possible color values
+        for (int c1 = 0; c1 < 256; c1++) {
+            for (int c2 = 0; c2 < 256; c2++) {
+                initTable((byte) c1, (byte) c2);
             }
         }
     }
 
-    private static void initTransparent(int index, byte color, boolean is_second) {
+    private static void initTable(byte color1, byte color2) {
+        int index = getMapIndex(color1, color2);
+        if (isTransparent(color1)) {
+            initTransparent(index, color2);
+        } else if (isTransparent(color2)) {
+            initTransparent(index, color1);
+        } else {
+            Color c1 = getRealColor(color1);
+            Color c2 = getRealColor(color2);
+            initColor(
+                    index,
+                    c1.getRed(), c1.getGreen(), c1.getBlue(),
+                    c2.getRed(), c2.getGreen(), c2.getBlue()
+            );
+        }
+    }
+
+    private static void initTransparent(int index, byte color) {
         COLOR_MAP_AVERAGE[index] = color;
         COLOR_MAP_ADD[index] = color;
         COLOR_MAP_SUBTRACT[index] = color;
         COLOR_MAP_MULTIPLY[index] = (byte) 0;
     }
 
-    private static void initTable(int index, int r1, int g1, int b1, int r2, int g2, int b2) {
+    private static void initColor(int index, int r1, int g1, int b1, int r2, int g2, int b2) {
         initArray(COLOR_MAP_AVERAGE,  index, (r1 + r2) >> 1, (g1 + g2) >> 1, (b1 + b2) >> 1);
         initArray(COLOR_MAP_ADD,      index, (r1 + r2),      (g1 + g2),      (b1 + b2));
         initArray(COLOR_MAP_SUBTRACT, index, (r2 - r1),      (g2 - g1),      (b2 - b1));
@@ -97,19 +107,34 @@ public class MapColorPalette {
         if (g > 0xFF) g = 0xFF;
         if (b < 0x00) b = 0x00;
         if (b > 0xFF) b = 0xFF;
-        array[index] = MapPalette.matchColor(r, g, b);
+        array[index] = getColor(r, g, b);
+    }
+
+    public static byte remapColor(byte inputA, byte inputB, byte[] remapArray) {
+        return remapArray[getMapIndex(inputA, inputB) & 0xFFFF];
     }
 
     public static void remapColors(byte input, byte[] output, byte[] remapArray) {
         for (int i = 0; i < output.length; i++) {
-            output[i] = remapArray[((int) input | ((int) output[i] << 8)) & 0xFFFF];
+            output[i] = remapArray[getMapIndex(input, output[i]) & 0xFFFF];
         }
     }
 
     public static void remapColors(byte[] input, byte[] output, byte[] remapArray) {
         for (int i = 0; i < output.length; i++) {
-            output[i] = remapArray[((int) input[i] | ((int) output[i] << 8)) & 0xFFFF];
+            output[i] = remapArray[getMapIndex(input[i], output[i]) & 0xFFFF];
         }
+    }
+
+    /**
+     * Gets whether a particular color code is a transparent color.
+     * There are 4 transparent colors available. Usually value 0 is used.
+     * 
+     * @param color value
+     * @return True if transparent
+     */
+    public static boolean isTransparent(byte color) {
+        return (color & 0xFF) < 0x4;
     }
 
     /**
@@ -168,7 +193,7 @@ public class MapColorPalette {
      * @return index
      */
     public static final int getMapIndex(byte color_a, byte color_b) {
-        return ((int) color_a | ((int) color_b << 8)) & 0xFFFF;
+        return (color_a & 0xFF) | ((color_b & 0xFF) << 8);
     }
 
     /**
