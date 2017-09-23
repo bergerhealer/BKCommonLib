@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import java.util.HashSet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
@@ -18,7 +19,8 @@ public class MapResourcePackTest {
         CommonUtil.bootstrap();
     }
 
-    //@Test
+    @Ignore
+    @Test
     public void testBlockModels() {
         MapResourcePack resourcePack = MapResourcePack.VANILLA;
 

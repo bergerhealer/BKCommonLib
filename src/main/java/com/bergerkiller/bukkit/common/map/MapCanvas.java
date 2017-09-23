@@ -1221,10 +1221,14 @@ public abstract class MapCanvas {
      * @return image
      */
     public final BufferedImage toJavaImage() {
-        BufferedImage result = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < this.getWidth(); x++) {
-            for (int y = 0; y < this.getHeight(); y++) {
-                result.setRGB(x, y, MapColorPalette.getRealColor(this.readPixel(x, y)).getRGB());
+        BufferedImage result = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        int[] buffer = ((java.awt.image.DataBufferInt) result.getRaster().getDataBuffer()).getData();
+        byte[] data = this.readPixels();
+        int index = 0;
+        for (int y = 0; y < this.getHeight(); y++) {
+            for (int x = 0; x < this.getWidth(); x++) {
+                buffer[index] = MapColorPalette.getRealColor(data[index]).getRGB();
+                index++;
             }
         }
         return result;

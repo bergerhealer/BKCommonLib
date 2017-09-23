@@ -201,6 +201,7 @@
                     <include>**/*.txt</include>
                     <include>**/*.json</include>
                     <include>**/*.png</include>
+                    <include>**/*.bub</include>
                 </includes>
             </resource>
         </resources>

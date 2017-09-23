@@ -16,9 +16,9 @@ import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
+import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
-import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -39,6 +39,7 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.awt.Color;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.logging.Level;
@@ -404,6 +405,9 @@ public class CommonPlugin extends PluginBase {
                 "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999");
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
+
+        // Initialize MapColorPalette (static initializer)
+        MapColorPalette.getColor(Color.RED);
 
         // Initialize permissions
         permissionHandler = new PermissionHandler();
