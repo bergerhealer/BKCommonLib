@@ -30,6 +30,10 @@ public class FluidRenderingProvider extends BlockRenderProvider {
 
     @Override
     public void addOptions(BlockRenderOptions options, World world, int x, int y, int z) {
+        if (world == null) {
+            return;
+        }
+
         // Store all 8 neighboring block water state information
         storeWaterBlock(options, "neigh_nn", world, x, y, z, BlockFace.NORTH);
         storeWaterBlock(options, "neigh_ne", world, x, y, z, BlockFace.NORTH_EAST);
@@ -62,8 +66,10 @@ public class FluidRenderingProvider extends BlockRenderProvider {
         Model model = new Model();
         Model.Element water = new Model.Element();
 
+        // Cut out only the first animation block from the texture
         // This is the 'side' of the water where no water animations show
         MapTexture waterSide = resources.getTexture(this.fluidTexture1);
+        waterSide = waterSide.getView(0, 0, waterSide.getWidth(), waterSide.getWidth()).clone();
 
         // Cut out only the first animation block from the texture
         // For now, we don't do animations in this renderer.

@@ -127,7 +127,21 @@ public class BlockModelState {
 
                 // Check own key-value pair
                 String option = options.get(this.key);
-                return option != null && option.equals(this.value);
+                if (option == null) {
+                    return false;
+                }
+
+                // Values with an OR (|) need each individual part checked
+                if (option.contains("|")) {
+                    for (String part : option.split("\\|")) {
+                        if (part.equals(this.value)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } else {
+                    return option.equals(this.value);
+                }
             }
         }
 

@@ -10,6 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.internal.blocks.type.FluidRenderingProvider;
+import com.bergerkiller.bukkit.common.internal.blocks.type.GrassRenderingProvider;
+import com.bergerkiller.bukkit.common.internal.blocks.type.RedstoneWireRenderingProvider;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapResourcePack.ResourceType;
 import com.bergerkiller.bukkit.common.map.util.Model;
@@ -27,6 +29,8 @@ public abstract class BlockRenderProvider {
     static {
         register(new FluidRenderingProvider("blocks/water_overlay", "blocks/water_still", Material.WATER, Material.STATIONARY_WATER));
         register(new FluidRenderingProvider("blocks/lava_still", "blocks/lava_still", Material.LAVA, Material.STATIONARY_LAVA));
+        register(new GrassRenderingProvider());
+        register(new RedstoneWireRenderingProvider());
     }
 
     /**
@@ -94,7 +98,8 @@ public abstract class BlockRenderProvider {
     }
 
     /**
-     * Adds options specific to the provider
+     * Adds options specific to the provider.
+     * <b>world can be null when default render options are requested</b>
      * 
      * @param options to add to
      * @param world the block is at

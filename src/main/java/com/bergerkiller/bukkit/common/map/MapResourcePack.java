@@ -283,14 +283,14 @@ public class MapResourcePack {
 
             // Not multipart, then simply load the one variant
             if (variants.size() == 1) {
-                return this.loadBlockVariant(variants.get(0));
+                return this.loadBlockVariant(variants.get(0), blockRenderOptions);
             }
 
             // Add all variant elements to the model
             Model result = new Model();
             boolean succ = true;
             for (BlockModelState.Variant variant : variants) {
-                Model subModel = this.loadBlockVariant(variant);
+                Model subModel = this.loadBlockVariant(variant, blockRenderOptions);
                 if (subModel != null) {
                     result.elements.addAll(subModel.elements);
                 } else {
@@ -307,11 +307,12 @@ public class MapResourcePack {
         }
     }
 
-    private Model loadBlockVariant(BlockModelState.Variant variant) {
+    private Model loadBlockVariant(BlockModelState.Variant variant, BlockRenderOptions blockRenderOptions) {
         Model model = this.loadModel("block/" + variant.modelName);
         if (model == null) {
             return null;
         }
+        model.buildBlock(blockRenderOptions);
         variant.update(model);
         model.buildQuads();
         return model;

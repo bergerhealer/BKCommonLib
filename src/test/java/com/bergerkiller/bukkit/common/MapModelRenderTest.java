@@ -77,7 +77,6 @@ class Pseudo3DImagePanel extends JPanel
     implements MouseListener, MouseMotionListener
 {
     private static final long serialVersionUID = 1L;
-    private final BufferedImage inputBufferedImage;
     private final MapTexture background;
     private final MapResourcePack textures;
     private final Vector2f p0;
@@ -88,7 +87,6 @@ class Pseudo3DImagePanel extends JPanel
 
     Pseudo3DImagePanel(BufferedImage inputImage, MapResourcePack textures)
     {
-        this.inputBufferedImage = inputImage;
         this.textures = textures;
         this.background = MapTexture.fromImage(inputImage);
         //this.background.setBlendMode(MapBlendMode.MULTIPLY);
@@ -118,7 +116,9 @@ class Pseudo3DImagePanel extends JPanel
 
         //System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterialData(Material.CARPET, 6).getDefaultRenderOptions();
+        BlockRenderOptions opt = BlockData.fromMaterialData(Material.PISTON_BASE, 0).getDefaultRenderOptions();
+        opt.put("west",  "side");
+
         System.out.println(opt);
         
         Model model = textures.getBlockModel(opt);

@@ -262,11 +262,9 @@ public class BlockDataImpl extends BlockData {
 
         // Add additional options not provided by the server
         // This handles the display parameters for blocks like Water and Lava
-        if (world != null) {
-            BlockRenderProvider renderProvider = BlockRenderProvider.get(this);
-            if (renderProvider != null) {
-                renderProvider.addOptions(options, world, x, y, z);
-            }
+        BlockRenderProvider renderProvider = BlockRenderProvider.get(this);
+        if (renderProvider != null) {
+            renderProvider.addOptions(options, world, x, y, z);
         }
 
         // When no options are being used, do not check for them again in the future

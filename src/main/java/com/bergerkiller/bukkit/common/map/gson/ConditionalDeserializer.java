@@ -18,6 +18,33 @@ import com.google.gson.JsonParseException;
 
 public class ConditionalDeserializer implements JsonDeserializer<BlockModelState.Condition> {
 
+    private static BlockModelState.Condition createSelfCondition(String key, String value) {
+        String[] parts = value.split("\\|");
+        if (parts.length > 1) {
+            // Multiple conditions or'd together
+            BlockModelState.Condition orCondition = new BlockModelState.Condition();
+            orCondition.mode = BlockModelState.Condition.Mode.OR;
+            orCondition.conditions = new ArrayList<BlockModelState.Condition>(parts.length);
+            for (String part : parts) {
+                BlockModelState.Condition condition = new BlockModelState.Condition();
+                condition.mode = BlockModelState.Condition.Mode.SELF;
+                condition.conditions = Collections.emptyList();
+                condition.key = key;
+                condition.value = part;
+                orCondition.conditions.add(condition);
+            }
+            return orCondition;
+        } else {
+            // Single condition
+            BlockModelState.Condition condition = new BlockModelState.Condition();
+            condition.mode = BlockModelState.Condition.Mode.SELF;
+            condition.conditions = Collections.emptyList();
+            condition.key = key;
+            condition.value = value;
+            return condition;
+        }
+    }
+
     @Override
     public BlockModelState.Condition deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         BlockModelState.Condition result = new BlockModelState.Condition();
@@ -28,12 +55,7 @@ public class ConditionalDeserializer implements JsonDeserializer<BlockModelState
             // Options stored in a single String token
             Map<String, String> options = new BlockRenderOptions(BlockData.AIR, jsonElement.getAsString());
             for (Map.Entry<String, String> option : options.entrySet()) {
-                BlockModelState.Condition condition = new BlockModelState.Condition();
-                condition.mode = BlockModelState.Condition.Mode.SELF;
-                condition.conditions = Collections.emptyList();
-                condition.key = option.getKey();
-                condition.value = option.getValue();
-                result.conditions.add(condition);
+                result.conditions.add(createSelfCondition(option.getKey(), option.getValue()));
             }
         } else {
             // Handle operator types in the condition structure
@@ -51,9 +73,7 @@ public class ConditionalDeserializer implements JsonDeserializer<BlockModelState
 
                 if (subCondition.mode == BlockModelState.Condition.Mode.SELF) {
                     // Self: store key:value pair
-                    subCondition.conditions = Collections.emptyList();
-                    subCondition.key = entry.getKey();
-                    subCondition.value = entry.getValue().getAsString();
+                    subCondition = createSelfCondition(entry.getKey(), entry.getValue().getAsString());
                 } else {
                     // Create a sub-tree with this operator mode
                     if (entry.getValue().isJsonArray()) {

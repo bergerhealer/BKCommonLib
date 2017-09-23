@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
+import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.annotations.SerializedName;
 
 public class Model {
@@ -65,6 +67,19 @@ public class Model {
         // Apply all textures to the model faces
         for (Element element : this.elements) {
             element.build(resourcePack, this.textures);
+        }
+    }
+
+    /**
+     * Called after build to initialize block-specific render options
+     * 
+     * @param options
+     */
+    public void buildBlock(BlockRenderOptions options) {
+        for (Element element : this.elements) {
+            for (Element.Face face : element.faces.values()) {
+                face.buildBlock(options);
+            }
         }
     }
 
@@ -188,9 +203,9 @@ public class Model {
             @SerializedName("texture")
             private String textureName = "";
             private float[] uv = null;
-            private int uvrot = 0;
             public transient MapTexture texture = null;
             public int tintindex = -1;
+            public int rotation = 180;
             public BlockFace cullface;
             public transient Quad quad = null;
 
@@ -241,19 +256,26 @@ public class Model {
                     this.texture = texture_uv;
                 }
 
-                // uvrot is a custom BKCommonLib property to rotate the texture increments of 90 degrees
-                // This helps to deal with odd texture positions not handled right with the uv parameter
-                // If a 'notchian' way to do this exists, please replace it with that then
-                if (this.uvrot != 0) {
-                    this.texture = MapTexture.rotate(this.texture, this.uvrot);
+                // By default a rotation of 180 is used. This rotation can be altered by specifying it.
+                if (this.rotation != 180) {
+                    this.texture = MapTexture.rotate(this.texture, this.rotation + 180);
                 }
+            }
 
-                // This is used for biome colors and such
-                // For now I hardcode it by overlaying a green factor color
-                if (this.tintindex != -1) {
-                    this.texture = this.texture.clone();
-                    byte[] buffer = this.texture.getBuffer();
-                    MapBlendMode.MULTIPLY.process((byte) 79, buffer);
+            /**
+             * Called after build to initialize block-specific render options
+             * 
+             * @param options
+             */
+            public void buildBlock(BlockRenderOptions options) {
+                if (this.tintindex != -1 && options.containsKey("tint")) {
+                    try {
+                        byte color = MapColorPalette.getColor(Color.decode(options.get("tint")));
+                        this.texture = this.texture.clone();
+                        byte[] buffer = this.texture.getBuffer();
+                        MapBlendMode.MULTIPLY.process(color, buffer);
+                    } catch (NumberFormatException ex) {
+                    }
                 }
             }
 
@@ -261,7 +283,7 @@ public class Model {
             public Face clone() {
                 Face clone = new Face();
                 clone.uv = (this.uv == null) ? null : this.uv.clone();
-                clone.uvrot = this.uvrot;
+                clone.rotation = this.rotation;
                 clone.textureName = this.textureName;
                 clone.texture = this.texture.clone();
                 clone.cullface = this.cullface;
