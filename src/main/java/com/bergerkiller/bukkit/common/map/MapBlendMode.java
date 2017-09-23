@@ -8,6 +8,24 @@ import java.util.Arrays;
 public enum MapBlendMode {
     NONE, OVERLAY, AVERAGE, ADD, SUBTRACT, MULTIPLY;
 
+    public byte process(byte inputA, byte inputB) {
+        switch (this) {
+        case NONE:
+            return inputA;
+        case OVERLAY:
+            return (inputA == 0) ? inputB : inputA;
+        case AVERAGE:
+            return MapColorPalette.remapColor(inputA, inputB, MapColorPalette.COLOR_MAP_AVERAGE);
+        case ADD:
+            return MapColorPalette.remapColor(inputA, inputB, MapColorPalette.COLOR_MAP_ADD);
+        case SUBTRACT:
+            return MapColorPalette.remapColor(inputA, inputB, MapColorPalette.COLOR_MAP_SUBTRACT);
+        case MULTIPLY:
+            return MapColorPalette.remapColor(inputA, inputB, MapColorPalette.COLOR_MAP_MULTIPLY);
+        }
+        return (byte) inputA;
+    }
+
     public void process(byte input, byte[] output) {
         switch (this) {
         case NONE:
