@@ -203,7 +203,11 @@ public class MapColorPalette {
      * @return real RGB color
      */
     public static final Color getRealColor(byte color) {
-        return COLOR_MAP[color & 0xFF];
+        int index = (color & 0xFF);
+        if (index >= COLOR_COUNT) {
+            index = 0;
+        }
+        return COLOR_MAP[index];
     }
 
     /**
