@@ -383,6 +383,7 @@ public class BlockUtil extends MaterialUtil {
      * @return update packet
      */
     public static CommonPacket getUpdatePacket(BlockState state) {
+        if (state == null) return null;
         Object tileEntity = HandleConversion.toTileEntityHandle(state);
         return (tileEntity == null) ? null : TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
