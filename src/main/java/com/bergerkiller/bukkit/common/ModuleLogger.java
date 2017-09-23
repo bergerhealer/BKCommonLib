@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.MountiplexUtil;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -26,21 +28,20 @@ public class ModuleLogger extends Logger {
     private final HashSet<String> logOnceSet = new HashSet<String>();
 
     private static Logger createDefaultLogger() {
-    	if (!Common.IS_TEST_MODE)
-    		return Bukkit.getLogger();
-    	
+        if (Bukkit.getServer() != null && Bukkit.getLogger() != MountiplexUtil.LOGGER)
+            return Bukkit.getLogger();
+
     	Logger log = Logger.getLogger("");
     	log.setUseParentHandlers(false);
     	CustomRecordFormatter formatter = new CustomRecordFormatter();
     	ConsoleHandler consoleHandler = new ConsoleHandler();
     	consoleHandler.setFormatter(formatter);
-    	
-        for(Handler iHandler:log.getHandlers())
-        {
-        log.removeHandler(iHandler);
+
+        for(Handler iHandler:log.getHandlers()) {
+            log.removeHandler(iHandler);
         }
     	log.addHandler(consoleHandler);
-    	
+
     	return log;
     }
     
