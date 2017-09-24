@@ -152,10 +152,19 @@ public class Model {
                 transform.translate(rotation.origin);
                 if (rotation.axis.equals("x")) {
                     transform.rotateX(rotation.angle);
+                    if (rotation.rescale) {
+                        transform.scale(1.0f, 1.0f / transform.m21, 1.0f / transform.m22);
+                    }
                 } else if (rotation.axis.equals("y")) {
                     transform.rotateY(rotation.angle);
+                    if (rotation.rescale) {
+                        transform.scale(1.0f / transform.m00, 1.0f, 1.0f / transform.m02);
+                    }
                 } else if (rotation.axis.equals("z")) {
                     transform.rotateZ(rotation.angle);
+                    if (rotation.rescale) {
+                        transform.scale(1.0f / transform.m10, 1.0f / transform.m11, 1.0f);
+                    }
                 }
                 transform.translate(rotation.origin.negate());
 
@@ -300,6 +309,7 @@ public class Model {
             public Vector3f origin = new Vector3f();
             public String axis = "y";
             public float angle = 0.0f;
+            public boolean rescale = false;
 
             @Override
             public Rotation clone() {
@@ -307,6 +317,7 @@ public class Model {
                 rotation.origin = this.origin.clone();
                 rotation.axis = this.axis;
                 rotation.angle = this.angle;
+                rotation.rescale = this.rescale;
                 return rotation;
             }
         }
