@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.mojang.authlib.GameProfile;
+
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
@@ -8,11 +10,16 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
@@ -104,6 +111,28 @@ class Packet {
         field.setByte(instance, (byte) serializeRotation(rotation));
     }
     </code>
+}
+
+class PacketPlayOutPlayerInfo extends Packet {
+    private (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction action:a;
+    private final (List<PlayerInfoDataHandle>) List<PacketPlayOutPlayerInfo.PlayerInfoData> players:b;
+
+    class PacketPlayOutPlayerInfo.PlayerInfoData {
+        public (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName);
+
+        public (GameProfileHandle) GameProfile getProfile:a();
+        public int getPing:b();
+        public (org.bukkit.GameMode) EnumGamemode getGameMode:c();
+        public (ChatText) IChatBaseComponent getListName:d();
+    }
+
+    class PacketPlayOutPlayerInfo.EnumPlayerInfoAction {
+        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction ADD_PLAYER;
+        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_GAME_MODE;
+        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_LATENCY;
+        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_DISPLAY_NAME;
+        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction REMOVE_PLAYER;    
+    }
 }
 
 class PacketPlayInKeepAlive extends Packet {
