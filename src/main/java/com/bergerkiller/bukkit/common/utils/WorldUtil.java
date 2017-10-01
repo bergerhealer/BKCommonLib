@@ -127,13 +127,24 @@ public class WorldUtil extends ChunkUtil {
      * Sets Block Data for a particular Block and performs physics updates
      * 
      * @param world of the block
+     * @param position of the block
+     * @param data to set to
+     */
+    public static void setBlockData(org.bukkit.World world, IntVector3 position, BlockData data) {
+        setBlockData(world, position.x, position.y, position.z, data);
+    }
+
+    /**
+     * Sets Block Data for a particular Block and performs physics updates
+     * 
+     * @param world of the block
      * @param x - coordinate
      * @param y - coordinate
      * @param z - coordinate
      * @param data to set to
      */
     public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
-        NMSWorld.updateBlock(Conversion.toWorldHandle.convert(world), x, y, z, data, NMSWorld.UPDATE_DEFAULT);
+        NMSWorld.updateBlock(HandleConversion.toWorldHandle(world), x, y, z, data, NMSWorld.UPDATE_DEFAULT);
     }
 
     /**

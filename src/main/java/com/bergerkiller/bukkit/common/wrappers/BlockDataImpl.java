@@ -282,7 +282,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final String getStepSound() {
-        return block.getStepSound().getDefault().toString();
+        return block.getStepSound().getDefault().getName().toString();
     }
 
     @Override

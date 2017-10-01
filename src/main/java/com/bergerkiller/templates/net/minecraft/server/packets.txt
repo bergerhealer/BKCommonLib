@@ -18,6 +18,7 @@ import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
@@ -117,6 +118,8 @@ class PacketPlayOutPlayerInfo extends Packet {
     private (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction action:a;
     private final (List<PlayerInfoDataHandle>) List<PacketPlayOutPlayerInfo.PlayerInfoData> players:b;
 
+    public (PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo();
+
     class PacketPlayOutPlayerInfo.PlayerInfoData {
         public (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName);
 
@@ -133,6 +136,12 @@ class PacketPlayOutPlayerInfo extends Packet {
         enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_DISPLAY_NAME;
         enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction REMOVE_PLAYER;    
     }
+}
+
+class PacketPlayOutEntityDestroy extends Packet {
+    private int[] entityIds:a;
+
+    public (PacketPlayOutEntityDestroyHandle) PacketPlayOutEntityDestroy(int[] entityIds);
 }
 
 class PacketPlayInKeepAlive extends Packet {
@@ -620,6 +629,22 @@ class PacketPlayOutScoreboardTeam extends Packet {
     private int mode:h;
     private int friendlyFire:i;
 #endif
+
+    <code>
+    public void setCollisionRule(String rule) {
+        if (T.collisionRule.isAvailable()) {
+            T.collisionRule.set(instance, rule);
+        }
+    }
+
+    public String getCollisionRule() {
+        if (T.collisionRule.isAvailable()) {
+            return T.collisionRule.get(instance);
+        } else {
+            return "always";
+        }
+    }
+    </code>
 }
 
 class PacketPlayInSettings extends Packet {

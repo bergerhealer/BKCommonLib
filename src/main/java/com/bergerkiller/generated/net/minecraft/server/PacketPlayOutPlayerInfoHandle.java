@@ -26,6 +26,10 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
         return handle;
     }
 
+    public static final PacketPlayOutPlayerInfoHandle createNew() {
+        return T.constr.newInstance();
+    }
+
     /* ============================================================================== */
 
     public EnumPlayerInfoActionHandle getAction() {
@@ -49,6 +53,8 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutPlayerInfoClass extends Template.Class<PacketPlayOutPlayerInfoHandle> {
+        public final Template.Constructor.Converted<PacketPlayOutPlayerInfoHandle> constr = new Template.Constructor.Converted<PacketPlayOutPlayerInfoHandle>();
+
         public final Template.Field.Converted<EnumPlayerInfoActionHandle> action = new Template.Field.Converted<EnumPlayerInfoActionHandle>();
         public final Template.Field.Converted<List<PlayerInfoDataHandle>> players = new Template.Field.Converted<List<PlayerInfoDataHandle>>();
 

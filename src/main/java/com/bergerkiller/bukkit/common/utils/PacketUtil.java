@@ -9,9 +9,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTrackerEntry;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
-import java.util.Set;
 
 public class PacketUtil {
 
@@ -55,7 +54,10 @@ public class PacketUtil {
         // Tile entities
         CommonPacket packet;
         for (Object tile : NMSChunk.tileEntities.get(chunkHandle).values()) {
-            if ((packet = NMSTileEntity.getUpdatePacket(tile)) != null) {
+            if (tile == null) {
+                continue;
+            }
+            if ((packet = TileEntityHandle.T.getUpdatePacket.invoke(tile)) != null) {
                 PacketUtil.sendPacket(player, packet);
             }
         }
@@ -98,17 +100,44 @@ public class PacketUtil {
         sendPacket(player, packet, true);
     }
 
-    public static void sendPacket(Player player, Object packet) {
-        sendPacket(player, packet, true);
-    }
-
     public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
         sendPacket(player, (Object) packet, throughListeners);
     }
 
+    public static void sendPacket(Player player, PacketHandle packet) {
+        sendPacket(player, packet, true);
+    }
+
+    public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
+        sendPacket(player, (Object) packet, throughListeners);
+    }
+
+    /**
+     * Sends a raw packet to a player. All wrapper types for Packet are supported as well.<br>
+     * <b>Deprecated: Please avoid using raw packet types</b>
+     * 
+     * @param player to send to
+     * @param packet to send
+     */
+    @Deprecated
+    public static void sendPacket(Player player, Object packet) {
+        sendPacket(player, packet, true);
+    }
+
+    /**
+     * Sends a raw packet to a player. All wrapper types for Packet are supported as well.<br>
+     * <b>Deprecated: Please avoid using raw packet types</b>
+     * 
+     * @param player to send to
+     * @param packet to send
+     * @param throughListeners whether to let packet listeners see this packet
+     */
+    @Deprecated
     public static void sendPacket(Player player, Object packet, boolean throughListeners) {
         if (packet instanceof CommonPacket) {
             packet = ((CommonPacket) packet).getHandle();
+        } else if (packet instanceof PacketHandle) {
+            packet = ((PacketHandle) packet).getRaw();
         }
         if (packet == null) {
             return;

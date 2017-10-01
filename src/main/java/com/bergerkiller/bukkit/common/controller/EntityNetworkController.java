@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.mutable.FloatAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.IntegerAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
@@ -522,6 +521,20 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
+     * Synchronizes new passenger information to a player viewer.
+     * This function is only called on MC >= 1.10.2.
+     * The oldPassengers list will be empty when the player sees this Entity
+     * for the first time ({@link #makeVisible(Player)}).
+     * 
+     * @param viewer
+     * @param oldPassengers known to the viewer
+     * @param newPassengers known to the viewer
+     */
+    protected void onSyncPassengers(Player viewer, List<org.bukkit.entity.Entity> oldPassengers, List<org.bukkit.entity.Entity> newPassengers) {
+        PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), newPassengers));
+    }
+
+    /**
      * Ensures that the Entity is displayed to the viewer
      *
      * @param viewer to display this Entity for
@@ -543,9 +556,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
             // On >= MC 1.10.2 we must update the passengers of this Entity
-            List<org.bukkit.entity.Entity> passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            List<org.bukkit.entity.Entity> passengers = getSynchedPassengers();
             if (!passengers.isEmpty()) {
-                PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), passengers));
+                onSyncPassengers(viewer, new ArrayList<org.bukkit.entity.Entity>(0), passengers);
             }
         } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             // On <= MC 1.8.8 we must update the vehicle of this Entity
@@ -691,6 +704,19 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
+     * Gets a list of passengers that have last been synchronized to the viewers.
+     * This method only works on MC >= 1.10.2
+     * 
+     * @return list of last known passengers
+     */
+    public List<org.bukkit.entity.Entity> getSynchedPassengers() {
+        if (!EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+            return Collections.emptyList();
+        }
+        return EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+    }
+
+    /**
      * Checks whether there are any passenger changes pending.<br>
      * <br>
      * Checks whether passengers have changed since the last sync. On MC 1.8.8, this method
@@ -700,7 +726,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public boolean isPassengersChanged() {
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            List<Entity> old_passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            List<Entity> old_passengers = getSynchedPassengers();
             List<Entity> new_passengers = this.entity.getPassengers();
             if (old_passengers.size() != new_passengers.size()) {
                 return true;
@@ -805,7 +831,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
             // On MC >= 1.10.2 we must update passengers of this Entity
 
-            List<Entity> old_passengers = EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
+            List<Entity> old_passengers = getSynchedPassengers();
             List<Entity> new_passengers = entity.getPassengers();
             boolean passengersDifferent = (old_passengers.size() != new_passengers.size());
             if (!passengersDifferent) {
@@ -817,6 +843,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 }
             }
             if (passengersDifferent) {
+                // Store old passengers list for later event handling
+                ArrayList<org.bukkit.entity.Entity> old_passengers_bu = new ArrayList<org.bukkit.entity.Entity>(old_passengers);  
+
                 // Update the raw List. This prevents converters being used in the final List.
                 List<Object> newList = CommonUtil.unsafeCast(EntityTrackerEntryHandle.T.opt_passengers.raw.get(getHandle()));
                 if (newList instanceof ArrayList) {
@@ -830,7 +859,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 }
 
                 // Send update packet for the new passengers
-                broadcast(PacketType.OUT_MOUNT.newInstance(this.entity.getEntity(), new_passengers));
+                for (Player viewer : this.getViewers()) {
+                    onSyncPassengers(viewer, old_passengers_bu, new_passengers);
+                }
             }
         } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             // On MC <= 1.8.8 we must update the vehicle of this Entity

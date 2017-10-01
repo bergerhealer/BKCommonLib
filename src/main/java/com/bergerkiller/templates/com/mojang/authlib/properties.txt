@@ -1,0 +1,12 @@
+package com.mojang.authlib.properties;
+
+import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
+
+class Property {
+    public (PropertyHandle) Property(String name, String value);
+    public (PropertyHandle) Property(String name, String value, String signature);
+
+    public String getName();
+    public String getValue();
+    public String getSignature();
+}

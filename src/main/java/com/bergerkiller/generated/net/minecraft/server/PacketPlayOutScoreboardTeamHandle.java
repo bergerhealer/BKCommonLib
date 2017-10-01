@@ -25,6 +25,20 @@ public class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+
+    public void setCollisionRule(String rule) {
+        if (T.collisionRule.isAvailable()) {
+            T.collisionRule.set(instance, rule);
+        }
+    }
+
+    public String getCollisionRule() {
+        if (T.collisionRule.isAvailable()) {
+            return T.collisionRule.get(instance);
+        } else {
+            return "always";
+        }
+    }
     public String getName() {
         return T.name.get(instance);
     }

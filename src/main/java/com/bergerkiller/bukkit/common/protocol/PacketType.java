@@ -5,10 +5,10 @@ import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSDataWatcher;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEnumProtocol;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
@@ -201,7 +201,7 @@ public class PacketType extends ClassTemplate<Object> {
         // Obtain the datawatcher Field
         FieldAccessor<DataWatcher> dataWatcherField = null;
         for (SafeField<?> field : this.getFields()) {
-            if (NMSDataWatcher.T.isType(field.getType())) {
+            if (DataWatcherHandle.T.isType(field.getType())) {
                 dataWatcherField = field.translate(DuplexConversion.dataWatcher);
                 break;
             }
