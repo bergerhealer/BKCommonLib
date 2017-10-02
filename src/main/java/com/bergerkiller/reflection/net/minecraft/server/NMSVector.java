@@ -114,7 +114,7 @@ public class NMSVector {
     /* ============================================================== */
 
     public static Object newAxisAlignedBB(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
-        return AxisAlignedBBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstance(xmin, ymin, zmin, xmax, ymax, zmax);
+        return AxisAlignedBBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstanceVA(xmin, ymin, zmin, xmax, ymax, zmax);
     }
 
     public static Object growAxisAlignedBB(Object axisAlignedBB, double growX, double growY, double growZ) {

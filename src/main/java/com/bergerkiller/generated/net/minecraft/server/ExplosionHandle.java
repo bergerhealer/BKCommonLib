@@ -22,7 +22,7 @@ public abstract class ExplosionHandle extends Template.Handle {
     }
 
     public static final ExplosionHandle createNew(World world, Entity entity, double x, double y, double z, float yield, boolean fire, boolean destroyBlocks) {
-        return T.constr_world_entity_x_y_z_yield_fire_destroyBlocks.newInstance(world, entity, x, y, z, yield, fire, destroyBlocks);
+        return T.constr_world_entity_x_y_z_yield_fire_destroyBlocks.newInstanceVA(world, entity, x, y, z, yield, fire, destroyBlocks);
     }
 
     /* ============================================================================== */
