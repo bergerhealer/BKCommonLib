@@ -21,10 +21,7 @@ public class DamageSourceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DamageSourceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        DamageSourceHandle handle = new DamageSourceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -62,15 +59,15 @@ public class DamageSourceHandle extends Template.Handle {
     }
 
     public boolean isExplosion() {
-        return T.isExplosion.invoke(instance);
+        return T.isExplosion.invoke(getRaw());
     }
 
     public boolean isFireDamage() {
-        return T.isFireDamage.invoke(instance);
+        return T.isFireDamage.invoke(getRaw());
     }
 
     public Entity getEntity() {
-        return T.getEntity.invoke(instance);
+        return T.getEntity.invoke(getRaw());
     }
 
 
@@ -99,11 +96,11 @@ public class DamageSourceHandle extends Template.Handle {
         return result;
     }
     public String getTranslationIndex() {
-        return T.translationIndex.get(instance);
+        return T.translationIndex.get(getRaw());
     }
 
     public void setTranslationIndex(String value) {
-        T.translationIndex.set(instance, value);
+        T.translationIndex.set(getRaw(), value);
     }
 
     /**

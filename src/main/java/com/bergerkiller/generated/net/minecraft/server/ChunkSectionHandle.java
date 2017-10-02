@@ -17,10 +17,7 @@ public class ChunkSectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChunkSectionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChunkSectionHandle handle = new ChunkSectionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final ChunkSectionHandle createNew(int y, boolean hasSkyLight) {
@@ -30,59 +27,59 @@ public class ChunkSectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public boolean isEmpty() {
-        return T.isEmpty.invoke(instance);
+        return T.isEmpty.invoke(getRaw());
     }
 
     public NibbleArrayHandle getBlockLightArray() {
-        return T.getBlockLightArray.invoke(instance);
+        return T.getBlockLightArray.invoke(getRaw());
     }
 
     public NibbleArrayHandle getSkyLightArray() {
-        return T.getSkyLightArray.invoke(instance);
+        return T.getSkyLightArray.invoke(getRaw());
     }
 
     public DataPaletteBlockHandle getBlockPalette() {
-        return T.getBlockPalette.invoke(instance);
+        return T.getBlockPalette.invoke(getRaw());
     }
 
     public BlockData getBlockData(int x, int y, int z) {
-        return T.getBlockData.invoke(instance, x, y, z);
+        return T.getBlockData.invoke(getRaw(), x, y, z);
     }
 
     public void setBlockData(int x, int y, int z, BlockData data) {
-        T.setBlockData.invoke(instance, x, y, z, data);
+        T.setBlockData.invoke(getRaw(), x, y, z, data);
     }
 
     public void setSkyLight(int x, int y, int z, int level) {
-        T.setSkyLight.invoke(instance, x, y, z, level);
+        T.setSkyLight.invoke(getRaw(), x, y, z, level);
     }
 
     public void setBlockLight(int x, int y, int z, int level) {
-        T.setBlockLight.invoke(instance, x, y, z, level);
+        T.setBlockLight.invoke(getRaw(), x, y, z, level);
     }
 
     public int getSkyLight(int x, int y, int z) {
-        return T.getSkyLight.invoke(instance, x, y, z);
+        return T.getSkyLight.invoke(getRaw(), x, y, z);
     }
 
     public int getBlockLight(int x, int y, int z) {
-        return T.getBlockLight.invoke(instance, x, y, z);
+        return T.getBlockLight.invoke(getRaw(), x, y, z);
     }
 
     public NibbleArrayHandle getBlockLight() {
-        return T.blockLight.get(instance);
+        return T.blockLight.get(getRaw());
     }
 
     public void setBlockLight(NibbleArrayHandle value) {
-        T.blockLight.set(instance, value);
+        T.blockLight.set(getRaw(), value);
     }
 
     public NibbleArrayHandle getSkyLight() {
-        return T.skyLight.get(instance);
+        return T.skyLight.get(getRaw());
     }
 
     public void setSkyLight(NibbleArrayHandle value) {
-        T.skyLight.set(instance, value);
+        T.skyLight.set(getRaw(), value);
     }
 
     /**

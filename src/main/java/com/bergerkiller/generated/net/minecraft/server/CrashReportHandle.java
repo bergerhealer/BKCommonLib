@@ -16,10 +16,7 @@ public class CrashReportHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CrashReportHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CrashReportHandle handle = new CrashReportHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -29,7 +26,7 @@ public class CrashReportHandle extends Template.Handle {
     }
 
     public CrashReportSystemDetailsHandle getSystemDetails(String message) {
-        return T.getSystemDetails.invoke(instance, message);
+        return T.getSystemDetails.invoke(getRaw(), message);
     }
 
     /**

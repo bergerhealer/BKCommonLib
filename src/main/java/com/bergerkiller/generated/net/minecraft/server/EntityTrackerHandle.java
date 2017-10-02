@@ -21,48 +21,45 @@ public class EntityTrackerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntityTrackerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityTrackerHandle handle = new EntityTrackerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void sendPacketToEntity(Entity entity, CommonPacket packet) {
-        T.sendPacketToEntity.invoke(instance, entity, packet);
+        T.sendPacketToEntity.invoke(getRaw(), entity, packet);
     }
 
     public World getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(World value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     public Set<EntityTrackerEntryHandle> getEntries() {
-        return T.entries.get(instance);
+        return T.entries.get(getRaw());
     }
 
     public void setEntries(Set<EntityTrackerEntryHandle> value) {
-        T.entries.set(instance, value);
+        T.entries.set(getRaw(), value);
     }
 
     public IntHashMap<Object> getTrackedEntities() {
-        return T.trackedEntities.get(instance);
+        return T.trackedEntities.get(getRaw());
     }
 
     public void setTrackedEntities(IntHashMap<Object> value) {
-        T.trackedEntities.set(instance, value);
+        T.trackedEntities.set(getRaw(), value);
     }
 
     public int getViewDistance() {
-        return T.viewDistance.getInteger(instance);
+        return T.viewDistance.getInteger(getRaw());
     }
 
     public void setViewDistance(int value) {
-        T.viewDistance.setInteger(instance, value);
+        T.viewDistance.setInteger(getRaw(), value);
     }
 
     /**

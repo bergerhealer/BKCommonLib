@@ -19,10 +19,7 @@ public class EnumMainHandHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumMainHandHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumMainHandHandle handle = new EnumMainHandHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

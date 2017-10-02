@@ -16,16 +16,13 @@ public class EnumItemSlotHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumItemSlotHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumItemSlotHandle handle = new EnumItemSlotHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getIndex() {
-        return T.getIndex.invoke(instance);
+        return T.getIndex.invoke(getRaw());
     }
 
 
@@ -39,7 +36,7 @@ public class EnumItemSlotHandle extends Template.Handle {
     }
 
     public org.bukkit.inventory.EquipmentSlot toBukkit() {
-        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) instance).ordinal()];
+        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) getRaw()).ordinal()];
     }
 
     public static Object fromBukkitRaw(org.bukkit.inventory.EquipmentSlot slot) {

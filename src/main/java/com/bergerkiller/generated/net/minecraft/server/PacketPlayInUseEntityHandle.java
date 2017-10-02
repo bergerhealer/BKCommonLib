@@ -18,36 +18,33 @@ public class PacketPlayInUseEntityHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInUseEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInUseEntityHandle handle = new PacketPlayInUseEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getUsedEntityId() {
-        return T.usedEntityId.getInteger(instance);
+        return T.usedEntityId.getInteger(getRaw());
     }
 
     public void setUsedEntityId(int value) {
-        T.usedEntityId.setInteger(instance, value);
+        T.usedEntityId.setInteger(getRaw(), value);
     }
 
     public UseAction getAction() {
-        return T.action.get(instance);
+        return T.action.get(getRaw());
     }
 
     public void setAction(UseAction value) {
-        T.action.set(instance, value);
+        T.action.set(getRaw(), value);
     }
 
     public Vector getOffset() {
-        return T.offset.get(instance);
+        return T.offset.get(getRaw());
     }
 
     public void setOffset(Vector value) {
-        T.offset.set(instance, value);
+        T.offset.set(getRaw(), value);
     }
 
     /**
@@ -80,10 +77,7 @@ public class PacketPlayInUseEntityHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static EnumEntityUseActionHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            EnumEntityUseActionHandle handle = new EnumEntityUseActionHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

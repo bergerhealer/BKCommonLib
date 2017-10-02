@@ -17,10 +17,7 @@ public class CraftMagicNumbersHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftMagicNumbersHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftMagicNumbersHandle handle = new CraftMagicNumbersHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

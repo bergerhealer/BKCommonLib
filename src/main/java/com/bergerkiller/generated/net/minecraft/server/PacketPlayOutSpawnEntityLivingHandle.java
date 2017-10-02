@@ -21,10 +21,7 @@ public class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityLivingHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSpawnEntityLivingHandle handle = new PacketPlayOutSpawnEntityLivingHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutSpawnEntityLivingHandle createNew() {
@@ -63,27 +60,27 @@ public class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(instance));
+        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(instance));
+        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(instance));
+        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(instance, serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(instance, serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(instance, serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
     }
 
     public float getYaw() {
@@ -110,35 +107,35 @@ public class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
         setProtocolRotation(T.headYaw_raw, headYaw);
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public int getEntityTypeId() {
-        return T.entityTypeId.getInteger(instance);
+        return T.entityTypeId.getInteger(getRaw());
     }
 
     public void setEntityTypeId(int value) {
-        T.entityTypeId.setInteger(instance, value);
+        T.entityTypeId.setInteger(getRaw(), value);
     }
 
     public DataWatcher getDataWatcher() {
-        return T.dataWatcher.get(instance);
+        return T.dataWatcher.get(getRaw());
     }
 
     public void setDataWatcher(DataWatcher value) {
-        T.dataWatcher.set(instance, value);
+        T.dataWatcher.set(getRaw(), value);
     }
 
     public List<Item<?>> getDataWatcherItems() {
-        return T.dataWatcherItems.get(instance);
+        return T.dataWatcherItems.get(getRaw());
     }
 
     public void setDataWatcherItems(List<Item<?>> value) {
-        T.dataWatcherItems.set(instance, value);
+        T.dataWatcherItems.set(getRaw(), value);
     }
 
     /**

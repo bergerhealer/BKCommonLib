@@ -17,10 +17,7 @@ public class PlayerInventoryHandle extends IInventoryHandle {
     /* ============================================================================== */
 
     public static PlayerInventoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerInventoryHandle handle = new PlayerInventoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -30,11 +27,11 @@ public class PlayerInventoryHandle extends IInventoryHandle {
     }
 
     public CommonTagList saveToNBT(CommonTagList nbttaglist) {
-        return T.saveToNBT.invoke(instance, nbttaglist);
+        return T.saveToNBT.invoke(getRaw(), nbttaglist);
     }
 
     public void loadFromNBT(CommonTagList nbttaglist) {
-        T.loadFromNBT.invoke(instance, nbttaglist);
+        T.loadFromNBT.invoke(getRaw(), nbttaglist);
     }
 
     /**

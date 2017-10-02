@@ -17,10 +17,7 @@ public class CraftSoundHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftSoundHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftSoundHandle handle = new CraftSoundHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

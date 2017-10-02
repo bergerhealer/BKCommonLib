@@ -17,16 +17,13 @@ public class MinecraftServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MinecraftServerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MinecraftServerHandle handle = new MinecraftServerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean isRunning() {
-        return T.isRunning.invoke(instance);
+        return T.isRunning.invoke(getRaw());
     }
 
 
@@ -34,11 +31,11 @@ public class MinecraftServerHandle extends Template.Handle {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
     }
     public List<WorldServerHandle> getWorlds() {
-        return T.worlds.get(instance);
+        return T.worlds.get(getRaw());
     }
 
     public void setWorlds(List<WorldServerHandle> value) {
-        T.worlds.set(instance, value);
+        T.worlds.set(getRaw(), value);
     }
 
     /**

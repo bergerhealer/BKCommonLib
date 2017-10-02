@@ -17,52 +17,49 @@ public class PacketPlayOutCombatEventHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PacketPlayOutCombatEventHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutCombatEventHandle handle = new PacketPlayOutCombatEventHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getEventType() {
-        return T.eventType.get(instance);
+        return T.eventType.get(getRaw());
     }
 
     public void setEventType(Object value) {
-        T.eventType.set(instance, value);
+        T.eventType.set(getRaw(), value);
     }
 
     public int getEntityId1() {
-        return T.entityId1.getInteger(instance);
+        return T.entityId1.getInteger(getRaw());
     }
 
     public void setEntityId1(int value) {
-        T.entityId1.setInteger(instance, value);
+        T.entityId1.setInteger(getRaw(), value);
     }
 
     public int getEntityId2() {
-        return T.entityId2.getInteger(instance);
+        return T.entityId2.getInteger(getRaw());
     }
 
     public void setEntityId2(int value) {
-        T.entityId2.setInteger(instance, value);
+        T.entityId2.setInteger(getRaw(), value);
     }
 
     public int getTickDuration() {
-        return T.tickDuration.getInteger(instance);
+        return T.tickDuration.getInteger(getRaw());
     }
 
     public void setTickDuration(int value) {
-        T.tickDuration.setInteger(instance, value);
+        T.tickDuration.setInteger(getRaw(), value);
     }
 
     public ChatText getMessage() {
-        return T.message.get(instance);
+        return T.message.get(getRaw());
     }
 
     public void setMessage(ChatText value) {
-        T.message.set(instance, value);
+        T.message.set(getRaw(), value);
     }
 
     /**

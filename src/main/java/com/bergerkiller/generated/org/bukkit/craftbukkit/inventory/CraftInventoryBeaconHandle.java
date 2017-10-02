@@ -17,10 +17,7 @@ public class CraftInventoryBeaconHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftInventoryBeaconHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftInventoryBeaconHandle handle = new CraftInventoryBeaconHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final BeaconInventory createNew(Object nmsTileEntityBeacon) {

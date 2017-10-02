@@ -17,10 +17,7 @@ public class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSpawnEntityHandle handle = new PacketPlayOutSpawnEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -51,66 +48,66 @@ public class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(instance));
+        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(instance));
+        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(instance));
+        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(instance, serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(instance, serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(instance, serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
     }
 
     public float getYaw() {
-        return deserializeRotation(T.yaw_raw.getInteger(instance));
+        return deserializeRotation(T.yaw_raw.getInteger(getRaw()));
     }
 
     public float getPitch() {
-        return deserializeRotation(T.pitch_raw.getInteger(instance));
+        return deserializeRotation(T.pitch_raw.getInteger(getRaw()));
     }
 
     public void setYaw(float yaw) {
-        T.yaw_raw.setInteger(instance, serializeRotation(yaw));
+        T.yaw_raw.setInteger(getRaw(), serializeRotation(yaw));
     }
 
     public void setPitch(float pitch) {
-        T.pitch_raw.setInteger(instance, serializeRotation(pitch));
+        T.pitch_raw.setInteger(getRaw(), serializeRotation(pitch));
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public int getEntityTypeId() {
-        return T.entityTypeId.getInteger(instance);
+        return T.entityTypeId.getInteger(getRaw());
     }
 
     public void setEntityTypeId(int value) {
-        T.entityTypeId.setInteger(instance, value);
+        T.entityTypeId.setInteger(getRaw(), value);
     }
 
     public int getExtraData() {
-        return T.extraData.getInteger(instance);
+        return T.extraData.getInteger(getRaw());
     }
 
     public void setExtraData(int value) {
-        T.extraData.setInteger(instance, value);
+        T.extraData.setInteger(getRaw(), value);
     }
 
     /**

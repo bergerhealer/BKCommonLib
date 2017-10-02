@@ -17,16 +17,13 @@ public class SoundEffectTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SoundEffectTypeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        SoundEffectTypeHandle handle = new SoundEffectTypeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public SoundEffectHandle getDefault() {
-        return T.getDefault.invoke(instance);
+        return T.getDefault.invoke(getRaw());
     }
 
     /**

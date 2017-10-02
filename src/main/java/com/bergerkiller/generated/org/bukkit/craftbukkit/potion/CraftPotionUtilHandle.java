@@ -17,10 +17,7 @@ public class CraftPotionUtilHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftPotionUtilHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftPotionUtilHandle handle = new CraftPotionUtilHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

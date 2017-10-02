@@ -16,20 +16,17 @@ public class EnumParticleHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumParticleHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumParticleHandle handle = new EnumParticleHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public String getName() {
-        return T.getName.invoke(instance);
+        return T.getName.invoke(getRaw());
     }
 
     public int getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
 

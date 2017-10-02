@@ -21,40 +21,37 @@ public class TileEntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static TileEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        TileEntityHandle handle = new TileEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public WorldHandle getWorld() {
-        return T.getWorld.invoke(instance);
+        return T.getWorld.invoke(getRaw());
     }
 
     public BlockPositionHandle getPosition() {
-        return T.getPosition.invoke(instance);
+        return T.getPosition.invoke(getRaw());
     }
 
     public int getRawData() {
-        return T.getRawData.invoke(instance);
+        return T.getRawData.invoke(getRaw());
     }
 
     public Material getType() {
-        return T.getType.invoke(instance);
+        return T.getType.invoke(getRaw());
     }
 
     public CommonPacket getUpdatePacket() {
-        return T.getUpdatePacket.invoke(instance);
+        return T.getUpdatePacket.invoke(getRaw());
     }
 
     public void load(CommonTagCompound nbttagcompound) {
-        T.load.invoke(instance, nbttagcompound);
+        T.load.invoke(getRaw(), nbttagcompound);
     }
 
     public void save(CommonTagCompound nbttagcompound) {
-        T.save.invoke(instance, nbttagcompound);
+        T.save.invoke(getRaw(), nbttagcompound);
     }
 
 
@@ -66,19 +63,19 @@ public class TileEntityHandle extends Template.Handle {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
     }
     public World getWorld_field() {
-        return T.world_field.get(instance);
+        return T.world_field.get(getRaw());
     }
 
     public void setWorld_field(World value) {
-        T.world_field.set(instance, value);
+        T.world_field.set(getRaw(), value);
     }
 
     public IntVector3 getPosition_field() {
-        return T.position_field.get(instance);
+        return T.position_field.get(getRaw());
     }
 
     public void setPosition_field(IntVector3 value) {
-        T.position_field.set(instance, value);
+        T.position_field.set(getRaw(), value);
     }
 
     /**

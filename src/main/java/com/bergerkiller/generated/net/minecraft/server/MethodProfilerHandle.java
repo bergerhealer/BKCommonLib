@@ -16,20 +16,17 @@ public class MethodProfilerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MethodProfilerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MethodProfilerHandle handle = new MethodProfilerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void begin(String label) {
-        T.begin.invoke(instance, label);
+        T.begin.invoke(getRaw(), label);
     }
 
     public void end() {
-        T.end.invoke(instance);
+        T.end.invoke(getRaw());
     }
 
     /**

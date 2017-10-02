@@ -16,10 +16,7 @@ public class TileEntityFurnaceHandle extends TileEntityHandle {
     /* ============================================================================== */
 
     public static TileEntityFurnaceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        TileEntityFurnaceHandle handle = new TileEntityFurnaceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

@@ -17,16 +17,13 @@ public class IRecipeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IRecipeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IRecipeHandle handle = new IRecipeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public ItemStack getOutput() {
-        return T.getOutput.invoke(instance);
+        return T.getOutput.invoke(getRaw());
     }
 
     /**

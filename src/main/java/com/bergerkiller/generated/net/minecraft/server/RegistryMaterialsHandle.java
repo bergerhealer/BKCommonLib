@@ -16,20 +16,17 @@ public class RegistryMaterialsHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RegistryMaterialsHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RegistryMaterialsHandle handle = new RegistryMaterialsHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object get(Object key) {
-        return T.get.invoke(instance, key);
+        return T.get.invoke(getRaw(), key);
     }
 
     public Object getKey(Object value) {
-        return T.getKey.invoke(instance, value);
+        return T.getKey.invoke(getRaw(), value);
     }
 
     /**

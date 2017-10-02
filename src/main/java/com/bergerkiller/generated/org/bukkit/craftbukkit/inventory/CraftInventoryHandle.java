@@ -19,10 +19,7 @@ public class CraftInventoryHandle extends InventoryHandle {
     /* ============================================================================== */
 
     public static CraftInventoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftInventoryHandle handle = new CraftInventoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final Inventory createNew(Object nmsIInventory) {
@@ -32,15 +29,15 @@ public class CraftInventoryHandle extends InventoryHandle {
     /* ============================================================================== */
 
     public IInventoryHandle getHandle() {
-        return T.getHandle.invoke(instance);
+        return T.getHandle.invoke(getRaw());
     }
 
     public IInventoryHandle getHandleField() {
-        return T.handleField.get(instance);
+        return T.handleField.get(getRaw());
     }
 
     public void setHandleField(IInventoryHandle value) {
-        T.handleField.set(instance, value);
+        T.handleField.set(getRaw(), value);
     }
 
     /**

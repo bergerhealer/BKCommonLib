@@ -17,10 +17,7 @@ public class MobEffectHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MobEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MobEffectHandle handle = new MobEffectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -30,51 +27,51 @@ public class MobEffectHandle extends Template.Handle {
     }
 
     public MobEffectListHandle getEffectList() {
-        return T.effectList.get(instance);
+        return T.effectList.get(getRaw());
     }
 
     public void setEffectList(MobEffectListHandle value) {
-        T.effectList.set(instance, value);
+        T.effectList.set(getRaw(), value);
     }
 
     public int getDuration() {
-        return T.duration.getInteger(instance);
+        return T.duration.getInteger(getRaw());
     }
 
     public void setDuration(int value) {
-        T.duration.setInteger(instance, value);
+        T.duration.setInteger(getRaw(), value);
     }
 
     public int getAmplification() {
-        return T.amplification.getInteger(instance);
+        return T.amplification.getInteger(getRaw());
     }
 
     public void setAmplification(int value) {
-        T.amplification.setInteger(instance, value);
+        T.amplification.setInteger(getRaw(), value);
     }
 
     public boolean isSplash() {
-        return T.splash.getBoolean(instance);
+        return T.splash.getBoolean(getRaw());
     }
 
     public void setSplash(boolean value) {
-        T.splash.setBoolean(instance, value);
+        T.splash.setBoolean(getRaw(), value);
     }
 
     public boolean isAmbient() {
-        return T.ambient.getBoolean(instance);
+        return T.ambient.getBoolean(getRaw());
     }
 
     public void setAmbient(boolean value) {
-        T.ambient.setBoolean(instance, value);
+        T.ambient.setBoolean(getRaw(), value);
     }
 
     public boolean isParticles() {
-        return T.particles.getBoolean(instance);
+        return T.particles.getBoolean(getRaw());
     }
 
     public void setParticles(boolean value) {
-        T.particles.setBoolean(instance, value);
+        T.particles.setBoolean(getRaw(), value);
     }
 
     /**

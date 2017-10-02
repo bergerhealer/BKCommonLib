@@ -18,48 +18,45 @@ public class NBTTagCompoundHandle extends NBTBaseHandle {
     /* ============================================================================== */
 
     public static NBTTagCompoundHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NBTTagCompoundHandle handle = new NBTTagCompoundHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Set<String> getKeys() {
-        return T.getKeys.invoke(instance);
+        return T.getKeys.invoke(getRaw());
     }
 
     public void remove(String key) {
-        T.remove.invoke(instance, key);
+        T.remove.invoke(getRaw(), key);
     }
 
     public void set(String key, NBTBaseHandle value) {
-        T.set.invoke(instance, key, value);
+        T.set.invoke(getRaw(), key, value);
     }
 
     public NBTBaseHandle get(String key) {
-        return T.get.invoke(instance, key);
+        return T.get.invoke(getRaw(), key);
     }
 
     public boolean contains(String key) {
-        return T.contains.invoke(instance, key);
+        return T.contains.invoke(getRaw(), key);
     }
 
     public boolean isEmpty() {
-        return T.isEmpty.invoke(instance);
+        return T.isEmpty.invoke(getRaw());
     }
 
 
     public int size() {
-        return ((java.util.Map<?, ?>) T.map.raw.get(instance)).size();
+        return ((java.util.Map<?, ?>) T.map.raw.get(getRaw())).size();
     }
     public Map<String, NBTBaseHandle> getMap() {
-        return T.map.get(instance);
+        return T.map.get(getRaw());
     }
 
     public void setMap(Map<String, NBTBaseHandle> value) {
-        T.map.set(instance, value);
+        T.map.set(getRaw(), value);
     }
 
     /**

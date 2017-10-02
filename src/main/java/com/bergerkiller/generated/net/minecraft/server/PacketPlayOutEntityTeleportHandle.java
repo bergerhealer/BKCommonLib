@@ -17,10 +17,7 @@ public class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutEntityTeleportHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutEntityTeleportHandle handle = new PacketPlayOutEntityTeleportHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutEntityTeleportHandle createNew() {
@@ -86,19 +83,19 @@ public class PacketPlayOutEntityTeleportHandle extends PacketHandle {
         setProtocolRotation(T.pitch_raw, pitch);
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public boolean isOnGround() {
-        return T.onGround.getBoolean(instance);
+        return T.onGround.getBoolean(getRaw());
     }
 
     public void setOnGround(boolean value) {
-        T.onGround.setBoolean(instance, value);
+        T.onGround.setBoolean(getRaw(), value);
     }
 
     /**

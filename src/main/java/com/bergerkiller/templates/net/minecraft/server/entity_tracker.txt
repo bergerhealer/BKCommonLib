@@ -103,85 +103,85 @@ class EntityTrackerEntry {
     // Performs protocol translation to set the synchronized x position coordinate
     public void setLocX(double x) {
         if (T.long_xLoc.isAvailable()) {
-            T.long_xLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
+            T.long_xLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
         } else {
-            T.int_xLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
+            T.int_xLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
         }
     }
 
     // Performs protocol translation to set the synchronized y position coordinate
     public void setLocY(double y) {
         if (T.long_yLoc.isAvailable()) {
-            T.long_yLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
+            T.long_yLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
         } else {
-            T.int_yLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
+            T.int_yLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
         }
     }
 
     // Performs protocol translation to set the synchronized z position coordinate
     public void setLocZ(double z) {
         if (T.long_zLoc.isAvailable()) {
-            T.long_zLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
+            T.long_zLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
         } else {
-            T.int_zLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
+            T.int_zLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
         }
     }
 
     // Performs protocol translation to set the synchronized yaw rotation
     public void setYaw(float yaw) {
-        T.raw_yRot.setInteger(instance, getProtocolRotation(yaw));
+        T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
     }
 
     // Performs protocol translation to set the synchronized pitch rotation
     public void setPitch(float pitch) {
-        T.raw_xRot.setInteger(instance, getProtocolRotation(pitch));
+        T.raw_xRot.setInteger(getRaw(), getProtocolRotation(pitch));
     }
 
     // Performs protocol translation to set the synchronized head rotation
     public void setHeadYaw(float headYaw) {
-        T.raw_headYaw.setInteger(instance, getProtocolRotation(headYaw));
+        T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
     }
 
     // Performs protocol translation to get the synchronized x position coordinate
     public double getLocX() {
         if (T.long_xLoc.isAvailable()) {
-            return (double) T.long_xLoc.getLong(instance) / 4096.0;
+            return (double) T.long_xLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_xLoc.getInteger(instance) / 32.0;
+            return (double) T.int_xLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     // Performs protocol translation to get the synchronized y position coordinate
     public double getLocY() {
         if (T.long_yLoc.isAvailable()) {
-            return (double) T.long_yLoc.getLong(instance) / 4096.0;
+            return (double) T.long_yLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_yLoc.getInteger(instance) / 32.0;
+            return (double) T.int_yLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     // Performs protocol translation to get the synchronized z position coordinate
     public double getLocZ() {
         if (T.long_zLoc.isAvailable()) {
-            return (double) T.long_zLoc.getLong(instance) / 4096.0;
+            return (double) T.long_zLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_zLoc.getInteger(instance) / 32.0;
+            return (double) T.int_zLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     // Performs protocol translation to get the synchronized yaw rotation
     public float getYaw() {
-        return ((float) T.raw_yRot.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_yRot.getInteger(getRaw()) * 360) / 256.0F;
     }
 
     // Performs protocol translation to get the synchronized pitch rotation
     public float getPitch() {
-        return ((float) T.raw_xRot.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_xRot.getInteger(getRaw()) * 360) / 256.0F;
     }
 
     // Performs protocol translation to get the synchronized head rotation
     public float getHeadYaw() {
-        return ((float) T.raw_headYaw.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_headYaw.getInteger(getRaw()) * 360) / 256.0F;
     }
     </code>
 
@@ -221,15 +221,15 @@ class EntityTrackerEntry {
     <code>
     public java.util.Collection<org.bukkit.entity.Player> getViewers() {
         if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(instance).keySet();
+            return T.viewersMap.get(getRaw()).keySet();
         } else {
-            return T.viewersSet.get(instance);
+            return T.viewersSet.get(getRaw());
         }
     }
 
     public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
         if (T.viewersMap.isAvailable()) {
-            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(instance);
+            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(getRaw());
             if (map.containsKey(viewer)) {
                 return false;
             } else {
@@ -237,15 +237,15 @@ class EntityTrackerEntry {
                 return true;
             }
         } else {
-            return T.viewersSet.get(instance).add(viewer);
+            return T.viewersSet.get(getRaw()).add(viewer);
         }
     }
 
     public boolean removeViewerFromSet(org.bukkit.entity.Player viewer) {
         if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(instance).remove(viewer) != null;
+            return T.viewersMap.get(getRaw()).remove(viewer) != null;
         } else {
-            return T.viewersSet.get(instance).remove(viewer);
+            return T.viewersSet.get(getRaw()).remove(viewer);
         }
     }
     </code>

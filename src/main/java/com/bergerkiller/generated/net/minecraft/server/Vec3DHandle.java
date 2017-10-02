@@ -16,10 +16,7 @@ public class Vec3DHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Vec3DHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        Vec3DHandle handle = new Vec3DHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final Vec3DHandle createNew(double x, double y, double z) {
@@ -29,27 +26,27 @@ public class Vec3DHandle extends Template.Handle {
     /* ============================================================================== */
 
     public double getX() {
-        return T.x.getDouble(instance);
+        return T.x.getDouble(getRaw());
     }
 
     public void setX(double value) {
-        T.x.setDouble(instance, value);
+        T.x.setDouble(getRaw(), value);
     }
 
     public double getY() {
-        return T.y.getDouble(instance);
+        return T.y.getDouble(getRaw());
     }
 
     public void setY(double value) {
-        T.y.setDouble(instance, value);
+        T.y.setDouble(getRaw(), value);
     }
 
     public double getZ() {
-        return T.z.getDouble(instance);
+        return T.z.getDouble(getRaw());
     }
 
     public void setZ(double value) {
-        T.z.setDouble(instance, value);
+        T.z.setDouble(getRaw(), value);
     }
 
     /**

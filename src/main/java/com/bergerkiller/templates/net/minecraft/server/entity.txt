@@ -46,14 +46,14 @@ class Entity {
     <code>
     public List<EntityHandle> getPassengers() {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
             if (passengers == null) {
                 return java.util.Collections.emptyList();
             } else {
                 return passengers;
             }
         } else {
-            EntityHandle passenger = T.opt_passenger.get(instance);
+            EntityHandle passenger = T.opt_passenger.get(getRaw());
             if (passenger == null) {
                 return java.util.Collections.emptyList();
             } else {
@@ -64,26 +64,26 @@ class Entity {
 
     public boolean hasPassengers() {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
             return passengers != null && passengers.size() > 0;
         } else {
-            return T.opt_passenger.get(instance) != null;
+            return T.opt_passenger.get(getRaw()) != null;
         }
     }
 
     public void setPassengers(List<EntityHandle> passengers) {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> entity_passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> entity_passengers = T.opt_passengers.get(getRaw());
             if (entity_passengers == null) {
-                T.opt_passengers.set(instance, passengers);
+                T.opt_passengers.set(getRaw(), passengers);
             } else {
                 entity_passengers.clear();
                 entity_passengers.addAll(passengers);
             }
         } else if (passengers.size() == 0) {
-            T.opt_passenger.set(instance, null);
+            T.opt_passenger.set(getRaw(), null);
         } else {
-            T.opt_passenger.set(instance, passengers.get(0));
+            T.opt_passenger.set(getRaw(), passengers.get(0));
         }
     }
     </code>
@@ -548,17 +548,17 @@ class Entity {
     <code>
     public boolean isPassenger() {
         if (T.isPassenger.isAvailable()) {
-            return T.isPassenger.invoke(instance);
+            return T.isPassenger.invoke(getRaw());
         } else {
-            return T.vehicle.raw.get(instance) != null;
+            return T.vehicle.raw.get(getRaw()) != null;
         }
     }
 
     public boolean isVehicle() {
         if (T.isVehicle.isAvailable()) {
-            return T.isVehicle.invoke(instance);
+            return T.isVehicle.invoke(getRaw());
         } else {
-            return T.opt_passenger.get(instance) != null;
+            return T.opt_passenger.get(getRaw()) != null;
         }
     }
     </code>
@@ -572,9 +572,9 @@ class Entity {
     <code>
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
-            return T.prop_getMaxFireTicks.invoke(instance);
+            return T.prop_getMaxFireTicks.invoke(getRaw());
         } else if (T.field_maxFireTicks.isAvailable()) {
-            return T.field_maxFireTicks.getInteger(instance);
+            return T.field_maxFireTicks.getInteger(getRaw());
         } else {
             throw new UnsupportedOperationException("Max Fire Ticks can not be read");
         }
@@ -622,7 +622,7 @@ class Entity {
     <code>
     public EntityHandle getDriverEntity() {
         if (T.getDriverEntity.isAvailable()) {
-            return T.getDriverEntity.invoke(instance);
+            return T.getDriverEntity.invoke(getRaw());
         } else {
             return null; // driver feature not a thing on this server
         }
@@ -655,10 +655,10 @@ class Entity {
     <code>
     public boolean isInSameVehicle(EntityHandle entity) {
         if (T.isInSameVehicle.isAvailable()) {
-            return T.isInSameVehicle.invoke(instance, entity);
+            return T.isInSameVehicle.invoke(getRaw(), entity);
         } else {
-            Object rawPassenger = T.opt_passenger.raw.get(this.instance);
-            Object rawVehicle = T.vehicle.raw.get(this.instance);
+            Object rawPassenger = T.opt_passenger.raw.get(this.getRaw());
+            Object rawVehicle = T.vehicle.raw.get(this.getRaw());
             Object rawEntity = entity.getRaw();
             return rawEntity == rawPassenger || rawEntity == rawVehicle;
         }
@@ -712,11 +712,11 @@ class Entity {
 
     <code>
     public WorldServerHandle getWorldServer() {
-        return WorldServerHandle.createHandle(T.world.raw.get(instance));
+        return WorldServerHandle.createHandle(T.world.raw.get(getRaw()));
     }
 
     public org.bukkit.entity.Entity toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(instance);
+        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(getRaw());
     }
 
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {

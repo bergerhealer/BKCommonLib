@@ -18,10 +18,7 @@ public class InventoryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static InventoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        InventoryHandle handle = new InventoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

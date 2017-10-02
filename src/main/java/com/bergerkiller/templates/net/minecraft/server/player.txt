@@ -58,7 +58,7 @@ class PlayerChunk {
     <code>
     public org.bukkit.Chunk getChunk(org.bukkit.World world) {
         if (T.opt_loaded_chunk.isAvailable()) {
-            return T.opt_loaded_chunk.get(instance);
+            return T.opt_loaded_chunk.get(getRaw());
         } else {
             // Fallback for 1.8.8: check if loaded, only then get the chunk
             IntVector2 loc = this.getLocation();
@@ -96,9 +96,9 @@ class PlayerChunkMap {
     <code>
     public void markForUpdate(PlayerChunkHandle playerChunk) {
         if (T.markForUpdate_1_10_2.isAvailable()) {
-            T.markForUpdate_1_10_2.invoke(instance, playerChunk);
+            T.markForUpdate_1_10_2.invoke(getRaw(), playerChunk);
         } else {
-            T.updateQueue_1_8_8.get(instance).add(playerChunk);
+            T.updateQueue_1_8_8.get(getRaw()).add(playerChunk);
         }
     }
     </code>
@@ -118,9 +118,9 @@ class PlayerChunkMap {
     <code>
     public PlayerChunkHandle getChunk(int x, int z) {
         if (T.getChunk_1_9.isAvailable()) {
-            return T.getChunk_1_9.invoke(instance, x, z);
+            return T.getChunk_1_9.invoke(getRaw(), x, z);
         } else {
-            return T.getChunk_1_8_8.invoke(instance, x, z, false);
+            return T.getChunk_1_8_8.invoke(getRaw(), x, z, false);
         }
     }
     </code>
@@ -131,7 +131,7 @@ class PlayerChunkMap {
 
     <code>
     public void flagDirty(int x, int y, int z) {
-        T.flagDirty.raw.invoke(instance, BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
+        T.flagDirty.raw.invoke(getRaw(), BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
     }
     </code>
 

@@ -16,10 +16,7 @@ public class HumanEntityHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static HumanEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        HumanEntityHandle handle = new HumanEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

@@ -16,10 +16,7 @@ public class PacketPlayOutAttachEntityHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutAttachEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutAttachEntityHandle handle = new PacketPlayOutAttachEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -33,19 +30,19 @@ public class PacketPlayOutAttachEntityHandle extends PacketHandle {
         }
     }
     public int getPassengerId() {
-        return T.passengerId.getInteger(instance);
+        return T.passengerId.getInteger(getRaw());
     }
 
     public void setPassengerId(int value) {
-        T.passengerId.setInteger(instance, value);
+        T.passengerId.setInteger(getRaw(), value);
     }
 
     public int getVehicleId() {
-        return T.vehicleId.getInteger(instance);
+        return T.vehicleId.getInteger(getRaw());
     }
 
     public void setVehicleId(int value) {
-        T.vehicleId.setInteger(instance, value);
+        T.vehicleId.setInteger(getRaw(), value);
     }
 
     /**

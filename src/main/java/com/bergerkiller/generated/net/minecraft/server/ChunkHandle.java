@@ -22,52 +22,49 @@ public class ChunkHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChunkHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChunkHandle handle = new ChunkHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invoke(instance, blockposition);
+        return T.getBlockData.invoke(getRaw(), blockposition);
     }
 
     public BlockData getBlockDataAtCoord(int x, int y, int z) {
-        return T.getBlockDataAtCoord.invoke(instance, x, y, z);
+        return T.getBlockDataAtCoord.invoke(getRaw(), x, y, z);
     }
 
     public BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata) {
-        return T.setBlockData.invoke(instance, blockposition, iblockdata);
+        return T.setBlockData.invoke(getRaw(), blockposition, iblockdata);
     }
 
     public void addEntity(EntityHandle entity) {
-        T.addEntity.invoke(instance, entity);
+        T.addEntity.invoke(getRaw(), entity);
     }
 
     public int getHeight(int x, int z) {
-        return T.getHeight.invoke(instance, x, z);
+        return T.getHeight.invoke(getRaw(), x, z);
     }
 
     public int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position) {
-        return T.getBrightness.invoke(instance, enumskyblock, position);
+        return T.getBrightness.invoke(getRaw(), enumskyblock, position);
     }
 
     public int getTopSliceY() {
-        return T.getTopSliceY.invoke(instance);
+        return T.getTopSliceY.invoke(getRaw());
     }
 
     public byte[] getBiomeIndex() {
-        return T.getBiomeIndex.invoke(instance);
+        return T.getBiomeIndex.invoke(getRaw());
     }
 
     public void addEntities() {
-        T.addEntities.invoke(instance);
+        T.addEntities.invoke(getRaw());
     }
 
     public boolean checkCanSave(boolean isNotAutosave) {
-        return T.checkCanSave.invoke(instance, isNotAutosave);
+        return T.checkCanSave.invoke(getRaw(), isNotAutosave);
     }
 
 
@@ -79,59 +76,59 @@ public class ChunkHandle extends Template.Handle {
         }
     }
     public ChunkSectionHandle[] getSections() {
-        return T.sections.get(instance);
+        return T.sections.get(getRaw());
     }
 
     public void setSections(ChunkSectionHandle[] value) {
-        T.sections.set(instance, value);
+        T.sections.set(getRaw(), value);
     }
 
     public WorldHandle getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(WorldHandle value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     public int getLocX() {
-        return T.locX.getInteger(instance);
+        return T.locX.getInteger(getRaw());
     }
 
     public void setLocX(int value) {
-        T.locX.setInteger(instance, value);
+        T.locX.setInteger(getRaw(), value);
     }
 
     public int getLocZ() {
-        return T.locZ.getInteger(instance);
+        return T.locZ.getInteger(getRaw());
     }
 
     public void setLocZ(int value) {
-        T.locZ.setInteger(instance, value);
+        T.locZ.setInteger(getRaw(), value);
     }
 
     public Map<IntVector3, BlockState> getTileEntities() {
-        return T.tileEntities.get(instance);
+        return T.tileEntities.get(getRaw());
     }
 
     public void setTileEntities(Map<IntVector3, BlockState> value) {
-        T.tileEntities.set(instance, value);
+        T.tileEntities.set(getRaw(), value);
     }
 
     public List<Object>[] getEntitySlices() {
-        return T.entitySlices.get(instance);
+        return T.entitySlices.get(getRaw());
     }
 
     public void setEntitySlices(List<Object>[] value) {
-        T.entitySlices.set(instance, value);
+        T.entitySlices.set(getRaw(), value);
     }
 
     public Chunk getBukkitChunk() {
-        return T.bukkitChunk.get(instance);
+        return T.bukkitChunk.get(getRaw());
     }
 
     public void setBukkitChunk(Chunk value) {
-        T.bukkitChunk.set(instance, value);
+        T.bukkitChunk.set(getRaw(), value);
     }
 
     /**

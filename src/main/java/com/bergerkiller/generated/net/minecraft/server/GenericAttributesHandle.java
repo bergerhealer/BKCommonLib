@@ -19,10 +19,7 @@ public class GenericAttributesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static GenericAttributesHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        GenericAttributesHandle handle = new GenericAttributesHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

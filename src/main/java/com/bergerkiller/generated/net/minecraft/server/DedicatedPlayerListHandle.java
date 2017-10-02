@@ -16,10 +16,7 @@ public class DedicatedPlayerListHandle extends PlayerListHandle {
     /* ============================================================================== */
 
     public static DedicatedPlayerListHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        DedicatedPlayerListHandle handle = new DedicatedPlayerListHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

@@ -17,40 +17,37 @@ public class NBTTagListHandle extends NBTBaseHandle {
     /* ============================================================================== */
 
     public static NBTTagListHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NBTTagListHandle handle = new NBTTagListHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void add(NBTBaseHandle value) {
-        T.add.invoke(instance, value);
+        T.add.invoke(getRaw(), value);
     }
 
     public int size() {
-        return T.size.invoke(instance);
+        return T.size.invoke(getRaw());
     }
 
     public NBTBaseHandle get(int index) {
-        return T.get.invoke(instance, index);
+        return T.get.invoke(getRaw(), index);
     }
 
     public List<NBTBaseHandle> getList() {
-        return T.list.get(instance);
+        return T.list.get(getRaw());
     }
 
     public void setList(List<NBTBaseHandle> value) {
-        T.list.set(instance, value);
+        T.list.set(getRaw(), value);
     }
 
     public byte getType() {
-        return T.type.getByte(instance);
+        return T.type.getByte(getRaw());
     }
 
     public void setType(byte value) {
-        T.type.setByte(instance, value);
+        T.type.setByte(getRaw(), value);
     }
 
     /**

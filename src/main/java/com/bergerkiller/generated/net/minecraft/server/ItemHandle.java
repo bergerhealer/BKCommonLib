@@ -16,20 +16,17 @@ public class ItemHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ItemHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ItemHandle handle = new ItemHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getMaxStackSize() {
-        return T.getMaxStackSize.invoke(instance);
+        return T.getMaxStackSize.invoke(getRaw());
     }
 
     public boolean usesDurability() {
-        return T.usesDurability.invoke(instance);
+        return T.usesDurability.invoke(getRaw());
     }
 
     /**

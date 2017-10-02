@@ -18,28 +18,25 @@ public class PacketPlayInUpdateSignHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInUpdateSignHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInUpdateSignHandle handle = new PacketPlayInUpdateSignHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public IntVector3 getPosition() {
-        return T.position.get(instance);
+        return T.position.get(getRaw());
     }
 
     public void setPosition(IntVector3 value) {
-        T.position.set(instance, value);
+        T.position.set(getRaw(), value);
     }
 
     public ChatText[] getLines() {
-        return T.lines.get(instance);
+        return T.lines.get(getRaw());
     }
 
     public void setLines(ChatText[] value) {
-        T.lines.set(instance, value);
+        T.lines.set(getRaw(), value);
     }
 
     /**

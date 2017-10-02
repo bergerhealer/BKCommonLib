@@ -17,10 +17,7 @@ public class CraftingManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftingManagerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftingManagerHandle handle = new CraftingManagerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

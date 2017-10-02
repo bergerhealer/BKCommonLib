@@ -24,100 +24,97 @@ public class WorldHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static WorldHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldHandle handle = new WorldHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public World getWorld() {
-        return T.getWorld.invoke(instance);
+        return T.getWorld.invoke(getRaw());
     }
 
     public Server getServer() {
-        return T.getServer.invoke(instance);
+        return T.getServer.invoke(getRaw());
     }
 
     public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invoke(instance, blockposition);
+        return T.getBlockData.invoke(getRaw(), blockposition);
     }
 
     public BlockData getBlockDataAtCoord(int x, int y, int z) {
-        return T.getBlockDataAtCoord.invoke(instance, x, y, z);
+        return T.getBlockDataAtCoord.invoke(getRaw(), x, y, z);
     }
 
     public boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags) {
-        return T.setBlockData.invoke(instance, blockposition, iblockdata, updateFlags);
+        return T.setBlockData.invoke(getRaw(), blockposition, iblockdata, updateFlags);
     }
 
     public long getTime() {
-        return T.getTime.invoke(instance);
+        return T.getTime.invoke(getRaw());
     }
 
     public List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds) {
-        return T.getRawEntitiesOfType.invoke(instance, rawType, bounds);
+        return T.getRawEntitiesOfType.invoke(getRaw(), rawType, bounds);
     }
 
     public List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getCubes.invoke(instance, entity, axisalignedbb);
+        return T.getCubes.invoke(getRaw(), entity, axisalignedbb);
     }
 
     public List<EntityHandle> getEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getEntities.invoke(instance, entity, axisalignedbb);
+        return T.getEntities.invoke(getRaw(), entity, axisalignedbb);
     }
 
     public TileEntityHandle getTileEntity(IntVector3 blockposition) {
-        return T.getTileEntity.invoke(instance, blockposition);
+        return T.getTileEntity.invoke(getRaw(), blockposition);
     }
 
     public WorldDataHandle getWorldData() {
-        return T.getWorldData.invoke(instance);
+        return T.getWorldData.invoke(getRaw());
     }
 
     public boolean isBurnArea(AxisAlignedBBHandle bounds) {
-        return T.isBurnArea.invoke(instance, bounds);
+        return T.isBurnArea.invoke(getRaw(), bounds);
     }
 
     public void removeEntity(EntityHandle entity) {
-        T.removeEntity.invoke(instance, entity);
+        T.removeEntity.invoke(getRaw(), entity);
     }
 
     public boolean addEntity(EntityHandle entity) {
-        return T.addEntity.invoke(instance, entity);
+        return T.addEntity.invoke(getRaw(), entity);
     }
 
     public Entity getEntityById(int entityId) {
-        return T.getEntityById.invoke(instance, entityId);
+        return T.getEntityById.invoke(getRaw(), entityId);
     }
 
     public IDataManagerHandle getDataManager() {
-        return T.getDataManager.invoke(instance);
+        return T.getDataManager.invoke(getRaw());
     }
 
     public float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds) {
-        return T.getExplosionFactor.invoke(instance, vec3d, bounds);
+        return T.getExplosionFactor.invoke(getRaw(), vec3d, bounds);
     }
 
     public boolean areChunksLoaded(IntVector3 blockposition, int distance) {
-        return T.areChunksLoaded.invoke(instance, blockposition, distance);
+        return T.areChunksLoaded.invoke(getRaw(), blockposition, distance);
     }
 
     public MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag) {
-        return T.rayTrace.invoke(instance, point1, point2, flag);
+        return T.rayTrace.invoke(getRaw(), point1, point2, flag);
     }
 
     public boolean isChunkLoaded(int cx, int cz, boolean flag) {
-        return T.isChunkLoaded.invoke(instance, cx, cz, flag);
+        return T.isChunkLoaded.invoke(getRaw(), cx, cz, flag);
     }
 
 
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
         if (T.opt_applyPhysics.isAvailable()) {
-            T.opt_applyPhysics.invoke(instance, position, causeType, self);
+            T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
         } else if (T.opt_applyPhysics_old.isAvailable()) {
-            T.opt_applyPhysics_old.invoke(instance, position, causeType);
+            T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
         } else {
             throw new UnsupportedOperationException("Apply physics function not available on this server");
         }
@@ -125,74 +122,74 @@ public class WorldHandle extends Template.Handle {
 
 
     public org.bukkit.World toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());
     }
 
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
     public List<EntityHandle> getEntityList() {
-        return T.entityList.get(instance);
+        return T.entityList.get(getRaw());
     }
 
     public void setEntityList(List<EntityHandle> value) {
-        T.entityList.set(instance, value);
+        T.entityList.set(getRaw(), value);
     }
 
     public List<EntityHumanHandle> getPlayers() {
-        return T.players.get(instance);
+        return T.players.get(getRaw());
     }
 
     public void setPlayers(List<EntityHumanHandle> value) {
-        T.players.set(instance, value);
+        T.players.set(getRaw(), value);
     }
 
     public Random getRandom() {
-        return T.random.get(instance);
+        return T.random.get(getRaw());
     }
 
     public void setRandom(Random value) {
-        T.random.set(instance, value);
+        T.random.set(getRaw(), value);
     }
 
     public WorldProviderHandle getWorldProvider() {
-        return T.worldProvider.get(instance);
+        return T.worldProvider.get(getRaw());
     }
 
     public void setWorldProvider(WorldProviderHandle value) {
-        T.worldProvider.set(instance, value);
+        T.worldProvider.set(getRaw(), value);
     }
 
     public List<IWorldAccessHandle> getAccessList() {
-        return T.accessList.get(instance);
+        return T.accessList.get(getRaw());
     }
 
     public void setAccessList(List<IWorldAccessHandle> value) {
-        T.accessList.set(instance, value);
+        T.accessList.set(getRaw(), value);
     }
 
     public MethodProfilerHandle getMethodProfiler() {
-        return T.methodProfiler.get(instance);
+        return T.methodProfiler.get(getRaw());
     }
 
     public void setMethodProfiler(MethodProfilerHandle value) {
-        T.methodProfiler.set(instance, value);
+        T.methodProfiler.set(getRaw(), value);
     }
 
     public World getBukkitWorld() {
-        return T.bukkitWorld.get(instance);
+        return T.bukkitWorld.get(getRaw());
     }
 
     public void setBukkitWorld(World value) {
-        T.bukkitWorld.set(instance, value);
+        T.bukkitWorld.set(getRaw(), value);
     }
 
     public boolean isKeepSpawnInMemory() {
-        return T.keepSpawnInMemory.getBoolean(instance);
+        return T.keepSpawnInMemory.getBoolean(getRaw());
     }
 
     public void setKeepSpawnInMemory(boolean value) {
-        T.keepSpawnInMemory.setBoolean(instance, value);
+        T.keepSpawnInMemory.setBoolean(getRaw(), value);
     }
 
     /**

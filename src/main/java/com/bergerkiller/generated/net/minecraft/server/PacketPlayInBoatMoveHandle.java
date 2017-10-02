@@ -17,28 +17,25 @@ public class PacketPlayInBoatMoveHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PacketPlayInBoatMoveHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInBoatMoveHandle handle = new PacketPlayInBoatMoveHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean isRightPaddle() {
-        return T.rightPaddle.getBoolean(instance);
+        return T.rightPaddle.getBoolean(getRaw());
     }
 
     public void setRightPaddle(boolean value) {
-        T.rightPaddle.setBoolean(instance, value);
+        T.rightPaddle.setBoolean(getRaw(), value);
     }
 
     public boolean isLeftPaddle() {
-        return T.leftPaddle.getBoolean(instance);
+        return T.leftPaddle.getBoolean(getRaw());
     }
 
     public void setLeftPaddle(boolean value) {
-        T.leftPaddle.setBoolean(instance, value);
+        T.leftPaddle.setBoolean(getRaw(), value);
     }
 
     /**

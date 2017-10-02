@@ -16,10 +16,7 @@ public class BlockPositionHandle extends BaseBlockPositionHandle {
     /* ============================================================================== */
 
     public static BlockPositionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        BlockPositionHandle handle = new BlockPositionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final BlockPositionHandle createNew(int x, int y, int z) {

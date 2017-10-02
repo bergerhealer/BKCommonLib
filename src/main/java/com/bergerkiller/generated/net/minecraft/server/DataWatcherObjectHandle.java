@@ -16,20 +16,17 @@ public class DataWatcherObjectHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DataWatcherObjectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        DataWatcherObjectHandle handle = new DataWatcherObjectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
     public Object getSerializer() {
-        return T.getSerializer.invoke(instance);
+        return T.getSerializer.invoke(getRaw());
     }
 
     /**

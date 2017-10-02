@@ -17,28 +17,25 @@ public class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInSetCreativeSlotHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInSetCreativeSlotHandle handle = new PacketPlayInSetCreativeSlotHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getSlot() {
-        return T.slot.getInteger(instance);
+        return T.slot.getInteger(getRaw());
     }
 
     public void setSlot(int value) {
-        T.slot.setInteger(instance, value);
+        T.slot.setInteger(getRaw(), value);
     }
 
     public ItemStack getItem() {
-        return T.item.get(instance);
+        return T.item.get(getRaw());
     }
 
     public void setItem(ItemStack value) {
-        T.item.set(instance, value);
+        T.item.set(getRaw(), value);
     }
 
     /**

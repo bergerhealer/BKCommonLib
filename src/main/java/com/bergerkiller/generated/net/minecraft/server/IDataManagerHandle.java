@@ -16,10 +16,7 @@ public class IDataManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IDataManagerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IDataManagerHandle handle = new IDataManagerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

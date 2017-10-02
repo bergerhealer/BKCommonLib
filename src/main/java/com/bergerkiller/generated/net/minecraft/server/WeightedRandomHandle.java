@@ -16,10 +16,7 @@ public class WeightedRandomHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static WeightedRandomHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WeightedRandomHandle handle = new WeightedRandomHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -45,20 +42,17 @@ public class WeightedRandomHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static WeightedRandomChoiceHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            WeightedRandomChoiceHandle handle = new WeightedRandomChoiceHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
 
         public int getChance() {
-            return T.chance.getInteger(instance);
+            return T.chance.getInteger(getRaw());
         }
 
         public void setChance(int value) {
-            T.chance.setInteger(instance, value);
+            T.chance.setInteger(getRaw(), value);
         }
 
         /**

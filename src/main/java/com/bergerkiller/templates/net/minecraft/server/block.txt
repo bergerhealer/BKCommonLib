@@ -60,9 +60,9 @@ class Block {
     <code>
     public SoundEffectTypeHandle getStepSound() {
         if (T.getStepSound.isAvailable()) {
-            return T.getStepSound.invoke(instance);
+            return T.getStepSound.invoke(getRaw());
         } else {
-            return T.opt_1_8_8_stepSound.get(instance);
+            return T.opt_1_8_8_stepSound.get(getRaw());
         }
     }
     </code>

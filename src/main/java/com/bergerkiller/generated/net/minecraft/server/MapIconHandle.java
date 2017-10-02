@@ -16,10 +16,7 @@ public class MapIconHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MapIconHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MapIconHandle handle = new MapIconHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
@@ -29,19 +26,19 @@ public class MapIconHandle extends Template.Handle {
     /* ============================================================================== */
 
     public byte getTypeId() {
-        return T.getTypeId.invoke(instance);
+        return T.getTypeId.invoke(getRaw());
     }
 
     public byte getX() {
-        return T.getX.invoke(instance);
+        return T.getX.invoke(getRaw());
     }
 
     public byte getY() {
-        return T.getY.invoke(instance);
+        return T.getY.invoke(getRaw());
     }
 
     public byte getDirection() {
-        return T.getDirection.invoke(instance);
+        return T.getDirection.invoke(getRaw());
     }
 
     /**
@@ -73,10 +70,7 @@ public class MapIconHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static TypeHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            TypeHandle handle = new TypeHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

@@ -19,10 +19,7 @@ public class RegionFileCacheHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RegionFileCacheHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RegionFileCacheHandle handle = new RegionFileCacheHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

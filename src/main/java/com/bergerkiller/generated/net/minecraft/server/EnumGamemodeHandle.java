@@ -16,10 +16,7 @@ public class EnumGamemodeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumGamemodeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumGamemodeHandle handle = new EnumGamemodeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -29,11 +26,11 @@ public class EnumGamemodeHandle extends Template.Handle {
     }
 
     public int getId() {
-        return T.id.getInteger(instance);
+        return T.id.getInteger(getRaw());
     }
 
     public void setId(int value) {
-        T.id.setInteger(instance, value);
+        T.id.setInteger(getRaw(), value);
     }
 
     /**

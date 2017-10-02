@@ -20,10 +20,7 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutPlayerInfoHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutPlayerInfoHandle handle = new PacketPlayOutPlayerInfoHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutPlayerInfoHandle createNew() {
@@ -33,19 +30,19 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     /* ============================================================================== */
 
     public EnumPlayerInfoActionHandle getAction() {
-        return T.action.get(instance);
+        return T.action.get(getRaw());
     }
 
     public void setAction(EnumPlayerInfoActionHandle value) {
-        T.action.set(instance, value);
+        T.action.set(getRaw(), value);
     }
 
     public List<PlayerInfoDataHandle> getPlayers() {
-        return T.players.get(instance);
+        return T.players.get(getRaw());
     }
 
     public void setPlayers(List<PlayerInfoDataHandle> value) {
-        T.players.set(instance, value);
+        T.players.set(getRaw(), value);
     }
 
     /**
@@ -74,10 +71,7 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static PlayerInfoDataHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            PlayerInfoDataHandle handle = new PlayerInfoDataHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         public static final PlayerInfoDataHandle createNew(PacketPlayOutPlayerInfoHandle packet, GameProfileHandle profile, int ping, GameMode gameMode, ChatText listName) {
@@ -87,19 +81,19 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
         /* ============================================================================== */
 
         public GameProfileHandle getProfile() {
-            return T.getProfile.invoke(instance);
+            return T.getProfile.invoke(getRaw());
         }
 
         public int getPing() {
-            return T.getPing.invoke(instance);
+            return T.getPing.invoke(getRaw());
         }
 
         public GameMode getGameMode() {
-            return T.getGameMode.invoke(instance);
+            return T.getGameMode.invoke(getRaw());
         }
 
         public ChatText getListName() {
-            return T.getListName.invoke(instance);
+            return T.getListName.invoke(getRaw());
         }
 
         /**
@@ -137,10 +131,7 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static EnumPlayerInfoActionHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            EnumPlayerInfoActionHandle handle = new EnumPlayerInfoActionHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

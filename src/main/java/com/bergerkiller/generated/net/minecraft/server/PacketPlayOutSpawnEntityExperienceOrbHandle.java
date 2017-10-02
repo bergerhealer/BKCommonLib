@@ -16,10 +16,7 @@ public class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityExperienceOrbHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSpawnEntityExperienceOrbHandle handle = new PacketPlayOutSpawnEntityExperienceOrbHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -49,19 +46,19 @@ public class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public int getExperience() {
-        return T.experience.getInteger(instance);
+        return T.experience.getInteger(getRaw());
     }
 
     public void setExperience(int value) {
-        T.experience.setInteger(instance, value);
+        T.experience.setInteger(getRaw(), value);
     }
 
     /**

@@ -18,10 +18,7 @@ public class SoundEffectHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SoundEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        SoundEffectHandle handle = new SoundEffectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final SoundEffectHandle createNew(MinecraftKeyHandle minecraftkey) {
@@ -41,11 +38,11 @@ public class SoundEffectHandle extends Template.Handle {
         }
     }
     public MinecraftKeyHandle getName() {
-        return T.name.get(instance);
+        return T.name.get(getRaw());
     }
 
     public void setName(MinecraftKeyHandle value) {
-        T.name.set(instance, value);
+        T.name.set(getRaw(), value);
     }
 
     /**

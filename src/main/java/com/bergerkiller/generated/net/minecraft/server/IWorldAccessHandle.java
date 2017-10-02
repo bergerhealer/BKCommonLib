@@ -16,20 +16,17 @@ public class IWorldAccessHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IWorldAccessHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IWorldAccessHandle handle = new IWorldAccessHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void onEntityAdded(EntityHandle entity) {
-        T.onEntityAdded.invoke(instance, entity);
+        T.onEntityAdded.invoke(getRaw(), entity);
     }
 
     public void onEntityRemoved(EntityHandle entity) {
-        T.onEntityRemoved.invoke(instance, entity);
+        T.onEntityRemoved.invoke(getRaw(), entity);
     }
 
     /**

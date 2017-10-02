@@ -16,28 +16,25 @@ public class PacketPlayOutCollectHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutCollectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutCollectHandle handle = new PacketPlayOutCollectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getCollectedItemId() {
-        return T.collectedItemId.getInteger(instance);
+        return T.collectedItemId.getInteger(getRaw());
     }
 
     public void setCollectedItemId(int value) {
-        T.collectedItemId.setInteger(instance, value);
+        T.collectedItemId.setInteger(getRaw(), value);
     }
 
     public int getCollectorEntityId() {
-        return T.collectorEntityId.getInteger(instance);
+        return T.collectorEntityId.getInteger(getRaw());
     }
 
     public void setCollectorEntityId(int value) {
-        T.collectorEntityId.setInteger(instance, value);
+        T.collectorEntityId.setInteger(getRaw(), value);
     }
 
     /**

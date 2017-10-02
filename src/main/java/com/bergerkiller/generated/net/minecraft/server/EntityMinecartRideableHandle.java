@@ -16,10 +16,7 @@ public class EntityMinecartRideableHandle extends EntityMinecartAbstractHandle {
     /* ============================================================================== */
 
     public static EntityMinecartRideableHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartRideableHandle handle = new EntityMinecartRideableHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

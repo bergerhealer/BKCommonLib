@@ -16,10 +16,7 @@ public class PacketPlayOutTitleHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutTitleHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutTitleHandle handle = new PacketPlayOutTitleHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -50,10 +47,7 @@ public class PacketPlayOutTitleHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static EnumTitleActionHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            EnumTitleActionHandle handle = new EnumTitleActionHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

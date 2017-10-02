@@ -16,20 +16,17 @@ public class EntityInsentientHandle extends EntityLivingHandle {
     /* ============================================================================== */
 
     public static EntityInsentientHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityInsentientHandle handle = new EntityInsentientHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public EntityHandle getLeashHolder() {
-        return T.getLeashHolder.invoke(instance);
+        return T.getLeashHolder.invoke(getRaw());
     }
 
     public Object getNavigation() {
-        return T.getNavigation.invoke(instance);
+        return T.getNavigation.invoke(getRaw());
     }
 
     /**

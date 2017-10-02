@@ -16,10 +16,7 @@ public class CrashReportSystemDetailsHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CrashReportSystemDetailsHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CrashReportSystemDetailsHandle handle = new CrashReportSystemDetailsHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

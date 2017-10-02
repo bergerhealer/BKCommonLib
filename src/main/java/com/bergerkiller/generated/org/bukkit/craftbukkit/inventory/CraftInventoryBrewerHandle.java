@@ -17,10 +17,7 @@ public class CraftInventoryBrewerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftInventoryBrewerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftInventoryBrewerHandle handle = new CraftInventoryBrewerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final BrewerInventory createNew(Object nmsTileEntityBrewingStand) {

@@ -16,16 +16,13 @@ public class WorldTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static WorldTypeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldTypeHandle handle = new WorldTypeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getDimension() {
-        return T.getDimension.invoke(instance);
+        return T.getDimension.invoke(getRaw());
     }
 
     /**

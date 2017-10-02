@@ -16,10 +16,7 @@ public class PlayerAbilitiesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PlayerAbilitiesHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerAbilitiesHandle handle = new PlayerAbilitiesHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PlayerAbilitiesHandle createNew() {
@@ -29,59 +26,59 @@ public class PlayerAbilitiesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public boolean isInvulnerable() {
-        return T.isInvulnerable.getBoolean(instance);
+        return T.isInvulnerable.getBoolean(getRaw());
     }
 
     public void setIsInvulnerable(boolean value) {
-        T.isInvulnerable.setBoolean(instance, value);
+        T.isInvulnerable.setBoolean(getRaw(), value);
     }
 
     public boolean isFlying() {
-        return T.isFlying.getBoolean(instance);
+        return T.isFlying.getBoolean(getRaw());
     }
 
     public void setIsFlying(boolean value) {
-        T.isFlying.setBoolean(instance, value);
+        T.isFlying.setBoolean(getRaw(), value);
     }
 
     public boolean isCanFly() {
-        return T.canFly.getBoolean(instance);
+        return T.canFly.getBoolean(getRaw());
     }
 
     public void setCanFly(boolean value) {
-        T.canFly.setBoolean(instance, value);
+        T.canFly.setBoolean(getRaw(), value);
     }
 
     public boolean isCanInstantlyBuild() {
-        return T.canInstantlyBuild.getBoolean(instance);
+        return T.canInstantlyBuild.getBoolean(getRaw());
     }
 
     public void setCanInstantlyBuild(boolean value) {
-        T.canInstantlyBuild.setBoolean(instance, value);
+        T.canInstantlyBuild.setBoolean(getRaw(), value);
     }
 
     public boolean isMayBuild() {
-        return T.mayBuild.getBoolean(instance);
+        return T.mayBuild.getBoolean(getRaw());
     }
 
     public void setMayBuild(boolean value) {
-        T.mayBuild.setBoolean(instance, value);
+        T.mayBuild.setBoolean(getRaw(), value);
     }
 
     public float getFlySpeed() {
-        return T.flySpeed.getFloat(instance);
+        return T.flySpeed.getFloat(getRaw());
     }
 
     public void setFlySpeed(float value) {
-        T.flySpeed.setFloat(instance, value);
+        T.flySpeed.setFloat(getRaw(), value);
     }
 
     public float getWalkSpeed() {
-        return T.walkSpeed.getFloat(instance);
+        return T.walkSpeed.getFloat(getRaw());
     }
 
     public void setWalkSpeed(float value) {
-        T.walkSpeed.setFloat(instance, value);
+        T.walkSpeed.setFloat(getRaw(), value);
     }
 
     /**

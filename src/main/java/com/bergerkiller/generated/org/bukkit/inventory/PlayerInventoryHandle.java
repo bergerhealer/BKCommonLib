@@ -17,10 +17,7 @@ public class PlayerInventoryHandle extends InventoryHandle {
     /* ============================================================================== */
 
     public static PlayerInventoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerInventoryHandle handle = new PlayerInventoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

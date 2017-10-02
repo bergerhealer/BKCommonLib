@@ -17,20 +17,17 @@ public class InventoryEnderChestHandle extends IInventoryHandle {
     /* ============================================================================== */
 
     public static InventoryEnderChestHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        InventoryEnderChestHandle handle = new InventoryEnderChestHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void loadFromNBT(CommonTagList nbttaglist) {
-        T.loadFromNBT.invoke(instance, nbttaglist);
+        T.loadFromNBT.invoke(getRaw(), nbttaglist);
     }
 
     public CommonTagList saveToNBT() {
-        return T.saveToNBT.invoke(instance);
+        return T.saveToNBT.invoke(getRaw());
     }
 
     /**

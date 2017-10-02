@@ -16,10 +16,7 @@ public class ReportedExceptionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ReportedExceptionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ReportedExceptionHandle handle = new ReportedExceptionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final ReportedExceptionHandle createNew(CrashReportHandle paramCrashReport) {

@@ -16,10 +16,7 @@ public class EnumDifficultyHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumDifficultyHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumDifficultyHandle handle = new EnumDifficultyHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -29,7 +26,7 @@ public class EnumDifficultyHandle extends Template.Handle {
     }
 
     public int getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
     /**

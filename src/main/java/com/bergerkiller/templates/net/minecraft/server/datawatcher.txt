@@ -61,17 +61,17 @@ class DataWatcher {
 #endif
     <code>
     public <T> void register(Key<T> key, T defaultValue) {
-        T.register.invoke(instance, key, key.getType().getConverter().convertReverse(defaultValue));
+        T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));
     }
 
     public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
-        T.set.invoke(instance, key, key.getType().getConverter().convertReverse(value));
+        T.set.invoke(getRaw(), key, key.getType().getConverter().convertReverse(value));
     }
 
     public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
         Object rawValue;
         if (T.get.isAvailable()) {
-            rawValue = T.get.invoke(instance, key);
+            rawValue = T.get.invoke(getRaw(), key);
         } else {
             rawValue = this.read(key).getRawValue();
         }
@@ -107,14 +107,14 @@ class DataWatcher {
         public DataWatcherHandle.ItemHandle cloneHandle() {
             Object clone;
             if (T.constr_key_value.isAvailable()) {
-                Object rawKey = T.key.raw.get(instance);
+                Object rawKey = T.key.raw.get(getRaw());
                 clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
             } else {
-                int typeId = T.typeId.getInteger(instance);
-                int keyId = T.keyId.getInteger(instance);
+                int typeId = T.typeId.getInteger(getRaw());
+                int keyId = T.keyId.getInteger(getRaw());
                 clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
             }
-            T.changed.copy(instance, clone);
+            T.changed.copy(getRaw(), clone);
             return createHandle(clone);
         }
         </code>

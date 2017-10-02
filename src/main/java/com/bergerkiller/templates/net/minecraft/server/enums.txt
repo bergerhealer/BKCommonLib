@@ -33,7 +33,7 @@ class EnumItemSlot {
     }
 
     public org.bukkit.inventory.EquipmentSlot toBukkit() {
-        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) instance).ordinal()];
+        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) getRaw()).ordinal()];
     }
 
     public static Object fromBukkitRaw(org.bukkit.inventory.EquipmentSlot slot) {
@@ -73,7 +73,7 @@ class EnumDirection {
 
         <code>
         public int ordinal() {
-            return ((Enum<?>) instance).ordinal();
+            return ((Enum<?>) getRaw()).ordinal();
         }
         </code>
     }

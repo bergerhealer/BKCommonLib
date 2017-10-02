@@ -20,10 +20,7 @@ public class GameProfileHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static GameProfileHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        GameProfileHandle handle = new GameProfileHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final GameProfileHandle createNew(UUID uuid, String name) {
@@ -33,31 +30,31 @@ public class GameProfileHandle extends Template.Handle {
     /* ============================================================================== */
 
     public UUID getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
     public String getName() {
-        return T.getName.invoke(instance);
+        return T.getName.invoke(getRaw());
     }
 
     public void clearProperties() {
-        T.clearProperties.invoke(instance);
+        T.clearProperties.invoke(getRaw());
     }
 
     public Set<String> getPropertyKeys() {
-        return T.getPropertyKeys.invoke(instance);
+        return T.getPropertyKeys.invoke(getRaw());
     }
 
     public Collection<PropertyHandle> getProperties(String key) {
-        return T.getProperties.invoke(instance, key);
+        return T.getProperties.invoke(getRaw(), key);
     }
 
     public boolean putProperty(String key, PropertyHandle property) {
-        return T.putProperty.invoke(instance, key, property);
+        return T.putProperty.invoke(getRaw(), key, property);
     }
 
     public void setAllProperties(GameProfileHandle profile) {
-        T.setAllProperties.invoke(instance, profile);
+        T.setAllProperties.invoke(getRaw(), profile);
     }
 
 

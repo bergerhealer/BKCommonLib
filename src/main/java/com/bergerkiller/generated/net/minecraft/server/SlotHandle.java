@@ -17,16 +17,13 @@ public class SlotHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SlotHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        SlotHandle handle = new SlotHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public ItemStack getItem() {
-        return T.getItem.invoke(instance);
+        return T.getItem.invoke(getRaw());
     }
 
     /**

@@ -19,10 +19,7 @@ public class DataWatcherHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DataWatcherHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        DataWatcherHandle handle = new DataWatcherHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final DataWatcherHandle createNew(EntityHandle owner) {
@@ -32,23 +29,23 @@ public class DataWatcherHandle extends Template.Handle {
     /* ============================================================================== */
 
     public List<Item<?>> unwatchAndReturnAllWatched() {
-        return T.unwatchAndReturnAllWatched.invoke(instance);
+        return T.unwatchAndReturnAllWatched.invoke(getRaw());
     }
 
     public List<Item<?>> returnAllWatched() {
-        return T.returnAllWatched.invoke(instance);
+        return T.returnAllWatched.invoke(getRaw());
     }
 
     public Item<Object> read(Key<?> key) {
-        return T.read.invoke(instance, key);
+        return T.read.invoke(getRaw(), key);
     }
 
     public boolean isChanged() {
-        return T.isChanged.invoke(instance);
+        return T.isChanged.invoke(getRaw());
     }
 
     public boolean isEmpty() {
-        return T.isEmpty.invoke(instance);
+        return T.isEmpty.invoke(getRaw());
     }
 
 
@@ -58,28 +55,28 @@ public class DataWatcherHandle extends Template.Handle {
 
 
     public <T> void register(Key<T> key, T defaultValue) {
-        T.register.invoke(instance, key, key.getType().getConverter().convertReverse(defaultValue));
+        T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));
     }
 
     public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
-        T.set.invoke(instance, key, key.getType().getConverter().convertReverse(value));
+        T.set.invoke(getRaw(), key, key.getType().getConverter().convertReverse(value));
     }
 
     public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
         Object rawValue;
         if (T.get.isAvailable()) {
-            rawValue = T.get.invoke(instance, key);
+            rawValue = T.get.invoke(getRaw(), key);
         } else {
             rawValue = this.read(key).getRawValue();
         }
         return key.getType().getConverter().convert(rawValue);
     }
     public EntityHandle getOwner() {
-        return T.owner.get(instance);
+        return T.owner.get(getRaw());
     }
 
     public void setOwner(EntityHandle value) {
-        T.owner.set(instance, value);
+        T.owner.set(getRaw(), value);
     }
 
     /**
@@ -119,10 +116,7 @@ public class DataWatcherHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static ItemHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            ItemHandle handle = new ItemHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
@@ -131,30 +125,30 @@ public class DataWatcherHandle extends Template.Handle {
         public DataWatcherHandle.ItemHandle cloneHandle() {
             Object clone;
             if (T.constr_key_value.isAvailable()) {
-                Object rawKey = T.key.raw.get(instance);
+                Object rawKey = T.key.raw.get(getRaw());
                 clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
             } else {
-                int typeId = T.typeId.getInteger(instance);
-                int keyId = T.keyId.getInteger(instance);
+                int typeId = T.typeId.getInteger(getRaw());
+                int keyId = T.keyId.getInteger(getRaw());
                 clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
             }
-            T.changed.copy(instance, clone);
+            T.changed.copy(getRaw(), clone);
             return createHandle(clone);
         }
         public Object getValue() {
-            return T.value.get(instance);
+            return T.value.get(getRaw());
         }
 
         public void setValue(Object value) {
-            T.value.set(instance, value);
+            T.value.set(getRaw(), value);
         }
 
         public boolean isChanged() {
-            return T.changed.getBoolean(instance);
+            return T.changed.getBoolean(getRaw());
         }
 
         public void setChanged(boolean value) {
-            T.changed.setBoolean(instance, value);
+            T.changed.setBoolean(getRaw(), value);
         }
 
         /**

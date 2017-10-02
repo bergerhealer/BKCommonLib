@@ -34,7 +34,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetada
 class Packet {
     <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
-        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(instance);
+        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw());
     }
     </code>
 
@@ -74,42 +74,42 @@ class Packet {
 
     protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
         if (field_1_10_2.isAvailable()) {
-            return deserializePosition_1_10_2(field_1_10_2.getInteger(instance));
+            return deserializePosition_1_10_2(field_1_10_2.getInteger(getRaw()));
         } else {
-            return deserializePosition_1_8_8((int) field_1_8_8.getByte(instance));
+            return deserializePosition_1_8_8((int) field_1_8_8.getByte(getRaw()));
         }
     }
 
     protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2, double position) {
         if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setInteger(instance, serializePosition_1_10_2(position));
+            field_1_10_2.setInteger(getRaw(), serializePosition_1_10_2(position));
         } else {
-            field_1_8_8.setByte(instance, (byte) serializePosition_1_8_8(position));
+            field_1_8_8.setByte(getRaw(), (byte) serializePosition_1_8_8(position));
         }
     }
 
     protected final double getProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2) {
         if (field_1_10_2.isAvailable()) {
-            return field_1_10_2.getDouble(instance);
+            return field_1_10_2.getDouble(getRaw());
         } else {
-            return deserializePosition_1_8_8(field_1_8_8.getInteger(instance));
+            return deserializePosition_1_8_8(field_1_8_8.getInteger(getRaw()));
         }
     }
 
     protected final void setProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2, double position) {
         if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setDouble(instance, position);
+            field_1_10_2.setDouble(getRaw(), position);
         } else {
-            field_1_8_8.setInteger(instance, serializePosition_1_8_8(position));
+            field_1_8_8.setInteger(getRaw(), serializePosition_1_8_8(position));
         }
     }
 
     protected final float getProtocolRotation(Template.Field.Byte field) {
-        return deserializeRotation((int) field.getByte(instance));
+        return deserializeRotation((int) field.getByte(getRaw()));
     }
 
     protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
-        field.setByte(instance, (byte) serializeRotation(rotation));
+        field.setByte(getRaw(), (byte) serializeRotation(rotation));
     }
     </code>
 }
@@ -340,39 +340,39 @@ class PacketPlayOutMapChunk extends Packet {
     <code>
     public int getSectionsMask() {
         if (T.sectionsMask.isAvailable()) {
-            return T.sectionsMask.get(instance);
+            return T.sectionsMask.get(getRaw());
         } else {
-            return T.chunkInfo.get(instance).getSectionsMask();
+            return T.chunkInfo.get(getRaw()).getSectionsMask();
         }
     }
 
     public void setSectionsMask(int sectionsMask) {
         if (T.sectionsMask.isAvailable()) {
-            T.sectionsMask.set(instance, sectionsMask);
+            T.sectionsMask.set(getRaw(), sectionsMask);
         } else {
-            T.chunkInfo.get(instance).setSectionsMask(sectionsMask);
+            T.chunkInfo.get(getRaw()).setSectionsMask(sectionsMask);
         }
     }
 
     public byte[] getData() {
         if (T.data.isAvailable()) {
-            return T.data.get(instance);
+            return T.data.get(getRaw());
         } else {
-            return T.chunkInfo.get(instance).getData();
+            return T.chunkInfo.get(getRaw()).getData();
         }
     }
     
     public void setData(byte[] data) {
         if (T.data.isAvailable()) {
-            T.data.set(instance, data);
+            T.data.set(getRaw(), data);
         } else {
-            T.chunkInfo.get(instance).setData(data);
+            T.chunkInfo.get(getRaw()).setData(data);
         }
     }
 
     public List<CommonTagCompound> getTags() {
         if (T.tags.isAvailable()) {
-            return T.tags.get(instance);
+            return T.tags.get(getRaw());
         } else {
             return java.util.Collections.emptyList();
         }
@@ -380,7 +380,7 @@ class PacketPlayOutMapChunk extends Packet {
 
     public void setTags(List<CommonTagCompound> tags) {
         if (T.tags.isAvailable()) {
-            T.tags.set(instance, tags);
+            T.tags.set(getRaw(), tags);
         } else {
             // Unsupported. Do nothing.
         }
@@ -442,17 +442,17 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     <code>
     public float getPitch() {
         if (T.pitch_1_10_2.isAvailable()) {
-            return T.pitch_1_10_2.getFloat(instance);
+            return T.pitch_1_10_2.getFloat(getRaw());
         } else {
-            return (float) T.pitch_1_8_8.getInteger(instance) / 63.0f;
+            return (float) T.pitch_1_8_8.getInteger(getRaw()) / 63.0f;
         }
     }
 
     public void setPitch(float pitch) {
         if (T.pitch_1_10_2.isAvailable()) {
-            T.pitch_1_10_2.setFloat(instance, pitch);
+            T.pitch_1_10_2.setFloat(getRaw(), pitch);
         } else {
-            T.pitch_1_8_8.setInteger(instance, (int) (pitch * 63.0f));
+            T.pitch_1_8_8.setInteger(getRaw(), (int) (pitch * 63.0f));
         }
     }
     </code>
@@ -462,7 +462,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     <code>
     public String getCategory() {
         if (T.category_1_10_2.isAvailable()) {
-            return T.category_1_10_2.get(instance);
+            return T.category_1_10_2.get(getRaw());
         } else {
             return "master";
         }
@@ -470,7 +470,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
     public void setCategory(String categoryName) {
         if (T.category_1_10_2.isAvailable()) {
-            T.category_1_10_2.set(instance, categoryName);
+            T.category_1_10_2.set(getRaw(), categoryName);
         } else {
             // Do nothing, unused
         }
@@ -504,7 +504,7 @@ class PacketPlayOutPosition extends Packet {
     <code>
     public int getTeleportWaitTimer() {
         if (T.teleportWaitTimer.isAvailable()) {
-            return T.teleportWaitTimer.getInteger(instance);
+            return T.teleportWaitTimer.getInteger(getRaw());
         } else {
             return 0;
         }
@@ -512,7 +512,7 @@ class PacketPlayOutPosition extends Packet {
 
     public void setTeleportWaitTimer(int ticks) {
         if (T.teleportWaitTimer.isAvailable()) {
-            T.teleportWaitTimer.setInteger(instance, ticks);
+            T.teleportWaitTimer.setInteger(getRaw(), ticks);
         }
     }
     </code>
@@ -633,13 +633,13 @@ class PacketPlayOutScoreboardTeam extends Packet {
     <code>
     public void setCollisionRule(String rule) {
         if (T.collisionRule.isAvailable()) {
-            T.collisionRule.set(instance, rule);
+            T.collisionRule.set(getRaw(), rule);
         }
     }
 
     public String getCollisionRule() {
         if (T.collisionRule.isAvailable()) {
-            return T.collisionRule.get(instance);
+            return T.collisionRule.get(getRaw());
         } else {
             return "always";
         }
@@ -658,7 +658,7 @@ class PacketPlayInSettings extends Packet {
     <code>
     public HumanHand getMainHand() {
         if (T.mainHand.isAvailable()) {
-            return T.mainHand.get(instance);
+            return T.mainHand.get(getRaw());
         } else {
             return HumanHand.RIGHT;
         }
@@ -666,7 +666,7 @@ class PacketPlayInSettings extends Packet {
 
     public void setMainHand(HumanHand mainHand) {
         if (T.mainHand.isAvailable()) {
-            T.mainHand.set(instance, mainHand);
+            T.mainHand.set(getRaw(), mainHand);
         }
     }
     </code>

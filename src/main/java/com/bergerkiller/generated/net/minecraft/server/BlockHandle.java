@@ -23,10 +23,7 @@ public class BlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static BlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        BlockHandle handle = new BlockHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -48,63 +45,63 @@ public class BlockHandle extends Template.Handle {
     }
 
     public void entityHitVertical(WorldHandle world, EntityHandle entity) {
-        T.entityHitVertical.invoke(instance, world, entity);
+        T.entityHitVertical.invoke(getRaw(), world, entity);
     }
 
     public int getOpacity(IBlockDataHandle iblockdata) {
-        return T.getOpacity.invoke(instance, iblockdata);
+        return T.getOpacity.invoke(getRaw(), iblockdata);
     }
 
     public int getEmission(IBlockDataHandle iblockdata) {
-        return T.getEmission.invoke(instance, iblockdata);
+        return T.getEmission.invoke(getRaw(), iblockdata);
     }
 
     public boolean isOccluding(IBlockDataHandle iblockdata) {
-        return T.isOccluding.invoke(instance, iblockdata);
+        return T.isOccluding.invoke(getRaw(), iblockdata);
     }
 
     public boolean isPowerSource(IBlockDataHandle iblockdata) {
-        return T.isPowerSource.invoke(instance, iblockdata);
+        return T.isPowerSource.invoke(getRaw(), iblockdata);
     }
 
     public float getDamageResillience(Entity entity) {
-        return T.getDamageResillience.invoke(instance, entity);
+        return T.getDamageResillience.invoke(getRaw(), entity);
     }
 
     public void dropNaturally(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, float yield, int chance) {
-        T.dropNaturally.invoke(instance, world, blockposition, iblockdata, yield, chance);
+        T.dropNaturally.invoke(getRaw(), world, blockposition, iblockdata, yield, chance);
     }
 
     public void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion) {
-        T.ignite.invoke(instance, world, blockposition, explosion);
+        T.ignite.invoke(getRaw(), world, blockposition, explosion);
     }
 
     public void stepOn(World world, IntVector3 blockposition, Entity entity) {
-        T.stepOn.invoke(instance, world, blockposition, entity);
+        T.stepOn.invoke(getRaw(), world, blockposition, entity);
     }
 
     public IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition) {
-        return T.updateState.invoke(instance, iblockdata, iblockaccess, blockposition);
+        return T.updateState.invoke(getRaw(), iblockdata, iblockaccess, blockposition);
     }
 
     public IBlockDataHandle getBlockData() {
-        return T.getBlockData.invoke(instance);
+        return T.getBlockData.invoke(getRaw());
     }
 
     public IBlockDataHandle fromLegacyData(int data) {
-        return T.fromLegacyData.invoke(instance, data);
+        return T.fromLegacyData.invoke(getRaw(), data);
     }
 
     public int toLegacyData(IBlockDataHandle iblockdata) {
-        return T.toLegacyData.invoke(instance, iblockdata);
+        return T.toLegacyData.invoke(getRaw(), iblockdata);
     }
 
 
     public SoundEffectTypeHandle getStepSound() {
         if (T.getStepSound.isAvailable()) {
-            return T.getStepSound.invoke(instance);
+            return T.getStepSound.invoke(getRaw());
         } else {
-            return T.opt_1_8_8_stepSound.get(instance);
+            return T.opt_1_8_8_stepSound.get(getRaw());
         }
     }
     /**

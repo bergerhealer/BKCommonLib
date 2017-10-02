@@ -23,8 +23,7 @@ class ItemStack {
         if (T.OPT_EMPTY_ITEM.isAvailable()) {
             EMPTY_ITEM = T.OPT_EMPTY_ITEM.get();
         } else {
-            EMPTY_ITEM = new ItemStackHandle();
-            EMPTY_ITEM.instance = null;
+            EMPTY_ITEM = T.createHandle(null, true);
         }
     }
     </code>

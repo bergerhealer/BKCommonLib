@@ -18,16 +18,13 @@ public class EntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityHandle handle = new EntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Entity getPassenger() {
-        return T.getPassenger.invoke(instance);
+        return T.getPassenger.invoke(getRaw());
     }
 
     /**

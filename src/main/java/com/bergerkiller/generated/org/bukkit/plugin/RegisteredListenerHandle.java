@@ -17,20 +17,17 @@ public class RegisteredListenerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RegisteredListenerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RegisteredListenerHandle handle = new RegisteredListenerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public EventExecutor getExecutor() {
-        return T.executor.get(instance);
+        return T.executor.get(getRaw());
     }
 
     public void setExecutor(EventExecutor value) {
-        T.executor.set(instance, value);
+        T.executor.set(getRaw(), value);
     }
 
     /**

@@ -18,104 +18,101 @@ public class MobSpawnerAbstractHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MobSpawnerAbstractHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MobSpawnerAbstractHandle handle = new MobSpawnerAbstractHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void onTick() {
-        T.onTick.invoke(instance);
+        T.onTick.invoke(getRaw());
     }
 
     public MinecraftKeyHandle getMobName() {
-        return T.getMobName.invoke(instance);
+        return T.getMobName.invoke(getRaw());
     }
 
     public void setMobName(MinecraftKeyHandle nameKey) {
-        T.setMobName.invoke(instance, nameKey);
+        T.setMobName.invoke(getRaw(), nameKey);
     }
 
     public int getSpawnDelay() {
-        return T.spawnDelay.getInteger(instance);
+        return T.spawnDelay.getInteger(getRaw());
     }
 
     public void setSpawnDelay(int value) {
-        T.spawnDelay.setInteger(instance, value);
+        T.spawnDelay.setInteger(getRaw(), value);
     }
 
     public List<MobSpawnerDataHandle> getMobs() {
-        return T.mobs.get(instance);
+        return T.mobs.get(getRaw());
     }
 
     public void setMobs(List<MobSpawnerDataHandle> value) {
-        T.mobs.set(instance, value);
+        T.mobs.set(getRaw(), value);
     }
 
     public MobSpawnerDataHandle getSpawnData() {
-        return T.spawnData.get(instance);
+        return T.spawnData.get(getRaw());
     }
 
     public void setSpawnData(MobSpawnerDataHandle value) {
-        T.spawnData.set(instance, value);
+        T.spawnData.set(getRaw(), value);
     }
 
     public int getMinSpawnDelay() {
-        return T.minSpawnDelay.getInteger(instance);
+        return T.minSpawnDelay.getInteger(getRaw());
     }
 
     public void setMinSpawnDelay(int value) {
-        T.minSpawnDelay.setInteger(instance, value);
+        T.minSpawnDelay.setInteger(getRaw(), value);
     }
 
     public int getMaxSpawnDelay() {
-        return T.maxSpawnDelay.getInteger(instance);
+        return T.maxSpawnDelay.getInteger(getRaw());
     }
 
     public void setMaxSpawnDelay(int value) {
-        T.maxSpawnDelay.setInteger(instance, value);
+        T.maxSpawnDelay.setInteger(getRaw(), value);
     }
 
     public int getSpawnCount() {
-        return T.spawnCount.getInteger(instance);
+        return T.spawnCount.getInteger(getRaw());
     }
 
     public void setSpawnCount(int value) {
-        T.spawnCount.setInteger(instance, value);
+        T.spawnCount.setInteger(getRaw(), value);
     }
 
     public Entity getEntity() {
-        return T.entity.get(instance);
+        return T.entity.get(getRaw());
     }
 
     public void setEntity(Entity value) {
-        T.entity.set(instance, value);
+        T.entity.set(getRaw(), value);
     }
 
     public int getMaxNearbyEntities() {
-        return T.maxNearbyEntities.getInteger(instance);
+        return T.maxNearbyEntities.getInteger(getRaw());
     }
 
     public void setMaxNearbyEntities(int value) {
-        T.maxNearbyEntities.setInteger(instance, value);
+        T.maxNearbyEntities.setInteger(getRaw(), value);
     }
 
     public int getRequiredPlayerRange() {
-        return T.requiredPlayerRange.getInteger(instance);
+        return T.requiredPlayerRange.getInteger(getRaw());
     }
 
     public void setRequiredPlayerRange(int value) {
-        T.requiredPlayerRange.setInteger(instance, value);
+        T.requiredPlayerRange.setInteger(getRaw(), value);
     }
 
     public int getSpawnRange() {
-        return T.spawnRange.getInteger(instance);
+        return T.spawnRange.getInteger(getRaw());
     }
 
     public void setSpawnRange(int value) {
-        T.spawnRange.setInteger(instance, value);
+        T.spawnRange.setInteger(getRaw(), value);
     }
 
     /**

@@ -18,10 +18,7 @@ public class ItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ItemStackHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ItemStackHandle handle = new ItemStackHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final ItemStackHandle createNew(Material type, int amount, int durability) {
@@ -31,47 +28,47 @@ public class ItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public Object getItem() {
-        return T.getItem.invoke(instance);
+        return T.getItem.invoke(getRaw());
     }
 
     public String getName() {
-        return T.getName.invoke(instance);
+        return T.getName.invoke(getRaw());
     }
 
     public ItemStackHandle setName(String s) {
-        return T.setName.invoke(instance, s);
+        return T.setName.invoke(getRaw(), s);
     }
 
     public int getRepairCost() {
-        return T.getRepairCost.invoke(instance);
+        return T.getRepairCost.invoke(getRaw());
     }
 
     public void setRepairCost(int cost) {
-        T.setRepairCost.invoke(instance, cost);
+        T.setRepairCost.invoke(getRaw(), cost);
     }
 
     public boolean hasName() {
-        return T.hasName.invoke(instance);
+        return T.hasName.invoke(getRaw());
     }
 
     public boolean hasTag() {
-        return T.hasTag.invoke(instance);
+        return T.hasTag.invoke(getRaw());
     }
 
     public CommonTagCompound getTag() {
-        return T.getTag.invoke(instance);
+        return T.getTag.invoke(getRaw());
     }
 
     public CommonTagCompound saveToNBT(CommonTagCompound compound) {
-        return T.saveToNBT.invoke(instance, compound);
+        return T.saveToNBT.invoke(getRaw(), compound);
     }
 
     public ItemStackHandle cloneAndSubtract(int n) {
-        return T.cloneAndSubtract.invoke(instance, n);
+        return T.cloneAndSubtract.invoke(getRaw(), n);
     }
 
     public ItemStackHandle cloneItemStack() {
-        return T.cloneItemStack.invoke(instance);
+        return T.cloneItemStack.invoke(getRaw());
     }
 
 
@@ -80,8 +77,7 @@ public class ItemStackHandle extends Template.Handle {
         if (T.OPT_EMPTY_ITEM.isAvailable()) {
             EMPTY_ITEM = T.OPT_EMPTY_ITEM.get();
         } else {
-            EMPTY_ITEM = new ItemStackHandle();
-            EMPTY_ITEM.instance = null;
+            EMPTY_ITEM = T.createHandle(null, true);
         }
     }
 
@@ -94,35 +90,35 @@ public class ItemStackHandle extends Template.Handle {
         }
     }
     public int getAmountField() {
-        return T.amountField.getInteger(instance);
+        return T.amountField.getInteger(getRaw());
     }
 
     public void setAmountField(int value) {
-        T.amountField.setInteger(instance, value);
+        T.amountField.setInteger(getRaw(), value);
     }
 
     public Material getTypeField() {
-        return T.typeField.get(instance);
+        return T.typeField.get(getRaw());
     }
 
     public void setTypeField(Material value) {
-        T.typeField.set(instance, value);
+        T.typeField.set(getRaw(), value);
     }
 
     public CommonTagCompound getTagField() {
-        return T.tagField.get(instance);
+        return T.tagField.get(getRaw());
     }
 
     public void setTagField(CommonTagCompound value) {
-        T.tagField.set(instance, value);
+        T.tagField.set(getRaw(), value);
     }
 
     public int getDurabilityField() {
-        return T.durabilityField.getInteger(instance);
+        return T.durabilityField.getInteger(getRaw());
     }
 
     public void setDurabilityField(int value) {
-        T.durabilityField.setInteger(instance, value);
+        T.durabilityField.setInteger(getRaw(), value);
     }
 
     /**

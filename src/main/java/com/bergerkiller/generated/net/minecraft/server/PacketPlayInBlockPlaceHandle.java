@@ -16,10 +16,7 @@ public class PacketPlayInBlockPlaceHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInBlockPlaceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInBlockPlaceHandle handle = new PacketPlayInBlockPlaceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

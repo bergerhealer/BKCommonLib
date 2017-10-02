@@ -16,10 +16,7 @@ public class IntHashMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IntHashMapHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IntHashMapHandle handle = new IntHashMapHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

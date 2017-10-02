@@ -16,10 +16,7 @@ public class ChunkRegionLoaderHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChunkRegionLoaderHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChunkRegionLoaderHandle handle = new ChunkRegionLoaderHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -27,9 +24,9 @@ public class ChunkRegionLoaderHandle extends Template.Handle {
 
     public boolean chunkExists(org.bukkit.World world, int cx, int cz) {
         if (T.opt_chunkExists_old.isAvailable()) {
-            return T.opt_chunkExists_old.invoke(instance, world, cx, cz);
+            return T.opt_chunkExists_old.invoke(getRaw(), world, cx, cz);
         } else {
-            return T.opt_chunkExists.invoke(instance, cx, cz);
+            return T.opt_chunkExists.invoke(getRaw(), cx, cz);
         }
     }
     /**

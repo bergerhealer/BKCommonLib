@@ -17,10 +17,7 @@ public class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutScoreboardTeamHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutScoreboardTeamHandle handle = new PacketPlayOutScoreboardTeamHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -28,87 +25,87 @@ public class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
 
     public void setCollisionRule(String rule) {
         if (T.collisionRule.isAvailable()) {
-            T.collisionRule.set(instance, rule);
+            T.collisionRule.set(getRaw(), rule);
         }
     }
 
     public String getCollisionRule() {
         if (T.collisionRule.isAvailable()) {
-            return T.collisionRule.get(instance);
+            return T.collisionRule.get(getRaw());
         } else {
             return "always";
         }
     }
     public String getName() {
-        return T.name.get(instance);
+        return T.name.get(getRaw());
     }
 
     public void setName(String value) {
-        T.name.set(instance, value);
+        T.name.set(getRaw(), value);
     }
 
     public String getDisplayName() {
-        return T.displayName.get(instance);
+        return T.displayName.get(getRaw());
     }
 
     public void setDisplayName(String value) {
-        T.displayName.set(instance, value);
+        T.displayName.set(getRaw(), value);
     }
 
     public String getPrefix() {
-        return T.prefix.get(instance);
+        return T.prefix.get(getRaw());
     }
 
     public void setPrefix(String value) {
-        T.prefix.set(instance, value);
+        T.prefix.set(getRaw(), value);
     }
 
     public String getSuffix() {
-        return T.suffix.get(instance);
+        return T.suffix.get(getRaw());
     }
 
     public void setSuffix(String value) {
-        T.suffix.set(instance, value);
+        T.suffix.set(getRaw(), value);
     }
 
     public String getVisibility() {
-        return T.visibility.get(instance);
+        return T.visibility.get(getRaw());
     }
 
     public void setVisibility(String value) {
-        T.visibility.set(instance, value);
+        T.visibility.set(getRaw(), value);
     }
 
     public int getChatFormat() {
-        return T.chatFormat.getInteger(instance);
+        return T.chatFormat.getInteger(getRaw());
     }
 
     public void setChatFormat(int value) {
-        T.chatFormat.setInteger(instance, value);
+        T.chatFormat.setInteger(getRaw(), value);
     }
 
     public Collection<String> getPlayers() {
-        return T.players.get(instance);
+        return T.players.get(getRaw());
     }
 
     public void setPlayers(Collection<String> value) {
-        T.players.set(instance, value);
+        T.players.set(getRaw(), value);
     }
 
     public int getMode() {
-        return T.mode.getInteger(instance);
+        return T.mode.getInteger(getRaw());
     }
 
     public void setMode(int value) {
-        T.mode.setInteger(instance, value);
+        T.mode.setInteger(getRaw(), value);
     }
 
     public int getFriendlyFire() {
-        return T.friendlyFire.getInteger(instance);
+        return T.friendlyFire.getInteger(getRaw());
     }
 
     public void setFriendlyFire(int value) {
-        T.friendlyFire.setInteger(instance, value);
+        T.friendlyFire.setInteger(getRaw(), value);
     }
 
     /**

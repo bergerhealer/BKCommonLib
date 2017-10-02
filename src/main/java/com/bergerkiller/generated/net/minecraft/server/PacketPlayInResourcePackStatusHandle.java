@@ -16,20 +16,17 @@ public class PacketPlayInResourcePackStatusHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInResourcePackStatusHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInResourcePackStatusHandle handle = new PacketPlayInResourcePackStatusHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getStatus() {
-        return T.status.get(instance);
+        return T.status.get(getRaw());
     }
 
     public void setStatus(Object value) {
-        T.status.set(instance, value);
+        T.status.set(getRaw(), value);
     }
 
     /**

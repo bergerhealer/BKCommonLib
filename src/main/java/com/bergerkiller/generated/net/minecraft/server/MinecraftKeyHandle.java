@@ -16,10 +16,7 @@ public class MinecraftKeyHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MinecraftKeyHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MinecraftKeyHandle handle = new MinecraftKeyHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final MinecraftKeyHandle createNew(String keyToken) {
@@ -37,19 +34,19 @@ public class MinecraftKeyHandle extends Template.Handle {
         return createNew(0, new String[] { namespace, name });
     }
     public String getNamespace() {
-        return T.namespace.get(instance);
+        return T.namespace.get(getRaw());
     }
 
     public void setNamespace(String value) {
-        T.namespace.set(instance, value);
+        T.namespace.set(getRaw(), value);
     }
 
     public String getName() {
-        return T.name.get(instance);
+        return T.name.get(getRaw());
     }
 
     public void setName(String value) {
-        T.name.set(instance, value);
+        T.name.set(getRaw(), value);
     }
 
     /**

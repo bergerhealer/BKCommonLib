@@ -16,10 +16,7 @@ public class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityWeatherHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSpawnEntityWeatherHandle handle = new PacketPlayOutSpawnEntityWeatherHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -49,19 +46,19 @@ public class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public int getType() {
-        return T.type.getInteger(instance);
+        return T.type.getInteger(getRaw());
     }
 
     public void setType(int value) {
-        T.type.setInteger(instance, value);
+        T.type.setInteger(getRaw(), value);
     }
 
     /**

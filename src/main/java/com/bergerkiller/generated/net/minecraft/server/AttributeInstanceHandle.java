@@ -16,20 +16,17 @@ public class AttributeInstanceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static AttributeInstanceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        AttributeInstanceHandle handle = new AttributeInstanceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void setValue(double value) {
-        T.setValue.invoke(instance, value);
+        T.setValue.invoke(getRaw(), value);
     }
 
     public double getValue() {
-        return T.getValue.invoke(instance);
+        return T.getValue.invoke(getRaw());
     }
 
     /**

@@ -20,36 +20,33 @@ public class PacketPlayOutUpdateSignHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PacketPlayOutUpdateSignHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutUpdateSignHandle handle = new PacketPlayOutUpdateSignHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public World getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(World value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     public IntVector3 getPosition() {
-        return T.position.get(instance);
+        return T.position.get(getRaw());
     }
 
     public void setPosition(IntVector3 value) {
-        T.position.set(instance, value);
+        T.position.set(getRaw(), value);
     }
 
     public ChatText[] getLines() {
-        return T.lines.get(instance);
+        return T.lines.get(getRaw());
     }
 
     public void setLines(ChatText[] value) {
-        T.lines.set(instance, value);
+        T.lines.set(getRaw(), value);
     }
 
     /**

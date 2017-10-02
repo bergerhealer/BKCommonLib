@@ -22,10 +22,7 @@ public class EnumDirectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumDirectionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumDirectionHandle handle = new EnumDirectionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -61,17 +58,14 @@ public class EnumDirectionHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static EnumAxisHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            EnumAxisHandle handle = new EnumAxisHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
 
 
         public int ordinal() {
-            return ((Enum<?>) instance).ordinal();
+            return ((Enum<?>) getRaw()).ordinal();
         }
         /**
          * Stores class members for <b>net.minecraft.server.EnumDirection.EnumAxis</b>.

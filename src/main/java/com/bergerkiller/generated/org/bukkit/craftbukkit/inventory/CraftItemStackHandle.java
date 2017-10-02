@@ -17,10 +17,7 @@ public class CraftItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftItemStackHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftItemStackHandle handle = new CraftItemStackHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -38,11 +35,11 @@ public class CraftItemStackHandle extends Template.Handle {
     }
 
     public Object getHandle() {
-        return T.handle.get(instance);
+        return T.handle.get(getRaw());
     }
 
     public void setHandle(Object value) {
-        T.handle.set(instance, value);
+        T.handle.set(getRaw(), value);
     }
 
     /**

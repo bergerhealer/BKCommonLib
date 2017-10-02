@@ -22,10 +22,7 @@ public class EnumMoveTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumMoveTypeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumMoveTypeHandle handle = new EnumMoveTypeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

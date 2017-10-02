@@ -130,7 +130,7 @@ class EnumSkyBlock {
 
     <code>
     public int ordinal() {
-        return ((Enum<?>) instance).ordinal();
+        return ((Enum<?>) getRaw()).ordinal();
     }
     </code>
 }

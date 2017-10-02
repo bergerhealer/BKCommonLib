@@ -16,17 +16,14 @@ public class PacketHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PacketHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketHandle handle = new PacketHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
 
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
-        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(instance);
+        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw());
     }
 
 
@@ -64,42 +61,42 @@ public class PacketHandle extends Template.Handle {
 
     protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
         if (field_1_10_2.isAvailable()) {
-            return deserializePosition_1_10_2(field_1_10_2.getInteger(instance));
+            return deserializePosition_1_10_2(field_1_10_2.getInteger(getRaw()));
         } else {
-            return deserializePosition_1_8_8((int) field_1_8_8.getByte(instance));
+            return deserializePosition_1_8_8((int) field_1_8_8.getByte(getRaw()));
         }
     }
 
     protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2, double position) {
         if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setInteger(instance, serializePosition_1_10_2(position));
+            field_1_10_2.setInteger(getRaw(), serializePosition_1_10_2(position));
         } else {
-            field_1_8_8.setByte(instance, (byte) serializePosition_1_8_8(position));
+            field_1_8_8.setByte(getRaw(), (byte) serializePosition_1_8_8(position));
         }
     }
 
     protected final double getProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2) {
         if (field_1_10_2.isAvailable()) {
-            return field_1_10_2.getDouble(instance);
+            return field_1_10_2.getDouble(getRaw());
         } else {
-            return deserializePosition_1_8_8(field_1_8_8.getInteger(instance));
+            return deserializePosition_1_8_8(field_1_8_8.getInteger(getRaw()));
         }
     }
 
     protected final void setProtocolPosition(Template.Field.Integer field_1_8_8, Template.Field.Double field_1_10_2, double position) {
         if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setDouble(instance, position);
+            field_1_10_2.setDouble(getRaw(), position);
         } else {
-            field_1_8_8.setInteger(instance, serializePosition_1_8_8(position));
+            field_1_8_8.setInteger(getRaw(), serializePosition_1_8_8(position));
         }
     }
 
     protected final float getProtocolRotation(Template.Field.Byte field) {
-        return deserializeRotation((int) field.getByte(instance));
+        return deserializeRotation((int) field.getByte(getRaw()));
     }
 
     protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
-        field.setByte(instance, (byte) serializeRotation(rotation));
+        field.setByte(getRaw(), (byte) serializeRotation(rotation));
     }
     /**
      * Stores class members for <b>net.minecraft.server.Packet</b>.

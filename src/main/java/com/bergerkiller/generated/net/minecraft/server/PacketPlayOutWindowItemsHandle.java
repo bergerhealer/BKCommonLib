@@ -18,28 +18,25 @@ public class PacketPlayOutWindowItemsHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutWindowItemsHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutWindowItemsHandle handle = new PacketPlayOutWindowItemsHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getWindowId() {
-        return T.windowId.getInteger(instance);
+        return T.windowId.getInteger(getRaw());
     }
 
     public void setWindowId(int value) {
-        T.windowId.setInteger(instance, value);
+        T.windowId.setInteger(getRaw(), value);
     }
 
     public List<ItemStack> getItems() {
-        return T.items.get(instance);
+        return T.items.get(getRaw());
     }
 
     public void setItems(List<ItemStack> value) {
-        T.items.set(instance, value);
+        T.items.set(getRaw(), value);
     }
 
     /**

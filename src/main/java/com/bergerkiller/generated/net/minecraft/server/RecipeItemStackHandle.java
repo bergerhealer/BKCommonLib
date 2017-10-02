@@ -19,20 +19,17 @@ public class RecipeItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RecipeItemStackHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RecipeItemStackHandle handle = new RecipeItemStackHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public List<ItemStack> getChoices() {
-        return T.choices.get(instance);
+        return T.choices.get(getRaw());
     }
 
     public void setChoices(List<ItemStack> value) {
-        T.choices.set(instance, value);
+        T.choices.set(getRaw(), value);
     }
 
     /**

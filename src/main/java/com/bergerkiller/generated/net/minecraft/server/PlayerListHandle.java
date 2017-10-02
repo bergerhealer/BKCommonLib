@@ -20,44 +20,41 @@ public class PlayerListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PlayerListHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerListHandle handle = new PlayerListHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void savePlayers() {
-        T.savePlayers.invoke(instance);
+        T.savePlayers.invoke(getRaw());
     }
 
     public void sendPacketNearby(HumanEntity human, double x, double y, double z, double radius, int dimension, CommonPacket packet) {
-        T.sendPacketNearby.invokeVA(instance, human, x, y, z, radius, dimension, packet);
+        T.sendPacketNearby.invokeVA(getRaw(), human, x, y, z, radius, dimension, packet);
     }
 
     public List<Player> getPlayers() {
-        return T.players.get(instance);
+        return T.players.get(getRaw());
     }
 
     public void setPlayers(List<Player> value) {
-        T.players.set(instance, value);
+        T.players.set(getRaw(), value);
     }
 
     public IPlayerFileDataHandle getPlayerFileData() {
-        return T.playerFileData.get(instance);
+        return T.playerFileData.get(getRaw());
     }
 
     public void setPlayerFileData(IPlayerFileDataHandle value) {
-        T.playerFileData.set(instance, value);
+        T.playerFileData.set(getRaw(), value);
     }
 
     public int getMaxPlayers() {
-        return T.maxPlayers.getInteger(instance);
+        return T.maxPlayers.getInteger(getRaw());
     }
 
     public void setMaxPlayers(int value) {
-        T.maxPlayers.setInteger(instance, value);
+        T.maxPlayers.setInteger(getRaw(), value);
     }
 
     /**

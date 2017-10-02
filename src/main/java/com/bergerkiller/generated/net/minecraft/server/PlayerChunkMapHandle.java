@@ -20,62 +20,59 @@ public class PlayerChunkMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PlayerChunkMapHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerChunkMapHandle handle = new PlayerChunkMapHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean shouldUnload(int i, int j, int k, int l, int i1) {
-        return T.shouldUnload.invoke(instance, i, j, k, l, i1);
+        return T.shouldUnload.invoke(getRaw(), i, j, k, l, i1);
     }
 
     public void flagDirty(IntVector3 blockposition) {
-        T.flagDirty.invoke(instance, blockposition);
+        T.flagDirty.invoke(getRaw(), blockposition);
     }
 
     public boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ) {
-        return T.isChunkEntered.invoke(instance, entityplayer, chunkX, chunkZ);
+        return T.isChunkEntered.invoke(getRaw(), entityplayer, chunkX, chunkZ);
     }
 
 
     public void markForUpdate(PlayerChunkHandle playerChunk) {
         if (T.markForUpdate_1_10_2.isAvailable()) {
-            T.markForUpdate_1_10_2.invoke(instance, playerChunk);
+            T.markForUpdate_1_10_2.invoke(getRaw(), playerChunk);
         } else {
-            T.updateQueue_1_8_8.get(instance).add(playerChunk);
+            T.updateQueue_1_8_8.get(getRaw()).add(playerChunk);
         }
     }
 
 
     public PlayerChunkHandle getChunk(int x, int z) {
         if (T.getChunk_1_9.isAvailable()) {
-            return T.getChunk_1_9.invoke(instance, x, z);
+            return T.getChunk_1_9.invoke(getRaw(), x, z);
         } else {
-            return T.getChunk_1_8_8.invoke(instance, x, z, false);
+            return T.getChunk_1_8_8.invoke(getRaw(), x, z, false);
         }
     }
 
 
     public void flagDirty(int x, int y, int z) {
-        T.flagDirty.raw.invoke(instance, BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
+        T.flagDirty.raw.invoke(getRaw(), BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
     }
     public List<Player> getManagedPlayers() {
-        return T.managedPlayers.get(instance);
+        return T.managedPlayers.get(getRaw());
     }
 
     public void setManagedPlayers(List<Player> value) {
-        T.managedPlayers.set(instance, value);
+        T.managedPlayers.set(getRaw(), value);
     }
 
     public int getRadius() {
-        return T.radius.getInteger(instance);
+        return T.radius.getInteger(getRaw());
     }
 
     public void setRadius(int value) {
-        T.radius.setInteger(instance, value);
+        T.radius.setInteger(getRaw(), value);
     }
 
     /**

@@ -16,10 +16,7 @@ public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutRemoveEntityEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutRemoveEntityEffectHandle handle = new PacketPlayOutRemoveEntityEffectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutRemoveEntityEffectHandle createNew() {
@@ -36,19 +33,19 @@ public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
         return handle;
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public MobEffectListHandle getEffectList() {
-        return T.effectList.get(instance);
+        return T.effectList.get(getRaw());
     }
 
     public void setEffectList(MobEffectListHandle value) {
-        T.effectList.set(instance, value);
+        T.effectList.set(getRaw(), value);
     }
 
     /**

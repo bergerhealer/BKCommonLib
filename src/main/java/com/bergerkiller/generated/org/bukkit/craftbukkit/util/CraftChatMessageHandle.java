@@ -17,10 +17,7 @@ public class CraftChatMessageHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftChatMessageHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftChatMessageHandle handle = new CraftChatMessageHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

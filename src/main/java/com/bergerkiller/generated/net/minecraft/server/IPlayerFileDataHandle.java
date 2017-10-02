@@ -18,24 +18,21 @@ public class IPlayerFileDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IPlayerFileDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IPlayerFileDataHandle handle = new IPlayerFileDataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void save(HumanEntity human) {
-        T.save.invoke(instance, human);
+        T.save.invoke(getRaw(), human);
     }
 
     public CommonTagCompound load(HumanEntity human) {
-        return T.load.invoke(instance, human);
+        return T.load.invoke(getRaw(), human);
     }
 
     public String[] getSeenPlayers() {
-        return T.getSeenPlayers.invoke(instance);
+        return T.getSeenPlayers.invoke(getRaw());
     }
 
     /**

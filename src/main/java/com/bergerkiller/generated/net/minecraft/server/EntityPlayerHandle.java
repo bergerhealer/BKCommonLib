@@ -17,44 +17,41 @@ public class EntityPlayerHandle extends EntityHumanHandle {
     /* ============================================================================== */
 
     public static EntityPlayerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityPlayerHandle handle = new EntityPlayerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getPlayerConnection() {
-        return T.playerConnection.get(instance);
+        return T.playerConnection.get(getRaw());
     }
 
     public void setPlayerConnection(Object value) {
-        T.playerConnection.set(instance, value);
+        T.playerConnection.set(getRaw(), value);
     }
 
     public double getChunkSyncX() {
-        return T.chunkSyncX.getDouble(instance);
+        return T.chunkSyncX.getDouble(getRaw());
     }
 
     public void setChunkSyncX(double value) {
-        T.chunkSyncX.setDouble(instance, value);
+        T.chunkSyncX.setDouble(getRaw(), value);
     }
 
     public double getChunkSyncZ() {
-        return T.chunkSyncZ.getDouble(instance);
+        return T.chunkSyncZ.getDouble(getRaw());
     }
 
     public void setChunkSyncZ(double value) {
-        T.chunkSyncZ.setDouble(instance, value);
+        T.chunkSyncZ.setDouble(getRaw(), value);
     }
 
     public int getPing() {
-        return T.ping.getInteger(instance);
+        return T.ping.getInteger(getRaw());
     }
 
     public void setPing(int value) {
-        T.ping.setInteger(instance, value);
+        T.ping.setInteger(getRaw(), value);
     }
 
     /**

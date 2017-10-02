@@ -17,10 +17,7 @@ public class PacketPlayInSettingsHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInSettingsHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInSettingsHandle handle = new PacketPlayInSettingsHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -28,7 +25,7 @@ public class PacketPlayInSettingsHandle extends PacketHandle {
 
     public HumanHand getMainHand() {
         if (T.mainHand.isAvailable()) {
-            return T.mainHand.get(instance);
+            return T.mainHand.get(getRaw());
         } else {
             return HumanHand.RIGHT;
         }
@@ -36,47 +33,47 @@ public class PacketPlayInSettingsHandle extends PacketHandle {
 
     public void setMainHand(HumanHand mainHand) {
         if (T.mainHand.isAvailable()) {
-            T.mainHand.set(instance, mainHand);
+            T.mainHand.set(getRaw(), mainHand);
         }
     }
     public String getLang() {
-        return T.lang.get(instance);
+        return T.lang.get(getRaw());
     }
 
     public void setLang(String value) {
-        T.lang.set(instance, value);
+        T.lang.set(getRaw(), value);
     }
 
     public int getView() {
-        return T.view.getInteger(instance);
+        return T.view.getInteger(getRaw());
     }
 
     public void setView(int value) {
-        T.view.setInteger(instance, value);
+        T.view.setInteger(getRaw(), value);
     }
 
     public Object getChatVisibility() {
-        return T.chatVisibility.get(instance);
+        return T.chatVisibility.get(getRaw());
     }
 
     public void setChatVisibility(Object value) {
-        T.chatVisibility.set(instance, value);
+        T.chatVisibility.set(getRaw(), value);
     }
 
     public boolean isEnableColors() {
-        return T.enableColors.getBoolean(instance);
+        return T.enableColors.getBoolean(getRaw());
     }
 
     public void setEnableColors(boolean value) {
-        T.enableColors.setBoolean(instance, value);
+        T.enableColors.setBoolean(getRaw(), value);
     }
 
     public int getModelPartFlags() {
-        return T.modelPartFlags.getInteger(instance);
+        return T.modelPartFlags.getInteger(getRaw());
     }
 
     public void setModelPartFlags(int value) {
-        T.modelPartFlags.setInteger(instance, value);
+        T.modelPartFlags.setInteger(getRaw(), value);
     }
 
     /**

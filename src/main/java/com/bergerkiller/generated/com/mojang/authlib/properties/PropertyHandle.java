@@ -16,10 +16,7 @@ public class PropertyHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PropertyHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PropertyHandle handle = new PropertyHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PropertyHandle createNew(String name, String value) {
@@ -33,15 +30,15 @@ public class PropertyHandle extends Template.Handle {
     /* ============================================================================== */
 
     public String getName() {
-        return T.getName.invoke(instance);
+        return T.getName.invoke(getRaw());
     }
 
     public String getValue() {
-        return T.getValue.invoke(instance);
+        return T.getValue.invoke(getRaw());
     }
 
     public String getSignature() {
-        return T.getSignature.invoke(instance);
+        return T.getSignature.invoke(getRaw());
     }
 
     /**

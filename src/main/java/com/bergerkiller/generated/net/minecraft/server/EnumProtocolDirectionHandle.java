@@ -18,10 +18,7 @@ public class EnumProtocolDirectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumProtocolDirectionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumProtocolDirectionHandle handle = new EnumProtocolDirectionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

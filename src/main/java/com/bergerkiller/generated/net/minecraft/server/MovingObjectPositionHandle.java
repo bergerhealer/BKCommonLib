@@ -17,20 +17,17 @@ public class MovingObjectPositionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MovingObjectPositionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MovingObjectPositionHandle handle = new MovingObjectPositionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Vector getPos() {
-        return T.pos.get(instance);
+        return T.pos.get(getRaw());
     }
 
     public void setPos(Vector value) {
-        T.pos.set(instance, value);
+        T.pos.set(getRaw(), value);
     }
 
     /**

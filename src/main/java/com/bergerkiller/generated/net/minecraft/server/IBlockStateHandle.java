@@ -16,20 +16,17 @@ public class IBlockStateHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IBlockStateHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IBlockStateHandle handle = new IBlockStateHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public String getKeyToken() {
-        return T.getKeyToken.invoke(instance);
+        return T.getKeyToken.invoke(getRaw());
     }
 
     public String getValueToken(Object value) {
-        return T.getValueToken.invoke(instance, value);
+        return T.getValueToken.invoke(getRaw(), value);
     }
 
     /**

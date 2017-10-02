@@ -16,20 +16,17 @@ public class WorldDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static WorldDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldDataHandle handle = new WorldDataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public WorldTypeHandle getType() {
-        return T.getType.invoke(instance);
+        return T.getType.invoke(getRaw());
     }
 
     public void setClearTimer(int ticks) {
-        T.setClearTimer.invoke(instance, ticks);
+        T.setClearTimer.invoke(getRaw(), ticks);
     }
 
     /**

@@ -126,10 +126,10 @@ class World {
     <code>
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
         if (T.opt_applyPhysics.isAvailable()) {
-            T.opt_applyPhysics.invoke(instance, position, causeType, self);
+            T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
         } else if (T.opt_applyPhysics_old.isAvailable()) {
             // On older versions 'observer' blocks did not exist, and so the 'self' parameter is unused.
-            T.opt_applyPhysics_old.invoke(instance, position, causeType);
+            T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
         } else {
             throw new UnsupportedOperationException("Apply physics function not available on this server");
         }
@@ -140,7 +140,7 @@ class World {
 
     <code>
     public org.bukkit.World toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(instance);
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());
     }
 
     public static WorldHandle fromBukkit(org.bukkit.World world) {
@@ -172,11 +172,11 @@ class WorldServer extends World {
 
     public ChunkProviderServerHandle getChunkProviderServer() {
         if (T.getChunkProviderServer.isAvailable()) {
-            return T.getChunkProviderServer.invoke(instance);
+            return T.getChunkProviderServer.invoke(getRaw());
         } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
-            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(instance));
+            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(getRaw()));
         } else if (T.field_chunkProviderServer.isAvailable()) {
-            return T.field_chunkProviderServer.get(instance);   
+            return T.field_chunkProviderServer.get(getRaw());   
         } else {
             throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
         }
@@ -184,10 +184,10 @@ class WorldServer extends World {
 
     public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
         if (T.field_chunkProviderServer.isAvailable()) {
-            T.field_chunkProviderServer.set(instance, chunkProviderServerHandle);
+            T.field_chunkProviderServer.set(getRaw(), chunkProviderServerHandle);
         }
         if (WorldHandle.T.field_chunkProvider.isAvailable()) {
-            WorldHandle.T.field_chunkProvider.set(instance, chunkProviderServerHandle.getRaw());
+            WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
     </code>
@@ -222,9 +222,9 @@ class ChunkProviderServer {
     <code>
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
-            T.saveChunk_new.invoke(instance, chunk);
+            T.saveChunk_new.invoke(getRaw(), chunk);
         } else {
-            T.saveChunk_old.invoke(instance, chunk, false);
+            T.saveChunk_old.invoke(getRaw(), chunk, false);
         }
     }
     </code>
@@ -251,7 +251,7 @@ class WorldProvider {
     private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
 
     public boolean hasSkyLight() {
-        return T.int_skyLightProperty.invoke(instance).booleanValue() != _darkInverted;
+        return T.int_skyLightProperty.invoke(getRaw()).booleanValue() != _darkInverted;
     }
 
     public boolean isDarkWorld() {
@@ -324,9 +324,9 @@ class ChunkRegionLoader {
 <code>
     public boolean chunkExists(org.bukkit.World world, int cx, int cz) {
         if (T.opt_chunkExists_old.isAvailable()) {
-            return T.opt_chunkExists_old.invoke(instance, world, cx, cz);
+            return T.opt_chunkExists_old.invoke(getRaw(), world, cx, cz);
         } else {
-            return T.opt_chunkExists.invoke(instance, cx, cz);
+            return T.opt_chunkExists.invoke(getRaw(), cx, cz);
         }
     }
 </code>

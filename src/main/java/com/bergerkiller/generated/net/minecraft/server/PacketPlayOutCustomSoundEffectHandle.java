@@ -18,68 +18,65 @@ public class PacketPlayOutCustomSoundEffectHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutCustomSoundEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutCustomSoundEffectHandle handle = new PacketPlayOutCustomSoundEffectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public ResourceKey getSound() {
-        return T.sound.get(instance);
+        return T.sound.get(getRaw());
     }
 
     public void setSound(ResourceKey value) {
-        T.sound.set(instance, value);
+        T.sound.set(getRaw(), value);
     }
 
     public String getCategory() {
-        return T.category.get(instance);
+        return T.category.get(getRaw());
     }
 
     public void setCategory(String value) {
-        T.category.set(instance, value);
+        T.category.set(getRaw(), value);
     }
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getY() {
-        return T.y.getInteger(instance);
+        return T.y.getInteger(getRaw());
     }
 
     public void setY(int value) {
-        T.y.setInteger(instance, value);
+        T.y.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     public float getVolume() {
-        return T.volume.getFloat(instance);
+        return T.volume.getFloat(getRaw());
     }
 
     public void setVolume(float value) {
-        T.volume.setFloat(instance, value);
+        T.volume.setFloat(getRaw(), value);
     }
 
     public float getPitch() {
-        return T.pitch.getFloat(instance);
+        return T.pitch.getFloat(getRaw());
     }
 
     public void setPitch(float value) {
-        T.pitch.setFloat(instance, value);
+        T.pitch.setFloat(getRaw(), value);
     }
 
     /**

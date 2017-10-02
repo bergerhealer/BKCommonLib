@@ -19,76 +19,73 @@ public class PacketPlayOutLoginHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutLoginHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutLoginHandle handle = new PacketPlayOutLoginHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getPlayerId() {
-        return T.playerId.getInteger(instance);
+        return T.playerId.getInteger(getRaw());
     }
 
     public void setPlayerId(int value) {
-        T.playerId.setInteger(instance, value);
+        T.playerId.setInteger(getRaw(), value);
     }
 
     public boolean isHardcore() {
-        return T.hardcore.getBoolean(instance);
+        return T.hardcore.getBoolean(getRaw());
     }
 
     public void setHardcore(boolean value) {
-        T.hardcore.setBoolean(instance, value);
+        T.hardcore.setBoolean(getRaw(), value);
     }
 
     public GameMode getGameMode() {
-        return T.gameMode.get(instance);
+        return T.gameMode.get(getRaw());
     }
 
     public void setGameMode(GameMode value) {
-        T.gameMode.set(instance, value);
+        T.gameMode.set(getRaw(), value);
     }
 
     public int getDimension() {
-        return T.dimension.getInteger(instance);
+        return T.dimension.getInteger(getRaw());
     }
 
     public void setDimension(int value) {
-        T.dimension.setInteger(instance, value);
+        T.dimension.setInteger(getRaw(), value);
     }
 
     public Difficulty getDifficulty() {
-        return T.difficulty.get(instance);
+        return T.difficulty.get(getRaw());
     }
 
     public void setDifficulty(Difficulty value) {
-        T.difficulty.set(instance, value);
+        T.difficulty.set(getRaw(), value);
     }
 
     public int getMaxPlayers() {
-        return T.maxPlayers.getInteger(instance);
+        return T.maxPlayers.getInteger(getRaw());
     }
 
     public void setMaxPlayers(int value) {
-        T.maxPlayers.setInteger(instance, value);
+        T.maxPlayers.setInteger(getRaw(), value);
     }
 
     public WorldType getWorldType() {
-        return T.worldType.get(instance);
+        return T.worldType.get(getRaw());
     }
 
     public void setWorldType(WorldType value) {
-        T.worldType.set(instance, value);
+        T.worldType.set(getRaw(), value);
     }
 
     public boolean isUnknown1() {
-        return T.unknown1.getBoolean(instance);
+        return T.unknown1.getBoolean(getRaw());
     }
 
     public void setUnknown1(boolean value) {
-        T.unknown1.setBoolean(instance, value);
+        T.unknown1.setBoolean(getRaw(), value);
     }
 
     /**

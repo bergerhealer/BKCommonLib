@@ -21,40 +21,37 @@ public class EntityLivingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static EntityLivingHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityLivingHandle handle = new EntityLivingHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Collection<MobEffectHandle> getEffects() {
-        return T.getEffects.invoke(instance);
+        return T.getEffects.invoke(getRaw());
     }
 
     public ItemStack getEquipment(EquipmentSlot paramEnumItemSlot) {
-        return T.getEquipment.invoke(instance, paramEnumItemSlot);
+        return T.getEquipment.invoke(getRaw(), paramEnumItemSlot);
     }
 
     public void resetAttributes() {
-        T.resetAttributes.invoke(instance);
+        T.resetAttributes.invoke(getRaw());
     }
 
     public AttributeMapServerHandle getAttributeMap() {
-        return T.getAttributeMap.invoke(instance);
+        return T.getAttributeMap.invoke(getRaw());
     }
 
     public AttributeInstanceHandle getAttributeInstance(Object iattribute) {
-        return T.getAttributeInstance.invoke(instance, iattribute);
+        return T.getAttributeInstance.invoke(getRaw(), iattribute);
     }
 
     public float getHealth() {
-        return T.getHealth.invoke(instance);
+        return T.getHealth.invoke(getRaw());
     }
 
     public float getMaxHealth() {
-        return T.getMaxHealth.invoke(instance);
+        return T.getMaxHealth.invoke(getRaw());
     }
 
 
@@ -69,43 +66,43 @@ public class EntityLivingHandle extends EntityHandle {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
     }
     public AttributeMapServerHandle getAttributeMapField() {
-        return T.attributeMapField.get(instance);
+        return T.attributeMapField.get(getRaw());
     }
 
     public void setAttributeMapField(AttributeMapServerHandle value) {
-        T.attributeMapField.set(instance, value);
+        T.attributeMapField.set(getRaw(), value);
     }
 
     public Map<MobEffectListHandle, MobEffectHandle> getMobEffects() {
-        return T.mobEffects.get(instance);
+        return T.mobEffects.get(getRaw());
     }
 
     public void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value) {
-        T.mobEffects.set(instance, value);
+        T.mobEffects.set(getRaw(), value);
     }
 
     public float getLastDamage() {
-        return T.lastDamage.getFloat(instance);
+        return T.lastDamage.getFloat(getRaw());
     }
 
     public void setLastDamage(float value) {
-        T.lastDamage.setFloat(instance, value);
+        T.lastDamage.setFloat(getRaw(), value);
     }
 
     public float getForwardMovement() {
-        return T.forwardMovement.getFloat(instance);
+        return T.forwardMovement.getFloat(getRaw());
     }
 
     public void setForwardMovement(float value) {
-        T.forwardMovement.setFloat(instance, value);
+        T.forwardMovement.setFloat(getRaw(), value);
     }
 
     public boolean isUpdateEffects() {
-        return T.updateEffects.getBoolean(instance);
+        return T.updateEffects.getBoolean(getRaw());
     }
 
     public void setUpdateEffects(boolean value) {
-        T.updateEffects.setBoolean(instance, value);
+        T.updateEffects.setBoolean(getRaw(), value);
     }
 
     /**

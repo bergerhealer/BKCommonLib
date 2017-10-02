@@ -18,10 +18,7 @@ public class LongObjectHashMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static LongObjectHashMapHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        LongObjectHashMapHandle handle = new LongObjectHashMapHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final LongObjectHashMapHandle createNew() {
@@ -31,31 +28,31 @@ public class LongObjectHashMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public int size() {
-        return T.size.invoke(instance);
+        return T.size.invoke(getRaw());
     }
 
     public boolean containsKey(long key) {
-        return T.containsKey.invoke(instance, key);
+        return T.containsKey.invoke(getRaw(), key);
     }
 
     public Object get(long key) {
-        return T.get.invoke(instance, key);
+        return T.get.invoke(getRaw(), key);
     }
 
     public Object remove(long key) {
-        return T.remove.invoke(instance, key);
+        return T.remove.invoke(getRaw(), key);
     }
 
     public Object put(long key, Object value) {
-        return T.put.invoke(instance, key, value);
+        return T.put.invoke(getRaw(), key, value);
     }
 
     public Collection<Object> values() {
-        return T.values.invoke(instance);
+        return T.values.invoke(getRaw());
     }
 
     public Set<Long> keySet() {
-        return T.keySet.invoke(instance);
+        return T.keySet.invoke(getRaw());
     }
 
     /**

@@ -16,10 +16,7 @@ public class ChunkCoordIntPairHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChunkCoordIntPairHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChunkCoordIntPairHandle handle = new ChunkCoordIntPairHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final ChunkCoordIntPairHandle createNew(int x, int z) {
@@ -29,19 +26,19 @@ public class ChunkCoordIntPairHandle extends Template.Handle {
     /* ============================================================================== */
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     /**

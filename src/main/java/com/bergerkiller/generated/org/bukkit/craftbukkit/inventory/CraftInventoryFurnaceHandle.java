@@ -17,10 +17,7 @@ public class CraftInventoryFurnaceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftInventoryFurnaceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftInventoryFurnaceHandle handle = new CraftInventoryFurnaceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final FurnaceInventory createNew(Object nmsTileEntityFurnace) {

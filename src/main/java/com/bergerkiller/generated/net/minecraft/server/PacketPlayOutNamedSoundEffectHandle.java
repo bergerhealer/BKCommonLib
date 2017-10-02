@@ -17,10 +17,7 @@ public class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutNamedSoundEffectHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutNamedSoundEffectHandle handle = new PacketPlayOutNamedSoundEffectHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -28,24 +25,24 @@ public class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
 
     public float getPitch() {
         if (T.pitch_1_10_2.isAvailable()) {
-            return T.pitch_1_10_2.getFloat(instance);
+            return T.pitch_1_10_2.getFloat(getRaw());
         } else {
-            return (float) T.pitch_1_8_8.getInteger(instance) / 63.0f;
+            return (float) T.pitch_1_8_8.getInteger(getRaw()) / 63.0f;
         }
     }
 
     public void setPitch(float pitch) {
         if (T.pitch_1_10_2.isAvailable()) {
-            T.pitch_1_10_2.setFloat(instance, pitch);
+            T.pitch_1_10_2.setFloat(getRaw(), pitch);
         } else {
-            T.pitch_1_8_8.setInteger(instance, (int) (pitch * 63.0f));
+            T.pitch_1_8_8.setInteger(getRaw(), (int) (pitch * 63.0f));
         }
     }
 
 
     public String getCategory() {
         if (T.category_1_10_2.isAvailable()) {
-            return T.category_1_10_2.get(instance);
+            return T.category_1_10_2.get(getRaw());
         } else {
             return "master";
         }
@@ -53,48 +50,48 @@ public class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
 
     public void setCategory(String categoryName) {
         if (T.category_1_10_2.isAvailable()) {
-            T.category_1_10_2.set(instance, categoryName);
+            T.category_1_10_2.set(getRaw(), categoryName);
         } else {
         }
     }
     public ResourceKey getSound() {
-        return T.sound.get(instance);
+        return T.sound.get(getRaw());
     }
 
     public void setSound(ResourceKey value) {
-        T.sound.set(instance, value);
+        T.sound.set(getRaw(), value);
     }
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getY() {
-        return T.y.getInteger(instance);
+        return T.y.getInteger(getRaw());
     }
 
     public void setY(int value) {
-        T.y.setInteger(instance, value);
+        T.y.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     public float getVolume() {
-        return T.volume.getFloat(instance);
+        return T.volume.getFloat(getRaw());
     }
 
     public void setVolume(float value) {
-        T.volume.setFloat(instance, value);
+        T.volume.setFloat(getRaw(), value);
     }
 
     /**

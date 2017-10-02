@@ -16,10 +16,7 @@ public class PacketPlayOutEntityDestroyHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutEntityDestroyHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutEntityDestroyHandle handle = new PacketPlayOutEntityDestroyHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutEntityDestroyHandle createNew(int[] entityIds) {
@@ -29,11 +26,11 @@ public class PacketPlayOutEntityDestroyHandle extends PacketHandle {
     /* ============================================================================== */
 
     public int[] getEntityIds() {
-        return T.entityIds.get(instance);
+        return T.entityIds.get(getRaw());
     }
 
     public void setEntityIds(int[] value) {
-        T.entityIds.set(instance, value);
+        T.entityIds.set(getRaw(), value);
     }
 
     /**

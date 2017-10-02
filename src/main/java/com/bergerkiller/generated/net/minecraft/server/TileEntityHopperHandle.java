@@ -16,10 +16,7 @@ public class TileEntityHopperHandle extends TileEntityHandle {
     /* ============================================================================== */
 
     public static TileEntityHopperHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        TileEntityHopperHandle handle = new TileEntityHopperHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

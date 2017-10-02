@@ -18,10 +18,7 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutMapChunkHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutMapChunkHandle handle = new PacketPlayOutMapChunkHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -29,39 +26,39 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
 
     public int getSectionsMask() {
         if (T.sectionsMask.isAvailable()) {
-            return T.sectionsMask.get(instance);
+            return T.sectionsMask.get(getRaw());
         } else {
-            return T.chunkInfo.get(instance).getSectionsMask();
+            return T.chunkInfo.get(getRaw()).getSectionsMask();
         }
     }
 
     public void setSectionsMask(int sectionsMask) {
         if (T.sectionsMask.isAvailable()) {
-            T.sectionsMask.set(instance, sectionsMask);
+            T.sectionsMask.set(getRaw(), sectionsMask);
         } else {
-            T.chunkInfo.get(instance).setSectionsMask(sectionsMask);
+            T.chunkInfo.get(getRaw()).setSectionsMask(sectionsMask);
         }
     }
 
     public byte[] getData() {
         if (T.data.isAvailable()) {
-            return T.data.get(instance);
+            return T.data.get(getRaw());
         } else {
-            return T.chunkInfo.get(instance).getData();
+            return T.chunkInfo.get(getRaw()).getData();
         }
     }
 
     public void setData(byte[] data) {
         if (T.data.isAvailable()) {
-            T.data.set(instance, data);
+            T.data.set(getRaw(), data);
         } else {
-            T.chunkInfo.get(instance).setData(data);
+            T.chunkInfo.get(getRaw()).setData(data);
         }
     }
 
     public List<CommonTagCompound> getTags() {
         if (T.tags.isAvailable()) {
-            return T.tags.get(instance);
+            return T.tags.get(getRaw());
         } else {
             return java.util.Collections.emptyList();
         }
@@ -69,7 +66,7 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
 
     public void setTags(List<CommonTagCompound> tags) {
         if (T.tags.isAvailable()) {
-            T.tags.set(instance, tags);
+            T.tags.set(getRaw(), tags);
         } else {
         }
     }
@@ -84,27 +81,27 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
         }
     }
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     public boolean isHasBiomeData() {
-        return T.hasBiomeData.getBoolean(instance);
+        return T.hasBiomeData.getBoolean(getRaw());
     }
 
     public void setHasBiomeData(boolean value) {
-        T.hasBiomeData.setBoolean(instance, value);
+        T.hasBiomeData.setBoolean(getRaw(), value);
     }
 
     /**
@@ -146,28 +143,25 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static ChunkMapHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            ChunkMapHandle handle = new ChunkMapHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */
 
         public byte[] getData() {
-            return T.data.get(instance);
+            return T.data.get(getRaw());
         }
 
         public void setData(byte[] value) {
-            T.data.set(instance, value);
+            T.data.set(getRaw(), value);
         }
 
         public int getSectionsMask() {
-            return T.sectionsMask.getInteger(instance);
+            return T.sectionsMask.getInteger(getRaw());
         }
 
         public void setSectionsMask(int value) {
-            T.sectionsMask.setInteger(instance, value);
+            T.sectionsMask.setInteger(getRaw(), value);
         }
 
         /**

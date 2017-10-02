@@ -18,10 +18,7 @@ public class RecipesFurnaceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RecipesFurnaceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RecipesFurnaceHandle handle = new RecipesFurnaceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -31,15 +28,15 @@ public class RecipesFurnaceHandle extends Template.Handle {
     }
 
     public ItemStackHandle getResult(ItemStackHandle itemstack) {
-        return T.getResult.invoke(instance, itemstack);
+        return T.getResult.invoke(getRaw(), itemstack);
     }
 
     public Map<ItemStack, ItemStack> getRecipes() {
-        return T.recipes.get(instance);
+        return T.recipes.get(getRaw());
     }
 
     public void setRecipes(Map<ItemStack, ItemStack> value) {
-        T.recipes.set(instance, value);
+        T.recipes.set(getRaw(), value);
     }
 
     /**

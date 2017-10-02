@@ -19,24 +19,21 @@ public class CraftServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftServerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftServerHandle handle = new CraftServerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public SimpleCommandMap getCommandMap() {
-        return T.getCommandMap.invoke(instance);
+        return T.getCommandMap.invoke(getRaw());
     }
 
     public DedicatedPlayerListHandle getPlayerList() {
-        return T.getPlayerList.invoke(instance);
+        return T.getPlayerList.invoke(getRaw());
     }
 
     public MinecraftServerHandle getServer() {
-        return T.getServer.invoke(instance);
+        return T.getServer.invoke(getRaw());
     }
 
 

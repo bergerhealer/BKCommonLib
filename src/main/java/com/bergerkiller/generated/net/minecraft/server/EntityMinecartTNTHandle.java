@@ -16,28 +16,25 @@ public class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
     /* ============================================================================== */
 
     public static EntityMinecartTNTHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartTNTHandle handle = new EntityMinecartTNTHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void explode(double damage) {
-        T.explode.invoke(instance, damage);
+        T.explode.invoke(getRaw(), damage);
     }
 
     public void prime() {
-        T.prime.invoke(instance);
+        T.prime.invoke(getRaw());
     }
 
     public int getFuse() {
-        return T.fuse.getInteger(instance);
+        return T.fuse.getInteger(getRaw());
     }
 
     public void setFuse(int value) {
-        T.fuse.setInteger(instance, value);
+        T.fuse.setInteger(getRaw(), value);
     }
 
     /**

@@ -17,10 +17,7 @@ public class EntityTypesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntityTypesHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityTypesHandle handle = new EntityTypesHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

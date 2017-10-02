@@ -17,10 +17,7 @@ public class AttributeMapServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static AttributeMapServerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        AttributeMapServerHandle handle = new AttributeMapServerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final AttributeMapServerHandle createNew() {
@@ -30,7 +27,7 @@ public class AttributeMapServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public Collection<Object> attributes() {
-        return T.attributes.invoke(instance);
+        return T.attributes.invoke(getRaw());
     }
 
     /**

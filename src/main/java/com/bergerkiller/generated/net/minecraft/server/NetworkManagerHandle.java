@@ -17,24 +17,21 @@ public class NetworkManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static NetworkManagerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NetworkManagerHandle handle = new NetworkManagerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean isConnected() {
-        return T.isConnected.invoke(instance);
+        return T.isConnected.invoke(getRaw());
     }
 
     public Channel getChannel() {
-        return T.channel.get(instance);
+        return T.channel.get(getRaw());
     }
 
     public void setChannel(Channel value) {
-        T.channel.set(instance, value);
+        T.channel.set(getRaw(), value);
     }
 
     /**

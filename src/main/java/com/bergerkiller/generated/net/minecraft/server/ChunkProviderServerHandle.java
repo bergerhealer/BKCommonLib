@@ -19,52 +19,49 @@ public class ChunkProviderServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChunkProviderServerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChunkProviderServerHandle handle = new ChunkProviderServerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public List<BiomeMetaHandle> getBiomeSpawnInfo(Object enumcreaturetype, IntVector3 position) {
-        return T.getBiomeSpawnInfo.invoke(instance, enumcreaturetype, position);
+        return T.getBiomeSpawnInfo.invoke(getRaw(), enumcreaturetype, position);
     }
 
     public boolean isLoaded(int cx, int cz) {
-        return T.isLoaded.invoke(instance, cx, cz);
+        return T.isLoaded.invoke(getRaw(), cx, cz);
     }
 
     public ChunkHandle getChunkIfLoaded(int cx, int cz) {
-        return T.getChunkIfLoaded.invoke(instance, cx, cz);
+        return T.getChunkIfLoaded.invoke(getRaw(), cx, cz);
     }
 
     public ChunkHandle getChunkAt(int cx, int cz) {
-        return T.getChunkAt.invoke(instance, cx, cz);
+        return T.getChunkAt.invoke(getRaw(), cx, cz);
     }
 
 
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
-            T.saveChunk_new.invoke(instance, chunk);
+            T.saveChunk_new.invoke(getRaw(), chunk);
         } else {
-            T.saveChunk_old.invoke(instance, chunk, false);
+            T.saveChunk_old.invoke(getRaw(), chunk, false);
         }
     }
     public Object getChunkLoader() {
-        return T.chunkLoader.get(instance);
+        return T.chunkLoader.get(getRaw());
     }
 
     public void setChunkLoader(Object value) {
-        T.chunkLoader.set(instance, value);
+        T.chunkLoader.set(getRaw(), value);
     }
 
     public WorldServerHandle getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(WorldServerHandle value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     /**

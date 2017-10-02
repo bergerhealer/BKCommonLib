@@ -34,7 +34,7 @@ class NBTTagCompound extends NBTBase {
 
     <code>
     public int size() {
-        return ((java.util.Map<?, ?>) T.map.raw.get(instance)).size();
+        return ((java.util.Map<?, ?>) T.map.raw.get(getRaw())).size();
     }
     </code>
 }

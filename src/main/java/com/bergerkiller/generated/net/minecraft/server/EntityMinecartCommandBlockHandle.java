@@ -17,10 +17,7 @@ public class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHand
     /* ============================================================================== */
 
     public static EntityMinecartCommandBlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartCommandBlockHandle handle = new EntityMinecartCommandBlockHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

@@ -17,10 +17,7 @@ public class PacketPlayOutMountHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutMountHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutMountHandle handle = new PacketPlayOutMountHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutMountHandle createNew() {
@@ -37,19 +34,19 @@ public class PacketPlayOutMountHandle extends PacketHandle {
         return handle;
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public int[] getMountedEntityIds() {
-        return T.mountedEntityIds.get(instance);
+        return T.mountedEntityIds.get(getRaw());
     }
 
     public void setMountedEntityIds(int[] value) {
-        T.mountedEntityIds.set(instance, value);
+        T.mountedEntityIds.set(getRaw(), value);
     }
 
     /**

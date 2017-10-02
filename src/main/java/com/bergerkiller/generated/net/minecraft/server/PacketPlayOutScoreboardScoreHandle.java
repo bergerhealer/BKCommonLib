@@ -16,10 +16,7 @@ public class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutScoreboardScoreHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutScoreboardScoreHandle handle = new PacketPlayOutScoreboardScoreHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -47,10 +44,7 @@ public class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static EnumScoreboardActionHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            EnumScoreboardActionHandle handle = new EnumScoreboardActionHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

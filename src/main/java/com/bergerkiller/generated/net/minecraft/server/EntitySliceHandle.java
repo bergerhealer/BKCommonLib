@@ -18,10 +18,7 @@ public class EntitySliceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntitySliceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntitySliceHandle handle = new EntitySliceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final EntitySliceHandle createNew(Class<?> oclass) {
@@ -31,19 +28,19 @@ public class EntitySliceHandle extends Template.Handle {
     /* ============================================================================== */
 
     public boolean add(Object value) {
-        return T.add.invoke(instance, value);
+        return T.add.invoke(getRaw(), value);
     }
 
     public boolean remove(Object value) {
-        return T.remove.invoke(instance, value);
+        return T.remove.invoke(getRaw(), value);
     }
 
     public List<Object> getListValues() {
-        return T.listValues.get(instance);
+        return T.listValues.get(getRaw());
     }
 
     public void setListValues(List<Object> value) {
-        T.listValues.set(instance, value);
+        T.listValues.set(getRaw(), value);
     }
 
     /**

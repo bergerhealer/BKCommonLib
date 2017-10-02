@@ -19,22 +19,19 @@ public class EnumProtocolHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumProtocolHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumProtocolHandle handle = new EnumProtocolHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     @SuppressWarnings("rawtypes")
     public Map<EnumProtocolDirectionHandle, BiMap> getPacketMap() {
-        return T.packetMap.get(instance);
+        return T.packetMap.get(getRaw());
     }
 
     @SuppressWarnings("rawtypes")
     public void setPacketMap(Map<EnumProtocolDirectionHandle, BiMap> value) {
-        T.packetMap.set(instance, value);
+        T.packetMap.set(getRaw(), value);
     }
 
     /**

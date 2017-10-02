@@ -17,10 +17,7 @@ public class SoundCategoryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SoundCategoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        SoundCategoryHandle handle = new SoundCategoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -30,7 +27,7 @@ public class SoundCategoryHandle extends Template.Handle {
     }
 
     public String getName() {
-        return T.getName.invoke(instance);
+        return T.getName.invoke(getRaw());
     }
 
     /**

@@ -19,10 +19,7 @@ public class CraftEntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftEntityHandle handle = new CraftEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -32,19 +29,19 @@ public class CraftEntityHandle extends Template.Handle {
     }
 
     public void setHandle(EntityHandle entity) {
-        T.setHandle.invoke(instance, entity);
+        T.setHandle.invoke(getRaw(), entity);
     }
 
     public Object getHandle() {
-        return T.getHandle.invoke(instance);
+        return T.getHandle.invoke(getRaw());
     }
 
     public EntityHandle getEntityHandle() {
-        return T.entityHandle.get(instance);
+        return T.entityHandle.get(getRaw());
     }
 
     public void setEntityHandle(EntityHandle value) {
-        T.entityHandle.set(instance, value);
+        T.entityHandle.set(getRaw(), value);
     }
 
     /**

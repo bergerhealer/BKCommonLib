@@ -18,84 +18,81 @@ public class PacketPlayOutBossHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutBossHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutBossHandle handle = new PacketPlayOutBossHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public UUID getEntityUUID() {
-        return T.entityUUID.get(instance);
+        return T.entityUUID.get(getRaw());
     }
 
     public void setEntityUUID(UUID value) {
-        T.entityUUID.set(instance, value);
+        T.entityUUID.set(getRaw(), value);
     }
 
     public Object getAction() {
-        return T.action.get(instance);
+        return T.action.get(getRaw());
     }
 
     public void setAction(Object value) {
-        T.action.set(instance, value);
+        T.action.set(getRaw(), value);
     }
 
     public Object getChat() {
-        return T.chat.get(instance);
+        return T.chat.get(getRaw());
     }
 
     public void setChat(Object value) {
-        T.chat.set(instance, value);
+        T.chat.set(getRaw(), value);
     }
 
     public float getProgress() {
-        return T.progress.getFloat(instance);
+        return T.progress.getFloat(getRaw());
     }
 
     public void setProgress(float value) {
-        T.progress.setFloat(instance, value);
+        T.progress.setFloat(getRaw(), value);
     }
 
     public Object getBossBarColor() {
-        return T.bossBarColor.get(instance);
+        return T.bossBarColor.get(getRaw());
     }
 
     public void setBossBarColor(Object value) {
-        T.bossBarColor.set(instance, value);
+        T.bossBarColor.set(getRaw(), value);
     }
 
     public Object getBossBarStyle() {
-        return T.bossBarStyle.get(instance);
+        return T.bossBarStyle.get(getRaw());
     }
 
     public void setBossBarStyle(Object value) {
-        T.bossBarStyle.set(instance, value);
+        T.bossBarStyle.set(getRaw(), value);
     }
 
     public boolean isUnknown1() {
-        return T.unknown1.getBoolean(instance);
+        return T.unknown1.getBoolean(getRaw());
     }
 
     public void setUnknown1(boolean value) {
-        T.unknown1.setBoolean(instance, value);
+        T.unknown1.setBoolean(getRaw(), value);
     }
 
     public boolean isUnknown2() {
-        return T.unknown2.getBoolean(instance);
+        return T.unknown2.getBoolean(getRaw());
     }
 
     public void setUnknown2(boolean value) {
-        T.unknown2.setBoolean(instance, value);
+        T.unknown2.setBoolean(getRaw(), value);
     }
 
     public boolean isUnknown3() {
-        return T.unknown3.getBoolean(instance);
+        return T.unknown3.getBoolean(getRaw());
     }
 
     public void setUnknown3(boolean value) {
-        T.unknown3.setBoolean(instance, value);
+        T.unknown3.setBoolean(getRaw(), value);
     }
 
     /**

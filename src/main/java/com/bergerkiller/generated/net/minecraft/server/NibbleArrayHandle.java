@@ -16,10 +16,7 @@ public class NibbleArrayHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static NibbleArrayHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NibbleArrayHandle handle = new NibbleArrayHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final NibbleArrayHandle createNew() {
@@ -33,19 +30,19 @@ public class NibbleArrayHandle extends Template.Handle {
     /* ============================================================================== */
 
     public int get(int x, int y, int z) {
-        return T.get.invoke(instance, x, y, z);
+        return T.get.invoke(getRaw(), x, y, z);
     }
 
     public void set(int x, int y, int z, int nibbleValue) {
-        T.set.invoke(instance, x, y, z, nibbleValue);
+        T.set.invoke(getRaw(), x, y, z, nibbleValue);
     }
 
     public byte[] getData() {
-        return T.data.get(instance);
+        return T.data.get(getRaw());
     }
 
     public void setData(byte[] value) {
-        T.data.set(instance, value);
+        T.data.set(getRaw(), value);
     }
 
     /**

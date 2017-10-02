@@ -17,20 +17,17 @@ public class FoodMetaDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static FoodMetaDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        FoodMetaDataHandle handle = new FoodMetaDataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void loadFromNBT(CommonTagCompound compound) {
-        T.loadFromNBT.invoke(instance, compound);
+        T.loadFromNBT.invoke(getRaw(), compound);
     }
 
     public void saveToNBT(CommonTagCompound compound) {
-        T.saveToNBT.invoke(instance, compound);
+        T.saveToNBT.invoke(getRaw(), compound);
     }
 
     /**

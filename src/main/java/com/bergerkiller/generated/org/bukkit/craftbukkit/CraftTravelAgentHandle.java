@@ -19,10 +19,7 @@ public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     /* ============================================================================== */
 
     public static CraftTravelAgentHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftTravelAgentHandle handle = new CraftTravelAgentHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final CraftTravelAgentHandle createNew(World worldserver) {
@@ -32,11 +29,11 @@ public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     /* ============================================================================== */
 
     public void setCanCreatePortal(boolean create) {
-        T.setCanCreatePortal.invoke(instance, create);
+        T.setCanCreatePortal.invoke(getRaw(), create);
     }
 
     public Location findOrCreate(Location target) {
-        return T.findOrCreate.invoke(instance, target);
+        return T.findOrCreate.invoke(getRaw(), target);
     }
 
     /**

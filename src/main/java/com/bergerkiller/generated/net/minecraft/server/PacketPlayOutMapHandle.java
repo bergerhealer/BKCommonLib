@@ -17,76 +17,73 @@ public class PacketPlayOutMapHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutMapHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutMapHandle handle = new PacketPlayOutMapHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getItemId() {
-        return T.itemId.getInteger(instance);
+        return T.itemId.getInteger(getRaw());
     }
 
     public void setItemId(int value) {
-        T.itemId.setInteger(instance, value);
+        T.itemId.setInteger(getRaw(), value);
     }
 
     public byte getScale() {
-        return T.scale.getByte(instance);
+        return T.scale.getByte(getRaw());
     }
 
     public void setScale(byte value) {
-        T.scale.setByte(instance, value);
+        T.scale.setByte(getRaw(), value);
     }
 
     public MapCursor[] getCursors() {
-        return T.cursors.get(instance);
+        return T.cursors.get(getRaw());
     }
 
     public void setCursors(MapCursor[] value) {
-        T.cursors.set(instance, value);
+        T.cursors.set(getRaw(), value);
     }
 
     public int getXmin() {
-        return T.xmin.getInteger(instance);
+        return T.xmin.getInteger(getRaw());
     }
 
     public void setXmin(int value) {
-        T.xmin.setInteger(instance, value);
+        T.xmin.setInteger(getRaw(), value);
     }
 
     public int getYmin() {
-        return T.ymin.getInteger(instance);
+        return T.ymin.getInteger(getRaw());
     }
 
     public void setYmin(int value) {
-        T.ymin.setInteger(instance, value);
+        T.ymin.setInteger(getRaw(), value);
     }
 
     public int getWidth() {
-        return T.width.getInteger(instance);
+        return T.width.getInteger(getRaw());
     }
 
     public void setWidth(int value) {
-        T.width.setInteger(instance, value);
+        T.width.setInteger(getRaw(), value);
     }
 
     public int getHeight() {
-        return T.height.getInteger(instance);
+        return T.height.getInteger(getRaw());
     }
 
     public void setHeight(int value) {
-        T.height.setInteger(instance, value);
+        T.height.setInteger(getRaw(), value);
     }
 
     public byte[] getPixels() {
-        return T.pixels.get(instance);
+        return T.pixels.get(getRaw());
     }
 
     public void setPixels(byte[] value) {
-        T.pixels.set(instance, value);
+        T.pixels.set(getRaw(), value);
     }
 
     /**

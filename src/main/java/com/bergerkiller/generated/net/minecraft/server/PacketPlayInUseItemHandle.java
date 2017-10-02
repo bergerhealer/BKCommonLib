@@ -18,60 +18,57 @@ public class PacketPlayInUseItemHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInUseItemHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInUseItemHandle handle = new PacketPlayInUseItemHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public IntVector3 getPosition() {
-        return T.position.get(instance);
+        return T.position.get(getRaw());
     }
 
     public void setPosition(IntVector3 value) {
-        T.position.set(instance, value);
+        T.position.set(getRaw(), value);
     }
 
     public Object getDirection() {
-        return T.direction.get(instance);
+        return T.direction.get(getRaw());
     }
 
     public void setDirection(Object value) {
-        T.direction.set(instance, value);
+        T.direction.set(getRaw(), value);
     }
 
     public Object getEnumHand() {
-        return T.enumHand.get(instance);
+        return T.enumHand.get(getRaw());
     }
 
     public void setEnumHand(Object value) {
-        T.enumHand.set(instance, value);
+        T.enumHand.set(getRaw(), value);
     }
 
     public float getUnknown1() {
-        return T.unknown1.getFloat(instance);
+        return T.unknown1.getFloat(getRaw());
     }
 
     public void setUnknown1(float value) {
-        T.unknown1.setFloat(instance, value);
+        T.unknown1.setFloat(getRaw(), value);
     }
 
     public float getUnknown2() {
-        return T.unknown2.getFloat(instance);
+        return T.unknown2.getFloat(getRaw());
     }
 
     public void setUnknown2(float value) {
-        T.unknown2.setFloat(instance, value);
+        T.unknown2.setFloat(getRaw(), value);
     }
 
     public float getUnknown3() {
-        return T.unknown3.getFloat(instance);
+        return T.unknown3.getFloat(getRaw());
     }
 
     public void setUnknown3(float value) {
-        T.unknown3.setFloat(instance, value);
+        T.unknown3.setFloat(getRaw(), value);
     }
 
     /**

@@ -20,30 +20,27 @@ public class PlayerChunkHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PlayerChunkHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerChunkHandle handle = new PlayerChunkHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void addPlayer(Player player) {
-        T.addPlayer.invoke(instance, player);
+        T.addPlayer.invoke(getRaw(), player);
     }
 
     public void removePlayer(Player player) {
-        T.removePlayer.invoke(instance, player);
+        T.removePlayer.invoke(getRaw(), player);
     }
 
     public void sendChunk(Player player) {
-        T.sendChunk.invoke(instance, player);
+        T.sendChunk.invoke(getRaw(), player);
     }
 
 
     public org.bukkit.Chunk getChunk(org.bukkit.World world) {
         if (T.opt_loaded_chunk.isAvailable()) {
-            return T.opt_loaded_chunk.get(instance);
+            return T.opt_loaded_chunk.get(getRaw());
         } else {
             IntVector2 loc = this.getLocation();
             if (world.isChunkLoaded(loc.x, loc.z)) {
@@ -54,51 +51,51 @@ public class PlayerChunkHandle extends Template.Handle {
         }
     }
     public PlayerChunkMapHandle getPlayerChunkMap() {
-        return T.playerChunkMap.get(instance);
+        return T.playerChunkMap.get(getRaw());
     }
 
     public void setPlayerChunkMap(PlayerChunkMapHandle value) {
-        T.playerChunkMap.set(instance, value);
+        T.playerChunkMap.set(getRaw(), value);
     }
 
     public List<Player> getPlayers() {
-        return T.players.get(instance);
+        return T.players.get(getRaw());
     }
 
     public void setPlayers(List<Player> value) {
-        T.players.set(instance, value);
+        T.players.set(getRaw(), value);
     }
 
     public IntVector2 getLocation() {
-        return T.location.get(instance);
+        return T.location.get(getRaw());
     }
 
     public void setLocation(IntVector2 value) {
-        T.location.set(instance, value);
+        T.location.set(getRaw(), value);
     }
 
     public int getDirtyCount() {
-        return T.dirtyCount.getInteger(instance);
+        return T.dirtyCount.getInteger(getRaw());
     }
 
     public void setDirtyCount(int value) {
-        T.dirtyCount.setInteger(instance, value);
+        T.dirtyCount.setInteger(getRaw(), value);
     }
 
     public int getDirtySectionMask() {
-        return T.dirtySectionMask.getInteger(instance);
+        return T.dirtySectionMask.getInteger(getRaw());
     }
 
     public void setDirtySectionMask(int value) {
-        T.dirtySectionMask.setInteger(instance, value);
+        T.dirtySectionMask.setInteger(getRaw(), value);
     }
 
     public boolean isDone() {
-        return T.done.getBoolean(instance);
+        return T.done.getBoolean(getRaw());
     }
 
     public void setDone(boolean value) {
-        T.done.setBoolean(instance, value);
+        T.done.setBoolean(getRaw(), value);
     }
 
     /**

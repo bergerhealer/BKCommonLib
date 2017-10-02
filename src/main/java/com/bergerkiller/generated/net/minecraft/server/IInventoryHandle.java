@@ -19,56 +19,53 @@ public class IInventoryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IInventoryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IInventoryHandle handle = new IInventoryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getSize() {
-        return T.getSize.invoke(instance);
+        return T.getSize.invoke(getRaw());
     }
 
     public ItemStackHandle getItem(int index) {
-        return T.getItem.invoke(instance, index);
+        return T.getItem.invoke(getRaw(), index);
     }
 
     public void setItem(int paramInt, ItemStackHandle paramItemStack) {
-        T.setItem.invoke(instance, paramInt, paramItemStack);
+        T.setItem.invoke(getRaw(), paramInt, paramItemStack);
     }
 
     public void update() {
-        T.update.invoke(instance);
+        T.update.invoke(getRaw());
     }
 
     public boolean canOpen(HumanEntity paramEntityHuman) {
-        return T.canOpen.invoke(instance, paramEntityHuman);
+        return T.canOpen.invoke(getRaw(), paramEntityHuman);
     }
 
     public boolean canStoreItem(int index, ItemStack itemstack) {
-        return T.canStoreItem.invoke(instance, index, itemstack);
+        return T.canStoreItem.invoke(getRaw(), index, itemstack);
     }
 
     public int getProperty(int key) {
-        return T.getProperty.invoke(instance, key);
+        return T.getProperty.invoke(getRaw(), key);
     }
 
     public void setProperty(int key, int value) {
-        T.setProperty.invoke(instance, key, value);
+        T.setProperty.invoke(getRaw(), key, value);
     }
 
     public List<ItemStackHandle> getContents() {
-        return T.getContents.invoke(instance);
+        return T.getContents.invoke(getRaw());
     }
 
     public int someFunction() {
-        return T.someFunction.invoke(instance);
+        return T.someFunction.invoke(getRaw());
     }
 
     public void clear() {
-        T.clear.invoke(instance);
+        T.clear.invoke(getRaw());
     }
 
     /**

@@ -17,10 +17,7 @@ public class PacketPlayOutPositionHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutPositionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutPositionHandle handle = new PacketPlayOutPositionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -28,7 +25,7 @@ public class PacketPlayOutPositionHandle extends PacketHandle {
 
     public int getTeleportWaitTimer() {
         if (T.teleportWaitTimer.isAvailable()) {
-            return T.teleportWaitTimer.getInteger(instance);
+            return T.teleportWaitTimer.getInteger(getRaw());
         } else {
             return 0;
         }
@@ -36,55 +33,55 @@ public class PacketPlayOutPositionHandle extends PacketHandle {
 
     public void setTeleportWaitTimer(int ticks) {
         if (T.teleportWaitTimer.isAvailable()) {
-            T.teleportWaitTimer.setInteger(instance, ticks);
+            T.teleportWaitTimer.setInteger(getRaw(), ticks);
         }
     }
     public double getX() {
-        return T.x.getDouble(instance);
+        return T.x.getDouble(getRaw());
     }
 
     public void setX(double value) {
-        T.x.setDouble(instance, value);
+        T.x.setDouble(getRaw(), value);
     }
 
     public double getY() {
-        return T.y.getDouble(instance);
+        return T.y.getDouble(getRaw());
     }
 
     public void setY(double value) {
-        T.y.setDouble(instance, value);
+        T.y.setDouble(getRaw(), value);
     }
 
     public double getZ() {
-        return T.z.getDouble(instance);
+        return T.z.getDouble(getRaw());
     }
 
     public void setZ(double value) {
-        T.z.setDouble(instance, value);
+        T.z.setDouble(getRaw(), value);
     }
 
     public float getYaw() {
-        return T.yaw.getFloat(instance);
+        return T.yaw.getFloat(getRaw());
     }
 
     public void setYaw(float value) {
-        T.yaw.setFloat(instance, value);
+        T.yaw.setFloat(getRaw(), value);
     }
 
     public float getPitch() {
-        return T.pitch.getFloat(instance);
+        return T.pitch.getFloat(getRaw());
     }
 
     public void setPitch(float value) {
-        T.pitch.setFloat(instance, value);
+        T.pitch.setFloat(getRaw(), value);
     }
 
     public Set<?> getTeleportFlags() {
-        return T.teleportFlags.get(instance);
+        return T.teleportFlags.get(getRaw());
     }
 
     public void setTeleportFlags(Set<?> value) {
-        T.teleportFlags.set(instance, value);
+        T.teleportFlags.set(getRaw(), value);
     }
 
     /**

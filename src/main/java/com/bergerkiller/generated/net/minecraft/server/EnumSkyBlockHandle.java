@@ -18,24 +18,21 @@ public class EnumSkyBlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EnumSkyBlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EnumSkyBlockHandle handle = new EnumSkyBlockHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
 
     public int ordinal() {
-        return ((Enum<?>) instance).ordinal();
+        return ((Enum<?>) getRaw()).ordinal();
     }
     public int getBrightness() {
-        return T.brightness.getInteger(instance);
+        return T.brightness.getInteger(getRaw());
     }
 
     public void setBrightness(int value) {
-        T.brightness.setInteger(instance, value);
+        T.brightness.setInteger(getRaw(), value);
     }
 
     /**

@@ -65,43 +65,43 @@ class PacketPlayOutSpawnEntity extends Packet {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(instance));
+        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(instance));
+        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(instance));
+        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(instance, serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(instance, serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(instance, serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
     }
 
     public float getYaw() {
-        return deserializeRotation(T.yaw_raw.getInteger(instance));
+        return deserializeRotation(T.yaw_raw.getInteger(getRaw()));
     }
 
     public float getPitch() {
-        return deserializeRotation(T.pitch_raw.getInteger(instance));
+        return deserializeRotation(T.pitch_raw.getInteger(getRaw()));
     }
 
     public void setYaw(float yaw) {
-        T.yaw_raw.setInteger(instance, serializeRotation(yaw));
+        T.yaw_raw.setInteger(getRaw(), serializeRotation(yaw));
     }
 
     public void setPitch(float pitch) {
-        T.pitch_raw.setInteger(instance, serializeRotation(pitch));
+        T.pitch_raw.setInteger(getRaw(), serializeRotation(pitch));
     }
     </code>
 }
@@ -180,13 +180,13 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 
     public void setHeldItem(Material type) {
         if (T.heldItem.isAvailable()) {
-            T.heldItem.set(instance, type);
+            T.heldItem.set(getRaw(), type);
         }
     }
 
     public org.bukkit.Material getHeldItem() {
         if (T.heldItem.isAvailable()) {
-            return T.heldItem.get(instance);
+            return T.heldItem.get(getRaw());
         } else {
             return org.bukkit.Material.AIR;
         }
@@ -263,27 +263,27 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(instance));
+        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(instance));
+        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(instance));
+        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(instance, serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(instance, serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(instance, serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
     }
 
     public float getYaw() {

@@ -17,10 +17,7 @@ public class CraftInventoryCraftingHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftInventoryCraftingHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftInventoryCraftingHandle handle = new CraftInventoryCraftingHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final CraftingInventory createNew(Object nmsInventoryCrafting, Object nmsResultIInventory) {

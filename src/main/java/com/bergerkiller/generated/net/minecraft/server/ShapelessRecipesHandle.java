@@ -18,20 +18,17 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
     /* ============================================================================== */
 
     public static ShapelessRecipesHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ShapelessRecipesHandle handle = new ShapelessRecipesHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public List<CraftInputSlot> getInputItems() {
-        return T.inputItems.get(instance);
+        return T.inputItems.get(getRaw());
     }
 
     public void setInputItems(List<CraftInputSlot> value) {
-        T.inputItems.set(instance, value);
+        T.inputItems.set(getRaw(), value);
     }
 
     /**

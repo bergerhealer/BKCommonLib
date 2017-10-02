@@ -18,10 +18,7 @@ public class RegionFileHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RegionFileHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RegionFileHandle handle = new RegionFileHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final RegionFileHandle createNew(File file) {
@@ -31,27 +28,27 @@ public class RegionFileHandle extends Template.Handle {
     /* ============================================================================== */
 
     public void close() {
-        T.close.invoke(instance);
+        T.close.invoke(getRaw());
     }
 
     public boolean chunkExists(int cx, int cz) {
-        return T.chunkExists.invoke(instance, cx, cz);
+        return T.chunkExists.invoke(getRaw(), cx, cz);
     }
 
     public File getFile() {
-        return T.file.get(instance);
+        return T.file.get(getRaw());
     }
 
     public void setFile(File value) {
-        T.file.set(instance, value);
+        T.file.set(getRaw(), value);
     }
 
     public RandomAccessFile getStream() {
-        return T.stream.get(instance);
+        return T.stream.get(getRaw());
     }
 
     public void setStream(RandomAccessFile value) {
-        T.stream.set(instance, value);
+        T.stream.set(getRaw(), value);
     }
 
     /**

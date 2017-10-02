@@ -16,10 +16,7 @@ public class EntityItemHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static EntityItemHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityItemHandle handle = new EntityItemHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final EntityItemHandle createNew(WorldHandle world, double x, double y, double z, ItemStackHandle itemstack) {
@@ -29,27 +26,27 @@ public class EntityItemHandle extends EntityHandle {
     /* ============================================================================== */
 
     public ItemStackHandle getItemStack() {
-        return T.getItemStack.invoke(instance);
+        return T.getItemStack.invoke(getRaw());
     }
 
     public void setItemStack(ItemStackHandle itemstack) {
-        T.setItemStack.invoke(instance, itemstack);
+        T.setItemStack.invoke(getRaw(), itemstack);
     }
 
     public int getAge() {
-        return T.age.getInteger(instance);
+        return T.age.getInteger(getRaw());
     }
 
     public void setAge(int value) {
-        T.age.setInteger(instance, value);
+        T.age.setInteger(getRaw(), value);
     }
 
     public int getPickupDelay() {
-        return T.pickupDelay.getInteger(instance);
+        return T.pickupDelay.getInteger(getRaw());
     }
 
     public void setPickupDelay(int value) {
-        T.pickupDelay.setInteger(instance, value);
+        T.pickupDelay.setInteger(getRaw(), value);
     }
 
     /**

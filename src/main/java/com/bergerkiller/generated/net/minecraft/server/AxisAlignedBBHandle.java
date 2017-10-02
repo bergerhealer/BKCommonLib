@@ -16,10 +16,7 @@ public class AxisAlignedBBHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static AxisAlignedBBHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        AxisAlignedBBHandle handle = new AxisAlignedBBHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final AxisAlignedBBHandle createNew(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -29,31 +26,31 @@ public class AxisAlignedBBHandle extends Template.Handle {
     /* ============================================================================== */
 
     public AxisAlignedBBHandle grow(double sx, double sy, double sz) {
-        return T.grow.invoke(instance, sx, sy, sz);
+        return T.grow.invoke(getRaw(), sx, sy, sz);
     }
 
     public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
-        return T.transformB.invoke(instance, lx, ly, lz);
+        return T.transformB.invoke(getRaw(), lx, ly, lz);
     }
 
     public AxisAlignedBBHandle translate(double dx, double dy, double dz) {
-        return T.translate.invoke(instance, dx, dy, dz);
+        return T.translate.invoke(getRaw(), dx, dy, dz);
     }
 
     public boolean bbTransformA(AxisAlignedBBHandle paramAxisAlignedBB) {
-        return T.bbTransformA.invoke(instance, paramAxisAlignedBB);
+        return T.bbTransformA.invoke(getRaw(), paramAxisAlignedBB);
     }
 
     public double calcSomeX(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeX.invoke(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeX.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
     }
 
     public double calcSomeY(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeY.invoke(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeY.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
     }
 
     public double calcSomeZ(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeZ.invoke(instance, paramAxisAlignedBB, paramDouble);
+        return T.calcSomeZ.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
     }
 
 
@@ -65,51 +62,51 @@ public class AxisAlignedBBHandle extends Template.Handle {
         return growUniform(-size);
     }
     public double getMinX() {
-        return T.minX.getDouble(instance);
+        return T.minX.getDouble(getRaw());
     }
 
     public void setMinX(double value) {
-        T.minX.setDouble(instance, value);
+        T.minX.setDouble(getRaw(), value);
     }
 
     public double getMinY() {
-        return T.minY.getDouble(instance);
+        return T.minY.getDouble(getRaw());
     }
 
     public void setMinY(double value) {
-        T.minY.setDouble(instance, value);
+        T.minY.setDouble(getRaw(), value);
     }
 
     public double getMinZ() {
-        return T.minZ.getDouble(instance);
+        return T.minZ.getDouble(getRaw());
     }
 
     public void setMinZ(double value) {
-        T.minZ.setDouble(instance, value);
+        T.minZ.setDouble(getRaw(), value);
     }
 
     public double getMaxX() {
-        return T.maxX.getDouble(instance);
+        return T.maxX.getDouble(getRaw());
     }
 
     public void setMaxX(double value) {
-        T.maxX.setDouble(instance, value);
+        T.maxX.setDouble(getRaw(), value);
     }
 
     public double getMaxY() {
-        return T.maxY.getDouble(instance);
+        return T.maxY.getDouble(getRaw());
     }
 
     public void setMaxY(double value) {
-        T.maxY.setDouble(instance, value);
+        T.maxY.setDouble(getRaw(), value);
     }
 
     public double getMaxZ() {
-        return T.maxZ.getDouble(instance);
+        return T.maxZ.getDouble(getRaw());
     }
 
     public void setMaxZ(double value) {
-        T.maxZ.setDouble(instance, value);
+        T.maxZ.setDouble(getRaw(), value);
     }
 
     /**

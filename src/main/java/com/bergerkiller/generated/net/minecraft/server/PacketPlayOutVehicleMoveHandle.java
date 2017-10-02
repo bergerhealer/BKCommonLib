@@ -17,52 +17,49 @@ public class PacketPlayOutVehicleMoveHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutVehicleMoveHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutVehicleMoveHandle handle = new PacketPlayOutVehicleMoveHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public double getPosX() {
-        return T.posX.getDouble(instance);
+        return T.posX.getDouble(getRaw());
     }
 
     public void setPosX(double value) {
-        T.posX.setDouble(instance, value);
+        T.posX.setDouble(getRaw(), value);
     }
 
     public double getPosY() {
-        return T.posY.getDouble(instance);
+        return T.posY.getDouble(getRaw());
     }
 
     public void setPosY(double value) {
-        T.posY.setDouble(instance, value);
+        T.posY.setDouble(getRaw(), value);
     }
 
     public double getPosZ() {
-        return T.posZ.getDouble(instance);
+        return T.posZ.getDouble(getRaw());
     }
 
     public void setPosZ(double value) {
-        T.posZ.setDouble(instance, value);
+        T.posZ.setDouble(getRaw(), value);
     }
 
     public float getYaw() {
-        return T.yaw.getFloat(instance);
+        return T.yaw.getFloat(getRaw());
     }
 
     public void setYaw(float value) {
-        T.yaw.setFloat(instance, value);
+        T.yaw.setFloat(getRaw(), value);
     }
 
     public float getPitch() {
-        return T.pitch.getFloat(instance);
+        return T.pitch.getFloat(getRaw());
     }
 
     public void setPitch(float value) {
-        T.pitch.setFloat(instance, value);
+        T.pitch.setFloat(getRaw(), value);
     }
 
     /**

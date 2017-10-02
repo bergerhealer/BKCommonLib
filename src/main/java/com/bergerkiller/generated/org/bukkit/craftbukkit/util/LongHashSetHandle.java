@@ -17,10 +17,7 @@ public class LongHashSetHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static LongHashSetHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        LongHashSetHandle handle = new LongHashSetHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final LongHashSetHandle createNew() {
@@ -34,83 +31,83 @@ public class LongHashSetHandle extends Template.Handle {
     /* ============================================================================== */
 
     public Iterator<Long> iterator() {
-        return T.iterator.invoke(instance);
+        return T.iterator.invoke(getRaw());
     }
 
     public int size() {
-        return T.size.invoke(instance);
+        return T.size.invoke(getRaw());
     }
 
     public boolean isEmpty() {
-        return T.isEmpty.invoke(instance);
+        return T.isEmpty.invoke(getRaw());
     }
 
     public boolean addPair(int msw, int lsw) {
-        return T.addPair.invoke(instance, msw, lsw);
+        return T.addPair.invoke(getRaw(), msw, lsw);
     }
 
     public boolean add(long value) {
-        return T.add.invoke(instance, value);
+        return T.add.invoke(getRaw(), value);
     }
 
     public void removePair(int msw, int lsw) {
-        T.removePair.invoke(instance, msw, lsw);
+        T.removePair.invoke(getRaw(), msw, lsw);
     }
 
     public boolean remove(long value) {
-        return T.remove.invoke(instance, value);
+        return T.remove.invoke(getRaw(), value);
     }
 
     public boolean containsPair(int msw, int lsw) {
-        return T.containsPair.invoke(instance, msw, lsw);
+        return T.containsPair.invoke(getRaw(), msw, lsw);
     }
 
     public boolean contains(long value) {
-        return T.contains.invoke(instance, value);
+        return T.contains.invoke(getRaw(), value);
     }
 
     public void clear() {
-        T.clear.invoke(instance);
+        T.clear.invoke(getRaw());
     }
 
     public long[] toArray() {
-        return T.toArray.invoke(instance);
+        return T.toArray.invoke(getRaw());
     }
 
     public long popFirst() {
-        return T.popFirst.invoke(instance);
+        return T.popFirst.invoke(getRaw());
     }
 
     public long[] popAll() {
-        return T.popAll.invoke(instance);
+        return T.popAll.invoke(getRaw());
     }
 
     public int hash(long value) {
-        return T.hash.invoke(instance, value);
+        return T.hash.invoke(getRaw(), value);
     }
 
     public void rehash() {
-        T.rehash.invoke(instance);
+        T.rehash.invoke(getRaw());
     }
 
     public void rehashResize(int newCapacity) {
-        T.rehashResize.invoke(instance, newCapacity);
+        T.rehashResize.invoke(getRaw(), newCapacity);
     }
 
     public int getElementsCountField() {
-        return T.elementsCountField.getInteger(instance);
+        return T.elementsCountField.getInteger(getRaw());
     }
 
     public void setElementsCountField(int value) {
-        T.elementsCountField.setInteger(instance, value);
+        T.elementsCountField.setInteger(getRaw(), value);
     }
 
     public long[] getValuesField() {
-        return T.valuesField.get(instance);
+        return T.valuesField.get(getRaw());
     }
 
     public void setValuesField(long[] value) {
-        T.valuesField.set(instance, value);
+        T.valuesField.set(getRaw(), value);
     }
 
     /**

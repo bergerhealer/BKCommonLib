@@ -19,132 +19,129 @@ public class EntityHumanHandle extends EntityLivingHandle {
     /* ============================================================================== */
 
     public static EntityHumanHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityHumanHandle handle = new EntityHumanHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getInventoryRaw() {
-        return T.inventoryRaw.get(instance);
+        return T.inventoryRaw.get(getRaw());
     }
 
     public void setInventoryRaw(Object value) {
-        T.inventoryRaw.set(instance, value);
+        T.inventoryRaw.set(getRaw(), value);
     }
 
     public Object getEnderChestRaw() {
-        return T.enderChestRaw.get(instance);
+        return T.enderChestRaw.get(getRaw());
     }
 
     public void setEnderChestRaw(Object value) {
-        T.enderChestRaw.set(instance, value);
+        T.enderChestRaw.set(getRaw(), value);
     }
 
     public ContainerHandle getActiveContainer() {
-        return T.activeContainer.get(instance);
+        return T.activeContainer.get(getRaw());
     }
 
     public void setActiveContainer(ContainerHandle value) {
-        T.activeContainer.set(instance, value);
+        T.activeContainer.set(getRaw(), value);
     }
 
     public Object getFoodDataRaw() {
-        return T.foodDataRaw.get(instance);
+        return T.foodDataRaw.get(getRaw());
     }
 
     public void setFoodDataRaw(Object value) {
-        T.foodDataRaw.set(instance, value);
+        T.foodDataRaw.set(getRaw(), value);
     }
 
     public boolean isSleeping() {
-        return T.sleeping.getBoolean(instance);
+        return T.sleeping.getBoolean(getRaw());
     }
 
     public void setSleeping(boolean value) {
-        T.sleeping.setBoolean(instance, value);
+        T.sleeping.setBoolean(getRaw(), value);
     }
 
     public IntVector3 getBedPosition() {
-        return T.bedPosition.get(instance);
+        return T.bedPosition.get(getRaw());
     }
 
     public void setBedPosition(IntVector3 value) {
-        T.bedPosition.set(instance, value);
+        T.bedPosition.set(getRaw(), value);
     }
 
     public int getSleepTicks() {
-        return T.sleepTicks.getInteger(instance);
+        return T.sleepTicks.getInteger(getRaw());
     }
 
     public void setSleepTicks(int value) {
-        T.sleepTicks.setInteger(instance, value);
+        T.sleepTicks.setInteger(getRaw(), value);
     }
 
     public IntVector3 getSpawnCoord() {
-        return T.spawnCoord.get(instance);
+        return T.spawnCoord.get(getRaw());
     }
 
     public void setSpawnCoord(IntVector3 value) {
-        T.spawnCoord.set(instance, value);
+        T.spawnCoord.set(getRaw(), value);
     }
 
     public boolean isSpawnForced() {
-        return T.spawnForced.getBoolean(instance);
+        return T.spawnForced.getBoolean(getRaw());
     }
 
     public void setSpawnForced(boolean value) {
-        T.spawnForced.setBoolean(instance, value);
+        T.spawnForced.setBoolean(getRaw(), value);
     }
 
     public PlayerAbilities getAbilities() {
-        return T.abilities.get(instance);
+        return T.abilities.get(getRaw());
     }
 
     public void setAbilities(PlayerAbilities value) {
-        T.abilities.set(instance, value);
+        T.abilities.set(getRaw(), value);
     }
 
     public int getExpLevel() {
-        return T.expLevel.getInteger(instance);
+        return T.expLevel.getInteger(getRaw());
     }
 
     public void setExpLevel(int value) {
-        T.expLevel.setInteger(instance, value);
+        T.expLevel.setInteger(getRaw(), value);
     }
 
     public int getExpTotal() {
-        return T.expTotal.getInteger(instance);
+        return T.expTotal.getInteger(getRaw());
     }
 
     public void setExpTotal(int value) {
-        T.expTotal.setInteger(instance, value);
+        T.expTotal.setInteger(getRaw(), value);
     }
 
     public float getExp() {
-        return T.exp.getFloat(instance);
+        return T.exp.getFloat(getRaw());
     }
 
     public void setExp(float value) {
-        T.exp.setFloat(instance, value);
+        T.exp.setFloat(getRaw(), value);
     }
 
     public GameProfileHandle getGameProfile() {
-        return T.gameProfile.get(instance);
+        return T.gameProfile.get(getRaw());
     }
 
     public void setGameProfile(GameProfileHandle value) {
-        T.gameProfile.set(instance, value);
+        T.gameProfile.set(getRaw(), value);
     }
 
     public String getSpawnWorld() {
-        return T.spawnWorld.get(instance);
+        return T.spawnWorld.get(getRaw());
     }
 
     public void setSpawnWorld(String value) {
-        T.spawnWorld.set(instance, value);
+        T.spawnWorld.set(getRaw(), value);
     }
 
     /**

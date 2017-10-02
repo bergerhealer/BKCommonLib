@@ -17,20 +17,17 @@ public class PluginDescriptionFileHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PluginDescriptionFileHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PluginDescriptionFileHandle handle = new PluginDescriptionFileHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Map<String, Map<String, Object>> getCommands() {
-        return T.commands.get(instance);
+        return T.commands.get(getRaw());
     }
 
     public void setCommands(Map<String, Map<String, Object>> value) {
-        T.commands.set(instance, value);
+        T.commands.set(getRaw(), value);
     }
 
     /**

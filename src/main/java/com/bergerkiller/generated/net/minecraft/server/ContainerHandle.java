@@ -19,32 +19,29 @@ public class ContainerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ContainerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ContainerHandle handle = new ContainerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public InventoryView getBukkitView() {
-        return T.getBukkitView.invoke(instance);
+        return T.getBukkitView.invoke(getRaw());
     }
 
     public List<ItemStack> getOldItems() {
-        return T.oldItems.get(instance);
+        return T.oldItems.get(getRaw());
     }
 
     public void setOldItems(List<ItemStack> value) {
-        T.oldItems.set(instance, value);
+        T.oldItems.set(getRaw(), value);
     }
 
     public List<SlotHandle> getSlots() {
-        return T.slots.get(instance);
+        return T.slots.get(getRaw());
     }
 
     public void setSlots(List<SlotHandle> value) {
-        T.slots.set(instance, value);
+        T.slots.set(getRaw(), value);
     }
 
     /**

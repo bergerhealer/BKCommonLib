@@ -17,28 +17,25 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static EntityMinecartAbstractHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartAbstractHandle handle = new EntityMinecartAbstractHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public float getDamage() {
-        return T.getDamage.invoke(instance);
+        return T.getDamage.invoke(getRaw());
     }
 
     public void setDamage(float damage) {
-        T.setDamage.invoke(instance, damage);
+        T.setDamage.invoke(getRaw(), damage);
     }
 
     public int getType() {
-        return T.getType.invoke(instance);
+        return T.getType.invoke(getRaw());
     }
 
     public void activate(int x, int y, int z, boolean active) {
-        T.activate.invoke(instance, x, y, z, active);
+        T.activate.invoke(getRaw(), x, y, z, active);
     }
 
 

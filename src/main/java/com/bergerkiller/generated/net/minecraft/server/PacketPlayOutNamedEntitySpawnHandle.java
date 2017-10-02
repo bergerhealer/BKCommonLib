@@ -21,10 +21,7 @@ public class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutNamedEntitySpawnHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutNamedEntitySpawnHandle handle = new PacketPlayOutNamedEntitySpawnHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -72,47 +69,47 @@ public class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
 
     public void setHeldItem(Material type) {
         if (T.heldItem.isAvailable()) {
-            T.heldItem.set(instance, type);
+            T.heldItem.set(getRaw(), type);
         }
     }
 
     public org.bukkit.Material getHeldItem() {
         if (T.heldItem.isAvailable()) {
-            return T.heldItem.get(instance);
+            return T.heldItem.get(getRaw());
         } else {
             return org.bukkit.Material.AIR;
         }
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public UUID getEntityUUID() {
-        return T.entityUUID.get(instance);
+        return T.entityUUID.get(getRaw());
     }
 
     public void setEntityUUID(UUID value) {
-        T.entityUUID.set(instance, value);
+        T.entityUUID.set(getRaw(), value);
     }
 
     public DataWatcher getDataWatcher() {
-        return T.dataWatcher.get(instance);
+        return T.dataWatcher.get(getRaw());
     }
 
     public void setDataWatcher(DataWatcher value) {
-        T.dataWatcher.set(instance, value);
+        T.dataWatcher.set(getRaw(), value);
     }
 
     public List<Item<?>> getDataWatcherItems() {
-        return T.dataWatcherItems.get(instance);
+        return T.dataWatcherItems.get(getRaw());
     }
 
     public void setDataWatcherItems(List<Item<?>> value) {
-        T.dataWatcherItems.set(instance, value);
+        T.dataWatcherItems.set(getRaw(), value);
     }
 
     /**

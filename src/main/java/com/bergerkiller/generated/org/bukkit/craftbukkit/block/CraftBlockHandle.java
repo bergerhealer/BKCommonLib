@@ -18,10 +18,7 @@ public class CraftBlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftBlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftBlockHandle handle = new CraftBlockHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final Block createNew(Chunk chunk, int x, int y, int z) {
@@ -31,35 +28,35 @@ public class CraftBlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public Chunk getChunk() {
-        return T.chunk.get(instance);
+        return T.chunk.get(getRaw());
     }
 
     public void setChunk(Chunk value) {
-        T.chunk.set(instance, value);
+        T.chunk.set(getRaw(), value);
     }
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getY() {
-        return T.y.getInteger(instance);
+        return T.y.getInteger(getRaw());
     }
 
     public void setY(int value) {
-        T.y.setInteger(instance, value);
+        T.y.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     /**

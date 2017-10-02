@@ -29,10 +29,7 @@ public class EntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityHandle handle = new EntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final EntityHandle createNew(WorldHandle world) {
@@ -50,184 +47,184 @@ public class EntityHandle extends Template.Handle {
     }
 
     public void updateBlockCollision() {
-        T.updateBlockCollision.invoke(instance);
+        T.updateBlockCollision.invoke(getRaw());
     }
 
     public void playStepSound(IntVector3 position, BlockData blockData) {
-        T.playStepSound.invoke(instance, position, blockData);
+        T.playStepSound.invoke(getRaw(), position, blockData);
     }
 
     public void setRotation(float yaw, float pitch) {
-        T.setRotation.invoke(instance, yaw, pitch);
+        T.setRotation.invoke(getRaw(), yaw, pitch);
     }
 
     public void burn(float dmg) {
-        T.burn.invoke(instance, dmg);
+        T.burn.invoke(getRaw(), dmg);
     }
 
     public Item dropItem(Material material, int amount, float force) {
-        return T.dropItem.invoke(instance, material, amount, force);
+        return T.dropItem.invoke(getRaw(), material, amount, force);
     }
 
     public Item dropItemStack(ItemStack itemstack, float force) {
-        return T.dropItemStack.invoke(instance, itemstack, force);
+        return T.dropItemStack.invoke(getRaw(), itemstack, force);
     }
 
     public ResourceKey getSwimSound() {
-        return T.getSwimSound.invoke(instance);
+        return T.getSwimSound.invoke(getRaw());
     }
 
     public void makeSound(ResourceKey soundeffect, float volume, float pitch) {
-        T.makeSound.invoke(instance, soundeffect, volume, pitch);
+        T.makeSound.invoke(getRaw(), soundeffect, volume, pitch);
     }
 
     public boolean isInWaterUpdate() {
-        return T.isInWaterUpdate.invoke(instance);
+        return T.isInWaterUpdate.invoke(getRaw());
     }
 
     public boolean isInWater() {
-        return T.isInWater.invoke(instance);
+        return T.isInWater.invoke(getRaw());
     }
 
     public boolean hasMovementSound() {
-        return T.hasMovementSound.invoke(instance);
+        return T.hasMovementSound.invoke(getRaw());
     }
 
     public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
-        T.updateFalling.invoke(instance, d0, flag, blockData, position);
+        T.updateFalling.invoke(getRaw(), d0, flag, blockData, position);
     }
 
     public void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData) {
-        T.doStepSoundUpdate.invoke(instance, blockposition, blockData);
+        T.doStepSoundUpdate.invoke(getRaw(), blockposition, blockData);
     }
 
     public void checkBlockCollisions() {
-        T.checkBlockCollisions.invoke(instance);
+        T.checkBlockCollisions.invoke(getRaw());
     }
 
     public double calculateDistance(double x, double y, double z) {
-        return T.calculateDistance.invoke(instance, x, y, z);
+        return T.calculateDistance.invoke(getRaw(), x, y, z);
     }
 
     public boolean damageEntity(DamageSourceHandle damagesource, float damage) {
-        return T.damageEntity.invoke(instance, damagesource, damage);
+        return T.damageEntity.invoke(getRaw(), damagesource, damage);
     }
 
     public void setPosition(double x, double y, double z) {
-        T.setPosition.invoke(instance, x, y, z);
+        T.setPosition.invoke(getRaw(), x, y, z);
     }
 
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch) {
-        T.setPositionRotation.invoke(instance, x, y, z, yaw, pitch);
+        T.setPositionRotation.invoke(getRaw(), x, y, z, yaw, pitch);
     }
 
     public void setLocation(double x, double y, double z, float yaw, float pitch) {
-        T.setLocation.invoke(instance, x, y, z, yaw, pitch);
+        T.setLocation.invoke(getRaw(), x, y, z, yaw, pitch);
     }
 
     public float getHeadRotation() {
-        return T.getHeadRotation.invoke(instance);
+        return T.getHeadRotation.invoke(getRaw());
     }
 
     public AxisAlignedBBHandle getBoundingBox() {
-        return T.getBoundingBox.invoke(instance);
+        return T.getBoundingBox.invoke(getRaw());
     }
 
     public void setBoundingBox(AxisAlignedBBHandle axisalignedbb) {
-        T.setBoundingBox.invoke(instance, axisalignedbb);
+        T.setBoundingBox.invoke(getRaw(), axisalignedbb);
     }
 
     public AxisAlignedBBHandle getOtherBoundingBox() {
-        return T.getOtherBoundingBox.invoke(instance);
+        return T.getOtherBoundingBox.invoke(getRaw());
     }
 
     public AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity) {
-        return T.getEntityBoundingBox.invoke(instance, entity);
+        return T.getEntityBoundingBox.invoke(getRaw(), entity);
     }
 
     public void recalcPosition() {
-        T.recalcPosition.invoke(instance);
+        T.recalcPosition.invoke(getRaw());
     }
 
     public boolean isBurning() {
-        return T.isBurning.invoke(instance);
+        return T.isBurning.invoke(getRaw());
     }
 
     public void setOnFire(int numSeconds) {
-        T.setOnFire.invoke(instance, numSeconds);
+        T.setOnFire.invoke(getRaw(), numSeconds);
     }
 
     public boolean isWet() {
-        return T.isWet.invoke(instance);
+        return T.isWet.invoke(getRaw());
     }
 
     public void saveToNBT(CommonTagCompound compound) {
-        T.saveToNBT.invoke(instance, compound);
+        T.saveToNBT.invoke(getRaw(), compound);
     }
 
     public void onTick() {
-        T.onTick.invoke(instance);
+        T.onTick.invoke(getRaw());
     }
 
     public void loadFromNBT(CommonTagCompound compound) {
-        T.loadFromNBT.invoke(instance, compound);
+        T.loadFromNBT.invoke(getRaw(), compound);
     }
 
     public boolean savePassenger(CommonTagCompound compound) {
-        return T.savePassenger.invoke(instance, compound);
+        return T.savePassenger.invoke(getRaw(), compound);
     }
 
     public boolean saveEntity(CommonTagCompound compound) {
-        return T.saveEntity.invoke(instance, compound);
+        return T.saveEntity.invoke(getRaw(), compound);
     }
 
     public boolean isSneaking() {
-        return T.isSneaking.invoke(instance);
+        return T.isSneaking.invoke(getRaw());
     }
 
     public void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails) {
-        T.appendEntityCrashDetails.invoke(instance, crashreportsystemdetails);
+        T.appendEntityCrashDetails.invoke(getRaw(), crashreportsystemdetails);
     }
 
     public int getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
     public UUID getUniqueID() {
-        return T.getUniqueID.invoke(instance);
+        return T.getUniqueID.invoke(getRaw());
     }
 
     public DataWatcher getDataWatcher() {
-        return T.getDataWatcher.invoke(instance);
+        return T.getDataWatcher.invoke(getRaw());
     }
 
     public void onPush(double d0, double d1, double d2) {
-        T.onPush.invoke(instance, d0, d1, d2);
+        T.onPush.invoke(getRaw(), d0, d1, d2);
     }
 
     public int getPortalCooldownMaximum() {
-        return T.getPortalCooldownMaximum.invoke(instance);
+        return T.getPortalCooldownMaximum.invoke(getRaw());
     }
 
     public void collide(EntityHandle entity) {
-        T.collide.invoke(instance, entity);
+        T.collide.invoke(getRaw(), entity);
     }
 
     public Entity getBukkitEntity() {
-        return T.getBukkitEntity.invoke(instance);
+        return T.getBukkitEntity.invoke(getRaw());
     }
 
 
     public List<EntityHandle> getPassengers() {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
             if (passengers == null) {
                 return java.util.Collections.emptyList();
             } else {
                 return passengers;
             }
         } else {
-            EntityHandle passenger = T.opt_passenger.get(instance);
+            EntityHandle passenger = T.opt_passenger.get(getRaw());
             if (passenger == null) {
                 return java.util.Collections.emptyList();
             } else {
@@ -238,26 +235,26 @@ public class EntityHandle extends Template.Handle {
 
     public boolean hasPassengers() {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
             return passengers != null && passengers.size() > 0;
         } else {
-            return T.opt_passenger.get(instance) != null;
+            return T.opt_passenger.get(getRaw()) != null;
         }
     }
 
     public void setPassengers(List<EntityHandle> passengers) {
         if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> entity_passengers = T.opt_passengers.get(instance);
+            List<EntityHandle> entity_passengers = T.opt_passengers.get(getRaw());
             if (entity_passengers == null) {
-                T.opt_passengers.set(instance, passengers);
+                T.opt_passengers.set(getRaw(), passengers);
             } else {
                 entity_passengers.clear();
                 entity_passengers.addAll(passengers);
             }
         } else if (passengers.size() == 0) {
-            T.opt_passenger.set(instance, null);
+            T.opt_passenger.set(getRaw(), null);
         } else {
-            T.opt_passenger.set(instance, passengers.get(0));
+            T.opt_passenger.set(getRaw(), passengers.get(0));
         }
     }
 
@@ -281,26 +278,26 @@ public class EntityHandle extends Template.Handle {
 
     public boolean isPassenger() {
         if (T.isPassenger.isAvailable()) {
-            return T.isPassenger.invoke(instance);
+            return T.isPassenger.invoke(getRaw());
         } else {
-            return T.vehicle.raw.get(instance) != null;
+            return T.vehicle.raw.get(getRaw()) != null;
         }
     }
 
     public boolean isVehicle() {
         if (T.isVehicle.isAvailable()) {
-            return T.isVehicle.invoke(instance);
+            return T.isVehicle.invoke(getRaw());
         } else {
-            return T.opt_passenger.get(instance) != null;
+            return T.opt_passenger.get(getRaw()) != null;
         }
     }
 
 
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
-            return T.prop_getMaxFireTicks.invoke(instance);
+            return T.prop_getMaxFireTicks.invoke(getRaw());
         } else if (T.field_maxFireTicks.isAvailable()) {
-            return T.field_maxFireTicks.getInteger(instance);
+            return T.field_maxFireTicks.getInteger(getRaw());
         } else {
             throw new UnsupportedOperationException("Max Fire Ticks can not be read");
         }
@@ -309,7 +306,7 @@ public class EntityHandle extends Template.Handle {
 
     public EntityHandle getDriverEntity() {
         if (T.getDriverEntity.isAvailable()) {
-            return T.getDriverEntity.invoke(instance);
+            return T.getDriverEntity.invoke(getRaw());
         } else {
             return null; // driver feature not a thing on this server
         }
@@ -318,10 +315,10 @@ public class EntityHandle extends Template.Handle {
 
     public boolean isInSameVehicle(EntityHandle entity) {
         if (T.isInSameVehicle.isAvailable()) {
-            return T.isInSameVehicle.invoke(instance, entity);
+            return T.isInSameVehicle.invoke(getRaw(), entity);
         } else {
-            Object rawPassenger = T.opt_passenger.raw.get(this.instance);
-            Object rawVehicle = T.vehicle.raw.get(this.instance);
+            Object rawPassenger = T.opt_passenger.raw.get(this.getRaw());
+            Object rawVehicle = T.vehicle.raw.get(this.getRaw());
             Object rawEntity = entity.getRaw();
             return rawEntity == rawPassenger || rawEntity == rawVehicle;
         }
@@ -329,390 +326,390 @@ public class EntityHandle extends Template.Handle {
 
 
     public WorldServerHandle getWorldServer() {
-        return WorldServerHandle.createHandle(T.world.raw.get(instance));
+        return WorldServerHandle.createHandle(T.world.raw.get(getRaw()));
     }
 
     public org.bukkit.entity.Entity toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(instance);
+        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(getRaw());
     }
 
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
     public Entity getBukkitEntityField() {
-        return T.bukkitEntityField.get(instance);
+        return T.bukkitEntityField.get(getRaw());
     }
 
     public void setBukkitEntityField(Entity value) {
-        T.bukkitEntityField.set(instance, value);
+        T.bukkitEntityField.set(getRaw(), value);
     }
 
     public int getIdField() {
-        return T.idField.getInteger(instance);
+        return T.idField.getInteger(getRaw());
     }
 
     public void setIdField(int value) {
-        T.idField.setInteger(instance, value);
+        T.idField.setInteger(getRaw(), value);
     }
 
     public EntityHandle getVehicle() {
-        return T.vehicle.get(instance);
+        return T.vehicle.get(getRaw());
     }
 
     public void setVehicle(EntityHandle value) {
-        T.vehicle.set(instance, value);
+        T.vehicle.set(getRaw(), value);
     }
 
     public boolean isIgnoreChunkCheck() {
-        return T.ignoreChunkCheck.getBoolean(instance);
+        return T.ignoreChunkCheck.getBoolean(getRaw());
     }
 
     public void setIgnoreChunkCheck(boolean value) {
-        T.ignoreChunkCheck.setBoolean(instance, value);
+        T.ignoreChunkCheck.setBoolean(getRaw(), value);
     }
 
     public WorldHandle getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(WorldHandle value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     public double getLastX() {
-        return T.lastX.getDouble(instance);
+        return T.lastX.getDouble(getRaw());
     }
 
     public void setLastX(double value) {
-        T.lastX.setDouble(instance, value);
+        T.lastX.setDouble(getRaw(), value);
     }
 
     public double getLastY() {
-        return T.lastY.getDouble(instance);
+        return T.lastY.getDouble(getRaw());
     }
 
     public void setLastY(double value) {
-        T.lastY.setDouble(instance, value);
+        T.lastY.setDouble(getRaw(), value);
     }
 
     public double getLastZ() {
-        return T.lastZ.getDouble(instance);
+        return T.lastZ.getDouble(getRaw());
     }
 
     public void setLastZ(double value) {
-        T.lastZ.setDouble(instance, value);
+        T.lastZ.setDouble(getRaw(), value);
     }
 
     public double getLocX() {
-        return T.locX.getDouble(instance);
+        return T.locX.getDouble(getRaw());
     }
 
     public void setLocX(double value) {
-        T.locX.setDouble(instance, value);
+        T.locX.setDouble(getRaw(), value);
     }
 
     public double getLocY() {
-        return T.locY.getDouble(instance);
+        return T.locY.getDouble(getRaw());
     }
 
     public void setLocY(double value) {
-        T.locY.setDouble(instance, value);
+        T.locY.setDouble(getRaw(), value);
     }
 
     public double getLocZ() {
-        return T.locZ.getDouble(instance);
+        return T.locZ.getDouble(getRaw());
     }
 
     public void setLocZ(double value) {
-        T.locZ.setDouble(instance, value);
+        T.locZ.setDouble(getRaw(), value);
     }
 
     public double getMotX() {
-        return T.motX.getDouble(instance);
+        return T.motX.getDouble(getRaw());
     }
 
     public void setMotX(double value) {
-        T.motX.setDouble(instance, value);
+        T.motX.setDouble(getRaw(), value);
     }
 
     public double getMotY() {
-        return T.motY.getDouble(instance);
+        return T.motY.getDouble(getRaw());
     }
 
     public void setMotY(double value) {
-        T.motY.setDouble(instance, value);
+        T.motY.setDouble(getRaw(), value);
     }
 
     public double getMotZ() {
-        return T.motZ.getDouble(instance);
+        return T.motZ.getDouble(getRaw());
     }
 
     public void setMotZ(double value) {
-        T.motZ.setDouble(instance, value);
+        T.motZ.setDouble(getRaw(), value);
     }
 
     public float getYaw() {
-        return T.yaw.getFloat(instance);
+        return T.yaw.getFloat(getRaw());
     }
 
     public void setYaw(float value) {
-        T.yaw.setFloat(instance, value);
+        T.yaw.setFloat(getRaw(), value);
     }
 
     public float getPitch() {
-        return T.pitch.getFloat(instance);
+        return T.pitch.getFloat(getRaw());
     }
 
     public void setPitch(float value) {
-        T.pitch.setFloat(instance, value);
+        T.pitch.setFloat(getRaw(), value);
     }
 
     public float getLastYaw() {
-        return T.lastYaw.getFloat(instance);
+        return T.lastYaw.getFloat(getRaw());
     }
 
     public void setLastYaw(float value) {
-        T.lastYaw.setFloat(instance, value);
+        T.lastYaw.setFloat(getRaw(), value);
     }
 
     public float getLastPitch() {
-        return T.lastPitch.getFloat(instance);
+        return T.lastPitch.getFloat(getRaw());
     }
 
     public void setLastPitch(float value) {
-        T.lastPitch.setFloat(instance, value);
+        T.lastPitch.setFloat(getRaw(), value);
     }
 
     public AxisAlignedBBHandle getBoundingBoxField() {
-        return T.boundingBoxField.get(instance);
+        return T.boundingBoxField.get(getRaw());
     }
 
     public void setBoundingBoxField(AxisAlignedBBHandle value) {
-        T.boundingBoxField.set(instance, value);
+        T.boundingBoxField.set(getRaw(), value);
     }
 
     public boolean isOnGround() {
-        return T.onGround.getBoolean(instance);
+        return T.onGround.getBoolean(getRaw());
     }
 
     public void setOnGround(boolean value) {
-        T.onGround.setBoolean(instance, value);
+        T.onGround.setBoolean(getRaw(), value);
     }
 
     public boolean isHorizontalMovementImpaired() {
-        return T.horizontalMovementImpaired.getBoolean(instance);
+        return T.horizontalMovementImpaired.getBoolean(getRaw());
     }
 
     public void setHorizontalMovementImpaired(boolean value) {
-        T.horizontalMovementImpaired.setBoolean(instance, value);
+        T.horizontalMovementImpaired.setBoolean(getRaw(), value);
     }
 
     public boolean isVerticalMovementImpaired() {
-        return T.verticalMovementImpaired.getBoolean(instance);
+        return T.verticalMovementImpaired.getBoolean(getRaw());
     }
 
     public void setVerticalMovementImpaired(boolean value) {
-        T.verticalMovementImpaired.setBoolean(instance, value);
+        T.verticalMovementImpaired.setBoolean(getRaw(), value);
     }
 
     public boolean isMovementImpaired() {
-        return T.movementImpaired.getBoolean(instance);
+        return T.movementImpaired.getBoolean(getRaw());
     }
 
     public void setMovementImpaired(boolean value) {
-        T.movementImpaired.setBoolean(instance, value);
+        T.movementImpaired.setBoolean(getRaw(), value);
     }
 
     public boolean isVelocityChanged() {
-        return T.velocityChanged.getBoolean(instance);
+        return T.velocityChanged.getBoolean(getRaw());
     }
 
     public void setVelocityChanged(boolean value) {
-        T.velocityChanged.setBoolean(instance, value);
+        T.velocityChanged.setBoolean(getRaw(), value);
     }
 
     public boolean isJustLanded() {
-        return T.justLanded.getBoolean(instance);
+        return T.justLanded.getBoolean(getRaw());
     }
 
     public void setJustLanded(boolean value) {
-        T.justLanded.setBoolean(instance, value);
+        T.justLanded.setBoolean(getRaw(), value);
     }
 
     public boolean isDead() {
-        return T.dead.getBoolean(instance);
+        return T.dead.getBoolean(getRaw());
     }
 
     public void setDead(boolean value) {
-        T.dead.setBoolean(instance, value);
+        T.dead.setBoolean(getRaw(), value);
     }
 
     public float getWidth() {
-        return T.width.getFloat(instance);
+        return T.width.getFloat(getRaw());
     }
 
     public void setWidth(float value) {
-        T.width.setFloat(instance, value);
+        T.width.setFloat(getRaw(), value);
     }
 
     public float getLength() {
-        return T.length.getFloat(instance);
+        return T.length.getFloat(getRaw());
     }
 
     public void setLength(float value) {
-        T.length.setFloat(instance, value);
+        T.length.setFloat(getRaw(), value);
     }
 
     public float getWalkedDistanceXZ() {
-        return T.walkedDistanceXZ.getFloat(instance);
+        return T.walkedDistanceXZ.getFloat(getRaw());
     }
 
     public void setWalkedDistanceXZ(float value) {
-        T.walkedDistanceXZ.setFloat(instance, value);
+        T.walkedDistanceXZ.setFloat(getRaw(), value);
     }
 
     public float getWalkedDistanceXYZ() {
-        return T.walkedDistanceXYZ.getFloat(instance);
+        return T.walkedDistanceXYZ.getFloat(getRaw());
     }
 
     public void setWalkedDistanceXYZ(float value) {
-        T.walkedDistanceXYZ.setFloat(instance, value);
+        T.walkedDistanceXYZ.setFloat(getRaw(), value);
     }
 
     public float getFallDistance() {
-        return T.fallDistance.getFloat(instance);
+        return T.fallDistance.getFloat(getRaw());
     }
 
     public void setFallDistance(float value) {
-        T.fallDistance.setFloat(instance, value);
+        T.fallDistance.setFloat(getRaw(), value);
     }
 
     public int getStepCounter() {
-        return T.stepCounter.getInteger(instance);
+        return T.stepCounter.getInteger(getRaw());
     }
 
     public void setStepCounter(int value) {
-        T.stepCounter.setInteger(instance, value);
+        T.stepCounter.setInteger(getRaw(), value);
     }
 
     public float getHeightOffset() {
-        return T.heightOffset.getFloat(instance);
+        return T.heightOffset.getFloat(getRaw());
     }
 
     public void setHeightOffset(float value) {
-        T.heightOffset.setFloat(instance, value);
+        T.heightOffset.setFloat(getRaw(), value);
     }
 
     public boolean isNoclip() {
-        return T.noclip.getBoolean(instance);
+        return T.noclip.getBoolean(getRaw());
     }
 
     public void setNoclip(boolean value) {
-        T.noclip.setBoolean(instance, value);
+        T.noclip.setBoolean(getRaw(), value);
     }
 
     public Random getRandom() {
-        return T.random.get(instance);
+        return T.random.get(getRaw());
     }
 
     public void setRandom(Random value) {
-        T.random.set(instance, value);
+        T.random.set(getRaw(), value);
     }
 
     public int getTicksLived() {
-        return T.ticksLived.getInteger(instance);
+        return T.ticksLived.getInteger(getRaw());
     }
 
     public void setTicksLived(int value) {
-        T.ticksLived.setInteger(instance, value);
+        T.ticksLived.setInteger(getRaw(), value);
     }
 
     public int getFireTicks() {
-        return T.fireTicks.getInteger(instance);
+        return T.fireTicks.getInteger(getRaw());
     }
 
     public void setFireTicks(int value) {
-        T.fireTicks.setInteger(instance, value);
+        T.fireTicks.setInteger(getRaw(), value);
     }
 
     public DataWatcher getDatawatcherField() {
-        return T.datawatcherField.get(instance);
+        return T.datawatcherField.get(getRaw());
     }
 
     public void setDatawatcherField(DataWatcher value) {
-        T.datawatcherField.set(instance, value);
+        T.datawatcherField.set(getRaw(), value);
     }
 
     public boolean isLoaded() {
-        return T.isLoaded.getBoolean(instance);
+        return T.isLoaded.getBoolean(getRaw());
     }
 
     public void setIsLoaded(boolean value) {
-        T.isLoaded.setBoolean(instance, value);
+        T.isLoaded.setBoolean(getRaw(), value);
     }
 
     public int getChunkX() {
-        return T.chunkX.getInteger(instance);
+        return T.chunkX.getInteger(getRaw());
     }
 
     public void setChunkX(int value) {
-        T.chunkX.setInteger(instance, value);
+        T.chunkX.setInteger(getRaw(), value);
     }
 
     public int getChunkY() {
-        return T.chunkY.getInteger(instance);
+        return T.chunkY.getInteger(getRaw());
     }
 
     public void setChunkY(int value) {
-        T.chunkY.setInteger(instance, value);
+        T.chunkY.setInteger(getRaw(), value);
     }
 
     public int getChunkZ() {
-        return T.chunkZ.getInteger(instance);
+        return T.chunkZ.getInteger(getRaw());
     }
 
     public void setChunkZ(int value) {
-        T.chunkZ.setInteger(instance, value);
+        T.chunkZ.setInteger(getRaw(), value);
     }
 
     public boolean isPositionChanged() {
-        return T.positionChanged.getBoolean(instance);
+        return T.positionChanged.getBoolean(getRaw());
     }
 
     public void setPositionChanged(boolean value) {
-        T.positionChanged.setBoolean(instance, value);
+        T.positionChanged.setBoolean(getRaw(), value);
     }
 
     public int getPortalCooldown() {
-        return T.portalCooldown.getInteger(instance);
+        return T.portalCooldown.getInteger(getRaw());
     }
 
     public void setPortalCooldown(int value) {
-        T.portalCooldown.setInteger(instance, value);
+        T.portalCooldown.setInteger(getRaw(), value);
     }
 
     public boolean isAllowTeleportation() {
-        return T.allowTeleportation.getBoolean(instance);
+        return T.allowTeleportation.getBoolean(getRaw());
     }
 
     public void setAllowTeleportation(boolean value) {
-        T.allowTeleportation.setBoolean(instance, value);
+        T.allowTeleportation.setBoolean(getRaw(), value);
     }
 
     public int getDimension() {
-        return T.dimension.getInteger(instance);
+        return T.dimension.getInteger(getRaw());
     }
 
     public void setDimension(int value) {
-        T.dimension.setInteger(instance, value);
+        T.dimension.setInteger(getRaw(), value);
     }
 
     public boolean isValid() {
-        return T.valid.getBoolean(instance);
+        return T.valid.getBoolean(getRaw());
     }
 
     public void setValid(boolean value) {
-        T.valid.setBoolean(instance, value);
+        T.valid.setBoolean(getRaw(), value);
     }
 
     /**

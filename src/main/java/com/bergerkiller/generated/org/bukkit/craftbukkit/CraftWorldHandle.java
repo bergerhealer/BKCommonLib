@@ -16,16 +16,13 @@ public class CraftWorldHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftWorldHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftWorldHandle handle = new CraftWorldHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getHandle() {
-        return T.getHandle.invoke(instance);
+        return T.getHandle.invoke(getRaw());
     }
 
     /**

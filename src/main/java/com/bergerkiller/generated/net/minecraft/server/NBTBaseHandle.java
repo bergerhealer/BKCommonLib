@@ -16,20 +16,17 @@ public class NBTBaseHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static NBTBaseHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NBTBaseHandle handle = new NBTBaseHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public byte getTypeId() {
-        return T.getTypeId.invoke(instance);
+        return T.getTypeId.invoke(getRaw());
     }
 
     public NBTBaseHandle clone() {
-        return T.clone.invoke(instance);
+        return T.clone.invoke(getRaw());
     }
 
     /**

@@ -19,20 +19,17 @@ public class WorldServerHandle extends WorldHandle {
     /* ============================================================================== */
 
     public static WorldServerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldServerHandle handle = new WorldServerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public PlayerChunkMapHandle getPlayerChunkMap() {
-        return T.getPlayerChunkMap.invoke(instance);
+        return T.getPlayerChunkMap.invoke(getRaw());
     }
 
     public void saveLevel() {
-        T.saveLevel.invoke(instance);
+        T.saveLevel.invoke(getRaw());
     }
 
 
@@ -42,11 +39,11 @@ public class WorldServerHandle extends WorldHandle {
 
     public ChunkProviderServerHandle getChunkProviderServer() {
         if (T.getChunkProviderServer.isAvailable()) {
-            return T.getChunkProviderServer.invoke(instance);
+            return T.getChunkProviderServer.invoke(getRaw());
         } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
-            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(instance));
+            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(getRaw()));
         } else if (T.field_chunkProviderServer.isAvailable()) {
-            return T.field_chunkProviderServer.get(instance);   
+            return T.field_chunkProviderServer.get(getRaw());   
         } else {
             throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
         }
@@ -54,42 +51,42 @@ public class WorldServerHandle extends WorldHandle {
 
     public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
         if (T.field_chunkProviderServer.isAvailable()) {
-            T.field_chunkProviderServer.set(instance, chunkProviderServerHandle);
+            T.field_chunkProviderServer.set(getRaw(), chunkProviderServerHandle);
         }
         if (WorldHandle.T.field_chunkProvider.isAvailable()) {
-            WorldHandle.T.field_chunkProvider.set(instance, chunkProviderServerHandle.getRaw());
+            WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
     public MinecraftServerHandle getMinecraftServer() {
-        return T.minecraftServer.get(instance);
+        return T.minecraftServer.get(getRaw());
     }
 
     public void setMinecraftServer(MinecraftServerHandle value) {
-        T.minecraftServer.set(instance, value);
+        T.minecraftServer.set(getRaw(), value);
     }
 
     public EntityTracker getEntityTracker() {
-        return T.entityTracker.get(instance);
+        return T.entityTracker.get(getRaw());
     }
 
     public void setEntityTracker(EntityTracker value) {
-        T.entityTracker.set(instance, value);
+        T.entityTracker.set(getRaw(), value);
     }
 
     public PlayerChunkMapHandle getPlayerChunkMapField() {
-        return T.playerChunkMapField.get(instance);
+        return T.playerChunkMapField.get(getRaw());
     }
 
     public void setPlayerChunkMapField(PlayerChunkMapHandle value) {
-        T.playerChunkMapField.set(instance, value);
+        T.playerChunkMapField.set(getRaw(), value);
     }
 
     public Map<UUID, EntityHandle> getEntitiesByUUID() {
-        return T.entitiesByUUID.get(instance);
+        return T.entitiesByUUID.get(getRaw());
     }
 
     public void setEntitiesByUUID(Map<UUID, EntityHandle> value) {
-        T.entitiesByUUID.set(instance, value);
+        T.entitiesByUUID.set(getRaw(), value);
     }
 
     /**

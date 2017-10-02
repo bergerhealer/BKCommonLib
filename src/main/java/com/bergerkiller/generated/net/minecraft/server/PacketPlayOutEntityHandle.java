@@ -16,10 +16,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutEntityHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutEntityHandle handle = new PacketPlayOutEntityHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -50,34 +47,34 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
     }
 
     public float getDeltaYaw() {
-        return deserializeRotation(T.dyaw_raw.getByte(instance));
+        return deserializeRotation(T.dyaw_raw.getByte(getRaw()));
     }
 
     public float getDeltaPitch() {
-        return deserializeRotation(T.dpitch_raw.getByte(instance));
+        return deserializeRotation(T.dpitch_raw.getByte(getRaw()));
     }
 
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(instance, (byte) serializeRotation(deltaYaw));
+        T.dyaw_raw.setByte(getRaw(), (byte) serializeRotation(deltaYaw));
     }
 
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(instance, (byte) serializeRotation(deltaPitch));
+        T.dpitch_raw.setByte(getRaw(), (byte) serializeRotation(deltaPitch));
     }
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public boolean isOnGround() {
-        return T.onGround.getBoolean(instance);
+        return T.onGround.getBoolean(getRaw());
     }
 
     public void setOnGround(boolean value) {
-        T.onGround.setBoolean(instance, value);
+        T.onGround.setBoolean(getRaw(), value);
     }
 
     /**
@@ -120,10 +117,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static PacketPlayOutEntityLookHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            PacketPlayOutEntityLookHandle handle = new PacketPlayOutEntityLookHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         public static final PacketPlayOutEntityLookHandle createNew() {
@@ -166,10 +160,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static PacketPlayOutRelEntityMoveHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            PacketPlayOutRelEntityMoveHandle handle = new PacketPlayOutRelEntityMoveHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         public static final PacketPlayOutRelEntityMoveHandle createNew() {
@@ -213,10 +204,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
         /* ============================================================================== */
 
         public static PacketPlayOutRelEntityMoveLookHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            PacketPlayOutRelEntityMoveLookHandle handle = new PacketPlayOutRelEntityMoveLookHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         public static final PacketPlayOutRelEntityMoveLookHandle createNew() {

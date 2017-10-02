@@ -16,10 +16,7 @@ public class MobEffectListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MobEffectListHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MobEffectListHandle handle = new MobEffectListHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

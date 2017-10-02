@@ -18,28 +18,25 @@ public class PacketPlayOutChatHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutChatHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutChatHandle handle = new PacketPlayOutChatHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public ChatText getText() {
-        return T.text.get(instance);
+        return T.text.get(getRaw());
     }
 
     public void setText(ChatText value) {
-        T.text.set(instance, value);
+        T.text.set(getRaw(), value);
     }
 
     public ChatMessageType getType() {
-        return T.type.get(instance);
+        return T.type.get(getRaw());
     }
 
     public void setType(ChatMessageType value) {
-        T.type.set(instance, value);
+        T.type.set(getRaw(), value);
     }
 
     /**

@@ -18,10 +18,7 @@ public class NonNullListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static NonNullListHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        NonNullListHandle handle = new NonNullListHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

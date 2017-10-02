@@ -16,36 +16,33 @@ public class BaseBlockPositionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static BaseBlockPositionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        BaseBlockPositionHandle handle = new BaseBlockPositionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getY() {
-        return T.y.getInteger(instance);
+        return T.y.getInteger(getRaw());
     }
 
     public void setY(int value) {
-        T.y.setInteger(instance, value);
+        T.y.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     /**

@@ -21,10 +21,7 @@ public class CraftBlockStateHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftBlockStateHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftBlockStateHandle handle = new CraftBlockStateHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final BlockState createNew(Block block) {
@@ -34,67 +31,67 @@ public class CraftBlockStateHandle extends Template.Handle {
     /* ============================================================================== */
 
     public World getWorld() {
-        return T.world.get(instance);
+        return T.world.get(getRaw());
     }
 
     public void setWorld(World value) {
-        T.world.set(instance, value);
+        T.world.set(getRaw(), value);
     }
 
     public Chunk getChunk() {
-        return T.chunk.get(instance);
+        return T.chunk.get(getRaw());
     }
 
     public void setChunk(Chunk value) {
-        T.chunk.set(instance, value);
+        T.chunk.set(getRaw(), value);
     }
 
     public int getX() {
-        return T.x.getInteger(instance);
+        return T.x.getInteger(getRaw());
     }
 
     public void setX(int value) {
-        T.x.setInteger(instance, value);
+        T.x.setInteger(getRaw(), value);
     }
 
     public int getY() {
-        return T.y.getInteger(instance);
+        return T.y.getInteger(getRaw());
     }
 
     public void setY(int value) {
-        T.y.setInteger(instance, value);
+        T.y.setInteger(getRaw(), value);
     }
 
     public int getZ() {
-        return T.z.getInteger(instance);
+        return T.z.getInteger(getRaw());
     }
 
     public void setZ(int value) {
-        T.z.setInteger(instance, value);
+        T.z.setInteger(getRaw(), value);
     }
 
     public int getTypeId() {
-        return T.typeId.getInteger(instance);
+        return T.typeId.getInteger(getRaw());
     }
 
     public void setTypeId(int value) {
-        T.typeId.setInteger(instance, value);
+        T.typeId.setInteger(getRaw(), value);
     }
 
     public MaterialData getData() {
-        return T.data.get(instance);
+        return T.data.get(getRaw());
     }
 
     public void setData(MaterialData value) {
-        T.data.set(instance, value);
+        T.data.set(getRaw(), value);
     }
 
     public int getFlag() {
-        return T.flag.getInteger(instance);
+        return T.flag.getInteger(getRaw());
     }
 
     public void setFlag(int value) {
-        T.flag.setInteger(instance, value);
+        T.flag.setInteger(getRaw(), value);
     }
 
     /**

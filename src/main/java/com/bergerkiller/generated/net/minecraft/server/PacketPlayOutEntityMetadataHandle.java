@@ -19,10 +19,7 @@ public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutEntityMetadataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutEntityMetadataHandle handle = new PacketPlayOutEntityMetadataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
@@ -32,19 +29,19 @@ public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     /* ============================================================================== */
 
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public List<Item<Object>> getMetadataItems() {
-        return T.metadataItems.get(instance);
+        return T.metadataItems.get(getRaw());
     }
 
     public void setMetadataItems(List<Item<Object>> value) {
-        T.metadataItems.set(instance, value);
+        T.metadataItems.set(getRaw(), value);
     }
 
     /**

@@ -17,24 +17,21 @@ public class PlayerConnectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PlayerConnectionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PlayerConnectionHandle handle = new PlayerConnectionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void sendPacket(CommonPacket packet) {
-        T.sendPacket.invoke(instance, packet);
+        T.sendPacket.invoke(getRaw(), packet);
     }
 
     public Object getNetworkManager() {
-        return T.networkManager.get(instance);
+        return T.networkManager.get(getRaw());
     }
 
     public void setNetworkManager(Object value) {
-        T.networkManager.set(instance, value);
+        T.networkManager.set(getRaw(), value);
     }
 
     /**

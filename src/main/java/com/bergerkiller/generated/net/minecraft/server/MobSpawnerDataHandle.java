@@ -16,10 +16,7 @@ public class MobSpawnerDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MobSpawnerDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MobSpawnerDataHandle handle = new MobSpawnerDataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

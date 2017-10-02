@@ -17,10 +17,7 @@ public class ChatMessageTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ChatMessageTypeHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ChatMessageTypeHandle handle = new ChatMessageTypeHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -30,7 +27,7 @@ public class ChatMessageTypeHandle extends Template.Handle {
     }
 
     public byte getId() {
-        return T.getId.invoke(instance);
+        return T.getId.invoke(getRaw());
     }
 
     /**

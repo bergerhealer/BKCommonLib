@@ -17,20 +17,17 @@ public class DataPaletteBlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static DataPaletteBlockHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        DataPaletteBlockHandle handle = new DataPaletteBlockHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public BlockData getBlockData(int x, int y, int z) {
-        return T.getBlockData.invoke(instance, x, y, z);
+        return T.getBlockData.invoke(getRaw(), x, y, z);
     }
 
     public void setBlockData(int x, int y, int z, BlockData data) {
-        T.setBlockData.invoke(instance, x, y, z, data);
+        T.setBlockData.invoke(getRaw(), x, y, z, data);
     }
 
     /**

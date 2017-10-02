@@ -16,16 +16,13 @@ public class CraftChunkHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static CraftChunkHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        CraftChunkHandle handle = new CraftChunkHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Object getHandle() {
-        return T.getHandle.invoke(instance);
+        return T.getHandle.invoke(getRaw());
     }
 
     /**

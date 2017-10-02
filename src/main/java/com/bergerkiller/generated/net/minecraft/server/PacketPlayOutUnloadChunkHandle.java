@@ -17,28 +17,25 @@ public class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutUnloadChunkHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutUnloadChunkHandle handle = new PacketPlayOutUnloadChunkHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getCx() {
-        return T.cx.getInteger(instance);
+        return T.cx.getInteger(getRaw());
     }
 
     public void setCx(int value) {
-        T.cx.setInteger(instance, value);
+        T.cx.setInteger(getRaw(), value);
     }
 
     public int getCz() {
-        return T.cz.getInteger(instance);
+        return T.cz.getInteger(getRaw());
     }
 
     public void setCz(int value) {
-        T.cz.setInteger(instance, value);
+        T.cz.setInteger(getRaw(), value);
     }
 
     /**

@@ -17,16 +17,13 @@ public class WorldNBTStorageHandle extends IDataManagerHandle {
     /* ============================================================================== */
 
     public static WorldNBTStorageHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldNBTStorageHandle handle = new WorldNBTStorageHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public File getPlayerDir() {
-        return T.getPlayerDir.invoke(instance);
+        return T.getPlayerDir.invoke(getRaw());
     }
 
     /**

@@ -16,20 +16,17 @@ public class PacketPlayOutKeepAliveHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutKeepAliveHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutKeepAliveHandle handle = new PacketPlayOutKeepAliveHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Long getKey() {
-        return T.key.get(instance);
+        return T.key.get(getRaw());
     }
 
     public void setKey(Long value) {
-        T.key.set(instance, value);
+        T.key.set(getRaw(), value);
     }
 
     /**

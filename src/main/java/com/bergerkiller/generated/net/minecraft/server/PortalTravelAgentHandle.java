@@ -19,16 +19,13 @@ public class PortalTravelAgentHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static PortalTravelAgentHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PortalTravelAgentHandle handle = new PortalTravelAgentHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void adjustExit(Entity entity, Location position, Vector velocity) {
-        T.adjustExit.invoke(instance, entity, position, velocity);
+        T.adjustExit.invoke(getRaw(), entity, position, velocity);
     }
 
     /**

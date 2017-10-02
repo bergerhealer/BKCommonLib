@@ -17,20 +17,17 @@ public class EntityHangingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static EntityHangingHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityHangingHandle handle = new EntityHangingHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public IntVector3 getBlockPosition() {
-        return T.blockPosition.get(instance);
+        return T.blockPosition.get(getRaw());
     }
 
     public void setBlockPosition(IntVector3 value) {
-        T.blockPosition.set(instance, value);
+        T.blockPosition.set(getRaw(), value);
     }
 
     /**

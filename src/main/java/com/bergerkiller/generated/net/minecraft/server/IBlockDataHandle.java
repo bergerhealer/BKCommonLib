@@ -17,20 +17,17 @@ public class IBlockDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IBlockDataHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IBlockDataHandle handle = new IBlockDataHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public BlockHandle getBlock() {
-        return T.getBlock.invoke(instance);
+        return T.getBlock.invoke(getRaw());
     }
 
     public Map<Object, Object> getStates() {
-        return T.getStates.invoke(instance);
+        return T.getStates.invoke(getRaw());
     }
 
     /**

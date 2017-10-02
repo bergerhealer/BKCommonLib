@@ -18,20 +18,17 @@ public class EntityItemFrameHandle extends EntityHandle {
     /* ============================================================================== */
 
     public static EntityItemFrameHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityItemFrameHandle handle = new EntityItemFrameHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public ItemStack getItem() {
-        return T.getItem.invoke(instance);
+        return T.getItem.invoke(getRaw());
     }
 
     public void setItem(ItemStack newItemStack) {
-        T.setItem.invoke(instance, newItemStack);
+        T.setItem.invoke(getRaw(), newItemStack);
     }
 
 

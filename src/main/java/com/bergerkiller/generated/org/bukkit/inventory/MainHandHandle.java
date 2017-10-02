@@ -19,10 +19,7 @@ public class MainHandHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static MainHandHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        MainHandHandle handle = new MainHandHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

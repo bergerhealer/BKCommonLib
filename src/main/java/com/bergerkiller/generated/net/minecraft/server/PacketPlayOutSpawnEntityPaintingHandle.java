@@ -19,44 +19,41 @@ public class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityPaintingHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSpawnEntityPaintingHandle handle = new PacketPlayOutSpawnEntityPaintingHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public IntVector3 getPosition() {
-        return T.position.get(instance);
+        return T.position.get(getRaw());
     }
 
     public void setPosition(IntVector3 value) {
-        T.position.set(instance, value);
+        T.position.set(getRaw(), value);
     }
 
     public BlockFace getFacing() {
-        return T.facing.get(instance);
+        return T.facing.get(getRaw());
     }
 
     public void setFacing(BlockFace value) {
-        T.facing.set(instance, value);
+        T.facing.set(getRaw(), value);
     }
 
     public String getArt() {
-        return T.art.get(instance);
+        return T.art.get(getRaw());
     }
 
     public void setArt(String value) {
-        T.art.set(instance, value);
+        T.art.set(getRaw(), value);
     }
 
     /**

@@ -16,16 +16,13 @@ public class RegistryIDHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static RegistryIDHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        RegistryIDHandle handle = new RegistryIDHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getId(Object value) {
-        return T.getId.invoke(instance, value);
+        return T.getId.invoke(getRaw(), value);
     }
 
     /**

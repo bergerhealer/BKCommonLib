@@ -22,32 +22,29 @@ public class EntityTrackerEntryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static EntityTrackerEntryHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityTrackerEntryHandle handle = new EntityTrackerEntryHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public void hideForAll() {
-        T.hideForAll.invoke(instance);
+        T.hideForAll.invoke(getRaw());
     }
 
     public void removeViewer(Player player) {
-        T.removeViewer.invoke(instance, player);
+        T.removeViewer.invoke(getRaw(), player);
     }
 
     public void scanPlayers(List<Player> playerList) {
-        T.scanPlayers.invoke(instance, playerList);
+        T.scanPlayers.invoke(getRaw(), playerList);
     }
 
     public void updatePlayer(Player player) {
-        T.updatePlayer.invoke(instance, player);
+        T.updatePlayer.invoke(getRaw(), player);
     }
 
     public CommonPacket getSpawnPacket() {
-        return T.getSpawnPacket.invoke(instance);
+        return T.getSpawnPacket.invoke(getRaw());
     }
 
 
@@ -79,88 +76,88 @@ public class EntityTrackerEntryHandle extends Template.Handle {
 
     public void setLocX(double x) {
         if (T.long_xLoc.isAvailable()) {
-            T.long_xLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
+            T.long_xLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
         } else {
-            T.int_xLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
+            T.int_xLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
         }
     }
 
     public void setLocY(double y) {
         if (T.long_yLoc.isAvailable()) {
-            T.long_yLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
+            T.long_yLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
         } else {
-            T.int_yLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
+            T.int_yLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
         }
     }
 
     public void setLocZ(double z) {
         if (T.long_zLoc.isAvailable()) {
-            T.long_zLoc.setLong(instance, com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
+            T.long_zLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
         } else {
-            T.int_zLoc.setInteger(instance, com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
+            T.int_zLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
         }
     }
 
     public void setYaw(float yaw) {
-        T.raw_yRot.setInteger(instance, getProtocolRotation(yaw));
+        T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
     }
 
     public void setPitch(float pitch) {
-        T.raw_xRot.setInteger(instance, getProtocolRotation(pitch));
+        T.raw_xRot.setInteger(getRaw(), getProtocolRotation(pitch));
     }
 
     public void setHeadYaw(float headYaw) {
-        T.raw_headYaw.setInteger(instance, getProtocolRotation(headYaw));
+        T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
     }
 
     public double getLocX() {
         if (T.long_xLoc.isAvailable()) {
-            return (double) T.long_xLoc.getLong(instance) / 4096.0;
+            return (double) T.long_xLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_xLoc.getInteger(instance) / 32.0;
+            return (double) T.int_xLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     public double getLocY() {
         if (T.long_yLoc.isAvailable()) {
-            return (double) T.long_yLoc.getLong(instance) / 4096.0;
+            return (double) T.long_yLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_yLoc.getInteger(instance) / 32.0;
+            return (double) T.int_yLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     public double getLocZ() {
         if (T.long_zLoc.isAvailable()) {
-            return (double) T.long_zLoc.getLong(instance) / 4096.0;
+            return (double) T.long_zLoc.getLong(getRaw()) / 4096.0;
         } else {
-            return (double) T.int_zLoc.getInteger(instance) / 32.0;
+            return (double) T.int_zLoc.getInteger(getRaw()) / 32.0;
         }
     }
 
     public float getYaw() {
-        return ((float) T.raw_yRot.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_yRot.getInteger(getRaw()) * 360) / 256.0F;
     }
 
     public float getPitch() {
-        return ((float) T.raw_xRot.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_xRot.getInteger(getRaw()) * 360) / 256.0F;
     }
 
     public float getHeadYaw() {
-        return ((float) T.raw_headYaw.getInteger(instance) * 360) / 256.0F;
+        return ((float) T.raw_headYaw.getInteger(getRaw()) * 360) / 256.0F;
     }
 
 
     public java.util.Collection<org.bukkit.entity.Player> getViewers() {
         if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(instance).keySet();
+            return T.viewersMap.get(getRaw()).keySet();
         } else {
-            return T.viewersSet.get(instance);
+            return T.viewersSet.get(getRaw());
         }
     }
 
     public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
         if (T.viewersMap.isAvailable()) {
-            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(instance);
+            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(getRaw());
             if (map.containsKey(viewer)) {
                 return false;
             } else {
@@ -168,143 +165,143 @@ public class EntityTrackerEntryHandle extends Template.Handle {
                 return true;
             }
         } else {
-            return T.viewersSet.get(instance).add(viewer);
+            return T.viewersSet.get(getRaw()).add(viewer);
         }
     }
 
     public boolean removeViewerFromSet(org.bukkit.entity.Player viewer) {
         if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(instance).remove(viewer) != null;
+            return T.viewersMap.get(getRaw()).remove(viewer) != null;
         } else {
-            return T.viewersSet.get(instance).remove(viewer);
+            return T.viewersSet.get(getRaw()).remove(viewer);
         }
     }
     public EntityHandle getTracker() {
-        return T.tracker.get(instance);
+        return T.tracker.get(getRaw());
     }
 
     public void setTracker(EntityHandle value) {
-        T.tracker.set(instance, value);
+        T.tracker.set(getRaw(), value);
     }
 
     public int getViewDistance() {
-        return T.viewDistance.getInteger(instance);
+        return T.viewDistance.getInteger(getRaw());
     }
 
     public void setViewDistance(int value) {
-        T.viewDistance.setInteger(instance, value);
+        T.viewDistance.setInteger(getRaw(), value);
     }
 
     public int getUpdateInterval() {
-        return T.updateInterval.getInteger(instance);
+        return T.updateInterval.getInteger(getRaw());
     }
 
     public void setUpdateInterval(int value) {
-        T.updateInterval.setInteger(instance, value);
+        T.updateInterval.setInteger(getRaw(), value);
     }
 
     public int getRaw_xRot() {
-        return T.raw_xRot.getInteger(instance);
+        return T.raw_xRot.getInteger(getRaw());
     }
 
     public void setRaw_xRot(int value) {
-        T.raw_xRot.setInteger(instance, value);
+        T.raw_xRot.setInteger(getRaw(), value);
     }
 
     public int getRaw_yRot() {
-        return T.raw_yRot.getInteger(instance);
+        return T.raw_yRot.getInteger(getRaw());
     }
 
     public void setRaw_yRot(int value) {
-        T.raw_yRot.setInteger(instance, value);
+        T.raw_yRot.setInteger(getRaw(), value);
     }
 
     public int getRaw_headYaw() {
-        return T.raw_headYaw.getInteger(instance);
+        return T.raw_headYaw.getInteger(getRaw());
     }
 
     public void setRaw_headYaw(int value) {
-        T.raw_headYaw.setInteger(instance, value);
+        T.raw_headYaw.setInteger(getRaw(), value);
     }
 
     public double getXVel() {
-        return T.xVel.getDouble(instance);
+        return T.xVel.getDouble(getRaw());
     }
 
     public void setXVel(double value) {
-        T.xVel.setDouble(instance, value);
+        T.xVel.setDouble(getRaw(), value);
     }
 
     public double getYVel() {
-        return T.yVel.getDouble(instance);
+        return T.yVel.getDouble(getRaw());
     }
 
     public void setYVel(double value) {
-        T.yVel.setDouble(instance, value);
+        T.yVel.setDouble(getRaw(), value);
     }
 
     public double getZVel() {
-        return T.zVel.getDouble(instance);
+        return T.zVel.getDouble(getRaw());
     }
 
     public void setZVel(double value) {
-        T.zVel.setDouble(instance, value);
+        T.zVel.setDouble(getRaw(), value);
     }
 
     public int getTickCounter() {
-        return T.tickCounter.getInteger(instance);
+        return T.tickCounter.getInteger(getRaw());
     }
 
     public void setTickCounter(int value) {
-        T.tickCounter.setInteger(instance, value);
+        T.tickCounter.setInteger(getRaw(), value);
     }
 
     public double getPrevX() {
-        return T.prevX.getDouble(instance);
+        return T.prevX.getDouble(getRaw());
     }
 
     public void setPrevX(double value) {
-        T.prevX.setDouble(instance, value);
+        T.prevX.setDouble(getRaw(), value);
     }
 
     public double getPrevY() {
-        return T.prevY.getDouble(instance);
+        return T.prevY.getDouble(getRaw());
     }
 
     public void setPrevY(double value) {
-        T.prevY.setDouble(instance, value);
+        T.prevY.setDouble(getRaw(), value);
     }
 
     public double getPrevZ() {
-        return T.prevZ.getDouble(instance);
+        return T.prevZ.getDouble(getRaw());
     }
 
     public void setPrevZ(double value) {
-        T.prevZ.setDouble(instance, value);
+        T.prevZ.setDouble(getRaw(), value);
     }
 
     public boolean isSynched() {
-        return T.synched.getBoolean(instance);
+        return T.synched.getBoolean(getRaw());
     }
 
     public void setSynched(boolean value) {
-        T.synched.setBoolean(instance, value);
+        T.synched.setBoolean(getRaw(), value);
     }
 
     public boolean isMobile() {
-        return T.isMobile.getBoolean(instance);
+        return T.isMobile.getBoolean(getRaw());
     }
 
     public void setIsMobile(boolean value) {
-        T.isMobile.setBoolean(instance, value);
+        T.isMobile.setBoolean(getRaw(), value);
     }
 
     public int getTimeSinceLocationSync() {
-        return T.timeSinceLocationSync.getInteger(instance);
+        return T.timeSinceLocationSync.getInteger(getRaw());
     }
 
     public void setTimeSinceLocationSync(int value) {
-        T.timeSinceLocationSync.setInteger(instance, value);
+        T.timeSinceLocationSync.setInteger(getRaw(), value);
     }
 
     /**

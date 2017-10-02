@@ -16,32 +16,29 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
     /* ============================================================================== */
 
     public static EntityMinecartHopperHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartHopperHandle handle = new EntityMinecartHopperHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean suckItems() {
-        return T.suckItems.invoke(instance);
+        return T.suckItems.invoke(getRaw());
     }
 
     public boolean isSuckingEnabled() {
-        return T.isSuckingEnabled.invoke(instance);
+        return T.isSuckingEnabled.invoke(getRaw());
     }
 
     public void setSuckingEnabled(boolean enabled) {
-        T.setSuckingEnabled.invoke(instance, enabled);
+        T.setSuckingEnabled.invoke(getRaw(), enabled);
     }
 
     public int getSuckingCooldown() {
-        return T.suckingCooldown.getInteger(instance);
+        return T.suckingCooldown.getInteger(getRaw());
     }
 
     public void setSuckingCooldown(int value) {
-        T.suckingCooldown.setInteger(instance, value);
+        T.suckingCooldown.setInteger(getRaw(), value);
     }
 
     /**

@@ -17,10 +17,7 @@ public class BiomeBaseHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static BiomeBaseHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        BiomeBaseHandle handle = new BiomeBaseHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -46,10 +43,7 @@ public class BiomeBaseHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static BiomeMetaHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            BiomeMetaHandle handle = new BiomeMetaHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         public static final BiomeMetaHandle createNew(java.lang.Class<?> entityClass, int x, int y, int z) {
@@ -59,27 +53,27 @@ public class BiomeBaseHandle extends Template.Handle {
         /* ============================================================================== */
 
         public java.lang.Class<?> getEntityClass() {
-            return T.entityClass.get(instance);
+            return T.entityClass.get(getRaw());
         }
 
         public void setEntityClass(java.lang.Class<?> value) {
-            T.entityClass.set(instance, value);
+            T.entityClass.set(getRaw(), value);
         }
 
         public int getMinSpawnCount() {
-            return T.minSpawnCount.getInteger(instance);
+            return T.minSpawnCount.getInteger(getRaw());
         }
 
         public void setMinSpawnCount(int value) {
-            T.minSpawnCount.setInteger(instance, value);
+            T.minSpawnCount.setInteger(getRaw(), value);
         }
 
         public int getMaxSpawnCount() {
-            return T.maxSpawnCount.getInteger(instance);
+            return T.maxSpawnCount.getInteger(getRaw());
         }
 
         public void setMaxSpawnCount(int value) {
-            T.maxSpawnCount.setInteger(instance, value);
+            T.maxSpawnCount.setInteger(getRaw(), value);
         }
 
         /**

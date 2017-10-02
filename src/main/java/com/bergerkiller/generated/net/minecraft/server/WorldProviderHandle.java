@@ -16,23 +16,20 @@ public class WorldProviderHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static WorldProviderHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        WorldProviderHandle handle = new WorldProviderHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public boolean int_skyLightProperty() {
-        return T.int_skyLightProperty.invoke(instance);
+        return T.int_skyLightProperty.invoke(getRaw());
     }
 
 
     private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
 
     public boolean hasSkyLight() {
-        return T.int_skyLightProperty.invoke(instance).booleanValue() != _darkInverted;
+        return T.int_skyLightProperty.invoke(getRaw()).booleanValue() != _darkInverted;
     }
 
     public boolean isDarkWorld() {

@@ -18,10 +18,7 @@ public class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutEntityEquipmentHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutEntityEquipmentHandle handle = new PacketPlayOutEntityEquipmentHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final PacketPlayOutEntityEquipmentHandle createNew(int entityId, EquipmentSlot slot, ItemStack itemStack) {
@@ -31,27 +28,27 @@ public class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
     /* ============================================================================== */
 
     public int getEntityId() {
-        return T.entityId.getInteger(instance);
+        return T.entityId.getInteger(getRaw());
     }
 
     public void setEntityId(int value) {
-        T.entityId.setInteger(instance, value);
+        T.entityId.setInteger(getRaw(), value);
     }
 
     public EquipmentSlot getSlot() {
-        return T.slot.get(instance);
+        return T.slot.get(getRaw());
     }
 
     public void setSlot(EquipmentSlot value) {
-        T.slot.set(instance, value);
+        T.slot.set(getRaw(), value);
     }
 
     public ItemStack getItemStack() {
-        return T.itemStack.get(instance);
+        return T.itemStack.get(getRaw());
     }
 
     public void setItemStack(ItemStack value) {
-        T.itemStack.set(instance, value);
+        T.itemStack.set(getRaw(), value);
     }
 
     /**

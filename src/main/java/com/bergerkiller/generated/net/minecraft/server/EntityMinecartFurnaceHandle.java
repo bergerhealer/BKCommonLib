@@ -17,10 +17,7 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /* ============================================================================== */
 
     public static EntityMinecartFurnaceHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        EntityMinecartFurnaceHandle handle = new EntityMinecartFurnaceHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -28,27 +25,27 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
 
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     public int getFuel() {
-        return T.fuel.getInteger(instance);
+        return T.fuel.getInteger(getRaw());
     }
 
     public void setFuel(int value) {
-        T.fuel.setInteger(instance, value);
+        T.fuel.setInteger(getRaw(), value);
     }
 
     public double getPushForceX() {
-        return T.pushForceX.getDouble(instance);
+        return T.pushForceX.getDouble(getRaw());
     }
 
     public void setPushForceX(double value) {
-        T.pushForceX.setDouble(instance, value);
+        T.pushForceX.setDouble(getRaw(), value);
     }
 
     public double getPushForceZ() {
-        return T.pushForceZ.getDouble(instance);
+        return T.pushForceZ.getDouble(getRaw());
     }
 
     public void setPushForceZ(double value) {
-        T.pushForceZ.setDouble(instance, value);
+        T.pushForceZ.setDouble(getRaw(), value);
     }
 
     /**

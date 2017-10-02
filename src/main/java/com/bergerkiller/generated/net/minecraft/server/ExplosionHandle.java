@@ -18,10 +18,7 @@ public class ExplosionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ExplosionHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        ExplosionHandle handle = new ExplosionHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     public static final ExplosionHandle createNew(World world, Entity entity, double x, double y, double z, float yield, boolean fire, boolean destroyBlocks) {

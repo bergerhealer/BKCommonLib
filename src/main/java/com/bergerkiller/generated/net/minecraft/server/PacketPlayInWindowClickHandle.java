@@ -18,60 +18,57 @@ public class PacketPlayInWindowClickHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInWindowClickHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInWindowClickHandle handle = new PacketPlayInWindowClickHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getWindowId() {
-        return T.windowId.getInteger(instance);
+        return T.windowId.getInteger(getRaw());
     }
 
     public void setWindowId(int value) {
-        T.windowId.setInteger(instance, value);
+        T.windowId.setInteger(getRaw(), value);
     }
 
     public int getSlot() {
-        return T.slot.getInteger(instance);
+        return T.slot.getInteger(getRaw());
     }
 
     public void setSlot(int value) {
-        T.slot.setInteger(instance, value);
+        T.slot.setInteger(getRaw(), value);
     }
 
     public int getButton() {
-        return T.button.getInteger(instance);
+        return T.button.getInteger(getRaw());
     }
 
     public void setButton(int value) {
-        T.button.setInteger(instance, value);
+        T.button.setInteger(getRaw(), value);
     }
 
     public short getAction() {
-        return T.action.getShort(instance);
+        return T.action.getShort(getRaw());
     }
 
     public void setAction(short value) {
-        T.action.setShort(instance, value);
+        T.action.setShort(getRaw(), value);
     }
 
     public ItemStack getItem() {
-        return T.item.get(instance);
+        return T.item.get(getRaw());
     }
 
     public void setItem(ItemStack value) {
-        T.item.set(instance, value);
+        T.item.set(getRaw(), value);
     }
 
     public InventoryClickType getMode() {
-        return T.mode.get(instance);
+        return T.mode.get(getRaw());
     }
 
     public void setMode(InventoryClickType value) {
-        T.mode.set(instance, value);
+        T.mode.set(getRaw(), value);
     }
 
     /**

@@ -18,28 +18,25 @@ public class PacketPlayOutSetCooldownHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayOutSetCooldownHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayOutSetCooldownHandle handle = new PacketPlayOutSetCooldownHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public Material getMaterial() {
-        return T.material.get(instance);
+        return T.material.get(getRaw());
     }
 
     public void setMaterial(Material value) {
-        T.material.set(instance, value);
+        T.material.set(getRaw(), value);
     }
 
     public int getCooldown() {
-        return T.cooldown.getInteger(instance);
+        return T.cooldown.getInteger(getRaw());
     }
 
     public void setCooldown(int value) {
-        T.cooldown.setInteger(instance, value);
+        T.cooldown.setInteger(getRaw(), value);
     }
 
     /**

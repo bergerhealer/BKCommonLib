@@ -17,28 +17,25 @@ public class PacketPlayInTabCompleteHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInTabCompleteHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInTabCompleteHandle handle = new PacketPlayInTabCompleteHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public String getText() {
-        return T.text.get(instance);
+        return T.text.get(getRaw());
     }
 
     public void setText(String value) {
-        T.text.set(instance, value);
+        T.text.set(getRaw(), value);
     }
 
     public IntVector3 getPosition() {
-        return T.position.get(instance);
+        return T.position.get(getRaw());
     }
 
     public void setPosition(IntVector3 value) {
-        T.position.set(instance, value);
+        T.position.set(getRaw(), value);
     }
 
     /**

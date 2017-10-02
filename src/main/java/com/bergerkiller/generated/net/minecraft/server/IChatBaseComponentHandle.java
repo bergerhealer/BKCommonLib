@@ -16,10 +16,7 @@ public class IChatBaseComponentHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static IChatBaseComponentHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        IChatBaseComponentHandle handle = new IChatBaseComponentHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
@@ -45,10 +42,7 @@ public class IChatBaseComponentHandle extends Template.Handle {
         /* ============================================================================== */
 
         public static ChatSerializerHandle createHandle(Object handleInstance) {
-            if (handleInstance == null) return null;
-            ChatSerializerHandle handle = new ChatSerializerHandle();
-            handle.instance = handleInstance;
-            return handle;
+            return T.createHandle(handleInstance);
         }
 
         /* ============================================================================== */

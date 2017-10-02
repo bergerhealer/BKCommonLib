@@ -17,20 +17,17 @@ public class PacketPlayInTeleportAcceptHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInTeleportAcceptHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInTeleportAcceptHandle handle = new PacketPlayInTeleportAcceptHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public int getTeleportId() {
-        return T.teleportId.getInteger(instance);
+        return T.teleportId.getInteger(getRaw());
     }
 
     public void setTeleportId(int value) {
-        T.teleportId.setInteger(instance, value);
+        T.teleportId.setInteger(getRaw(), value);
     }
 
     /**

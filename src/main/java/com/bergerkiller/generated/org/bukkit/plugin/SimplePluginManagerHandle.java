@@ -18,20 +18,17 @@ public class SimplePluginManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static SimplePluginManagerHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        SimplePluginManagerHandle handle = new SimplePluginManagerHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
 
     public List<Plugin> getPlugins() {
-        return T.plugins.get(instance);
+        return T.plugins.get(getRaw());
     }
 
     public void setPlugins(List<Plugin> value) {
-        T.plugins.set(instance, value);
+        T.plugins.set(getRaw(), value);
     }
 
     /**

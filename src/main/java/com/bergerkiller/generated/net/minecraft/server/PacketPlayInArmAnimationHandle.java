@@ -16,10 +16,7 @@ public class PacketPlayInArmAnimationHandle extends PacketHandle {
     /* ============================================================================== */
 
     public static PacketPlayInArmAnimationHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        PacketPlayInArmAnimationHandle handle = new PacketPlayInArmAnimationHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */

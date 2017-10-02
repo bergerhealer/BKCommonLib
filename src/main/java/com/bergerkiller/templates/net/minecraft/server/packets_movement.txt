@@ -159,19 +159,19 @@ class PacketPlayOutEntity extends Packet {
     }
 
     public float getDeltaYaw() {
-        return deserializeRotation(T.dyaw_raw.getByte(instance));
+        return deserializeRotation(T.dyaw_raw.getByte(getRaw()));
     }
 
     public float getDeltaPitch() {
-        return deserializeRotation(T.dpitch_raw.getByte(instance));
+        return deserializeRotation(T.dpitch_raw.getByte(getRaw()));
     }
 
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(instance, (byte) serializeRotation(deltaYaw));
+        T.dyaw_raw.setByte(getRaw(), (byte) serializeRotation(deltaYaw));
     }
 
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(instance, (byte) serializeRotation(deltaPitch));
+        T.dpitch_raw.setByte(getRaw(), (byte) serializeRotation(deltaPitch));
     }
     </code>
 

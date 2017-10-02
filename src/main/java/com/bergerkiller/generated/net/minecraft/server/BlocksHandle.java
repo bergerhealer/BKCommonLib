@@ -17,10 +17,7 @@ public class BlocksHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static BlocksHandle createHandle(Object handleInstance) {
-        if (handleInstance == null) return null;
-        BlocksHandle handle = new BlocksHandle();
-        handle.instance = handleInstance;
-        return handle;
+        return T.createHandle(handleInstance);
     }
 
     /* ============================================================================== */
