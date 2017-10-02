@@ -13,7 +13,7 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityTrackerHandle extends Template.Handle {
+public abstract class EntityTrackerHandle extends Template.Handle {
     /** @See {@link EntityTrackerClass} */
     public static final EntityTrackerClass T = new EntityTrackerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerHandle.class, "net.minecraft.server.EntityTracker");
@@ -26,42 +26,15 @@ public class EntityTrackerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void sendPacketToEntity(Entity entity, CommonPacket packet) {
-        T.sendPacketToEntity.invoke(getRaw(), entity, packet);
-    }
-
-    public World getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(World value) {
-        T.world.set(getRaw(), value);
-    }
-
-    public Set<EntityTrackerEntryHandle> getEntries() {
-        return T.entries.get(getRaw());
-    }
-
-    public void setEntries(Set<EntityTrackerEntryHandle> value) {
-        T.entries.set(getRaw(), value);
-    }
-
-    public IntHashMap<Object> getTrackedEntities() {
-        return T.trackedEntities.get(getRaw());
-    }
-
-    public void setTrackedEntities(IntHashMap<Object> value) {
-        T.trackedEntities.set(getRaw(), value);
-    }
-
-    public int getViewDistance() {
-        return T.viewDistance.getInteger(getRaw());
-    }
-
-    public void setViewDistance(int value) {
-        T.viewDistance.setInteger(getRaw(), value);
-    }
-
+    public abstract void sendPacketToEntity(Entity entity, CommonPacket packet);
+    public abstract World getWorld();
+    public abstract void setWorld(World value);
+    public abstract Set<EntityTrackerEntryHandle> getEntries();
+    public abstract void setEntries(Set<EntityTrackerEntryHandle> value);
+    public abstract IntHashMap<Object> getTrackedEntities();
+    public abstract void setTrackedEntities(IntHashMap<Object> value);
+    public abstract int getViewDistance();
+    public abstract void setViewDistance(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityTracker</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

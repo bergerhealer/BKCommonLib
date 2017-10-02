@@ -9,7 +9,7 @@ import org.bukkit.potion.PotionEffect;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftPotionUtilHandle extends Template.Handle {
+public abstract class CraftPotionUtilHandle extends Template.Handle {
     /** @See {@link CraftPotionUtilClass} */
     public static final CraftPotionUtilClass T = new CraftPotionUtilClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftPotionUtilHandle.class, "org.bukkit.craftbukkit.potion.CraftPotionUtil");

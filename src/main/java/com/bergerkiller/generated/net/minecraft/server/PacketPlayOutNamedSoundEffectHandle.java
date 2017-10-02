@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
+public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
     /** @See {@link PacketPlayOutNamedSoundEffectClass} */
     public static final PacketPlayOutNamedSoundEffectClass T = new PacketPlayOutNamedSoundEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutNamedSoundEffectHandle.class, "net.minecraft.server.PacketPlayOutNamedSoundEffect");
@@ -54,46 +54,16 @@ public class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
         } else {
         }
     }
-    public ResourceKey getSound() {
-        return T.sound.get(getRaw());
-    }
-
-    public void setSound(ResourceKey value) {
-        T.sound.set(getRaw(), value);
-    }
-
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getY() {
-        return T.y.getInteger(getRaw());
-    }
-
-    public void setY(int value) {
-        T.y.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
-    public float getVolume() {
-        return T.volume.getFloat(getRaw());
-    }
-
-    public void setVolume(float value) {
-        T.volume.setFloat(getRaw(), value);
-    }
-
+    public abstract ResourceKey getSound();
+    public abstract void setSound(ResourceKey value);
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getY();
+    public abstract void setY(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
+    public abstract float getVolume();
+    public abstract void setVolume(float value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutNamedSoundEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

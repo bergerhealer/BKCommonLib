@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityHandle extends Template.Handle {
+public abstract class EntityHandle extends Template.Handle {
     /** @See {@link EntityClass} */
     public static final EntityClass T = new EntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "org.bukkit.entity.Entity");
@@ -23,10 +23,7 @@ public class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Entity getPassenger() {
-        return T.getPassenger.invoke(getRaw());
-    }
-
+    public abstract Entity getPassenger();
     /**
      * Stores class members for <b>org.bukkit.entity.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

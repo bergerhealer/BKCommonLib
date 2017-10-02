@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class Vec3DHandle extends Template.Handle {
+public abstract class Vec3DHandle extends Template.Handle {
     /** @See {@link Vec3DClass} */
     public static final Vec3DClass T = new Vec3DClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(Vec3DHandle.class, "net.minecraft.server.Vec3D");
@@ -25,30 +25,12 @@ public class Vec3DHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public double getX() {
-        return T.x.getDouble(getRaw());
-    }
-
-    public void setX(double value) {
-        T.x.setDouble(getRaw(), value);
-    }
-
-    public double getY() {
-        return T.y.getDouble(getRaw());
-    }
-
-    public void setY(double value) {
-        T.y.setDouble(getRaw(), value);
-    }
-
-    public double getZ() {
-        return T.z.getDouble(getRaw());
-    }
-
-    public void setZ(double value) {
-        T.z.setDouble(getRaw(), value);
-    }
-
+    public abstract double getX();
+    public abstract void setX(double value);
+    public abstract double getY();
+    public abstract void setY(double value);
+    public abstract double getZ();
+    public abstract void setZ(double value);
     /**
      * Stores class members for <b>net.minecraft.server.Vec3D</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

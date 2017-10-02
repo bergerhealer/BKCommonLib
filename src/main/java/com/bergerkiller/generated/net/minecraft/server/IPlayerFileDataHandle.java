@@ -10,7 +10,7 @@ import org.bukkit.entity.HumanEntity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IPlayerFileDataHandle extends Template.Handle {
+public abstract class IPlayerFileDataHandle extends Template.Handle {
     /** @See {@link IPlayerFileDataClass} */
     public static final IPlayerFileDataClass T = new IPlayerFileDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IPlayerFileDataHandle.class, "net.minecraft.server.IPlayerFileData");
@@ -23,18 +23,9 @@ public class IPlayerFileDataHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void save(HumanEntity human) {
-        T.save.invoke(getRaw(), human);
-    }
-
-    public CommonTagCompound load(HumanEntity human) {
-        return T.load.invoke(getRaw(), human);
-    }
-
-    public String[] getSeenPlayers() {
-        return T.getSeenPlayers.invoke(getRaw());
-    }
-
+    public abstract void save(HumanEntity human);
+    public abstract CommonTagCompound load(HumanEntity human);
+    public abstract String[] getSeenPlayers();
     /**
      * Stores class members for <b>net.minecraft.server.IPlayerFileData</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

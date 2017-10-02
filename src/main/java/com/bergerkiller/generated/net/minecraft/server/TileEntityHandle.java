@@ -13,7 +13,7 @@ import org.bukkit.World;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class TileEntityHandle extends Template.Handle {
+public abstract class TileEntityHandle extends Template.Handle {
     /** @See {@link TileEntityClass} */
     public static final TileEntityClass T = new TileEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHandle.class, "net.minecraft.server.TileEntity");
@@ -26,34 +26,13 @@ public class TileEntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public WorldHandle getWorld() {
-        return T.getWorld.invoke(getRaw());
-    }
-
-    public BlockPositionHandle getPosition() {
-        return T.getPosition.invoke(getRaw());
-    }
-
-    public int getRawData() {
-        return T.getRawData.invoke(getRaw());
-    }
-
-    public Material getType() {
-        return T.getType.invoke(getRaw());
-    }
-
-    public CommonPacket getUpdatePacket() {
-        return T.getUpdatePacket.invoke(getRaw());
-    }
-
-    public void load(CommonTagCompound nbttagcompound) {
-        T.load.invoke(getRaw(), nbttagcompound);
-    }
-
-    public void save(CommonTagCompound nbttagcompound) {
-        T.save.invoke(getRaw(), nbttagcompound);
-    }
-
+    public abstract WorldHandle getWorld();
+    public abstract BlockPositionHandle getPosition();
+    public abstract int getRawData();
+    public abstract Material getType();
+    public abstract CommonPacket getUpdatePacket();
+    public abstract void load(CommonTagCompound nbttagcompound);
+    public abstract void save(CommonTagCompound nbttagcompound);
 
     public org.bukkit.block.BlockState toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toBlockState.convert(getRaw());
@@ -62,22 +41,10 @@ public class TileEntityHandle extends Template.Handle {
     public static TileEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
     }
-    public World getWorld_field() {
-        return T.world_field.get(getRaw());
-    }
-
-    public void setWorld_field(World value) {
-        T.world_field.set(getRaw(), value);
-    }
-
-    public IntVector3 getPosition_field() {
-        return T.position_field.get(getRaw());
-    }
-
-    public void setPosition_field(IntVector3 value) {
-        T.position_field.set(getRaw(), value);
-    }
-
+    public abstract World getWorld_field();
+    public abstract void setWorld_field(World value);
+    public abstract IntVector3 getPosition_field();
+    public abstract void setPosition_field(IntVector3 value);
     /**
      * Stores class members for <b>net.minecraft.server.TileEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

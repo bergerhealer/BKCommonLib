@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayInTeleportAcceptHandle extends PacketHandle {
+public abstract class PacketPlayInTeleportAcceptHandle extends PacketHandle {
     /** @See {@link PacketPlayInTeleportAcceptClass} */
     public static final PacketPlayInTeleportAcceptClass T = new PacketPlayInTeleportAcceptClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInTeleportAcceptHandle.class, "net.minecraft.server.PacketPlayInTeleportAccept");
@@ -22,14 +22,8 @@ public class PacketPlayInTeleportAcceptHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getTeleportId() {
-        return T.teleportId.getInteger(getRaw());
-    }
-
-    public void setTeleportId(int value) {
-        T.teleportId.setInteger(getRaw(), value);
-    }
-
+    public abstract int getTeleportId();
+    public abstract void setTeleportId(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInTeleportAccept</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

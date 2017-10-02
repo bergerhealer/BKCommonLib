@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class SimplePluginManagerHandle extends Template.Handle {
+public abstract class SimplePluginManagerHandle extends Template.Handle {
     /** @See {@link SimplePluginManagerClass} */
     public static final SimplePluginManagerClass T = new SimplePluginManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SimplePluginManagerHandle.class, "org.bukkit.plugin.SimplePluginManager");
@@ -23,14 +23,8 @@ public class SimplePluginManagerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public List<Plugin> getPlugins() {
-        return T.plugins.get(getRaw());
-    }
-
-    public void setPlugins(List<Plugin> value) {
-        T.plugins.set(getRaw(), value);
-    }
-
+    public abstract List<Plugin> getPlugins();
+    public abstract void setPlugins(List<Plugin> value);
     /**
      * Stores class members for <b>org.bukkit.plugin.SimplePluginManager</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

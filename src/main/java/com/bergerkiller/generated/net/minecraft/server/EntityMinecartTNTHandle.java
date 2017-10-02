@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
+public abstract class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartTNTClass} */
     public static final EntityMinecartTNTClass T = new EntityMinecartTNTClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartTNTHandle.class, "net.minecraft.server.EntityMinecartTNT");
@@ -21,22 +21,10 @@ public class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
 
     /* ============================================================================== */
 
-    public void explode(double damage) {
-        T.explode.invoke(getRaw(), damage);
-    }
-
-    public void prime() {
-        T.prime.invoke(getRaw());
-    }
-
-    public int getFuse() {
-        return T.fuse.getInteger(getRaw());
-    }
-
-    public void setFuse(int value) {
-        T.fuse.setInteger(getRaw(), value);
-    }
-
+    public abstract void explode(double damage);
+    public abstract void prime();
+    public abstract int getFuse();
+    public abstract void setFuse(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartTNT</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

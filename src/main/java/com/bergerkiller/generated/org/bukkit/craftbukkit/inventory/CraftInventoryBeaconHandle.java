@@ -9,7 +9,7 @@ import org.bukkit.inventory.BeaconInventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftInventoryBeaconHandle extends Template.Handle {
+public abstract class CraftInventoryBeaconHandle extends Template.Handle {
     /** @See {@link CraftInventoryBeaconClass} */
     public static final CraftInventoryBeaconClass T = new CraftInventoryBeaconClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBeaconHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBeacon");

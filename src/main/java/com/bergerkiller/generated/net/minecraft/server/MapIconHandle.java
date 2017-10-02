@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MapIconHandle extends Template.Handle {
+public abstract class MapIconHandle extends Template.Handle {
     /** @See {@link MapIconClass} */
     public static final MapIconClass T = new MapIconClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MapIconHandle.class, "net.minecraft.server.MapIcon");
@@ -25,22 +25,10 @@ public class MapIconHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public byte getTypeId() {
-        return T.getTypeId.invoke(getRaw());
-    }
-
-    public byte getX() {
-        return T.getX.invoke(getRaw());
-    }
-
-    public byte getY() {
-        return T.getY.invoke(getRaw());
-    }
-
-    public byte getDirection() {
-        return T.getDirection.invoke(getRaw());
-    }
-
+    public abstract byte getTypeId();
+    public abstract byte getX();
+    public abstract byte getY();
+    public abstract byte getDirection();
     /**
      * Stores class members for <b>net.minecraft.server.MapIcon</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -62,7 +50,7 @@ public class MapIconHandle extends Template.Handle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
-    public static class TypeHandle extends Template.Handle {
+    public abstract static class TypeHandle extends Template.Handle {
         /** @See {@link TypeClass} */
         public static final TypeClass T = new TypeClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(TypeHandle.class, "net.minecraft.server.MapIcon.Type");

@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class WeightedRandomHandle extends Template.Handle {
+public abstract class WeightedRandomHandle extends Template.Handle {
     /** @See {@link WeightedRandomClass} */
     public static final WeightedRandomClass T = new WeightedRandomClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomHandle.class, "net.minecraft.server.WeightedRandom");
@@ -34,7 +34,7 @@ public class WeightedRandomHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class WeightedRandomChoiceHandle extends Template.Handle {
+    public abstract static class WeightedRandomChoiceHandle extends Template.Handle {
         /** @See {@link WeightedRandomChoiceClass} */
         public static final WeightedRandomChoiceClass T = new WeightedRandomChoiceClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomChoiceHandle.class, "net.minecraft.server.WeightedRandom.WeightedRandomChoice");
@@ -47,14 +47,8 @@ public class WeightedRandomHandle extends Template.Handle {
 
         /* ============================================================================== */
 
-        public int getChance() {
-            return T.chance.getInteger(getRaw());
-        }
-
-        public void setChance(int value) {
-            T.chance.setInteger(getRaw(), value);
-        }
-
+        public abstract int getChance();
+        public abstract void setChance(int value);
         /**
          * Stores class members for <b>net.minecraft.server.WeightedRandom.WeightedRandomChoice</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.

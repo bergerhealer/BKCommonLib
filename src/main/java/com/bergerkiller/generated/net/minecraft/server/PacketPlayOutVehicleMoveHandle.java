@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayOutVehicleMoveHandle extends PacketHandle {
+public abstract class PacketPlayOutVehicleMoveHandle extends PacketHandle {
     /** @See {@link PacketPlayOutVehicleMoveClass} */
     public static final PacketPlayOutVehicleMoveClass T = new PacketPlayOutVehicleMoveClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutVehicleMoveHandle.class, "net.minecraft.server.PacketPlayOutVehicleMove");
@@ -22,46 +22,16 @@ public class PacketPlayOutVehicleMoveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public double getPosX() {
-        return T.posX.getDouble(getRaw());
-    }
-
-    public void setPosX(double value) {
-        T.posX.setDouble(getRaw(), value);
-    }
-
-    public double getPosY() {
-        return T.posY.getDouble(getRaw());
-    }
-
-    public void setPosY(double value) {
-        T.posY.setDouble(getRaw(), value);
-    }
-
-    public double getPosZ() {
-        return T.posZ.getDouble(getRaw());
-    }
-
-    public void setPosZ(double value) {
-        T.posZ.setDouble(getRaw(), value);
-    }
-
-    public float getYaw() {
-        return T.yaw.getFloat(getRaw());
-    }
-
-    public void setYaw(float value) {
-        T.yaw.setFloat(getRaw(), value);
-    }
-
-    public float getPitch() {
-        return T.pitch.getFloat(getRaw());
-    }
-
-    public void setPitch(float value) {
-        T.pitch.setFloat(getRaw(), value);
-    }
-
+    public abstract double getPosX();
+    public abstract void setPosX(double value);
+    public abstract double getPosY();
+    public abstract void setPosY(double value);
+    public abstract double getPosZ();
+    public abstract void setPosZ(double value);
+    public abstract float getYaw();
+    public abstract void setYaw(float value);
+    public abstract float getPitch();
+    public abstract void setPitch(float value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutVehicleMove</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

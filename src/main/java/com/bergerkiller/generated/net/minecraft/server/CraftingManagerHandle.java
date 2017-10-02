@@ -9,7 +9,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftingManagerHandle extends Template.Handle {
+public abstract class CraftingManagerHandle extends Template.Handle {
     /** @See {@link CraftingManagerClass} */
     public static final CraftingManagerClass T = new CraftingManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftingManagerHandle.class, "net.minecraft.server.CraftingManager");

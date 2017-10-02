@@ -9,7 +9,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityTypesHandle extends Template.Handle {
+public abstract class EntityTypesHandle extends Template.Handle {
     /** @See {@link EntityTypesClass} */
     public static final EntityTypesClass T = new EntityTypesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes");

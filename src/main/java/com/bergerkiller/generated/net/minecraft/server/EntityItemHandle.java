@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityItemHandle extends EntityHandle {
+public abstract class EntityItemHandle extends EntityHandle {
     /** @See {@link EntityItemClass} */
     public static final EntityItemClass T = new EntityItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemHandle.class, "net.minecraft.server.EntityItem");
@@ -25,30 +25,12 @@ public class EntityItemHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-    public ItemStackHandle getItemStack() {
-        return T.getItemStack.invoke(getRaw());
-    }
-
-    public void setItemStack(ItemStackHandle itemstack) {
-        T.setItemStack.invoke(getRaw(), itemstack);
-    }
-
-    public int getAge() {
-        return T.age.getInteger(getRaw());
-    }
-
-    public void setAge(int value) {
-        T.age.setInteger(getRaw(), value);
-    }
-
-    public int getPickupDelay() {
-        return T.pickupDelay.getInteger(getRaw());
-    }
-
-    public void setPickupDelay(int value) {
-        T.pickupDelay.setInteger(getRaw(), value);
-    }
-
+    public abstract ItemStackHandle getItemStack();
+    public abstract void setItemStack(ItemStackHandle itemstack);
+    public abstract int getAge();
+    public abstract void setAge(int value);
+    public abstract int getPickupDelay();
+    public abstract void setPickupDelay(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityItem</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

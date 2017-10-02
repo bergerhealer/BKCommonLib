@@ -12,7 +12,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class GameProfileHandle extends Template.Handle {
+public abstract class GameProfileHandle extends Template.Handle {
     /** @See {@link GameProfileClass} */
     public static final GameProfileClass T = new GameProfileClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(GameProfileHandle.class, "com.mojang.authlib.GameProfile");
@@ -29,34 +29,13 @@ public class GameProfileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public UUID getId() {
-        return T.getId.invoke(getRaw());
-    }
-
-    public String getName() {
-        return T.getName.invoke(getRaw());
-    }
-
-    public void clearProperties() {
-        T.clearProperties.invoke(getRaw());
-    }
-
-    public Set<String> getPropertyKeys() {
-        return T.getPropertyKeys.invoke(getRaw());
-    }
-
-    public Collection<PropertyHandle> getProperties(String key) {
-        return T.getProperties.invoke(getRaw(), key);
-    }
-
-    public boolean putProperty(String key, PropertyHandle property) {
-        return T.putProperty.invoke(getRaw(), key, property);
-    }
-
-    public void setAllProperties(GameProfileHandle profile) {
-        T.setAllProperties.invoke(getRaw(), profile);
-    }
-
+    public abstract UUID getId();
+    public abstract String getName();
+    public abstract void clearProperties();
+    public abstract Set<String> getPropertyKeys();
+    public abstract Collection<PropertyHandle> getProperties(String key);
+    public abstract boolean putProperty(String key, PropertyHandle property);
+    public abstract void setAllProperties(GameProfileHandle profile);
 
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);

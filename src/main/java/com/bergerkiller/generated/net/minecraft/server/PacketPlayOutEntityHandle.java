@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutEntityHandle extends PacketHandle {
+public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityClass} */
     public static final PacketPlayOutEntityClass T = new PacketPlayOutEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityHandle.class, "net.minecraft.server.PacketPlayOutEntity");
@@ -61,22 +61,10 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
     public void setDeltaPitch(float deltaPitch) {
         T.dpitch_raw.setByte(getRaw(), (byte) serializeRotation(deltaPitch));
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public boolean isOnGround() {
-        return T.onGround.getBoolean(getRaw());
-    }
-
-    public void setOnGround(boolean value) {
-        T.onGround.setBoolean(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract boolean isOnGround();
+    public abstract void setOnGround(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -109,7 +97,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class PacketPlayOutEntityLookHandle extends PacketPlayOutEntityHandle {
+    public abstract static class PacketPlayOutEntityLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutEntityLookClass} */
         public static final PacketPlayOutEntityLookClass T = new PacketPlayOutEntityLookClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutEntityLook");
@@ -152,7 +140,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class PacketPlayOutRelEntityMoveHandle extends PacketPlayOutEntityHandle {
+    public abstract static class PacketPlayOutRelEntityMoveHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveClass} */
         public static final PacketPlayOutRelEntityMoveClass T = new PacketPlayOutRelEntityMoveClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMove");
@@ -196,7 +184,7 @@ public class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class PacketPlayOutRelEntityMoveLookHandle extends PacketPlayOutEntityHandle {
+    public abstract static class PacketPlayOutRelEntityMoveLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveLookClass} */
         public static final PacketPlayOutRelEntityMoveLookClass T = new PacketPlayOutRelEntityMoveLookClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook");

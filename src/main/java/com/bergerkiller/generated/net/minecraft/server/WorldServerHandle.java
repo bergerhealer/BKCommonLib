@@ -11,7 +11,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class WorldServerHandle extends WorldHandle {
+public abstract class WorldServerHandle extends WorldHandle {
     /** @See {@link WorldServerClass} */
     public static final WorldServerClass T = new WorldServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer");
@@ -24,14 +24,8 @@ public class WorldServerHandle extends WorldHandle {
 
     /* ============================================================================== */
 
-    public PlayerChunkMapHandle getPlayerChunkMap() {
-        return T.getPlayerChunkMap.invoke(getRaw());
-    }
-
-    public void saveLevel() {
-        T.saveLevel.invoke(getRaw());
-    }
-
+    public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract void saveLevel();
 
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
@@ -57,38 +51,14 @@ public class WorldServerHandle extends WorldHandle {
             WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
-    public MinecraftServerHandle getMinecraftServer() {
-        return T.minecraftServer.get(getRaw());
-    }
-
-    public void setMinecraftServer(MinecraftServerHandle value) {
-        T.minecraftServer.set(getRaw(), value);
-    }
-
-    public EntityTracker getEntityTracker() {
-        return T.entityTracker.get(getRaw());
-    }
-
-    public void setEntityTracker(EntityTracker value) {
-        T.entityTracker.set(getRaw(), value);
-    }
-
-    public PlayerChunkMapHandle getPlayerChunkMapField() {
-        return T.playerChunkMapField.get(getRaw());
-    }
-
-    public void setPlayerChunkMapField(PlayerChunkMapHandle value) {
-        T.playerChunkMapField.set(getRaw(), value);
-    }
-
-    public Map<UUID, EntityHandle> getEntitiesByUUID() {
-        return T.entitiesByUUID.get(getRaw());
-    }
-
-    public void setEntitiesByUUID(Map<UUID, EntityHandle> value) {
-        T.entitiesByUUID.set(getRaw(), value);
-    }
-
+    public abstract MinecraftServerHandle getMinecraftServer();
+    public abstract void setMinecraftServer(MinecraftServerHandle value);
+    public abstract EntityTracker getEntityTracker();
+    public abstract void setEntityTracker(EntityTracker value);
+    public abstract PlayerChunkMapHandle getPlayerChunkMapField();
+    public abstract void setPlayerChunkMapField(PlayerChunkMapHandle value);
+    public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
+    public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.WorldServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

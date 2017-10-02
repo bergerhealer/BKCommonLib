@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PortalTravelAgentHandle extends Template.Handle {
+public abstract class PortalTravelAgentHandle extends Template.Handle {
     /** @See {@link PortalTravelAgentClass} */
     public static final PortalTravelAgentClass T = new PortalTravelAgentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PortalTravelAgentHandle.class, "net.minecraft.server.PortalTravelAgent");
@@ -24,10 +24,7 @@ public class PortalTravelAgentHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void adjustExit(Entity entity, Location position, Vector velocity) {
-        T.adjustExit.invoke(getRaw(), entity, position, velocity);
-    }
-
+    public abstract void adjustExit(Entity entity, Location position, Vector velocity);
     /**
      * Stores class members for <b>net.minecraft.server.PortalTravelAgent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

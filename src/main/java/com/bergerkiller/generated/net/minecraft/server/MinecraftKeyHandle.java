@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MinecraftKeyHandle extends Template.Handle {
+public abstract class MinecraftKeyHandle extends Template.Handle {
     /** @See {@link MinecraftKeyClass} */
     public static final MinecraftKeyClass T = new MinecraftKeyClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftKeyHandle.class, "net.minecraft.server.MinecraftKey");
@@ -33,22 +33,10 @@ public class MinecraftKeyHandle extends Template.Handle {
     public static MinecraftKeyHandle createNew(String namespace, String name) {
         return createNew(0, new String[] { namespace, name });
     }
-    public String getNamespace() {
-        return T.namespace.get(getRaw());
-    }
-
-    public void setNamespace(String value) {
-        T.namespace.set(getRaw(), value);
-    }
-
-    public String getName() {
-        return T.name.get(getRaw());
-    }
-
-    public void setName(String value) {
-        T.name.set(getRaw(), value);
-    }
-
+    public abstract String getNamespace();
+    public abstract void setNamespace(String value);
+    public abstract String getName();
+    public abstract void setName(String value);
     /**
      * Stores class members for <b>net.minecraft.server.MinecraftKey</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

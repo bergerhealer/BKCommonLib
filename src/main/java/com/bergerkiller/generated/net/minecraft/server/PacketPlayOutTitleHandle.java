@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutTitleHandle extends PacketHandle {
+public abstract class PacketPlayOutTitleHandle extends PacketHandle {
     /** @See {@link PacketPlayOutTitleClass} */
     public static final PacketPlayOutTitleClass T = new PacketPlayOutTitleClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutTitleHandle.class, "net.minecraft.server.PacketPlayOutTitle");
@@ -34,7 +34,7 @@ public class PacketPlayOutTitleHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class EnumTitleActionHandle extends Template.Handle {
+    public abstract static class EnumTitleActionHandle extends Template.Handle {
         /** @See {@link EnumTitleActionClass} */
         public static final EnumTitleActionClass T = new EnumTitleActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumTitleActionHandle.class, "net.minecraft.server.PacketPlayOutTitle.EnumTitleAction");

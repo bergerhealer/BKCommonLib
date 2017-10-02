@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutCombatEventHandle extends Template.Handle {
+public abstract class PacketPlayOutCombatEventHandle extends Template.Handle {
     /** @See {@link PacketPlayOutCombatEventClass} */
     public static final PacketPlayOutCombatEventClass T = new PacketPlayOutCombatEventClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutCombatEventHandle.class, "net.minecraft.server.PacketPlayOutCombatEvent");
@@ -22,46 +22,16 @@ public class PacketPlayOutCombatEventHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Object getEventType() {
-        return T.eventType.get(getRaw());
-    }
-
-    public void setEventType(Object value) {
-        T.eventType.set(getRaw(), value);
-    }
-
-    public int getEntityId1() {
-        return T.entityId1.getInteger(getRaw());
-    }
-
-    public void setEntityId1(int value) {
-        T.entityId1.setInteger(getRaw(), value);
-    }
-
-    public int getEntityId2() {
-        return T.entityId2.getInteger(getRaw());
-    }
-
-    public void setEntityId2(int value) {
-        T.entityId2.setInteger(getRaw(), value);
-    }
-
-    public int getTickDuration() {
-        return T.tickDuration.getInteger(getRaw());
-    }
-
-    public void setTickDuration(int value) {
-        T.tickDuration.setInteger(getRaw(), value);
-    }
-
-    public ChatText getMessage() {
-        return T.message.get(getRaw());
-    }
-
-    public void setMessage(ChatText value) {
-        T.message.set(getRaw(), value);
-    }
-
+    public abstract Object getEventType();
+    public abstract void setEventType(Object value);
+    public abstract int getEntityId1();
+    public abstract void setEntityId1(int value);
+    public abstract int getEntityId2();
+    public abstract void setEntityId2(int value);
+    public abstract int getTickDuration();
+    public abstract void setTickDuration(int value);
+    public abstract ChatText getMessage();
+    public abstract void setMessage(ChatText value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutCombatEvent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

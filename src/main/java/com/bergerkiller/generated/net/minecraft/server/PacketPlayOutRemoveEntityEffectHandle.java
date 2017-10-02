@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
+public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
     /** @See {@link PacketPlayOutRemoveEntityEffectClass} */
     public static final PacketPlayOutRemoveEntityEffectClass T = new PacketPlayOutRemoveEntityEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRemoveEntityEffectHandle.class, "net.minecraft.server.PacketPlayOutRemoveEntityEffect");
@@ -32,22 +32,10 @@ public class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
         handle.setEffectList(mobEffectList);
         return handle;
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public MobEffectListHandle getEffectList() {
-        return T.effectList.get(getRaw());
-    }
-
-    public void setEffectList(MobEffectListHandle value) {
-        T.effectList.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract MobEffectListHandle getEffectList();
+    public abstract void setEffectList(MobEffectListHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutRemoveEntityEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class RegistryIDHandle extends Template.Handle {
+public abstract class RegistryIDHandle extends Template.Handle {
     /** @See {@link RegistryIDClass} */
     public static final RegistryIDClass T = new RegistryIDClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryIDHandle.class, "net.minecraft.server.RegistryID");
@@ -21,10 +21,7 @@ public class RegistryIDHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getId(Object value) {
-        return T.getId.invoke(getRaw(), value);
-    }
-
+    public abstract int getId(Object value);
     /**
      * Stores class members for <b>net.minecraft.server.RegistryID</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

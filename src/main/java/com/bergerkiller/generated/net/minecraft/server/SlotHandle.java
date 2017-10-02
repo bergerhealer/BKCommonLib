@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class SlotHandle extends Template.Handle {
+public abstract class SlotHandle extends Template.Handle {
     /** @See {@link SlotClass} */
     public static final SlotClass T = new SlotClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SlotHandle.class, "net.minecraft.server.Slot");
@@ -22,10 +22,7 @@ public class SlotHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public ItemStack getItem() {
-        return T.getItem.invoke(getRaw());
-    }
-
+    public abstract ItemStack getItem();
     /**
      * Stores class members for <b>net.minecraft.server.Slot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

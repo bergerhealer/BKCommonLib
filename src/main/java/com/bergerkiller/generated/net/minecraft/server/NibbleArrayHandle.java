@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class NibbleArrayHandle extends Template.Handle {
+public abstract class NibbleArrayHandle extends Template.Handle {
     /** @See {@link NibbleArrayClass} */
     public static final NibbleArrayClass T = new NibbleArrayClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NibbleArrayHandle.class, "net.minecraft.server.NibbleArray");
@@ -29,22 +29,10 @@ public class NibbleArrayHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int get(int x, int y, int z) {
-        return T.get.invoke(getRaw(), x, y, z);
-    }
-
-    public void set(int x, int y, int z, int nibbleValue) {
-        T.set.invoke(getRaw(), x, y, z, nibbleValue);
-    }
-
-    public byte[] getData() {
-        return T.data.get(getRaw());
-    }
-
-    public void setData(byte[] value) {
-        T.data.set(getRaw(), value);
-    }
-
+    public abstract int get(int x, int y, int z);
+    public abstract void set(int x, int y, int z, int nibbleValue);
+    public abstract byte[] getData();
+    public abstract void setData(byte[] value);
     /**
      * Stores class members for <b>net.minecraft.server.NibbleArray</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

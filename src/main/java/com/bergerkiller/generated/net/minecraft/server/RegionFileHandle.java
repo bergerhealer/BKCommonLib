@@ -10,7 +10,7 @@ import java.io.RandomAccessFile;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class RegionFileHandle extends Template.Handle {
+public abstract class RegionFileHandle extends Template.Handle {
     /** @See {@link RegionFileClass} */
     public static final RegionFileClass T = new RegionFileClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileHandle.class, "net.minecraft.server.RegionFile");
@@ -27,30 +27,12 @@ public class RegionFileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void close() {
-        T.close.invoke(getRaw());
-    }
-
-    public boolean chunkExists(int cx, int cz) {
-        return T.chunkExists.invoke(getRaw(), cx, cz);
-    }
-
-    public File getFile() {
-        return T.file.get(getRaw());
-    }
-
-    public void setFile(File value) {
-        T.file.set(getRaw(), value);
-    }
-
-    public RandomAccessFile getStream() {
-        return T.stream.get(getRaw());
-    }
-
-    public void setStream(RandomAccessFile value) {
-        T.stream.set(getRaw(), value);
-    }
-
+    public abstract void close();
+    public abstract boolean chunkExists(int cx, int cz);
+    public abstract File getFile();
+    public abstract void setFile(File value);
+    public abstract RandomAccessFile getStream();
+    public abstract void setStream(RandomAccessFile value);
     /**
      * Stores class members for <b>net.minecraft.server.RegionFile</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

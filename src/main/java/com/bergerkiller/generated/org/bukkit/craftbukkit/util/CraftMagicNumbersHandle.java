@@ -9,7 +9,7 @@ import org.bukkit.Material;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftMagicNumbersHandle extends Template.Handle {
+public abstract class CraftMagicNumbersHandle extends Template.Handle {
     /** @See {@link CraftMagicNumbersClass} */
     public static final CraftMagicNumbersClass T = new CraftMagicNumbersClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftMagicNumbersHandle.class, "org.bukkit.craftbukkit.util.CraftMagicNumbers");

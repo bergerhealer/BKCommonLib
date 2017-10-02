@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IDataManagerHandle extends Template.Handle {
+public abstract class IDataManagerHandle extends Template.Handle {
     /** @See {@link IDataManagerClass} */
     public static final IDataManagerClass T = new IDataManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IDataManagerHandle.class, "net.minecraft.server.IDataManager");

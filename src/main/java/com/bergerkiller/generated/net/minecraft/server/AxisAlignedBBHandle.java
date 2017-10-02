@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class AxisAlignedBBHandle extends Template.Handle {
+public abstract class AxisAlignedBBHandle extends Template.Handle {
     /** @See {@link AxisAlignedBBClass} */
     public static final AxisAlignedBBClass T = new AxisAlignedBBClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AxisAlignedBBHandle.class, "net.minecraft.server.AxisAlignedBB");
@@ -25,34 +25,13 @@ public class AxisAlignedBBHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public AxisAlignedBBHandle grow(double sx, double sy, double sz) {
-        return T.grow.invoke(getRaw(), sx, sy, sz);
-    }
-
-    public AxisAlignedBBHandle transformB(double lx, double ly, double lz) {
-        return T.transformB.invoke(getRaw(), lx, ly, lz);
-    }
-
-    public AxisAlignedBBHandle translate(double dx, double dy, double dz) {
-        return T.translate.invoke(getRaw(), dx, dy, dz);
-    }
-
-    public boolean bbTransformA(AxisAlignedBBHandle paramAxisAlignedBB) {
-        return T.bbTransformA.invoke(getRaw(), paramAxisAlignedBB);
-    }
-
-    public double calcSomeX(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeX.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
-    }
-
-    public double calcSomeY(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeY.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
-    }
-
-    public double calcSomeZ(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble) {
-        return T.calcSomeZ.invoke(getRaw(), paramAxisAlignedBB, paramDouble);
-    }
-
+    public abstract AxisAlignedBBHandle grow(double sx, double sy, double sz);
+    public abstract AxisAlignedBBHandle transformB(double lx, double ly, double lz);
+    public abstract AxisAlignedBBHandle translate(double dx, double dy, double dz);
+    public abstract boolean bbTransformA(AxisAlignedBBHandle paramAxisAlignedBB);
+    public abstract double calcSomeX(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
+    public abstract double calcSomeY(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
+    public abstract double calcSomeZ(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
 
     public AxisAlignedBBHandle growUniform(double size) {
         return grow(size, size, size);
@@ -61,54 +40,18 @@ public class AxisAlignedBBHandle extends Template.Handle {
     public AxisAlignedBBHandle shrinkUniform(double size) {
         return growUniform(-size);
     }
-    public double getMinX() {
-        return T.minX.getDouble(getRaw());
-    }
-
-    public void setMinX(double value) {
-        T.minX.setDouble(getRaw(), value);
-    }
-
-    public double getMinY() {
-        return T.minY.getDouble(getRaw());
-    }
-
-    public void setMinY(double value) {
-        T.minY.setDouble(getRaw(), value);
-    }
-
-    public double getMinZ() {
-        return T.minZ.getDouble(getRaw());
-    }
-
-    public void setMinZ(double value) {
-        T.minZ.setDouble(getRaw(), value);
-    }
-
-    public double getMaxX() {
-        return T.maxX.getDouble(getRaw());
-    }
-
-    public void setMaxX(double value) {
-        T.maxX.setDouble(getRaw(), value);
-    }
-
-    public double getMaxY() {
-        return T.maxY.getDouble(getRaw());
-    }
-
-    public void setMaxY(double value) {
-        T.maxY.setDouble(getRaw(), value);
-    }
-
-    public double getMaxZ() {
-        return T.maxZ.getDouble(getRaw());
-    }
-
-    public void setMaxZ(double value) {
-        T.maxZ.setDouble(getRaw(), value);
-    }
-
+    public abstract double getMinX();
+    public abstract void setMinX(double value);
+    public abstract double getMinY();
+    public abstract void setMinY(double value);
+    public abstract double getMinZ();
+    public abstract void setMinZ(double value);
+    public abstract double getMaxX();
+    public abstract void setMaxX(double value);
+    public abstract double getMaxY();
+    public abstract void setMaxY(double value);
+    public abstract double getMaxZ();
+    public abstract void setMaxZ(double value);
     /**
      * Stores class members for <b>net.minecraft.server.AxisAlignedBB</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

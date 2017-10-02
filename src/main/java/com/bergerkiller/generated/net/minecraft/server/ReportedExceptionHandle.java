@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ReportedExceptionHandle extends Template.Handle {
+public abstract class ReportedExceptionHandle extends Template.Handle {
     /** @See {@link ReportedExceptionClass} */
     public static final ReportedExceptionClass T = new ReportedExceptionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ReportedExceptionHandle.class, "net.minecraft.server.ReportedException");

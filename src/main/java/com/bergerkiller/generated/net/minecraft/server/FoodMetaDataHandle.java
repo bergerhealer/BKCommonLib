@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class FoodMetaDataHandle extends Template.Handle {
+public abstract class FoodMetaDataHandle extends Template.Handle {
     /** @See {@link FoodMetaDataClass} */
     public static final FoodMetaDataClass T = new FoodMetaDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(FoodMetaDataHandle.class, "net.minecraft.server.FoodMetaData");
@@ -22,14 +22,8 @@ public class FoodMetaDataHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void loadFromNBT(CommonTagCompound compound) {
-        T.loadFromNBT.invoke(getRaw(), compound);
-    }
-
-    public void saveToNBT(CommonTagCompound compound) {
-        T.saveToNBT.invoke(getRaw(), compound);
-    }
-
+    public abstract void loadFromNBT(CommonTagCompound compound);
+    public abstract void saveToNBT(CommonTagCompound compound);
     /**
      * Stores class members for <b>net.minecraft.server.FoodMetaData</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -9,7 +9,7 @@ import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftChatMessageHandle extends Template.Handle {
+public abstract class CraftChatMessageHandle extends Template.Handle {
     /** @See {@link CraftChatMessageClass} */
     public static final CraftChatMessageClass T = new CraftChatMessageClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChatMessageHandle.class, "org.bukkit.craftbukkit.util.CraftChatMessage");

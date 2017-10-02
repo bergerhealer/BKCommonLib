@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
+public abstract class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
     /** @See {@link PacketPlayInSetCreativeSlotClass} */
     public static final PacketPlayInSetCreativeSlotClass T = new PacketPlayInSetCreativeSlotClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSetCreativeSlotHandle.class, "net.minecraft.server.PacketPlayInSetCreativeSlot");
@@ -22,22 +22,10 @@ public class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getSlot() {
-        return T.slot.getInteger(getRaw());
-    }
-
-    public void setSlot(int value) {
-        T.slot.setInteger(getRaw(), value);
-    }
-
-    public ItemStack getItem() {
-        return T.item.get(getRaw());
-    }
-
-    public void setItem(ItemStack value) {
-        T.item.set(getRaw(), value);
-    }
-
+    public abstract int getSlot();
+    public abstract void setSlot(int value);
+    public abstract ItemStack getItem();
+    public abstract void setItem(ItemStack value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInSetCreativeSlot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

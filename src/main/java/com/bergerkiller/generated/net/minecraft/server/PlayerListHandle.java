@@ -12,7 +12,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PlayerListHandle extends Template.Handle {
+public abstract class PlayerListHandle extends Template.Handle {
     /** @See {@link PlayerListClass} */
     public static final PlayerListClass T = new PlayerListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerListHandle.class, "net.minecraft.server.PlayerList");
@@ -25,38 +25,14 @@ public class PlayerListHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void savePlayers() {
-        T.savePlayers.invoke(getRaw());
-    }
-
-    public void sendPacketNearby(HumanEntity human, double x, double y, double z, double radius, int dimension, CommonPacket packet) {
-        T.sendPacketNearby.invokeVA(getRaw(), human, x, y, z, radius, dimension, packet);
-    }
-
-    public List<Player> getPlayers() {
-        return T.players.get(getRaw());
-    }
-
-    public void setPlayers(List<Player> value) {
-        T.players.set(getRaw(), value);
-    }
-
-    public IPlayerFileDataHandle getPlayerFileData() {
-        return T.playerFileData.get(getRaw());
-    }
-
-    public void setPlayerFileData(IPlayerFileDataHandle value) {
-        T.playerFileData.set(getRaw(), value);
-    }
-
-    public int getMaxPlayers() {
-        return T.maxPlayers.getInteger(getRaw());
-    }
-
-    public void setMaxPlayers(int value) {
-        T.maxPlayers.setInteger(getRaw(), value);
-    }
-
+    public abstract void savePlayers();
+    public abstract void sendPacketNearby(HumanEntity human, double x, double y, double z, double radius, int dimension, CommonPacket packet);
+    public abstract List<Player> getPlayers();
+    public abstract void setPlayers(List<Player> value);
+    public abstract IPlayerFileDataHandle getPlayerFileData();
+    public abstract void setPlayerFileData(IPlayerFileDataHandle value);
+    public abstract int getMaxPlayers();
+    public abstract void setMaxPlayers(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerList</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

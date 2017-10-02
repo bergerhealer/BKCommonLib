@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class WorldProviderHandle extends Template.Handle {
+public abstract class WorldProviderHandle extends Template.Handle {
     /** @See {@link WorldProviderClass} */
     public static final WorldProviderClass T = new WorldProviderClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldProviderHandle.class, "net.minecraft.server.WorldProvider");
@@ -21,10 +21,7 @@ public class WorldProviderHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean int_skyLightProperty() {
-        return T.int_skyLightProperty.invoke(getRaw());
-    }
-
+    public abstract boolean int_skyLightProperty();
 
     private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
 

@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PlayerInventoryHandle extends IInventoryHandle {
+public abstract class PlayerInventoryHandle extends IInventoryHandle {
     /** @See {@link PlayerInventoryClass} */
     public static final PlayerInventoryClass T = new PlayerInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "net.minecraft.server.PlayerInventory");
@@ -26,14 +26,8 @@ public class PlayerInventoryHandle extends IInventoryHandle {
         return T.getHotbarSize.invoke();
     }
 
-    public CommonTagList saveToNBT(CommonTagList nbttaglist) {
-        return T.saveToNBT.invoke(getRaw(), nbttaglist);
-    }
-
-    public void loadFromNBT(CommonTagList nbttaglist) {
-        T.loadFromNBT.invoke(getRaw(), nbttaglist);
-    }
-
+    public abstract CommonTagList saveToNBT(CommonTagList nbttaglist);
+    public abstract void loadFromNBT(CommonTagList nbttaglist);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

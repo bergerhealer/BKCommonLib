@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IWorldAccessHandle extends Template.Handle {
+public abstract class IWorldAccessHandle extends Template.Handle {
     /** @See {@link IWorldAccessClass} */
     public static final IWorldAccessClass T = new IWorldAccessClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IWorldAccessHandle.class, "net.minecraft.server.IWorldAccess");
@@ -21,14 +21,8 @@ public class IWorldAccessHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void onEntityAdded(EntityHandle entity) {
-        T.onEntityAdded.invoke(getRaw(), entity);
-    }
-
-    public void onEntityRemoved(EntityHandle entity) {
-        T.onEntityRemoved.invoke(getRaw(), entity);
-    }
-
+    public abstract void onEntityAdded(EntityHandle entity);
+    public abstract void onEntityRemoved(EntityHandle entity);
     /**
      * Stores class members for <b>net.minecraft.server.IWorldAccess</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

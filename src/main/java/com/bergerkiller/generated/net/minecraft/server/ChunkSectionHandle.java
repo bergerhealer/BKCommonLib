@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ChunkSectionHandle extends Template.Handle {
+public abstract class ChunkSectionHandle extends Template.Handle {
     /** @See {@link ChunkSectionClass} */
     public static final ChunkSectionClass T = new ChunkSectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkSectionHandle.class, "net.minecraft.server.ChunkSection");
@@ -26,62 +26,20 @@ public class ChunkSectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean isEmpty() {
-        return T.isEmpty.invoke(getRaw());
-    }
-
-    public NibbleArrayHandle getBlockLightArray() {
-        return T.getBlockLightArray.invoke(getRaw());
-    }
-
-    public NibbleArrayHandle getSkyLightArray() {
-        return T.getSkyLightArray.invoke(getRaw());
-    }
-
-    public DataPaletteBlockHandle getBlockPalette() {
-        return T.getBlockPalette.invoke(getRaw());
-    }
-
-    public BlockData getBlockData(int x, int y, int z) {
-        return T.getBlockData.invoke(getRaw(), x, y, z);
-    }
-
-    public void setBlockData(int x, int y, int z, BlockData data) {
-        T.setBlockData.invoke(getRaw(), x, y, z, data);
-    }
-
-    public void setSkyLight(int x, int y, int z, int level) {
-        T.setSkyLight.invoke(getRaw(), x, y, z, level);
-    }
-
-    public void setBlockLight(int x, int y, int z, int level) {
-        T.setBlockLight.invoke(getRaw(), x, y, z, level);
-    }
-
-    public int getSkyLight(int x, int y, int z) {
-        return T.getSkyLight.invoke(getRaw(), x, y, z);
-    }
-
-    public int getBlockLight(int x, int y, int z) {
-        return T.getBlockLight.invoke(getRaw(), x, y, z);
-    }
-
-    public NibbleArrayHandle getBlockLight() {
-        return T.blockLight.get(getRaw());
-    }
-
-    public void setBlockLight(NibbleArrayHandle value) {
-        T.blockLight.set(getRaw(), value);
-    }
-
-    public NibbleArrayHandle getSkyLight() {
-        return T.skyLight.get(getRaw());
-    }
-
-    public void setSkyLight(NibbleArrayHandle value) {
-        T.skyLight.set(getRaw(), value);
-    }
-
+    public abstract boolean isEmpty();
+    public abstract NibbleArrayHandle getBlockLightArray();
+    public abstract NibbleArrayHandle getSkyLightArray();
+    public abstract DataPaletteBlockHandle getBlockPalette();
+    public abstract BlockData getBlockData(int x, int y, int z);
+    public abstract void setBlockData(int x, int y, int z, BlockData data);
+    public abstract void setSkyLight(int x, int y, int z, int level);
+    public abstract void setBlockLight(int x, int y, int z, int level);
+    public abstract int getSkyLight(int x, int y, int z);
+    public abstract int getBlockLight(int x, int y, int z);
+    public abstract NibbleArrayHandle getBlockLight();
+    public abstract void setBlockLight(NibbleArrayHandle value);
+    public abstract NibbleArrayHandle getSkyLight();
+    public abstract void setSkyLight(NibbleArrayHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.ChunkSection</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

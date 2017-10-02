@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MobEffectHandle extends Template.Handle {
+public abstract class MobEffectHandle extends Template.Handle {
     /** @See {@link MobEffectClass} */
     public static final MobEffectClass T = new MobEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectHandle.class, "net.minecraft.server.MobEffect");
@@ -26,54 +26,18 @@ public class MobEffectHandle extends Template.Handle {
         return T.fromNBT.invoke(compound);
     }
 
-    public MobEffectListHandle getEffectList() {
-        return T.effectList.get(getRaw());
-    }
-
-    public void setEffectList(MobEffectListHandle value) {
-        T.effectList.set(getRaw(), value);
-    }
-
-    public int getDuration() {
-        return T.duration.getInteger(getRaw());
-    }
-
-    public void setDuration(int value) {
-        T.duration.setInteger(getRaw(), value);
-    }
-
-    public int getAmplification() {
-        return T.amplification.getInteger(getRaw());
-    }
-
-    public void setAmplification(int value) {
-        T.amplification.setInteger(getRaw(), value);
-    }
-
-    public boolean isSplash() {
-        return T.splash.getBoolean(getRaw());
-    }
-
-    public void setSplash(boolean value) {
-        T.splash.setBoolean(getRaw(), value);
-    }
-
-    public boolean isAmbient() {
-        return T.ambient.getBoolean(getRaw());
-    }
-
-    public void setAmbient(boolean value) {
-        T.ambient.setBoolean(getRaw(), value);
-    }
-
-    public boolean isParticles() {
-        return T.particles.getBoolean(getRaw());
-    }
-
-    public void setParticles(boolean value) {
-        T.particles.setBoolean(getRaw(), value);
-    }
-
+    public abstract MobEffectListHandle getEffectList();
+    public abstract void setEffectList(MobEffectListHandle value);
+    public abstract int getDuration();
+    public abstract void setDuration(int value);
+    public abstract int getAmplification();
+    public abstract void setAmplification(int value);
+    public abstract boolean isSplash();
+    public abstract void setSplash(boolean value);
+    public abstract boolean isAmbient();
+    public abstract void setAmbient(boolean value);
+    public abstract boolean isParticles();
+    public abstract void setParticles(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.MobEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ChunkRegionLoaderHandle extends Template.Handle {
+public abstract class ChunkRegionLoaderHandle extends Template.Handle {
     /** @See {@link ChunkRegionLoaderClass} */
     public static final ChunkRegionLoaderClass T = new ChunkRegionLoaderClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkRegionLoaderHandle.class, "net.minecraft.server.ChunkRegionLoader");

@@ -9,7 +9,7 @@ import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.Weig
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class BiomeBaseHandle extends Template.Handle {
+public abstract class BiomeBaseHandle extends Template.Handle {
     /** @See {@link BiomeBaseClass} */
     public static final BiomeBaseClass T = new BiomeBaseClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase");
@@ -35,7 +35,7 @@ public class BiomeBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
+    public abstract static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
         /** @See {@link BiomeMetaClass} */
         public static final BiomeMetaClass T = new BiomeMetaClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta");
@@ -52,30 +52,12 @@ public class BiomeBaseHandle extends Template.Handle {
 
         /* ============================================================================== */
 
-        public java.lang.Class<?> getEntityClass() {
-            return T.entityClass.get(getRaw());
-        }
-
-        public void setEntityClass(java.lang.Class<?> value) {
-            T.entityClass.set(getRaw(), value);
-        }
-
-        public int getMinSpawnCount() {
-            return T.minSpawnCount.getInteger(getRaw());
-        }
-
-        public void setMinSpawnCount(int value) {
-            T.minSpawnCount.setInteger(getRaw(), value);
-        }
-
-        public int getMaxSpawnCount() {
-            return T.maxSpawnCount.getInteger(getRaw());
-        }
-
-        public void setMaxSpawnCount(int value) {
-            T.maxSpawnCount.setInteger(getRaw(), value);
-        }
-
+        public abstract java.lang.Class<?> getEntityClass();
+        public abstract void setEntityClass(java.lang.Class<?> value);
+        public abstract int getMinSpawnCount();
+        public abstract void setMinSpawnCount(int value);
+        public abstract int getMaxSpawnCount();
+        public abstract void setMaxSpawnCount(int value);
         /**
          * Stores class members for <b>net.minecraft.server.BiomeBase.BiomeMeta</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.

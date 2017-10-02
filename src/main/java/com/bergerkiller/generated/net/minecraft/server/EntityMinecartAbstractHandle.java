@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityMinecartAbstractHandle extends EntityHandle {
+public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     /** @See {@link EntityMinecartAbstractClass} */
     public static final EntityMinecartAbstractClass T = new EntityMinecartAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartAbstractHandle.class, "net.minecraft.server.EntityMinecartAbstract");
@@ -22,22 +22,10 @@ public class EntityMinecartAbstractHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-    public float getDamage() {
-        return T.getDamage.invoke(getRaw());
-    }
-
-    public void setDamage(float damage) {
-        T.setDamage.invoke(getRaw(), damage);
-    }
-
-    public int getType() {
-        return T.getType.invoke(getRaw());
-    }
-
-    public void activate(int x, int y, int z, boolean active) {
-        T.activate.invoke(getRaw(), x, y, z, active);
-    }
-
+    public abstract float getDamage();
+    public abstract void setDamage(float damage);
+    public abstract int getType();
+    public abstract void activate(int x, int y, int z, boolean active);
 
     public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
     public static final Key<Integer> DATA_SHAKING_DIRECTION = Key.Type.INTEGER.createKey(T.DATA_SHAKING_DIRECTION, 18);

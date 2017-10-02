@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityItemFrameHandle extends EntityHandle {
+public abstract class EntityItemFrameHandle extends EntityHandle {
     /** @See {@link EntityItemFrameClass} */
     public static final EntityItemFrameClass T = new EntityItemFrameClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemFrameHandle.class, "net.minecraft.server.EntityItemFrame");
@@ -23,14 +23,8 @@ public class EntityItemFrameHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-    public ItemStack getItem() {
-        return T.getItem.invoke(getRaw());
-    }
-
-    public void setItem(ItemStack newItemStack) {
-        T.setItem.invoke(getRaw(), newItemStack);
-    }
-
+    public abstract ItemStack getItem();
+    public abstract void setItem(ItemStack newItemStack);
 
     public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
 

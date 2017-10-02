@@ -9,7 +9,7 @@ import org.bukkit.plugin.EventExecutor;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class RegisteredListenerHandle extends Template.Handle {
+public abstract class RegisteredListenerHandle extends Template.Handle {
     /** @See {@link RegisteredListenerClass} */
     public static final RegisteredListenerClass T = new RegisteredListenerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegisteredListenerHandle.class, "org.bukkit.plugin.RegisteredListener");
@@ -22,14 +22,8 @@ public class RegisteredListenerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public EventExecutor getExecutor() {
-        return T.executor.get(getRaw());
-    }
-
-    public void setExecutor(EventExecutor value) {
-        T.executor.set(getRaw(), value);
-    }
-
+    public abstract EventExecutor getExecutor();
+    public abstract void setExecutor(EventExecutor value);
     /**
      * Stores class members for <b>org.bukkit.plugin.RegisteredListener</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

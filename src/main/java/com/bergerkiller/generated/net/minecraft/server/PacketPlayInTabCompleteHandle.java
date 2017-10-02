@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInTabCompleteHandle extends PacketHandle {
+public abstract class PacketPlayInTabCompleteHandle extends PacketHandle {
     /** @See {@link PacketPlayInTabCompleteClass} */
     public static final PacketPlayInTabCompleteClass T = new PacketPlayInTabCompleteClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInTabCompleteHandle.class, "net.minecraft.server.PacketPlayInTabComplete");
@@ -22,22 +22,10 @@ public class PacketPlayInTabCompleteHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public String getText() {
-        return T.text.get(getRaw());
-    }
-
-    public void setText(String value) {
-        T.text.set(getRaw(), value);
-    }
-
-    public IntVector3 getPosition() {
-        return T.position.get(getRaw());
-    }
-
-    public void setPosition(IntVector3 value) {
-        T.position.set(getRaw(), value);
-    }
-
+    public abstract String getText();
+    public abstract void setText(String value);
+    public abstract IntVector3 getPosition();
+    public abstract void setPosition(IntVector3 value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInTabComplete</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

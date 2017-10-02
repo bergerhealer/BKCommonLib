@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class DedicatedPlayerListHandle extends PlayerListHandle {
+public abstract class DedicatedPlayerListHandle extends PlayerListHandle {
     /** @See {@link DedicatedPlayerListClass} */
     public static final DedicatedPlayerListClass T = new DedicatedPlayerListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DedicatedPlayerListHandle.class, "net.minecraft.server.DedicatedPlayerList");

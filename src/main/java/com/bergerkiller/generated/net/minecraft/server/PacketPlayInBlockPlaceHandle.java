@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInBlockPlaceHandle extends PacketHandle {
+public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
     /** @See {@link PacketPlayInBlockPlaceClass} */
     public static final PacketPlayInBlockPlaceClass T = new PacketPlayInBlockPlaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBlockPlaceHandle.class, "net.minecraft.server.PacketPlayInBlockPlace");

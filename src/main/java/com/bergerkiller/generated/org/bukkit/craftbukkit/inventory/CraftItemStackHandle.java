@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftItemStackHandle extends Template.Handle {
+public abstract class CraftItemStackHandle extends Template.Handle {
     /** @See {@link CraftItemStackClass} */
     public static final CraftItemStackClass T = new CraftItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftItemStackHandle.class, "org.bukkit.craftbukkit.inventory.CraftItemStack");
@@ -34,14 +34,8 @@ public class CraftItemStackHandle extends Template.Handle {
         return T.asCraftMirror.invoke(nmsItemStack);
     }
 
-    public Object getHandle() {
-        return T.handle.get(getRaw());
-    }
-
-    public void setHandle(Object value) {
-        T.handle.set(getRaw(), value);
-    }
-
+    public abstract Object getHandle();
+    public abstract void setHandle(Object value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

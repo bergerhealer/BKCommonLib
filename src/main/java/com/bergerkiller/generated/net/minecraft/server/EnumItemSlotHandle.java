@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EnumItemSlotHandle extends Template.Handle {
+public abstract class EnumItemSlotHandle extends Template.Handle {
     /** @See {@link EnumItemSlotClass} */
     public static final EnumItemSlotClass T = new EnumItemSlotClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumItemSlotHandle.class, "net.minecraft.server.EnumItemSlot");
@@ -21,10 +21,7 @@ public class EnumItemSlotHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getIndex() {
-        return T.getIndex.invoke(getRaw());
-    }
-
+    public abstract int getIndex();
 
     public static Object fromIndexRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {

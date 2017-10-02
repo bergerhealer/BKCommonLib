@@ -10,7 +10,7 @@ import java.util.List;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class NonNullListHandle extends Template.Handle {
+public abstract class NonNullListHandle extends Template.Handle {
     /** @See {@link NonNullListClass} */
     public static final NonNullListClass T = new NonNullListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NonNullListHandle.class, "net.minecraft.server.NonNullList");

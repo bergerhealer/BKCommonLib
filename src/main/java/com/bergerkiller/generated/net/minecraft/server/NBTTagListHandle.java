@@ -9,7 +9,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class NBTTagListHandle extends NBTBaseHandle {
+public abstract class NBTTagListHandle extends NBTBaseHandle {
     /** @See {@link NBTTagListClass} */
     public static final NBTTagListClass T = new NBTTagListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagListHandle.class, "net.minecraft.server.NBTTagList");
@@ -22,34 +22,13 @@ public class NBTTagListHandle extends NBTBaseHandle {
 
     /* ============================================================================== */
 
-    public void add(NBTBaseHandle value) {
-        T.add.invoke(getRaw(), value);
-    }
-
-    public int size() {
-        return T.size.invoke(getRaw());
-    }
-
-    public NBTBaseHandle get(int index) {
-        return T.get.invoke(getRaw(), index);
-    }
-
-    public List<NBTBaseHandle> getList() {
-        return T.list.get(getRaw());
-    }
-
-    public void setList(List<NBTBaseHandle> value) {
-        T.list.set(getRaw(), value);
-    }
-
-    public byte getType() {
-        return T.type.getByte(getRaw());
-    }
-
-    public void setType(byte value) {
-        T.type.setByte(getRaw(), value);
-    }
-
+    public abstract void add(NBTBaseHandle value);
+    public abstract int size();
+    public abstract NBTBaseHandle get(int index);
+    public abstract List<NBTBaseHandle> getList();
+    public abstract void setList(List<NBTBaseHandle> value);
+    public abstract byte getType();
+    public abstract void setType(byte value);
     /**
      * Stores class members for <b>net.minecraft.server.NBTTagList</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

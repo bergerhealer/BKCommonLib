@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
+public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardScoreClass} */
     public static final PacketPlayOutScoreboardScoreClass T = new PacketPlayOutScoreboardScoreClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardScoreHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore");
@@ -34,7 +34,7 @@ public class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class EnumScoreboardActionHandle extends Template.Handle {
+    public abstract static class EnumScoreboardActionHandle extends Template.Handle {
         /** @See {@link EnumScoreboardActionClass} */
         public static final EnumScoreboardActionClass T = new EnumScoreboardActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumScoreboardActionHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");

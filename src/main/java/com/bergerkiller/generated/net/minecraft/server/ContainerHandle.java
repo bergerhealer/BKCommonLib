@@ -11,7 +11,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ContainerHandle extends Template.Handle {
+public abstract class ContainerHandle extends Template.Handle {
     /** @See {@link ContainerClass} */
     public static final ContainerClass T = new ContainerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerHandle.class, "net.minecraft.server.Container");
@@ -24,26 +24,11 @@ public class ContainerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public InventoryView getBukkitView() {
-        return T.getBukkitView.invoke(getRaw());
-    }
-
-    public List<ItemStack> getOldItems() {
-        return T.oldItems.get(getRaw());
-    }
-
-    public void setOldItems(List<ItemStack> value) {
-        T.oldItems.set(getRaw(), value);
-    }
-
-    public List<SlotHandle> getSlots() {
-        return T.slots.get(getRaw());
-    }
-
-    public void setSlots(List<SlotHandle> value) {
-        T.slots.set(getRaw(), value);
-    }
-
+    public abstract InventoryView getBukkitView();
+    public abstract List<ItemStack> getOldItems();
+    public abstract void setOldItems(List<ItemStack> value);
+    public abstract List<SlotHandle> getSlots();
+    public abstract void setSlots(List<SlotHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.Container</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

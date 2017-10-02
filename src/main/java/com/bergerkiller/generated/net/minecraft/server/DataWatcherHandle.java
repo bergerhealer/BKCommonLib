@@ -11,7 +11,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class DataWatcherHandle extends Template.Handle {
+public abstract class DataWatcherHandle extends Template.Handle {
     /** @See {@link DataWatcherClass} */
     public static final DataWatcherClass T = new DataWatcherClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher");
@@ -28,26 +28,11 @@ public class DataWatcherHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public List<Item<?>> unwatchAndReturnAllWatched() {
-        return T.unwatchAndReturnAllWatched.invoke(getRaw());
-    }
-
-    public List<Item<?>> returnAllWatched() {
-        return T.returnAllWatched.invoke(getRaw());
-    }
-
-    public Item<Object> read(Key<?> key) {
-        return T.read.invoke(getRaw(), key);
-    }
-
-    public boolean isChanged() {
-        return T.isChanged.invoke(getRaw());
-    }
-
-    public boolean isEmpty() {
-        return T.isEmpty.invoke(getRaw());
-    }
-
+    public abstract List<Item<?>> unwatchAndReturnAllWatched();
+    public abstract List<Item<?>> returnAllWatched();
+    public abstract Item<Object> read(Key<?> key);
+    public abstract boolean isChanged();
+    public abstract boolean isEmpty();
 
     public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
         return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
@@ -71,14 +56,8 @@ public class DataWatcherHandle extends Template.Handle {
         }
         return key.getType().getConverter().convert(rawValue);
     }
-    public EntityHandle getOwner() {
-        return T.owner.get(getRaw());
-    }
-
-    public void setOwner(EntityHandle value) {
-        T.owner.set(getRaw(), value);
-    }
-
+    public abstract EntityHandle getOwner();
+    public abstract void setOwner(EntityHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.DataWatcher</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -108,7 +87,7 @@ public class DataWatcherHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class ItemHandle extends Template.Handle {
+    public abstract static class ItemHandle extends Template.Handle {
         /** @See {@link ItemClass} */
         public static final ItemClass T = new ItemClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item");
@@ -135,22 +114,10 @@ public class DataWatcherHandle extends Template.Handle {
             T.changed.copy(getRaw(), clone);
             return createHandle(clone);
         }
-        public Object getValue() {
-            return T.value.get(getRaw());
-        }
-
-        public void setValue(Object value) {
-            T.value.set(getRaw(), value);
-        }
-
-        public boolean isChanged() {
-            return T.changed.getBoolean(getRaw());
-        }
-
-        public void setChanged(boolean value) {
-            T.changed.setBoolean(getRaw(), value);
-        }
-
+        public abstract Object getValue();
+        public abstract void setValue(Object value);
+        public abstract boolean isChanged();
+        public abstract void setChanged(boolean value);
         /**
          * Stores class members for <b>net.minecraft.server.DataWatcher.Item</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.

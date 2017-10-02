@@ -16,7 +16,7 @@ import java.util.Random;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class WorldHandle extends Template.Handle {
+public abstract class WorldHandle extends Template.Handle {
     /** @See {@link WorldClass} */
     public static final WorldClass T = new WorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World");
@@ -29,86 +29,26 @@ public class WorldHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public World getWorld() {
-        return T.getWorld.invoke(getRaw());
-    }
-
-    public Server getServer() {
-        return T.getServer.invoke(getRaw());
-    }
-
-    public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invoke(getRaw(), blockposition);
-    }
-
-    public BlockData getBlockDataAtCoord(int x, int y, int z) {
-        return T.getBlockDataAtCoord.invoke(getRaw(), x, y, z);
-    }
-
-    public boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags) {
-        return T.setBlockData.invoke(getRaw(), blockposition, iblockdata, updateFlags);
-    }
-
-    public long getTime() {
-        return T.getTime.invoke(getRaw());
-    }
-
-    public List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds) {
-        return T.getRawEntitiesOfType.invoke(getRaw(), rawType, bounds);
-    }
-
-    public List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getCubes.invoke(getRaw(), entity, axisalignedbb);
-    }
-
-    public List<EntityHandle> getEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
-        return T.getEntities.invoke(getRaw(), entity, axisalignedbb);
-    }
-
-    public TileEntityHandle getTileEntity(IntVector3 blockposition) {
-        return T.getTileEntity.invoke(getRaw(), blockposition);
-    }
-
-    public WorldDataHandle getWorldData() {
-        return T.getWorldData.invoke(getRaw());
-    }
-
-    public boolean isBurnArea(AxisAlignedBBHandle bounds) {
-        return T.isBurnArea.invoke(getRaw(), bounds);
-    }
-
-    public void removeEntity(EntityHandle entity) {
-        T.removeEntity.invoke(getRaw(), entity);
-    }
-
-    public boolean addEntity(EntityHandle entity) {
-        return T.addEntity.invoke(getRaw(), entity);
-    }
-
-    public Entity getEntityById(int entityId) {
-        return T.getEntityById.invoke(getRaw(), entityId);
-    }
-
-    public IDataManagerHandle getDataManager() {
-        return T.getDataManager.invoke(getRaw());
-    }
-
-    public float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds) {
-        return T.getExplosionFactor.invoke(getRaw(), vec3d, bounds);
-    }
-
-    public boolean areChunksLoaded(IntVector3 blockposition, int distance) {
-        return T.areChunksLoaded.invoke(getRaw(), blockposition, distance);
-    }
-
-    public MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag) {
-        return T.rayTrace.invoke(getRaw(), point1, point2, flag);
-    }
-
-    public boolean isChunkLoaded(int cx, int cz, boolean flag) {
-        return T.isChunkLoaded.invoke(getRaw(), cx, cz, flag);
-    }
-
+    public abstract World getWorld();
+    public abstract Server getServer();
+    public abstract BlockData getBlockData(IntVector3 blockposition);
+    public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
+    public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
+    public abstract long getTime();
+    public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
+    public abstract List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
+    public abstract List<EntityHandle> getEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
+    public abstract TileEntityHandle getTileEntity(IntVector3 blockposition);
+    public abstract WorldDataHandle getWorldData();
+    public abstract boolean isBurnArea(AxisAlignedBBHandle bounds);
+    public abstract void removeEntity(EntityHandle entity);
+    public abstract boolean addEntity(EntityHandle entity);
+    public abstract Entity getEntityById(int entityId);
+    public abstract IDataManagerHandle getDataManager();
+    public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
+    public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
+    public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag);
+    public abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
 
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
         if (T.opt_applyPhysics.isAvailable()) {
@@ -128,70 +68,22 @@ public class WorldHandle extends Template.Handle {
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
-    public List<EntityHandle> getEntityList() {
-        return T.entityList.get(getRaw());
-    }
-
-    public void setEntityList(List<EntityHandle> value) {
-        T.entityList.set(getRaw(), value);
-    }
-
-    public List<EntityHumanHandle> getPlayers() {
-        return T.players.get(getRaw());
-    }
-
-    public void setPlayers(List<EntityHumanHandle> value) {
-        T.players.set(getRaw(), value);
-    }
-
-    public Random getRandom() {
-        return T.random.get(getRaw());
-    }
-
-    public void setRandom(Random value) {
-        T.random.set(getRaw(), value);
-    }
-
-    public WorldProviderHandle getWorldProvider() {
-        return T.worldProvider.get(getRaw());
-    }
-
-    public void setWorldProvider(WorldProviderHandle value) {
-        T.worldProvider.set(getRaw(), value);
-    }
-
-    public List<IWorldAccessHandle> getAccessList() {
-        return T.accessList.get(getRaw());
-    }
-
-    public void setAccessList(List<IWorldAccessHandle> value) {
-        T.accessList.set(getRaw(), value);
-    }
-
-    public MethodProfilerHandle getMethodProfiler() {
-        return T.methodProfiler.get(getRaw());
-    }
-
-    public void setMethodProfiler(MethodProfilerHandle value) {
-        T.methodProfiler.set(getRaw(), value);
-    }
-
-    public World getBukkitWorld() {
-        return T.bukkitWorld.get(getRaw());
-    }
-
-    public void setBukkitWorld(World value) {
-        T.bukkitWorld.set(getRaw(), value);
-    }
-
-    public boolean isKeepSpawnInMemory() {
-        return T.keepSpawnInMemory.getBoolean(getRaw());
-    }
-
-    public void setKeepSpawnInMemory(boolean value) {
-        T.keepSpawnInMemory.setBoolean(getRaw(), value);
-    }
-
+    public abstract List<EntityHandle> getEntityList();
+    public abstract void setEntityList(List<EntityHandle> value);
+    public abstract List<EntityHumanHandle> getPlayers();
+    public abstract void setPlayers(List<EntityHumanHandle> value);
+    public abstract Random getRandom();
+    public abstract void setRandom(Random value);
+    public abstract WorldProviderHandle getWorldProvider();
+    public abstract void setWorldProvider(WorldProviderHandle value);
+    public abstract List<IWorldAccessHandle> getAccessList();
+    public abstract void setAccessList(List<IWorldAccessHandle> value);
+    public abstract MethodProfilerHandle getMethodProfiler();
+    public abstract void setMethodProfiler(MethodProfilerHandle value);
+    public abstract World getBukkitWorld();
+    public abstract void setBukkitWorld(World value);
+    public abstract boolean isKeepSpawnInMemory();
+    public abstract void setKeepSpawnInMemory(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.World</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

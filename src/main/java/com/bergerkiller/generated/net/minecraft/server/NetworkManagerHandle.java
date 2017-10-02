@@ -9,7 +9,7 @@ import io.netty.channel.Channel;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class NetworkManagerHandle extends Template.Handle {
+public abstract class NetworkManagerHandle extends Template.Handle {
     /** @See {@link NetworkManagerClass} */
     public static final NetworkManagerClass T = new NetworkManagerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NetworkManagerHandle.class, "net.minecraft.server.NetworkManager");
@@ -22,18 +22,9 @@ public class NetworkManagerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean isConnected() {
-        return T.isConnected.invoke(getRaw());
-    }
-
-    public Channel getChannel() {
-        return T.channel.get(getRaw());
-    }
-
-    public void setChannel(Channel value) {
-        T.channel.set(getRaw(), value);
-    }
-
+    public abstract boolean isConnected();
+    public abstract Channel getChannel();
+    public abstract void setChannel(Channel value);
     /**
      * Stores class members for <b>net.minecraft.server.NetworkManager</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

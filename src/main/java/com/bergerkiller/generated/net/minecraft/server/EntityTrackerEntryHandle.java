@@ -14,7 +14,7 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityTrackerEntryHandle extends Template.Handle {
+public abstract class EntityTrackerEntryHandle extends Template.Handle {
     /** @See {@link EntityTrackerEntryClass} */
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryHandle.class, "net.minecraft.server.EntityTrackerEntry");
@@ -27,26 +27,11 @@ public class EntityTrackerEntryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void hideForAll() {
-        T.hideForAll.invoke(getRaw());
-    }
-
-    public void removeViewer(Player player) {
-        T.removeViewer.invoke(getRaw(), player);
-    }
-
-    public void scanPlayers(List<Player> playerList) {
-        T.scanPlayers.invoke(getRaw(), playerList);
-    }
-
-    public void updatePlayer(Player player) {
-        T.updatePlayer.invoke(getRaw(), player);
-    }
-
-    public CommonPacket getSpawnPacket() {
-        return T.getSpawnPacket.invoke(getRaw());
-    }
-
+    public abstract void hideForAll();
+    public abstract void removeViewer(Player player);
+    public abstract void scanPlayers(List<Player> playerList);
+    public abstract void updatePlayer(Player player);
+    public abstract CommonPacket getSpawnPacket();
 
     public static EntityTrackerEntryHandle createNew(org.bukkit.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
         if (T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.isAvailable()) {
@@ -176,134 +161,38 @@ public class EntityTrackerEntryHandle extends Template.Handle {
             return T.viewersSet.get(getRaw()).remove(viewer);
         }
     }
-    public EntityHandle getTracker() {
-        return T.tracker.get(getRaw());
-    }
-
-    public void setTracker(EntityHandle value) {
-        T.tracker.set(getRaw(), value);
-    }
-
-    public int getViewDistance() {
-        return T.viewDistance.getInteger(getRaw());
-    }
-
-    public void setViewDistance(int value) {
-        T.viewDistance.setInteger(getRaw(), value);
-    }
-
-    public int getUpdateInterval() {
-        return T.updateInterval.getInteger(getRaw());
-    }
-
-    public void setUpdateInterval(int value) {
-        T.updateInterval.setInteger(getRaw(), value);
-    }
-
-    public int getRaw_xRot() {
-        return T.raw_xRot.getInteger(getRaw());
-    }
-
-    public void setRaw_xRot(int value) {
-        T.raw_xRot.setInteger(getRaw(), value);
-    }
-
-    public int getRaw_yRot() {
-        return T.raw_yRot.getInteger(getRaw());
-    }
-
-    public void setRaw_yRot(int value) {
-        T.raw_yRot.setInteger(getRaw(), value);
-    }
-
-    public int getRaw_headYaw() {
-        return T.raw_headYaw.getInteger(getRaw());
-    }
-
-    public void setRaw_headYaw(int value) {
-        T.raw_headYaw.setInteger(getRaw(), value);
-    }
-
-    public double getXVel() {
-        return T.xVel.getDouble(getRaw());
-    }
-
-    public void setXVel(double value) {
-        T.xVel.setDouble(getRaw(), value);
-    }
-
-    public double getYVel() {
-        return T.yVel.getDouble(getRaw());
-    }
-
-    public void setYVel(double value) {
-        T.yVel.setDouble(getRaw(), value);
-    }
-
-    public double getZVel() {
-        return T.zVel.getDouble(getRaw());
-    }
-
-    public void setZVel(double value) {
-        T.zVel.setDouble(getRaw(), value);
-    }
-
-    public int getTickCounter() {
-        return T.tickCounter.getInteger(getRaw());
-    }
-
-    public void setTickCounter(int value) {
-        T.tickCounter.setInteger(getRaw(), value);
-    }
-
-    public double getPrevX() {
-        return T.prevX.getDouble(getRaw());
-    }
-
-    public void setPrevX(double value) {
-        T.prevX.setDouble(getRaw(), value);
-    }
-
-    public double getPrevY() {
-        return T.prevY.getDouble(getRaw());
-    }
-
-    public void setPrevY(double value) {
-        T.prevY.setDouble(getRaw(), value);
-    }
-
-    public double getPrevZ() {
-        return T.prevZ.getDouble(getRaw());
-    }
-
-    public void setPrevZ(double value) {
-        T.prevZ.setDouble(getRaw(), value);
-    }
-
-    public boolean isSynched() {
-        return T.synched.getBoolean(getRaw());
-    }
-
-    public void setSynched(boolean value) {
-        T.synched.setBoolean(getRaw(), value);
-    }
-
-    public boolean isMobile() {
-        return T.isMobile.getBoolean(getRaw());
-    }
-
-    public void setIsMobile(boolean value) {
-        T.isMobile.setBoolean(getRaw(), value);
-    }
-
-    public int getTimeSinceLocationSync() {
-        return T.timeSinceLocationSync.getInteger(getRaw());
-    }
-
-    public void setTimeSinceLocationSync(int value) {
-        T.timeSinceLocationSync.setInteger(getRaw(), value);
-    }
-
+    public abstract EntityHandle getTracker();
+    public abstract void setTracker(EntityHandle value);
+    public abstract int getViewDistance();
+    public abstract void setViewDistance(int value);
+    public abstract int getUpdateInterval();
+    public abstract void setUpdateInterval(int value);
+    public abstract int getRaw_xRot();
+    public abstract void setRaw_xRot(int value);
+    public abstract int getRaw_yRot();
+    public abstract void setRaw_yRot(int value);
+    public abstract int getRaw_headYaw();
+    public abstract void setRaw_headYaw(int value);
+    public abstract double getXVel();
+    public abstract void setXVel(double value);
+    public abstract double getYVel();
+    public abstract void setYVel(double value);
+    public abstract double getZVel();
+    public abstract void setZVel(double value);
+    public abstract int getTickCounter();
+    public abstract void setTickCounter(int value);
+    public abstract double getPrevX();
+    public abstract void setPrevX(double value);
+    public abstract double getPrevY();
+    public abstract void setPrevY(double value);
+    public abstract double getPrevZ();
+    public abstract void setPrevZ(double value);
+    public abstract boolean isSynched();
+    public abstract void setSynched(boolean value);
+    public abstract boolean isMobile();
+    public abstract void setIsMobile(boolean value);
+    public abstract int getTimeSinceLocationSync();
+    public abstract void setTimeSinceLocationSync(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityTrackerEntry</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

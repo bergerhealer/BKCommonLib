@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class SoundEffectHandle extends Template.Handle {
+public abstract class SoundEffectHandle extends Template.Handle {
     /** @See {@link SoundEffectClass} */
     public static final SoundEffectClass T = new SoundEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectHandle.class, "net.minecraft.server.SoundEffect");
@@ -37,14 +37,8 @@ public class SoundEffectHandle extends Template.Handle {
             return null;
         }
     }
-    public MinecraftKeyHandle getName() {
-        return T.name.get(getRaw());
-    }
-
-    public void setName(MinecraftKeyHandle value) {
-        T.name.set(getRaw(), value);
-    }
-
+    public abstract MinecraftKeyHandle getName();
+    public abstract void setName(MinecraftKeyHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.SoundEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -21,7 +21,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityHandle extends Template.Handle {
+public abstract class EntityHandle extends Template.Handle {
     /** @See {@link EntityClass} */
     public static final EntityClass T = new EntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity");
@@ -46,174 +46,48 @@ public class EntityHandle extends Template.Handle {
         T.entityCount.setInteger(value);
     }
 
-    public void updateBlockCollision() {
-        T.updateBlockCollision.invoke(getRaw());
-    }
-
-    public void playStepSound(IntVector3 position, BlockData blockData) {
-        T.playStepSound.invoke(getRaw(), position, blockData);
-    }
-
-    public void setRotation(float yaw, float pitch) {
-        T.setRotation.invoke(getRaw(), yaw, pitch);
-    }
-
-    public void burn(float dmg) {
-        T.burn.invoke(getRaw(), dmg);
-    }
-
-    public Item dropItem(Material material, int amount, float force) {
-        return T.dropItem.invoke(getRaw(), material, amount, force);
-    }
-
-    public Item dropItemStack(ItemStack itemstack, float force) {
-        return T.dropItemStack.invoke(getRaw(), itemstack, force);
-    }
-
-    public ResourceKey getSwimSound() {
-        return T.getSwimSound.invoke(getRaw());
-    }
-
-    public void makeSound(ResourceKey soundeffect, float volume, float pitch) {
-        T.makeSound.invoke(getRaw(), soundeffect, volume, pitch);
-    }
-
-    public boolean isInWaterUpdate() {
-        return T.isInWaterUpdate.invoke(getRaw());
-    }
-
-    public boolean isInWater() {
-        return T.isInWater.invoke(getRaw());
-    }
-
-    public boolean hasMovementSound() {
-        return T.hasMovementSound.invoke(getRaw());
-    }
-
-    public void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position) {
-        T.updateFalling.invoke(getRaw(), d0, flag, blockData, position);
-    }
-
-    public void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData) {
-        T.doStepSoundUpdate.invoke(getRaw(), blockposition, blockData);
-    }
-
-    public void checkBlockCollisions() {
-        T.checkBlockCollisions.invoke(getRaw());
-    }
-
-    public double calculateDistance(double x, double y, double z) {
-        return T.calculateDistance.invoke(getRaw(), x, y, z);
-    }
-
-    public boolean damageEntity(DamageSourceHandle damagesource, float damage) {
-        return T.damageEntity.invoke(getRaw(), damagesource, damage);
-    }
-
-    public void setPosition(double x, double y, double z) {
-        T.setPosition.invoke(getRaw(), x, y, z);
-    }
-
-    public void setPositionRotation(double x, double y, double z, float yaw, float pitch) {
-        T.setPositionRotation.invoke(getRaw(), x, y, z, yaw, pitch);
-    }
-
-    public void setLocation(double x, double y, double z, float yaw, float pitch) {
-        T.setLocation.invoke(getRaw(), x, y, z, yaw, pitch);
-    }
-
-    public float getHeadRotation() {
-        return T.getHeadRotation.invoke(getRaw());
-    }
-
-    public AxisAlignedBBHandle getBoundingBox() {
-        return T.getBoundingBox.invoke(getRaw());
-    }
-
-    public void setBoundingBox(AxisAlignedBBHandle axisalignedbb) {
-        T.setBoundingBox.invoke(getRaw(), axisalignedbb);
-    }
-
-    public AxisAlignedBBHandle getOtherBoundingBox() {
-        return T.getOtherBoundingBox.invoke(getRaw());
-    }
-
-    public AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity) {
-        return T.getEntityBoundingBox.invoke(getRaw(), entity);
-    }
-
-    public void recalcPosition() {
-        T.recalcPosition.invoke(getRaw());
-    }
-
-    public boolean isBurning() {
-        return T.isBurning.invoke(getRaw());
-    }
-
-    public void setOnFire(int numSeconds) {
-        T.setOnFire.invoke(getRaw(), numSeconds);
-    }
-
-    public boolean isWet() {
-        return T.isWet.invoke(getRaw());
-    }
-
-    public void saveToNBT(CommonTagCompound compound) {
-        T.saveToNBT.invoke(getRaw(), compound);
-    }
-
-    public void onTick() {
-        T.onTick.invoke(getRaw());
-    }
-
-    public void loadFromNBT(CommonTagCompound compound) {
-        T.loadFromNBT.invoke(getRaw(), compound);
-    }
-
-    public boolean savePassenger(CommonTagCompound compound) {
-        return T.savePassenger.invoke(getRaw(), compound);
-    }
-
-    public boolean saveEntity(CommonTagCompound compound) {
-        return T.saveEntity.invoke(getRaw(), compound);
-    }
-
-    public boolean isSneaking() {
-        return T.isSneaking.invoke(getRaw());
-    }
-
-    public void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails) {
-        T.appendEntityCrashDetails.invoke(getRaw(), crashreportsystemdetails);
-    }
-
-    public int getId() {
-        return T.getId.invoke(getRaw());
-    }
-
-    public UUID getUniqueID() {
-        return T.getUniqueID.invoke(getRaw());
-    }
-
-    public DataWatcher getDataWatcher() {
-        return T.getDataWatcher.invoke(getRaw());
-    }
-
-    public void onPush(double d0, double d1, double d2) {
-        T.onPush.invoke(getRaw(), d0, d1, d2);
-    }
-
-    public int getPortalCooldownMaximum() {
-        return T.getPortalCooldownMaximum.invoke(getRaw());
-    }
-
-    public void collide(EntityHandle entity) {
-        T.collide.invoke(getRaw(), entity);
-    }
-
-    public Entity getBukkitEntity() {
-        return T.getBukkitEntity.invoke(getRaw());
-    }
-
+    public abstract void updateBlockCollision();
+    public abstract void playStepSound(IntVector3 position, BlockData blockData);
+    public abstract void setRotation(float yaw, float pitch);
+    public abstract void burn(float dmg);
+    public abstract Item dropItem(Material material, int amount, float force);
+    public abstract Item dropItemStack(ItemStack itemstack, float force);
+    public abstract ResourceKey getSwimSound();
+    public abstract void makeSound(ResourceKey soundeffect, float volume, float pitch);
+    public abstract boolean isInWaterUpdate();
+    public abstract boolean isInWater();
+    public abstract boolean hasMovementSound();
+    public abstract void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position);
+    public abstract void doStepSoundUpdate(IntVector3 blockposition, BlockData blockData);
+    public abstract void checkBlockCollisions();
+    public abstract double calculateDistance(double x, double y, double z);
+    public abstract boolean damageEntity(DamageSourceHandle damagesource, float damage);
+    public abstract void setPosition(double x, double y, double z);
+    public abstract void setPositionRotation(double x, double y, double z, float yaw, float pitch);
+    public abstract void setLocation(double x, double y, double z, float yaw, float pitch);
+    public abstract float getHeadRotation();
+    public abstract AxisAlignedBBHandle getBoundingBox();
+    public abstract void setBoundingBox(AxisAlignedBBHandle axisalignedbb);
+    public abstract AxisAlignedBBHandle getOtherBoundingBox();
+    public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
+    public abstract void recalcPosition();
+    public abstract boolean isBurning();
+    public abstract void setOnFire(int numSeconds);
+    public abstract boolean isWet();
+    public abstract void saveToNBT(CommonTagCompound compound);
+    public abstract void onTick();
+    public abstract void loadFromNBT(CommonTagCompound compound);
+    public abstract boolean savePassenger(CommonTagCompound compound);
+    public abstract boolean saveEntity(CommonTagCompound compound);
+    public abstract boolean isSneaking();
+    public abstract void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails);
+    public abstract int getId();
+    public abstract UUID getUniqueID();
+    public abstract DataWatcher getDataWatcher();
+    public abstract void onPush(double d0, double d1, double d2);
+    public abstract int getPortalCooldownMaximum();
+    public abstract void collide(EntityHandle entity);
+    public abstract Entity getBukkitEntity();
 
     public List<EntityHandle> getPassengers() {
         if (T.opt_passengers.isAvailable()) {
@@ -336,382 +210,100 @@ public class EntityHandle extends Template.Handle {
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
-    public Entity getBukkitEntityField() {
-        return T.bukkitEntityField.get(getRaw());
-    }
-
-    public void setBukkitEntityField(Entity value) {
-        T.bukkitEntityField.set(getRaw(), value);
-    }
-
-    public int getIdField() {
-        return T.idField.getInteger(getRaw());
-    }
-
-    public void setIdField(int value) {
-        T.idField.setInteger(getRaw(), value);
-    }
-
-    public EntityHandle getVehicle() {
-        return T.vehicle.get(getRaw());
-    }
-
-    public void setVehicle(EntityHandle value) {
-        T.vehicle.set(getRaw(), value);
-    }
-
-    public boolean isIgnoreChunkCheck() {
-        return T.ignoreChunkCheck.getBoolean(getRaw());
-    }
-
-    public void setIgnoreChunkCheck(boolean value) {
-        T.ignoreChunkCheck.setBoolean(getRaw(), value);
-    }
-
-    public WorldHandle getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(WorldHandle value) {
-        T.world.set(getRaw(), value);
-    }
-
-    public double getLastX() {
-        return T.lastX.getDouble(getRaw());
-    }
-
-    public void setLastX(double value) {
-        T.lastX.setDouble(getRaw(), value);
-    }
-
-    public double getLastY() {
-        return T.lastY.getDouble(getRaw());
-    }
-
-    public void setLastY(double value) {
-        T.lastY.setDouble(getRaw(), value);
-    }
-
-    public double getLastZ() {
-        return T.lastZ.getDouble(getRaw());
-    }
-
-    public void setLastZ(double value) {
-        T.lastZ.setDouble(getRaw(), value);
-    }
-
-    public double getLocX() {
-        return T.locX.getDouble(getRaw());
-    }
-
-    public void setLocX(double value) {
-        T.locX.setDouble(getRaw(), value);
-    }
-
-    public double getLocY() {
-        return T.locY.getDouble(getRaw());
-    }
-
-    public void setLocY(double value) {
-        T.locY.setDouble(getRaw(), value);
-    }
-
-    public double getLocZ() {
-        return T.locZ.getDouble(getRaw());
-    }
-
-    public void setLocZ(double value) {
-        T.locZ.setDouble(getRaw(), value);
-    }
-
-    public double getMotX() {
-        return T.motX.getDouble(getRaw());
-    }
-
-    public void setMotX(double value) {
-        T.motX.setDouble(getRaw(), value);
-    }
-
-    public double getMotY() {
-        return T.motY.getDouble(getRaw());
-    }
-
-    public void setMotY(double value) {
-        T.motY.setDouble(getRaw(), value);
-    }
-
-    public double getMotZ() {
-        return T.motZ.getDouble(getRaw());
-    }
-
-    public void setMotZ(double value) {
-        T.motZ.setDouble(getRaw(), value);
-    }
-
-    public float getYaw() {
-        return T.yaw.getFloat(getRaw());
-    }
-
-    public void setYaw(float value) {
-        T.yaw.setFloat(getRaw(), value);
-    }
-
-    public float getPitch() {
-        return T.pitch.getFloat(getRaw());
-    }
-
-    public void setPitch(float value) {
-        T.pitch.setFloat(getRaw(), value);
-    }
-
-    public float getLastYaw() {
-        return T.lastYaw.getFloat(getRaw());
-    }
-
-    public void setLastYaw(float value) {
-        T.lastYaw.setFloat(getRaw(), value);
-    }
-
-    public float getLastPitch() {
-        return T.lastPitch.getFloat(getRaw());
-    }
-
-    public void setLastPitch(float value) {
-        T.lastPitch.setFloat(getRaw(), value);
-    }
-
-    public AxisAlignedBBHandle getBoundingBoxField() {
-        return T.boundingBoxField.get(getRaw());
-    }
-
-    public void setBoundingBoxField(AxisAlignedBBHandle value) {
-        T.boundingBoxField.set(getRaw(), value);
-    }
-
-    public boolean isOnGround() {
-        return T.onGround.getBoolean(getRaw());
-    }
-
-    public void setOnGround(boolean value) {
-        T.onGround.setBoolean(getRaw(), value);
-    }
-
-    public boolean isHorizontalMovementImpaired() {
-        return T.horizontalMovementImpaired.getBoolean(getRaw());
-    }
-
-    public void setHorizontalMovementImpaired(boolean value) {
-        T.horizontalMovementImpaired.setBoolean(getRaw(), value);
-    }
-
-    public boolean isVerticalMovementImpaired() {
-        return T.verticalMovementImpaired.getBoolean(getRaw());
-    }
-
-    public void setVerticalMovementImpaired(boolean value) {
-        T.verticalMovementImpaired.setBoolean(getRaw(), value);
-    }
-
-    public boolean isMovementImpaired() {
-        return T.movementImpaired.getBoolean(getRaw());
-    }
-
-    public void setMovementImpaired(boolean value) {
-        T.movementImpaired.setBoolean(getRaw(), value);
-    }
-
-    public boolean isVelocityChanged() {
-        return T.velocityChanged.getBoolean(getRaw());
-    }
-
-    public void setVelocityChanged(boolean value) {
-        T.velocityChanged.setBoolean(getRaw(), value);
-    }
-
-    public boolean isJustLanded() {
-        return T.justLanded.getBoolean(getRaw());
-    }
-
-    public void setJustLanded(boolean value) {
-        T.justLanded.setBoolean(getRaw(), value);
-    }
-
-    public boolean isDead() {
-        return T.dead.getBoolean(getRaw());
-    }
-
-    public void setDead(boolean value) {
-        T.dead.setBoolean(getRaw(), value);
-    }
-
-    public float getWidth() {
-        return T.width.getFloat(getRaw());
-    }
-
-    public void setWidth(float value) {
-        T.width.setFloat(getRaw(), value);
-    }
-
-    public float getLength() {
-        return T.length.getFloat(getRaw());
-    }
-
-    public void setLength(float value) {
-        T.length.setFloat(getRaw(), value);
-    }
-
-    public float getWalkedDistanceXZ() {
-        return T.walkedDistanceXZ.getFloat(getRaw());
-    }
-
-    public void setWalkedDistanceXZ(float value) {
-        T.walkedDistanceXZ.setFloat(getRaw(), value);
-    }
-
-    public float getWalkedDistanceXYZ() {
-        return T.walkedDistanceXYZ.getFloat(getRaw());
-    }
-
-    public void setWalkedDistanceXYZ(float value) {
-        T.walkedDistanceXYZ.setFloat(getRaw(), value);
-    }
-
-    public float getFallDistance() {
-        return T.fallDistance.getFloat(getRaw());
-    }
-
-    public void setFallDistance(float value) {
-        T.fallDistance.setFloat(getRaw(), value);
-    }
-
-    public int getStepCounter() {
-        return T.stepCounter.getInteger(getRaw());
-    }
-
-    public void setStepCounter(int value) {
-        T.stepCounter.setInteger(getRaw(), value);
-    }
-
-    public float getHeightOffset() {
-        return T.heightOffset.getFloat(getRaw());
-    }
-
-    public void setHeightOffset(float value) {
-        T.heightOffset.setFloat(getRaw(), value);
-    }
-
-    public boolean isNoclip() {
-        return T.noclip.getBoolean(getRaw());
-    }
-
-    public void setNoclip(boolean value) {
-        T.noclip.setBoolean(getRaw(), value);
-    }
-
-    public Random getRandom() {
-        return T.random.get(getRaw());
-    }
-
-    public void setRandom(Random value) {
-        T.random.set(getRaw(), value);
-    }
-
-    public int getTicksLived() {
-        return T.ticksLived.getInteger(getRaw());
-    }
-
-    public void setTicksLived(int value) {
-        T.ticksLived.setInteger(getRaw(), value);
-    }
-
-    public int getFireTicks() {
-        return T.fireTicks.getInteger(getRaw());
-    }
-
-    public void setFireTicks(int value) {
-        T.fireTicks.setInteger(getRaw(), value);
-    }
-
-    public DataWatcher getDatawatcherField() {
-        return T.datawatcherField.get(getRaw());
-    }
-
-    public void setDatawatcherField(DataWatcher value) {
-        T.datawatcherField.set(getRaw(), value);
-    }
-
-    public boolean isLoaded() {
-        return T.isLoaded.getBoolean(getRaw());
-    }
-
-    public void setIsLoaded(boolean value) {
-        T.isLoaded.setBoolean(getRaw(), value);
-    }
-
-    public int getChunkX() {
-        return T.chunkX.getInteger(getRaw());
-    }
-
-    public void setChunkX(int value) {
-        T.chunkX.setInteger(getRaw(), value);
-    }
-
-    public int getChunkY() {
-        return T.chunkY.getInteger(getRaw());
-    }
-
-    public void setChunkY(int value) {
-        T.chunkY.setInteger(getRaw(), value);
-    }
-
-    public int getChunkZ() {
-        return T.chunkZ.getInteger(getRaw());
-    }
-
-    public void setChunkZ(int value) {
-        T.chunkZ.setInteger(getRaw(), value);
-    }
-
-    public boolean isPositionChanged() {
-        return T.positionChanged.getBoolean(getRaw());
-    }
-
-    public void setPositionChanged(boolean value) {
-        T.positionChanged.setBoolean(getRaw(), value);
-    }
-
-    public int getPortalCooldown() {
-        return T.portalCooldown.getInteger(getRaw());
-    }
-
-    public void setPortalCooldown(int value) {
-        T.portalCooldown.setInteger(getRaw(), value);
-    }
-
-    public boolean isAllowTeleportation() {
-        return T.allowTeleportation.getBoolean(getRaw());
-    }
-
-    public void setAllowTeleportation(boolean value) {
-        T.allowTeleportation.setBoolean(getRaw(), value);
-    }
-
-    public int getDimension() {
-        return T.dimension.getInteger(getRaw());
-    }
-
-    public void setDimension(int value) {
-        T.dimension.setInteger(getRaw(), value);
-    }
-
-    public boolean isValid() {
-        return T.valid.getBoolean(getRaw());
-    }
-
-    public void setValid(boolean value) {
-        T.valid.setBoolean(getRaw(), value);
-    }
-
+    public abstract Entity getBukkitEntityField();
+    public abstract void setBukkitEntityField(Entity value);
+    public abstract int getIdField();
+    public abstract void setIdField(int value);
+    public abstract EntityHandle getVehicle();
+    public abstract void setVehicle(EntityHandle value);
+    public abstract boolean isIgnoreChunkCheck();
+    public abstract void setIgnoreChunkCheck(boolean value);
+    public abstract WorldHandle getWorld();
+    public abstract void setWorld(WorldHandle value);
+    public abstract double getLastX();
+    public abstract void setLastX(double value);
+    public abstract double getLastY();
+    public abstract void setLastY(double value);
+    public abstract double getLastZ();
+    public abstract void setLastZ(double value);
+    public abstract double getLocX();
+    public abstract void setLocX(double value);
+    public abstract double getLocY();
+    public abstract void setLocY(double value);
+    public abstract double getLocZ();
+    public abstract void setLocZ(double value);
+    public abstract double getMotX();
+    public abstract void setMotX(double value);
+    public abstract double getMotY();
+    public abstract void setMotY(double value);
+    public abstract double getMotZ();
+    public abstract void setMotZ(double value);
+    public abstract float getYaw();
+    public abstract void setYaw(float value);
+    public abstract float getPitch();
+    public abstract void setPitch(float value);
+    public abstract float getLastYaw();
+    public abstract void setLastYaw(float value);
+    public abstract float getLastPitch();
+    public abstract void setLastPitch(float value);
+    public abstract AxisAlignedBBHandle getBoundingBoxField();
+    public abstract void setBoundingBoxField(AxisAlignedBBHandle value);
+    public abstract boolean isOnGround();
+    public abstract void setOnGround(boolean value);
+    public abstract boolean isHorizontalMovementImpaired();
+    public abstract void setHorizontalMovementImpaired(boolean value);
+    public abstract boolean isVerticalMovementImpaired();
+    public abstract void setVerticalMovementImpaired(boolean value);
+    public abstract boolean isMovementImpaired();
+    public abstract void setMovementImpaired(boolean value);
+    public abstract boolean isVelocityChanged();
+    public abstract void setVelocityChanged(boolean value);
+    public abstract boolean isJustLanded();
+    public abstract void setJustLanded(boolean value);
+    public abstract boolean isDead();
+    public abstract void setDead(boolean value);
+    public abstract float getWidth();
+    public abstract void setWidth(float value);
+    public abstract float getLength();
+    public abstract void setLength(float value);
+    public abstract float getWalkedDistanceXZ();
+    public abstract void setWalkedDistanceXZ(float value);
+    public abstract float getWalkedDistanceXYZ();
+    public abstract void setWalkedDistanceXYZ(float value);
+    public abstract float getFallDistance();
+    public abstract void setFallDistance(float value);
+    public abstract int getStepCounter();
+    public abstract void setStepCounter(int value);
+    public abstract float getHeightOffset();
+    public abstract void setHeightOffset(float value);
+    public abstract boolean isNoclip();
+    public abstract void setNoclip(boolean value);
+    public abstract Random getRandom();
+    public abstract void setRandom(Random value);
+    public abstract int getTicksLived();
+    public abstract void setTicksLived(int value);
+    public abstract int getFireTicks();
+    public abstract void setFireTicks(int value);
+    public abstract DataWatcher getDatawatcherField();
+    public abstract void setDatawatcherField(DataWatcher value);
+    public abstract boolean isLoaded();
+    public abstract void setIsLoaded(boolean value);
+    public abstract int getChunkX();
+    public abstract void setChunkX(int value);
+    public abstract int getChunkY();
+    public abstract void setChunkY(int value);
+    public abstract int getChunkZ();
+    public abstract void setChunkZ(int value);
+    public abstract boolean isPositionChanged();
+    public abstract void setPositionChanged(boolean value);
+    public abstract int getPortalCooldown();
+    public abstract void setPortalCooldown(int value);
+    public abstract boolean isAllowTeleportation();
+    public abstract void setAllowTeleportation(boolean value);
+    public abstract int getDimension();
+    public abstract void setDimension(int value);
+    public abstract boolean isValid();
+    public abstract void setValid(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

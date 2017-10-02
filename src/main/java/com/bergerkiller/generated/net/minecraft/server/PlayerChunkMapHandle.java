@@ -12,7 +12,7 @@ import java.util.Queue;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PlayerChunkMapHandle extends Template.Handle {
+public abstract class PlayerChunkMapHandle extends Template.Handle {
     /** @See {@link PlayerChunkMapClass} */
     public static final PlayerChunkMapClass T = new PlayerChunkMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkMapHandle.class, "net.minecraft.server.PlayerChunkMap");
@@ -25,18 +25,9 @@ public class PlayerChunkMapHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean shouldUnload(int i, int j, int k, int l, int i1) {
-        return T.shouldUnload.invoke(getRaw(), i, j, k, l, i1);
-    }
-
-    public void flagDirty(IntVector3 blockposition) {
-        T.flagDirty.invoke(getRaw(), blockposition);
-    }
-
-    public boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ) {
-        return T.isChunkEntered.invoke(getRaw(), entityplayer, chunkX, chunkZ);
-    }
-
+    public abstract boolean shouldUnload(int i, int j, int k, int l, int i1);
+    public abstract void flagDirty(IntVector3 blockposition);
+    public abstract boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ);
 
     public void markForUpdate(PlayerChunkHandle playerChunk) {
         if (T.markForUpdate_1_10_2.isAvailable()) {
@@ -59,22 +50,10 @@ public class PlayerChunkMapHandle extends Template.Handle {
     public void flagDirty(int x, int y, int z) {
         T.flagDirty.raw.invoke(getRaw(), BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
     }
-    public List<Player> getManagedPlayers() {
-        return T.managedPlayers.get(getRaw());
-    }
-
-    public void setManagedPlayers(List<Player> value) {
-        T.managedPlayers.set(getRaw(), value);
-    }
-
-    public int getRadius() {
-        return T.radius.getInteger(getRaw());
-    }
-
-    public void setRadius(int value) {
-        T.radius.setInteger(getRaw(), value);
-    }
-
+    public abstract List<Player> getManagedPlayers();
+    public abstract void setManagedPlayers(List<Player> value);
+    public abstract int getRadius();
+    public abstract void setRadius(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerChunkMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

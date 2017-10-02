@@ -13,7 +13,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
+public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
     /** @See {@link PacketPlayOutNamedEntitySpawnClass} */
     public static final PacketPlayOutNamedEntitySpawnClass T = new PacketPlayOutNamedEntitySpawnClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutNamedEntitySpawnHandle.class, "net.minecraft.server.PacketPlayOutNamedEntitySpawn");
@@ -80,38 +80,14 @@ public class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
             return org.bukkit.Material.AIR;
         }
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public UUID getEntityUUID() {
-        return T.entityUUID.get(getRaw());
-    }
-
-    public void setEntityUUID(UUID value) {
-        T.entityUUID.set(getRaw(), value);
-    }
-
-    public DataWatcher getDataWatcher() {
-        return T.dataWatcher.get(getRaw());
-    }
-
-    public void setDataWatcher(DataWatcher value) {
-        T.dataWatcher.set(getRaw(), value);
-    }
-
-    public List<Item<?>> getDataWatcherItems() {
-        return T.dataWatcherItems.get(getRaw());
-    }
-
-    public void setDataWatcherItems(List<Item<?>> value) {
-        T.dataWatcherItems.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract UUID getEntityUUID();
+    public abstract void setEntityUUID(UUID value);
+    public abstract DataWatcher getDataWatcher();
+    public abstract void setDataWatcher(DataWatcher value);
+    public abstract List<Item<?>> getDataWatcherItems();
+    public abstract void setDataWatcherItems(List<Item<?>> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutNamedEntitySpawn</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

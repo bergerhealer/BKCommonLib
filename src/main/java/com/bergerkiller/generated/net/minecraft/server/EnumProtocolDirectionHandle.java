@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EnumProtocolDirectionHandle extends Template.Handle {
+public abstract class EnumProtocolDirectionHandle extends Template.Handle {
     /** @See {@link EnumProtocolDirectionClass} */
     public static final EnumProtocolDirectionClass T = new EnumProtocolDirectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolDirectionHandle.class, "net.minecraft.server.EnumProtocolDirection");

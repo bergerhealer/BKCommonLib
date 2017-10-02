@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInKeepAliveHandle extends PacketHandle {
+public abstract class PacketPlayInKeepAliveHandle extends PacketHandle {
     /** @See {@link PacketPlayInKeepAliveClass} */
     public static final PacketPlayInKeepAliveClass T = new PacketPlayInKeepAliveClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInKeepAliveHandle.class, "net.minecraft.server.PacketPlayInKeepAlive");
@@ -21,14 +21,8 @@ public class PacketPlayInKeepAliveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public Long getKey() {
-        return T.key.get(getRaw());
-    }
-
-    public void setKey(Long value) {
-        T.key.set(getRaw(), value);
-    }
-
+    public abstract Long getKey();
+    public abstract void setKey(Long value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInKeepAlive</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

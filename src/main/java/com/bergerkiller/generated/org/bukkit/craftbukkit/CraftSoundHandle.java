@@ -9,7 +9,7 @@ import org.bukkit.Sound;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftSoundHandle extends Template.Handle {
+public abstract class CraftSoundHandle extends Template.Handle {
     /** @See {@link CraftSoundClass} */
     public static final CraftSoundClass T = new CraftSoundClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftSoundHandle.class, "org.bukkit.craftbukkit.CraftSound");

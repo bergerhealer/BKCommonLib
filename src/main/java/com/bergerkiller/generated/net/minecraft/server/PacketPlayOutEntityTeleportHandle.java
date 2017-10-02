@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutEntityTeleportHandle extends PacketHandle {
+public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityTeleportClass} */
     public static final PacketPlayOutEntityTeleportClass T = new PacketPlayOutEntityTeleportClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityTeleportHandle.class, "net.minecraft.server.PacketPlayOutEntityTeleport");
@@ -82,22 +82,10 @@ public class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     public void setPitch(float pitch) {
         setProtocolRotation(T.pitch_raw, pitch);
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public boolean isOnGround() {
-        return T.onGround.getBoolean(getRaw());
-    }
-
-    public void setOnGround(boolean value) {
-        T.onGround.setBoolean(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract boolean isOnGround();
+    public abstract void setOnGround(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntityTeleport</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class EnumMoveTypeHandle extends Template.Handle {
+public abstract class EnumMoveTypeHandle extends Template.Handle {
     /** @See {@link EnumMoveTypeClass} */
     public static final EnumMoveTypeClass T = new EnumMoveTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumMoveTypeHandle.class, "net.minecraft.server.EnumMoveType");

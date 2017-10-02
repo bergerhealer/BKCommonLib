@@ -10,7 +10,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class RecipesFurnaceHandle extends Template.Handle {
+public abstract class RecipesFurnaceHandle extends Template.Handle {
     /** @See {@link RecipesFurnaceClass} */
     public static final RecipesFurnaceClass T = new RecipesFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RecipesFurnaceHandle.class, "net.minecraft.server.RecipesFurnace");
@@ -27,18 +27,9 @@ public class RecipesFurnaceHandle extends Template.Handle {
         return T.getInstance.invoke();
     }
 
-    public ItemStackHandle getResult(ItemStackHandle itemstack) {
-        return T.getResult.invoke(getRaw(), itemstack);
-    }
-
-    public Map<ItemStack, ItemStack> getRecipes() {
-        return T.recipes.get(getRaw());
-    }
-
-    public void setRecipes(Map<ItemStack, ItemStack> value) {
-        T.recipes.set(getRaw(), value);
-    }
-
+    public abstract ItemStackHandle getResult(ItemStackHandle itemstack);
+    public abstract Map<ItemStack, ItemStack> getRecipes();
+    public abstract void setRecipes(Map<ItemStack, ItemStack> value);
     /**
      * Stores class members for <b>net.minecraft.server.RecipesFurnace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

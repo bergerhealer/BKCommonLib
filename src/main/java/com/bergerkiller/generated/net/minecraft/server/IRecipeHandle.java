@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IRecipeHandle extends Template.Handle {
+public abstract class IRecipeHandle extends Template.Handle {
     /** @See {@link IRecipeClass} */
     public static final IRecipeClass T = new IRecipeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IRecipeHandle.class, "net.minecraft.server.IRecipe");
@@ -22,10 +22,7 @@ public class IRecipeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public ItemStack getOutput() {
-        return T.getOutput.invoke(getRaw());
-    }
-
+    public abstract ItemStack getOutput();
     /**
      * Stores class members for <b>net.minecraft.server.IRecipe</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

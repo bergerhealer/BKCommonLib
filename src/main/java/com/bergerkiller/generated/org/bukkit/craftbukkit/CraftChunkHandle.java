@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftChunkHandle extends Template.Handle {
+public abstract class CraftChunkHandle extends Template.Handle {
     /** @See {@link CraftChunkClass} */
     public static final CraftChunkClass T = new CraftChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChunkHandle.class, "org.bukkit.craftbukkit.CraftChunk");
@@ -21,10 +21,7 @@ public class CraftChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Object getHandle() {
-        return T.getHandle.invoke(getRaw());
-    }
-
+    public abstract Object getHandle();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.CraftChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

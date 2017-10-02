@@ -10,7 +10,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EnumProtocolHandle extends Template.Handle {
+public abstract class EnumProtocolHandle extends Template.Handle {
     /** @See {@link EnumProtocolClass} */
     public static final EnumProtocolClass T = new EnumProtocolClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolHandle.class, "net.minecraft.server.EnumProtocol");
@@ -25,15 +25,9 @@ public class EnumProtocolHandle extends Template.Handle {
     /* ============================================================================== */
 
     @SuppressWarnings("rawtypes")
-    public Map<EnumProtocolDirectionHandle, BiMap> getPacketMap() {
-        return T.packetMap.get(getRaw());
-    }
-
+    public abstract Map<EnumProtocolDirectionHandle, BiMap> getPacketMap();
     @SuppressWarnings("rawtypes")
-    public void setPacketMap(Map<EnumProtocolDirectionHandle, BiMap> value) {
-        T.packetMap.set(getRaw(), value);
-    }
-
+    public abstract void setPacketMap(Map<EnumProtocolDirectionHandle, BiMap> value);
     /**
      * Stores class members for <b>net.minecraft.server.EnumProtocol</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

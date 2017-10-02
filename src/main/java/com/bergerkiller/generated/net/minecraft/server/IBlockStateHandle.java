@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IBlockStateHandle extends Template.Handle {
+public abstract class IBlockStateHandle extends Template.Handle {
     /** @See {@link IBlockStateClass} */
     public static final IBlockStateClass T = new IBlockStateClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockStateHandle.class, "net.minecraft.server.IBlockState");
@@ -21,14 +21,8 @@ public class IBlockStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public String getKeyToken() {
-        return T.getKeyToken.invoke(getRaw());
-    }
-
-    public String getValueToken(Object value) {
-        return T.getValueToken.invoke(getRaw(), value);
-    }
-
+    public abstract String getKeyToken();
+    public abstract String getValueToken(Object value);
     /**
      * Stores class members for <b>net.minecraft.server.IBlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -12,7 +12,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PlayerChunkHandle extends Template.Handle {
+public abstract class PlayerChunkHandle extends Template.Handle {
     /** @See {@link PlayerChunkClass} */
     public static final PlayerChunkClass T = new PlayerChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkHandle.class, "net.minecraft.server.PlayerChunk");
@@ -25,18 +25,9 @@ public class PlayerChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void addPlayer(Player player) {
-        T.addPlayer.invoke(getRaw(), player);
-    }
-
-    public void removePlayer(Player player) {
-        T.removePlayer.invoke(getRaw(), player);
-    }
-
-    public void sendChunk(Player player) {
-        T.sendChunk.invoke(getRaw(), player);
-    }
-
+    public abstract void addPlayer(Player player);
+    public abstract void removePlayer(Player player);
+    public abstract void sendChunk(Player player);
 
     public org.bukkit.Chunk getChunk(org.bukkit.World world) {
         if (T.opt_loaded_chunk.isAvailable()) {
@@ -50,54 +41,18 @@ public class PlayerChunkHandle extends Template.Handle {
             }
         }
     }
-    public PlayerChunkMapHandle getPlayerChunkMap() {
-        return T.playerChunkMap.get(getRaw());
-    }
-
-    public void setPlayerChunkMap(PlayerChunkMapHandle value) {
-        T.playerChunkMap.set(getRaw(), value);
-    }
-
-    public List<Player> getPlayers() {
-        return T.players.get(getRaw());
-    }
-
-    public void setPlayers(List<Player> value) {
-        T.players.set(getRaw(), value);
-    }
-
-    public IntVector2 getLocation() {
-        return T.location.get(getRaw());
-    }
-
-    public void setLocation(IntVector2 value) {
-        T.location.set(getRaw(), value);
-    }
-
-    public int getDirtyCount() {
-        return T.dirtyCount.getInteger(getRaw());
-    }
-
-    public void setDirtyCount(int value) {
-        T.dirtyCount.setInteger(getRaw(), value);
-    }
-
-    public int getDirtySectionMask() {
-        return T.dirtySectionMask.getInteger(getRaw());
-    }
-
-    public void setDirtySectionMask(int value) {
-        T.dirtySectionMask.setInteger(getRaw(), value);
-    }
-
-    public boolean isDone() {
-        return T.done.getBoolean(getRaw());
-    }
-
-    public void setDone(boolean value) {
-        T.done.setBoolean(getRaw(), value);
-    }
-
+    public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract void setPlayerChunkMap(PlayerChunkMapHandle value);
+    public abstract List<Player> getPlayers();
+    public abstract void setPlayers(List<Player> value);
+    public abstract IntVector2 getLocation();
+    public abstract void setLocation(IntVector2 value);
+    public abstract int getDirtyCount();
+    public abstract void setDirtyCount(int value);
+    public abstract int getDirtySectionMask();
+    public abstract void setDirtySectionMask(int value);
+    public abstract boolean isDone();
+    public abstract void setDone(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

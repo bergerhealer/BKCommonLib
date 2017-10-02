@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftInventoryHandle extends InventoryHandle {
+public abstract class CraftInventoryHandle extends InventoryHandle {
     /** @See {@link CraftInventoryClass} */
     public static final CraftInventoryClass T = new CraftInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventory");
@@ -28,18 +28,9 @@ public class CraftInventoryHandle extends InventoryHandle {
 
     /* ============================================================================== */
 
-    public IInventoryHandle getHandle() {
-        return T.getHandle.invoke(getRaw());
-    }
-
-    public IInventoryHandle getHandleField() {
-        return T.handleField.get(getRaw());
-    }
-
-    public void setHandleField(IInventoryHandle value) {
-        T.handleField.set(getRaw(), value);
-    }
-
+    public abstract IInventoryHandle getHandle();
+    public abstract IInventoryHandle getHandleField();
+    public abstract void setHandleField(IInventoryHandle value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

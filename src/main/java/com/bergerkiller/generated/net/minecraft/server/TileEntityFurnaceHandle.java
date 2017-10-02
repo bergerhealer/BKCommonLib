@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class TileEntityFurnaceHandle extends TileEntityHandle {
+public abstract class TileEntityFurnaceHandle extends TileEntityHandle {
     /** @See {@link TileEntityFurnaceClass} */
     public static final TileEntityFurnaceClass T = new TileEntityFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityFurnaceHandle.class, "net.minecraft.server.TileEntityFurnace");

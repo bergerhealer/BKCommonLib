@@ -10,7 +10,7 @@ import org.bukkit.block.Block;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftBlockHandle extends Template.Handle {
+public abstract class CraftBlockHandle extends Template.Handle {
     /** @See {@link CraftBlockClass} */
     public static final CraftBlockClass T = new CraftBlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockHandle.class, "org.bukkit.craftbukkit.block.CraftBlock");
@@ -27,38 +27,14 @@ public class CraftBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Chunk getChunk() {
-        return T.chunk.get(getRaw());
-    }
-
-    public void setChunk(Chunk value) {
-        T.chunk.set(getRaw(), value);
-    }
-
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getY() {
-        return T.y.getInteger(getRaw());
-    }
-
-    public void setY(int value) {
-        T.y.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
+    public abstract Chunk getChunk();
+    public abstract void setChunk(Chunk value);
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getY();
+    public abstract void setY(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.block.CraftBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

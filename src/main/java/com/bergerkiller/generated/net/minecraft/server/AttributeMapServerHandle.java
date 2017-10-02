@@ -9,7 +9,7 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class AttributeMapServerHandle extends Template.Handle {
+public abstract class AttributeMapServerHandle extends Template.Handle {
     /** @See {@link AttributeMapServerClass} */
     public static final AttributeMapServerClass T = new AttributeMapServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeMapServerHandle.class, "net.minecraft.server.AttributeMapServer");
@@ -26,10 +26,7 @@ public class AttributeMapServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Collection<Object> attributes() {
-        return T.attributes.invoke(getRaw());
-    }
-
+    public abstract Collection<Object> attributes();
     /**
      * Stores class members for <b>net.minecraft.server.AttributeMapServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

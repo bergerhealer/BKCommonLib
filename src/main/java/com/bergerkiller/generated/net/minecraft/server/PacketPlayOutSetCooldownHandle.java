@@ -10,7 +10,7 @@ import org.bukkit.Material;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayOutSetCooldownHandle extends PacketHandle {
+public abstract class PacketPlayOutSetCooldownHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSetCooldownClass} */
     public static final PacketPlayOutSetCooldownClass T = new PacketPlayOutSetCooldownClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSetCooldownHandle.class, "net.minecraft.server.PacketPlayOutSetCooldown");
@@ -23,22 +23,10 @@ public class PacketPlayOutSetCooldownHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public Material getMaterial() {
-        return T.material.get(getRaw());
-    }
-
-    public void setMaterial(Material value) {
-        T.material.set(getRaw(), value);
-    }
-
-    public int getCooldown() {
-        return T.cooldown.getInteger(getRaw());
-    }
-
-    public void setCooldown(int value) {
-        T.cooldown.setInteger(getRaw(), value);
-    }
-
+    public abstract Material getMaterial();
+    public abstract void setMaterial(Material value);
+    public abstract int getCooldown();
+    public abstract void setCooldown(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSetCooldown</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

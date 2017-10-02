@@ -14,7 +14,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ChunkHandle extends Template.Handle {
+public abstract class ChunkHandle extends Template.Handle {
     /** @See {@link ChunkClass} */
     public static final ChunkClass T = new ChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk");
@@ -27,46 +27,16 @@ public class ChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public BlockData getBlockData(IntVector3 blockposition) {
-        return T.getBlockData.invoke(getRaw(), blockposition);
-    }
-
-    public BlockData getBlockDataAtCoord(int x, int y, int z) {
-        return T.getBlockDataAtCoord.invoke(getRaw(), x, y, z);
-    }
-
-    public BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata) {
-        return T.setBlockData.invoke(getRaw(), blockposition, iblockdata);
-    }
-
-    public void addEntity(EntityHandle entity) {
-        T.addEntity.invoke(getRaw(), entity);
-    }
-
-    public int getHeight(int x, int z) {
-        return T.getHeight.invoke(getRaw(), x, z);
-    }
-
-    public int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position) {
-        return T.getBrightness.invoke(getRaw(), enumskyblock, position);
-    }
-
-    public int getTopSliceY() {
-        return T.getTopSliceY.invoke(getRaw());
-    }
-
-    public byte[] getBiomeIndex() {
-        return T.getBiomeIndex.invoke(getRaw());
-    }
-
-    public void addEntities() {
-        T.addEntities.invoke(getRaw());
-    }
-
-    public boolean checkCanSave(boolean isNotAutosave) {
-        return T.checkCanSave.invoke(getRaw(), isNotAutosave);
-    }
-
+    public abstract BlockData getBlockData(IntVector3 blockposition);
+    public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
+    public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata);
+    public abstract void addEntity(EntityHandle entity);
+    public abstract int getHeight(int x, int z);
+    public abstract int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position);
+    public abstract int getTopSliceY();
+    public abstract byte[] getBiomeIndex();
+    public abstract void addEntities();
+    public abstract boolean checkCanSave(boolean isNotAutosave);
 
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
@@ -75,62 +45,20 @@ public class ChunkHandle extends Template.Handle {
             return null;
         }
     }
-    public ChunkSectionHandle[] getSections() {
-        return T.sections.get(getRaw());
-    }
-
-    public void setSections(ChunkSectionHandle[] value) {
-        T.sections.set(getRaw(), value);
-    }
-
-    public WorldHandle getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(WorldHandle value) {
-        T.world.set(getRaw(), value);
-    }
-
-    public int getLocX() {
-        return T.locX.getInteger(getRaw());
-    }
-
-    public void setLocX(int value) {
-        T.locX.setInteger(getRaw(), value);
-    }
-
-    public int getLocZ() {
-        return T.locZ.getInteger(getRaw());
-    }
-
-    public void setLocZ(int value) {
-        T.locZ.setInteger(getRaw(), value);
-    }
-
-    public Map<IntVector3, BlockState> getTileEntities() {
-        return T.tileEntities.get(getRaw());
-    }
-
-    public void setTileEntities(Map<IntVector3, BlockState> value) {
-        T.tileEntities.set(getRaw(), value);
-    }
-
-    public List<Object>[] getEntitySlices() {
-        return T.entitySlices.get(getRaw());
-    }
-
-    public void setEntitySlices(List<Object>[] value) {
-        T.entitySlices.set(getRaw(), value);
-    }
-
-    public Chunk getBukkitChunk() {
-        return T.bukkitChunk.get(getRaw());
-    }
-
-    public void setBukkitChunk(Chunk value) {
-        T.bukkitChunk.set(getRaw(), value);
-    }
-
+    public abstract ChunkSectionHandle[] getSections();
+    public abstract void setSections(ChunkSectionHandle[] value);
+    public abstract WorldHandle getWorld();
+    public abstract void setWorld(WorldHandle value);
+    public abstract int getLocX();
+    public abstract void setLocX(int value);
+    public abstract int getLocZ();
+    public abstract void setLocZ(int value);
+    public abstract Map<IntVector3, BlockState> getTileEntities();
+    public abstract void setTileEntities(Map<IntVector3, BlockState> value);
+    public abstract List<Object>[] getEntitySlices();
+    public abstract void setEntitySlices(List<Object>[] value);
+    public abstract Chunk getBukkitChunk();
+    public abstract void setBukkitChunk(Chunk value);
     /**
      * Stores class members for <b>net.minecraft.server.Chunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

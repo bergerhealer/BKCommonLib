@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInSettingsHandle extends PacketHandle {
+public abstract class PacketPlayInSettingsHandle extends PacketHandle {
     /** @See {@link PacketPlayInSettingsClass} */
     public static final PacketPlayInSettingsClass T = new PacketPlayInSettingsClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSettingsHandle.class, "net.minecraft.server.PacketPlayInSettings");
@@ -36,46 +36,16 @@ public class PacketPlayInSettingsHandle extends PacketHandle {
             T.mainHand.set(getRaw(), mainHand);
         }
     }
-    public String getLang() {
-        return T.lang.get(getRaw());
-    }
-
-    public void setLang(String value) {
-        T.lang.set(getRaw(), value);
-    }
-
-    public int getView() {
-        return T.view.getInteger(getRaw());
-    }
-
-    public void setView(int value) {
-        T.view.setInteger(getRaw(), value);
-    }
-
-    public Object getChatVisibility() {
-        return T.chatVisibility.get(getRaw());
-    }
-
-    public void setChatVisibility(Object value) {
-        T.chatVisibility.set(getRaw(), value);
-    }
-
-    public boolean isEnableColors() {
-        return T.enableColors.getBoolean(getRaw());
-    }
-
-    public void setEnableColors(boolean value) {
-        T.enableColors.setBoolean(getRaw(), value);
-    }
-
-    public int getModelPartFlags() {
-        return T.modelPartFlags.getInteger(getRaw());
-    }
-
-    public void setModelPartFlags(int value) {
-        T.modelPartFlags.setInteger(getRaw(), value);
-    }
-
+    public abstract String getLang();
+    public abstract void setLang(String value);
+    public abstract int getView();
+    public abstract void setView(int value);
+    public abstract Object getChatVisibility();
+    public abstract void setChatVisibility(Object value);
+    public abstract boolean isEnableColors();
+    public abstract void setEnableColors(boolean value);
+    public abstract int getModelPartFlags();
+    public abstract void setModelPartFlags(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInSettings</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

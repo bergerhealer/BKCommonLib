@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class BlockHandle extends Template.Handle {
+public abstract class BlockHandle extends Template.Handle {
     /** @See {@link BlockClass} */
     public static final BlockClass T = new BlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block");
@@ -44,58 +44,19 @@ public class BlockHandle extends Template.Handle {
         return T.getByCombinedId.invoke(combinedId);
     }
 
-    public void entityHitVertical(WorldHandle world, EntityHandle entity) {
-        T.entityHitVertical.invoke(getRaw(), world, entity);
-    }
-
-    public int getOpacity(IBlockDataHandle iblockdata) {
-        return T.getOpacity.invoke(getRaw(), iblockdata);
-    }
-
-    public int getEmission(IBlockDataHandle iblockdata) {
-        return T.getEmission.invoke(getRaw(), iblockdata);
-    }
-
-    public boolean isOccluding(IBlockDataHandle iblockdata) {
-        return T.isOccluding.invoke(getRaw(), iblockdata);
-    }
-
-    public boolean isPowerSource(IBlockDataHandle iblockdata) {
-        return T.isPowerSource.invoke(getRaw(), iblockdata);
-    }
-
-    public float getDamageResillience(Entity entity) {
-        return T.getDamageResillience.invoke(getRaw(), entity);
-    }
-
-    public void dropNaturally(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, float yield, int chance) {
-        T.dropNaturally.invoke(getRaw(), world, blockposition, iblockdata, yield, chance);
-    }
-
-    public void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion) {
-        T.ignite.invoke(getRaw(), world, blockposition, explosion);
-    }
-
-    public void stepOn(World world, IntVector3 blockposition, Entity entity) {
-        T.stepOn.invoke(getRaw(), world, blockposition, entity);
-    }
-
-    public IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition) {
-        return T.updateState.invoke(getRaw(), iblockdata, iblockaccess, blockposition);
-    }
-
-    public IBlockDataHandle getBlockData() {
-        return T.getBlockData.invoke(getRaw());
-    }
-
-    public IBlockDataHandle fromLegacyData(int data) {
-        return T.fromLegacyData.invoke(getRaw(), data);
-    }
-
-    public int toLegacyData(IBlockDataHandle iblockdata) {
-        return T.toLegacyData.invoke(getRaw(), iblockdata);
-    }
-
+    public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
+    public abstract int getOpacity(IBlockDataHandle iblockdata);
+    public abstract int getEmission(IBlockDataHandle iblockdata);
+    public abstract boolean isOccluding(IBlockDataHandle iblockdata);
+    public abstract boolean isPowerSource(IBlockDataHandle iblockdata);
+    public abstract float getDamageResillience(Entity entity);
+    public abstract void dropNaturally(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, float yield, int chance);
+    public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);
+    public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
+    public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition);
+    public abstract IBlockDataHandle getBlockData();
+    public abstract IBlockDataHandle fromLegacyData(int data);
+    public abstract int toLegacyData(IBlockDataHandle iblockdata);
 
     public SoundEffectTypeHandle getStepSound() {
         if (T.getStepSound.isAvailable()) {

@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PropertyHandle extends Template.Handle {
+public abstract class PropertyHandle extends Template.Handle {
     /** @See {@link PropertyClass} */
     public static final PropertyClass T = new PropertyClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PropertyHandle.class, "com.mojang.authlib.properties.Property");
@@ -29,18 +29,9 @@ public class PropertyHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public String getName() {
-        return T.getName.invoke(getRaw());
-    }
-
-    public String getValue() {
-        return T.getValue.invoke(getRaw());
-    }
-
-    public String getSignature() {
-        return T.getSignature.invoke(getRaw());
-    }
-
+    public abstract String getName();
+    public abstract String getValue();
+    public abstract String getSignature();
     /**
      * Stores class members for <b>com.mojang.authlib.properties.Property</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

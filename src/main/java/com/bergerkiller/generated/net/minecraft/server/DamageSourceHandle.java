@@ -13,7 +13,7 @@ import org.bukkit.entity.LivingEntity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class DamageSourceHandle extends Template.Handle {
+public abstract class DamageSourceHandle extends Template.Handle {
     /** @See {@link DamageSourceClass} */
     public static final DamageSourceClass T = new DamageSourceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource");
@@ -58,18 +58,9 @@ public class DamageSourceHandle extends Template.Handle {
         return T.explosion.invoke(explosion);
     }
 
-    public boolean isExplosion() {
-        return T.isExplosion.invoke(getRaw());
-    }
-
-    public boolean isFireDamage() {
-        return T.isFireDamage.invoke(getRaw());
-    }
-
-    public Entity getEntity() {
-        return T.getEntity.invoke(getRaw());
-    }
-
+    public abstract boolean isExplosion();
+    public abstract boolean isFireDamage();
+    public abstract Entity getEntity();
 
     public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {
         ExplosionHandle explosionHandle = null;
@@ -95,14 +86,8 @@ public class DamageSourceHandle extends Template.Handle {
         }
         return result;
     }
-    public String getTranslationIndex() {
-        return T.translationIndex.get(getRaw());
-    }
-
-    public void setTranslationIndex(String value) {
-        T.translationIndex.set(getRaw(), value);
-    }
-
+    public abstract String getTranslationIndex();
+    public abstract void setTranslationIndex(String value);
     /**
      * Stores class members for <b>net.minecraft.server.DamageSource</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

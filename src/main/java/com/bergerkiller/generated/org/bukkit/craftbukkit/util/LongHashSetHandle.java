@@ -9,7 +9,7 @@ import java.util.Iterator;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class LongHashSetHandle extends Template.Handle {
+public abstract class LongHashSetHandle extends Template.Handle {
     /** @See {@link LongHashSetClass} */
     public static final LongHashSetClass T = new LongHashSetClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LongHashSetHandle.class, "org.bukkit.craftbukkit.util.LongHashSet");
@@ -30,86 +30,26 @@ public class LongHashSetHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Iterator<Long> iterator() {
-        return T.iterator.invoke(getRaw());
-    }
-
-    public int size() {
-        return T.size.invoke(getRaw());
-    }
-
-    public boolean isEmpty() {
-        return T.isEmpty.invoke(getRaw());
-    }
-
-    public boolean addPair(int msw, int lsw) {
-        return T.addPair.invoke(getRaw(), msw, lsw);
-    }
-
-    public boolean add(long value) {
-        return T.add.invoke(getRaw(), value);
-    }
-
-    public void removePair(int msw, int lsw) {
-        T.removePair.invoke(getRaw(), msw, lsw);
-    }
-
-    public boolean remove(long value) {
-        return T.remove.invoke(getRaw(), value);
-    }
-
-    public boolean containsPair(int msw, int lsw) {
-        return T.containsPair.invoke(getRaw(), msw, lsw);
-    }
-
-    public boolean contains(long value) {
-        return T.contains.invoke(getRaw(), value);
-    }
-
-    public void clear() {
-        T.clear.invoke(getRaw());
-    }
-
-    public long[] toArray() {
-        return T.toArray.invoke(getRaw());
-    }
-
-    public long popFirst() {
-        return T.popFirst.invoke(getRaw());
-    }
-
-    public long[] popAll() {
-        return T.popAll.invoke(getRaw());
-    }
-
-    public int hash(long value) {
-        return T.hash.invoke(getRaw(), value);
-    }
-
-    public void rehash() {
-        T.rehash.invoke(getRaw());
-    }
-
-    public void rehashResize(int newCapacity) {
-        T.rehashResize.invoke(getRaw(), newCapacity);
-    }
-
-    public int getElementsCountField() {
-        return T.elementsCountField.getInteger(getRaw());
-    }
-
-    public void setElementsCountField(int value) {
-        T.elementsCountField.setInteger(getRaw(), value);
-    }
-
-    public long[] getValuesField() {
-        return T.valuesField.get(getRaw());
-    }
-
-    public void setValuesField(long[] value) {
-        T.valuesField.set(getRaw(), value);
-    }
-
+    public abstract Iterator<Long> iterator();
+    public abstract int size();
+    public abstract boolean isEmpty();
+    public abstract boolean addPair(int msw, int lsw);
+    public abstract boolean add(long value);
+    public abstract void removePair(int msw, int lsw);
+    public abstract boolean remove(long value);
+    public abstract boolean containsPair(int msw, int lsw);
+    public abstract boolean contains(long value);
+    public abstract void clear();
+    public abstract long[] toArray();
+    public abstract long popFirst();
+    public abstract long[] popAll();
+    public abstract int hash(long value);
+    public abstract void rehash();
+    public abstract void rehashResize(int newCapacity);
+    public abstract int getElementsCountField();
+    public abstract void setElementsCountField(int value);
+    public abstract long[] getValuesField();
+    public abstract void setValuesField(long[] value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.LongHashSet</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

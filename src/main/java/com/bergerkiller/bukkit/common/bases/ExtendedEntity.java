@@ -202,7 +202,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     /**
      * A reference to the internal net.minecraft.server.Entity (or its extension)
      */
-    protected EntityHandle handle = new EntityHandle();
+    protected EntityHandle handle = EntityHandle.T.createHandle(null, true);
 
     /**
      * Constructs a new Extended Entity with the initial entity specified

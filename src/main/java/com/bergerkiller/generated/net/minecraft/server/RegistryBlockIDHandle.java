@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class RegistryBlockIDHandle extends Template.Handle {
+public abstract class RegistryBlockIDHandle extends Template.Handle {
     /** @See {@link RegistryBlockIDClass} */
     public static final RegistryBlockIDClass T = new RegistryBlockIDClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryBlockIDHandle.class, "net.minecraft.server.RegistryBlockID");
@@ -22,10 +22,7 @@ public class RegistryBlockIDHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getId(Object value) {
-        return T.getId.invoke(getRaw(), value);
-    }
-
+    public abstract int getId(Object value);
     /**
      * Stores class members for <b>net.minecraft.server.RegistryBlockID</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutWindowItemsHandle extends PacketHandle {
+public abstract class PacketPlayOutWindowItemsHandle extends PacketHandle {
     /** @See {@link PacketPlayOutWindowItemsClass} */
     public static final PacketPlayOutWindowItemsClass T = new PacketPlayOutWindowItemsClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWindowItemsHandle.class, "net.minecraft.server.PacketPlayOutWindowItems");
@@ -23,22 +23,10 @@ public class PacketPlayOutWindowItemsHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getWindowId() {
-        return T.windowId.getInteger(getRaw());
-    }
-
-    public void setWindowId(int value) {
-        T.windowId.setInteger(getRaw(), value);
-    }
-
-    public List<ItemStack> getItems() {
-        return T.items.get(getRaw());
-    }
-
-    public void setItems(List<ItemStack> value) {
-        T.items.set(getRaw(), value);
-    }
-
+    public abstract int getWindowId();
+    public abstract void setWindowId(int value);
+    public abstract List<ItemStack> getItems();
+    public abstract void setItems(List<ItemStack> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutWindowItems</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

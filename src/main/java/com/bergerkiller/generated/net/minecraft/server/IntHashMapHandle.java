@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IntHashMapHandle extends Template.Handle {
+public abstract class IntHashMapHandle extends Template.Handle {
     /** @See {@link IntHashMapClass} */
     public static final IntHashMapClass T = new IntHashMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapHandle.class, "net.minecraft.server.IntHashMap");

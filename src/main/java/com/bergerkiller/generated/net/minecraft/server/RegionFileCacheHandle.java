@@ -10,7 +10,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class RegionFileCacheHandle extends Template.Handle {
+public abstract class RegionFileCacheHandle extends Template.Handle {
     /** @See {@link RegionFileCacheClass} */
     public static final RegionFileCacheClass T = new RegionFileCacheClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileCacheHandle.class, "net.minecraft.server.RegionFileCache");

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayOutMountHandle extends PacketHandle {
+public abstract class PacketPlayOutMountHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMountClass} */
     public static final PacketPlayOutMountClass T = new PacketPlayOutMountClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMountHandle.class, "net.minecraft.server.PacketPlayOutMount");
@@ -33,22 +33,10 @@ public class PacketPlayOutMountHandle extends PacketHandle {
         handle.setMountedEntityIds(mountedEntityIds);
         return handle;
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public int[] getMountedEntityIds() {
-        return T.mountedEntityIds.get(getRaw());
-    }
-
-    public void setMountedEntityIds(int[] value) {
-        T.mountedEntityIds.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract int[] getMountedEntityIds();
+    public abstract void setMountedEntityIds(int[] value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutMount</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

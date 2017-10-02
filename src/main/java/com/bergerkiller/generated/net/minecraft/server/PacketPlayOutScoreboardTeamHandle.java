@@ -9,7 +9,7 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
+public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardTeamClass} */
     public static final PacketPlayOutScoreboardTeamClass T = new PacketPlayOutScoreboardTeamClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardTeamHandle.class, "net.minecraft.server.PacketPlayOutScoreboardTeam");
@@ -36,78 +36,24 @@ public class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
             return "always";
         }
     }
-    public String getName() {
-        return T.name.get(getRaw());
-    }
-
-    public void setName(String value) {
-        T.name.set(getRaw(), value);
-    }
-
-    public String getDisplayName() {
-        return T.displayName.get(getRaw());
-    }
-
-    public void setDisplayName(String value) {
-        T.displayName.set(getRaw(), value);
-    }
-
-    public String getPrefix() {
-        return T.prefix.get(getRaw());
-    }
-
-    public void setPrefix(String value) {
-        T.prefix.set(getRaw(), value);
-    }
-
-    public String getSuffix() {
-        return T.suffix.get(getRaw());
-    }
-
-    public void setSuffix(String value) {
-        T.suffix.set(getRaw(), value);
-    }
-
-    public String getVisibility() {
-        return T.visibility.get(getRaw());
-    }
-
-    public void setVisibility(String value) {
-        T.visibility.set(getRaw(), value);
-    }
-
-    public int getChatFormat() {
-        return T.chatFormat.getInteger(getRaw());
-    }
-
-    public void setChatFormat(int value) {
-        T.chatFormat.setInteger(getRaw(), value);
-    }
-
-    public Collection<String> getPlayers() {
-        return T.players.get(getRaw());
-    }
-
-    public void setPlayers(Collection<String> value) {
-        T.players.set(getRaw(), value);
-    }
-
-    public int getMode() {
-        return T.mode.getInteger(getRaw());
-    }
-
-    public void setMode(int value) {
-        T.mode.setInteger(getRaw(), value);
-    }
-
-    public int getFriendlyFire() {
-        return T.friendlyFire.getInteger(getRaw());
-    }
-
-    public void setFriendlyFire(int value) {
-        T.friendlyFire.setInteger(getRaw(), value);
-    }
-
+    public abstract String getName();
+    public abstract void setName(String value);
+    public abstract String getDisplayName();
+    public abstract void setDisplayName(String value);
+    public abstract String getPrefix();
+    public abstract void setPrefix(String value);
+    public abstract String getSuffix();
+    public abstract void setSuffix(String value);
+    public abstract String getVisibility();
+    public abstract void setVisibility(String value);
+    public abstract int getChatFormat();
+    public abstract void setChatFormat(int value);
+    public abstract Collection<String> getPlayers();
+    public abstract void setPlayers(Collection<String> value);
+    public abstract int getMode();
+    public abstract void setMode(int value);
+    public abstract int getFriendlyFire();
+    public abstract void setFriendlyFire(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutScoreboardTeam</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayOutUnloadChunkHandle extends PacketHandle {
+public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutUnloadChunkClass} */
     public static final PacketPlayOutUnloadChunkClass T = new PacketPlayOutUnloadChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUnloadChunkHandle.class, "net.minecraft.server.PacketPlayOutUnloadChunk");
@@ -22,22 +22,10 @@ public class PacketPlayOutUnloadChunkHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getCx() {
-        return T.cx.getInteger(getRaw());
-    }
-
-    public void setCx(int value) {
-        T.cx.setInteger(getRaw(), value);
-    }
-
-    public int getCz() {
-        return T.cz.getInteger(getRaw());
-    }
-
-    public void setCz(int value) {
-        T.cz.setInteger(getRaw(), value);
-    }
-
+    public abstract int getCx();
+    public abstract void setCx(int value);
+    public abstract int getCz();
+    public abstract void setCz(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutUnloadChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

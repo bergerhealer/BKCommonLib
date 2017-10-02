@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutEntityDestroyHandle extends PacketHandle {
+public abstract class PacketPlayOutEntityDestroyHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityDestroyClass} */
     public static final PacketPlayOutEntityDestroyClass T = new PacketPlayOutEntityDestroyClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityDestroyHandle.class, "net.minecraft.server.PacketPlayOutEntityDestroy");
@@ -25,14 +25,8 @@ public class PacketPlayOutEntityDestroyHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int[] getEntityIds() {
-        return T.entityIds.get(getRaw());
-    }
-
-    public void setEntityIds(int[] value) {
-        T.entityIds.set(getRaw(), value);
-    }
-
+    public abstract int[] getEntityIds();
+    public abstract void setEntityIds(int[] value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntityDestroy</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

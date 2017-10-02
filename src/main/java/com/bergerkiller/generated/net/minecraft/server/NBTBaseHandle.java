@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class NBTBaseHandle extends Template.Handle {
+public abstract class NBTBaseHandle extends Template.Handle {
     /** @See {@link NBTBaseClass} */
     public static final NBTBaseClass T = new NBTBaseClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(NBTBaseHandle.class, "net.minecraft.server.NBTBase");
@@ -21,14 +21,8 @@ public class NBTBaseHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public byte getTypeId() {
-        return T.getTypeId.invoke(getRaw());
-    }
-
-    public NBTBaseHandle clone() {
-        return T.clone.invoke(getRaw());
-    }
-
+    public abstract byte getTypeId();
+    public abstract NBTBaseHandle clone();
     /**
      * Stores class members for <b>net.minecraft.server.NBTBase</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

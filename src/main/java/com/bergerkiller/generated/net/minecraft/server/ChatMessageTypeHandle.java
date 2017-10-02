@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class ChatMessageTypeHandle extends Template.Handle {
+public abstract class ChatMessageTypeHandle extends Template.Handle {
     /** @See {@link ChatMessageTypeClass} */
     public static final ChatMessageTypeClass T = new ChatMessageTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChatMessageTypeHandle.class, "net.minecraft.server.ChatMessageType");
@@ -26,10 +26,7 @@ public class ChatMessageTypeHandle extends Template.Handle {
         return T.getRawById.invoke(id);
     }
 
-    public byte getId() {
-        return T.getId.invoke(getRaw());
-    }
-
+    public abstract byte getId();
     /**
      * Stores class members for <b>net.minecraft.server.ChatMessageType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

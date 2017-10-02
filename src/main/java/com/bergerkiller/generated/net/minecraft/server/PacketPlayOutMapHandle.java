@@ -9,7 +9,7 @@ import org.bukkit.map.MapCursor;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutMapHandle extends PacketHandle {
+public abstract class PacketPlayOutMapHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapClass} */
     public static final PacketPlayOutMapClass T = new PacketPlayOutMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapHandle.class, "net.minecraft.server.PacketPlayOutMap");
@@ -22,70 +22,22 @@ public class PacketPlayOutMapHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getItemId() {
-        return T.itemId.getInteger(getRaw());
-    }
-
-    public void setItemId(int value) {
-        T.itemId.setInteger(getRaw(), value);
-    }
-
-    public byte getScale() {
-        return T.scale.getByte(getRaw());
-    }
-
-    public void setScale(byte value) {
-        T.scale.setByte(getRaw(), value);
-    }
-
-    public MapCursor[] getCursors() {
-        return T.cursors.get(getRaw());
-    }
-
-    public void setCursors(MapCursor[] value) {
-        T.cursors.set(getRaw(), value);
-    }
-
-    public int getXmin() {
-        return T.xmin.getInteger(getRaw());
-    }
-
-    public void setXmin(int value) {
-        T.xmin.setInteger(getRaw(), value);
-    }
-
-    public int getYmin() {
-        return T.ymin.getInteger(getRaw());
-    }
-
-    public void setYmin(int value) {
-        T.ymin.setInteger(getRaw(), value);
-    }
-
-    public int getWidth() {
-        return T.width.getInteger(getRaw());
-    }
-
-    public void setWidth(int value) {
-        T.width.setInteger(getRaw(), value);
-    }
-
-    public int getHeight() {
-        return T.height.getInteger(getRaw());
-    }
-
-    public void setHeight(int value) {
-        T.height.setInteger(getRaw(), value);
-    }
-
-    public byte[] getPixels() {
-        return T.pixels.get(getRaw());
-    }
-
-    public void setPixels(byte[] value) {
-        T.pixels.set(getRaw(), value);
-    }
-
+    public abstract int getItemId();
+    public abstract void setItemId(int value);
+    public abstract byte getScale();
+    public abstract void setScale(byte value);
+    public abstract MapCursor[] getCursors();
+    public abstract void setCursors(MapCursor[] value);
+    public abstract int getXmin();
+    public abstract void setXmin(int value);
+    public abstract int getYmin();
+    public abstract void setYmin(int value);
+    public abstract int getWidth();
+    public abstract void setWidth(int value);
+    public abstract int getHeight();
+    public abstract void setHeight(int value);
+    public abstract byte[] getPixels();
+    public abstract void setPixels(byte[] value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

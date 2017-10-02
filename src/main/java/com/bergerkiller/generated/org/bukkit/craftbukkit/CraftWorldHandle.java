@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftWorldHandle extends Template.Handle {
+public abstract class CraftWorldHandle extends Template.Handle {
     /** @See {@link CraftWorldClass} */
     public static final CraftWorldClass T = new CraftWorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftWorldHandle.class, "org.bukkit.craftbukkit.CraftWorld");
@@ -21,10 +21,7 @@ public class CraftWorldHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Object getHandle() {
-        return T.getHandle.invoke(getRaw());
-    }
-
+    public abstract Object getHandle();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.CraftWorld</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

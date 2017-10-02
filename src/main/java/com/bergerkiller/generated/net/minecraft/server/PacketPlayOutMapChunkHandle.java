@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutMapChunkHandle extends PacketHandle {
+public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapChunkClass} */
     public static final PacketPlayOutMapChunkClass T = new PacketPlayOutMapChunkClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapChunkHandle.class, "net.minecraft.server.PacketPlayOutMapChunk");
@@ -80,30 +80,12 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
             return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
         }
     }
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
-    public boolean isHasBiomeData() {
-        return T.hasBiomeData.getBoolean(getRaw());
-    }
-
-    public void setHasBiomeData(boolean value) {
-        T.hasBiomeData.setBoolean(getRaw(), value);
-    }
-
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
+    public abstract boolean isHasBiomeData();
+    public abstract void setHasBiomeData(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutMapChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -135,7 +117,7 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
-    public static class ChunkMapHandle extends Template.Handle {
+    public abstract static class ChunkMapHandle extends Template.Handle {
         /** @See {@link ChunkMapClass} */
         public static final ChunkMapClass T = new ChunkMapClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkMapHandle.class, "net.minecraft.server.PacketPlayOutMapChunk.ChunkMap");
@@ -148,22 +130,10 @@ public class PacketPlayOutMapChunkHandle extends PacketHandle {
 
         /* ============================================================================== */
 
-        public byte[] getData() {
-            return T.data.get(getRaw());
-        }
-
-        public void setData(byte[] value) {
-            T.data.set(getRaw(), value);
-        }
-
-        public int getSectionsMask() {
-            return T.sectionsMask.getInteger(getRaw());
-        }
-
-        public void setSectionsMask(int value) {
-            T.sectionsMask.setInteger(getRaw(), value);
-        }
-
+        public abstract byte[] getData();
+        public abstract void setData(byte[] value);
+        public abstract int getSectionsMask();
+        public abstract void setSectionsMask(int value);
         /**
          * Stores class members for <b>net.minecraft.server.PacketPlayOutMapChunk.ChunkMap</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.

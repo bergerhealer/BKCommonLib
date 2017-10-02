@@ -11,7 +11,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IInventoryHandle extends Template.Handle {
+public abstract class IInventoryHandle extends Template.Handle {
     /** @See {@link IInventoryClass} */
     public static final IInventoryClass T = new IInventoryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IInventoryHandle.class, "net.minecraft.server.IInventory");
@@ -24,50 +24,17 @@ public class IInventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getSize() {
-        return T.getSize.invoke(getRaw());
-    }
-
-    public ItemStackHandle getItem(int index) {
-        return T.getItem.invoke(getRaw(), index);
-    }
-
-    public void setItem(int paramInt, ItemStackHandle paramItemStack) {
-        T.setItem.invoke(getRaw(), paramInt, paramItemStack);
-    }
-
-    public void update() {
-        T.update.invoke(getRaw());
-    }
-
-    public boolean canOpen(HumanEntity paramEntityHuman) {
-        return T.canOpen.invoke(getRaw(), paramEntityHuman);
-    }
-
-    public boolean canStoreItem(int index, ItemStack itemstack) {
-        return T.canStoreItem.invoke(getRaw(), index, itemstack);
-    }
-
-    public int getProperty(int key) {
-        return T.getProperty.invoke(getRaw(), key);
-    }
-
-    public void setProperty(int key, int value) {
-        T.setProperty.invoke(getRaw(), key, value);
-    }
-
-    public List<ItemStackHandle> getContents() {
-        return T.getContents.invoke(getRaw());
-    }
-
-    public int someFunction() {
-        return T.someFunction.invoke(getRaw());
-    }
-
-    public void clear() {
-        T.clear.invoke(getRaw());
-    }
-
+    public abstract int getSize();
+    public abstract ItemStackHandle getItem(int index);
+    public abstract void setItem(int paramInt, ItemStackHandle paramItemStack);
+    public abstract void update();
+    public abstract boolean canOpen(HumanEntity paramEntityHuman);
+    public abstract boolean canStoreItem(int index, ItemStack itemstack);
+    public abstract int getProperty(int key);
+    public abstract void setProperty(int key, int value);
+    public abstract List<ItemStackHandle> getContents();
+    public abstract int someFunction();
+    public abstract void clear();
     /**
      * Stores class members for <b>net.minecraft.server.IInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

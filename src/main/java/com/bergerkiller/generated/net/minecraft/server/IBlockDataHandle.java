@@ -9,7 +9,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IBlockDataHandle extends Template.Handle {
+public abstract class IBlockDataHandle extends Template.Handle {
     /** @See {@link IBlockDataClass} */
     public static final IBlockDataClass T = new IBlockDataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockDataHandle.class, "net.minecraft.server.IBlockData");
@@ -22,14 +22,8 @@ public class IBlockDataHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public BlockHandle getBlock() {
-        return T.getBlock.invoke(getRaw());
-    }
-
-    public Map<Object, Object> getStates() {
-        return T.getStates.invoke(getRaw());
-    }
-
+    public abstract BlockHandle getBlock();
+    public abstract Map<Object, Object> getStates();
     /**
      * Stores class members for <b>net.minecraft.server.IBlockData</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

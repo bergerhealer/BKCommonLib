@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityHangingHandle extends EntityHandle {
+public abstract class EntityHangingHandle extends EntityHandle {
     /** @See {@link EntityHangingClass} */
     public static final EntityHangingClass T = new EntityHangingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHangingHandle.class, "net.minecraft.server.EntityHanging");
@@ -22,14 +22,8 @@ public class EntityHangingHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-    public IntVector3 getBlockPosition() {
-        return T.blockPosition.get(getRaw());
-    }
-
-    public void setBlockPosition(IntVector3 value) {
-        T.blockPosition.set(getRaw(), value);
-    }
-
+    public abstract IntVector3 getBlockPosition();
+    public abstract void setBlockPosition(IntVector3 value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityHanging</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

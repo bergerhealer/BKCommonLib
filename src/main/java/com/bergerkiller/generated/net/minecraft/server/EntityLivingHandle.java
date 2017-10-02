@@ -13,7 +13,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityLivingHandle extends EntityHandle {
+public abstract class EntityLivingHandle extends EntityHandle {
     /** @See {@link EntityLivingClass} */
     public static final EntityLivingClass T = new EntityLivingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityLivingHandle.class, "net.minecraft.server.EntityLiving");
@@ -26,34 +26,13 @@ public class EntityLivingHandle extends EntityHandle {
 
     /* ============================================================================== */
 
-    public Collection<MobEffectHandle> getEffects() {
-        return T.getEffects.invoke(getRaw());
-    }
-
-    public ItemStack getEquipment(EquipmentSlot paramEnumItemSlot) {
-        return T.getEquipment.invoke(getRaw(), paramEnumItemSlot);
-    }
-
-    public void resetAttributes() {
-        T.resetAttributes.invoke(getRaw());
-    }
-
-    public AttributeMapServerHandle getAttributeMap() {
-        return T.getAttributeMap.invoke(getRaw());
-    }
-
-    public AttributeInstanceHandle getAttributeInstance(Object iattribute) {
-        return T.getAttributeInstance.invoke(getRaw(), iattribute);
-    }
-
-    public float getHealth() {
-        return T.getHealth.invoke(getRaw());
-    }
-
-    public float getMaxHealth() {
-        return T.getMaxHealth.invoke(getRaw());
-    }
-
+    public abstract Collection<MobEffectHandle> getEffects();
+    public abstract ItemStack getEquipment(EquipmentSlot paramEnumItemSlot);
+    public abstract void resetAttributes();
+    public abstract AttributeMapServerHandle getAttributeMap();
+    public abstract AttributeInstanceHandle getAttributeInstance(Object iattribute);
+    public abstract float getHealth();
+    public abstract float getMaxHealth();
 
     public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
     public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
@@ -65,46 +44,16 @@ public class EntityLivingHandle extends EntityHandle {
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
     }
-    public AttributeMapServerHandle getAttributeMapField() {
-        return T.attributeMapField.get(getRaw());
-    }
-
-    public void setAttributeMapField(AttributeMapServerHandle value) {
-        T.attributeMapField.set(getRaw(), value);
-    }
-
-    public Map<MobEffectListHandle, MobEffectHandle> getMobEffects() {
-        return T.mobEffects.get(getRaw());
-    }
-
-    public void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value) {
-        T.mobEffects.set(getRaw(), value);
-    }
-
-    public float getLastDamage() {
-        return T.lastDamage.getFloat(getRaw());
-    }
-
-    public void setLastDamage(float value) {
-        T.lastDamage.setFloat(getRaw(), value);
-    }
-
-    public float getForwardMovement() {
-        return T.forwardMovement.getFloat(getRaw());
-    }
-
-    public void setForwardMovement(float value) {
-        T.forwardMovement.setFloat(getRaw(), value);
-    }
-
-    public boolean isUpdateEffects() {
-        return T.updateEffects.getBoolean(getRaw());
-    }
-
-    public void setUpdateEffects(boolean value) {
-        T.updateEffects.setBoolean(getRaw(), value);
-    }
-
+    public abstract AttributeMapServerHandle getAttributeMapField();
+    public abstract void setAttributeMapField(AttributeMapServerHandle value);
+    public abstract Map<MobEffectListHandle, MobEffectHandle> getMobEffects();
+    public abstract void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value);
+    public abstract float getLastDamage();
+    public abstract void setLastDamage(float value);
+    public abstract float getForwardMovement();
+    public abstract void setForwardMovement(float value);
+    public abstract boolean isUpdateEffects();
+    public abstract void setUpdateEffects(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityLiving</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
+public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartFurnaceClass} */
     public static final EntityMinecartFurnaceClass T = new EntityMinecartFurnaceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace");
@@ -24,30 +24,12 @@ public class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
 
 
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
-    public int getFuel() {
-        return T.fuel.getInteger(getRaw());
-    }
-
-    public void setFuel(int value) {
-        T.fuel.setInteger(getRaw(), value);
-    }
-
-    public double getPushForceX() {
-        return T.pushForceX.getDouble(getRaw());
-    }
-
-    public void setPushForceX(double value) {
-        T.pushForceX.setDouble(getRaw(), value);
-    }
-
-    public double getPushForceZ() {
-        return T.pushForceZ.getDouble(getRaw());
-    }
-
-    public void setPushForceZ(double value) {
-        T.pushForceZ.setDouble(getRaw(), value);
-    }
-
+    public abstract int getFuel();
+    public abstract void setFuel(int value);
+    public abstract double getPushForceX();
+    public abstract void setPushForceX(double value);
+    public abstract double getPushForceZ();
+    public abstract void setPushForceZ(double value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartFurnace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

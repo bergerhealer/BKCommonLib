@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EnumParticleHandle extends Template.Handle {
+public abstract class EnumParticleHandle extends Template.Handle {
     /** @See {@link EnumParticleClass} */
     public static final EnumParticleClass T = new EnumParticleClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumParticleHandle.class, "net.minecraft.server.EnumParticle");
@@ -21,14 +21,8 @@ public class EnumParticleHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public String getName() {
-        return T.getName.invoke(getRaw());
-    }
-
-    public int getId() {
-        return T.getId.invoke(getRaw());
-    }
-
+    public abstract String getName();
+    public abstract int getId();
 
     public static EnumParticleHandle getByName(String name) {
         if (T.byName.isAvailable()) {

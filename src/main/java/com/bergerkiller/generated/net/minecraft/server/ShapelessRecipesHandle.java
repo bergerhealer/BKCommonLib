@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ShapelessRecipesHandle extends IRecipeHandle {
+public abstract class ShapelessRecipesHandle extends IRecipeHandle {
     /** @See {@link ShapelessRecipesClass} */
     public static final ShapelessRecipesClass T = new ShapelessRecipesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ShapelessRecipesHandle.class, "net.minecraft.server.ShapelessRecipes");
@@ -23,14 +23,8 @@ public class ShapelessRecipesHandle extends IRecipeHandle {
 
     /* ============================================================================== */
 
-    public List<CraftInputSlot> getInputItems() {
-        return T.inputItems.get(getRaw());
-    }
-
-    public void setInputItems(List<CraftInputSlot> value) {
-        T.inputItems.set(getRaw(), value);
-    }
-
+    public abstract List<CraftInputSlot> getInputItems();
+    public abstract void setInputItems(List<CraftInputSlot> value);
     /**
      * Stores class members for <b>net.minecraft.server.ShapelessRecipes</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

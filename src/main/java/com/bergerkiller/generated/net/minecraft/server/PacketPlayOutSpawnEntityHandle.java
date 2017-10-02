@@ -9,7 +9,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutSpawnEntityHandle extends PacketHandle {
+public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityClass} */
     public static final PacketPlayOutSpawnEntityClass T = new PacketPlayOutSpawnEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntity");
@@ -86,30 +86,12 @@ public class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     public void setPitch(float pitch) {
         T.pitch_raw.setInteger(getRaw(), serializeRotation(pitch));
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public int getEntityTypeId() {
-        return T.entityTypeId.getInteger(getRaw());
-    }
-
-    public void setEntityTypeId(int value) {
-        T.entityTypeId.setInteger(getRaw(), value);
-    }
-
-    public int getExtraData() {
-        return T.extraData.getInteger(getRaw());
-    }
-
-    public void setExtraData(int value) {
-        T.extraData.setInteger(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract int getEntityTypeId();
+    public abstract void setEntityTypeId(int value);
+    public abstract int getExtraData();
+    public abstract void setExtraData(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

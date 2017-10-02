@@ -10,7 +10,7 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class LongObjectHashMapHandle extends Template.Handle {
+public abstract class LongObjectHashMapHandle extends Template.Handle {
     /** @See {@link LongObjectHashMapClass} */
     public static final LongObjectHashMapClass T = new LongObjectHashMapClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LongObjectHashMapHandle.class, "org.bukkit.craftbukkit.util.LongObjectHashMap");
@@ -27,34 +27,13 @@ public class LongObjectHashMapHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int size() {
-        return T.size.invoke(getRaw());
-    }
-
-    public boolean containsKey(long key) {
-        return T.containsKey.invoke(getRaw(), key);
-    }
-
-    public Object get(long key) {
-        return T.get.invoke(getRaw(), key);
-    }
-
-    public Object remove(long key) {
-        return T.remove.invoke(getRaw(), key);
-    }
-
-    public Object put(long key, Object value) {
-        return T.put.invoke(getRaw(), key, value);
-    }
-
-    public Collection<Object> values() {
-        return T.values.invoke(getRaw());
-    }
-
-    public Set<Long> keySet() {
-        return T.keySet.invoke(getRaw());
-    }
-
+    public abstract int size();
+    public abstract boolean containsKey(long key);
+    public abstract Object get(long key);
+    public abstract Object remove(long key);
+    public abstract Object put(long key, Object value);
+    public abstract Collection<Object> values();
+    public abstract Set<Long> keySet();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

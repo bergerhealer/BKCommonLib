@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class BaseBlockPositionHandle extends Template.Handle {
+public abstract class BaseBlockPositionHandle extends Template.Handle {
     /** @See {@link BaseBlockPositionClass} */
     public static final BaseBlockPositionClass T = new BaseBlockPositionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BaseBlockPositionHandle.class, "net.minecraft.server.BaseBlockPosition");
@@ -21,30 +21,12 @@ public class BaseBlockPositionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getY() {
-        return T.y.getInteger(getRaw());
-    }
-
-    public void setY(int value) {
-        T.y.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getY();
+    public abstract void setY(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
     /**
      * Stores class members for <b>net.minecraft.server.BaseBlockPosition</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

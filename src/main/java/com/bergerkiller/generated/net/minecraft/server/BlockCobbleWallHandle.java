@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class BlockCobbleWallHandle extends Template.Handle {
+public abstract class BlockCobbleWallHandle extends Template.Handle {
     /** @See {@link BlockCobbleWallClass} */
     public static final BlockCobbleWallClass T = new BlockCobbleWallClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCobbleWallHandle.class, "net.minecraft.server.BlockCobbleWall");

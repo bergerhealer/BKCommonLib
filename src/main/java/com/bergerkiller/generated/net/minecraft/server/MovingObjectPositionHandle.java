@@ -9,7 +9,7 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MovingObjectPositionHandle extends Template.Handle {
+public abstract class MovingObjectPositionHandle extends Template.Handle {
     /** @See {@link MovingObjectPositionClass} */
     public static final MovingObjectPositionClass T = new MovingObjectPositionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MovingObjectPositionHandle.class, "net.minecraft.server.MovingObjectPosition");
@@ -22,14 +22,8 @@ public class MovingObjectPositionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Vector getPos() {
-        return T.pos.get(getRaw());
-    }
-
-    public void setPos(Vector value) {
-        T.pos.set(getRaw(), value);
-    }
-
+    public abstract Vector getPos();
+    public abstract void setPos(Vector value);
     /**
      * Stores class members for <b>net.minecraft.server.MovingObjectPosition</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class MainHandHandle extends Template.Handle {
+public abstract class MainHandHandle extends Template.Handle {
     /** @See {@link MainHandClass} */
     public static final MainHandClass T = new MainHandClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MainHandHandle.class, "org.bukkit.inventory.MainHand");

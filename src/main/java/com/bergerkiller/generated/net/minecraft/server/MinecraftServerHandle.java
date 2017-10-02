@@ -9,7 +9,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MinecraftServerHandle extends Template.Handle {
+public abstract class MinecraftServerHandle extends Template.Handle {
     /** @See {@link MinecraftServerClass} */
     public static final MinecraftServerClass T = new MinecraftServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftServerHandle.class, "net.minecraft.server.MinecraftServer");
@@ -22,22 +22,13 @@ public class MinecraftServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean isRunning() {
-        return T.isRunning.invoke(getRaw());
-    }
-
+    public abstract boolean isRunning();
 
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
     }
-    public List<WorldServerHandle> getWorlds() {
-        return T.worlds.get(getRaw());
-    }
-
-    public void setWorlds(List<WorldServerHandle> value) {
-        T.worlds.set(getRaw(), value);
-    }
-
+    public abstract List<WorldServerHandle> getWorlds();
+    public abstract void setWorlds(List<WorldServerHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.MinecraftServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

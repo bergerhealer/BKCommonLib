@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class IChatBaseComponentHandle extends Template.Handle {
+public abstract class IChatBaseComponentHandle extends Template.Handle {
     /** @See {@link IChatBaseComponentClass} */
     public static final IChatBaseComponentClass T = new IChatBaseComponentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(IChatBaseComponentHandle.class, "net.minecraft.server.IChatBaseComponent");
@@ -34,7 +34,7 @@ public class IChatBaseComponentHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class ChatSerializerHandle extends Template.Handle {
+    public abstract static class ChatSerializerHandle extends Template.Handle {
         /** @See {@link ChatSerializerClass} */
         public static final ChatSerializerClass T = new ChatSerializerClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(ChatSerializerHandle.class, "net.minecraft.server.IChatBaseComponent.ChatSerializer");

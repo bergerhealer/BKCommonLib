@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutAttachEntityHandle extends PacketHandle {
+public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutAttachEntityClass} */
     public static final PacketPlayOutAttachEntityClass T = new PacketPlayOutAttachEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutAttachEntityHandle.class, "net.minecraft.server.PacketPlayOutAttachEntity");
@@ -29,22 +29,10 @@ public class PacketPlayOutAttachEntityHandle extends PacketHandle {
             return T.constr_leashId_passengerEntity_vehicleEntity.newInstance(0, passengerEntity, vehicleEntity);
         }
     }
-    public int getPassengerId() {
-        return T.passengerId.getInteger(getRaw());
-    }
-
-    public void setPassengerId(int value) {
-        T.passengerId.setInteger(getRaw(), value);
-    }
-
-    public int getVehicleId() {
-        return T.vehicleId.getInteger(getRaw());
-    }
-
-    public void setVehicleId(int value) {
-        T.vehicleId.setInteger(getRaw(), value);
-    }
-
+    public abstract int getPassengerId();
+    public abstract void setPassengerId(int value);
+    public abstract int getVehicleId();
+    public abstract void setVehicleId(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutAttachEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

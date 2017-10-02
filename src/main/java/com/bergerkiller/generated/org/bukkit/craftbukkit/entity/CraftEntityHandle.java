@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftEntityHandle extends Template.Handle {
+public abstract class CraftEntityHandle extends Template.Handle {
     /** @See {@link CraftEntityClass} */
     public static final CraftEntityClass T = new CraftEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftEntityHandle.class, "org.bukkit.craftbukkit.entity.CraftEntity");
@@ -28,22 +28,10 @@ public class CraftEntityHandle extends Template.Handle {
         return T.createCraftEntity.invoke(server, entity);
     }
 
-    public void setHandle(EntityHandle entity) {
-        T.setHandle.invoke(getRaw(), entity);
-    }
-
-    public Object getHandle() {
-        return T.getHandle.invoke(getRaw());
-    }
-
-    public EntityHandle getEntityHandle() {
-        return T.entityHandle.get(getRaw());
-    }
-
-    public void setEntityHandle(EntityHandle value) {
-        T.entityHandle.set(getRaw(), value);
-    }
-
+    public abstract void setHandle(EntityHandle entity);
+    public abstract Object getHandle();
+    public abstract EntityHandle getEntityHandle();
+    public abstract void setEntityHandle(EntityHandle value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.entity.CraftEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

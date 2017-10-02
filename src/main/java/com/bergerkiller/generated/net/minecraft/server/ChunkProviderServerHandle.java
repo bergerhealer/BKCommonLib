@@ -11,7 +11,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ChunkProviderServerHandle extends Template.Handle {
+public abstract class ChunkProviderServerHandle extends Template.Handle {
     /** @See {@link ChunkProviderServerClass} */
     public static final ChunkProviderServerClass T = new ChunkProviderServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkProviderServerHandle.class, "net.minecraft.server.ChunkProviderServer");
@@ -24,22 +24,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public List<BiomeMetaHandle> getBiomeSpawnInfo(Object enumcreaturetype, IntVector3 position) {
-        return T.getBiomeSpawnInfo.invoke(getRaw(), enumcreaturetype, position);
-    }
-
-    public boolean isLoaded(int cx, int cz) {
-        return T.isLoaded.invoke(getRaw(), cx, cz);
-    }
-
-    public ChunkHandle getChunkIfLoaded(int cx, int cz) {
-        return T.getChunkIfLoaded.invoke(getRaw(), cx, cz);
-    }
-
-    public ChunkHandle getChunkAt(int cx, int cz) {
-        return T.getChunkAt.invoke(getRaw(), cx, cz);
-    }
-
+    public abstract List<BiomeMetaHandle> getBiomeSpawnInfo(Object enumcreaturetype, IntVector3 position);
+    public abstract boolean isLoaded(int cx, int cz);
+    public abstract ChunkHandle getChunkIfLoaded(int cx, int cz);
+    public abstract ChunkHandle getChunkAt(int cx, int cz);
 
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
@@ -48,22 +36,10 @@ public class ChunkProviderServerHandle extends Template.Handle {
             T.saveChunk_old.invoke(getRaw(), chunk, false);
         }
     }
-    public Object getChunkLoader() {
-        return T.chunkLoader.get(getRaw());
-    }
-
-    public void setChunkLoader(Object value) {
-        T.chunkLoader.set(getRaw(), value);
-    }
-
-    public WorldServerHandle getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(WorldServerHandle value) {
-        T.world.set(getRaw(), value);
-    }
-
+    public abstract Object getChunkLoader();
+    public abstract void setChunkLoader(Object value);
+    public abstract WorldServerHandle getWorld();
+    public abstract void setWorld(WorldServerHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.ChunkProviderServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

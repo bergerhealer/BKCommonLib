@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityInsentientHandle extends EntityLivingHandle {
+public abstract class EntityInsentientHandle extends EntityLivingHandle {
     /** @See {@link EntityInsentientClass} */
     public static final EntityInsentientClass T = new EntityInsentientClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityInsentientHandle.class, "net.minecraft.server.EntityInsentient");
@@ -21,14 +21,8 @@ public class EntityInsentientHandle extends EntityLivingHandle {
 
     /* ============================================================================== */
 
-    public EntityHandle getLeashHolder() {
-        return T.getLeashHolder.invoke(getRaw());
-    }
-
-    public Object getNavigation() {
-        return T.getNavigation.invoke(getRaw());
-    }
-
+    public abstract EntityHandle getLeashHolder();
+    public abstract Object getNavigation();
     /**
      * Stores class members for <b>net.minecraft.server.EntityInsentient</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

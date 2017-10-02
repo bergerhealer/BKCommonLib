@@ -12,7 +12,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
+public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPlayerInfoClass} */
     public static final PacketPlayOutPlayerInfoClass T = new PacketPlayOutPlayerInfoClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerInfoHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo");
@@ -29,22 +29,10 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public EnumPlayerInfoActionHandle getAction() {
-        return T.action.get(getRaw());
-    }
-
-    public void setAction(EnumPlayerInfoActionHandle value) {
-        T.action.set(getRaw(), value);
-    }
-
-    public List<PlayerInfoDataHandle> getPlayers() {
-        return T.players.get(getRaw());
-    }
-
-    public void setPlayers(List<PlayerInfoDataHandle> value) {
-        T.players.set(getRaw(), value);
-    }
-
+    public abstract EnumPlayerInfoActionHandle getAction();
+    public abstract void setAction(EnumPlayerInfoActionHandle value);
+    public abstract List<PlayerInfoDataHandle> getPlayers();
+    public abstract void setPlayers(List<PlayerInfoDataHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutPlayerInfo</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -63,7 +51,7 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class PlayerInfoDataHandle extends Template.Handle {
+    public abstract static class PlayerInfoDataHandle extends Template.Handle {
         /** @See {@link PlayerInfoDataClass} */
         public static final PlayerInfoDataClass T = new PlayerInfoDataClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInfoDataHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData");
@@ -80,22 +68,10 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
 
         /* ============================================================================== */
 
-        public GameProfileHandle getProfile() {
-            return T.getProfile.invoke(getRaw());
-        }
-
-        public int getPing() {
-            return T.getPing.invoke(getRaw());
-        }
-
-        public GameMode getGameMode() {
-            return T.getGameMode.invoke(getRaw());
-        }
-
-        public ChatText getListName() {
-            return T.getListName.invoke(getRaw());
-        }
-
+        public abstract GameProfileHandle getProfile();
+        public abstract int getPing();
+        public abstract GameMode getGameMode();
+        public abstract ChatText getListName();
         /**
          * Stores class members for <b>net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
@@ -118,7 +94,7 @@ public class PacketPlayOutPlayerInfoHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class EnumPlayerInfoActionHandle extends Template.Handle {
+    public abstract static class EnumPlayerInfoActionHandle extends Template.Handle {
         /** @See {@link EnumPlayerInfoActionClass} */
         public static final EnumPlayerInfoActionClass T = new EnumPlayerInfoActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerInfoActionHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.EnumPlayerInfoAction");

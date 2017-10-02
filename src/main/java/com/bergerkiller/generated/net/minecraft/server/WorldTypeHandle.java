@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class WorldTypeHandle extends Template.Handle {
+public abstract class WorldTypeHandle extends Template.Handle {
     /** @See {@link WorldTypeClass} */
     public static final WorldTypeClass T = new WorldTypeClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldTypeHandle.class, "net.minecraft.server.WorldType");
@@ -21,10 +21,7 @@ public class WorldTypeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getDimension() {
-        return T.getDimension.invoke(getRaw());
-    }
-
+    public abstract int getDimension();
     /**
      * Stores class members for <b>net.minecraft.server.WorldType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

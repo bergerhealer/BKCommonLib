@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PlayerConnectionHandle extends Template.Handle {
+public abstract class PlayerConnectionHandle extends Template.Handle {
     /** @See {@link PlayerConnectionClass} */
     public static final PlayerConnectionClass T = new PlayerConnectionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerConnectionHandle.class, "net.minecraft.server.PlayerConnection");
@@ -22,18 +22,9 @@ public class PlayerConnectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void sendPacket(CommonPacket packet) {
-        T.sendPacket.invoke(getRaw(), packet);
-    }
-
-    public Object getNetworkManager() {
-        return T.networkManager.get(getRaw());
-    }
-
-    public void setNetworkManager(Object value) {
-        T.networkManager.set(getRaw(), value);
-    }
-
+    public abstract void sendPacket(CommonPacket packet);
+    public abstract Object getNetworkManager();
+    public abstract void setNetworkManager(Object value);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerConnection</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

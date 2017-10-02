@@ -10,7 +10,7 @@ import org.bukkit.Material;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ItemStackHandle extends Template.Handle {
+public abstract class ItemStackHandle extends Template.Handle {
     /** @See {@link ItemStackClass} */
     public static final ItemStackClass T = new ItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack");
@@ -27,50 +27,17 @@ public class ItemStackHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Object getItem() {
-        return T.getItem.invoke(getRaw());
-    }
-
-    public String getName() {
-        return T.getName.invoke(getRaw());
-    }
-
-    public ItemStackHandle setName(String s) {
-        return T.setName.invoke(getRaw(), s);
-    }
-
-    public int getRepairCost() {
-        return T.getRepairCost.invoke(getRaw());
-    }
-
-    public void setRepairCost(int cost) {
-        T.setRepairCost.invoke(getRaw(), cost);
-    }
-
-    public boolean hasName() {
-        return T.hasName.invoke(getRaw());
-    }
-
-    public boolean hasTag() {
-        return T.hasTag.invoke(getRaw());
-    }
-
-    public CommonTagCompound getTag() {
-        return T.getTag.invoke(getRaw());
-    }
-
-    public CommonTagCompound saveToNBT(CommonTagCompound compound) {
-        return T.saveToNBT.invoke(getRaw(), compound);
-    }
-
-    public ItemStackHandle cloneAndSubtract(int n) {
-        return T.cloneAndSubtract.invoke(getRaw(), n);
-    }
-
-    public ItemStackHandle cloneItemStack() {
-        return T.cloneItemStack.invoke(getRaw());
-    }
-
+    public abstract Object getItem();
+    public abstract String getName();
+    public abstract ItemStackHandle setName(String s);
+    public abstract int getRepairCost();
+    public abstract void setRepairCost(int cost);
+    public abstract boolean hasName();
+    public abstract boolean hasTag();
+    public abstract CommonTagCompound getTag();
+    public abstract CommonTagCompound saveToNBT(CommonTagCompound compound);
+    public abstract ItemStackHandle cloneAndSubtract(int n);
+    public abstract ItemStackHandle cloneItemStack();
 
     public static final ItemStackHandle EMPTY_ITEM;
     static {
@@ -89,38 +56,14 @@ public class ItemStackHandle extends Template.Handle {
             return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toItemStackHandle(itemStack));
         }
     }
-    public int getAmountField() {
-        return T.amountField.getInteger(getRaw());
-    }
-
-    public void setAmountField(int value) {
-        T.amountField.setInteger(getRaw(), value);
-    }
-
-    public Material getTypeField() {
-        return T.typeField.get(getRaw());
-    }
-
-    public void setTypeField(Material value) {
-        T.typeField.set(getRaw(), value);
-    }
-
-    public CommonTagCompound getTagField() {
-        return T.tagField.get(getRaw());
-    }
-
-    public void setTagField(CommonTagCompound value) {
-        T.tagField.set(getRaw(), value);
-    }
-
-    public int getDurabilityField() {
-        return T.durabilityField.getInteger(getRaw());
-    }
-
-    public void setDurabilityField(int value) {
-        T.durabilityField.setInteger(getRaw(), value);
-    }
-
+    public abstract int getAmountField();
+    public abstract void setAmountField(int value);
+    public abstract Material getTypeField();
+    public abstract void setTypeField(Material value);
+    public abstract CommonTagCompound getTagField();
+    public abstract void setTagField(CommonTagCompound value);
+    public abstract int getDurabilityField();
+    public abstract void setDurabilityField(int value);
     /**
      * Stores class members for <b>net.minecraft.server.ItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MobEffectListHandle extends Template.Handle {
+public abstract class MobEffectListHandle extends Template.Handle {
     /** @See {@link MobEffectListClass} */
     public static final MobEffectListClass T = new MobEffectListClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectListHandle.class, "net.minecraft.server.MobEffectList");

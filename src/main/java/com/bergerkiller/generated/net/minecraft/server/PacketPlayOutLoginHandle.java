@@ -11,7 +11,7 @@ import org.bukkit.WorldType;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutLoginHandle extends PacketHandle {
+public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     /** @See {@link PacketPlayOutLoginClass} */
     public static final PacketPlayOutLoginClass T = new PacketPlayOutLoginClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutLoginHandle.class, "net.minecraft.server.PacketPlayOutLogin");
@@ -24,70 +24,22 @@ public class PacketPlayOutLoginHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getPlayerId() {
-        return T.playerId.getInteger(getRaw());
-    }
-
-    public void setPlayerId(int value) {
-        T.playerId.setInteger(getRaw(), value);
-    }
-
-    public boolean isHardcore() {
-        return T.hardcore.getBoolean(getRaw());
-    }
-
-    public void setHardcore(boolean value) {
-        T.hardcore.setBoolean(getRaw(), value);
-    }
-
-    public GameMode getGameMode() {
-        return T.gameMode.get(getRaw());
-    }
-
-    public void setGameMode(GameMode value) {
-        T.gameMode.set(getRaw(), value);
-    }
-
-    public int getDimension() {
-        return T.dimension.getInteger(getRaw());
-    }
-
-    public void setDimension(int value) {
-        T.dimension.setInteger(getRaw(), value);
-    }
-
-    public Difficulty getDifficulty() {
-        return T.difficulty.get(getRaw());
-    }
-
-    public void setDifficulty(Difficulty value) {
-        T.difficulty.set(getRaw(), value);
-    }
-
-    public int getMaxPlayers() {
-        return T.maxPlayers.getInteger(getRaw());
-    }
-
-    public void setMaxPlayers(int value) {
-        T.maxPlayers.setInteger(getRaw(), value);
-    }
-
-    public WorldType getWorldType() {
-        return T.worldType.get(getRaw());
-    }
-
-    public void setWorldType(WorldType value) {
-        T.worldType.set(getRaw(), value);
-    }
-
-    public boolean isUnknown1() {
-        return T.unknown1.getBoolean(getRaw());
-    }
-
-    public void setUnknown1(boolean value) {
-        T.unknown1.setBoolean(getRaw(), value);
-    }
-
+    public abstract int getPlayerId();
+    public abstract void setPlayerId(int value);
+    public abstract boolean isHardcore();
+    public abstract void setHardcore(boolean value);
+    public abstract GameMode getGameMode();
+    public abstract void setGameMode(GameMode value);
+    public abstract int getDimension();
+    public abstract void setDimension(int value);
+    public abstract Difficulty getDifficulty();
+    public abstract void setDifficulty(Difficulty value);
+    public abstract int getMaxPlayers();
+    public abstract void setMaxPlayers(int value);
+    public abstract WorldType getWorldType();
+    public abstract void setWorldType(WorldType value);
+    public abstract boolean isUnknown1();
+    public abstract void setUnknown1(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutLogin</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

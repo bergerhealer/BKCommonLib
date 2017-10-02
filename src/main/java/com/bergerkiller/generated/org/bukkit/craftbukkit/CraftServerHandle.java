@@ -11,7 +11,7 @@ import org.bukkit.command.SimpleCommandMap;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftServerHandle extends Template.Handle {
+public abstract class CraftServerHandle extends Template.Handle {
     /** @See {@link CraftServerClass} */
     public static final CraftServerClass T = new CraftServerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftServerHandle.class, "org.bukkit.craftbukkit.CraftServer");
@@ -24,18 +24,9 @@ public class CraftServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public SimpleCommandMap getCommandMap() {
-        return T.getCommandMap.invoke(getRaw());
-    }
-
-    public DedicatedPlayerListHandle getPlayerList() {
-        return T.getPlayerList.invoke(getRaw());
-    }
-
-    public MinecraftServerHandle getServer() {
-        return T.getServer.invoke(getRaw());
-    }
-
+    public abstract SimpleCommandMap getCommandMap();
+    public abstract DedicatedPlayerListHandle getPlayerList();
+    public abstract MinecraftServerHandle getServer();
 
     public static CraftServerHandle instance() {
         return createHandle(org.bukkit.Bukkit.getServer());

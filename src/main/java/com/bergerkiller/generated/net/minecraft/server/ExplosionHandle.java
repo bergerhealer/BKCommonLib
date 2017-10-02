@@ -10,7 +10,7 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ExplosionHandle extends Template.Handle {
+public abstract class ExplosionHandle extends Template.Handle {
     /** @See {@link ExplosionClass} */
     public static final ExplosionClass T = new ExplosionClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ExplosionHandle.class, "net.minecraft.server.Explosion");

@@ -11,7 +11,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
+public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityMetadataClass} */
     public static final PacketPlayOutEntityMetadataClass T = new PacketPlayOutEntityMetadataClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityMetadataHandle.class, "net.minecraft.server.PacketPlayOutEntityMetadata");
@@ -28,22 +28,10 @@ public class PacketPlayOutEntityMetadataHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public List<Item<Object>> getMetadataItems() {
-        return T.metadataItems.get(getRaw());
-    }
-
-    public void setMetadataItems(List<Item<Object>> value) {
-        T.metadataItems.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract List<Item<Object>> getMetadataItems();
+    public abstract void setMetadataItems(List<Item<Object>> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntityMetadata</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

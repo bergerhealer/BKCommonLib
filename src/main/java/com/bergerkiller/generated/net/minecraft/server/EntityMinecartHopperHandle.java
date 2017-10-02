@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
+public abstract class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartHopperClass} */
     public static final EntityMinecartHopperClass T = new EntityMinecartHopperClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartHopperHandle.class, "net.minecraft.server.EntityMinecartHopper");
@@ -21,26 +21,11 @@ public class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
 
     /* ============================================================================== */
 
-    public boolean suckItems() {
-        return T.suckItems.invoke(getRaw());
-    }
-
-    public boolean isSuckingEnabled() {
-        return T.isSuckingEnabled.invoke(getRaw());
-    }
-
-    public void setSuckingEnabled(boolean enabled) {
-        T.setSuckingEnabled.invoke(getRaw(), enabled);
-    }
-
-    public int getSuckingCooldown() {
-        return T.suckingCooldown.getInteger(getRaw());
-    }
-
-    public void setSuckingCooldown(int value) {
-        T.suckingCooldown.setInteger(getRaw(), value);
-    }
-
+    public abstract boolean suckItems();
+    public abstract boolean isSuckingEnabled();
+    public abstract void setSuckingEnabled(boolean enabled);
+    public abstract int getSuckingCooldown();
+    public abstract void setSuckingCooldown(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityMinecartHopper</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

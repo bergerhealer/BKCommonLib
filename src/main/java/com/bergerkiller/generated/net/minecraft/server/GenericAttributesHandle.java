@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class GenericAttributesHandle extends Template.Handle {
+public abstract class GenericAttributesHandle extends Template.Handle {
     /** @See {@link GenericAttributesClass} */
     public static final GenericAttributesClass T = new GenericAttributesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(GenericAttributesHandle.class, "net.minecraft.server.GenericAttributes");

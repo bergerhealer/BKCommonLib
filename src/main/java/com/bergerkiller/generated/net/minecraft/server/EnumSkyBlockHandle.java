@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EnumSkyBlockHandle extends Template.Handle {
+public abstract class EnumSkyBlockHandle extends Template.Handle {
     /** @See {@link EnumSkyBlockClass} */
     public static final EnumSkyBlockClass T = new EnumSkyBlockClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EnumSkyBlockHandle.class, "net.minecraft.server.EnumSkyBlock");
@@ -27,14 +27,8 @@ public class EnumSkyBlockHandle extends Template.Handle {
     public int ordinal() {
         return ((Enum<?>) getRaw()).ordinal();
     }
-    public int getBrightness() {
-        return T.brightness.getInteger(getRaw());
-    }
-
-    public void setBrightness(int value) {
-        T.brightness.setInteger(getRaw(), value);
-    }
-
+    public abstract int getBrightness();
+    public abstract void setBrightness(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EnumSkyBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

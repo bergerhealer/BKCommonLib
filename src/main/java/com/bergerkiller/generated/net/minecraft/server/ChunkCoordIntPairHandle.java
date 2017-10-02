@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ChunkCoordIntPairHandle extends Template.Handle {
+public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     /** @See {@link ChunkCoordIntPairClass} */
     public static final ChunkCoordIntPairClass T = new ChunkCoordIntPairClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkCoordIntPairHandle.class, "net.minecraft.server.ChunkCoordIntPair");
@@ -25,22 +25,10 @@ public class ChunkCoordIntPairHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
     /**
      * Stores class members for <b>net.minecraft.server.ChunkCoordIntPair</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

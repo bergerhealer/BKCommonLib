@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayInBoatMoveHandle extends Template.Handle {
+public abstract class PacketPlayInBoatMoveHandle extends Template.Handle {
     /** @See {@link PacketPlayInBoatMoveClass} */
     public static final PacketPlayInBoatMoveClass T = new PacketPlayInBoatMoveClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBoatMoveHandle.class, "net.minecraft.server.PacketPlayInBoatMove");
@@ -22,22 +22,10 @@ public class PacketPlayInBoatMoveHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean isRightPaddle() {
-        return T.rightPaddle.getBoolean(getRaw());
-    }
-
-    public void setRightPaddle(boolean value) {
-        T.rightPaddle.setBoolean(getRaw(), value);
-    }
-
-    public boolean isLeftPaddle() {
-        return T.leftPaddle.getBoolean(getRaw());
-    }
-
-    public void setLeftPaddle(boolean value) {
-        T.leftPaddle.setBoolean(getRaw(), value);
-    }
-
+    public abstract boolean isRightPaddle();
+    public abstract void setRightPaddle(boolean value);
+    public abstract boolean isLeftPaddle();
+    public abstract void setLeftPaddle(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInBoatMove</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

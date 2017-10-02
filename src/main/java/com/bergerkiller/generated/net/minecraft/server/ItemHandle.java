@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class ItemHandle extends Template.Handle {
+public abstract class ItemHandle extends Template.Handle {
     /** @See {@link ItemClass} */
     public static final ItemClass T = new ItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item");
@@ -21,14 +21,8 @@ public class ItemHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public int getMaxStackSize() {
-        return T.getMaxStackSize.invoke(getRaw());
-    }
-
-    public boolean usesDurability() {
-        return T.usesDurability.invoke(getRaw());
-    }
-
+    public abstract int getMaxStackSize();
+    public abstract boolean usesDurability();
     /**
      * Stores class members for <b>net.minecraft.server.Item</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

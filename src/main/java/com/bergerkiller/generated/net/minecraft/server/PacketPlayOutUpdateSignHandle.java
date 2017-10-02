@@ -12,7 +12,7 @@ import org.bukkit.World;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class PacketPlayOutUpdateSignHandle extends Template.Handle {
+public abstract class PacketPlayOutUpdateSignHandle extends Template.Handle {
     /** @See {@link PacketPlayOutUpdateSignClass} */
     public static final PacketPlayOutUpdateSignClass T = new PacketPlayOutUpdateSignClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUpdateSignHandle.class, "net.minecraft.server.PacketPlayOutUpdateSign");
@@ -25,30 +25,12 @@ public class PacketPlayOutUpdateSignHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public World getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(World value) {
-        T.world.set(getRaw(), value);
-    }
-
-    public IntVector3 getPosition() {
-        return T.position.get(getRaw());
-    }
-
-    public void setPosition(IntVector3 value) {
-        T.position.set(getRaw(), value);
-    }
-
-    public ChatText[] getLines() {
-        return T.lines.get(getRaw());
-    }
-
-    public void setLines(ChatText[] value) {
-        T.lines.set(getRaw(), value);
-    }
-
+    public abstract World getWorld();
+    public abstract void setWorld(World value);
+    public abstract IntVector3 getPosition();
+    public abstract void setPosition(IntVector3 value);
+    public abstract ChatText[] getLines();
+    public abstract void setLines(ChatText[] value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutUpdateSign</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

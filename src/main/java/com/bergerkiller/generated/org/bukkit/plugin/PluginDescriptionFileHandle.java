@@ -9,7 +9,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PluginDescriptionFileHandle extends Template.Handle {
+public abstract class PluginDescriptionFileHandle extends Template.Handle {
     /** @See {@link PluginDescriptionFileClass} */
     public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile");
@@ -22,14 +22,8 @@ public class PluginDescriptionFileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public Map<String, Map<String, Object>> getCommands() {
-        return T.commands.get(getRaw());
-    }
-
-    public void setCommands(Map<String, Map<String, Object>> value) {
-        T.commands.set(getRaw(), value);
-    }
-
+    public abstract Map<String, Map<String, Object>> getCommands();
+    public abstract void setCommands(Map<String, Map<String, Object>> value);
     /**
      * Stores class members for <b>org.bukkit.plugin.PluginDescriptionFile</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

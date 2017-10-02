@@ -9,7 +9,7 @@ import org.bukkit.inventory.CraftingInventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftInventoryCraftingHandle extends Template.Handle {
+public abstract class CraftInventoryCraftingHandle extends Template.Handle {
     /** @See {@link CraftInventoryCraftingClass} */
     public static final CraftInventoryCraftingClass T = new CraftInventoryCraftingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryCraftingHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryCrafting");

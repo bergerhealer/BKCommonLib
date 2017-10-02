@@ -11,7 +11,7 @@ import org.bukkit.World;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
+public abstract class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     /** @See {@link CraftTravelAgentClass} */
     public static final CraftTravelAgentClass T = new CraftTravelAgentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTravelAgentHandle.class, "org.bukkit.craftbukkit.CraftTravelAgent");
@@ -28,14 +28,8 @@ public class CraftTravelAgentHandle extends PortalTravelAgentHandle {
 
     /* ============================================================================== */
 
-    public void setCanCreatePortal(boolean create) {
-        T.setCanCreatePortal.invoke(getRaw(), create);
-    }
-
-    public Location findOrCreate(Location target) {
-        return T.findOrCreate.invoke(getRaw(), target);
-    }
-
+    public abstract void setCanCreatePortal(boolean create);
+    public abstract Location findOrCreate(Location target);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.CraftTravelAgent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

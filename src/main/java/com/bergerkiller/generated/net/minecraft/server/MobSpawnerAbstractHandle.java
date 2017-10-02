@@ -10,7 +10,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class MobSpawnerAbstractHandle extends Template.Handle {
+public abstract class MobSpawnerAbstractHandle extends Template.Handle {
     /** @See {@link MobSpawnerAbstractClass} */
     public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract");
@@ -23,98 +23,29 @@ public class MobSpawnerAbstractHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public void onTick() {
-        T.onTick.invoke(getRaw());
-    }
-
-    public MinecraftKeyHandle getMobName() {
-        return T.getMobName.invoke(getRaw());
-    }
-
-    public void setMobName(MinecraftKeyHandle nameKey) {
-        T.setMobName.invoke(getRaw(), nameKey);
-    }
-
-    public int getSpawnDelay() {
-        return T.spawnDelay.getInteger(getRaw());
-    }
-
-    public void setSpawnDelay(int value) {
-        T.spawnDelay.setInteger(getRaw(), value);
-    }
-
-    public List<MobSpawnerDataHandle> getMobs() {
-        return T.mobs.get(getRaw());
-    }
-
-    public void setMobs(List<MobSpawnerDataHandle> value) {
-        T.mobs.set(getRaw(), value);
-    }
-
-    public MobSpawnerDataHandle getSpawnData() {
-        return T.spawnData.get(getRaw());
-    }
-
-    public void setSpawnData(MobSpawnerDataHandle value) {
-        T.spawnData.set(getRaw(), value);
-    }
-
-    public int getMinSpawnDelay() {
-        return T.minSpawnDelay.getInteger(getRaw());
-    }
-
-    public void setMinSpawnDelay(int value) {
-        T.minSpawnDelay.setInteger(getRaw(), value);
-    }
-
-    public int getMaxSpawnDelay() {
-        return T.maxSpawnDelay.getInteger(getRaw());
-    }
-
-    public void setMaxSpawnDelay(int value) {
-        T.maxSpawnDelay.setInteger(getRaw(), value);
-    }
-
-    public int getSpawnCount() {
-        return T.spawnCount.getInteger(getRaw());
-    }
-
-    public void setSpawnCount(int value) {
-        T.spawnCount.setInteger(getRaw(), value);
-    }
-
-    public Entity getEntity() {
-        return T.entity.get(getRaw());
-    }
-
-    public void setEntity(Entity value) {
-        T.entity.set(getRaw(), value);
-    }
-
-    public int getMaxNearbyEntities() {
-        return T.maxNearbyEntities.getInteger(getRaw());
-    }
-
-    public void setMaxNearbyEntities(int value) {
-        T.maxNearbyEntities.setInteger(getRaw(), value);
-    }
-
-    public int getRequiredPlayerRange() {
-        return T.requiredPlayerRange.getInteger(getRaw());
-    }
-
-    public void setRequiredPlayerRange(int value) {
-        T.requiredPlayerRange.setInteger(getRaw(), value);
-    }
-
-    public int getSpawnRange() {
-        return T.spawnRange.getInteger(getRaw());
-    }
-
-    public void setSpawnRange(int value) {
-        T.spawnRange.setInteger(getRaw(), value);
-    }
-
+    public abstract void onTick();
+    public abstract MinecraftKeyHandle getMobName();
+    public abstract void setMobName(MinecraftKeyHandle nameKey);
+    public abstract int getSpawnDelay();
+    public abstract void setSpawnDelay(int value);
+    public abstract List<MobSpawnerDataHandle> getMobs();
+    public abstract void setMobs(List<MobSpawnerDataHandle> value);
+    public abstract MobSpawnerDataHandle getSpawnData();
+    public abstract void setSpawnData(MobSpawnerDataHandle value);
+    public abstract int getMinSpawnDelay();
+    public abstract void setMinSpawnDelay(int value);
+    public abstract int getMaxSpawnDelay();
+    public abstract void setMaxSpawnDelay(int value);
+    public abstract int getSpawnCount();
+    public abstract void setSpawnCount(int value);
+    public abstract Entity getEntity();
+    public abstract void setEntity(Entity value);
+    public abstract int getMaxNearbyEntities();
+    public abstract void setMaxNearbyEntities(int value);
+    public abstract int getRequiredPlayerRange();
+    public abstract void setRequiredPlayerRange(int value);
+    public abstract int getSpawnRange();
+    public abstract void setSpawnRange(int value);
     /**
      * Stores class members for <b>net.minecraft.server.MobSpawnerAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

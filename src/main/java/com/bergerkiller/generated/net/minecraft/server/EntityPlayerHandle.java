@@ -9,7 +9,7 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class EntityPlayerHandle extends EntityHumanHandle {
+public abstract class EntityPlayerHandle extends EntityHumanHandle {
     /** @See {@link EntityPlayerClass} */
     public static final EntityPlayerClass T = new EntityPlayerClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer");
@@ -22,38 +22,14 @@ public class EntityPlayerHandle extends EntityHumanHandle {
 
     /* ============================================================================== */
 
-    public Object getPlayerConnection() {
-        return T.playerConnection.get(getRaw());
-    }
-
-    public void setPlayerConnection(Object value) {
-        T.playerConnection.set(getRaw(), value);
-    }
-
-    public double getChunkSyncX() {
-        return T.chunkSyncX.getDouble(getRaw());
-    }
-
-    public void setChunkSyncX(double value) {
-        T.chunkSyncX.setDouble(getRaw(), value);
-    }
-
-    public double getChunkSyncZ() {
-        return T.chunkSyncZ.getDouble(getRaw());
-    }
-
-    public void setChunkSyncZ(double value) {
-        T.chunkSyncZ.setDouble(getRaw(), value);
-    }
-
-    public int getPing() {
-        return T.ping.getInteger(getRaw());
-    }
-
-    public void setPing(int value) {
-        T.ping.setInteger(getRaw(), value);
-    }
-
+    public abstract Object getPlayerConnection();
+    public abstract void setPlayerConnection(Object value);
+    public abstract double getChunkSyncX();
+    public abstract void setChunkSyncX(double value);
+    public abstract double getChunkSyncZ();
+    public abstract void setChunkSyncZ(double value);
+    public abstract int getPing();
+    public abstract void setPing(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityPlayer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

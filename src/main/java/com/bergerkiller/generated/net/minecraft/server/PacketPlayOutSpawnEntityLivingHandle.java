@@ -13,7 +13,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
+public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityLivingClass} */
     public static final PacketPlayOutSpawnEntityLivingClass T = new PacketPlayOutSpawnEntityLivingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityLivingHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityLiving");
@@ -106,38 +106,14 @@ public class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
     public void setHeadYaw(float headYaw) {
         setProtocolRotation(T.headYaw_raw, headYaw);
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public int getEntityTypeId() {
-        return T.entityTypeId.getInteger(getRaw());
-    }
-
-    public void setEntityTypeId(int value) {
-        T.entityTypeId.setInteger(getRaw(), value);
-    }
-
-    public DataWatcher getDataWatcher() {
-        return T.dataWatcher.get(getRaw());
-    }
-
-    public void setDataWatcher(DataWatcher value) {
-        T.dataWatcher.set(getRaw(), value);
-    }
-
-    public List<Item<?>> getDataWatcherItems() {
-        return T.dataWatcherItems.get(getRaw());
-    }
-
-    public void setDataWatcherItems(List<Item<?>> value) {
-        T.dataWatcherItems.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract int getEntityTypeId();
+    public abstract void setEntityTypeId(int value);
+    public abstract DataWatcher getDataWatcher();
+    public abstract void setDataWatcher(DataWatcher value);
+    public abstract List<Item<?>> getDataWatcherItems();
+    public abstract void setDataWatcherItems(List<Item<?>> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntityLiving</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

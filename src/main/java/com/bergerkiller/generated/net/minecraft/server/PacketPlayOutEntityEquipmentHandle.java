@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
+public abstract class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityEquipmentClass} */
     public static final PacketPlayOutEntityEquipmentClass T = new PacketPlayOutEntityEquipmentClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityEquipmentHandle.class, "net.minecraft.server.PacketPlayOutEntityEquipment");
@@ -27,30 +27,12 @@ public class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public EquipmentSlot getSlot() {
-        return T.slot.get(getRaw());
-    }
-
-    public void setSlot(EquipmentSlot value) {
-        T.slot.set(getRaw(), value);
-    }
-
-    public ItemStack getItemStack() {
-        return T.itemStack.get(getRaw());
-    }
-
-    public void setItemStack(ItemStack value) {
-        T.itemStack.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract EquipmentSlot getSlot();
+    public abstract void setSlot(EquipmentSlot value);
+    public abstract ItemStack getItemStack();
+    public abstract void setItemStack(ItemStack value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntityEquipment</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

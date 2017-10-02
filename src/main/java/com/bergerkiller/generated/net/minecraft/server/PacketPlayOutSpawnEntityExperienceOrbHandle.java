@@ -8,7 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
+public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityExperienceOrbClass} */
     public static final PacketPlayOutSpawnEntityExperienceOrbClass T = new PacketPlayOutSpawnEntityExperienceOrbClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityExperienceOrbHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb");
@@ -45,22 +45,10 @@ public class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     public void setPosZ(double posZ) {
         setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public int getExperience() {
-        return T.experience.getInteger(getRaw());
-    }
-
-    public void setExperience(int value) {
-        T.experience.setInteger(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract int getExperience();
+    public abstract void setExperience(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

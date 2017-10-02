@@ -10,7 +10,7 @@ import java.util.List;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class EntitySliceHandle extends Template.Handle {
+public abstract class EntitySliceHandle extends Template.Handle {
     /** @See {@link EntitySliceClass} */
     public static final EntitySliceClass T = new EntitySliceClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntitySliceHandle.class, "net.minecraft.server.EntitySlice");
@@ -27,22 +27,10 @@ public class EntitySliceHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public boolean add(Object value) {
-        return T.add.invoke(getRaw(), value);
-    }
-
-    public boolean remove(Object value) {
-        return T.remove.invoke(getRaw(), value);
-    }
-
-    public List<Object> getListValues() {
-        return T.listValues.get(getRaw());
-    }
-
-    public void setListValues(List<Object> value) {
-        T.listValues.set(getRaw(), value);
-    }
-
+    public abstract boolean add(Object value);
+    public abstract boolean remove(Object value);
+    public abstract List<Object> getListValues();
+    public abstract void setListValues(List<Object> value);
     /**
      * Stores class members for <b>net.minecraft.server.EntitySlice</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

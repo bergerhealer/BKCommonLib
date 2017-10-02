@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class DataWatcherRegistryHandle extends Template.Handle {
+public abstract class DataWatcherRegistryHandle extends Template.Handle {
     /** @See {@link DataWatcherRegistryClass} */
     public static final DataWatcherRegistryClass T = new DataWatcherRegistryClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherRegistryHandle.class, "net.minecraft.server.DataWatcherRegistry");

@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayInUseEntityHandle extends PacketHandle {
+public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseEntityClass} */
     public static final PacketPlayInUseEntityClass T = new PacketPlayInUseEntityClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity");
@@ -23,30 +23,12 @@ public class PacketPlayInUseEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getUsedEntityId() {
-        return T.usedEntityId.getInteger(getRaw());
-    }
-
-    public void setUsedEntityId(int value) {
-        T.usedEntityId.setInteger(getRaw(), value);
-    }
-
-    public UseAction getAction() {
-        return T.action.get(getRaw());
-    }
-
-    public void setAction(UseAction value) {
-        T.action.set(getRaw(), value);
-    }
-
-    public Vector getOffset() {
-        return T.offset.get(getRaw());
-    }
-
-    public void setOffset(Vector value) {
-        T.offset.set(getRaw(), value);
-    }
-
+    public abstract int getUsedEntityId();
+    public abstract void setUsedEntityId(int value);
+    public abstract UseAction getAction();
+    public abstract void setAction(UseAction value);
+    public abstract Vector getOffset();
+    public abstract void setOffset(Vector value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInUseEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -66,7 +48,7 @@ public class PacketPlayInUseEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    public static class EnumEntityUseActionHandle extends Template.Handle {
+    public abstract static class EnumEntityUseActionHandle extends Template.Handle {
         /** @See {@link EnumEntityUseActionClass} */
         public static final EnumEntityUseActionClass T = new EnumEntityUseActionClass();
         static final StaticInitHelper _init_helper = new StaticInitHelper(EnumEntityUseActionHandle.class, "net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");

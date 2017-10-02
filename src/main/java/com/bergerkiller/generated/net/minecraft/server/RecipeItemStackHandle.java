@@ -11,7 +11,7 @@ import java.util.List;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-public class RecipeItemStackHandle extends Template.Handle {
+public abstract class RecipeItemStackHandle extends Template.Handle {
     /** @See {@link RecipeItemStackClass} */
     public static final RecipeItemStackClass T = new RecipeItemStackClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(RecipeItemStackHandle.class, "net.minecraft.server.RecipeItemStack");
@@ -24,14 +24,8 @@ public class RecipeItemStackHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public List<ItemStack> getChoices() {
-        return T.choices.get(getRaw());
-    }
-
-    public void setChoices(List<ItemStack> value) {
-        T.choices.set(getRaw(), value);
-    }
-
+    public abstract List<ItemStack> getChoices();
+    public abstract void setChoices(List<ItemStack> value);
     /**
      * Stores class members for <b>net.minecraft.server.RecipeItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

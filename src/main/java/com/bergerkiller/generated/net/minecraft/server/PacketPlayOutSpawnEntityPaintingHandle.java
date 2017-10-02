@@ -11,7 +11,7 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
+public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityPaintingClass} */
     public static final PacketPlayOutSpawnEntityPaintingClass T = new PacketPlayOutSpawnEntityPaintingClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityPaintingHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityPainting");
@@ -24,38 +24,14 @@ public class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public int getEntityId() {
-        return T.entityId.getInteger(getRaw());
-    }
-
-    public void setEntityId(int value) {
-        T.entityId.setInteger(getRaw(), value);
-    }
-
-    public IntVector3 getPosition() {
-        return T.position.get(getRaw());
-    }
-
-    public void setPosition(IntVector3 value) {
-        T.position.set(getRaw(), value);
-    }
-
-    public BlockFace getFacing() {
-        return T.facing.get(getRaw());
-    }
-
-    public void setFacing(BlockFace value) {
-        T.facing.set(getRaw(), value);
-    }
-
-    public String getArt() {
-        return T.art.get(getRaw());
-    }
-
-    public void setArt(String value) {
-        T.art.set(getRaw(), value);
-    }
-
+    public abstract int getEntityId();
+    public abstract void setEntityId(int value);
+    public abstract IntVector3 getPosition();
+    public abstract void setPosition(IntVector3 value);
+    public abstract BlockFace getFacing();
+    public abstract void setFacing(BlockFace value);
+    public abstract String getArt();
+    public abstract void setArt(String value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntityPainting</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

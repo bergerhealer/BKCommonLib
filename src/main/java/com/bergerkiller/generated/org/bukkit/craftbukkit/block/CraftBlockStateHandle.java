@@ -13,7 +13,7 @@ import org.bukkit.material.MaterialData;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public class CraftBlockStateHandle extends Template.Handle {
+public abstract class CraftBlockStateHandle extends Template.Handle {
     /** @See {@link CraftBlockStateClass} */
     public static final CraftBlockStateClass T = new CraftBlockStateClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState");
@@ -30,70 +30,22 @@ public class CraftBlockStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public World getWorld() {
-        return T.world.get(getRaw());
-    }
-
-    public void setWorld(World value) {
-        T.world.set(getRaw(), value);
-    }
-
-    public Chunk getChunk() {
-        return T.chunk.get(getRaw());
-    }
-
-    public void setChunk(Chunk value) {
-        T.chunk.set(getRaw(), value);
-    }
-
-    public int getX() {
-        return T.x.getInteger(getRaw());
-    }
-
-    public void setX(int value) {
-        T.x.setInteger(getRaw(), value);
-    }
-
-    public int getY() {
-        return T.y.getInteger(getRaw());
-    }
-
-    public void setY(int value) {
-        T.y.setInteger(getRaw(), value);
-    }
-
-    public int getZ() {
-        return T.z.getInteger(getRaw());
-    }
-
-    public void setZ(int value) {
-        T.z.setInteger(getRaw(), value);
-    }
-
-    public int getTypeId() {
-        return T.typeId.getInteger(getRaw());
-    }
-
-    public void setTypeId(int value) {
-        T.typeId.setInteger(getRaw(), value);
-    }
-
-    public MaterialData getData() {
-        return T.data.get(getRaw());
-    }
-
-    public void setData(MaterialData value) {
-        T.data.set(getRaw(), value);
-    }
-
-    public int getFlag() {
-        return T.flag.getInteger(getRaw());
-    }
-
-    public void setFlag(int value) {
-        T.flag.setInteger(getRaw(), value);
-    }
-
+    public abstract World getWorld();
+    public abstract void setWorld(World value);
+    public abstract Chunk getChunk();
+    public abstract void setChunk(Chunk value);
+    public abstract int getX();
+    public abstract void setX(int value);
+    public abstract int getY();
+    public abstract void setY(int value);
+    public abstract int getZ();
+    public abstract void setZ(int value);
+    public abstract int getTypeId();
+    public abstract void setTypeId(int value);
+    public abstract MaterialData getData();
+    public abstract void setData(MaterialData value);
+    public abstract int getFlag();
+    public abstract void setFlag(int value);
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.block.CraftBlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
