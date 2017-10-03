@@ -106,15 +106,18 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
         EntityTrackerEntryHandle previous;
         final int id = entity.getEntityId();
 
-        // Set in tracked entities map, replacing the original entry
+        // Remove the original entry from the mapping and entry set
         IntHashMap<?> trackedMap = handle.getTrackedEntities();
-        previous = EntityTrackerEntryHandle.createHandle(trackedMap.remove(id));
-        trackedMap.put(id, entityTrackerEntry);
-
-        // Replace in entry set
         Set<EntityTrackerEntryHandle> trackers = handle.getEntries();
+        previous = EntityTrackerEntryHandle.createHandle(trackedMap.remove(id));
         trackers.remove(previous);
-        trackers.add(entityTrackerEntry);
+
+        // Add the new entry
+        if (entityTrackerEntry != null) {
+            trackedMap.put(id, entityTrackerEntry.getRaw());
+            trackers.add(entityTrackerEntry);
+        }
+
         return previous;
     }
 

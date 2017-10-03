@@ -159,7 +159,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         controller.bind(this, newEntry.getRaw());
 
         // Attach (new?) entry to the world
-        if (!newEntry.equals(storedEntry)) {
+        if (Handle.getRaw(storedEntry) != Handle.getRaw(newEntry)) {
             tracker.setEntry(entity, newEntry);
 
             // Make sure to update the viewers
