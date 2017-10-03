@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftMagicNumbers;
 
+@Deprecated
 public class NMSBlock {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Block");
 

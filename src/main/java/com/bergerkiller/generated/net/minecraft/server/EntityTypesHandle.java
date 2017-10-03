@@ -22,6 +22,20 @@ public abstract class EntityTypesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+
+
+    public static String getName(Class<?> type) {
+        if (T.getName.isAvailable()) {
+            Object mcKey = T.getName.invoke(type);
+            return (mcKey == null) ? null : mcKey.toString();
+        } else if (T.getName_old.isAvailable()) {
+            return T.getName_old.invoke(type);
+        } else if (T.entityNamesMap_1_8_8.isAvailable()) {
+            return T.entityNamesMap_1_8_8.get().get(type);
+        } else {
+            throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.server.EntityTypes</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

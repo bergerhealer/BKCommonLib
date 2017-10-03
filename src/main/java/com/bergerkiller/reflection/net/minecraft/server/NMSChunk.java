@@ -18,6 +18,7 @@ import org.bukkit.World;
 
 import java.util.Map;
 
+@Deprecated
 public class NMSChunk {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
     public static final FieldAccessor<Integer> x = ChunkHandle.T.locX.toFieldAccessor();

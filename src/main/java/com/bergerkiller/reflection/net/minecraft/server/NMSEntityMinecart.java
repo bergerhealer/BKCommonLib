@@ -6,11 +6,13 @@ import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHan
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartMobSpawnerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
+@Deprecated
 public class NMSEntityMinecart {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartAbstract");
 
@@ -39,7 +41,7 @@ public class NMSEntityMinecart {
 
     public static class MobSpawner {
         public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartMobSpawner");
-        public static final FieldAccessor<Object> mobSpawner = T.selectField("private final MobSpawnerAbstract a");
+        public static final FieldAccessor<Object> mobSpawner = EntityMinecartMobSpawnerHandle.T.mobSpawner.raw.toFieldAccessor();
     }
 
     public static class Hopper {

@@ -1,7 +1,5 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle;
@@ -14,6 +12,7 @@ import org.bukkit.entity.Entity;
 
 import java.util.List;
 
+@Deprecated
 public class NMSMobSpawnerAbstract {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobSpawnerAbstract");
 

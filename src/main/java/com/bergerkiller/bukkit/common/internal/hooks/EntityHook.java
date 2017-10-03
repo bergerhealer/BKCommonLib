@@ -14,8 +14,8 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
@@ -236,7 +236,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     /* This key is used for later de-serializing the entity */
     private final String getSavedName() {
-        return NMSEntityTypes.getName(this.instanceBaseType());
+        return EntityTypesHandle.getName(this.instanceBaseType());
     }
 
     @HookMethod("public void collide(Entity entity)")

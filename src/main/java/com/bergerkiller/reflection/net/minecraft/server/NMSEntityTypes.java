@@ -5,6 +5,7 @@ import java.util.Map;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
+@Deprecated
 public class NMSEntityTypes {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTypes");
 
@@ -54,16 +55,7 @@ public class NMSEntityTypes {
      * @return Minecraft key
      */
     public static String getName(Class<?> type) {
-        if (EntityTypesHandle.T.getName.isAvailable()) {
-            Object mcKey = EntityTypesHandle.T.getName.invoke(type);
-            return (mcKey == null) ? null : mcKey.toString();
-        } else if (EntityTypesHandle.T.getName_old.isAvailable()) {
-            return EntityTypesHandle.T.getName_old.invoke(type);
-        } else if (EntityTypesHandle.T.entityNamesMap_1_8_8.isAvailable()) {
-            return EntityTypesHandle.T.entityNamesMap_1_8_8.get().get(type);
-        } else {
-            throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
-        }
+        return EntityTypesHandle.getName(type);
     }
 
     /**

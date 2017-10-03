@@ -31,6 +31,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
@@ -38,6 +39,7 @@ import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -436,7 +438,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ChunkSection")
     public static ChunkSection toChunkSection(Object nmsChunkSectionHandle) {
-        return new ChunkSection(nmsChunkSectionHandle);
+        return new ChunkSection(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
     }
 
     @ConverterMethod(input="net.minecraft.server.MobEffectList")
@@ -565,6 +567,11 @@ public class WrapperConversion {
         } else {
             return null;
         }
+    }
+
+    @ConverterMethod(input="net.minecraft.server.MobSpawnerAbstract")
+    public static MobSpawner toMobSpawner(Object nmsMobSpawnerAbstractHandle) {
+        return new MobSpawner(nmsMobSpawnerAbstractHandle);
     }
 
     @ConverterMethod()

@@ -8,6 +8,7 @@ import com.google.common.collect.BiMap;
 
 import java.util.Map;
 
+@Deprecated
 public class NMSEnumProtocol {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol");
 

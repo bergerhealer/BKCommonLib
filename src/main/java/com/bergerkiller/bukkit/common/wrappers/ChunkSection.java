@@ -8,8 +8,8 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
 public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
     private final DataPaletteBlockHandle blockIds;
 
-    public ChunkSection(Object nmsChunkSectionHandle) {
-        setHandle(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
+    public ChunkSection(ChunkSectionHandle nmsChunkSectionHandle) {
+        setHandle(nmsChunkSectionHandle);
         this.blockIds = handle.getBlockPalette();
     }
 

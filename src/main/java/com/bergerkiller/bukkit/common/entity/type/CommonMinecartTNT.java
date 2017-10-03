@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
-
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.ItemStack;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +47,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @param yieldModifier - factor stating what yield the explosion has
      */
     public void explode(double yieldModifier) {
-        NMSEntityMinecart.TNT.explode.invoke(getHandle(), yieldModifier);
+        EntityMinecartTNTHandle.T.explode.invoke(getHandle(), yieldModifier);
     }
 
     /**
@@ -55,7 +55,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * animation/sound.
      */
     public void primeTNT() {
-    	NMSEntityMinecart.TNT.prime.invoke(getHandle());
+        EntityMinecartTNTHandle.T.prime.invoke(getHandle());
     }
 
     /**
@@ -84,7 +84,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @return fuse ticks
      */
     public int getFuseTicks() {
-        return NMSEntityMinecart.TNT.fuse.get(getHandle());
+        return EntityMinecartTNTHandle.T.fuse.getInteger(getHandle());
     }
 
     /**
@@ -93,6 +93,6 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
      * @param fuseTicks to set to
      */
     public void setFuseTicks(int fuseTicks) {
-    	NMSEntityMinecart.TNT.fuse.set(getHandle(), fuseTicks);
+        EntityMinecartTNTHandle.T.fuse.setInteger(getHandle(), fuseTicks);
     }
 }

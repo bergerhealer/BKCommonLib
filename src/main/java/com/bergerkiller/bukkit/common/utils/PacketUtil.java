@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -8,10 +8,10 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class PacketUtil {
 
@@ -43,8 +44,10 @@ public class PacketUtil {
      * @param sendPayload - whether the block data is sent
      */
     @Deprecated
+    @SuppressWarnings("unchecked")
     public static void sendChunk(final Player player, final org.bukkit.Chunk chunk, boolean sendPayload) {
-        final Object chunkHandle = Conversion.toChunkHandle.convert(chunk);
+        final Object chunkHandle = HandleConversion.toChunkHandle(chunk);
+        final Map<Object, Object> tileEntities = (Map<Object, Object>) ChunkHandle.T.tileEntities.raw.get(chunkHandle);
 
         // Send payload
         if (sendPayload) {
@@ -53,7 +56,7 @@ public class PacketUtil {
         }
         // Tile entities
         CommonPacket packet;
-        for (Object tile : NMSChunk.tileEntities.get(chunkHandle).values()) {
+        for (Object tile : tileEntities.values()) {
             if (tile == null) {
                 continue;
             }

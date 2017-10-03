@@ -6,10 +6,10 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEnumProtocol;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
 import java.util.logging.Level;
@@ -184,10 +184,10 @@ public class PacketType extends ClassTemplate<Object> {
 
         // Obtain ID and determine in/outgoing
         int tmpId;
-        if ((tmpId = NMSEnumProtocol.getPacketIdIn(getType())) != -1) {
+        if ((tmpId = EnumProtocolHandle.PLAY.getPacketIdIn(getType())) != -1) {
             this.outgoing = false;
             this.id = tmpId;
-        } else if ((tmpId = NMSEnumProtocol.getPacketIdOut(getType())) != -1) {
+        } else if ((tmpId = EnumProtocolHandle.PLAY.getPacketIdOut(getType())) != -1) {
             this.outgoing = true;
             this.id = tmpId;
         } else {
@@ -262,9 +262,9 @@ public class PacketType extends ClassTemplate<Object> {
     public static PacketType getType(int packetId, boolean outGoing) {
         final Class<?> type;
         if (outGoing) {
-            type = NMSEnumProtocol.getPacketClassOut(packetId);
+            type = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
         } else {
-            type = NMSEnumProtocol.getPacketClassIn(packetId);
+            type = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
         }
         if (type == null) {
             return null;

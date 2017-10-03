@@ -17,7 +17,6 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSChunk;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
 import org.bukkit.Material;
@@ -42,7 +41,14 @@ public class ChunkUtil {
      * @return chunk sections
      */
     public static ChunkSection[] getSections(org.bukkit.Chunk chunk) {
-        return NMSChunk.sections.get(Conversion.toChunkHandle.convert(chunk));
+        Object[] nmsSections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
+        ChunkSection[] sections = new ChunkSection[nmsSections.length];
+        for (int i = 0; i < sections.length; i++) {
+            if (nmsSections[i] != null) {
+                sections[i] = new ChunkSection(ChunkSectionHandle.createHandle(nmsSections[i]));
+            }
+        }
+        return sections;
     }
 
     /**
@@ -158,7 +164,7 @@ public class ChunkUtil {
             return;
         }
 
-        Object[] sections = (Object[]) NMSChunk.sections.getInternal(HandleConversion.toChunkHandle(chunk));
+        Object[] sections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
         final int secIndex = y >> 4;
         Object section = sections[secIndex];
         if (section == null) {
@@ -284,7 +290,7 @@ public class ChunkUtil {
      * @return True if it needs to be saved, False if not
      */
     public static boolean needsSaving(org.bukkit.Chunk chunk) {
-        return NMSChunk.needsSaving(Conversion.toChunkHandle.convert(chunk));
+        return ChunkHandle.T.checkCanSave.invoke(HandleConversion.toChunkHandle(chunk));
     }
 
     /**

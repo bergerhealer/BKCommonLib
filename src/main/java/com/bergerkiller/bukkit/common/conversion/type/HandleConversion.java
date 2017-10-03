@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
+import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
@@ -289,6 +290,11 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.MobEffect")
     public static Object toMobEffectHandle(PotionEffect potionEffect) {
         return CraftPotionUtilHandle.fromBukkit(potionEffect);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.MobSpawnerAbstract")
+    public static Object toMobSpawnerAbstractHandle(MobSpawner mobSpawner) {
+        return mobSpawner.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.DataWatcherObject<V>")

@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.HopperMinecart;
@@ -62,7 +61,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @param cooldownTicks to set to
      */
     public void setSuckingCooldown(int cooldownTicks) {
-        NMSEntityMinecart.Hopper.suckingCooldown.set(getHandle(), cooldownTicks);
+        EntityMinecartHopperHandle.T.suckingCooldown.setInteger(getHandle(), cooldownTicks);
     }
 
     /**
@@ -71,7 +70,7 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * @return sucking cooldown ticks
      */
     public int getSuckingCooldown() {
-        return NMSEntityMinecart.Hopper.suckingCooldown.get(getHandle());
+        return EntityMinecartHopperHandle.T.suckingCooldown.getInteger(getHandle());
     }
 
 }

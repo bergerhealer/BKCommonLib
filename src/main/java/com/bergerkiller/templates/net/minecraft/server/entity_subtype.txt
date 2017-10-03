@@ -382,6 +382,10 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
     </code>
 }
 
+class EntityMinecartMobSpawner extends EntityMinecartAbstract {
+    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) MobSpawnerAbstract mobSpawner:a;
+}
+
 class EntityItemFrame extends Entity {
 #if version >= 1.9
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;

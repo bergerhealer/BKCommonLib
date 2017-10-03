@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
 
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.PoweredMinecart;
@@ -21,18 +21,18 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
      */
     public static final int COAL_FUEL = 3600;
 
-    public final DataWatcher.EntityItem<Boolean> metaSmoking = getDataItem(NMSEntityMinecart.Furnace.DATA_SMOKING);
+    public final DataWatcher.EntityItem<Boolean> metaSmoking = getDataItem(EntityMinecartFurnaceHandle.DATA_SMOKING);
 
     public CommonMinecartFurnace(PoweredMinecart base) {
         super(base);
     }
 
     public int getFuelTicks() {
-        return NMSEntityMinecart.Furnace.fuel.get(getHandle());
+        return EntityMinecartFurnaceHandle.T.fuel.getInteger(getHandle());
     }
 
     public void setFuelTicks(int fuelTicks) {
-    	NMSEntityMinecart.Furnace.fuel.set(getHandle(), fuelTicks);
+        EntityMinecartFurnaceHandle.T.fuel.setInteger(getHandle(), fuelTicks);
     }
 
     public boolean hasFuel() {
@@ -44,19 +44,19 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
     }
 
     public double getPushX() {
-        return NMSEntityMinecart.Furnace.pushForceX.get(getHandle());
+        return EntityMinecartFurnaceHandle.T.pushForceX.getDouble(getHandle());
     }
 
     public void setPushX(double pushX) {
-    	NMSEntityMinecart.Furnace.pushForceX.set(getHandle(), pushX);
+        EntityMinecartFurnaceHandle.T.pushForceX.setDouble(getHandle(), pushX);
     }
 
     public double getPushZ() {
-        return NMSEntityMinecart.Furnace.pushForceZ.get(getHandle());
+        return EntityMinecartFurnaceHandle.T.pushForceZ.getDouble(getHandle());
     }
 
     public void setPushZ(double pushZ) {
-    	NMSEntityMinecart.Furnace.pushForceZ.set(getHandle(), pushZ);
+        EntityMinecartFurnaceHandle.T.pushForceZ.setDouble(getHandle(), pushZ);
     }
 
     public boolean isSmoking() {

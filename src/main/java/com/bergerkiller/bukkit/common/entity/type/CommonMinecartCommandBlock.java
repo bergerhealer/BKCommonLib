@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class CommonMinecartCommandBlock extends CommonMinecart<CommandMinecart> {
 
-    public final DataWatcher.EntityItem<String> metaCommand = getDataItem(NMSEntityMinecart.CommandBlock.DATA_COMMAND);
-    public final DataWatcher.EntityItem<ChatText> metaPreviousOutput = getDataItem(NMSEntityMinecart.CommandBlock.DATA_PREVIOUS_OUTPUT);
+    public final DataWatcher.EntityItem<String> metaCommand = getDataItem(EntityMinecartCommandBlockHandle.DATA_COMMAND);
+    public final DataWatcher.EntityItem<ChatText> metaPreviousOutput = getDataItem(EntityMinecartCommandBlockHandle.DATA_PREVIOUS_OUTPUT);
 
     public CommonMinecartCommandBlock(CommandMinecart base) {
         super(base);

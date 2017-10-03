@@ -33,4 +33,24 @@ class EntityTypes {
     private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_8_8:???;
 #endif
 
+    <code>
+    /**
+     * Gets the Minecraft key associated with an Entity Class Type
+     * 
+     * @param type of Entity
+     * @return Minecraft key
+     */
+    public static String getName(Class<?> type) {
+        if (T.getName.isAvailable()) {
+            Object mcKey = T.getName.invoke(type);
+            return (mcKey == null) ? null : mcKey.toString();
+        } else if (T.getName_old.isAvailable()) {
+            return T.getName_old.invoke(type);
+        } else if (T.entityNamesMap_1_8_8.isAvailable()) {
+            return T.entityNamesMap_1_8_8.get().get(type);
+        } else {
+            throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
+        }
+    }
+    </code>
 }

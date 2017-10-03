@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSMobSpawnerAbstract;
 
 public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
 
@@ -15,7 +15,7 @@ public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
      * @return mob name
      */
     public String getMobName() {
-        return NMSMobSpawnerAbstract.mobName.get(getRawHandle());
+        return handle.getMobName().toString();
     }
 
     /**
@@ -24,7 +24,7 @@ public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
      * @param name of mob
      */
     public void setMobName(String name) {
-    	NMSMobSpawnerAbstract.mobName.set(getRawHandle(), name);
+        handle.setMobName(MinecraftKeyHandle.createNew(name));
     }
 
     /**

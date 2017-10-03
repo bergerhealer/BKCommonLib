@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
 
 /**
  * An abstract implementation for all Minecarts
@@ -23,12 +22,12 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSEntityMinecart;
  */
 public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
 
-    public final DataWatcher.EntityItem<Integer> metaShakingDirection = getDataItem(NMSEntityMinecart.DATA_SHAKING_DIRECTION);
-    public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(NMSEntityMinecart.DATA_SHAKING_DAMAGE);
-    public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(NMSEntityMinecart.DATA_SHAKING_FACTOR);
-    public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(NMSEntityMinecart.DATA_BLOCK_OFFSET);
-    public final DataWatcher.EntityItem<Integer> metaBlockType        = getDataItem(NMSEntityMinecart.DATA_BLOCK_TYPE);
-    public final DataWatcher.EntityItem<Boolean> metaBlockVisible     = getDataItem(NMSEntityMinecart.DATA_BLOCK_VISIBLE);
+    public final DataWatcher.EntityItem<Integer> metaShakingDirection = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION);
+    public final DataWatcher.EntityItem<Float>   metaShakingDamage    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_DAMAGE);
+    public final DataWatcher.EntityItem<Integer> metaShakingFactor    = getDataItem(EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR);
+    public final DataWatcher.EntityItem<Integer> metaBlockOffset      = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_OFFSET);
+    public final DataWatcher.EntityItem<Integer> metaBlockType        = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_TYPE);
+    public final DataWatcher.EntityItem<Boolean> metaBlockVisible     = getDataItem(EntityMinecartAbstractHandle.DATA_BLOCK_VISIBLE);
 
     public CommonMinecart(T base) {
         super(base);
@@ -254,7 +253,7 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
      * @param activated state of the activator rail
      */
     public void activate(Block activatorBlock, boolean activated) {
-        NMSEntityMinecart.activate.invoke(getHandle(), 
+        EntityMinecartAbstractHandle.T.activate.invoke(getHandle(),
                 activatorBlock.getX(), activatorBlock.getY(), activatorBlock.getZ(), activated);
     }
 }

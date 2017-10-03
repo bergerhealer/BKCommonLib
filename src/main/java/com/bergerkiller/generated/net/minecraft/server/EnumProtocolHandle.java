@@ -24,6 +24,24 @@ public abstract class EnumProtocolHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+
+    public Class<?> getPacketClassIn(int id) {
+        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).get(id);
+    }
+
+    public Class<?> getPacketClassOut(int id) {
+        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).get(id);
+    }
+
+    public int getPacketIdIn(Class<?> packetClass) {
+        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).inverse().get(packetClass);
+        return (id == null) ? -1 : id.intValue();
+    }
+
+    public int getPacketIdOut(Class<?> packetClass) {
+        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).inverse().get(packetClass);
+        return (id == null) ? -1 : id.intValue();
+    }
     @SuppressWarnings("rawtypes")
     public abstract Map<EnumProtocolDirectionHandle, BiMap> getPacketMap();
     @SuppressWarnings("rawtypes")
