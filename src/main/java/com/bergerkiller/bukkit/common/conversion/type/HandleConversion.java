@@ -51,6 +51,7 @@ import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
@@ -61,7 +62,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 
 public class HandleConversion {
 
@@ -200,7 +200,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.WorldType")
     public static Object toWorldTypeHandle(org.bukkit.WorldType worldType) {
-        return NMSWorldType.getType.invoke(null, worldType.getName());
+        return WorldTypeHandle.T.getType.raw.invoke(worldType.getName());
     }
 
     @ConverterMethod(output="T extends net.minecraft.server.Packet")

@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
@@ -16,8 +15,8 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -212,12 +211,12 @@ public class ChunkUtil {
      * not
      */
     public static boolean isChunkAvailable(World world, int x, int z) {
-        Object cps = NMSWorldServer.chunkProviderServer.get(Conversion.toWorldHandle.convert(world));
-        if (ChunkProviderServerHandle.T.isLoaded.invoke(cps, x, z)) {
+        ChunkProviderServerHandle cps = WorldServerHandle.T.getChunkProviderServer.invoke(HandleConversion.toWorldHandle(world));
+        if (cps.isLoaded(x, z)) {
             // Chunk is loaded into memory, True
             return true;
         } else {
-            Object chunkLoader = ChunkProviderServerHandle.T.chunkLoader.get(cps);
+            Object chunkLoader = cps.getChunkLoader();
             if (ChunkRegionLoaderHandle.T.isAssignableFrom(chunkLoader)) {
                 // Chunk can be loaded from file
                 return ChunkRegionLoaderHandle.createHandle(chunkLoader).chunkExists(world, x, z);

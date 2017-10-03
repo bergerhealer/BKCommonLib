@@ -21,12 +21,22 @@ public abstract class WorldTypeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static WorldTypeHandle getType(String name) {
+        return T.getType.invoke(name);
+    }
+
     public abstract int getDimension();
+    public abstract String getName();
+    public abstract void setName(String value);
     /**
      * Stores class members for <b>net.minecraft.server.WorldType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldTypeClass extends Template.Class<WorldTypeHandle> {
+        public final Template.Field<String> name = new Template.Field<String>();
+
+        public final Template.StaticMethod.Converted<WorldTypeHandle> getType = new Template.StaticMethod.Converted<WorldTypeHandle>();
+
         public final Template.Method<Integer> getDimension = new Template.Method<Integer>();
 
     }

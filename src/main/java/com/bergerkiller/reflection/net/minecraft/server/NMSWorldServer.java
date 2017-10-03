@@ -11,6 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import java.util.Map;
 import java.util.UUID;
 
+@Deprecated
 public class NMSWorldServer extends NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("WorldServer");
     

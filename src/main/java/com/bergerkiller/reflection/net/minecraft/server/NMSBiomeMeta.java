@@ -3,6 +3,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
+@Deprecated
 public class NMSBiomeMeta extends NMSWeightedRandomChoice {
 	public static final ClassTemplate<?> T = ClassTemplate.createNMS("BiomeBase.BiomeMeta");
 	public static final FieldAccessor<Class<?>> entity = T.nextField("public Class<? extends EntityInsentient> b");

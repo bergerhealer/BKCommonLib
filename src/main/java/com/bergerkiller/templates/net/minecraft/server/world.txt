@@ -237,7 +237,11 @@ class WorldData {
 }
 
 class WorldType {
+    private final String name;
+
     public int getDimension:g();
+    
+    public static (WorldTypeHandle) WorldType getType(String name)
 }
 
 class WorldProvider {

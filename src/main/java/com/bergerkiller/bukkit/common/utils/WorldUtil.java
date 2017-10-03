@@ -26,7 +26,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorldServer;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import org.bukkit.Bukkit;
@@ -416,7 +415,7 @@ public class WorldUtil extends ChunkUtil {
      * @return server
      */
     public static Server getServer(org.bukkit.World world) {
-        return NMSWorldServer.getServer(Conversion.toWorldHandle.convert(world));
+        return WorldHandle.T.getServer.invoke(HandleConversion.toWorldHandle(world));
     }
 
     /**
@@ -426,7 +425,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world Entity Tracker
      */
     public static EntityTracker getTracker(org.bukkit.World world) {
-        return NMSWorldServer.entityTracker.get(Conversion.toWorldHandle.convert(world));
+        return WorldServerHandle.T.entityTracker.get(HandleConversion.toWorldHandle(world));
     }
 
     /**

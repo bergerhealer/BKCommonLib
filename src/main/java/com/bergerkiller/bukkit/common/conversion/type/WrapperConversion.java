@@ -54,6 +54,7 @@ import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
@@ -66,7 +67,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilH
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorldType;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 public class WrapperConversion {
@@ -273,7 +273,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.WorldType")
     public static org.bukkit.WorldType toWorldType(Object nmsWorldTypeHandle) {
-        return org.bukkit.WorldType.getByName(NMSWorldType.name.get(nmsWorldTypeHandle));
+        return org.bukkit.WorldType.getByName(WorldTypeHandle.T.name.get(nmsWorldTypeHandle));
     }
 
     @ConverterMethod
