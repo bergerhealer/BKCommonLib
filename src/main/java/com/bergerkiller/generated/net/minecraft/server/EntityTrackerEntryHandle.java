@@ -140,6 +140,14 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         }
     }
 
+    public void clearViewers() {
+        if (T.viewersMap.isAvailable()) {
+            T.viewersMap.get(getRaw()).clear();
+        } else {
+            T.viewersSet.get(getRaw()).clear();
+        }
+    }
+
     public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
         if (T.viewersMap.isAvailable()) {
             java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(getRaw());

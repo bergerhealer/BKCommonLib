@@ -24,6 +24,7 @@ public abstract class EntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract Entity getPassenger();
+    public abstract boolean setPassenger(Entity passenger);
     /**
      * Stores class members for <b>org.bukkit.entity.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,6 +37,7 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method<Boolean> removePassenger = new Template.Method<Boolean>();
         public final Template.Method<Entity> getPassenger = new Template.Method<Entity>();
+        public final Template.Method<Boolean> setPassenger = new Template.Method<Boolean>();
 
     }
 

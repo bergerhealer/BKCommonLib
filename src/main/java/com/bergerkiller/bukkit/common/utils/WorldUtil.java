@@ -447,7 +447,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the previous tracker entry for the entity, or null if there was
      * none
      */
-    public static Object setTrackerEntry(org.bukkit.entity.Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
+    public static EntityTrackerEntryHandle setTrackerEntry(org.bukkit.entity.Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
         return getTracker(entity.getWorld()).setEntry(entity, entityTrackerEntry);
     }
 

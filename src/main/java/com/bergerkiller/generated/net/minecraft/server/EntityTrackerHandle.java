@@ -4,8 +4,10 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import java.util.Set;
 
 /**
@@ -27,6 +29,10 @@ public abstract class EntityTrackerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract void sendPacketToEntity(Entity entity, CommonPacket packet);
+    public abstract void trackEntity(Entity entity);
+    public abstract void untrackEntity(Entity entity);
+    public abstract void untrackPlayer(Player player);
+    public abstract void spawnEntities(Player entityplayer, Chunk chunk);
     public abstract World getWorld();
     public abstract void setWorld(World value);
     public abstract Set<EntityTrackerEntryHandle> getEntries();
@@ -46,6 +52,10 @@ public abstract class EntityTrackerHandle extends Template.Handle {
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
 
         public final Template.Method.Converted<Void> sendPacketToEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> untrackEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> untrackPlayer = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> spawnEntities = new Template.Method.Converted<Void>();
 
     }
 

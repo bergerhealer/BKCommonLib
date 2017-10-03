@@ -13,6 +13,7 @@ class Entity {
 
     // Note: this may stop being supported at some point
     public Entity getPassenger();
+    public boolean setPassenger(Entity passenger);
 }
 
 class HumanEntity extends Entity {

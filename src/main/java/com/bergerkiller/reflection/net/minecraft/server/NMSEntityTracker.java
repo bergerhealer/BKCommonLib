@@ -1,26 +1,20 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * <b>Deprecated: </b>Please move on to using {@link EntityTrackerHandle} instead
@@ -28,7 +22,6 @@ import java.util.logging.Level;
 @Deprecated
 public class NMSEntityTracker {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTracker");
-    private static Object dummyTracker = null;
 
     public static final FieldAccessor<World> world = EntityTrackerHandle.T.world.toFieldAccessor();
     public static final FieldAccessor<Set<Object>> trackerSet = CommonUtil.unsafeCast(EntityTrackerHandle.T.entries.raw.toFieldAccessor());
@@ -98,54 +91,8 @@ public class NMSEntityTracker {
      * @param entity to create a dummy EntityTrackerEntry for
      * @return dummy EntityTrackerEntry
      */
-    @SuppressWarnings("unchecked")
     public static Object createDummyEntry(Entity entity) {
-        Object createdEntry = null;
-        try {
-            // Initialize the dummy tracker without calling any methods/constructors
-            if (dummyTracker == null) {
-                dummyTracker = T.newInstanceNull();
-                trackerSet.set(dummyTracker, new HashSet<Object>());
-                trackedEntities.set(dummyTracker, new IntHashMap<Object>());
-            }
-            trackerSet.get(dummyTracker).clear();
-
-            // Track it!
-            world.set(dummyTracker, entity.getWorld());
-            trackerViewDistance.set(dummyTracker, (Bukkit.getViewDistance()-1) * 16);
-            IntHashMap<?> tracked = trackedEntities.get(dummyTracker);
-            tracked.clear();
-            track.invoke(dummyTracker, Conversion.toEntityHandle.convert(entity));
-
-            // Retrieve it from the mapping
-            List<IntHashMap.Entry<Object>> entries = ((IntHashMap<Object>) tracked).entries();
-            if (!entries.isEmpty()) {
-                createdEntry = entries.get(0).getValue();
-            } else {
-                Logging.LOGGER_REFLECTION.once(Level.WARNING, "No dummy entry created for " + entity.getName() + ", resolving to defaults");
-            }
-        } catch (Throwable t) {
-            Logging.LOGGER_REFLECTION.once(Level.SEVERE, "Failed to create dummy entry", t);
-        }
-        if (createdEntry == null) {
-            createdEntry = NMSEntityTrackerEntry.createNew(entity, 80, (Bukkit.getViewDistance()-1) * 16, 3, true); // defaults
-        }
-
-        // Only on MC >= 1.10.2
-        // Bugfix: Add all current passengers to the passengers field right now
-        // We must do this so that the next updatePlayer() update is properly synchronized
-        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            EntityTrackerEntryHandle.T.opt_passengers.set(createdEntry, (new ExtendedEntity<Entity>(entity)).getPassengers());
-        }
-
-        // Only on MC <= 1.8.8
-        // Bugfix: Add the current vehicle to the vehicle field right now
-        // We must do this so that the next updatePlayer() update is properly synchronized
-        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
-            EntityTrackerEntryHandle.T.opt_vehicle.set(createdEntry, entity.getVehicle());
-        }
-
-        return createdEntry;
+        return CommonNMS.createDummyTrackerEntry(entity).getRaw();
     }
 
 }

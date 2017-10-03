@@ -827,7 +827,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 	    if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.isAvailable()) {
 	        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.invoke(entity, passenger);
 	    } else {
-	        return entity.setPassenger(passenger);
+	        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.setPassenger.invoke(entity, passenger);
 	    }
 	}
 
@@ -841,8 +841,8 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     public boolean removePassenger(org.bukkit.entity.Entity passenger) {
         if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.isAvailable()) {
             return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.invoke(entity, passenger);
-        } else if (entity.getPassenger() == passenger) {
-            return entity.setPassenger(null);
+        } else if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassenger.invoke(entity) == passenger) {
+            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.setPassenger.invoke(entity, null);
         } else {
             return false;
         }

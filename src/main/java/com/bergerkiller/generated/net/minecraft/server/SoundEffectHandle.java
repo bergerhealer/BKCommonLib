@@ -31,7 +31,6 @@ public abstract class SoundEffectHandle extends Template.Handle {
     public static SoundEffectHandle byName(String name) {
         if (REGISTRY != null) {
             Object mc_key_raw = MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
-            Object sound_raw = REGISTRY.get(mc_key_raw);
             return createHandle(REGISTRY.get(mc_key_raw));
         } else {
             return null;

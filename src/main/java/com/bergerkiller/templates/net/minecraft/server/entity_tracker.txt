@@ -15,6 +15,12 @@ class EntityTracker {
 #else
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet packet);
 #endif
+
+    public void trackEntity:track((org.bukkit.entity.Entity) Entity entity);
+    public void untrackEntity((org.bukkit.entity.Entity) Entity entity);
+
+    public void untrackPlayer((org.bukkit.entity.Player) EntityPlayer player);
+    public void spawnEntities:a((org.bukkit.entity.Player) EntityPlayer entityplayer, (org.bukkit.Chunk) Chunk chunk);
 }
 
 class EntityTrackerEntry {
@@ -224,6 +230,14 @@ class EntityTrackerEntry {
             return T.viewersMap.get(getRaw()).keySet();
         } else {
             return T.viewersSet.get(getRaw());
+        }
+    }
+
+    public void clearViewers() {
+        if (T.viewersMap.isAvailable()) {
+            T.viewersMap.get(getRaw()).clear();
+        } else {
+            T.viewersSet.get(getRaw()).clear();
         }
     }
 
