@@ -27,6 +27,7 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
 
     public abstract boolean shouldUnload(int i, int j, int k, int l, int i1);
     public abstract void flagDirty(IntVector3 blockposition);
+    public abstract void flagPosDirty(int x, int y, int z);
     public abstract boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ);
 
     public void markForUpdate(PlayerChunkHandle playerChunk) {
@@ -44,11 +45,6 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
         } else {
             return T.getChunk_1_8_8.invoke(getRaw(), x, z, false);
         }
-    }
-
-
-    public void flagDirty(int x, int y, int z) {
-        T.flagDirty.raw.invoke(getRaw(), BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
     }
     public abstract List<Player> getManagedPlayers();
     public abstract void setManagedPlayers(List<Player> value);
@@ -72,6 +68,7 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_9 = new Template.Method.Converted<PlayerChunkHandle>();
         public final Template.Method.Converted<Void> flagDirty = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> flagPosDirty = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
 
     }

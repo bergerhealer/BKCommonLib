@@ -169,7 +169,7 @@ public class ChunkUtil {
         if (section == null) {
             section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y).getRaw();
         }
-        ChunkSectionHandle.T.setBlockData.invoke(section, x, y, z, data);
+        ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
     }
 
     /**

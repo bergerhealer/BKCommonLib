@@ -44,6 +44,6 @@ public class NMSPlayerChunkMap {
     };
 
     public static void flagBlockDirty(Object playerChunkMap, int x, int y, int z) {
-        PlayerChunkMapHandle.createHandle(playerChunkMap).flagDirty(x, y, z);
+        PlayerChunkMapHandle.createHandle(playerChunkMap).flagPosDirty(x, y, z);
     }
 }

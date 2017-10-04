@@ -176,7 +176,9 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockDataFast(org.bukkit.block.Block block, BlockData data) {
-        setBlockDataFast(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
+        ChunkUtil.setBlockFast(block.getChunk(), block.getX(), block.getY(), block.getZ(), data);
+
+        //setBlockDataFast(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
     }
 
     /**
@@ -189,7 +191,11 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockDataFast(org.bukkit.World world, int x, int y, int z, BlockData data) {
-        NMSWorld.updateBlock(Conversion.toWorldHandle.convert(world), x, y, z, data, NMSWorld.UPDATE_NOTIFY);
+        ChunkUtil.setBlockFast(world.getChunkAt(x >> 4, z >> 4), x, y, z, data);
+
+        // We can not use this, because it causes doPhysics to be called when setting the Block in Chunk
+        // For some blocks, such as powered rails, it causes a forced uncancellable physics update - unwanted!
+        //NMSWorld.updateBlock(Conversion.toWorldHandle.convert(world), x, y, z, data, NMSWorld.UPDATE_NOTIFY);
     }
 
     /**
@@ -642,6 +648,15 @@ public class WorldUtil extends ChunkUtil {
 
     /**
      * Queues a block for sending to all players in view
+     * 
+     * @param block
+     */
+    public static void queueBlockSend(org.bukkit.block.Block block) {
+        queueBlockSend(block.getWorld(), block.getX(), block.getY(), block.getZ());
+    }
+
+    /**
+     * Queues a block for sending to all players in view
      *
      * @param world the block is in
      * @param blockX of the block
@@ -651,7 +666,7 @@ public class WorldUtil extends ChunkUtil {
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
         PlayerChunkMapHandle playerChunkMap = WorldServerHandle.T.playerChunkMapField.get(worldHandle);
-        playerChunkMap.flagDirty(blockX, blockY, blockZ);
+        playerChunkMap.flagPosDirty(blockX, blockY, blockZ);
     }
 
     /**

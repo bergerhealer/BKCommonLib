@@ -127,12 +127,10 @@ class PlayerChunkMap {
 
     public void flagDirty((IntVector3) BlockPosition blockposition);
 
-    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
-
-    <code>
-    public void flagDirty(int x, int y, int z) {
-        T.flagDirty.raw.invoke(getRaw(), BlockPositionHandle.T.constr_x_y_z.newInstance(x, y, z));
+    public void flagPosDirty(int x, int y, int z) {
+        instance.flagDirty(new BlockPosition(x, y, z));
     }
-    </code>
+
+    public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
 
 }
