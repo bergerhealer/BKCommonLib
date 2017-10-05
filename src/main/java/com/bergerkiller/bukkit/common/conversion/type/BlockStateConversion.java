@@ -178,12 +178,18 @@ public class BlockStateConversion {
     }
 
     public static BlockState blockToBlockState(Block block) {
+        return block.getState();
+
+        // I'm not sure why we ever want to do this, because it introduces a nasty overhead for no reason!
+        // Restore this part if there really was a reason to have this
+        /*
         Object tileEntity = getTileEntityFromWorld(block);
         if (tileEntity != null) {
             return tileEntityToBlockState(block, tileEntity);
         } else {
             return CraftBlockStateHandle.createNew(block);
         }
+        */
     }
 
     public static BlockState tileEntityToBlockState(Object nmsTileEntity) {
