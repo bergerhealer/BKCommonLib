@@ -2,9 +2,11 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
@@ -169,5 +171,14 @@ public class EntityUtil extends EntityPropertyUtil {
     public static Block getHangingBlock(Hanging entityHanging) {
         IntVector3 pos = EntityHangingHandle.T.blockPosition.get(Conversion.toEntityHandle.convert(entityHanging));
         return pos.toBlock(entityHanging.getWorld());
+    }
+
+    /**
+     * Gets the Data Watcher of an Entity
+     * 
+     * @return entity data watcher
+     */
+    public static DataWatcher getDataWatcher(org.bukkit.entity.Entity entity) {
+        return EntityHandle.T.getDataWatcher.invoke(HandleConversion.toEntityHandle(entity));
     }
 }

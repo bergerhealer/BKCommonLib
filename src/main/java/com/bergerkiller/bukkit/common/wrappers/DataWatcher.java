@@ -30,7 +30,7 @@ import org.bukkit.inventory.ItemStack;
  * It is used to store data and to keep track of changes so they can be
  * synchronized
  */
-public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
+public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Cloneable {
 
     public DataWatcher(org.bukkit.entity.Entity entityOwner) {
         setHandle(DataWatcherHandle.createNew(entityOwner));
@@ -96,13 +96,23 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
     }
 
     /**
-     * Watch an object
+     * Watches an object
      *
      * @param key of the watched item
      * @param defaultValue of the watched item
      */
     public <T> void watch(Key<T> key, T defaultValue) {
         handle.register(key, defaultValue);
+    }
+
+    /**
+     * Watches a single DataWatcher item
+     * 
+     * @param item to watch
+     */
+    @SuppressWarnings("unchecked")
+    public void watch(Item<?> item) {
+        this.watch((Key<Object>) item.getKey(), item.getValue());
     }
 
     /**
@@ -173,6 +183,21 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> {
         }
         str += "]";
         return str;
+    }
+
+    /**
+     * Creates a clone of this DataWatcher with all data entries copied.
+     * Changes to the cloned datawatcher do not result in changes in this one.
+     * 
+     * @return a clone of this instance
+     */
+    @Override
+    public DataWatcher clone() {
+        DataWatcher clone = new DataWatcher();
+        for (Item<?> item : this.getWatchedItems()) {
+            clone.watch(item);
+        }
+        return clone;
     }
 
     /**
