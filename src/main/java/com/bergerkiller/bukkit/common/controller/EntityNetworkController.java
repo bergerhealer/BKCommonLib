@@ -705,13 +705,14 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     /**
      * Gets a list of passengers that have last been synchronized to the viewers.
-     * This method only works on MC >= 1.10.2
+     * This method only works on MC >= 1.10.2.
+     * Before MC 1.10.2 it will return the real passengers.
      * 
      * @return list of last known passengers
      */
     public List<org.bukkit.entity.Entity> getSynchedPassengers() {
         if (!EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            return Collections.emptyList();
+            return entity.getPassengers();
         }
         return EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
     }

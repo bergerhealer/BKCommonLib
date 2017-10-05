@@ -27,6 +27,20 @@ public abstract class PacketPlayOutMountHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    public void addMountedEntityId(int entityId) {
+        int[] oldIds = this.getMountedEntityIds();
+        if (oldIds == null || oldIds.length == 0) {
+            this.setMountedEntityIds(new int[] {entityId});
+        } else {
+            int[] newIds = new int[oldIds.length + 1];
+            for (int i = 0; i < oldIds.length; i++) {
+                newIds[i] = oldIds[i];
+            }
+            newIds[newIds.length - 1] = entityId;
+            this.setMountedEntityIds(newIds);
+        }
+    }
+
     public static PacketPlayOutMountHandle createNew(int entityId, int[] mountedEntityIds) {
         PacketPlayOutMountHandle handle = createNew();
         handle.setEntityId(entityId);
