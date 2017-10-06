@@ -128,13 +128,26 @@ class World {
         if (T.opt_applyPhysics.isAvailable()) {
             T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
         } else if (T.opt_applyPhysics_old.isAvailable()) {
-            // On older versions 'observer' blocks did not exist, and so the 'self' parameter is unused.
             T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
         } else {
             throw new UnsupportedOperationException("Apply physics function not available on this server");
         }
+        // Update self
+        if (self) {
+            applyBlockPhysics(position, causeType);
+        }
     }
     </code>
+
+    public void applyBlockPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType) {
+#if version >= 1.11
+        instance.a(position, causeType, position);
+#elseif version >= 1.9
+        instance.e(position, causeType);
+#else
+        instance.d(position, causeType);
+#endif
+    }
 
     protected abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
 

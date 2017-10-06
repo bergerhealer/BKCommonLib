@@ -48,6 +48,7 @@ public abstract class WorldHandle extends Template.Handle {
     public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag);
+    public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
     public abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
 
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
@@ -57,6 +58,9 @@ public abstract class WorldHandle extends Template.Handle {
             T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
         } else {
             throw new UnsupportedOperationException("Apply physics function not available on this server");
+        }
+        if (self) {
+            applyBlockPhysics(position, causeType);
         }
     }
 
@@ -133,6 +137,7 @@ public abstract class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<Void> opt_applyPhysics = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isChunkLoaded = new Template.Method<Boolean>();
 
     }
