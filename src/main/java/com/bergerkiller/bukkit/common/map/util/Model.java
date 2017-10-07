@@ -14,6 +14,8 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
+import com.bergerkiller.bukkit.common.math.Matrix4x4;
+import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -123,11 +125,11 @@ public class Model {
      * A square element in the model
      */
     public static class Element {
-        public Vector3f from = new Vector3f(0.0f, 0.0f, 0.0f);
-        public Vector3f to = new Vector3f(16.0f, 16.0f, 16.0f);
+        public Vector3 from = new Vector3(0.0f, 0.0f, 0.0f);
+        public Vector3 to = new Vector3(16.0f, 16.0f, 16.0f);
         public Rotation rotation = null;
         public Map<BlockFace, Face> faces = new EnumMap<BlockFace, Face>(BlockFace.class);
-        public transient Matrix4f transform = null;
+        public transient Matrix4x4 transform = null;
 
         public void build(MapResourcePack resourcePack, Map<String, String> textures) {
             for (Face face : faces.values()) {
@@ -148,7 +150,7 @@ public class Model {
             }
 
             if (rotation != null) {
-                Matrix4f transform = new Matrix4f();
+                Matrix4x4 transform = new Matrix4x4();
                 transform.translate(rotation.origin);
                 if (rotation.axis.equals("x")) {
                     transform.rotateX(rotation.angle);
@@ -306,7 +308,7 @@ public class Model {
          * The rotation of a model element
          */
         public static class Rotation implements Cloneable {
-            public Vector3f origin = new Vector3f();
+            public Vector3 origin = new Vector3();
             public String axis = "y";
             public float angle = 0.0f;
             public boolean rescale = false;
@@ -327,9 +329,9 @@ public class Model {
      * Display rendering options
      */
     public static class Display {
-        public Vector3f rotation = new Vector3f();
-        public Vector3f translation = new Vector3f();
-        public Vector3f scale = new Vector3f();
+        public Vector3 rotation = new Vector3();
+        public Vector3 translation = new Vector3();
+        public Vector3 scale = new Vector3();
 
         @Override
         public Display clone() {

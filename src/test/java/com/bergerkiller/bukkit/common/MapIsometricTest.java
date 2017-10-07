@@ -7,9 +7,9 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
-import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
+import com.bergerkiller.bukkit.common.math.Matrix4x4;
+import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -54,7 +54,7 @@ public class MapIsometricTest {
         //map.fill(MapColorPalette.COLOR_RED);
         //map.setBrushMask(null);
         
-        Matrix4f transform = new Matrix4f();
+        Matrix4x4 transform = new Matrix4x4();
 
         //transform.rotateOrigin(new Vector3f(8,8,8), new Vector3f(180, 0, 0));
 
@@ -67,7 +67,7 @@ public class MapIsometricTest {
         //transform.rotateOrigin(new Vector3f(8,8,8), new Vector3f(0, 0, 0));
 
         //map.fill(MapColorPalette.COLOR_RED);
-        map.setLightOptions(0.2f, 0.8f, new Vector3f(-1.0f, 1.0f, -1.0f));
+        map.setLightOptions(0.2f, 0.8f, new Vector3(-1.0, 1.0, -1.0));
         map.drawModel(model, transform);
 
         return map;

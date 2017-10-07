@@ -11,6 +11,8 @@ import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Quad;
 import com.bergerkiller.bukkit.common.map.util.Vector3f;
+import com.bergerkiller.bukkit.common.math.Matrix4x4;
+import com.bergerkiller.bukkit.common.math.Vector3;
 
 /**
  * A base implementation canvas for performing drawing operations on.
@@ -36,8 +38,8 @@ public abstract class MapCanvas {
     private boolean maskRelative = false;
     private short currentDepthZ = 0;
     private boolean hasDepthHoles = false;
-    private Matrix4f projMatrix = null;
-    private Vector3f directionalLightVec = null;
+    private Matrix4x4 projMatrix = null;
+    private Vector3 directionalLightVec = null;
     private float directionalLightFact = 0.0f;
     private float ambientLightFact = 1.0f;
     public static final int MAX_DEPTH = Short.MAX_VALUE;
@@ -589,6 +591,11 @@ public abstract class MapCanvas {
         return this.fillRectangle(0, 0, getWidth(), getHeight(), color);
     }
 
+    @Deprecated
+    public final MapCanvas setLightOptions(float ambientLightFactor, float directionalLightFactor, Vector3f directionVector) {
+        return this.setLightOptions(ambientLightFactor, directionalLightFactor, (Vector3) directionVector);
+    }
+
     /**
      * Sets the ambient and directional light source options:
      * <ul>
@@ -606,7 +613,7 @@ public abstract class MapCanvas {
      * @param directionVector - direction of the directional light
      * @return this canvas
      */
-    public final MapCanvas setLightOptions(float ambientLightFactor, float directionalLightFactor, Vector3f directionVector) {
+    public final MapCanvas setLightOptions(float ambientLightFactor, float directionalLightFactor, Vector3 directionVector) {
         this.ambientLightFact = ambientLightFactor;
         this.directionalLightFact = (directionVector == null) ? 0.0f : directionalLightFactor;
         this.directionalLightVec = (directionVector == null) ? null : directionVector.normalize();
@@ -994,12 +1001,17 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final MapCanvas drawModel(Model model, float scale, int x, int y, float yaw, float pitch) {
-        Matrix4f transform = new Matrix4f();
+        Matrix4x4 transform = new Matrix4x4();
         transform.translate(x, 0.0f, y);
         transform.scale(scale);
         transform.rotateX(pitch);
         transform.rotateY(yaw);
         return drawModel(model, transform);
+    }
+
+    @Deprecated
+    public final MapCanvas drawModel(Model model, Matrix4f transform) {
+        return this.drawModel(model, (Matrix4x4) transform);
     }
 
     /**
@@ -1010,7 +1022,7 @@ public abstract class MapCanvas {
      * @param transform for drawing the model
      * @return this canvas
      */
-    public final MapCanvas drawModel(Model model, Matrix4f transform) {
+    public final MapCanvas drawModel(Model model, Matrix4x4 transform) {
         if (model == null) {
             throw new IllegalArgumentException("Model is null");
         }
@@ -1049,15 +1061,15 @@ public abstract class MapCanvas {
      * @param p3 the bottom-left fourth point of the quad
      * @return view
      */
-    public final MapCanvas drawQuad(MapCanvas canvas, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3) {
-        Vector3f fp3 = Vector3f.add(p2, Vector3f.subtract(p0, p1));
-        if (fp3.distanceSquared(p3) > 0.0001f) {
+    public final MapCanvas drawQuad(MapCanvas canvas, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
+        Vector3 fp3 = Vector3.add(p2, Vector3.subtract(p0, p1));
+        if (fp3.distanceSquared(p3) > 0.0001) {
             // Split into two separate triangle draw calls
             // We can draw the entire Quad in one go
             // Triangle drawing logic? Lol, I'll just draw one half of a quad.
             // Really though, this shit needs to be optimized :(
             this.drawQuad(canvas, p0, p1, p2, fp3, 1);
-            Vector3f fp1 = Vector3f.add(p2, Vector3f.subtract(p0, p3));
+            Vector3 fp1 = Vector3.add(p2, Vector3.subtract(p0, p3));
             this.drawQuad(canvas, p0, fp1, p2, p3, -1);
         } else {
             // We can draw the entire Quad in one go
@@ -1074,26 +1086,26 @@ public abstract class MapCanvas {
      * @param projectionMatrix to use for the transformation
      * @return view
      */
-    public final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix) {
+    public final MapCanvas drawQuad(MapCanvas canvas, Matrix4x4 projectionMatrix) {
         return drawQuad(canvas, projectionMatrix, 0);
     }
 
-    private final MapCanvas drawQuad(MapCanvas canvas, Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3, int half) {
+    private final MapCanvas drawQuad(MapCanvas canvas, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, int half) {
         // This matrix can be cached, saving a precious matrix inversion
         if (canvas.projMatrix == null) {
-            Vector3f ip0 = new Vector3f(0, 0, 0);
-            Vector3f ip1 = new Vector3f(0, 0, canvas.getHeight());
-            Vector3f ip2 = new Vector3f(canvas.getWidth(), 0,  canvas.getHeight());
-            Vector3f ip3 = new Vector3f(canvas.getWidth(), 0,  0);
+            Vector3 ip0 = new Vector3(0, 0, 0);
+            Vector3 ip1 = new Vector3(0, 0, canvas.getHeight());
+            Vector3 ip2 = new Vector3(canvas.getWidth(), 0,  canvas.getHeight());
+            Vector3 ip3 = new Vector3(canvas.getWidth(), 0,  0);
 
-            canvas.projMatrix = Matrix4f.computeProjectionMatrix(new Vector3f[] { ip0, ip1, ip2, ip3 });
+            canvas.projMatrix = Matrix4x4.computeProjectionMatrix(new Vector3[] { ip0, ip1, ip2, ip3 });
             if (canvas.projMatrix == null) {
                 return this; // texture resolution is invalid (0x0?)
             }
             canvas.projMatrix.invert();
         }
 
-        Matrix4f m0 = Matrix4f.computeProjectionMatrix(new Vector3f[] {  p0,  p1,  p2,  p3 });
+        Matrix4x4 m0 = Matrix4x4.computeProjectionMatrix(new Vector3[] {  p0,  p1,  p2,  p3 });
         if (m0 == null) {
             return this;
         }
@@ -1103,26 +1115,26 @@ public abstract class MapCanvas {
         return drawQuad(canvas, m0, half);
     }
 
-    private final MapCanvas drawQuad(MapCanvas canvas, Matrix4f projectionMatrix, int half) {
-        Matrix4f mInv = new Matrix4f(projectionMatrix);
+    private final MapCanvas drawQuad(MapCanvas canvas, Matrix4x4 projectionMatrix, int half) {
+        Matrix4x4 mInv = new Matrix4x4(projectionMatrix);
         mInv.invert();
 
-        Vector3f ip0 = new Vector3f(0, 0, 0);
-        Vector3f ip1 = new Vector3f(0, 0, canvas.getHeight());
-        Vector3f ip2 = new Vector3f(canvas.getWidth(), 0,  canvas.getHeight());
+        Vector3 ip0 = new Vector3(0, 0, 0);
+        Vector3 ip1 = new Vector3(0, 0, canvas.getHeight());
+        Vector3 ip2 = new Vector3(canvas.getWidth(), 0,  canvas.getHeight());
         projectionMatrix.transformPoint(ip0);
         projectionMatrix.transformPoint(ip1);
         projectionMatrix.transformPoint(ip2);
 
-        Vector3f v1 = Vector3f.subtract(ip0, ip1);
-        Vector3f v2 = Vector3f.subtract(ip2, ip1);
-        Vector3f cross = Vector3f.cross(v1, v2).normalize();
+        Vector3 v1 = Vector3.subtract(ip0, ip1);
+        Vector3 v2 = Vector3.subtract(ip2, ip1);
+        Vector3 cross = Vector3.cross(v1, v2).normalize();
 
         if (cross.y < 0.0f) {
             cross = cross.negate();
         }
 
-        Vector3f p = new Vector3f();
+        Vector3 p = new Vector3();
         MapTexture temp = MapTexture.createEmpty(this.getWidth(), this.getHeight());
         int minX = this.getWidth();
         int minY = this.getHeight();
@@ -1131,10 +1143,10 @@ public abstract class MapCanvas {
 
         float light = this.ambientLightFact;
         if (this.directionalLightVec != null) {
-            float dot = Vector3f.dot(cross.normalize(), this.directionalLightVec);
+            double dot = Vector3.dot(cross.normalize(), this.directionalLightVec);
 
             // Change -1.0...1.0 to 0...1
-            dot = (dot + 1.0f) / 2.0f;
+            dot = (dot + 1.0) / 2.0;
 
             light += this.directionalLightFact * dot;
         }
@@ -1148,8 +1160,8 @@ public abstract class MapCanvas {
                 p.y = 1.0f;
                 mInv.transformPoint(p);
 
-                float ax = p.x;
-                float ay = p.z;
+                double ax = p.x;
+                double ay = p.z;
 
                 // Half parameter makes it draw only one half (triangle)
                 if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {

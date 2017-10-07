@@ -24,11 +24,11 @@ import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
-import com.bergerkiller.bukkit.common.map.gson.Vector3fDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
+import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -449,7 +449,7 @@ public class MapResourcePack {
                 Reader reader = new InputStreamReader(inputStream, "UTF-8");
                 if (this.gson == null) {
                     GsonBuilder gsonBuilder = new GsonBuilder();
-                    gsonBuilder.registerTypeAdapter(Vector3f.class, new Vector3fDeserializer());
+                    gsonBuilder.registerTypeAdapter(Vector3.class, new Vector3Deserializer());
                     gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
                     gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
                     gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());

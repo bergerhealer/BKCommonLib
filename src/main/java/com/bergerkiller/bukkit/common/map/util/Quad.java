@@ -3,20 +3,21 @@ package com.bergerkiller.bukkit.common.map.util;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.map.MapTexture;
+import com.bergerkiller.bukkit.common.math.Vector3;
 
 /**
  * A four-side four-cornered polygon that represents a rectangle with a texture applied to it
  */
 public class Quad implements Comparable<Quad>, Cloneable {
-    public Vector3f p0, p1, p2, p3;
+    public Vector3 p0, p1, p2, p3;
     public BlockFace face;
     public MapTexture texture;
 
     public Quad() {
-        this.p0 = new Vector3f();
-        this.p1 = new Vector3f();
-        this.p2 = new Vector3f();
-        this.p3 = new Vector3f();
+        this.p0 = new Vector3();
+        this.p1 = new Vector3();
+        this.p2 = new Vector3();
+        this.p3 = new Vector3();
         this.face = BlockFace.UP;
         this.texture = null;
     }
@@ -30,7 +31,7 @@ public class Quad implements Comparable<Quad>, Cloneable {
         this.texture = quad.texture;
     }
 
-    public Quad(BlockFace face, Vector3f from, Vector3f to, MapTexture texture) {
+    public Quad(BlockFace face, Vector3 from, Vector3 to, MapTexture texture) {
         this();
         this.texture = texture;
         this.face = face;
@@ -140,15 +141,15 @@ public class Quad implements Comparable<Quad>, Cloneable {
         mergePoint(quad.p3);
     }
 
-    private final void mergePoint(Vector3f p) {
+    private final void mergePoint(Vector3 p) {
         if (p0.equals(p)) p0 = p;
         if (p1.equals(p)) p1 = p;
         if (p2.equals(p)) p2 = p;
         if (p3.equals(p)) p3 = p;
     }
 
-    public float depth() {
-        float d = p0.y;
+    public double depth() {
+        double d = p0.y;
         if (p1.y < d) d = p1.y;
         if (p2.y < d) d = p2.y;
         if (p3.y < d) d = p3.y;
@@ -159,7 +160,7 @@ public class Quad implements Comparable<Quad>, Cloneable {
 
     @Override
     public int compareTo(Quad o) {
-        return Float.compare(this.depth(), o.depth());
+        return Double.compare(this.depth(), o.depth());
     }
 
     @Override

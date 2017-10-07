@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.math.Matrix4x4;
+import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -66,10 +68,10 @@ public class BlockModelState {
             if (this.rotationX != 0.0f || this.rotationY != 0.0f || this.rotationZ != 0.0f) {
                 for (Model.Element element : model.elements) {
                     if (element.transform == null) {
-                        element.transform = new Matrix4f();
+                        element.transform = new Matrix4x4();
                     }
-                    element.transform.rotateOrigin(new Vector3f(8,8,8), 
-                            new Vector3f(-this.rotationX, -this.rotationY, -this.rotationZ));
+                    element.transform.rotateOrigin(new Vector3(8,8,8), 
+                            new Vector3(-this.rotationX, -this.rotationY, -this.rotationZ));
                 }
             }
         }
