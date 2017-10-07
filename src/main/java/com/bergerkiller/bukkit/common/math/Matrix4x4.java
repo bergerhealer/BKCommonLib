@@ -248,6 +248,22 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
+     * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
+     * 
+     * @param yaw rotation
+     * @param pitch rotation
+     * @param roll rotation
+     */
+    public final void rotateYawPitchRoll(float yaw, float pitch, float roll) {
+        this.rotateY(-yaw - 90.0f);
+        this.rotateX(pitch);
+        if (roll != 0.0f) {
+            this.rotateZ(roll);
+        }
+    }
+
+    /**
      * Multiplies this matrix with a translation transformation
      * 
      * @param translation
@@ -333,8 +349,22 @@ public class Matrix4x4 implements Cloneable {
      */
     public final void translateRotate(double x, double y, double z, float yaw, float pitch) {
         this.translate(x, y, z);
-        this.rotateY(yaw + 90.0f);
-        this.rotateX(pitch);
+        this.rotateYawPitchRoll(yaw, pitch, 0.0f);
+    }
+
+    /**
+     * Translates and rotates this Matrix with position and rotation information
+     * 
+     * @param x position
+     * @param y position
+     * @param z position
+     * @param yaw rotation
+     * @param pitch rotation
+     * @param roll rotation
+     */
+    public final void translateRotate(double x, double y, double z, float yaw, float pitch, float roll) {
+        this.translate(x, y, z);
+        this.rotateYawPitchRoll(yaw, pitch, roll);
     }
 
     /**
