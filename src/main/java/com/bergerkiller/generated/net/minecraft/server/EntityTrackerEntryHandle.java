@@ -56,7 +56,19 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     }
 
     public static final int getProtocolRotation(float angle) {
-        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * 256.0F / 360.0F);
+        int protAngle = com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * 256.0F / 360.0F) & 0xFF;
+        if (protAngle >= 128) {
+            protAngle -= 256;
+        }
+        return protAngle;
+    }
+
+    public static final float getRotationFromProtocol(int protocol) {
+        int protAngle = protocol & 0xFF;
+        if (protAngle >= 128) {
+            protAngle -= 256;
+        }
+        return (float) protAngle * 360.0f / (256.0f);
     }
 
     public void setLocX(double x) {
@@ -120,15 +132,15 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     }
 
     public float getYaw() {
-        return ((float) T.raw_yRot.getInteger(getRaw()) * 360) / 256.0F;
+        return getRotationFromProtocol(T.raw_yRot.getInteger(getRaw()));
     }
 
     public float getPitch() {
-        return ((float) T.raw_xRot.getInteger(getRaw()) * 360) / 256.0F;
+        return getRotationFromProtocol(T.raw_xRot.getInteger(getRaw()));
     }
 
     public float getHeadYaw() {
-        return ((float) T.raw_headYaw.getInteger(getRaw()) * 360) / 256.0F;
+        return getRotationFromProtocol(T.raw_headYaw.getInteger(getRaw()));
     }
 
 
