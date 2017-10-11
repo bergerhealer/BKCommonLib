@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -61,6 +62,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     public static final int ABSOLUTE_UPDATE_INTERVAL = 400;
 
     private EntityTrackerEntryHandle handle;
+    private org.bukkit.entity.Entity last_passenger_1_8_8 = null;
 
     /**
      * Obtains the velocity as the clients know it, allowing it to be read from
@@ -352,6 +354,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         this.entity = entity;
         this.handle = EntityTrackerEntryHandle.createHandle(entityTrackerEntry);
 
+        if (!CommonCapabilities.MULTIPLE_PASSENGERS) {
+            this.last_passenger_1_8_8 = entity.getPassenger();
+        }
+
         EntityTrackerHook hook = EntityTrackerHook.get(this.handle.getRaw(), EntityTrackerHook.class);
         if (hook != null) {
             hook.setController(this);
@@ -557,13 +563,13 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_VELOCITY.newInstance(entity.getEntityId(), this.velSynched.vector()));
         }
 
-        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            // On >= MC 1.10.2 we must update the passengers of this Entity
-            List<org.bukkit.entity.Entity> passengers = getSynchedPassengers();
-            if (!passengers.isEmpty()) {
-                onSyncPassengers(viewer, new ArrayList<org.bukkit.entity.Entity>(0), passengers);
-            }
-        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+        // On >= MC 1.10.2 we must update the passengers of this Entity
+        List<org.bukkit.entity.Entity> passengers = getSynchedPassengers();
+        if (!passengers.isEmpty()) {
+            onSyncPassengers(viewer, new ArrayList<org.bukkit.entity.Entity>(0), passengers);
+        }
+
+        if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
             // On <= MC 1.8.8 we must update the vehicle of this Entity
             org.bukkit.entity.Entity vehicle = EntityTrackerEntryHandle.T.opt_vehicle.get(getHandle());
             if (vehicle != null) {
@@ -708,14 +714,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     /**
      * Gets a list of passengers that have last been synchronized to the viewers.
-     * This method only works on MC >= 1.10.2.
-     * Before MC 1.10.2 it will return the real passengers.
+     * On MC 1.8.8 this will return the last known passenger entity.
      * 
      * @return list of last known passengers
      */
     public List<org.bukkit.entity.Entity> getSynchedPassengers() {
         if (!EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            return entity.getPassengers();
+            if (this.last_passenger_1_8_8 == null) {
+                return new ArrayList<org.bukkit.entity.Entity>(0);
+            } else {
+                return new ArrayList<org.bukkit.entity.Entity>(Collections.singleton(this.last_passenger_1_8_8));
+            }
         }
         return EntityTrackerEntryHandle.T.opt_passengers.get(getHandle());
     }
@@ -833,7 +842,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      */
     public void syncPassengers() {
         if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
-            // On MC >= 1.10.2 we must update passengers of this Entity
+            // On MC >= 1.9 we must update passengers of this Entity
 
             List<Entity> old_passengers = getSynchedPassengers();
             List<Entity> new_passengers = entity.getPassengers();
@@ -875,6 +884,24 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             if (old_vehicle != new_vehicle) {
                 EntityTrackerEntryHandle.T.opt_vehicle.set(getHandle(), new_vehicle);
                 broadcast(PacketType.OUT_ENTITY_ATTACH.newInstance(this.entity.getEntity(), new_vehicle));
+            }
+
+            // Track passenger ourselves to implement onSyncPassengers functionality
+            org.bukkit.entity.Entity new_entity = this.entity.getPassenger();
+            if (new_entity != this.last_passenger_1_8_8) {
+                ArrayList<org.bukkit.entity.Entity> old_list = new ArrayList<org.bukkit.entity.Entity>(1);
+                ArrayList<org.bukkit.entity.Entity> new_list = new ArrayList<org.bukkit.entity.Entity>(1);
+                if (this.last_passenger_1_8_8 != null) {
+                    old_list.add(this.last_passenger_1_8_8);
+                }
+                if (new_entity != null) {
+                    new_list.add(new_entity);
+                }
+                this.last_passenger_1_8_8 = new_entity;
+
+                for (Player viewer : this.getViewers()) {
+                    onSyncPassengers(viewer, old_list, new_list);
+                }
             }
         }
     }

@@ -52,4 +52,9 @@ public class CommonCapabilities {
      * The player inventory 'dirty' state uses this new empty state, among others.
      */
     public static final boolean ITEMSTACK_EMPTY_STATE = Common.evaluateMCVersion(">=", "1.11");
+
+    /**
+     * Since Minecraft 1.9 more than one passenger per vehicle are permitted
+     */
+    public static final boolean MULTIPLE_PASSENGERS = Common.evaluateMCVersion(">=", "1.9");
 }
