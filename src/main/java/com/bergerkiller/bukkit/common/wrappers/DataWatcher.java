@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
@@ -71,7 +72,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return Object value at the key
      */
     public <V> V get(Key<V> key) {
-        Object rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        Object rawItem;
+        if (CommonCapabilities.DATAWATCHER_OBJECTS) {
+            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        } else {
+            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
+        }
         if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
@@ -87,7 +93,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return Object item at the key, <i>null</i> if not registered
      */
     public <V> Item<V> getItem(Key<V> key) {
-        Object rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        Object rawItem;
+        if (CommonCapabilities.DATAWATCHER_OBJECTS) {
+            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        } else {
+            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
+        }
         if (rawItem == null) {
             return null;
         } else {

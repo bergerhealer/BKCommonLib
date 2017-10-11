@@ -531,7 +531,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param newPassengers known to the viewer
      */
     protected void onSyncPassengers(Player viewer, List<org.bukkit.entity.Entity> oldPassengers, List<org.bukkit.entity.Entity> newPassengers) {
-        PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), newPassengers));
+        // MC >= 1.9 only
+        if (PacketType.OUT_MOUNT.isValid()) {
+            PacketUtil.sendPacket(viewer, PacketType.OUT_MOUNT.newInstance(entity.getEntity(), newPassengers));
+        }
     }
 
     /**
