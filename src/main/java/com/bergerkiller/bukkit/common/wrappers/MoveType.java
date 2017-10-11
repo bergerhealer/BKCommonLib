@@ -9,13 +9,13 @@ public enum MoveType {
     SHULKER(EnumMoveTypeHandle.SHULKER),
     SHULKER_BOX(EnumMoveTypeHandle.SHULKER_BOX);
 
-    private final EnumMoveTypeHandle handle;
+    private final Object handle;
 
     private MoveType(EnumMoveTypeHandle handle) {
         if (EnumMoveTypeHandle.T.isValid()) {
-            this.handle = handle;
+            this.handle = handle.getRaw();
         } else {
-            this.handle = EnumMoveTypeHandle.createHandle(new Object()); // dummy
+            this.handle = new Object(); // dummy
         }
     }
 
@@ -25,7 +25,7 @@ public enum MoveType {
      * @return MoveType enum handle
      */
     public Object getHandle() {
-        return handle.getRaw();
+        return handle;
     }
 
     /**
@@ -36,7 +36,7 @@ public enum MoveType {
      */
     public static MoveType getFromHandle(Object handle) {
         for (MoveType type : MoveType.values()) {
-            if (type.handle.getRaw() == handle) {
+            if (type.handle == handle) {
                 return type;
             }
         }
