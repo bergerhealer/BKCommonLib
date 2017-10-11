@@ -13,23 +13,38 @@ optional class SoundCategory {
     public static (SoundCategoryHandle) SoundCategory byName:a(String name);
 }
 
-optional class SoundEffectType {
-    public (SoundEffectHandle) SoundEffect getDefault:e();
+class SoundEffectType {
+#if version >= 1.9
+    public (SoundEffectHandle) SoundEffect getBreakSound:d();
+    public (SoundEffectHandle) SoundEffect getStepSound:g();
+    public (SoundEffectHandle) SoundEffect getPlaceSound:e();
+#else
+    public (SoundEffectHandle) String getBreakSound();
+    public (SoundEffectHandle) String getStepSound();
+    public (SoundEffectHandle) String getPlaceSound();
+#endif
 }
 
-optional class SoundEffect {
-    public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
+class SoundEffect {
+#if version >= 1.9
+    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:a;
     private final (MinecraftKeyHandle) MinecraftKey name:b;
 
     public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
+#else
+    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:???;
+    private final (MinecraftKeyHandle) MinecraftKeyHandle name;
+
+    public (SoundEffectHandle) SoundEffect(MinecraftKeyHandle minecraftkey);
+#endif
 
     <code>
     public static SoundEffectHandle byName(String name) {
-        if (REGISTRY != null) {
+        if (T.REGISTRY.isAvailable()) {
             Object mc_key_raw = MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
-            return createHandle(REGISTRY.get(mc_key_raw));
+            return createHandle(T.REGISTRY.get().get(mc_key_raw));
         } else {
-            return null;
+            return createNew(MinecraftKeyHandle.createNew(name));
         }
     }
     </code>

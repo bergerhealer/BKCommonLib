@@ -58,11 +58,11 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract IBlockDataHandle fromLegacyData(int data);
     public abstract int toLegacyData(IBlockDataHandle iblockdata);
 
-    public SoundEffectTypeHandle getStepSound() {
-        if (T.getStepSound.isAvailable()) {
-            return T.getStepSound.invoke(getRaw());
+    public SoundEffectTypeHandle getSoundType() {
+        if (T.getSoundType.isAvailable()) {
+            return T.getSoundType.invoke(getRaw());
         } else {
-            return T.opt_1_8_8_stepSound.get(getRaw());
+            return T.opt_1_8_8_soundType.get(getRaw());
         }
     }
     /**
@@ -76,7 +76,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
         @Template.Optional
-        public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_stepSound = new Template.Field.Converted<SoundEffectTypeHandle>();
+        public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_soundType = new Template.Field.Converted<SoundEffectTypeHandle>();
 
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
         public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
@@ -90,7 +90,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Float> getDamageResillience = new Template.Method.Converted<Float>();
         @Template.Optional
-        public final Template.Method.Converted<SoundEffectTypeHandle> getStepSound = new Template.Method.Converted<SoundEffectTypeHandle>();
+        public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();

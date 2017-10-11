@@ -8,7 +8,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.Optional
 public abstract class SoundEffectTypeHandle extends Template.Handle {
     /** @See {@link SoundEffectTypeClass} */
     public static final SoundEffectTypeClass T = new SoundEffectTypeClass();
@@ -22,13 +21,17 @@ public abstract class SoundEffectTypeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract SoundEffectHandle getDefault();
+    public abstract SoundEffectHandle getBreakSound();
+    public abstract SoundEffectHandle getStepSound();
+    public abstract SoundEffectHandle getPlaceSound();
     /**
      * Stores class members for <b>net.minecraft.server.SoundEffectType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundEffectTypeClass extends Template.Class<SoundEffectTypeHandle> {
-        public final Template.Method.Converted<SoundEffectHandle> getDefault = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<SoundEffectHandle> getBreakSound = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<SoundEffectHandle> getStepSound = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<SoundEffectHandle> getPlaceSound = new Template.Method.Converted<SoundEffectHandle>();
 
     }
 

@@ -8,13 +8,11 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.Optional
 public abstract class SoundEffectHandle extends Template.Handle {
     /** @See {@link SoundEffectClass} */
     public static final SoundEffectClass T = new SoundEffectClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectHandle.class, "net.minecraft.server.SoundEffect");
 
-    public static final RegistryMaterialsHandle REGISTRY = T.REGISTRY.getSafe();
     /* ============================================================================== */
 
     public static SoundEffectHandle createHandle(Object handleInstance) {
@@ -29,11 +27,11 @@ public abstract class SoundEffectHandle extends Template.Handle {
 
 
     public static SoundEffectHandle byName(String name) {
-        if (REGISTRY != null) {
+        if (T.REGISTRY.isAvailable()) {
             Object mc_key_raw = MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
-            return createHandle(REGISTRY.get(mc_key_raw));
+            return createHandle(T.REGISTRY.get().get(mc_key_raw));
         } else {
-            return null;
+            return createNew(MinecraftKeyHandle.createNew(name));
         }
     }
     public abstract MinecraftKeyHandle getName();
@@ -45,6 +43,7 @@ public abstract class SoundEffectHandle extends Template.Handle {
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
         public final Template.Constructor.Converted<SoundEffectHandle> constr_minecraftkey = new Template.Constructor.Converted<SoundEffectHandle>();
 
+        @Template.Optional
         public final Template.StaticField.Converted<RegistryMaterialsHandle> REGISTRY = new Template.StaticField.Converted<RegistryMaterialsHandle>();
 
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();

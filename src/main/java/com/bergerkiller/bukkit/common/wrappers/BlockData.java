@@ -224,12 +224,26 @@ public abstract class BlockData extends BlockDataRegistry {
     /* ====================================================================== */
 
     /**
-     * Gets the name of the sound effect played when building or stepping on this Block
+     * Gets the name of the sound effect played when stepping on this Block
      * 
      * @return step sound
      */
-    public abstract String getStepSound();
-    
+    public abstract ResourceKey getStepSound();
+
+    /**
+     * Gets the name of the sound effect played when placing down this Block
+     * 
+     * @return place sound
+     */
+    public abstract ResourceKey getPlaceSound();
+
+    /**
+     * Gets the name of the sound effect played when breaking this Block
+     * 
+     * @return break sound
+     */
+    public abstract ResourceKey getBreakSound();
+
     /**
      * Gets the opacity of the Block, a value between 0 and 15.
      * A value of 255 indicates full opaque-ness. A value of 0 is fully transparent.

@@ -125,6 +125,8 @@ public abstract class WorldHandle extends Template.Handle {
         public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
         public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();
+        @Template.Optional
+        public final Template.Method<Void> makeSound = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();

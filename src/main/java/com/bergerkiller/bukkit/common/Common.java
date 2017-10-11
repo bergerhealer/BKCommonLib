@@ -198,7 +198,7 @@ public class Common {
                         return "net.minecraft.server.v1_8_R3.MobSpawnerAbstract$a";
                     }
                     if (classPath.equals("net.minecraft.server.v1_8_R3.SoundEffectType")) {
-                        return "net.minecraft.server.v1_8_R3.Block.StepSound"; // workaround
+                        return "net.minecraft.server.v1_8_R3.Block$StepSound"; // workaround
                     }
                     if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcher$Item")) {
                         return "net.minecraft.server.v1_8_R3.DataWatcher$WatchableObject";
@@ -222,6 +222,9 @@ public class Common {
                     }
                     if (classPath.equals("net.minecraft.server.v1_8_R3.MobEffectList")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList";
+                    }
+                    if (classPath.equals("net.minecraft.server.v1_8_R3.SoundEffect")) {
+                        return "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect";
                     }
                     return classPath;
                 }

@@ -49,6 +49,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
@@ -544,28 +545,22 @@ public class WrapperConversion {
         return new CraftInputSlot(RecipeItemStackHandle.T.choices.get(recipeItemStackHandle));
     }
 
-    // 1.9 =>
-    @ConverterMethod(input="net.minecraft.server.SoundEffect", optional=true)
+    @ConverterMethod(input="net.minecraft.server.SoundEffect")
     public static ResourceKey soundEffectToResourceKey(Object nmsSoundEffectHandle) {
-        if (SoundEffectHandle.T.isAvailable()) {
-            return ResourceKey.fromMinecraftKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle).getRaw());
-        } else {
-            return null;
-        }
+        return ResourceKey.fromMinecraftKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle));
     }
 
-    // 1.9 =>
-    @ConverterMethod(output="net.minecraft.server.SoundEffect", optional=true)
+    @ConverterMethod(output="net.minecraft.server.SoundEffect")
     public static Object soundEffectFromResourceKey(ResourceKey soundKey) {
-        if (SoundEffectHandle.T.isAvailable()) {
-            Object mcKey = soundKey.toMinecraftKey();
-            Object effect = SoundEffectHandle.REGISTRY.get(mcKey);
+        if (SoundEffectHandle.T.REGISTRY.isAvailable()) {
+            Object mcKey = soundKey.toMinecraftKey().getRaw();
+            Object effect = SoundEffectHandle.T.REGISTRY.get().get(mcKey);
             if (effect == null) {
                 effect = SoundEffectHandle.T.constr_minecraftkey.raw.newInstance(mcKey);
             }
             return effect;
         } else {
-            return null;
+            return SoundEffectHandle.createNew(MinecraftKeyHandle.createNew(soundKey.getPath()));
         }
     }
 

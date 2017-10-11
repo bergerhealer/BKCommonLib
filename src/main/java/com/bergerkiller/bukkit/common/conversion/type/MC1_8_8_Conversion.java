@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 /**
@@ -32,5 +33,10 @@ public class MC1_8_8_Conversion {
     public static com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> watchableObjectToItem(Object watchableObject) {
         DataWatcherHandle.ItemHandle handle = DataWatcherHandle.ItemHandle.createHandle(watchableObject);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>(handle);
+    }
+
+    @ConverterMethod()
+    public static com.bergerkiller.bukkit.common.internal.proxy.SoundEffect soundEffectFromName(String name) {
+        return new com.bergerkiller.bukkit.common.internal.proxy.SoundEffect(MinecraftKeyHandle.createNew(name));
     }
 }

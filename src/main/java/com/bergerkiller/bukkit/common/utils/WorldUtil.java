@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
@@ -891,4 +892,24 @@ public class WorldUtil extends ChunkUtil {
         }
     }
 
+    /**
+     * Plays a named sound effect at a location
+     * 
+     * @param location to play at
+     * @param soundKey of the sound to play
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Location location, ResourceKey soundKey, float volume, float pitch) {
+        if (WorldHandle.T.makeSound.isAvailable()) {
+            // MC 1.8.8: use world makeSound function
+            WorldHandle.T.makeSound.invokeVA(HandleConversion.toWorldHandle(location.getWorld()),
+                    location.getX(), location.getY(), location.getZ(),
+                    soundKey.toMinecraftKey().getName(),
+                    volume, pitch);
+        } else {
+            // MC >= 1.9: we can use Bukkit's API for this!
+            location.getWorld().playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
+        }
+    }
 }

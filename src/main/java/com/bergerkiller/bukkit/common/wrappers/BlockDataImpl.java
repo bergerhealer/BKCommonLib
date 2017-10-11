@@ -281,8 +281,18 @@ public class BlockDataImpl extends BlockData {
     /* ====================================================================== */
 
     @Override
-    public final String getStepSound() {
-        return block.getStepSound().getDefault().getName().toString();
+    public final ResourceKey getStepSound() {
+        return ResourceKey.fromMinecraftKey(block.getSoundType().getStepSound().getName());
+    }
+
+    @Override
+    public final ResourceKey getPlaceSound() {
+        return ResourceKey.fromMinecraftKey(block.getSoundType().getPlaceSound().getName());
+    }
+
+    @Override
+    public final ResourceKey getBreakSound() {
+        return ResourceKey.fromMinecraftKey(block.getSoundType().getBreakSound().getName());
     }
 
     @Override

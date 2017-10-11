@@ -18,10 +18,10 @@ class Block {
 
 #if version >= 1.9
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
-    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_stepSound:???;
+    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:???;
 #else
     public static final rawtype (Iterable) RegistryID<IBlockData> REGISTRY_ID:d;
-    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_stepSound:stepSound;
+    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:stepSound;
 #endif
 
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
@@ -51,18 +51,18 @@ class Block {
     public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
 
 #if version >= 1.11
-    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound();
+    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound();
 #elseif version >= 1.9
-    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:w();
+    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:w();
 #else
-    public optional (SoundEffectTypeHandle) SoundEffectType getStepSound:???();
+    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:???();
 #endif
     <code>
-    public SoundEffectTypeHandle getStepSound() {
-        if (T.getStepSound.isAvailable()) {
-            return T.getStepSound.invoke(getRaw());
+    public SoundEffectTypeHandle getSoundType() {
+        if (T.getSoundType.isAvailable()) {
+            return T.getSoundType.invoke(getRaw());
         } else {
-            return T.opt_1_8_8_stepSound.get(getRaw());
+            return T.opt_1_8_8_soundType.get(getRaw());
         }
     }
     </code>

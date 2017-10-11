@@ -4,11 +4,15 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.bukkit.Material;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -61,6 +65,9 @@ public class TemplateTest {
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle.PlayerChunkHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.BlockHandle.StepSoundHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
                 }
             }
 
@@ -119,6 +126,17 @@ public class TemplateTest {
             assertAvailable(EntityHandle.T.DATA_FLAGS);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME_VISIBLE);
+        }
+    }
+
+    @Test
+    public void testBlockStepSound() {
+        assertTrue(SoundEffectTypeHandle.T.isAvailable());
+        ResourceKey stepName = BlockData.fromMaterial(Material.WOOD).getPlaceSound();
+        if (CommonCapabilities.KEYED_EFFECTS) {
+            assertEquals("minecraft:block.wood.place", stepName.getPath());
+        } else {
+            assertEquals("step.wood", stepName.getPath());
         }
     }
 
