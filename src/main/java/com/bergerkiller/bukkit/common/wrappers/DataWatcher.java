@@ -501,8 +501,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 Object handle;
                 if (tokenField.isAvailable()) {
                     handle = tokenField.raw.get();
-                } else {
+                } else if (alternativeId != -1) {
                     handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<T>(alternativeId, this._token);
+                } else {
+                    return null;
                 }
                 return new Key<T>(handle, this);
             }
