@@ -85,29 +85,36 @@ class EntityLiving extends Entity {
 #endif
 
     public float lastDamage;
-#if version >= 1.11
+
+#if version >= 1.12
     protected unknown boolean bd;
-    public unknown float be;
+    public float sideMovement:be;
+    public unknown float bf;
+    public float forwardMovement:bg;
+    public unknown float bh;
+#elseif version >= 1.11
+    protected unknown boolean bd;
+    public float sideMovement:be;
     public float forwardMovement:bf;
     public unknown float bg;
 #elseif version >= 1.10.2
     protected unknown boolean be;
-    public unknown float bf;
+    public float sideMovement:bf;
     public float forwardMovement:bg;
     public unknown float bh;
 #elseif version >= 1.9.4
     protected unknown boolean bd;
-    public unknown float be;
+    public float sideMovement:be;
     public float forwardMovement:bf;
     public unknown float bg;
 #elseif version >= 1.9
     protected unknown boolean bc;
-    public unknown float bd;
+    public float sideMovement:bd;
     public float forwardMovement:be;
     public unknown float bf;
 #else
     protected unknown boolean aY;
-    public unknown float aZ;
+    public float sideMovement:aZ;
     public float forwardMovement:ba;
     protected unknown float bb;
 #endif

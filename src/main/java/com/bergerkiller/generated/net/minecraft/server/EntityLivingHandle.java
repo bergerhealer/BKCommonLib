@@ -50,6 +50,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
     public abstract void setMobEffects(Map<MobEffectListHandle, MobEffectHandle> value);
     public abstract float getLastDamage();
     public abstract void setLastDamage(float value);
+    public abstract float getSideMovement();
+    public abstract void setSideMovement(float value);
     public abstract float getForwardMovement();
     public abstract void setForwardMovement(float value);
     public abstract boolean isUpdateEffects();
@@ -73,6 +75,7 @@ public abstract class EntityLivingHandle extends EntityHandle {
         public final Template.Field.Converted<AttributeMapServerHandle> attributeMapField = new Template.Field.Converted<AttributeMapServerHandle>();
         public final Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>> mobEffects = new Template.Field.Converted<Map<MobEffectListHandle, MobEffectHandle>>();
         public final Template.Field.Float lastDamage = new Template.Field.Float();
+        public final Template.Field.Float sideMovement = new Template.Field.Float();
         public final Template.Field.Float forwardMovement = new Template.Field.Float();
         public final Template.Field.Boolean updateEffects = new Template.Field.Boolean();
 
