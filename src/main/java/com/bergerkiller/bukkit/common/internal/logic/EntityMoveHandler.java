@@ -14,11 +14,11 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.Resources;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.resources.CommonSounds;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -628,7 +628,7 @@ public class EntityMoveHandler {
             }
 
             if (flag1 && that.isBurning()) {
-                that.makeSound(Resources.SOUND_FIRE_EXTINGUISH, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
+                that.makeSound(CommonSounds.EXTINGUISH, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
                 that.setFireTicks(-that.getMaxFireTicks());
             }
 
