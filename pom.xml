@@ -5,7 +5,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.12.2-v3</version>
+    <version>1.12.2-v4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>1.12.1</project.mcversion>
+        <project.mcversion>1.12.2</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
         <project.mountiplexversion>1.15</project.mountiplexversion>
         <junit.version>4.11</junit.version>
@@ -74,10 +74,13 @@
         </repository>
 
         <!-- Local repository stores the server implementations for during test -->
+        <!-- No longer used; run Build Tools before building this project! -->
+        <!--
         <repository>
             <id>local-repo</id>
             <url>file:///${project.basedir}/lib</url>
         </repository>
+        -->
 
     </repositories>
 
@@ -120,16 +123,6 @@
             <version>${project.cbversion}</version>
             <scope>test</scope>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>${project.cbversion}</version>
-            <scope>test</scope>
-            <systemPath>${project.basedir}/lib/spigot-${project.cbversion}.jar</systemPath>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>

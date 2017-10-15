@@ -1,6 +1,9 @@
 # BKCommonLib
 [Spigot Resource Page](https://www.spigotmc.org/resources/bkcommonlib.39590/) | [Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/)
 
+To build BKCommonLib you will (probably) need to run [Build Tools](https://www.spigotmc.org/wiki/buildtools/) beforehand.
+Otherwise tests will fail and maven will complain. No actual server code is linked during compiling, hence the dependency is type test.
+
 This is a library-plugin system, introducing a lot of utility classes
 It also simplifies coding:
 * PluginBase: allows quick registering and monitoring of plugins being enabled
