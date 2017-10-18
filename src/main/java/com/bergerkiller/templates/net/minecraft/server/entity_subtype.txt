@@ -414,3 +414,33 @@ class EntityItemFrame extends Entity {
     }
     </code>
 }
+
+class EntityArmorStand extends EntityLiving {
+#if version >= 1.9
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:a;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:b;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:c;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:d;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:e;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:f;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:g;
+#else
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:???;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:???;
+#endif
+
+    <code>
+    public static final Key<Byte> DATA_ARMORSTAND_FLAGS = Key.Type.BYTE.createKey(T.DATA_ARMORSTAND_FLAGS, 10);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_HEAD = Key.Type.VECTOR.createKey(T.DATA_POSE_HEAD, 11);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_BODY = Key.Type.VECTOR.createKey(T.DATA_POSE_BODY, 12);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_LEFT, 13);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_RIGHT, 14);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_LEFT, 15);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_RIGHT, 16);
+    </code>
+}

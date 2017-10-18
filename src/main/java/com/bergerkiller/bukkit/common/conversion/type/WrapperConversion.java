@@ -54,6 +54,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -346,6 +347,12 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.Vec3D")
     public static Vector toVector(Object nmsVec3DHandle) {
         return NMSVector.getVec(nmsVec3DHandle);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.Vector3f")
+    public static Vector fromVector3fToVector(Object nmsVector3fHandle) {
+        Vector3fHandle handle = Vector3fHandle.createHandle(nmsVector3fHandle);
+        return new Vector(handle.getX(), handle.getY(), handle.getZ());
     }
 
     @ConverterMethod

@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 
 class BaseBlockPosition {
@@ -41,4 +42,12 @@ class ChunkCoordIntPair {
     public final int z;
 
     public (ChunkCoordIntPairHandle) ChunkCoordIntPair(int x, int z);
+}
+
+class Vector3f {
+    public (Vector3fHandle) Vector3f(float x, float y, float z);
+
+    public float getX();
+    public float getY();
+    public float getZ();
 }

@@ -50,6 +50,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
@@ -231,6 +232,11 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.Vec3D")
     public static Object toVec3DHandle(Vector vector) {
         return NMSVector.newVec(vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    @ConverterMethod(output="net.minecraft.server.Vector3f")
+    public static Object toVector3fHandle(Vector vector) {
+        return Vector3fHandle.T.constr_x_y_z.raw.newInstance((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
     }
 
     @ConverterMethod(output="net.minecraft.server.PlayerAbilities")

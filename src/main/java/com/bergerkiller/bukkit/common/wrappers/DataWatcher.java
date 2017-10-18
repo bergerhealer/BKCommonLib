@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 /**
  * This class is a wrapper of the DataWatcher class from CraftBukkit<br>
@@ -483,6 +484,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<Integer> INTEGER = getForType(Integer.class);
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
+            public static final Type<Vector> VECTOR = getForType(Vector.class);
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
@@ -643,6 +645,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 typeMapping.put(type, type);
             }
 
+            // Vector -> Vector3f
+            typeMapping.put(Vector.class, CommonUtil.getNMSClass("Vector3f"));
             // IntVector3 -> BlockPosition
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
             // Bukkit ItemStack -> nms ItemStack

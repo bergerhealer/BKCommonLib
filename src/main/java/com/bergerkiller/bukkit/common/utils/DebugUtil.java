@@ -124,6 +124,50 @@ public class DebugUtil {
     }
 
     /**
+     * Gets the value of a debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value initial (can not be null)
+     * @return value of the variable
+     */
+    public static <T> T getVariableValue(String name, T value) {
+        return getVariable(name, value).value;
+    }
+
+    /**
+     * Gets the value of a double debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static double getDoubleValue(String name, double value) {
+        return getVariableValue(name, Double.valueOf(value)).doubleValue();
+    }
+
+    /**
+     * Gets the value of a float debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static float getFloatValue(String name, double value) {
+        return getVariableValue(name, Double.valueOf(value)).floatValue();
+    }
+
+    /**
+     * Gets the value of a short debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static float getShortValue(String name, int value) {
+        return getVariableValue(name, Integer.valueOf(value)).shortValue();
+    }
+
+    /**
      * Goes down the entirety of the server to see where a particular instance of a variable is referenced.
      * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
      * <br><br>
