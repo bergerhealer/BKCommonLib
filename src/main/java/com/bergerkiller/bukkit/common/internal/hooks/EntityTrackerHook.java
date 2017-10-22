@@ -32,7 +32,7 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         updateTrackers(list);
         EntityTrackerEntryHandle.T.timeSinceLocationSync.setInteger(handle, EntityTrackerEntryHandle.T.timeSinceLocationSync.getInteger(handle) + 1);
         try {
-            controller.onSync();
+            controller.onTick();
         } catch (Throwable t) {
             Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
             t.printStackTrace();

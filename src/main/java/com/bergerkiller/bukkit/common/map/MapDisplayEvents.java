@@ -1,12 +1,13 @@
 package com.bergerkiller.bukkit.common.map;
 
+import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 
 /**
  * An interface of all possible event callback methods provided by Map Displays and Map Display Controls.
  */
-public interface MapDisplayEvents {
+public interface MapDisplayEvents extends Tickable {
     /**
      * Called right after this Map Display is bound to a plugin and map
      */

@@ -1,9 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle;
 
-public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
+public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> implements Tickable {
 
     public MobSpawner(Object mobSpawnerHandle) {
         setHandle(MobSpawnerAbstractHandle.createHandle(mobSpawnerHandle));
@@ -30,6 +31,7 @@ public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
     /**
      * Performs the per-tick spawning logic
      */
+    @Override
     public void onTick() {
         handle.onTick();
     }

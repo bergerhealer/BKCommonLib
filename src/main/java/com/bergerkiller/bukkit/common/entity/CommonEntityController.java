@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.entity;
 
+import com.bergerkiller.bukkit.common.controller.Tickable;
+
 /**
  * A base class for various kinds of Entity Controllers
  */
-public class CommonEntityController<T extends CommonEntity<? extends org.bukkit.entity.Entity>> {
+public class CommonEntityController<T extends CommonEntity<? extends org.bukkit.entity.Entity>> implements Tickable {
 
     protected T entity;
 
@@ -31,5 +33,9 @@ public class CommonEntityController<T extends CommonEntity<? extends org.bukkit.
      * you can access the Entity from this Controller
      */
     public void onDetached() {
+    }
+
+    @Override
+    public void onTick() {
     }
 }

@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -21,7 +22,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
  * Input controller for virtual map navigation and UI.
  * A single instance manages the input coming from a single player.
  */
-public class MapPlayerInput {
+public class MapPlayerInput implements Tickable {
     private int last_dx, last_dy, last_dz;
     private int curr_dx, curr_dy, curr_dz;
     private int recv_dx, recv_dy, recv_dz;
@@ -318,6 +319,7 @@ public class MapPlayerInput {
     /**
      * Updates the internal input state.
      */
+    @Override
     public void onTick() {
         this._isIntercepting = this._newInterceptState;
         this._newInterceptState = false; // any displays intercepting will set it back True

@@ -659,6 +659,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
     }
 
+    @Override
+    public void onTick() {
+        this.onSync();
+    }
+
     /**
      * Called at a set interval to synchronize data to clients
      */
