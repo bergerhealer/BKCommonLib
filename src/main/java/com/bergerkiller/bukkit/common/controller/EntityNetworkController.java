@@ -665,8 +665,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
-     * Called at a set interval to synchronize data to clients
+     * Called at a set interval to synchronize data to clients.
+     * Deprecated: please use {@link #onTick()} instead.
      */
+    @Deprecated
     public void onSync() {
         if (entity.isDead()) {
             return;
