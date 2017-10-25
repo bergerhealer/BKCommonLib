@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Collection;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -49,6 +50,22 @@ public class BlockDataRegistry {
         BlockDataImpl.BlockDataConstant c = new BlockDataImpl.BlockDataConstant(b);
         BlockDataImpl.BY_BLOCK_DATA.put(b, c);
         return c;
+    }
+
+    /**
+     * Obtains immutable BlockData information for the Material and Data of an ItemStack
+     * 
+     * @param itemStack input
+     * @return Immutable BlockData
+     */
+    public static BlockData fromItemStack(ItemStack itemStack) {
+        if (itemStack != null) {
+            Material type = itemStack.getType();
+            if (type.isBlock()) {
+                return fromMaterialData(type, itemStack.getDurability());
+            }
+        }
+        return AIR;
     }
 
     /**

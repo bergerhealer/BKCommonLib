@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 class Item {
+    public static final rawtype (Iterable) RegistryMaterials<MinecraftKey, Item> REGISTRY;
+
     public int getMaxStackSize();
 
     public boolean usesDurability();

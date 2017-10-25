@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -23,6 +24,7 @@ public class Model {
     private String parent = null;
     private int totalQuadCount = 0;
     public transient boolean placeholder = false;
+    protected transient BuiltinType builtinType = BuiltinType.DEFAULT;
     public boolean ambientocclusion = true;
     public Map<String, Display> display = new HashMap<String, Display>();
     public Map<String, String> textures = new HashMap<String, String>();
@@ -48,6 +50,8 @@ public class Model {
         for (Element element : parentModel.elements) {
             this.elements.add(elementIdx++, element.clone());
         }
+
+        this.builtinType = parentModel.builtinType;
     }
 
     public void build(MapResourcePack resourcePack) {
@@ -65,6 +69,63 @@ public class Model {
                 }
             }
         } while (hasChanges);
+
+        // For generated models, we must now generate the model elements up-front
+        // This basically creates a small cube for every non-transparent pixel in the texture
+        if (this.builtinType == BuiltinType.GENERATED) {
+            this.elements.clear();
+
+            MapTexture result = null;
+            for (int i = 0;;i++) {
+                String layerTexturePath = this.textures.get("layer" + i);
+                if (layerTexturePath == null) {
+                    break;
+                }
+                MapTexture texture = resourcePack.getTexture(layerTexturePath);
+                if (result == null) {
+                    result = texture.clone();
+                } else {
+                    result.draw(texture, 0, 0);
+                }
+            }
+
+            if (result != null) {
+                System.out.println("GENERATE!!!");
+                for (int y = 0; y < result.getHeight(); y++) {
+                    for (int x = 0; x < result.getWidth(); x++) {
+                        byte color = result.readPixel(x, y);
+                        if (color == MapColorPalette.COLOR_TRANSPARENT) {
+                            continue;
+                        }
+                        
+                        Element element = new Element();
+                        element.from = new Vector3(x, 0, y);
+                        element.to = new Vector3(element.from.x + 1, element.from.y + 1, element.from.z + 1);
+
+                        for (BlockFace bface : FaceUtil.BLOCK_SIDES) {
+                            // If pixel on this face is not transparent, do not add one there
+                            if (!FaceUtil.isVertical(bface)) {
+                                int x2 = x - bface.getModX();
+                                int y2 = y - bface.getModZ();
+                                if (result.readPixel(x2, y2) == MapColorPalette.COLOR_TRANSPARENT) {
+                                    continue;
+                                }
+                            }
+                            
+                            
+                            Face face = new Face();
+                            
+                            MapTexture tex = MapTexture.createEmpty(1, 1);
+                            tex.writePixel(0, 0, color);
+                            
+                            face.texture = tex;
+                            element.faces.put(bface, face);
+                        }
+                        this.elements.add(element);
+                    }
+                }
+            }
+        }
 
         // Apply all textures to the model faces
         for (Element element : this.elements) {
@@ -227,7 +288,9 @@ public class Model {
                         this.textureName = texture;
                     }
                 }
-                this.texture = resourcePack.getTexture(this.textureName);
+                if (!this.textureName.isEmpty()) {
+                    this.texture = resourcePack.getTexture(this.textureName);
+                }
                 if (uv != null) {
                     int[] i_uv = new int[uv.length];
                     for (int i = 0; i < uv.length; i++) {
@@ -341,5 +404,12 @@ public class Model {
             clone.scale = this.scale.clone();
             return clone;
         }
+    }
+
+    /**
+     * The builtin internal type that manages the further loading of this model
+     */
+    public static enum BuiltinType {
+        DEFAULT, GENERATED
     }
 }

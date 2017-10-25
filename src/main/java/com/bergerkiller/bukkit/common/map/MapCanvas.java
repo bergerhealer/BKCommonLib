@@ -1119,27 +1119,40 @@ public abstract class MapCanvas {
         Matrix4x4 mInv = new Matrix4x4(projectionMatrix);
         mInv.invert();
 
-        Vector3 ip0 = new Vector3(0, 0, 0);
-        Vector3 ip1 = new Vector3(0, 0, canvas.getHeight());
-        Vector3 ip2 = new Vector3(canvas.getWidth(), 0,  canvas.getHeight());
-        projectionMatrix.transformPoint(ip0);
-        projectionMatrix.transformPoint(ip1);
-        projectionMatrix.transformPoint(ip2);
+        // Calculate the pixel coordinates of the 3 corners of the projected quad
+        Vector3[] corners = new Vector3[] {
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, canvas.getHeight()),
+                new Vector3(canvas.getWidth(), 0,  canvas.getHeight()),
+                new Vector3(canvas.getWidth(), 0, 0)
+        };
+        for (Vector3 corner : corners) {
+            projectionMatrix.transformPoint(corner);
+        }
 
-        Vector3 v1 = Vector3.subtract(ip0, ip1);
-        Vector3 v2 = Vector3.subtract(ip2, ip1);
+        // Check whether the face is back-facing or front-facing, and correct light that way
+        Vector3 v1 = Vector3.subtract(corners[0], corners[1]);
+        Vector3 v2 = Vector3.subtract(corners[2], corners[1]);
         Vector3 cross = Vector3.cross(v1, v2).normalize();
-
         if (cross.y < 0.0f) {
             cross = cross.negate();
         }
 
-        Vector3 p = new Vector3();
-        MapTexture temp = MapTexture.createEmpty(this.getWidth(), this.getHeight());
-        int minX = this.getWidth();
-        int minY = this.getHeight();
-        int maxX = 0;
-        int maxY = 0;
+        // Get the bounds on the screen area that will be drawn when drawing this quad
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        for (Vector3 corner : corners) {
+            int cx = (int) corner.x;
+            int cy = (int) corner.z;
+            if (cx > maxX) maxX = cx;
+            if (cx < minX) minX = cx;
+            if (cy > maxY) maxY = cy;
+            if (cy < minY) minY = cy;
+        }
+
+        MapTexture temp = MapTexture.createEmpty(maxX - minX + 1, maxY - minY + 1);
 
         float light = this.ambientLightFact;
         if (this.directionalLightVec != null) {
@@ -1151,13 +1164,14 @@ public abstract class MapCanvas {
             light += this.directionalLightFact * dot;
         }
 
-        for (int y = 0; y < getHeight(); y++)
+        Vector3 p = new Vector3();
+        for (int y = minY; y <= maxY; y++)
         {
-            for (int x = 0; x < getWidth(); x++)
+            for (int x = minX; x <= maxX; x++)
             {
                 p.x = x;
                 p.z = y;
-                p.y = 1.0f;
+                p.y = 1.0;
                 mInv.transformPoint(p);
 
                 double ax = p.x;
@@ -1171,27 +1185,19 @@ public abstract class MapCanvas {
                 //float depth = p.y;
 
                 if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-
                     byte color = canvas.readPixel((int) ax, (int) ay);
                     if (color != MapColorPalette.COLOR_TRANSPARENT) {
                         // Shows specular brightness based on distance from camera (debug)
                         color = MapColorPalette.getSpecular(color, light);
 
-                        temp.writePixel(x, y, color);
+                        temp.writePixel(x - minX, y - minY, color);
                     }
                 }
             }
         }
-        if (minX != this.getWidth()) {
-            this.draw(temp.getView(minX, minY, maxX - minX + 1, maxY - minY + 1), minX, minY);
-        }
-        return this;
+        return this.draw(temp, minX, minY);
     }
-    
+
     /**
      * Obtains a view into this canvas for a viewport area
      * 

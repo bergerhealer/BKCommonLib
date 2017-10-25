@@ -1,13 +1,22 @@
 package com.bergerkiller.bukkit.common.map.util;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 /**
  * This is needed because Minecraft is really stupid sometimes
  */
 public class BlockModelNameLookup {
 
-    public static String lookup(BlockRenderOptions options) {
+    public static String lookupBlock(BlockRenderOptions options) {
         String name = options.getBlockData().getBlockName();
         String variant = options.get("variant");
 
@@ -116,5 +125,20 @@ public class BlockModelNameLookup {
         }
 
         return name;
+    }
+
+    public static String lookupItem(ItemStack item) {
+        Material type = item.getType();
+        if (type.isBlock()) {
+            return lookupBlock(BlockData.fromItemStack(item).getDefaultRenderOptions());
+        }
+
+        Object itemHandle = HandleConversion.toItemHandle(type);
+        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.REGISTRY, itemHandle);
+        String itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
+
+        // Perform various renaming for the item types that don't use this name for the model name
+
+        return itemName;
     }
 }

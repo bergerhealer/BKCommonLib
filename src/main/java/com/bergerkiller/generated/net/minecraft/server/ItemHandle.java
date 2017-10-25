@@ -13,6 +13,8 @@ public abstract class ItemHandle extends Template.Handle {
     public static final ItemClass T = new ItemClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item");
 
+    @SuppressWarnings("rawtypes")
+    public static final Iterable REGISTRY = T.REGISTRY.getSafe();
     /* ============================================================================== */
 
     public static ItemHandle createHandle(Object handleInstance) {
@@ -28,6 +30,9 @@ public abstract class ItemHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ItemClass extends Template.Class<ItemHandle> {
+        @SuppressWarnings("rawtypes")
+        public final Template.StaticField.Converted<Iterable> REGISTRY = new Template.StaticField.Converted<Iterable>();
+
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
 

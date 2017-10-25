@@ -17,14 +17,17 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
+import com.bergerkiller.bukkit.common.internal.resources.builtin.GeneratedModel;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
+import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
@@ -213,6 +216,36 @@ public class MapResourcePack {
         return model;
     }
 
+    public Model getItemModel(ItemStack item) {
+        // Standard block models (or null, indicating air)
+        if (item == null || item.getType().isBlock()) {
+            return this.getBlockModel(BlockData.fromItemStack(item));
+        }
+
+        // Item models
+        String itemModelName = BlockModelNameLookup.lookupItem(item);
+        Model itemModel = this.getModel("item/" + itemModelName);
+
+        System.out.println(itemModelName);
+        
+        
+        return itemModel;
+    }
+    
+    /**
+     * Renders the item slot texture of an item
+     * 
+     * @param item to render
+     * @param width of the produced icon image
+     * @param height of the produced icon image
+     * @return rendered item slot image
+     */
+    public MapTexture getItemTexture(ItemStack item, int width, int height) {
+        Model model = this.getItemModel(item);
+                
+        return null;
+    }
+
     /**
      * Loads a texture from this resource pack.
      * 
@@ -325,6 +358,11 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadModel(String path) {
+        // Builtin models
+        if (path.equals("builtin/generated")) {
+            return new GeneratedModel();
+        }
+
         Model model = openGsonObject(Model.class, ResourceType.MODELS, path);
         if (model == null) {
             Logging.LOGGER_MAPDISPLAY.warning("Failed to load model " + path);

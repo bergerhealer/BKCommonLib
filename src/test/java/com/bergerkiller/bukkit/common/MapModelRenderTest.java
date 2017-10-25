@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -121,7 +122,7 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println(opt);
         
-        Model model = textures.getBlockModel(opt);
+        Model model = textures.getItemModel(new ItemStack(Material.DIAMOND_SWORD, 1)); //textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
 
         transform.translate(p0.x, 0.0f, p0.y);

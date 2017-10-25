@@ -1,11 +1,17 @@
 package com.bergerkiller.bukkit.common;
 
+import static org.junit.Assert.*;
+
 import java.util.HashSet;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
+import com.bergerkiller.bukkit.common.map.MapTexture;
+import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -19,6 +25,20 @@ public class MapResourcePackTest {
         CommonUtil.bootstrap();
     }
 
+    @Ignore
+    @Test
+    public void testItemSlotTexture() {
+        MapResourcePack resourcePack = MapResourcePack.VANILLA;
+
+        ItemStack item = new ItemStack(Material.DIAMOND_SWORD, 1);
+        MapTexture texture = resourcePack.getItemTexture(item, 16, 16);
+        if (texture == null) {
+            fail("Failed to load texture for " + item);
+        } else {
+            MapDebugWindow.showMapForeverAutoScale(texture);
+        }
+    }
+    
     @Ignore
     @Test
     public void testBlockModels() {

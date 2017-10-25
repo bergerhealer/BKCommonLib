@@ -214,7 +214,7 @@ public final class BlockRenderOptions implements Map<String, String>, Cloneable 
      * @return model name
      */
     public final String lookupModelName() {
-        return BlockModelNameLookup.lookup(this);
+        return BlockModelNameLookup.lookupBlock(this);
     }
 
     /**
