@@ -33,16 +33,14 @@ public class MapResourcePackTest {
         MapTexture map = MapTexture.createEmpty(128, 128);
         map.fill(MapColorPalette.getColor(128, 128, 128));
         
-        map.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(Material.SPLASH_POTION, 1, (short) 4), 128, 128), 0, 0);
+        //map.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(Material.SPLASH_POTION, 1, (short) 4), 128, 128), 0, 0);
 
-        /*
         Random rand = new Random();
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {
                 testDraw(map, x, y, Material.values()[rand.nextInt(Material.values().length)]);
             }
         }
-        */
 
         MapDebugWindow.showMapForeverAutoScale(map);
     }
@@ -50,6 +48,21 @@ public class MapResourcePackTest {
     private void testDraw(MapTexture canvas, int x, int y, Material material) {
         canvas.drawRect(x, y, 16, 16, MapColorPalette.COLOR_RED);
         canvas.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(material), 16, 16), x, y);
+    }
+
+    @Ignore
+    @Test
+    public void testLineDrawing() {
+        MapTexture texture = MapTexture.createEmpty(32, 32);
+        texture.drawLine(1, 1, 30, 1, MapColorPalette.COLOR_RED);
+        texture.drawLine(30, 3, 1, 3, MapColorPalette.COLOR_RED);
+        texture.drawLine(1, 5, 1, 30, MapColorPalette.COLOR_RED);
+        texture.drawLine(3, 30, 3, 5, MapColorPalette.COLOR_RED);
+        texture.drawLine(5, 7, 28, 30, MapColorPalette.COLOR_RED);
+        texture.drawLine(30, 28, 7, 5, MapColorPalette.COLOR_RED);
+        texture.drawLine(5, 9, 10, 30, MapColorPalette.COLOR_RED);
+        texture.drawLine(30, 10, 9, 5, MapColorPalette.COLOR_RED);
+        MapDebugWindow.showMapForeverAutoScale(texture);
     }
 
     @Ignore

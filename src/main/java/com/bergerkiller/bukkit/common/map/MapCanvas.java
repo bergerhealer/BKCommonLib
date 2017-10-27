@@ -931,6 +931,21 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Draws a single pixel color onto this canvas. Color blending
+     * logic is performed for this call.
+     * 
+     * @param x - coordinate of the pixel
+     * @param y - coordinate of the pixel
+     * @param color to draw
+     */
+    public final MapCanvas drawPixel(int x, int y, byte color) {
+        byte oldColor = this.readPixel(x, y);
+        byte newColor = this.blendMode.process(oldColor, color);
+        this.writePixel(x, y, newColor);
+        return this;
+    }
+
+    /**
      * Draws a line connecting two points
      * 
      * @param x1 coordinate of the first point
@@ -940,15 +955,58 @@ public abstract class MapCanvas {
      * @param color to draw the line as
      * @return this canvas
      */
-    public final <T> MapCanvas drawLine(int x1, int y1, int x2, int y2, byte color) {
+    public final MapCanvas drawLine(int x1, int y1, int x2, int y2, byte color) {
         if (x1 == x2) {
             return this.fillRectangle(x1, Math.min(y1, y2), 1, Math.abs(y2 - y1) + 1, color);
         } else if (y1 == y2) {
             return this.fillRectangle(Math.min(x1, x2), y1, Math.abs(x2 - x1) + 1, 1, color);
         } else {
-            //TODO: Make use of Bresenham's algorithm
+            // Bresenham's algorithm
             // https://github.com/Phoenard/Phoenard/blob/master/PHNDisplay.cpp#L481
-            // Im the creator, so it should be fine!
+            int dx, dy;
+            dx = x2 - x1;
+            dy = y2 - y1;
+            int adx, ady;
+            adx = Math.abs(dx);
+            ady = Math.abs(dy);
+
+            boolean steep = ady > adx;
+            if (steep) {
+                int c;
+                c = x1; x1 = y1; y1 = c;
+                c = x2; x2 = y2; y2 = c;
+                c = adx; adx = ady; ady = c;
+            }
+            if (x1 > x2) {
+                int c;
+                c = x1; x1 = x2; x2 = c;
+                c = y1; y1 = y2; y2 = c;
+            }
+
+            int err = adx;
+            int ystep = (y1 < y2) ? 1 : -1;
+
+            adx += adx;
+            ady += ady;
+            if (steep) {
+                for (; x1<=x2; x1++) {
+                    drawPixel(y1, x1, color);
+                    err -= ady;
+                    if (err < 0) {
+                        y1 += ystep;
+                        err += adx;
+                    }
+                }
+            } else {
+                for (; x1<=x2; x1++) {
+                    drawPixel(x1, y1, color);
+                    err -= ady;
+                    if (err < 0) {
+                        y1 += ystep;
+                        err += adx;
+                    }
+                }
+            }
             return this;
         }
     }
