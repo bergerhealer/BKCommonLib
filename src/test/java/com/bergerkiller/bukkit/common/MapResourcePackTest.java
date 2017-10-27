@@ -3,12 +3,14 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
+import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
@@ -28,17 +30,22 @@ public class MapResourcePackTest {
     @Ignore
     @Test
     public void testItemSlotTexture() {
-        MapResourcePack resourcePack = MapResourcePack.VANILLA;
-
-        ItemStack item = new ItemStack(Material.DIAMOND_SWORD, 1);
-        MapTexture texture = resourcePack.getItemTexture(item, 16, 16);
-        if (texture == null) {
-            fail("Failed to load texture for " + item);
-        } else {
-            MapDebugWindow.showMapForeverAutoScale(texture);
+        MapTexture map = MapTexture.createEmpty(128, 128);
+        map.fill(MapColorPalette.getColor(128, 128, 128));
+        Random rand = new Random();
+        for (int x = 0; x < 128-16; x += 18) {
+            for (int y = 0; y < 128-16; y += 18) {
+                testDraw(map, x, y, Material.values()[rand.nextInt(Material.values().length)]);
+            }
         }
+        MapDebugWindow.showMapForeverAutoScale(map);
     }
-    
+
+    private void testDraw(MapTexture canvas, int x, int y, Material material) {
+        canvas.drawRect(x, y, 16, 16, MapColorPalette.COLOR_RED);
+        canvas.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(material), 16, 16), x, y);
+    }
+
     @Ignore
     @Test
     public void testBlockModels() {

@@ -31,6 +31,7 @@ import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
+import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -216,24 +217,20 @@ public class MapResourcePack {
         return model;
     }
 
-    public Model getItemModel(ItemStack item) {
-        // Standard block models (or null, indicating air)
-        if (item == null || item.getType().isBlock()) {
-            return this.getBlockModel(BlockData.fromItemStack(item));
-        }
-
-        // Item models
-        String itemModelName = BlockModelNameLookup.lookupItem(item);
-        Model itemModel = this.getModel("item/" + itemModelName);
-
-        System.out.println(itemModelName);
-        
-        
-        return itemModel;
-    }
-    
     /**
-     * Renders the item slot texture of an item
+     * Loads the model to be displayed for items displayed in the world, held in a player's hand
+     * or shown in a GUI item slot.
+     * 
+     * @param item to get the model for
+     * @return item model for the item
+     */
+    public Model getItemModel(ItemStack item) {
+        String itemModelName = BlockModelNameLookup.lookupItem(item);
+        return this.getModel("item/" + itemModelName);
+    }
+
+    /**
+     * Renders the item gui slot texture of an item
      * 
      * @param item to render
      * @param width of the produced icon image
@@ -242,8 +239,20 @@ public class MapResourcePack {
      */
     public MapTexture getItemTexture(ItemStack item, int width, int height) {
         Model model = this.getItemModel(item);
-                
-        return null;
+        Matrix4x4 transform = new Matrix4x4();
+        if (width != 16 || height != 16) {
+            transform.scale((double) width / 16.0, 1.0, (double) height / 16.0);
+        }
+        Model.Display display = model.display.get("gui");
+        if (display != null) {
+            display.apply(transform);
+        } else {
+            //System.out.println("GUI DISPLAY ELEMENT NOT FOUND");
+        }
+
+        MapTexture texture = MapTexture.createEmpty(width, height);
+        texture.drawModel(model, transform);
+        return texture;
     }
 
     /**

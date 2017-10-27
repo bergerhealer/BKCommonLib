@@ -90,7 +90,6 @@ public class Model {
             }
 
             if (result != null) {
-                System.out.println("GENERATE!!!");
                 for (int y = 0; y < result.getHeight(); y++) {
                     for (int x = 0; x < result.getWidth(); x++) {
                         byte color = result.readPixel(x, y);
@@ -172,9 +171,7 @@ public class Model {
         clone.ambientocclusion = this.ambientocclusion;
         clone.textures.putAll(this.textures);
         for (Map.Entry<String, Display> displayEntry : this.display.entrySet()) {
-            if (!this.display.containsKey(displayEntry.getKey())) {
-                clone.display.put(displayEntry.getKey(), displayEntry.getValue().clone());
-            }
+            clone.display.put(displayEntry.getKey(), displayEntry.getValue().clone());
         }
         for (Element element : this.elements) {
             clone.elements.add(element.clone());
@@ -394,7 +391,17 @@ public class Model {
     public static class Display {
         public Vector3 rotation = new Vector3();
         public Vector3 translation = new Vector3();
-        public Vector3 scale = new Vector3();
+        public Vector3 scale = new Vector3(1, 1, 1);
+
+        public void apply(Matrix4x4 transform) {
+            transform.translate(8, 8, 8);
+            transform.rotateZ(this.rotation.z);
+            transform.rotateX(this.rotation.x - 90.0);
+            transform.rotateY(this.rotation.y);
+            transform.scale(this.scale);
+            transform.translate(-8, -8, -8);
+            transform.translate(this.translation);
+        }
 
         @Override
         public Display clone() {

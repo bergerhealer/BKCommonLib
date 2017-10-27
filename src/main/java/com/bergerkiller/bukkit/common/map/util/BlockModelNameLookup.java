@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
@@ -16,7 +15,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
  */
 public class BlockModelNameLookup {
 
-    public static String lookupBlock(BlockRenderOptions options) {
+    private static String lookupBlock(BlockRenderOptions options, boolean item) {
         String name = options.getBlockData().getBlockName();
         String variant = options.get("variant");
 
@@ -127,17 +126,31 @@ public class BlockModelNameLookup {
         return name;
     }
 
+    public static String lookupBlock(BlockRenderOptions options) {
+        return lookupBlock(options, false);
+    }
+
     public static String lookupItem(ItemStack item) {
         Material type = item.getType();
+        String itemName;
         if (type.isBlock()) {
-            return lookupBlock(BlockData.fromItemStack(item).getDefaultRenderOptions());
+            itemName = lookupBlock(BlockData.fromItemStack(item).getDefaultRenderOptions(), true);
+
+            // Perform renames needed to get the correct item block model name
+            if (itemName.equals("fence")) {
+                itemName = "oak_fence";
+            } else if (itemName.equals("fence_gate")) {
+                itemName = "oak_fence_gate";
+            } else if (itemName.equals("wooden_door")) {
+                itemName = "oak_door";
+            }
+        } else {
+            Object itemHandle = HandleConversion.toItemHandle(type);
+            Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.REGISTRY, itemHandle);
+            itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
+
+            // Perform renames needed to get the correct item model name
         }
-
-        Object itemHandle = HandleConversion.toItemHandle(type);
-        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.REGISTRY, itemHandle);
-        String itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
-
-        // Perform various renaming for the item types that don't use this name for the model name
 
         return itemName;
     }
