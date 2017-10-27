@@ -913,6 +913,47 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Draws a rectangle
+     * 
+     * @param x - coordinate of the top-left corner of the rectangle
+     * @param y - coordinate of the top-left corner of the rectangle
+     * @param width of the rectangle
+     * @param height of the rectangle
+     * @param color to draw the rectangle as
+     * @return this canvas
+     */
+    public final <T> MapCanvas drawRect(int x, int y, int width, int height, byte color) {
+        this.drawLine(x, y, x, y + height - 1, color);
+        this.drawLine(x, y, x + width - 1, y, color);
+        this.drawLine(x + width - 1, y, x + width - 1, y + height - 1, color);
+        this.drawLine(x, y + height - 1, x + width - 1, y + height - 1, color);
+        return this;
+    }
+
+    /**
+     * Draws a line connecting two points
+     * 
+     * @param x1 coordinate of the first point
+     * @param y1 coordinate of the first point
+     * @param x2 coordinate of the second point
+     * @param y2 coordinate of the second point
+     * @param color to draw the line as
+     * @return this canvas
+     */
+    public final <T> MapCanvas drawLine(int x1, int y1, int x2, int y2, byte color) {
+        if (x1 == x2) {
+            return this.fillRectangle(x1, Math.min(y1, y2), 1, Math.abs(y2 - y1) + 1, color);
+        } else if (y1 == y2) {
+            return this.fillRectangle(Math.min(x1, x2), y1, Math.abs(x2 - x1) + 1, 1, color);
+        } else {
+            //TODO: Make use of Bresenham's algorithm
+            // https://github.com/Phoenard/Phoenard/blob/master/PHNDisplay.cpp#L481
+            // Im the creator, so it should be fine!
+            return this;
+        }
+    }
+
+    /**
      * Draws a font in its natural colors. If this is a binary font, it will be drawn in white.
      * 
      * @param font to draw
