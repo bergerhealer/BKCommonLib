@@ -108,8 +108,9 @@ class Pseudo3DImagePanel extends JPanel
         MapTexture image = MapTexture.createEmpty(MapModelRenderTest.RES_WIDTH, MapModelRenderTest.RES_HEIGHT);
         image.draw(background, 0, 0);
         image.setBlendMode(MapBlendMode.OVERLAY);
-        image.setLightOptions(0.0f, 1.0f, new Vector3(-1.0, 1.0, -1.0));
+        image.setLightOptions(0.0f, 1.0f, new Vector3(-1, 1, -1)); //new Vector3(-1.0, 1.0, -1.0));
 
+        System.out.println("{" + p3.x + ", " + p2.x + ", " + p3.y + "}");
         // Draws a 3D quad
         float scale = 16.0f;
         float yaw = (float) (p1.x - 128);
@@ -131,7 +132,7 @@ class Pseudo3DImagePanel extends JPanel
         transform.rotateY(yaw);
         transform.translate(-8, -8, -8);
 
-        image.drawModel(textures.getBlockModel(Material.FENCE), transform);
+        image.drawModel(textures.getBlockModel(Material.QUARTZ_BLOCK), transform);
 
         transform.translate(20, 0 ,0);
         

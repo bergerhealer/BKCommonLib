@@ -27,7 +27,7 @@ import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
-import com.bergerkiller.bukkit.common.map.util.BlockModelNameLookup;
+import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
@@ -37,6 +37,7 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
+import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -225,8 +226,17 @@ public class MapResourcePack {
      * @return item model for the item
      */
     public Model getItemModel(ItemStack item) {
-        String itemModelName = BlockModelNameLookup.lookupItem(item);
-        return this.getModel("item/" + itemModelName);
+        String itemModelName = ModelInfoLookup.lookupItem(item);
+        RenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
+        Model m = this.loadModel("item/" + itemModelName, options);
+        if (m != null) {
+            m.buildBlock(options);
+            m.buildQuads();
+        }
+        if (m == null) {
+            m = this.createPlaceholderModel();
+        }
+        return m;
     }
 
     /**
@@ -238,7 +248,9 @@ public class MapResourcePack {
      * @return rendered item slot image
      */
     public MapTexture getItemTexture(ItemStack item, int width, int height) {
+        MapTexture texture = MapTexture.createEmpty(width, height);
         Model model = this.getItemModel(item);
+        
         Matrix4x4 transform = new Matrix4x4();
         if (width != 16 || height != 16) {
             transform.scale((double) width / 16.0, 1.0, (double) height / 16.0);
@@ -246,11 +258,11 @@ public class MapResourcePack {
         Model.Display display = model.display.get("gui");
         if (display != null) {
             display.apply(transform);
+            texture.setLightOptions(0.0f, 1.0f, new Vector3(-1, 1, -1));
         } else {
             //System.out.println("GUI DISPLAY ELEMENT NOT FOUND");
         }
 
-        MapTexture texture = MapTexture.createEmpty(width, height);
         texture.drawModel(model, transform);
         return texture;
     }
@@ -350,7 +362,7 @@ public class MapResourcePack {
     }
 
     private Model loadBlockVariant(BlockModelState.Variant variant, BlockRenderOptions blockRenderOptions) {
-        Model model = this.loadModel("block/" + variant.modelName);
+        Model model = this.loadModel("block/" + variant.modelName, blockRenderOptions);
         if (model == null) {
             return null;
         }
@@ -367,6 +379,17 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadModel(String path) {
+        return this.loadModel(path, new RenderOptions());
+    }
+
+    /**
+     * Loads a model, always fetching it from the resource pack instead of the cache
+     * 
+     * @param path to find the model at
+     * @param options to apply when building the model
+     * @return the model, or <i>null</i> if not found
+     */
+    protected final Model loadModel(String path, RenderOptions options) {
         // Builtin models
         if (path.equals("builtin/generated")) {
             return new GeneratedModel();
@@ -389,7 +412,7 @@ public class MapResourcePack {
         }
 
         // Make all texture paths absolute
-        model.build(this);
+        model.build(this, options);
         return model;
     }
 

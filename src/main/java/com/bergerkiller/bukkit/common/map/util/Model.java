@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
+import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
 public class Model {
@@ -54,7 +54,7 @@ public class Model {
         this.builtinType = parentModel.builtinType;
     }
 
-    public void build(MapResourcePack resourcePack) {
+    public void build(MapResourcePack resourcePack, RenderOptions options) {
         // Build all textures, turning paths into absolute paths
         boolean hasChanges;
         do {
@@ -77,11 +77,16 @@ public class Model {
 
             MapTexture result = null;
             for (int i = 0;;i++) {
-                String layerTexturePath = this.textures.get("layer" + i);
+                String layerKey = "layer" + i;
+                String layerTexturePath = this.textures.get(layerKey);
                 if (layerTexturePath == null) {
                     break;
                 }
                 MapTexture texture = resourcePack.getTexture(layerTexturePath);
+
+                // Item-specific layer render colors
+                texture = applyTint(texture, options.get(layerKey + "tint"));
+
                 if (result == null) {
                     result = texture.clone();
                 } else {
@@ -137,7 +142,7 @@ public class Model {
      * 
      * @param options
      */
-    public void buildBlock(BlockRenderOptions options) {
+    public void buildBlock(RenderOptions options) {
         for (Element element : this.elements) {
             for (Element.Face face : element.faces.values()) {
                 face.buildBlock(options);
@@ -177,6 +182,21 @@ public class Model {
             clone.elements.add(element.clone());
         }
         return clone;
+    }
+
+    private static MapTexture applyTint(MapTexture input, String tint) {
+        if (tint == null || input == null) {
+            return input;
+        }
+        try {
+            byte color = MapColorPalette.getColor(Color.decode(tint));
+            MapTexture result = input.clone();
+            byte[] buffer = result.getBuffer();
+            MapBlendMode.MULTIPLY.process(color, buffer);
+            return result;
+        } catch (NumberFormatException ex) {
+        }
+        return input;
     }
 
     /**
@@ -338,15 +358,9 @@ public class Model {
              * 
              * @param options
              */
-            public void buildBlock(BlockRenderOptions options) {
-                if (this.tintindex != -1 && options.containsKey("tint")) {
-                    try {
-                        byte color = MapColorPalette.getColor(Color.decode(options.get("tint")));
-                        this.texture = this.texture.clone();
-                        byte[] buffer = this.texture.getBuffer();
-                        MapBlendMode.MULTIPLY.process(color, buffer);
-                    } catch (NumberFormatException ex) {
-                    }
+            public void buildBlock(RenderOptions options) {
+                if (this.tintindex != -1) {
+                    this.texture = applyTint(this.texture, options.get("tint"));
                 }
             }
 

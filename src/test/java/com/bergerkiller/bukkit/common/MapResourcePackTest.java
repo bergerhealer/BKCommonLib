@@ -32,12 +32,18 @@ public class MapResourcePackTest {
     public void testItemSlotTexture() {
         MapTexture map = MapTexture.createEmpty(128, 128);
         map.fill(MapColorPalette.getColor(128, 128, 128));
+        
+        map.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(Material.SPLASH_POTION, 1, (short) 4), 128, 128), 0, 0);
+
+        /*
         Random rand = new Random();
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {
                 testDraw(map, x, y, Material.values()[rand.nextInt(Material.values().length)]);
             }
         }
+        */
+
         MapDebugWindow.showMapForeverAutoScale(map);
     }
 
