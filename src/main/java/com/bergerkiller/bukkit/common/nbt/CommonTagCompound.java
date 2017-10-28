@@ -53,7 +53,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param key of the element to remove
@@ -111,6 +111,12 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             if (x != null && y != null && z != null) {
                 return (T) new IntVector3(x.intValue(), y.intValue(), z.intValue());
             }
+        } else if (type == boolean.class || type == Boolean.class) {
+            // == Booleans (serialized as Byte) ==
+            Byte v = putGetRemove(op, key, Byte.class, (value == null) ? null : ((Boolean) value) ? (byte) 1 : (byte) 0);
+            if (v != null) {
+                return (T) ((v.byteValue() != (byte) 0) ? Boolean.TRUE : Boolean.FALSE);
+            }
         } else if (op == PutGetRemoveOp.GET) {
             // Get other types of values
             rawNBTResult = NMSNBT.Compound.get.invoke(getRawHandle(), key);
@@ -145,7 +151,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -164,7 +170,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * null to remove the data at the key.<br>
      * <br>
      * Supported data types:<br>
-     * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte,
+     * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte, boolean,
      * short, int, long, float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -184,7 +190,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Supported data types:<br>
      * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte,
-     * short, int, long, float, double, byte[], int[],
+     * boolean, short, int, long, float, double, byte[], int[],
      * String, UUID*, BlockLocation*, IntVector3*, other**</u><br>
      * <br>
      * <i>* these types do not support removing, use {@link #removeValue(key, type)}
@@ -216,7 +222,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -235,7 +241,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param key to get
@@ -250,7 +256,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself. Returns the default value if no tag is contained.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
      * <i>** these types are serialized from/to a stored String type.</i>
@@ -270,7 +276,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself. Returns the default value if no tag is contained.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
      * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
      * <i>** these types are serialized from/to a stored String type.</i>

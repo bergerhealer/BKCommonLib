@@ -27,6 +27,8 @@ public class NBTTest {
         testGetPutRemove(compound, "random", UUID.randomUUID());
         testGetPutRemove(compound, "face", BlockFace.EAST);
         testGetPutRemove(compound, "perm", PermissionDefault.OP);
+        testGetPutRemove(compound, "boolT", Boolean.TRUE);
+        testGetPutRemove(compound, "boolF", Boolean.FALSE);
     }
 
     private void testGetPutRemove(CommonTagCompound compound, String key, Object value) {
