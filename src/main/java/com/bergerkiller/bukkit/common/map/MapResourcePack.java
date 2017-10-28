@@ -60,7 +60,9 @@ public class MapResourcePack {
      * Resource packs extend or override these default resources.<br>
      * <br>
      * <b>Before using, call {@link VanillaResourcePack#load() VANILLA.load()} when enabling your plugin to download
-     * and install this Minecraft client jar. This downloading is only performed once.</b><br>
+     * and install this Minecraft client jar. This downloading is only performed once. Doing this here prevents
+     * long lag pauses the first time your plugin accesses this resource pack.
+     * </b><br>
      * <br>
      * The Minecraft client resources are owned by Mojang. These assets are installed separately from BKCommonLib.
      * BKCommonLib, nor its developers, distribute (illegal) copies of the Minecraft client.
@@ -68,6 +70,18 @@ public class MapResourcePack {
      * please read <a href="https://account.mojang.com/documents/minecraft_eula">https://account.mojang.com/documents/minecraft_eula.</a>
      */
     public static final VanillaResourcePack VANILLA = new VanillaResourcePack();
+
+    /**
+     * The SERVER resource pack consists of the default Minecraft models and textures,
+     * unless a special resource pack is defined in server.properties. Then the resource pack
+     * defined there is downloaded and used for providing the textures and models.<br>
+     * <br>
+     * <b>Before using, call {@link MapResourcePack#load() SERVER.load()} when enabling your plugin to download
+     * and install this Minecraft client jar, and the resource pack of the server if it is defined.
+     * This downloading is only performed once. Doing this here prevents long lag pauses the first time
+     * your plugin accesses this resource pack.
+     */
+    public static final MapResourcePack SERVER = new MapResourcePack("server");
 
     private final MapResourcePack baseResourcePack;
     protected ZipFile archive;
@@ -95,7 +109,9 @@ public class MapResourcePack {
     public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackFilePath) {
         this.baseResourcePack = baseResourcePack;
         this.archive = null;
-        if (resourcePackFilePath.length() > 0) {
+        if (resourcePackFilePath.equalsIgnoreCase("server")) {
+            //TODO! Download the resource pack defined in server.properties and assign it to archive lazily
+        } else if (resourcePackFilePath.length() > 0 && !resourcePackFilePath.equalsIgnoreCase("default")) {
             try {
                 this.archive = new JarFile(resourcePackFilePath);
             } catch (IOException ex) {
@@ -399,6 +415,16 @@ public class MapResourcePack {
         if (model == null) {
             Logging.LOGGER_MAPDISPLAY.warning("Failed to load model " + path);
             return null;
+        }
+
+        // Handle overrides first
+        if (model.overrides != null && !model.overrides.isEmpty()) {
+            for (Model.ModelOverride override : model.overrides) {
+                if (override.matches(options)) {
+                    System.out.println("MATCH " + override.model + "  " + options);
+                    return this.loadModel(override.model, options);
+                }
+            }
         }
 
         // Insert the parent model as required

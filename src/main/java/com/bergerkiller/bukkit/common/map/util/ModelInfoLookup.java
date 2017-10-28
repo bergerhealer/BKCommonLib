@@ -65,6 +65,17 @@ public class ModelInfoLookup {
             options.put("layer0tint", String.format("#%06x", color));
         }
 
+        // damage and damaged properties of weapons, armor and tools
+        if (ItemUtil.hasDurability(item)) {
+            boolean unbreakable = false;
+            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
+            if (nbt != null) {
+                unbreakable = nbt.getValue("Unbreakable", unbreakable);
+            }
+            options.put("damaged", unbreakable ? "0" : "1");
+            options.put("damage", Double.toString((double) item.getDurability() / (double) (ItemUtil.getMaxDurability(item) + 1)));
+        }
+
         return options;
     }
 

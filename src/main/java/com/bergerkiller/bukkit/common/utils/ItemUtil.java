@@ -552,6 +552,59 @@ public class ItemUtil {
     }
 
     /**
+     * Gets the max durability value for a given item.
+     * When the durability values becomes larger than this value, the item breaks.
+     * Items that do not use durability return def here.
+     * 
+     * @param itemType of the item
+     * @param def to return for invalid items (that do not have durability)
+     * @return max durability
+     */
+    public static int getMaxDurability(Material itemType, int def) {
+        ItemHandle item = CommonNMS.getItem(itemType);
+        return (item == null || !item.usesDurability()) ? def : item.getMaxDurability();
+    }
+
+    /**
+     * Gets the max durability value for a given item.
+     * When the durability values becomes larger than this value, the item breaks.
+     * Items that do not use durability return 0 here.
+     *
+     * @param stack to get the max durability
+     * @return max durability
+     */
+    public static int getMaxDurability(ItemStack stack) {
+        if (LogicUtil.nullOrEmpty(stack)) {
+            return 0;
+        } else {
+            return getMaxDurability(stack.getType(), 0);
+        }
+    }
+
+    /**
+     * Checks whether a particular item material type uses durability
+     * for automatically breaking the item after a number of uses.
+     * 
+     * @param itemType to check
+     * @return True if durability is used
+     */
+    public static boolean hasDurability(Material itemType) {
+        ItemHandle item = CommonNMS.getItem(itemType);
+        return item != null && item.usesDurability();
+    }
+
+    /**
+     * Checks whether a particular item material type uses durability
+     * for automatically breaking the item after a number of uses.
+     * 
+     * @param stack to check
+     * @return True if durability is used
+     */
+    public static boolean hasDurability(ItemStack stack) {
+        return !LogicUtil.nullOrEmpty(stack) && hasDurability(stack.getType());
+    }
+    
+    /**
      * Gets the max stacking size for a given item
      *
      * @param itemType of the item

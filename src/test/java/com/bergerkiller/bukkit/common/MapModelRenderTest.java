@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector2;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
@@ -44,8 +45,9 @@ public class MapModelRenderTest
     @Test
     public void test3DRender() {
 
-        createAndShowGUI(MapResourcePack.VANILLA);
-    
+        //createAndShowGUI(MapResourcePack.VANILLA);
+        createAndShowGUI(new MapResourcePack("TestPack.zip"));
+
         while (true) {
             AsyncTask.sleep(5000);
         }
@@ -123,7 +125,9 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println(opt);
         
-        Model model = textures.getItemModel(new ItemStack(Material.DIAMOND_SWORD, 1)); //textures.getBlockModel(opt);
+        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, (int) p3.x, 1);
+        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+        Model model = textures.getItemModel(item); //textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
         
         transform.translate(p0.x, 0.0f, p0.y);
@@ -132,7 +136,7 @@ class Pseudo3DImagePanel extends JPanel
         transform.rotateY(yaw);
         transform.translate(-8, -8, -8);
 
-        image.drawModel(textures.getBlockModel(Material.QUARTZ_BLOCK), transform);
+        //image.drawModel(textures.getBlockModel(Material.QUARTZ_BLOCK), transform);
 
         transform.translate(20, 0 ,0);
         

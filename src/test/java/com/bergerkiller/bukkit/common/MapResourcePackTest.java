@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 import java.util.Random;
 
@@ -16,6 +14,7 @@ import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 /**
@@ -30,24 +29,48 @@ public class MapResourcePackTest {
     @Ignore
     @Test
     public void testItemSlotTexture() {
+        Random rand = new Random();
         MapTexture map = MapTexture.createEmpty(128, 128);
         map.fill(MapColorPalette.getColor(128, 128, 128));
-        
-        //map.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(Material.SPLASH_POTION, 1, (short) 4), 128, 128), 0, 0);
 
-        Random rand = new Random();
+        MapResourcePack pack = new MapResourcePack("TestPack.zip");
+
+        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, 2, 1);
+        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+
+        //map.draw(pack.getItemTexture(item, 128, 128), 0, 0);
+
+
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {
-                testDraw(map, x, y, Material.values()[rand.nextInt(Material.values().length)]);
+                testDrawModel(map, pack, x, y, rand.nextInt(70));
             }
         }
+        
+        /*
+        for (int x = 0; x < 128-16; x += 18) {
+            for (int y = 0; y < 128-16; y += 18) {
+                testDraw(map, pack, x, y, Material.values()[rand.nextInt(Material.values().length)]);
+            }
+        }
+        */
 
         MapDebugWindow.showMapForeverAutoScale(map);
     }
 
-    private void testDraw(MapTexture canvas, int x, int y, Material material) {
+    protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, Material material) {
+        testDraw(canvas, pack, x, y, new ItemStack(material));
+    }
+
+    protected void testDrawModel(MapTexture canvas, MapResourcePack pack, int x, int y, int damage) {
+        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, damage, 1);
+        ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
+        testDraw(canvas, pack, x, y, item);
+    }
+
+    protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, ItemStack item) {
         canvas.drawRect(x, y, 16, 16, MapColorPalette.COLOR_RED);
-        canvas.draw(MapResourcePack.VANILLA.getItemTexture(new ItemStack(material), 16, 16), x, y);
+        canvas.draw(pack.getItemTexture(item, 16, 16), x, y);
     }
 
     @Ignore

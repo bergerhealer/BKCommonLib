@@ -24,6 +24,7 @@ public abstract class ItemHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract int getMaxStackSize();
+    public abstract int getMaxDurability();
     public abstract boolean usesDurability();
     /**
      * Stores class members for <b>net.minecraft.server.Item</b>.
@@ -34,6 +35,7 @@ public abstract class ItemHandle extends Template.Handle {
         public final Template.StaticField.Converted<Iterable> REGISTRY = new Template.StaticField.Converted<Iterable>();
 
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
+        public final Template.Method<Integer> getMaxDurability = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
 
     }

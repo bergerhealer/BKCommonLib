@@ -29,6 +29,7 @@ public class Model {
     public Map<String, Display> display = new HashMap<String, Display>();
     public Map<String, String> textures = new HashMap<String, String>();
     public List<Element> elements = new ArrayList<Element>();
+    public List<ModelOverride> overrides = new ArrayList<ModelOverride>();
 
     public final String getParentName() {
         return this.parent;
@@ -180,6 +181,11 @@ public class Model {
         }
         for (Element element : this.elements) {
             clone.elements.add(element.clone());
+        }
+        if (this.overrides != null && !this.overrides.isEmpty()) {
+            for (ModelOverride override : this.overrides) {
+                clone.overrides.add(override);
+            }
         }
         return clone;
     }
@@ -424,6 +430,56 @@ public class Model {
             clone.translation = this.translation.clone();
             clone.scale = this.scale.clone();
             return clone;
+        }
+    }
+
+    /**
+     * Model override based on a predicate.
+     * When the predicate matches, the linked model is loaded instead of this one.
+     */
+    public static class ModelOverride {
+        public Map<String, String> predicate;
+        public String model;
+
+        @Override
+        public ModelOverride clone() {
+            ModelOverride clone = new ModelOverride();
+            clone.model = this.model;
+            clone.predicate = (this.predicate == null) ? null : new HashMap<String, String>(this.predicate);
+            return clone;
+        }
+
+        @Override
+        public String toString() {
+            return this.model + "[" + this.predicate + "]";
+        }
+
+        /**
+         * Checks whether the predicate of this override matches the render options
+         * 
+         * @param options to check
+         * @return True if it matches the predicate
+         */
+        public boolean matches(RenderOptions options) {
+            if (this.predicate != null && !this.predicate.isEmpty()) {
+                for (Map.Entry<String, String> pred : this.predicate.entrySet()) {
+                    String opt = options.get(pred.getKey());
+                    if (opt == null) {
+                        return false;
+                    }
+                    if (opt.equals(pred.getValue())) {
+                        continue;
+                    }
+                    try {
+                        final double RANGE = 0.0000001;
+                        double diff = Double.parseDouble(opt) - Double.parseDouble(pred.getValue());
+                        return diff >= -RANGE && diff <= RANGE;
+                    } catch (NumberFormatException ex) {}
+
+                    return false; // No rounding for non-numeric values
+                }
+            }
+            return true;
         }
     }
 

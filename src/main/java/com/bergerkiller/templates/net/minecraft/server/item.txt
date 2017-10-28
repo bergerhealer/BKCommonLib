@@ -5,5 +5,7 @@ class Item {
 
     public int getMaxStackSize();
 
+    public int getMaxDurability();
+
     public boolean usesDurability();
 }
