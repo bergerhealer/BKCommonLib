@@ -33,20 +33,20 @@ public class MapResourcePackTest {
         MapTexture map = MapTexture.createEmpty(128, 128);
         map.fill(MapColorPalette.getColor(128, 128, 128));
 
-        MapResourcePack pack = new MapResourcePack("TestPack.zip");
+        MapResourcePack pack = MapResourcePack.SERVER; //new MapResourcePack("https://www.dropbox.com/s/s77nz3zaclrdqog/TestPack.zip?dl=1");
+        pack.load();
 
         ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, 2, 1);
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
 
         //map.draw(pack.getItemTexture(item, 128, 128), 0, 0);
 
-
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {
                 testDrawModel(map, pack, x, y, rand.nextInt(70));
             }
         }
-        
+
         /*
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {

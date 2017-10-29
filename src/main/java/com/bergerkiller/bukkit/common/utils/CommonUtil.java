@@ -670,6 +670,9 @@ public class CommonUtil {
      * @return Plugin
      */
     public static Plugin getPlugin(String name) {
+        if (Common.IS_TEST_MODE) {
+            return null;
+        }
         return Bukkit.getPluginManager().getPlugin(name);
     }
 
@@ -680,6 +683,9 @@ public class CommonUtil {
      * @return the Plugin matching the Class, or null if not found
      */
     public static Plugin getPluginByClass(Class<?> clazz) {
+        if (Common.IS_TEST_MODE) {
+            return null;
+        }
         ClassLoader loader = clazz.getClassLoader();
         synchronized (Bukkit.getServer().getPluginManager()) {
             for (Plugin plugin : getPluginsUnsafe()) {

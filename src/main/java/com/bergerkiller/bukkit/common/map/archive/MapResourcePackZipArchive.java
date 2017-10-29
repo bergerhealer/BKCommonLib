@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.archive;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarFile;
@@ -14,19 +15,19 @@ import com.bergerkiller.bukkit.common.Logging;
  */
 public class MapResourcePackZipArchive implements MapResourcePackArchive {
     private ZipFile archive = null;
-    private final String zipFilePath;
+    private final File zipFile;
 
-    public MapResourcePackZipArchive(String filePath) {
-        this.zipFilePath = filePath;
+    public MapResourcePackZipArchive(File zipFile) {
+        this.zipFile = zipFile;
     }
 
     @Override
     public void load(boolean lazy) {
         try {
-            this.archive = new JarFile(this.zipFilePath);
+            this.archive = new JarFile(this.zipFile);
         } catch (IOException ex) {
             this.archive = null;
-            Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + this.zipFilePath, ex);
+            Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + this.zipFile.getAbsolutePath(), ex);
         }
     }
 

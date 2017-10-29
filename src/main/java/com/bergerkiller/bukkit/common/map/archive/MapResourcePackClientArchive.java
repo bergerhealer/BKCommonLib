@@ -57,9 +57,6 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
      */
     @Override
     public void load(boolean lazy) {
-        if (lazy) {
-            log.warning("[Developer] You must call MapResourcePack.VANILLA.load() when enabling your plugin!");
-        }
         if (this.archive == null && !this.clientJarFile.exists()) {
             if (lazy) {
                 log.severe("The client for Minecraft " + Common.MC_VERSION + " is presently not installed");

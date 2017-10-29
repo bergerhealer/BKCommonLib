@@ -18,7 +18,7 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
     public MapResourcePackAutoArchive(String resourcePackPath, String resourcePackHash) {
         File file = new File(resourcePackPath);
         if (file.isFile()) {
-            this.archive = new MapResourcePackZipArchive(resourcePackPath);
+            this.archive = new MapResourcePackZipArchive(file);
         } else if (file.isDirectory()) {
             this.archive = new MapResourcePackDirectoryArchive(file);
         } else {

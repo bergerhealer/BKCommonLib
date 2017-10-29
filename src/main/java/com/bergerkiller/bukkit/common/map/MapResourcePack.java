@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
+import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -173,19 +174,24 @@ public class MapResourcePack {
      * at the very beginning.
      */
     public void load() {
-        handleLoad(false);
+        handleLoad(false, false);
     }
 
-    protected void handleLoad(boolean lazy) {
+    protected void handleLoad(boolean lazy, boolean recurse) {
         if (this.loaded) {
             return;
         }
         this.loaded = true;
+        if (lazy && !recurse) {
+            Logging.LOGGER_MAPDISPLAY.warning("[Developer] You must call MapResourcePack.load() when enabling your plugin!");
+            Logging.LOGGER_MAPDISPLAY.warning("[Developer] This avoids stalling the server while downloading large resource packs/Minecraft client.");
+            Logging.LOGGER_MAPDISPLAY.warning("[Developer] Potential plugins that caused this: " + DebugUtil.getPluginCauses());
+        }
         if (this.archive != null) {
             this.archive.load(lazy);
         }
         if (this.baseResourcePack != null) {
-            this.baseResourcePack.handleLoad(lazy);
+            this.baseResourcePack.handleLoad(lazy, true);
         }
     }
 
@@ -565,7 +571,7 @@ public class MapResourcePack {
      */
     protected InputStream openFileStream(ResourceType type, String path) {
         // =null: failed to load resource pack file
-        this.handleLoad(true);
+        this.handleLoad(true, false);
         if (this.archive != null) {
             try {
                 InputStream stream = this.archive.openFileStream(type.makePath(path));

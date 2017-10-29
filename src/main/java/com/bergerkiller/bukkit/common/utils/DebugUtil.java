@@ -19,6 +19,7 @@ import com.bergerkiller.mountiplex.reflection.util.SecureField;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Contains utilities to debug code, such as logging objects
@@ -165,6 +166,23 @@ public class DebugUtil {
      */
     public static float getShortValue(String name, int value) {
         return getVariableValue(name, Integer.valueOf(value)).shortValue();
+    }
+
+    /**
+     * Looks at the current stack trace to find all potential plugins that could have caused something
+     * 
+     * @return plugin causes
+     */
+    public static String getPluginCauses() {
+        Plugin[] plugins = CommonUtil.findPlugins(Thread.currentThread().getStackTrace());
+        if (plugins == null || plugins.length == 0) {
+            return "Unknown";
+        }
+        String[] names = new String[plugins.length];
+        for (int i = 0; i < plugins.length; i++) {
+            names[i] = plugins[i].getName();
+        }
+        return StringUtil.combineNames(names);
     }
 
     /**

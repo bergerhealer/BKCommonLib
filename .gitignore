@@ -5,6 +5,7 @@
 
 # Minecraft client cache folder
 /minecraft/
+/resourcepacks/
 
 # netbeans
 nbproject/
