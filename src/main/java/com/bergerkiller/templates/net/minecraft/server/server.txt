@@ -12,6 +12,10 @@ class MinecraftServer {
 
     public boolean isRunning();
 
+    public String getResourcePack();
+
+    public String getResourcePackHash();
+
     <code>
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();

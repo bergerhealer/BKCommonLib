@@ -8,10 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -23,6 +19,9 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.resources.builtin.GeneratedModel;
+import com.bergerkiller.bukkit.common.map.archive.MapResourcePackArchive;
+import com.bergerkiller.bukkit.common.map.archive.MapResourcePackAutoArchive;
+import com.bergerkiller.bukkit.common.map.archive.MapResourcePackClientArchive;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
@@ -38,6 +37,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -84,47 +84,109 @@ public class MapResourcePack {
     public static final MapResourcePack SERVER = new MapResourcePack("server");
 
     private final MapResourcePack baseResourcePack;
-    protected ZipFile archive;
+    protected MapResourcePackArchive archive;
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
     private BlockRenderProvider currProvider = null;
     private Gson gson = null;
+    private boolean loaded = false;
 
     /**
      * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
      * 
-     * @param resourcePackFilePath of the resource pack to load
+     * @param resourcePackPath of the resource pack to load. File or URL.
      */
-    public MapResourcePack(String resourcePackFilePath) {
-        this(VANILLA, resourcePackFilePath);
+    public MapResourcePack(String resourcePackPath) {
+        this(VANILLA, resourcePackPath, "");
+    }
+
+    /**
+     * Loads a new resource pack, extending the default {@link #VANILLA} resource pack
+     * 
+     * @param resourcePackPath of the resource pack to load. File or URL.
+     * @param resourcePackHash SHA1 hash of the resource pack to detect changes (when URL)
+     */
+    public MapResourcePack(String resourcePackPath, String resourcePackHash) {
+        this(VANILLA, resourcePackPath, resourcePackHash);
     }
 
     /**
      * Loads a new resource pack, extending another one
      * 
      * @param baseResourcePack to extend
-     * @param resourcePackFilePath of the resource pack to load
+     * @param resourcePackPath of the resource pack to load. File path or URL.
      */
-    public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackFilePath) {
+    public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackPath) {
+        this(baseResourcePack, resourcePackPath, "");
+    }
+
+    /**
+     * Loads a new resource pack, extending another one
+     * 
+     * @param baseResourcePack to extend
+     * @param resourcePackPath of the resource pack to load. File path or URL.
+     * @param resourcePackHash SHA1 hash of the resource pack to detect changes (when URL)
+     */
+    public MapResourcePack(MapResourcePack baseResourcePack, String resourcePackPath, String resourcePackHash) {
         this.baseResourcePack = baseResourcePack;
         this.archive = null;
-        if (resourcePackFilePath.equalsIgnoreCase("server")) {
-            //TODO! Download the resource pack defined in server.properties and assign it to archive lazily
-        } else if (resourcePackFilePath.length() > 0 && !resourcePackFilePath.equalsIgnoreCase("default")) {
-            try {
-                this.archive = new JarFile(resourcePackFilePath);
-            } catch (IOException ex) {
-                this.archive = null;
-                Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + resourcePackFilePath, ex);
-            }
+
+        // Detect the appropriate archive to use
+
+        // Server-defined. Take over the options from the server.properties
+        if (resourcePackPath != null && resourcePackPath.equalsIgnoreCase("server")) {
+            MinecraftServerHandle mcs = MinecraftServerHandle.instance();
+            resourcePackPath = mcs.getResourcePack();
+            resourcePackHash = mcs.getResourcePackHash();
         }
+
+        // Vanilla Minecraft client, without any other resource packs applied
+        if (resourcePackPath == null || resourcePackPath.isEmpty() ||
+            resourcePackPath.equalsIgnoreCase("vanilla") || resourcePackPath.equalsIgnoreCase("default")
+        ) {
+            // Vanilla client resource pack.
+            // If a base resource pack is already defined, don't use any archive
+            // Otherwise, use the client archive
+            if (this.baseResourcePack == null) {
+                this.archive = new MapResourcePackClientArchive();
+            } else {
+                this.archive = null;
+            }
+            return;
+        }
+
+        // Auto-detect the right way to use it
+        this.archive = new MapResourcePackAutoArchive(resourcePackPath, resourcePackHash);
     }
 
     // constructor only used by the Vanilla texture pack
     protected MapResourcePack() {
         this.baseResourcePack = null;
         this.archive = null;
+    }
+
+    /**
+     * Initializes the resource pack and all underlying resource packs.
+     * This is called automatically once the resource packs are first accessed.
+     * To initialize up-front and avoid lazy initialization at runtime, call this method
+     * at the very beginning.
+     */
+    public void load() {
+        handleLoad(false);
+    }
+
+    protected void handleLoad(boolean lazy) {
+        if (this.loaded) {
+            return;
+        }
+        this.loaded = true;
+        if (this.archive != null) {
+            this.archive.load(lazy);
+        }
+        if (this.baseResourcePack != null) {
+            this.baseResourcePack.handleLoad(lazy);
+        }
     }
 
     /**
@@ -264,9 +326,12 @@ public class MapResourcePack {
      * @return rendered item slot image
      */
     public MapTexture getItemTexture(ItemStack item, int width, int height) {
-        MapTexture texture = MapTexture.createEmpty(width, height);
         Model model = this.getItemModel(item);
-        
+        if (model == null || model.placeholder) {
+            return createPlaceholderTexture(width, height);
+        }
+
+        MapTexture texture = MapTexture.createEmpty(width, height);
         Matrix4x4 transform = new Matrix4x4();
         if (width != 16 || height != 16) {
             transform.scale((double) width / 16.0, 1.0, (double) height / 16.0);
@@ -471,10 +536,23 @@ public class MapResourcePack {
      * @return placeholder texture
      */
     protected final MapTexture createPlaceholderTexture() {
-        MapTexture result = MapTexture.createEmpty(16, 16);
+        return createPlaceholderTexture(16, 16);
+    }
+
+    /**
+     * Creates a placeholder 16x16 texture. Used when textures can not be loaded.
+     * 
+     * @param width
+     * @param height
+     * @return placeholder texture
+     */
+    protected final MapTexture createPlaceholderTexture(int width, int height) {
+        int wd2 = width >> 2;
+        int hd2 = height >> 2;
+        MapTexture result = MapTexture.createEmpty(width, height);
         result.fill(MapColorPalette.COLOR_PURPLE);
-        result.fillRectangle(0, 0, 8, 8, MapColorPalette.COLOR_BLUE);
-        result.fillRectangle(8, 8, 8, 8, MapColorPalette.COLOR_BLUE);
+        result.fillRectangle(0, 0, wd2, hd2, MapColorPalette.COLOR_BLUE);
+        result.fillRectangle(wd2, hd2, width - wd2, height - hd2, MapColorPalette.COLOR_BLUE);
         return result;
     }
 
@@ -487,14 +565,12 @@ public class MapResourcePack {
      */
     protected InputStream openFileStream(ResourceType type, String path) {
         // =null: failed to load resource pack file
+        this.handleLoad(true);
         if (this.archive != null) {
             try {
-                ZipEntry entry = this.archive.getEntry(type.makePath(path));
-                if (entry != null) {
-                    InputStream stream = this.archive.getInputStream(entry);
-                    if (stream != null) {
-                        return stream;
-                    }
+                InputStream stream = this.archive.openFileStream(type.makePath(path));
+                if (stream != null) {
+                    return stream;
                 }
             } catch (IOException ex) {
             }

@@ -23,6 +23,8 @@ public abstract class MinecraftServerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean isRunning();
+    public abstract String getResourcePack();
+    public abstract String getResourcePackHash();
 
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
@@ -37,6 +39,8 @@ public abstract class MinecraftServerHandle extends Template.Handle {
         public final Template.Field.Converted<List<WorldServerHandle>> worlds = new Template.Field.Converted<List<WorldServerHandle>>();
 
         public final Template.Method<Boolean> isRunning = new Template.Method<Boolean>();
+        public final Template.Method<String> getResourcePack = new Template.Method<String>();
+        public final Template.Method<String> getResourcePackHash = new Template.Method<String>();
 
     }
 
