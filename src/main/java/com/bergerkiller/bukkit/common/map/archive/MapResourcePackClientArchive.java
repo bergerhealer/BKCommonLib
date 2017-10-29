@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -23,11 +24,13 @@ import com.google.gson.GsonBuilder;
  * This archive will automatically download the correct client jar from Mojang's servers before use.
  */
 public class MapResourcePackClientArchive implements MapResourcePackArchive {
+    private final Logger log;
     private final File clientJarFile;
     private JarFile archive = null;
 
     public MapResourcePackClientArchive() {
         super();
+        this.log = Logging.LOGGER;
 
         File file;
         if (Common.IS_TEST_MODE) {
@@ -55,21 +58,21 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     @Override
     public void load(boolean lazy) {
         if (lazy) {
-            Logging.LOGGER.warning("[Developer] You must call MapResourcePack.VANILLA.load() when enabling your plugin!");
+            log.warning("[Developer] You must call MapResourcePack.VANILLA.load() when enabling your plugin!");
         }
         if (this.archive == null && !this.clientJarFile.exists()) {
             if (lazy) {
-                Logging.LOGGER.severe("The client for Minecraft " + Common.MC_VERSION + " is presently not installed");
-                Logging.LOGGER.severe("Since the plugin did not call load(), it will be downloaded now. This may cause lag.");
-                Logging.LOGGER.severe("To fix this, please tell the plugin author to call load() on startup.");
+                log.severe("The client for Minecraft " + Common.MC_VERSION + " is presently not installed");
+                log.severe("Since the plugin did not call load(), it will be downloaded now. This may cause lag.");
+                log.severe("To fix this, please tell the plugin author to call load() on startup.");
             }
             try {
                 // Informative log to the administrators so they know what is going on
-                Logging.LOGGER.warning("To display Minecraft assets (models, textures) on maps, the Minecraft client jar is required");
-                Logging.LOGGER.warning("BKCommonLib will now download Minecraft " + Common.MC_VERSION + " client jar from Mojang's servers");
-                Logging.LOGGER.warning("The file will be installed in: " + this.clientJarFile.toString());
-                Logging.LOGGER.warning("By installing this Minecraft client you further indicate agreement to Mojang's EULA.");
-                Logging.LOGGER.warning("The EULA can be read here: https://account.mojang.com/documents/minecraft_eula");
+                log.warning("To display Minecraft assets (models, textures) on maps, the Minecraft client jar is required");
+                log.warning("BKCommonLib will now download Minecraft " + Common.MC_VERSION + " client jar from Mojang's servers");
+                log.warning("The file will be installed in: " + this.clientJarFile.toString());
+                log.warning("By installing this Minecraft client you further indicate agreement to Mojang's EULA.");
+                log.warning("The EULA can be read here: https://account.mojang.com/documents/minecraft_eula");
 
                 // Download the version manifest, to find all available versions
                 VersionManifest versionManifest = downloadJson(VersionManifest.class, "https://launchermeta.mojang.com/mc/game/version_manifest.json");
@@ -97,7 +100,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                 }
 
                 // Download the file
-                Logging.LOGGER.warning("> Fetching Minecraft Client " + Common.MC_VERSION + " from Mojang servers: " + download.url);
+                log.warning("> Fetching Minecraft Client " + Common.MC_VERSION + " from Mojang servers: " + download.url);
                 FileOutputStream outStream = new FileOutputStream(this.clientJarFile);
                 try {
                     URL dlUrl = new URL(download.url);
@@ -115,7 +118,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                             int progress = (int) ((100 * downloaded) / download.size);
                             if (progress >= (old_progress + 10)) {
                                 old_progress = progress;
-                                Logging.LOGGER.warning("> Downloading Minecraft Client " + Common.MC_VERSION + ".jar: " + progress + "%");
+                                log.warning("> Downloading Minecraft Client " + Common.MC_VERSION + ".jar: " + progress + "%");
                             }
                         }
                     } finally {
@@ -131,17 +134,19 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                     throw new IOException("Jar file is corrupt");
                 }
             } catch (DownloadFailure f) {
-                Logging.LOGGER.severe("Failed to download the Minecraft " + Common.VERSION + " client: " + f.getMessage());
+                log.severe("Failed to download the Minecraft " + Common.MC_VERSION + " client: " + f.getMessage());
                 this.clientJarFile.delete();
+                logAlternative();
             } catch (Throwable t) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to download the Minecraft " + Common.VERSION + " client:", t);
+                log.log(Level.SEVERE, "Failed to download the Minecraft " + Common.MC_VERSION + " client:", t);
                 this.clientJarFile.delete();
+                logAlternative();
             }
         }
     }
 
     private static <T> T downloadJson(Class<T> type, String urlString) throws IOException {
-        Common.LOGGER.warning("> Fetching JSON from Mojang servers: " + urlString);
+        Logging.LOGGER.warning("> Fetching JSON from Mojang servers: " + urlString);
         URL url = new URL(urlString);
         InputStream inputStream = url.openStream();
         try {
@@ -154,16 +159,22 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
         }
     }
 
+    private void logAlternative() {
+        log.severe("If automatically downloading the client is impossible at this time, you can manually install it.");
+        log.severe("Install the correct Minecraft client jar file for " + Common.MC_VERSION + " in the following location:");
+        log.severe("> " + clientJarFile.getAbsolutePath());
+    }
+
     private void loadArchive() {
         if (clientJarFile.exists()) {
             try {
                 this.archive = new JarFile(this.clientJarFile);
             } catch (IOException ex) {
                 this.archive = null;
-                Logging.LOGGER.severe("Failed to load the Minecraft client jar for accessing resources!");
-                Logging.LOGGER.severe("In case the file is corrupt, try deleting it so it is re-downloaded:");
-                Logging.LOGGER.severe("> " + this.clientJarFile.getAbsolutePath());
-                Logging.LOGGER.log(Level.SEVERE, "Loading " + this.clientJarFile.getName() + " failed!", ex);
+                log.severe("Failed to load the Minecraft client jar for accessing resources!");
+                log.severe("In case the file is corrupt, try deleting it so it is re-downloaded:");
+                log.severe("> " + this.clientJarFile.getAbsolutePath());
+                log.log(Level.SEVERE, "Loading " + this.clientJarFile.getName() + " failed!", ex);
             }
         }
     }
