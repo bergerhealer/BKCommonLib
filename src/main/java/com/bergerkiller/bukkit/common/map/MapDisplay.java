@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
+import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
@@ -49,6 +50,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  */
 public class MapDisplay implements MapDisplayEvents {
     private final MapSession session = new MapSession(this);
+    private final MapWidgetCollection widgets = new MapWidgetCollection(this);
     private int width, height;
     private final MapClip clip = new MapClip();
     private List<MapDisplayTile> tiles = new ArrayList<MapDisplayTile>();
@@ -309,6 +311,7 @@ public class MapDisplay implements MapDisplayEvents {
         if (this._updateWhenNotViewing || this.session.hasViewers) {
             //StopWatch.instance.start();
             this.onTick();
+            this.widgets.update();
             //StopWatch.instance.stop().log("VirtualMap onTick()");
         }
 
@@ -585,6 +588,45 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets all widgets added to this display using {@link #addWidget(MapWidget)}.
+     * 
+     * @return an immutable list of all added widgets
+     */
+    public List<MapWidget> getWidgets() {
+        return this.widgets.getWidgets();
+    }
+
+    /**
+     * Removes all widgets added to this display using {@link #addWidget(MapWidget)}.
+     * Previously drawn widget contents will be cleared.
+     */
+    public void clearWidgets() {
+        this.widgets.clearWidgets();
+    }
+
+    /**
+     * Adds a widget to this display. This widget will receive updates and can automatically
+     * re-draw itself. It is a smart display element on the map. Widgets can have other widgets
+     * added as well, allowing for widgets composed of other widgets.
+     * 
+     * @param widget to add
+     */
+    public void addWidget(MapWidget widget) {
+        this.widgets.addWidget(widget);
+    }
+
+    /**
+     * Removes a widget previously added using {@link #addWidget(MapWidget)}.
+     * Previously drawn widget contents will be cleared.
+     * 
+     * @param widget to remove
+     * @return True if the widget was removed
+     */
+    public boolean removeWidget(MapWidget widget) {
+        return this.widgets.removeWidget(widget);
+    }
+
+    /**
      * Retrieves the base layer at z-index 0.
      * Note that if layers at negative z-index exist, this is not the background.
      * 
@@ -650,6 +692,7 @@ public class MapDisplay implements MapDisplayEvents {
 
                 // Handle onDetached
                 this.onDetached();
+                this.widgets.clearWidgets();
                 this.refreshMapItem();
 
                 // Clean up
@@ -1129,5 +1172,23 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public static <T extends MapDisplay> Collection<T> getAllDisplays(Class<T> displayClass) {
         return CommonPlugin.getInstance().getMapController().getDisplays(displayClass);
+    }
+
+    /**
+     * The root node of a map display widget view. It is here that the display and main display layer
+     * are initialized. Other widgets can be added to this main widget recursively, and all will
+     * be updated with an appropriate z-level assigned.
+     */
+    private static final class MapWidgetCollection extends MapWidget {
+        public MapWidgetCollection(MapDisplay display) {
+            this.parent = null;
+            this.display = display;
+        }
+
+        @Override
+        public void onAttached() {
+            this.setFocusable(true);
+            this.setBounds(0, 0, display.getWidth(), display.getHeight());
+        }
     }
 }

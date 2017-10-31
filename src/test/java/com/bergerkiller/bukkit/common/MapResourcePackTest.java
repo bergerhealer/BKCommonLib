@@ -69,7 +69,7 @@ public class MapResourcePackTest {
     }
 
     protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, ItemStack item) {
-        canvas.drawRect(x, y, 16, 16, MapColorPalette.COLOR_RED);
+        canvas.drawRectangle(x, y, 16, 16, MapColorPalette.COLOR_RED);
         canvas.draw(pack.getItemTexture(item, 16, 16), x, y);
     }
 

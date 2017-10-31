@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.inventory.ItemStack;
+
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
 import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
@@ -485,7 +487,7 @@ public abstract class MapCanvas {
 
     /**
      * Moves all pixel information, including depth buffer data, with an offset.
-     * This enables quick movement of pixel data without re-drawing all the partss.
+     * This enables quick movement of pixel data without re-drawing all the parts.
      * 
      * @param dx pixel offset
      * @param dy pixel offset
@@ -922,7 +924,7 @@ public abstract class MapCanvas {
      * @param color to draw the rectangle as
      * @return this canvas
      */
-    public final <T> MapCanvas drawRect(int x, int y, int width, int height, byte color) {
+    public final <T> MapCanvas drawRectangle(int x, int y, int width, int height, byte color) {
         this.drawLine(x, y, x, y + height - 1, color);
         this.drawLine(x, y, x + width - 1, y, color);
         this.drawLine(x + width - 1, y, x + width - 1, y + height - 1, color);
@@ -1106,6 +1108,32 @@ public abstract class MapCanvas {
         transform.rotateX(pitch);
         transform.rotateY(yaw);
         return drawModel(model, transform);
+    }
+
+    /**
+     * Draws the icon of an item onto this canvas
+     * 
+     * @param resourcePack for loading the item icon from
+     * @param item to draw
+     * @param x - coordinate of the drawn icon
+     * @param y - coordinate of the drawn icon
+     * @param width of the drawn icon
+     * @param height of the drawn icon
+     * @return this canvas
+     */
+    public final MapCanvas drawItem(MapResourcePack resourcePack, ItemStack item, int x, int y, int width, int height) {
+        return this.draw(resourcePack.getItemTexture(item, width, height), x, y);
+    }
+
+    /**
+     * Fills this canvas with the icon of an item, covering the entire area
+     * 
+     * @param resourcePack for loading the item icon from
+     * @param item to draw
+     * @return this canvas
+     */
+    public final MapCanvas fillItem(MapResourcePack resourcePack, ItemStack item) {
+        return this.drawItem(resourcePack, item, 0, 0, this.getWidth(), this.getHeight());
     }
 
     @Deprecated
