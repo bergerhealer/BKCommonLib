@@ -1025,6 +1025,11 @@ public class MapDisplay implements MapDisplayEvents {
             // Read layer itself
             readBasePixels(x, y, w, h, dst_buffer);
 
+            // If blend mode is none/overlay, don't read pixels from underlying layers
+            if (this.getBlendMode() == MapBlendMode.NONE || this.getBlendMode() == MapBlendMode.OVERLAY) {
+                return dst_buffer;
+            }
+
             // Slow method. Have to figure out the underlying pixel values
             byte[] tmp_buffer = null;
             Layer layer = this;

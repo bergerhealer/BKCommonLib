@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -887,6 +889,15 @@ public abstract class MapCanvas {
     }
 
     /**
+     * Gets the alignment at which font is drawn on this canvas.
+     * 
+     * @return font alignment
+     */
+    public final MapFont.Alignment getAlignment() {
+        return this.fontAlignment;
+    }
+
+    /**
      * Sets the color blending mode to use, applied when drawing contents on this canvas.
      * <ul>
      * <li>NONE - overwrites pixels already there, no transparency</li>
@@ -942,9 +953,47 @@ public abstract class MapCanvas {
      */
     public final MapCanvas drawPixel(int x, int y, byte color) {
         byte oldColor = this.readPixel(x, y);
-        byte newColor = this.blendMode.process(oldColor, color);
+        byte newColor = this.blendMode.process(color, oldColor);
         this.writePixel(x, y, newColor);
         return this;
+    }
+
+    /**
+     * Draws a contour of multiple connected points forming a line, connecting all the points into a circle
+     * 
+     * @param points of the contour to draw
+     * @param color to draw the contour as
+     * @return this canvas
+     */
+    public final MapCanvas drawContour(Collection<Point> points, byte color) {
+        if (!points.isEmpty()) {
+            Point first = null;
+            Point last = null;
+            for (Point point : points) {
+                if (first == null) {
+                    first = point;
+                } else {
+                    drawLine(last, point, color);
+                }
+                last = point;
+            }
+            drawLine(first, last, color);
+        }
+        return this;
+    }
+
+    /**
+     * Draws a line connecting two points
+     * 
+     * @param x1 coordinate of the first point
+     * @param y1 coordinate of the first point
+     * @param x2 coordinate of the second point
+     * @param y2 coordinate of the second point
+     * @param color to draw the line as
+     * @return this canvas
+     */
+    public final MapCanvas drawLine(Point p1, Point p2, byte color) {
+        return drawLine((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color);
     }
 
     /**

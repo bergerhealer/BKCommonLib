@@ -27,10 +27,12 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _invalidated;
     private boolean _focusable;
     private boolean _attached;
+    private boolean _boundsChanged;
     private List<MapWidget> _children;
 
     public MapWidget() {
         this._invalidated = true;
+        this._boundsChanged = true;
         this._focusable = false;
         this._attached = false;
         this._children = Collections.emptyList();
@@ -68,6 +70,12 @@ public class MapWidget implements MapDisplayEvents {
      * When this is called, the old area the widget was displayed has already been cleared.
      */
     public void onDraw() {
+    }
+
+    /**
+     * Called when the bounding box area of this widget was changed
+     */
+    public void onBoundsChanged() {
     }
 
     /**
@@ -321,6 +329,7 @@ public class MapWidget implements MapDisplayEvents {
         this._y = y;
         this._width = width;
         this._height = height;
+        this._boundsChanged = true;
         this.refreshView();
         this.invalidate();
         return this;
@@ -409,6 +418,10 @@ public class MapWidget implements MapDisplayEvents {
     // Handles onTick() of this widget and all children
     private final void handleTick() {
         this.onTick();
+        if (this._boundsChanged) {
+            this._boundsChanged = false;
+            this.onBoundsChanged();
+        }
         for (MapWidget child : this._children) {
             child.handleTick();
         }
@@ -438,6 +451,27 @@ public class MapWidget implements MapDisplayEvents {
             this._lastWidth = this._width;
             this._lastHeight = this._height;
             this._invalidated = false;
+        }
+
+        // For all invalidated children, if their bounding box intersects with another widget,
+        // invalidate the intersected widgets too to enable proper overlay. This is a work-around
+        // for an annoying to use z-buffer...
+        for (MapWidget child : this._children) {
+            if (child._invalidated) {
+                for (MapWidget otherChild : this._children) {
+                    if (otherChild == child || otherChild._invalidated) {
+                        continue;
+                    }
+                    if (
+                        (otherChild.getX() + otherChild.getWidth()) >= child.getX() &&
+                        otherChild.getX() <= (child.getX() + child.getWidth()) &&
+                        (otherChild.getY() + otherChild.getHeight()) >= child.getY() &&
+                        otherChild.getY() <= (child.getY() + child.getHeight())
+                    ) {
+                        otherChild._invalidated = true;
+                    }
+                }
+            }
         }
 
         // Draw children of this widget, relative to the current coordinates
