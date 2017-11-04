@@ -363,10 +363,15 @@ public class MapPlayerInput implements Tickable {
                 boolean press_a = wasPressed(key);
                 boolean press_b = isPressed(key);
                 if (press_b) {
-                    display.onKeyPressed(new MapKeyEvent(display, this.player, key)); // Repeat!
-                    display.onKey(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKeyPressed(event); // Repeat!
+                    display.onKey(event);
+                    display.getActivatedWidget().onKeyPressed(event);
+                    display.getActivatedWidget().onKey(event);
                 } else if (press_a) {
-                    display.onKeyReleased(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKeyReleased(event);
+                    display.getActivatedWidget().onKeyReleased(event);
                 }
             }
         } if (hasChanges()) {
@@ -374,18 +379,26 @@ public class MapPlayerInput implements Tickable {
                 boolean press_a = wasPressed(key);
                 boolean press_b = isPressed(key);
                 if (!press_a && press_b) {
-                    display.onKeyPressed(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKeyPressed(event);
+                    display.getActivatedWidget().onKeyPressed(event);
                 } else if (press_a && !press_b) {
-                    display.onKeyReleased(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKeyReleased(event);
+                    display.getActivatedWidget().onKeyReleased(event);
                 }
                 if (press_b) {
-                    display.onKey(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKey(event);
+                    display.getActivatedWidget().onKey(event);
                 }
             }
         } else {
             for (MapPlayerInput.Key key : MapPlayerInput.Key.values()) {
                 if (isPressed(key)) {
-                    display.onKey(new MapKeyEvent(display, this.player, key));
+                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    display.onKey(event);
+                    display.getActivatedWidget().onKey(event);
                 }
             }
         }

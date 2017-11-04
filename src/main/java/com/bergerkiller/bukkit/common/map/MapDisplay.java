@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
+import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
@@ -50,7 +51,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  */
 public class MapDisplay implements MapDisplayEvents {
     private final MapSession session = new MapSession(this);
-    private final MapWidgetCollection widgets = new MapWidgetCollection(this);
     private int width, height;
     private final MapClip clip = new MapClip();
     private List<MapDisplayTile> tiles = new ArrayList<MapDisplayTile>();
@@ -65,6 +65,7 @@ public class MapDisplay implements MapDisplayEvents {
     private ItemStack _item = null;
     protected MapDisplayInfo info = null;
     protected JavaPlugin plugin = null;
+    private final MapWidgetRoot widgets = new MapWidgetRoot(this);
     protected final MapDisplayProperties properties = new MapDisplayProperties(this);
 
     /**
@@ -407,6 +408,14 @@ public class MapDisplay implements MapDisplayEvents {
         this._item = item;
         this._oldItem = ItemUtil.cloneItem(item);
         this.onMapItemChanged();
+        onMapChangedWidgets(this.widgets);
+    }
+
+    private static void onMapChangedWidgets(MapWidget widget) {
+        widget.onMapItemChanged();
+        for (MapWidget child : widget.getWidgets()) {
+            onMapChangedWidgets(child);
+        }
     }
 
     /**
@@ -627,6 +636,16 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets the widget that is currently activated for this display.
+     * This is the widget that is receiving all user input.
+     * 
+     * @return activated widget
+     */
+    public MapWidget getActivatedWidget() {
+        return this.widgets.getActivatedWidget();
+    }
+
+    /**
      * Retrieves the base layer at z-index 0.
      * Note that if layers at negative z-index exist, this is not the background.
      * 
@@ -653,6 +672,19 @@ public class MapDisplay implements MapDisplayEvents {
             z--;
         }
         return currentLayer;
+    }
+
+    /**
+     * Gets the top-most layer, overlapping all other layers of the display.
+     * 
+     * @return top layer
+     */
+    public final Layer getTopLayer() {
+        Layer top = this.layerStack;
+        while (top.next != null) {
+            top = top.next;
+        }
+        return top;
     }
 
     /**
@@ -1174,21 +1206,4 @@ public class MapDisplay implements MapDisplayEvents {
         return CommonPlugin.getInstance().getMapController().getDisplays(displayClass);
     }
 
-    /**
-     * The root node of a map display widget view. It is here that the display and main display layer
-     * are initialized. Other widgets can be added to this main widget recursively, and all will
-     * be updated with an appropriate z-level assigned.
-     */
-    private static final class MapWidgetCollection extends MapWidget {
-        public MapWidgetCollection(MapDisplay display) {
-            this.parent = null;
-            this.display = display;
-        }
-
-        @Override
-        public void onAttached() {
-            this.setFocusable(true);
-            this.setBounds(0, 0, display.getWidth(), display.getHeight());
-        }
-    }
 }

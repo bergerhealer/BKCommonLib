@@ -5,13 +5,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
+import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.map.MapCanvas;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
+import com.bergerkiller.bukkit.common.map.MapDisplayEvents;
+import com.bergerkiller.bukkit.common.map.MapPlayerInput.Key;
+import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
 
 /**
  * A single rectangular element on the map
  */
-public class MapWidget {
+public class MapWidget implements MapDisplayEvents {
+    protected MapWidgetRoot root;
     protected MapWidget parent;
     protected MapDisplay display;
     protected MapDisplay.Layer layer;
@@ -20,19 +26,18 @@ public class MapWidget {
     private int _lastX, _lastY, _lastWidth, _lastHeight; // last drawn bounds (absolute)
     private boolean _invalidated;
     private boolean _focusable;
-    private boolean _focused;
     private boolean _attached;
     private List<MapWidget> _children;
 
     public MapWidget() {
         this._invalidated = true;
         this._focusable = false;
-        this._focused = false;
         this._attached = false;
         this._children = Collections.emptyList();
         this.display = null;
         this.layer = null;
         this.parent = null;
+        this.root = null;
         this._lastX = this._x = 0;
         this._lastY = this._y = 0;
         this._lastWidth = this._width = 0;
@@ -138,24 +143,64 @@ public class MapWidget {
     }
 
     /**
-     * Gets whether this widget currently has focus
+     * Gets whether this widget currently has focus. The focused widget is the widget which
+     * will be activated when the user presses spacebar.
      * 
      * @return True if focused
      */
     public final boolean isFocused() {
-        return this._focused;
+        return (this.root != null) && (this == this.root.getFocusedWidget());
     }
 
     /**
-     * Sets whether this widget currently has focus.
-     * 
-     * @param focused to set to
+     * Gives this widget the focus. When the user presses spacebar, this will be the widget
+     * that is activated.
      */
-    public final void setFocused(boolean focused) {
-        if (this._focused != focused) {
-            this._focused = focused;
-            this.invalidate();
+    public final void focus() {
+        if (this.root != null) {
+            this.root.setFocusedWidget(this);
         }
+    }
+
+    /**
+     * Gets whether this widget has been activated. The activated widget is the widget to which
+     * all user input (W/A/S/D/Spacebar/Shift) is redirected.
+     * 
+     * @return True if activated
+     */
+    public final boolean isActivated() {
+        return (this.root != null) && (this == this.root.getActivatedWidget());
+    }
+
+    public final void activate() {
+        if (this.root != null) {
+            this.root.setActivatedWidget(this);
+        }
+    }
+
+    /**
+     * Gets whether this map widget is a potential widget that can be focused
+     * by navigating using W/A/S/D. If true, this widget can be focused
+     * without changing the activated widget. If false, the widget can only be
+     * focused by changing the currently activated widget.<br>
+     * <br>
+     * If this widget is not {@link #isFocusable()} this always returns false.
+     * 
+     * @return True if this widget can be focused by navigating to it
+     */
+    public final boolean isNavigableFocus() {
+        if (!this.isFocusable() || this.root == null) {
+            return false;
+        }
+        MapWidget activated = this.root.getActivatedWidget();
+        MapWidget parent = this.parent;
+        while (parent != null) {
+            if (parent == activated) {
+                return true;
+            }
+            parent = parent.parent;
+        }
+        return false;
     }
 
     /**
@@ -188,6 +233,7 @@ public class MapWidget {
         if (this._children.isEmpty()) {
             this._children = new ArrayList<MapWidget>(1);
         }
+        widget.root = this.root;
         widget.parent = this;
         widget._attached = false;
         this._children.add(widget);
@@ -336,15 +382,22 @@ public class MapWidget {
             this._attached = true;
             if (this.parent != null) {
                 // This is done for children of widgets
+                this.root = this.parent.root;
                 this.display = this.parent.display;
                 this.layer = this.parent.layer.next();
                 this.refreshView();
             } else if (this.layer == null && this.display != null) {
                 // This is done for the root node (covers entire display)
-                this.layer = this.display.getLayer();
+                this.layer = this.display.getTopLayer().next();
                 this.view = this.layer;
             }
             this.onAttached();
+
+            // If the attached widget can be focused, and no widget is focused yet, focus it
+            // Only do this if this current widget has an activated parent
+            if (this.root.getFocusedWidget() == null && this.isNavigableFocus()) {
+                this.focus();
+            }
         }
 
         // Also attach (new) children
@@ -411,5 +464,71 @@ public class MapWidget {
             // Clear our occupied area on the canvas
             this.clear();
         }
+    }
+
+    /**
+     * Handles key navigation of the widgets, changing which widgets are focused and activated.
+     * 
+     * @param event
+     */
+    protected void handleNavigation(MapKeyEvent event) {
+        MapWidget focused = this.root.getFocusedWidget();
+        if (event.getKey() == Key.ENTER) {
+            // Activate the currently focused widget when activated
+            // If none exists, we can't do this and the enter key should be handled by the widget
+            if (focused != null) {
+                focused.activate();
+            }
+        } else if (event.getKey() == Key.BACK) {
+            // De-activate ourselves, moving control back to the closest parent that can be focused
+            MapWidget tmp = this.parent;
+            while (tmp != null) {
+                if (tmp.isFocusable()) {
+                    break;
+                }
+                tmp = tmp.parent;
+            }
+            if (tmp == null) {
+                tmp = this.root;
+            }
+            tmp.activate();
+        } else {
+            // W/A/S/D controls to switch the focused widget
+            // Collect all the widgets eligible for focusing
+            // Then use the widget navigator helper class to select the right widget
+            List<MapWidget> widgets = MapWidgetNavigator.getFocusableWidgets(this);
+            if (!widgets.isEmpty()) {
+                if (focused == null) {
+                    widgets.get(0).focus();
+                } else {
+                    MapWidgetNavigator.getNextWidget(widgets, focused, event.getKey()).focus();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onKey(MapKeyEvent event) {
+    }
+
+    @Override
+    public void onKeyPressed(MapKeyEvent event) {
+        this.handleNavigation(event);
+    }
+
+    @Override
+    public void onKeyReleased(MapKeyEvent event) {
+    }
+
+    @Override
+    public void onLeftClick(MapClickEvent event) {
+    }
+
+    @Override
+    public void onRightClick(MapClickEvent event) {
+    }
+
+    @Override
+    public void onMapItemChanged() {
     }
 }
