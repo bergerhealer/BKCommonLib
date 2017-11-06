@@ -59,6 +59,16 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Called right after the user presses spacebar to 'enter' this widget.
+     * This function is only called when {@link #setFocusable(boolean)} is set to true.
+     * By default this function will activate and enter the element, allowing input
+     * to be handled by this widget. By overriding this base functionality can be disabled.
+     */
+    public void onActivated() {
+        this.activate();
+    }
+
+    /**
      * Called every tick to refresh this widget.
      * The base {@link #update()} automatically calls onDraw() when the widget is invalidated.
      */
@@ -511,7 +521,7 @@ public class MapWidget implements MapDisplayEvents {
             // Activate the currently focused widget when activated
             // If none exists, we can't do this and the enter key should be handled by the widget
             if (focused != null) {
-                focused.activate();
+                focused.onActivated();
             }
         } else if (event.getKey() == Key.BACK) {
             // De-activate ourselves, moving control back to the closest parent that can be focused
