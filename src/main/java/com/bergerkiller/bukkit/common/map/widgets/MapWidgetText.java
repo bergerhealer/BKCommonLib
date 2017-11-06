@@ -11,6 +11,7 @@ public class MapWidgetText extends MapWidget {
     private MapFont<Character> _font = MapFont.MINECRAFT;
     private MapFont.Alignment _alignment = MapFont.Alignment.LEFT;
     private byte _color = MapColorPalette.COLOR_BLACK;
+    private byte _shadowColor = MapColorPalette.COLOR_TRANSPARENT;
     private String _text = "";
 
     /**
@@ -105,12 +106,48 @@ public class MapWidgetText extends MapWidget {
         return this;
     }
 
+    /**
+     * Gets the shadow color of the text. When set non-transparent, a duplicate
+     * of the text is drawn at an offset underneath the text with this color
+     * 
+     * @return shadow color
+     */
+    public byte getShadowColor() {
+        return this._shadowColor;
+    }
+
+    /**
+     * Sets the shadow color of the text. When set non-transparent, a duplicate
+     * of the text is drawn at an offset underneath the text with this color
+     * 
+     * @param color to set to
+     * @return this text widget
+     */
+    public MapWidgetText setShadowColor(byte color) {
+        if (this._shadowColor != color) {
+            this._shadowColor = color;
+            this.invalidate();
+        }
+        return this;
+    }
+
     @Override
     public void onDraw() {
         if (this._text != null && !this._text.isEmpty()) {
             MapFont.Alignment oldAlignment = this.view.getAlignment();
             this.view.setAlignment(this._alignment);
-            this.view.draw(this._font, 0, 0, this._color, this._text);
+            
+            int x = 0;
+            if (this._alignment == MapFont.Alignment.RIGHT) {
+                x = this.getWidth() - 1;
+            } else if (this._alignment == MapFont.Alignment.MIDDLE) {
+                x = this.getWidth() / 2;
+            }
+
+            if (this._shadowColor != MapColorPalette.COLOR_TRANSPARENT) {
+                this.view.draw(this._font, x + 1, 1, this._shadowColor, this._text);
+            }
+            this.view.draw(this._font, x, 0, this._color, this._text);
             this.view.setAlignment(oldAlignment);
         }
     }
