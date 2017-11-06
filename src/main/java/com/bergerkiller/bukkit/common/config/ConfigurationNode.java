@@ -3,6 +3,9 @@ package com.bergerkiller.bukkit.common.config;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -264,12 +267,74 @@ public class ConfigurationNode implements Cloneable {
     }
 
     /**
-     * Gets all configuration nodes
+     * Gets a sorted list of configuration nodes at a particular path.
+     * Changes in the list are not reflected back into this configuration.
+     * The list will be sorted by the key value of the nodes, and not by
+     * the order in which they appear in the YAML.
+     * 
+     * @param path
+     * @return list of configuration nodes
+     */
+    public List<ConfigurationNode> getNodeList(String path) {
+        ArrayList<ConfigurationNode> list = new ArrayList<ConfigurationNode>(this.getNode(path).getNodes());
+        Collections.sort(list, new Comparator<ConfigurationNode>() {
+            @Override
+            public int compare(ConfigurationNode o1, ConfigurationNode o2) {
+                String n1 = o1.getName();
+                String n2 = o2.getName();
+                if (ParseUtil.isNumeric(n1) && ParseUtil.isNumeric(n2)) {
+                    try {
+                        int num1 = Integer.parseInt(n1);
+                        int num2 = Integer.parseInt(n2);
+                        return Integer.compare(num1, num2);
+                    } catch (NumberFormatException ex) {}
+                }
+                return n1.compareTo(n2);
+            }
+        });
+        return list;
+    }
+
+    /**
+     * Stores the nodes in the list in the order they appear in this configuration,
+     * giving them integer key name starting with 1. This will result in a list of
+     * 1,2,3,etc. keys with the nodes being added to this configuration node.
+     * Changes to the nodes after adding do not have an effect.
+     * 
+     * @param path to set
+     * @param list of nodes to add
+     */
+    public void setNodeList(String path, List<ConfigurationNode> list) {
+        // Get root of this configuration
+        Configuration root = this.source.getRoot();
+
+        // Clone the list with the nodes cloned that are directly originating from here
+        // This prevents nasty problems where setting a node thats in the list will corrupt it
+        if (root != null) {
+            list = new ArrayList<ConfigurationNode>(list);
+            for (int i = 0; i < list.size(); i++) {
+                ConfigurationNode node = list.get(i);
+                if (node != null && node.source.getRoot() == root) {
+                    list.set(i, node.clone());
+                }
+            }
+        }
+
+        // Load all items in the (cloned) List
+        ConfigurationNode baseNode = this.getNode(path);
+        baseNode.clear();
+        for (int i = 0; i < list.size(); i++) {
+            baseNode.set(Integer.toString(i + 1), list.get(i));
+        }
+    }
+
+    /**
+     * Gets all configuration nodes sorted by insertion order
      *
      * @return Set of configuration nodes
      */
     public Set<ConfigurationNode> getNodes() {
-        Set<ConfigurationNode> rval = new HashSet<ConfigurationNode>();
+        Set<ConfigurationNode> rval = new LinkedHashSet<ConfigurationNode>();
         for (String path : this.getKeys()) {
             if (this.isNode(path)) {
                 rval.add(this.getNode(path));
@@ -309,7 +374,7 @@ public class ConfigurationNode implements Cloneable {
     }
 
     /**
-     * Gets all the keys of the values
+     * Gets all the keys of the values sorted in the order they exist in the YAML file
      *
      * @return key set
      */
@@ -412,6 +477,21 @@ public class ConfigurationNode implements Cloneable {
     public void set(String path, Object value) {
         if (value != null) {
             this.setRead(path);
+            if (value instanceof ConfigurationNode) {
+                value = ((ConfigurationNode) value).getSource();
+            }
+            if (value instanceof ConfigurationSection) {
+                // Copy the full configuration section into this configuration
+                if (this.contains(path)) {
+                    this.remove(path);
+                }
+                ConfigurationNode node = this.getNode(path);
+                ConfigurationSection section = (ConfigurationSection) value;
+                for (String key : section.getKeys(true)) {
+                    node.set(key, section.get(key));
+                }
+                return;
+            }
             if (value.getClass().isEnum()) {
                 String text = value.toString();
                 if (text.equals("true")) {
