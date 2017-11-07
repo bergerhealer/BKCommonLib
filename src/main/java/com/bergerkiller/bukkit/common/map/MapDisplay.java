@@ -26,6 +26,8 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
 /**
  * A {@link MapDisplay} updates and displays map contents to a group of players set as <u>owners</u>.
@@ -652,6 +654,28 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public MapWidget getActivatedWidget() {
         return this.widgets.getActivatedWidget();
+    }
+
+    /**
+     * Convenience function for playing sounds to the viewers of this map display
+     * 
+     * @param soundKey of the sound to play
+     */
+    public void playSound(ResourceKey soundKey) {
+        playSound(soundKey, 1.0f, 1.0f);
+    }
+
+    /**
+     * Convenience function for playing sounds to the viewers of this map display
+     * 
+     * @param soundKey of the sound to play
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public void playSound(ResourceKey soundKey, float volume, float pitch) {
+        for (Player viewer : this.getViewers()) {
+            PlayerUtil.playSound(viewer, soundKey, volume, pitch);
+        }
     }
 
     /**

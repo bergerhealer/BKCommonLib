@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
@@ -20,6 +21,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -297,5 +299,30 @@ public class PlayerUtil extends EntityUtil {
             }
             rawOldItems.set(index, oldItem);
         }
+    }
+
+    /**
+     * Plays a named sound effect at the player's location for a single player
+     * 
+     * @param player to play for and play at
+     * @param soundKey of the sound to play
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Player player, ResourceKey soundKey, float volume, float pitch) {
+        player.playSound(player.getEyeLocation(), soundKey.toMinecraftKey().getName(), volume, pitch);
+    }
+
+    /**
+     * Plays a named sound effect at a location for a single player
+     * 
+     * @param player to play for
+     * @param location to play at
+     * @param soundKey of the sound to play
+     * @param volume of the sound
+     * @param pitch of the sound
+     */
+    public static void playSound(Player player, Location location, ResourceKey soundKey, float volume, float pitch) {
+        player.playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
     }
 }
