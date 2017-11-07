@@ -100,10 +100,8 @@ public class MapColorPalette {
 
     private static void initTable(byte color1, byte color2) {
         int index = getMapIndex(color1, color2);
-        if (isTransparent(color1)) {
-            initTransparent(index, color2);
-        } else if (isTransparent(color2)) {
-            initTransparent(index, color1);
+        if (isTransparent(color1) || isTransparent(color2)) {
+            initTransparent(index, color1, color2);
         } else {
             Color c1 = getRealColor(color1);
             Color c2 = getRealColor(color2);
@@ -115,10 +113,10 @@ public class MapColorPalette {
         }
     }
 
-    private static void initTransparent(int index, byte color) {
-        COLOR_MAP_AVERAGE[index] = color;
-        COLOR_MAP_ADD[index] = color;
-        COLOR_MAP_SUBTRACT[index] = color;
+    private static void initTransparent(int index, byte color1, byte color2) {
+        COLOR_MAP_AVERAGE[index] = color2;
+        COLOR_MAP_ADD[index] = color2;
+        COLOR_MAP_SUBTRACT[index] = color2;
         COLOR_MAP_MULTIPLY[index] = (byte) 0;
     }
 
