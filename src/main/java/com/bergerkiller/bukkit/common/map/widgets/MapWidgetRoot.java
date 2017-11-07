@@ -50,6 +50,7 @@ public class MapWidgetRoot extends MapWidget {
         MapWidget oldActivatedWidget = this._activatedWidget;
         if (this._activatedWidget != null) {
             this._activatedWidget.invalidate();
+            this._activatedWidget.onDeactivate();
         }
         if (widget == null) {
             // Find the first parent of the current activated widget which can be activated

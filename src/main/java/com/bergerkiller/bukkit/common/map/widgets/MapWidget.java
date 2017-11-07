@@ -22,6 +22,7 @@ public class MapWidget implements MapDisplayEvents {
     protected MapDisplay display;
     protected MapDisplay.Layer layer;
     protected MapCanvas view;
+    private int _z; // depth value can be changed if desired
     private int _x, _y, _width, _height; // live bounds (relative to parent)
     private int _lastX, _lastY, _lastWidth, _lastHeight; // last drawn bounds (absolute)
     private boolean _enabled;
@@ -29,9 +30,11 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _focusable;
     private boolean _attached;
     private boolean _boundsChanged;
+    private boolean _wasFocused;
     private List<MapWidget> _children;
 
     public MapWidget() {
+        this._wasFocused = false;
         this._enabled = true;
         this._invalidated = true;
         this._boundsChanged = true;
@@ -42,6 +45,7 @@ public class MapWidget implements MapDisplayEvents {
         this.layer = null;
         this.parent = null;
         this.root = null;
+        this._z = 0;
         this._lastX = this._x = 0;
         this._lastY = this._y = 0;
         this._lastWidth = this._width = 0;
@@ -66,8 +70,30 @@ public class MapWidget implements MapDisplayEvents {
      * By default this function will activate and enter the element, allowing input
      * to be handled by this widget. By overriding this base functionality can be disabled.
      */
-    public void onActivated() {
-        this.activate();
+    public void onActivate() {
+        if (this.root != null) {
+            this.root.setActivatedWidget(this);
+        }
+    }
+
+    /**
+     * Called right before a new widget becomes activated when this widget was previously
+     * activated. This method is always called at most once after {@link #onActivate()}
+     * is called.
+     */
+    public void onDeactivate() {
+    }
+
+    /**
+     * Called right after this item is focused using W/A/S/D navigation controls
+     */
+    public void onFocus() {
+    }
+
+    /**
+     * Called right before this item loses the focus
+     */
+    public void onBlur() {
     }
 
     /**
@@ -97,6 +123,17 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final MapWidget getParent() {
         return this.parent;
+    }
+
+    /**
+     * Changes the depth offset of this widget relative to the parent.
+     * By increasing this value it can be ensured that this widget sits on top of another widget.
+     * The default depth offset is 0, putting it on equal depth as other children.
+     * 
+     * @param z depth offset
+     */
+    public final void setDepthOffset(int z) {
+        this._z = z;
     }
 
     /**
@@ -201,10 +238,11 @@ public class MapWidget implements MapDisplayEvents {
         return (this.root != null) && (this == this.root.getActivatedWidget());
     }
 
+    /**
+     * Activates this widget. Equivalent to calling {@link #onActivate()} directly.
+     */
     public final void activate() {
-        if (this.root != null) {
-            this.root.setActivatedWidget(this);
-        }
+        this.onActivate();
     }
 
     /**
@@ -438,6 +476,18 @@ public class MapWidget implements MapDisplayEvents {
                 this.root = this.parent.root;
                 this.display = this.parent.display;
                 this.layer = this.parent.layer.next();
+
+                // Use the depth offset to switch layers
+                int n = this._z;
+                while (n > 0) {
+                    this.layer = this.layer.next();
+                    n--;
+                }
+                while (n < 0) {
+                    this.layer = this.layer.previous();
+                    n++;
+                }
+
                 this.refreshView();
             } else if (this.layer == null && this.display != null) {
                 // This is done for the root node (covers entire display)
@@ -465,6 +515,14 @@ public class MapWidget implements MapDisplayEvents {
         if (this._boundsChanged) {
             this._boundsChanged = false;
             this.onBoundsChanged();
+        }
+        if (this._wasFocused != this.isFocused()) {
+            this._wasFocused = !this._wasFocused;
+            if (this._wasFocused) {
+                this.onFocus();
+            } else {
+                this.onBlur();
+            }
         }
         for (MapWidget child : this._children) {
             child.handleTick();
@@ -555,7 +613,7 @@ public class MapWidget implements MapDisplayEvents {
             // Activate the currently focused widget when activated
             // If none exists, we can't do this and the enter key should be handled by the widget
             if (focused != null) {
-                focused.onActivated();
+                focused.activate();
             }
         } else if (event.getKey() == Key.BACK) {
             // De-activate ourselves, moving control back to the closest parent that can be focused
@@ -593,7 +651,7 @@ public class MapWidget implements MapDisplayEvents {
 
     @Override
     public void onKeyPressed(MapKeyEvent event) {
-        if (this.isFocused()) {
+        if (this == this.getInputWidget()) {
             // Let the activated widget decide the next widget to switch to
             this.root.getActivatedWidget().handleNavigation(event);
             return;
@@ -625,14 +683,19 @@ public class MapWidget implements MapDisplayEvents {
     public void onMapItemChanged() {
     }
 
-    private MapWidget getNextFocused() {
+    private MapWidget getInputWidget() {
         if (this.root == null) {
             return null;
         }
-        MapWidget focused = this.root.getFocusedWidget();
-        if (this == focused) {
-            return null;
+        MapWidget input = this.root.getFocusedWidget();
+        if (input == null) {
+            input = this.root.getActivatedWidget();
         }
+        return input;
+    }
+
+    private MapWidget getNextFocused() {
+        MapWidget focused = this.getInputWidget();
 
         // Propagate the event down the widget tree to the focused widget
         // If the focused widget is not accessible from this widget, stop propagating
