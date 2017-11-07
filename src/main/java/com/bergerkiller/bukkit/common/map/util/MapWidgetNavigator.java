@@ -88,7 +88,7 @@ public class MapWidgetNavigator {
         int y = current.getY();
         int x1 = current.getX();
         int x2 = current.getX() + current.getWidth();
-        int weight = y - (widget.getY() + widget.getHeight());
+        int weight = y - widget.getY();
         int weight_a = (widget.getX() - x2);
         int weight_b = (x1 - (widget.getX() + widget.getWidth()));
         if (weight > 0) {
@@ -104,7 +104,7 @@ public class MapWidgetNavigator {
         int y = current.getY() + current.getHeight();
         int x1 = current.getX();
         int x2 = current.getX() + current.getWidth();
-        int weight = widget.getY() - y;
+        int weight = (widget.getY() + widget.getHeight()) - y;
         int weight_a = (widget.getX() - x2);
         int weight_b = (x1 - (widget.getX() + widget.getWidth()));
         if (weight > 0) {

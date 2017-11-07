@@ -636,6 +636,15 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets the default root widget to which all other widgets are added
+     * 
+     * @return root widget
+     */
+    public MapWidget getRootWidget() {
+        return this.widgets;
+    }
+
+    /**
      * Gets the widget that is currently activated for this display.
      * This is the widget that is receiving all user input.
      * 

@@ -24,6 +24,7 @@ public class MapWidget implements MapDisplayEvents {
     protected MapCanvas view;
     private int _x, _y, _width, _height; // live bounds (relative to parent)
     private int _lastX, _lastY, _lastWidth, _lastHeight; // last drawn bounds (absolute)
+    private boolean _enabled;
     private boolean _invalidated;
     private boolean _focusable;
     private boolean _attached;
@@ -31,6 +32,7 @@ public class MapWidget implements MapDisplayEvents {
     private List<MapWidget> _children;
 
     public MapWidget() {
+        this._enabled = true;
         this._invalidated = true;
         this._boundsChanged = true;
         this._focusable = false;
@@ -86,6 +88,15 @@ public class MapWidget implements MapDisplayEvents {
      * Called when the bounding box area of this widget was changed
      */
     public void onBoundsChanged() {
+    }
+
+    /**
+     * Gets the parent node of this widget
+     * 
+     * @return parent node, null if this is the root node
+     */
+    public final MapWidget getParent() {
+        return this.parent;
     }
 
     /**
@@ -222,6 +233,27 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Gets whether this widget is currently enabled using {@link #setEnabled(enabled)}.
+     * If the parent of this widget is not enabled, this method returns false as well.
+     * 
+     * @return True if this widget and the parent widgets are enabled
+     */
+    public final boolean isEnabled() {
+        return this._enabled && (this.parent == null || this.parent.isEnabled());
+    }
+
+    /**
+     * Sets whether this widget is currently enabled. If a parent of this widget is not
+     * enabled, then {@link #isEnabled()} will continue to return false.
+     * 
+     * @param enabled
+     */
+    public final void setEnabled(boolean enabled) {
+        this._enabled = enabled;
+        this.invalidate();
+    }
+
+    /**
      * Gets an immutable list of children of this widget.
      * These children are drawn on top of this widget.
      * 
@@ -254,6 +286,8 @@ public class MapWidget implements MapDisplayEvents {
         widget.root = this.root;
         widget.parent = this;
         widget._attached = false;
+        widget._invalidated = true;
+        widget._boundsChanged = true;
         this._children.add(widget);
     }
 
@@ -278,8 +312,8 @@ public class MapWidget implements MapDisplayEvents {
      * @return this widget
      */
     public final MapWidget clear() {
-        if (this.layer != null) {
-            this.layer.clearRectangle(this._x, this._y, this._width, this._height);
+        if (this.view != null) {
+            this.view.clear();
         }
         return this;
     }
@@ -553,26 +587,59 @@ public class MapWidget implements MapDisplayEvents {
 
     @Override
     public void onKey(MapKeyEvent event) {
+        MapWidget next = this.getNextFocused();
+        if (next != null) next.onKey(event);
     }
 
     @Override
     public void onKeyPressed(MapKeyEvent event) {
-        this.handleNavigation(event);
+        if (this.isFocused()) {
+            // Let the activated widget decide the next widget to switch to
+            this.root.getActivatedWidget().handleNavigation(event);
+            return;
+        }
+
+        MapWidget next = this.getNextFocused();
+        if (next != null) next.onKeyPressed(event);
     }
 
     @Override
     public void onKeyReleased(MapKeyEvent event) {
+        MapWidget next = this.getNextFocused();
+        if (next != null) next.onKeyReleased(event);
     }
 
     @Override
     public void onLeftClick(MapClickEvent event) {
+        MapWidget next = this.getNextFocused();
+        if (next != null) next.onLeftClick(event);
     }
 
     @Override
     public void onRightClick(MapClickEvent event) {
+        MapWidget next = this.getNextFocused();
+        if (next != null) next.onRightClick(event);
     }
 
     @Override
     public void onMapItemChanged() {
+    }
+
+    private MapWidget getNextFocused() {
+        if (this.root == null) {
+            return null;
+        }
+        MapWidget focused = this.root.getFocusedWidget();
+        if (this == focused) {
+            return null;
+        }
+
+        // Propagate the event down the widget tree to the focused widget
+        // If the focused widget is not accessible from this widget, stop propagating
+        MapWidget tmp = focused;
+        while (tmp != null && tmp.parent != this) {
+            tmp = tmp.parent;
+        }
+        return tmp;
     }
 }

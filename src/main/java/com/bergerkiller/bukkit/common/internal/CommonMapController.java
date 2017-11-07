@@ -661,10 +661,10 @@ public class CommonMapController implements PacketListener, Listener {
         if (!event.isCancelled()) {
             if (action == MapAction.LEFT_CLICK) {
                 event.getDisplay().onLeftClick(event);
-                event.getDisplay().getActivatedWidget().onLeftClick(event);
+                event.getDisplay().getRootWidget().onLeftClick(event);
             } else {
                 event.getDisplay().onRightClick(event);
-                event.getDisplay().getActivatedWidget().onRightClick(event);
+                event.getDisplay().getRootWidget().onRightClick(event);
             }
         }
         return event.isCancelled();
