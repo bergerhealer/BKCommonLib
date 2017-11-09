@@ -23,6 +23,53 @@ public class MapWidgetWindow extends MapWidget {
     }
 
     /**
+     * Sets the color of the outer border of the window.
+     * By default this is black.
+     * 
+     * @param color to set to
+     * @return this window widget
+     */
+    public MapWidgetWindow setOuterBorderColor(byte color) {
+        if (this._outerBorderColor != color) {
+            this._outerBorderColor = color;
+            this.invalidate();
+        }
+        return this;
+    }
+
+    /**
+     * Sets the color of the background of the window. Other widgets are shown on top.
+     * By default this is light-grey.
+     * 
+     * @param color to set to
+     * @return this window widget
+     */
+    public MapWidgetWindow setBackgroundColor(byte color) {
+        if (this._backgroundColor != color) {
+            this._backgroundColor = color;
+            this.invalidate();
+        }
+        return this;
+    }
+
+    /**
+     * Sets the color of the inner border of the window.
+     * This consists of two colors for top/left and bottom/right.
+     * 
+     * @param color1 to set to
+     * @param color2 to set to
+     * @return this window widget
+     */
+    public MapWidgetWindow setInnerBorderColors(byte color1, byte color2) {
+        if (this._innerBorderColor1 != color1 || this._innerBorderColor2 != color2) {
+            this._innerBorderColor1 = color1;
+            this._innerBorderColor2 = color2;
+            this.invalidate();
+        }
+        return this;
+    }
+
+    /**
      * Gets the title widget of this window, where the title of the window can be displayed
      * 
      * @return title widget

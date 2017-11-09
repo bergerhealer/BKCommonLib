@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.map.widgets;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -13,6 +15,7 @@ import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
 public class MapWidgetRoot extends MapWidget {
     private MapWidget _focusedWidget = null;
     private MapWidget _activatedWidget = this;
+    private List<MapWidget> _focusHistory = new ArrayList<MapWidget>();
 
     public MapWidgetRoot(MapDisplay display) {
         this.parent = null;
@@ -33,8 +36,23 @@ public class MapWidgetRoot extends MapWidget {
             this._focusedWidget.invalidate();
         }
         this._focusedWidget = widget;
+        if (widget != null) {
+            this._focusHistory.remove(widget);
+            this._focusHistory.add(widget);
+            this.cleanupFocusHistory();
+        }
         if (this._focusedWidget != null) {
             this._focusedWidget.invalidate();
+        }
+    }
+
+    private void cleanupFocusHistory() {
+        // Remove widget from focus history that don't exist anymore
+        Iterator<MapWidget> iter = this._focusHistory.iterator();
+        while (iter.hasNext()) {
+            if (iter.next().root != this) {
+                iter.remove();
+            }
         }
     }
 
@@ -78,8 +96,16 @@ public class MapWidgetRoot extends MapWidget {
             // we focus the previously activated widget. This correctly implements the forward/backward logic.
             this.setFocusedWidget(oldActivatedWidget);
         } else if (!widgets.isEmpty()) {
-            // The first child of the activated widget that can be focused is given the focus
-            this.setFocusedWidget(widgets.get(0));
+            // Check focus history in reverse order (newest - oldest) to see if we can focus
+            // By default pick the first child
+            MapWidget result = widgets.get(0);
+            for (int i = this._focusHistory.size() - 1; i >= 0; i--) {
+                if (widgets.contains(this._focusHistory.get(i))) {
+                    result = this._focusHistory.get(i);
+                    break;
+                }
+            }
+            this.setFocusedWidget(result);
         } else {
             // If none exists, set focus to null to indicate no further focus is possible
             this.setFocusedWidget(null);
