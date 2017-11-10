@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -235,6 +236,37 @@ public class ItemMaterialTest {
         assertNotNull(tag);
         assertTrue(tag.containsKey("test"));
         assertEquals("awesome!", tag.getValue("test"));
+    }
+
+    @Test
+    public void testItemVariants() {
+        // All 16 wool colors should be returned here
+        List<ItemStack> expected = new ArrayList<ItemStack>();
+        for (int dur = 0; dur < 16; dur++) {
+            expected.add(new ItemStack(Material.WOOL, 1, (short) dur));
+        }
+
+        // Retrieve from listing
+        List<ItemStack> actual = ItemUtil.getItemVariants(Material.WOOL);
+
+        // Check all are contained, order does not matter
+        assertEquals(expected.size(), actual.size());
+        for (ItemStack expectedItem : expected) {
+            boolean contained = false;
+            for (ItemStack actualItem : actual) {
+                if (actualItem.getType() == expectedItem.getType() && actualItem.getDurability() == expectedItem.getDurability()) {
+                    contained = true;
+                    break;
+                }
+            }
+            if (!contained) {
+                System.out.println("Actual: ");
+                for (ItemStack actualItem : actual) {
+                    System.out.println("- " + actualItem.toString());
+                }
+                fail("Item was not found: " + expectedItem);
+            }
+        }
     }
 
     private static void testEQIgnoreAmount(ItemStack item) {

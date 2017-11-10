@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
+
 class Item {
     public static final rawtype (Iterable) RegistryMaterials<MinecraftKey, Item> REGISTRY;
 
@@ -8,4 +10,20 @@ class Item {
     public int getMaxDurability();
 
     public boolean usesDurability();
+
+#if version >= 1.12.1
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants((CreativeModeTabHandle) CreativeModeTab creativemodetab) {
+        NonNullList result = NonNullList.a();
+        instance.a(creativemodetab, result);
+        return result;
+    }
+#else
+    public List<org.bukkit.inventory.ItemStack> getItemVariants((CreativeModeTabHandle) CreativeModeTab creativemodetab) {
+        org.bukkit.Material type = com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toMaterialFromItemHandle(instance_raw);
+        java.util.ArrayList result = new java.util.ArrayList();
+        result.add(new org.bukkit.inventory.ItemStack(type));
+        //TODO: Hardcode a bunch of items from somewhere?
+        return result;
+    }
+#endif
 }

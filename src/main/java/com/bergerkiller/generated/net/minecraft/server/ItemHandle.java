@@ -2,6 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.ItemStack;
+import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.Item</b>.
@@ -26,6 +28,7 @@ public abstract class ItemHandle extends Template.Handle {
     public abstract int getMaxStackSize();
     public abstract int getMaxDurability();
     public abstract boolean usesDurability();
+    public abstract List<ItemStack> getItemVariants(CreativeModeTabHandle creativemodetab);
     /**
      * Stores class members for <b>net.minecraft.server.Item</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -37,6 +40,7 @@ public abstract class ItemHandle extends Template.Handle {
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
         public final Template.Method<Integer> getMaxDurability = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
+        public final Template.Method.Converted<List<ItemStack>> getItemVariants = new Template.Method.Converted<List<ItemStack>>();
 
     }
 

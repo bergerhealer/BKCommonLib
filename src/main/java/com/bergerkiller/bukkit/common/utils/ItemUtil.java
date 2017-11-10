@@ -1,16 +1,21 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -746,5 +751,16 @@ public class ItemUtil {
         } else if (hasDisplayName(stack)) {
             CommonNMS.getHandle(stack).getTag().remove("display");
         }
+    }
+
+    /**
+     * Gets a list of valid items of a particular item type.
+     * A list with only a single variant will be returned if the item has no other variants.
+     * 
+     * @param itemType
+     * @return item variants
+     */
+    public static List<ItemStack> getItemVariants(Material itemType) {
+        return ItemHandle.createHandle(HandleConversion.toItemHandle(itemType)).getItemVariants(CreativeModeTabHandle.SEARCH);
     }
 }

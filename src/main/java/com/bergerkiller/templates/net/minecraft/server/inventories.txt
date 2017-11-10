@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 
 interface IInventory {
     public abstract int getSize();
@@ -54,11 +55,15 @@ class PlayerInventory extends IInventory {
 }
 
 class InventoryEnderChest extends IInventory {
-   public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
+    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 
 #if version >= 1.11
-   public (CommonTagList) NBTTagList saveToNBT:i()
+    public (CommonTagList) NBTTagList saveToNBT:i()
 #else
-   public (CommonTagList) NBTTagList saveToNBT:h()
+    public (CommonTagList) NBTTagList saveToNBT:h()
 #endif
+}
+
+class CreativeModeTab {
+    public static final (CreativeModeTabHandle) CreativeModeTab SEARCH:g;
 }
