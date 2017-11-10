@@ -129,7 +129,9 @@ class Pseudo3DImagePanel extends JPanel
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
         Model model = textures.getItemModel(item); //textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
-        
+
+        //image.draw(textures.getItemTexture(item, 32, 32), 0, 0);
+
         transform.translate(p0.x, 0.0f, p0.y);
         transform.scale(scale);
         transform.rotateX(pitch);

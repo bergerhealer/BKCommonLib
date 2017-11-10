@@ -163,6 +163,9 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
         // Set the archive if an entry was successfully added/found
         if (foundEntry != null) {
             this.archive = new MapResourcePackZipArchive(new File(resourcepacksFolder, foundEntry.file));
+            this.archive.load(lazy);
+        } else {
+            this.archive = null;
         }
     }
 

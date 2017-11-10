@@ -38,11 +38,14 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
 
     @Override
     public void load(boolean lazy) {
-        this.archive.load(lazy);
+        if (this.archive != null) {
+            this.archive.load(lazy);
+        }
     }
 
     @Override
     public InputStream openFileStream(String path) throws IOException {
+        if (this.archive == null) return null;
         return this.archive.openFileStream(path);
     }
 
