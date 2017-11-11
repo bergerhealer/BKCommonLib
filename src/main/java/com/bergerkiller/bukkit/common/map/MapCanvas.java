@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -1060,6 +1061,52 @@ public abstract class MapCanvas {
             }
             return this;
         }
+    }
+
+    /**
+     * Calculates the width and height bounding boxes of contents drawn with a font
+     * 
+     * @param font
+     * @param characters
+     * @return width and height of the drawn font bounding box
+     */
+    public final <T> Dimension calcFontSize(MapFont<T> font, T... characters) {
+        return this.calcFontSize(font, Arrays.asList(characters));
+    }
+
+    /**
+     * Calculates the width and height bounding boxes of contents drawn with a font
+     * 
+     * @param font
+     * @param characters
+     * @return width and height of the drawn font bounding box
+     */
+    public final Dimension calcFontSize(MapFont<Character> font, CharSequence characters) {
+        return this.calcFontSize(font, new CharacterIterable(characters));
+    }
+
+    /**
+     * Calculates the width and height bounding boxes of contents drawn with a font
+     * 
+     * @param font
+     * @param characters
+     * @return width and height of the drawn font bounding box
+     */
+    public final <T> Dimension calcFontSize(MapFont<T> font, Iterable<T> characters) {
+        int width = 0;
+        int height = 0;
+        boolean first = false;
+        for (T character : characters) {
+            MapTexture sprite = font.getSprite(character);
+            if (first) {
+                first = false;
+            } else {
+                width += this.fontSpacing;
+            }
+            width += sprite.getWidth();
+            height = Math.max(height, sprite.getHeight());
+        }
+        return new Dimension(width, height);
     }
 
     /**

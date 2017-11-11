@@ -17,7 +17,7 @@ public class MapWidgetWindow extends MapWidget {
     private MapWidgetText _titleWidget = new MapWidgetText();
 
     public MapWidgetWindow() {
-        this._titleWidget.setBounds(6, 4, 32, 32);
+        this._titleWidget.setPosition(6, 4);
         this._titleWidget.setColor(MapColorPalette.getColor(64, 64, 64));
         this.addWidget(this._titleWidget);
     }
@@ -76,11 +76,6 @@ public class MapWidgetWindow extends MapWidget {
      */
     public MapWidgetText getTitle() {
         return this._titleWidget;
-    }
-
-    @Override
-    public void onBoundsChanged() {
-        this._titleWidget.setSize(this.getWidth() - this._titleWidget.getX() - 4, this._titleWidget.getHeight());
     }
 
     @Override

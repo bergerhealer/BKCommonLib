@@ -13,6 +13,7 @@ public class MapWidgetText extends MapWidget {
     private byte _color = MapColorPalette.COLOR_BLACK;
     private byte _shadowColor = MapColorPalette.COLOR_TRANSPARENT;
     private String _text = "";
+    private boolean _autoSize = true;
 
     /**
      * Gets the text
@@ -32,6 +33,7 @@ public class MapWidgetText extends MapWidget {
     public MapWidgetText setText(String text) {
         if (!LogicUtil.bothNullOrEqual(this._text, text)) {
             this._text = text;
+            this.calcAutoSize();
             this.invalidate();
         }
         return this;
@@ -61,6 +63,21 @@ public class MapWidgetText extends MapWidget {
     }
 
     /**
+     * Sets whether the size of this text widget is automatically calculated.
+     * By default this is true.
+     * 
+     * @param autoSize
+     * @return this text widget
+     */
+    public MapWidgetText setAutoSize(boolean autoSize) {
+        if (this._autoSize != autoSize) {
+            this._autoSize = autoSize;
+            this.calcAutoSize();
+        }
+        return this;
+    }
+
+    /**
      * Gets the font of hte text
      * 
      * @return text font
@@ -78,6 +95,7 @@ public class MapWidgetText extends MapWidget {
     public MapWidgetText setFont(MapFont<Character> font) {
         if (this._font != font) {
             this._font = font;
+            this.calcAutoSize();
             this.invalidate();
         }
         return this;
@@ -132,6 +150,13 @@ public class MapWidgetText extends MapWidget {
     }
 
     @Override
+    public void onAttached() {
+        if (this._autoSize) {
+            this.calcAutoSize();
+        }
+    }
+
+    @Override
     public void onDraw() {
         if (this._text != null && !this._text.isEmpty()) {
             MapFont.Alignment oldAlignment = this.view.getAlignment();
@@ -152,4 +177,13 @@ public class MapWidgetText extends MapWidget {
         }
     }
 
+    private void calcAutoSize() {
+        if (this._autoSize && this.view != null) {
+            if (this._text == null || this._text.isEmpty()) {
+                this.setSize(0, 0);
+            } else {
+                this.setSize(this.view.calcFontSize(this._font, this._text));
+            }
+        }
+    }
 }

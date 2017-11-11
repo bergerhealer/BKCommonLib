@@ -557,8 +557,8 @@ public class MapResourcePack {
      * @return placeholder texture
      */
     protected final MapTexture createPlaceholderTexture(int width, int height) {
-        int wd2 = width >> 2;
-        int hd2 = height >> 2;
+        int wd2 = width / 2;
+        int hd2 = height / 2;
         MapTexture result = MapTexture.createEmpty(width, height);
         result.fill(MapColorPalette.COLOR_PURPLE);
         result.fillRectangle(0, 0, wd2, hd2, MapColorPalette.COLOR_BLUE);

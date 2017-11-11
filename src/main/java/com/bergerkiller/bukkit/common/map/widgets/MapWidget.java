@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map.widgets;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -467,6 +468,16 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final MapWidget setSize(int width, int height) {
         return this.setBounds(this._x, this._y, width, height);
+    }
+
+    /**
+     * Changes the size of this widget
+     * 
+     * @param dimension
+     * @return this widget
+     */
+    public final MapWidget setSize(Dimension dimension) {
+        return this.setSize(dimension.width, dimension.height);
     }
 
     /**
