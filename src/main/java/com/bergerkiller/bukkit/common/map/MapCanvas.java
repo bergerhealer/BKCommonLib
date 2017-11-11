@@ -1516,14 +1516,14 @@ public abstract class MapCanvas {
 
         @Override
         public void writePixel(int x, int y, byte color) {
-            if (x >= 0 && y >= 0 && x < this.w && y <= this.h) {
+            if (x >= 0 && y >= 0 && x < this.w && y < this.h) {
                 this.parent.writePixel(x + this.x, y + this.y, color);
             }
         }
 
         @Override
         public byte readPixel(int x, int y) {
-            if (x >= 0 && y >= 0 && x < this.w && y <= this.h) {
+            if (x >= 0 && y >= 0 && x < this.w && y < this.h) {
                 return this.parent.readPixel(x + this.x, y + this.y);
             }
             return (byte) 0;
