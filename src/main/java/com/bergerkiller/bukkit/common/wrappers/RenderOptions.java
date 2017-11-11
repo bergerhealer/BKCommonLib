@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
  * Render hints such as shape and orientation are stored using this type.
  * This type is safe to use in HashMaps for efficient look-ups.
  */
-public class RenderOptions implements Map<String, String>, Cloneable {
+public abstract class RenderOptions implements Map<String, String>, Cloneable {
     protected String optionsToken;
     protected Map<String, String> optionsMap;
 
@@ -190,13 +190,14 @@ public class RenderOptions implements Map<String, String>, Cloneable {
     }
 
     @Override
-    public RenderOptions clone() {
-        if (this.optionsMap != null) {
-            return new RenderOptions(this.optionsMap);
-        } else {
-            return new RenderOptions(this.optionsToken);
-        }
-    }
+    public abstract RenderOptions clone();
+
+    /**
+     * Looks up the appropriate name of the model in the Minecraft resource pack format
+     * 
+     * @return model name
+     */
+    public abstract String lookupModelName();
 
     /**
      * Parses a list of key=value pairs (delimited by ,) into a block render options mapping

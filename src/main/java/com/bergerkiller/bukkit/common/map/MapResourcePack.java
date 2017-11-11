@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -37,6 +38,7 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
+import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.google.gson.Gson;
@@ -275,7 +277,7 @@ public class MapResourcePack {
                 model = this.loadBlockModel(blockRenderOptions);
             }
             if (model == null) {
-                model = this.createPlaceholderModel();
+                model = this.createPlaceholderModel(blockRenderOptions);
             }
             blockModelCache.put(blockRenderOptions, model);
         }
@@ -296,7 +298,8 @@ public class MapResourcePack {
 
         model = this.loadModel(path);
         if (model == null) {
-            model = this.createPlaceholderModel(); // failed to load or find
+            model = this.createPlaceholderModel(BlockData.AIR.getDefaultRenderOptions()); // failed to load or find
+            model.name = path;
         }
         modelCache.put(path, model);
         return model;
@@ -310,15 +313,15 @@ public class MapResourcePack {
      * @return item model for the item
      */
     public Model getItemModel(ItemStack item) {
-        String itemModelName = ModelInfoLookup.lookupItem(item);
-        RenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
+        ItemRenderOptions options = ModelInfoLookup.lookupItemRenderOptions(item);
+        String itemModelName = options.lookupModelName();
         Model m = this.loadModel("item/" + itemModelName, options);
         if (m != null) {
             m.buildBlock(options);
             m.buildQuads();
         }
         if (m == null) {
-            m = this.createPlaceholderModel();
+            m = this.createPlaceholderModel(options);
         }
         return m;
     }
@@ -369,7 +372,7 @@ public class MapResourcePack {
             }
             if (result == null) {
                 if (!path.startsWith("#")) {
-                    Logging.LOGGER_MAPDISPLAY.warning("Failed to load texture: " + path);
+                    Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load texture: " + path);
                 }
                 result = this.createPlaceholderTexture();
             }
@@ -466,7 +469,7 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadModel(String path) {
-        return this.loadModel(path, new RenderOptions());
+        return this.loadModel(path, BlockData.AIR.getDefaultRenderOptions());
     }
 
     /**
@@ -484,7 +487,7 @@ public class MapResourcePack {
 
         Model model = openGsonObject(Model.class, ResourceType.MODELS, path);
         if (model == null) {
-            Logging.LOGGER_MAPDISPLAY.warning("Failed to load model " + path);
+            Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load model " + path);
             return null;
         }
 
@@ -500,9 +503,9 @@ public class MapResourcePack {
 
         // Insert the parent model as required
         if (model.getParentName() != null) {
-            Model parentModel = getModel(model.getParentName());
+            Model parentModel = this.loadModel(model.getParentName(), options);
             if (parentModel == null || parentModel.placeholder) {
-                Logging.LOGGER_MAPDISPLAY.warning("Parent of model " + path + " not found: " + model.getParentName());
+                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Parent of model " + path + " not found: " + model.getParentName());
                 return null;
             }
             model.loadParent(parentModel);
@@ -518,7 +521,7 @@ public class MapResourcePack {
      * 
      * @return placeholder model
      */
-    protected final Model createPlaceholderModel() {
+    protected final Model createPlaceholderModel(RenderOptions renderOptions) {
         Model model = new Model();
         Model.Element element = new Model.Element();
         for (BlockFace face : FaceUtil.BLOCK_SIDES) {
@@ -527,6 +530,7 @@ public class MapResourcePack {
         element.buildQuads();
         model.placeholder = true;
         model.elements.add(element);
+        model.name = renderOptions.lookupModelName();
         return model;
     }
 

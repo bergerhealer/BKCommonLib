@@ -28,6 +28,7 @@ public abstract class ItemHandle extends Template.Handle {
     public abstract int getMaxStackSize();
     public abstract int getMaxDurability();
     public abstract boolean usesDurability();
+    public abstract String getInternalName(ItemStack itemstack);
     public abstract List<ItemStack> getItemVariants(CreativeModeTabHandle creativemodetab);
     /**
      * Stores class members for <b>net.minecraft.server.Item</b>.
@@ -40,6 +41,7 @@ public abstract class ItemHandle extends Template.Handle {
         public final Template.Method<Integer> getMaxStackSize = new Template.Method<Integer>();
         public final Template.Method<Integer> getMaxDurability = new Template.Method<Integer>();
         public final Template.Method<Boolean> usesDurability = new Template.Method<Boolean>();
+        public final Template.Method.Converted<String> getInternalName = new Template.Method.Converted<String>();
         public final Template.Method.Converted<List<ItemStack>> getItemVariants = new Template.Method.Converted<List<ItemStack>>();
 
     }

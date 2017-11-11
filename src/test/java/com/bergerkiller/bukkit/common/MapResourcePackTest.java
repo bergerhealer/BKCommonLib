@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
+import static org.junit.Assert.*;
+
 import java.util.HashSet;
 import java.util.Random;
 
@@ -90,28 +92,71 @@ public class MapResourcePackTest {
 
     @Ignore
     @Test
+    public void testItemModels() {
+        MapResourcePack resourcePack = MapResourcePack.VANILLA;
+
+        // All of these have animations or a complicated model
+        // We need to define a simplified placeholder model to make it work
+        // This acts as a TODO list for models to fix
+        HashSet<String> ignore = new HashSet<String>();
+        ignore.add("bed");
+        ignore.add("chest");
+        ignore.add("trapped_chest");
+        ignore.add("ender_chest");
+        ignore.add("anvil");
+        ignore.add("skull");
+        ignore.add("banner");
+        ignore.add("shield");
+
+        // Shulker boxes come in many colors. How will we deal?
+        ignore.add("brown_shulker_box");
+        ignore.add("white_shulker_box");
+        ignore.add("red_shulker_box");
+        ignore.add("magenta_shulker_box");
+        ignore.add("pink_shulker_box");
+        ignore.add("yellow_shulker_box");
+        ignore.add("black_shulker_box");
+        ignore.add("cyan_shulker_box");
+        ignore.add("orange_shulker_box");
+        ignore.add("lime_shulker_box");
+        ignore.add("light_blue_shulker_box");
+        ignore.add("green_shulker_box");
+        ignore.add("purple_shulker_box");
+        ignore.add("gray_shulker_box");
+        ignore.add("blue_shulker_box");
+        ignore.add("silver_shulker_box");
+
+        boolean hasLoadErrors = false;
+        for (Material type : ItemUtil.getItemTypes()) {
+            for (ItemStack variant : ItemUtil.getItemVariants(type)) {
+                Model model = resourcePack.getItemModel(variant);
+                if (model.placeholder && !ignore.contains(model.name)) {
+                    hasLoadErrors = true;
+                    System.err.println("Failed to load model of item " + 
+                            variant.getType() + ":" + variant.getDurability() +  " " +
+                            model.name);
+                }
+            }
+        }
+        if (hasLoadErrors) {
+            fail("Some block models could not be loaded!");
+        }
+    }
+
+    @Ignore
+    @Test
     public void testBlockModels() {
         MapResourcePack resourcePack = MapResourcePack.VANILLA;
 
         // All of these have animations or a complicated model
         // We need to define a simplified placeholder model to make it work
+        // This acts as a TODO list for models to fix
         HashSet<String> ignore = new HashSet<String>();
         ignore.add("bed");
         ignore.add("skull");
-        ignore.add("chest");
-        ignore.add("trapped_chest");
-        ignore.add("ender_chest");
         ignore.add("barrier");
-        ignore.add("lava");
-        ignore.add("water");
-        ignore.add("flowing_lava");
-        ignore.add("flowing_water");
-        ignore.add("standing_lava");
-        ignore.add("standing_water");
         ignore.add("standing_banner");
-        ignore.add("standing_sign");
         ignore.add("wall_banner");
-        ignore.add("wall_sign");
         ignore.add("piston_extension");
 
         ignore.add("end_portal"); // this is the black void-looking surface
@@ -145,7 +190,7 @@ public class MapResourcePackTest {
             }
         }
         if (hasLoadErrors) {
-            throw new RuntimeException("Some block models could not be loaded!");
+            fail("Some block models could not be loaded!");
         }
     }
 }

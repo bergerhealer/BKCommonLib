@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
 public class Model {
+    public transient String name = "unknown";
     private String parent = null;
     private int totalQuadCount = 0;
     public transient boolean placeholder = false;
@@ -56,6 +57,9 @@ public class Model {
     }
 
     public void build(MapResourcePack resourcePack, RenderOptions options) {
+        // Mostly for debug, but can be useful elsewhere perhaps?
+        this.name = options.lookupModelName();
+
         // Build all textures, turning paths into absolute paths
         boolean hasChanges;
         do {
@@ -174,6 +178,7 @@ public class Model {
     @Override
     public Model clone() {
         Model clone = new Model();
+        clone.name = this.name;
         clone.ambientocclusion = this.ambientocclusion;
         clone.textures.putAll(this.textures);
         for (Map.Entry<String, Display> displayEntry : this.display.entrySet()) {

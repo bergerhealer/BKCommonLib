@@ -54,11 +54,7 @@ public final class BlockRenderOptions extends RenderOptions {
         return this.blockData;
     }
 
-    /**
-     * Resolves the model name for these Block and Block rendering options
-     * 
-     * @return model name
-     */
+    @Override
     public final String lookupModelName() {
         return ModelInfoLookup.lookupBlock(this);
     }

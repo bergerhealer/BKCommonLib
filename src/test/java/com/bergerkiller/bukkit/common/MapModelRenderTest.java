@@ -124,8 +124,8 @@ class Pseudo3DImagePanel extends JPanel
         opt.put("west",  "side");
 
         System.out.println(opt);
-        
-        ItemStack item = ItemUtil.createItem(Material.DIAMOND_SWORD, (int) p3.x, 1);
+
+        ItemStack item = ItemUtil.createItem(Material.COOKED_FISH, 0, 1);
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
         Model model = textures.getItemModel(item); //textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();

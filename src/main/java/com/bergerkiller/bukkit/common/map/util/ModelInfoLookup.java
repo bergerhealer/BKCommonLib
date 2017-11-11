@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
-import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
+import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
@@ -18,15 +18,16 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
  */
 public class ModelInfoLookup {
 
-    public static RenderOptions lookupItemRenderOptions(ItemStack item) {
+    public static ItemRenderOptions lookupItemRenderOptions(ItemStack item) {
         // Blocks
         Material type = (item == null) ? Material.AIR : item.getType();
         if (item == null || type.isBlock()) {
-            return BlockData.fromItemStack(item).getDefaultRenderOptions();
+            BlockRenderOptions blockOpt = BlockData.fromItemStack(item).getDefaultRenderOptions();
+            return new ItemRenderOptions(item, blockOpt);
         }
 
         // Some items, like leather boots, require additional render options passed
-        RenderOptions options = new RenderOptions();
+        ItemRenderOptions options = new ItemRenderOptions(item, "");
         if (
                 type == Material.LEATHER_BOOTS ||
                 type == Material.LEATHER_CHESTPLATE ||
@@ -217,7 +218,8 @@ public class ModelInfoLookup {
         return lookupBlock(options, false);
     }
 
-    public static String lookupItem(ItemStack item) {
+    public static String lookupItem(ItemRenderOptions options) {
+        ItemStack item = options.getItem();
         Material type = item.getType();
         String itemName;
         if (type.isBlock()) {
@@ -243,6 +245,35 @@ public class ModelInfoLookup {
                 itemName = "bottle_lingering";
             } else if (type == Material.SPLASH_POTION) {
                 itemName = "bottle_splash";
+            } else if (type == Material.WOOD_DOOR) {
+                itemName = "oak_door";
+            } else if (type == Material.BOAT) {
+                itemName = "oak_boat";
+            } else if (type == Material.TOTEM) {
+                itemName = "totem"; // totem_of_undying otherwise
+            } else if (type == Material.COOKED_FISH || type == Material.RAW_FISH) {
+                itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
+
+                if (itemName.startsWith("item.fish.")) {
+                    if (itemName.endsWith(".raw")) {
+                        itemName = itemName.substring(10, itemName.length() - 4);
+                    } else if (itemName.endsWith(".cooked")) {
+                        itemName = "cooked_" + itemName.substring(10, itemName.length() - 7);
+                    }
+                }
+            } else if (type == Material.INK_SACK) {
+                // For dyes we must parse the color from the internal name, then stick dye_ in front of it
+                itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
+                int lastIdx = itemName.lastIndexOf('.');
+                if (lastIdx != -1) {
+                    itemName = itemName.substring(lastIdx + 1);
+                }
+                itemName = "dye_" + itemName;
+
+                // Fix some derps on Mojang's part...
+                if (itemName.equals("dye_lightBlue")) {
+                    itemName = "dye_light_blue";
+                }
             }
         }
 
