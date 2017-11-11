@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
@@ -762,5 +763,19 @@ public class ItemUtil {
      */
     public static List<ItemStack> getItemVariants(Material itemType) {
         return ItemHandle.createHandle(HandleConversion.toItemHandle(itemType)).getItemVariants(CreativeModeTabHandle.SEARCH);
+    }
+
+    /**
+     * Gets a list of valid materials that can be items stored in a player's inventory.
+     * Blocks that can not be used as items are excluded.
+     * 
+     * @return list of valid inventory item types
+     */
+    public static List<Material> getItemTypes() {
+        List<Material> result = new ArrayList<Material>(500);
+        for (Object itemRawHandle : ItemHandle.REGISTRY) {
+            result.add(WrapperConversion.toMaterialFromItemHandle(itemRawHandle));
+        }
+        return result;
     }
 }

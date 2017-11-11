@@ -269,6 +269,23 @@ public class ItemMaterialTest {
         }
     }
 
+    @Test
+    public void testItemTypes() {
+        // Get a full listing of all valid item types
+        List<Material> itemTypes = ItemUtil.getItemTypes();
+
+        // Perform some basic tests on the list to validate correctness
+        assertTrue(itemTypes.contains(Material.WOOD));
+        assertTrue(itemTypes.contains(Material.DIAMOND));
+        assertTrue(itemTypes.contains(Material.DIAMOND_PICKAXE));
+        assertTrue(itemTypes.contains(Material.POTION));
+        assertTrue(itemTypes.contains(Material.ARMOR_STAND));
+        assertFalse(itemTypes.contains(Material.PORTAL));
+        assertFalse(itemTypes.contains(Material.ENDER_PORTAL));
+        assertFalse(itemTypes.contains(Material.DIODE_BLOCK_ON));
+        assertFalse(itemTypes.contains(Material.PISTON_EXTENSION));
+    }
+
     private static void testEQIgnoreAmount(ItemStack item) {
         ItemStack a = ItemUtil.cloneItem(item);
         ItemStack b = ItemUtil.cloneItem(item);
