@@ -258,8 +258,8 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
-     * Gets whether this widget has been activated. The activated widget is the widget to which
-     * all user input (W/A/S/D/Spacebar/Shift) is redirected.
+     * Gets whether this widget has been activated. All the focusable children of the activated
+     * widget can be switched between using W/A/S/D. Only focusable widgets can become activated.
      * 
      * @return True if activated
      */
@@ -635,8 +635,9 @@ public class MapWidget implements MapDisplayEvents {
     /**
      * Performs {@link #onTick()} and {@link #onDraw()} update operations, and other widget refreshing logic
      * needed to run in the background. Attaches newly added widgets before any updates are performed.
+     * This method is called by the internal implementation.
      */
-    public final void update() {
+    public final void performTickUpdates() {
         this.handleAttach();
         this.clearInvalidatedAreas();
         this.handleTick();

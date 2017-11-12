@@ -315,7 +315,7 @@ public class MapDisplay implements MapDisplayEvents {
         if (this._updateWhenNotViewing || this.session.hasViewers) {
             //StopWatch.instance.start();
             this.onTick();
-            this.widgets.update();
+            this.widgets.performTickUpdates();
             //StopWatch.instance.stop().log("VirtualMap onTick()");
         }
 

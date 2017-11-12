@@ -24,6 +24,16 @@ public class MapStatusEvent {
     }
 
     /**
+     * Checks whether the name of the status matches the input name
+     * 
+     * @param name to check against
+     * @return True if the name is equal
+     */
+    public boolean isName(String name) {
+        return this.name != null && this.name.equals(name);
+    }
+
+    /**
      * Gets the argument of this status event
      * 
      * @return argument
@@ -41,5 +51,10 @@ public class MapStatusEvent {
      */
     public <T> T getArgument(Class<T> type) {
         return CommonUtil.tryCast(this.argument, type);
+    }
+
+    @Override
+    public String toString() {
+        return "MapStatusEvent{name=" + this.name + ", arg=" + this.argument + "}";
     }
 }
