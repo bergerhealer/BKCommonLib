@@ -140,4 +140,14 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
     public EntityTrackerEntryHandle getEntry(int id) {
         return EntityTrackerEntryHandle.createHandle(this.handle.getTrackedEntities().get(id));
     }
+
+    /**
+     * Checks whether a certain entry is contained and managed by this tracker
+     * 
+     * @param entityTrackerEntry
+     * @return True if the entity tracker entry is contained
+     */
+    public boolean containsEntry(EntityTrackerEntryHandle entityTrackerEntry) {
+        return this.handle.getEntries().contains(entityTrackerEntry);
+    }
 }

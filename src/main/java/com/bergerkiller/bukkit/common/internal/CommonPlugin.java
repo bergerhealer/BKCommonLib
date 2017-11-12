@@ -7,12 +7,14 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
@@ -554,6 +556,13 @@ public class CommonPlugin extends PluginBase {
                 if (CommonUtil.hasHandlers(EntityRemoveFromServerEvent.getHandlerList())) {
                     for (org.bukkit.entity.Entity e : removed) {
                         CommonUtil.callEvent(new EntityRemoveFromServerEvent(e));
+                    }
+                }
+                // Remove any entity controllers set for the entities that were removed
+                for (org.bukkit.entity.Entity e : removed) {
+                    EntityHook hook = EntityHook.get(HandleConversion.toEntityHandle(e), EntityHook.class);
+                    if (hook != null && hook.hasController()) {
+                        hook.getController().getEntity().setController(null);
                     }
                 }
                 // Clear for next run

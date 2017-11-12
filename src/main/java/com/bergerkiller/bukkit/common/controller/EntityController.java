@@ -22,9 +22,10 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * and should be ignored entirely.
      *
      * @param entity to bind with
+     * @param handleAttachment whether to fire {@link #onAttached()}
      */
     @SuppressWarnings("unchecked")
-    public final void bind(CommonEntity<?> entity) {
+    public final void bind(CommonEntity<?> entity, boolean handleAttachment) {
         if (entity == null && this.hook == null) {
             throw new RuntimeException("WTF");
         }
@@ -42,7 +43,9 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
                 this.hook.mock(this.entity.getHandle());
             }
             this.hook.setController(this);
-            this.onAttached();
+            if (handleAttachment) {
+                this.onAttached();
+            }
         }
     }
 

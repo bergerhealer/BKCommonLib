@@ -184,7 +184,7 @@ public class CommonEntityType {
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
 
         DefaultEntityController controller = new DefaultEntityController();
-        controller.bind(entity);
+        controller.bind(entity, false);
 
         return entity;
     }
@@ -210,7 +210,7 @@ public class CommonEntityType {
         entity.loc.set(entity.last.set(location));
 
         DefaultEntityController controller = new DefaultEntityController();
-        controller.bind(entity);
+        controller.bind(entity, false);
 
         return entity;
     }

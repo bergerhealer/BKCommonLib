@@ -206,13 +206,13 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final EntityController controller;
         if (hook == null) {
             controller = new DefaultEntityController();
-            controller.bind(this);
+            controller.bind(this, false);
         } else if (hook.hasController()) {
             controller = hook.getController();
         } else {
             // This should not occur. Return some dummy controller for now.
             controller = new DefaultEntityController();
-            controller.bind(this);
+            controller.bind(this, false);
         }
         return controller;
     }
@@ -237,11 +237,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (isHooked()) {
             EntityController old_controller = this.getController();
             if (old_controller != null) {
-                old_controller.bind(null);
+                old_controller.bind(null, true);
             }
         }
 
-        controller.bind(this);
+        controller.bind(this, true);
     }
 
     /**
@@ -369,7 +369,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // *** Make sure a controller is set when hooked ***
         if (this.isHooked()) {
             DefaultEntityController controller = new DefaultEntityController();
-            controller.bind(this);
+            controller.bind(this, true);
         }
     }
 
@@ -637,7 +637,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * @return True if spawning occurred, False if not
      * @see #spawn(Location)
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static final CommonEntity spawn(EntityType entityType, Location location, EntityController controller, EntityNetworkController networkController) {
         CommonEntityType type = CommonEntityType.byEntityType(entityType);
         if (type == CommonEntityType.UNKNOWN) {
@@ -648,16 +648,18 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final CommonEntity<org.bukkit.entity.Entity> entity = type.createNMSHookEntity(location);
 
         // Set controller before spawning
-        entity.setController(controller);
+        controller.bind(entity, false);
 
         // Add the Entity in the world. Note that this creates a default Entity Network Controller entry.
         EntityUtil.addEntity(entity.getEntity());
 
+        // This is why we use bind(entity, false)!
+        // Fire onAttached after having added the Entity to the world
+        entity.getController().onAttached();
+
         // Replace the default Entity Network Controller with the one specified
         entity.setNetworkController(networkController);
-
-        // Done!
-        entity.onSpawn();
+        // entity.getNetworkController().onAttached(); // Not needed, the setNetworkController() above does this
         return entity;
     }
 
@@ -693,14 +695,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new IllegalArgumentException("The Entity Type '" + entityType + "' is invalid!");
         }
         return type.createCommonEntityNull();
-    }
-
-    /**
-     * Called after this CommonEntity has spawned
-     */
-    protected void onSpawn() {
-        getController().onAttached();
-        getNetworkController().onAttached();
     }
 
     /**
