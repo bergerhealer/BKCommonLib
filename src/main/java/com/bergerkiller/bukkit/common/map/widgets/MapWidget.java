@@ -8,9 +8,11 @@ import java.util.List;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.map.MapCanvas;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayEvents;
+import com.bergerkiller.bukkit.common.map.MapEventPropagation;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput.Key;
 import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
 
@@ -437,6 +439,76 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Broadcasts a status change to all widgets of the display this widget is attached to
+     * 
+     * @param name of the status change
+     */
+    public final void sendStatusChange(String name) {
+        sendStatusChange(MapEventPropagation.BROADCAST, name, null);
+    }
+
+    /**
+     * Broadcasts a status change to all widgets of the display this widget is attached to
+     * 
+     * @param name of the status change
+     * @param argument for the status change
+     */
+    public final void sendStatusChange(String name, Object argument) {
+        sendStatusChange(MapEventPropagation.BROADCAST, name, argument);
+    }
+
+    /**
+     * Sends a status change to all widgets, the propagation mode defining who receives the status change
+     * and in what order.
+     * 
+     * @param propagationMode of sending the status change
+     * @param name of the status change
+     */
+    public final void sendStatusChange(MapEventPropagation propagationMode, String name) {
+        sendStatusChange(propagationMode, name, null);
+    }
+
+    /**
+     * Sends a status change to all widgets, the propagation mode defining who receives the status change
+     * and in what order.
+     * 
+     * @param propagationMode of sending the status change
+     * @param name of the status change
+     * @param argument for the status change
+     */
+    public final void sendStatusChange(MapEventPropagation propagationMode, String name, Object argument) {
+        switch (propagationMode) {
+        case BROADCAST:
+            if (this.display != null) {
+                this.display.sendStatusChange(name, argument);
+            }
+            break;
+        case UPSTREAM:
+            sendStatusChangeUpstream(this, new MapStatusEvent(name, argument));
+            break;
+        case DOWNSTREAM:
+            sendStatusChangeDownstream(this, new MapStatusEvent(name, argument));
+            break;
+        }
+    }
+
+    private static void sendStatusChangeUpstream(MapWidget widget, MapStatusEvent event) {
+        widget.onStatusChanged(event);
+        for (MapWidget child : widget.getWidgets()) {
+            sendStatusChangeUpstream(child, event);
+        }
+    }
+
+    private static void sendStatusChangeDownstream(MapWidget widget, MapStatusEvent event) {
+        widget.onStatusChanged(event);
+        if (widget.parent != null) {
+            sendStatusChangeDownstream(widget.parent, event);
+        } else if (widget.display != null) {
+            widget.display.onStatusChanged(event);
+        }
+    }
+
+    /**
      * Performs {@link #onTick()} and {@link #onDraw()} update operations, and other widget refreshing logic
      * needed to run in the background. Attaches newly added widgets before any updates are performed.
      */
@@ -768,6 +840,10 @@ public class MapWidget implements MapDisplayEvents {
     public void onRightClick(MapClickEvent event) {
         MapWidget next = this.getNextInputWidget();
         if (next != null) next.onRightClick(event);
+    }
+
+    @Override
+    public void onStatusChanged(MapStatusEvent event) {
     }
 
     @Override

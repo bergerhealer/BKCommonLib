@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
@@ -679,6 +680,36 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Sends a status change event without argument to this map display and all widgets attached to it.
+     * First {@link #onStatusChanged(MapStatusEvent)} is called for all widgets, then for this display.
+     * 
+     * @param name of the status change
+     */
+    public final void sendStatusChange(String name) {
+        this.sendStatusChange(name, null);
+    }
+
+    /**
+     * Sends a status change event to this map display and all widgets attached to it.
+     * First {@link #onStatusChanged(MapStatusEvent)} is called for all widgets, then for this display.
+     * 
+     * @param name of the status change
+     * @param argument for the status change
+     */
+    public final void sendStatusChange(String name, Object argument) {
+        MapStatusEvent event = new MapStatusEvent(name, argument);
+        sendStatusChanges(this.widgets, event);
+        this.onStatusChanged(event);
+    }
+
+    private static void sendStatusChanges(MapWidget from, MapStatusEvent event) {
+        from.onStatusChanged(event);
+        for (MapWidget child : from.getWidgets()) {
+            sendStatusChanges(child, event);
+        }
+    }
+
+    /**
      * Retrieves the base layer at z-index 0.
      * Note that if layers at negative z-index exist, this is not the background.
      * 
@@ -1144,6 +1175,9 @@ public class MapDisplay implements MapDisplayEvents {
 
     @Override
     public void onMapItemChanged() {}
+
+    @Override
+    public void onStatusChanged(MapStatusEvent event) {};
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class

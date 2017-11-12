@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map;
 import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 
 /**
  * An interface of all possible event callback methods provided by Map Displays and Map Display Controls.
@@ -69,4 +70,13 @@ public interface MapDisplayEvents extends Tickable {
      * Callback function called when the map item of this Map Display changed
      */
     public void onMapItemChanged();
+
+    /**
+     * Callback function called when a widget in the map display wishes to broadcast
+     * a status change. These status changes can be used to refresh the map or apply
+     * updated configurations.
+     * 
+     * @param event of the status change
+     */
+    public void onStatusChanged(MapStatusEvent event);
 }
