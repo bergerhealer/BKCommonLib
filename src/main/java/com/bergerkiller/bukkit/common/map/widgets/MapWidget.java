@@ -2,8 +2,7 @@ package com.bergerkiller.bukkit.common.map.widgets;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
@@ -15,6 +14,7 @@ import com.bergerkiller.bukkit.common.map.MapDisplayEvents;
 import com.bergerkiller.bukkit.common.map.MapEventPropagation;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput.Key;
 import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * A single rectangular element on the map
@@ -34,7 +34,7 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _attached;
     private boolean _boundsChanged;
     private boolean _wasFocused;
-    private List<MapWidget> _children;
+    private MapWidget[] _children;
 
     public MapWidget() {
         this._wasFocused = false;
@@ -43,7 +43,7 @@ public class MapWidget implements MapDisplayEvents {
         this._boundsChanged = true;
         this._focusable = false;
         this._attached = false;
-        this._children = Collections.emptyList();
+        this._children = new MapWidget[0];
         this.display = null;
         this.layer = null;
         this.parent = null;
@@ -211,6 +211,15 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Gets the map display this widget is attached to. Returns null if not attached yet.
+     * 
+     * @return map display
+     */
+    public final MapDisplay getDisplay() {
+        return this.display;
+    }
+
+    /**
      * Gets whether or not it is possible for this widget to be focused
      * 
      * @return True if this widget can receive focus
@@ -346,11 +355,13 @@ public class MapWidget implements MapDisplayEvents {
     /**
      * Gets an immutable list of children of this widget.
      * These children are drawn on top of this widget.
+     * The returned list is guaranteed to be left unmodified when additional children
+     * are added or removed from this widget, making it safe to use for iterating.
      * 
      * @return list of children
      */
     public final List<MapWidget> getWidgets() {
-        return this._children;
+        return Arrays.asList(this._children);
     }
 
     /**
@@ -361,7 +372,7 @@ public class MapWidget implements MapDisplayEvents {
      * @return widget at the index
      */
     public final MapWidget getWidget(int index) {
-        return (index >= 0 && index < this._children.size()) ? this._children.get(index) : null;
+        return (index >= 0 && index < this._children.length) ? this._children[index] : null;
     }
 
     /**
@@ -370,17 +381,48 @@ public class MapWidget implements MapDisplayEvents {
      * @return widget count
      */
     public final int getWidgetCount() {
-        return this._children.size();
+        return this._children.length;
+    }
+
+    /**
+     * Removes this widget from its parent. If this widget or a child thereof was previously
+     * focused, the focus will automatically switch to the appropriate alternative.
+     * This method is equivalent to calling:
+     * <pre>
+     * widget.getParent().removeWidget(widget);
+     * </pre>
+     */
+    public final void remove() {
+        if (this.parent != null) {
+            this.parent.removeWidget(this);
+        }
     }
 
     /**
      * Removes all previously added widgets
      */
     public final void clearWidgets() {
-        Iterator<MapWidget> child_iter = this._children.iterator();
-        while (child_iter.hasNext()) {
-            child_iter.next().handleDetach();
-            child_iter.remove();
+        MapWidget[] old_children = this._children;
+        for (MapWidget old_child : old_children) {
+            old_child.handleDetach();
+        }
+
+        // If the old_children and children are one and the same, there are no changes
+        // Then we can use a shortcut to keep things simple
+        // If this is not the case, we must only remove those widgets we have actually detached
+        if (this._children == old_children) {
+            this._children = new MapWidget[0];
+        } else {
+            ArrayList<MapWidget> remaining = new ArrayList<MapWidget>(Arrays.asList(this._children));
+            for (MapWidget old_child : old_children) {
+                for (int i = 0; i < remaining.size(); i++) {
+                    if (remaining.get(i) == old_child) {
+                        remaining.remove(i);
+                        break;
+                    }
+                }
+            }
+            this._children = LogicUtil.toArray(remaining, MapWidget.class);
         }
     }
 
@@ -391,17 +433,65 @@ public class MapWidget implements MapDisplayEvents {
      * @return input widget (can be used for chaining calls)
      */
     public final <T extends MapWidget> T addWidget(T widget) {
-        if (this._children.isEmpty()) {
-            this._children = new ArrayList<MapWidget>(1);
-        }
-        MapWidget mw = widget; // Damn broken generics!
-        mw.root = this.root;
-        mw.parent = this;
-        mw._attached = false;
-        mw._invalidated = true;
-        mw._boundsChanged = true;
-        this._children.add(mw);
+        this._children = java.util.Arrays.copyOf(this._children, this._children.length + 1);
+        this._children[this._children.length - 1] = widget;
+        this.handleWidgetAdded(widget);
         return widget;
+    }
+
+    /**
+     * Replaces a widget with a new widget at the exact same index.
+     * If the old widget is not contained, the new widget is added instead.
+     * 
+     * @param oldWidget to replace
+     * @param newWidget to replace oldWidget with
+     * @return newWidget (for chained calls)
+     */
+    public final <T extends MapWidget> T swapWidget(MapWidget oldWidget, T newWidget) {
+        MapWidget[] old_children = this._children;
+        int oldIndex = -1;
+        for (int i = 0; i < old_children.length; i++) {
+            if (old_children[i] == oldWidget) {
+                oldIndex = i;
+                break;
+            }
+        }
+        if (oldIndex == -1) {
+            return this.addWidget(newWidget);
+        }
+
+        // Perform detachment of the old widget
+        oldWidget.handleDetach();
+
+        // If the old_children and children are one and the same, there are no changes
+        // Then we can use a shortcut to keep things simple
+        if (old_children == this._children) {
+            this._children = this._children.clone();
+            this._children[oldIndex] = newWidget;
+            this.handleWidgetAdded(newWidget);
+            return newWidget;
+        }
+
+        // If this is not the case, we must only replace those widgets we have actually detached
+        for (int i = 0; i < this._children.length; i++) {
+            if (this._children[i] == oldWidget) {
+                this._children = this._children.clone();
+                this._children[i] = newWidget;
+                this.handleWidgetAdded(newWidget);
+                return newWidget;
+            }
+        }
+
+        // Old widget no longer exists as a child. Just add the new widget and be done with it
+        return this.addWidget(newWidget);
+    }
+
+    private final void handleWidgetAdded(MapWidget child) {
+        child.root = this.root;
+        child.parent = this;
+        child._attached = false;
+        child._invalidated = true;
+        child._boundsChanged = true;
     }
 
     /**
@@ -411,11 +501,45 @@ public class MapWidget implements MapDisplayEvents {
      * @return True if the child widget was removed
      */
     public final boolean removeWidget(MapWidget widget) {
-        if (this._children.isEmpty() || !this._children.remove(widget)) {
+        // Check if the widget is a child of this widget at all
+        int index = -1;
+        for (int i = 0; i < this._children.length; i++) {
+            if (this._children[i] == widget) {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) {
             return false;
         }
 
+        // Handles detachment. This calls user code, which could result in further changes to widgets.
+        // To prevent weird bugs, the widget is still marked a child while it handles handleDetach()
         widget.handleDetach();
+
+        // In case the order of the widget was changed, find it again
+        if (index >= this._children.length || this._children[index] != widget) {
+            index = -1;
+            for (int i = 0; i < this._children.length; i++) {
+                if (this._children[i] == widget) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        // Remove the widget at the index
+        if (index != -1) {
+            MapWidget[] new_children = new MapWidget[this._children.length - 1];
+            int dest_idx = 0;
+            for (int i = 0; i < this._children.length; i++) {
+                if (i != index) {
+                    new_children[dest_idx++] = this._children[i];
+                }
+            }
+            this._children = new_children;
+        }
+
         return true;
     }
 
@@ -755,11 +879,7 @@ public class MapWidget implements MapDisplayEvents {
             this.deactivate();
 
             // Detach children first
-            Iterator<MapWidget> child_iter = this._children.iterator();
-            while (child_iter.hasNext()) {
-                child_iter.next().handleDetach();
-                child_iter.remove();
-            }
+            this.clearWidgets();
 
             // Fire onDetached
             this.onDetached();
