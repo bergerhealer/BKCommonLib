@@ -231,8 +231,8 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * Gets a modifiable List of Entity IDs that are queuing for Player Chunk
-     * Packets to be sent
+     * Gets a modifiable List of Entity IDs that will result in entity destroy packets
+     * to be sent the next tick.
      *
      * @param player to get it for
      * @return Entity Remove Queue

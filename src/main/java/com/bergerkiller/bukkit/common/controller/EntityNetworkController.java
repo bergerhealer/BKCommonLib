@@ -350,6 +350,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     public final void bind(T entity, Object entityTrackerEntry) {
         if (this.entity != null) {
             this.onDetached();
+            this.entity = null;
+            this.handle = null;
+        }
+        if (entity == null) {
+            return;
         }
         this.entity = entity;
         this.handle = EntityTrackerEntryHandle.createHandle(entityTrackerEntry);
@@ -544,7 +549,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
-     * Ensures that the Entity is displayed to the viewer
+     * Ensures that the Entity is displayed to the viewer.
+     * Can be overridden to completely alter how the entity is spawned.
      *
      * @param viewer to display this Entity for
      */
@@ -1096,7 +1102,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
         // Viewers
         for (Player viewer : this.getViewers()) {
-            PacketUtil.sendPacket(viewer, packet);
+            if (viewer != entity.getEntity()) {
+                PacketUtil.sendPacket(viewer, packet);
+            }
         }
     }
 

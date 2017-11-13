@@ -10,8 +10,12 @@ import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -103,21 +107,50 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final EntityTracker tracker = WorldUtil.getTracker(getWorld());
         final EntityTrackerEntryHandle storedEntry = tracker.getEntry(entity);
 
-        // Properly handle a previously set controller
-        EntityTrackerHook hook = EntityTrackerHook.get(Handle.getRaw(storedEntry), EntityTrackerHook.class);
-        if (hook != null) {
-            final EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>> oldController = (EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>>) hook.getController();
-            if (oldController == controller) {
-                return;
-            } else if (oldController != null) {
-                oldController.onDetached();
-            }
-        }
-
         // Take care of null controllers - stop tracking
         if (controller == null) {
             tracker.stopTracking(entity);
             return;
+        }
+
+        // Find a previous network controller that may have been set
+        EntityNetworkController oldController = null;
+        EntityTrackerHook hook = EntityTrackerHook.get(Handle.getRaw(storedEntry), EntityTrackerHook.class);
+        if (hook != null) {
+            oldController = (EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>>) hook.getController();
+            if (oldController == controller) {
+                return; // No Change!
+            }
+        }
+
+        // Store the previous viewers set for the entry before we swap the controllers
+        // This is required to respawn the entity if so required
+        List<Player> previousViewers;
+        if (storedEntry != null) {
+            previousViewers = new ArrayList<Player>(storedEntry.getViewers());
+        } else {
+            previousViewers = Collections.emptyList();
+        }
+
+        // Hide the entity to all viewers. This will use a previously set controller, if set.
+        // The vanilla controller will simply send a destroy packet.
+        for (Player previousViewer : previousViewers) {
+            storedEntry.removeViewer(previousViewer);
+        }
+
+        // Remove this entity from all the viewer's "removeNextTick" lists
+        // This prevents the spawned entity despawning again the next tick
+        // We fire the destroy packet right away to prevent that.
+        for (Player previousViewer : previousViewers) {
+            if (PlayerUtil.getEntityRemoveQueue(previousViewer).remove((Object) this.entity.getEntityId())) {
+                CommonPacket destroyPacket = PacketType.OUT_ENTITY_DESTROY.newInstance(this.entity.getEntityId());
+                PacketUtil.sendPacket(previousViewer, destroyPacket);
+            }
+        }
+
+        // Handle the onDetached() of the previous controller, if set
+        if (oldController != null) {
+            oldController.bind(null, storedEntry.getRaw());
         }
 
         final EntityTrackerEntryHandle newEntry;
@@ -161,8 +194,15 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // Attach (new?) entry to the world
         if (Handle.getRaw(storedEntry) != Handle.getRaw(newEntry)) {
             tracker.setEntry(entity, newEntry);
+        }
 
-            // Make sure to update the viewers
+        // Make the new controller visible to the previous viewers
+        // If this is a new entry entirely, perform a scan
+        if (storedEntry != null) {
+            for (Player previousViewer : previousViewers) {
+                newEntry.updatePlayer(previousViewer);
+            }
+        } else {
             newEntry.scanPlayers(getWorld().getPlayers());
         }
     }
