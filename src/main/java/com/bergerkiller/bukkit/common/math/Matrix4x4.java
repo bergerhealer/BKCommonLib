@@ -269,7 +269,7 @@ public class Matrix4x4 implements Cloneable {
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        float yaw = -MathUtil.atan2(-m20, m00);
+        float yaw = -90.0f + -MathUtil.atan2(-m20, m00);
         float pitch = MathUtil.atan2(-m12, m11);
         float roll = (float) (MathUtil.RADTODEG * Math.asin(m10));
         return new Vector(pitch, yaw, roll);
