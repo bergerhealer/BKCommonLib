@@ -19,10 +19,12 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -44,6 +46,7 @@ import org.bukkit.entity.Player;
  * overflow exceptions.
  */
 public class CommonNMS {
+    private static WorldServerHandle dummyTrackerWorld = null; // lazy-initialized once
     private static EntityTrackerHandle dummyTracker = null; // lazy-initialized once
 
     public static boolean isItemEmpty(Object rawItemStackHandle) {
@@ -140,16 +143,24 @@ public class CommonNMS {
     public static EntityTrackerEntryHandle createDummyTrackerEntry(Entity entity) {
         EntityTrackerEntryHandle createdEntry = null;
         try {
+            // Initialize a dummy world, whose only use is providing access to the 'players' field.
+            // This field is used by the EntityTracker to scan for players
+            // We explicitly set this to an empty list to guarantee no spawn packets are produced
+            if (dummyTrackerWorld == null) {
+                dummyTrackerWorld = WorldServerHandle.T.newHandleNull();
+                WorldHandle.T.players.raw.set(dummyTrackerWorld.getRaw(), Collections.emptyList());
+            }
+
             // Initialize the dummy tracker without calling any methods/constructors
             if (dummyTracker == null) {
                 dummyTracker = EntityTrackerHandle.T.newHandleNull();
                 EntityTrackerHandle.T.entries.raw.set(dummyTracker.getRaw(), new HashSet<Object>());
+                EntityTrackerHandle.T.world.raw.set(dummyTracker.getRaw(), dummyTrackerWorld.getRaw());
                 dummyTracker.setTrackedEntities(new IntHashMap<Object>());
             }
             dummyTracker.getEntries().clear();
 
             // Track it!
-            dummyTracker.setWorld(entity.getWorld());
             dummyTracker.setViewDistance((Bukkit.getViewDistance()-1) * 16);
             IntHashMap<?> tracked = dummyTracker.getTrackedEntities();
             tracked.clear();

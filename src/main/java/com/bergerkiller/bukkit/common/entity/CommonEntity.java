@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -690,16 +691,48 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // Set controller before spawning
         controller.bind(entity, false);
 
-        // Add the Entity in the world. Note that this creates a default Entity Network Controller entry.
-        EntityUtil.addEntity(entity.getEntity());
+        // When setting a custom entity network controller, avoid the creation of a default network controller
+        // We do this by temporarily hooking the EntityTracker, cancelling track() for the entity we don't want
+        if (networkController != null && !(networkController instanceof DefaultEntityNetworkController)) {
+            // Hook the entity tracker to cancel track() on this Entity
+            Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
+            Object nmsEntityTrackerHandle = WorldServerHandle.T.entityTracker.raw.get(nmsWorldHandle);
+            EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
+            if (hook == null) {
+                hook = new EntityTrackerHook(nmsEntityTrackerHandle);
+                WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+            }
+            hook.ignoredEntities.add(entity.getHandle());
 
-        // This is why we use bind(entity, false)!
-        // Fire onAttached after having added the Entity to the world
-        entity.getController().onAttached();
+            try {
+                // Spawn the entity. This will not create an entity tracker entry.
+                EntityUtil.addEntity(entity.getEntity());
 
-        // Replace the default Entity Network Controller with the one specified
-        entity.setNetworkController(networkController);
-        // entity.getNetworkController().onAttached(); // Not needed, the setNetworkController() above does this
+                // This is why we use bind(entity, false)!
+                // Fire onAttached after having added the Entity to the world
+                entity.getController().onAttached();
+
+                // Set the network controller
+                entity.setNetworkController(networkController);
+                // entity.getNetworkController().onAttached(); // Not needed, the setNetworkController() above does this
+            } finally {
+                // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
+                hook.ignoredEntities.remove(entity.getHandle());
+                if (hook.ignoredEntities.isEmpty()) {
+                    WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.original);
+                }
+            }
+
+
+        } else {
+            // Simply spawn. No special things to do here.
+            EntityUtil.addEntity(entity.getEntity());
+
+            // This is why we use bind(entity, false)!
+            // Fire onAttached after having added the Entity to the world
+            entity.getController().onAttached();
+        }
+
         return entity;
     }
 
