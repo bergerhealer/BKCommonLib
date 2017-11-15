@@ -491,6 +491,30 @@ public class Matrix4x4 implements Cloneable {
         transformPoint(quad.p3);
     }
 
+    /**
+     * Obtains the absolute position vector of this matrix, equivalent to performing
+     * transformPoint with a zero vector.
+     * 
+     * @return position vector
+     */
+    public Vector3 toVector3() {
+        Vector3 result = new Vector3(0.0, 0.0, 0.0);
+        this.transformPoint(result);
+        return result;
+    }
+
+    /**
+     * Obtains the absolute position vector of this matrix, equivalent to performing
+     * transformPoint with a zero vector.
+     * 
+     * @return position vector
+     */
+    public Vector toVector() {
+        Vector result = new Vector(0.0, 0.0, 0.0);
+        this.transformPoint(result);
+        return result;
+    }
+
     @Override
     public Matrix4x4 clone() {
         return new Matrix4x4(this);
