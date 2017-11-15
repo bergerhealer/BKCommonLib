@@ -33,8 +33,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -911,5 +913,17 @@ public class WorldUtil extends ChunkUtil {
             // MC >= 1.9: we can use Bukkit's API for this!
             location.getWorld().playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
         }
+    }
+
+    /**
+     * Looks up an Entity by its Entity Id in a World.
+     * The Entity Id is not persistent!
+     * 
+     * @param world
+     * @param entityId
+     * @return Entity by this entity Id, null if not found
+     */
+    public static Entity getEntityById(World world, int entityId) {
+        return WorldHandle.fromBukkit(world).getEntityById(entityId);
     }
 }
