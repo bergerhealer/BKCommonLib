@@ -14,7 +14,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
-public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
+public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
     private EntityNetworkController<?> controller;
 
     public EntityNetworkController<?> getController() {

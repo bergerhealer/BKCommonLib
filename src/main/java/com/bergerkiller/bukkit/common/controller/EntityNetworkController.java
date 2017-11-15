@@ -8,7 +8,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.*;
@@ -363,7 +363,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             this.last_passenger_1_8_8 = entity.getPassenger();
         }
 
-        EntityTrackerHook hook = EntityTrackerHook.get(this.handle.getRaw(), EntityTrackerHook.class);
+        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(this.handle.getRaw(), EntityTrackerEntryHook.class);
         if (hook != null) {
             hook.setController(this);
         }
