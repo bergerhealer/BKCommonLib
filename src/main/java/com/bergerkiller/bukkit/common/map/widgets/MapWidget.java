@@ -35,6 +35,7 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _boundsChanged;
     private boolean _wasFocused;
     private boolean _retainChildren;
+    private boolean _visible;
     private MapWidget[] _children;
 
     public MapWidget() {
@@ -45,6 +46,7 @@ public class MapWidget implements MapDisplayEvents {
         this._focusable = false;
         this._attached = false;
         this._retainChildren = false;
+        this._visible = true;
         this._children = new MapWidget[0];
         this.display = null;
         this.layer = null;
@@ -219,6 +221,29 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final MapDisplay getDisplay() {
         return this.display;
+    }
+
+    /**
+     * Gets whether this widget is visible
+     * 
+     * @return True if visible
+     */
+    public final boolean isVisible() {
+        return this._visible;
+    }
+
+    /**
+     * Sets whether this widget is visible
+     * 
+     * @param visible
+     * @return this map widget
+     */
+    public final MapWidget setVisible(boolean visible) {
+        if (this._visible != visible) {
+            this._visible = visible;
+            this.invalidate();
+        }
+        return this;
     }
 
     /**
@@ -849,7 +874,9 @@ public class MapWidget implements MapDisplayEvents {
         // If invalidated, redraw
         if (this._invalidated) {
             this.view = this.layer.getView(absoluteX, absoluteY, this._width, this._height);
-            this.onDraw();
+            if (this.isVisible()) {
+                this.onDraw();
+            }
             this._lastX = absoluteX;
             this._lastY = absoluteY;
             this._lastWidth = this._width;

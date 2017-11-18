@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
 public class MapWidgetRoot extends MapWidget {
     private MapWidget _focusedWidget = null;
     private MapWidget _activatedWidget = this;
-    private boolean _focusChangeRequired = true;
+    private MapWidget _focusChangeFrom = this;
     private List<MapWidget> _focusHistory = new ArrayList<MapWidget>();
 
     public MapWidgetRoot(MapDisplay display) {
@@ -35,13 +35,13 @@ public class MapWidgetRoot extends MapWidget {
                 this._focusedWidget.invalidate();
             }
             this._focusedWidget = null;
-            this._focusChangeRequired = false;
+            this._focusChangeFrom = null;
             return;
         }
 
         // Check not already focused. If it is, only disable automatic focus changes.
         if (this._focusedWidget == widget) {
-            this._focusChangeRequired = false;
+            this._focusChangeFrom = null;
             return;
         }
 
@@ -71,7 +71,7 @@ public class MapWidgetRoot extends MapWidget {
         if (this._focusedWidget != null) {
             this._focusedWidget.invalidate();
         }
-        this._focusChangeRequired = false;
+        this._focusChangeFrom = null;
     }
 
     private void pushFocus(MapWidget widget) {
@@ -118,20 +118,30 @@ public class MapWidgetRoot extends MapWidget {
                 tmp = this;
             }
             this._activatedWidget = tmp;
+            this._focusChangeFrom = tmp;
         } else {
             // Set the activated widget to the widget specified
-            this._activatedWidget = widget;
+            // Activate a parent widget of the widget if the widget is not focusable
+            MapWidget tmp = widget;
+            while (tmp != null && !tmp.isFocusable()) {
+                tmp = tmp.parent;
+            }
+            if (tmp == null) {
+                tmp = this;
+            }
+
+            this._activatedWidget = tmp;
+            this._focusChangeFrom = widget;
         }
         this._activatedWidget.invalidate();
-        this._focusChangeRequired = true;
     }
 
     @Override
     public void onTick() {
-        if (this._focusChangeRequired) {
+        if (this._focusChangeFrom != null) {
 
             // Find all potential widgets that can be focused
-            List<MapWidget> widgets = MapWidgetNavigator.getFocusableWidgets(this._activatedWidget);
+            List<MapWidget> widgets = MapWidgetNavigator.getFocusableWidgets(this._focusChangeFrom);
             if (!widgets.isEmpty()) {
                 // Check focus history in reverse order (newest - oldest) to see if we can focus
                 // By default pick the first child
