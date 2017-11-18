@@ -34,6 +34,7 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _attached;
     private boolean _boundsChanged;
     private boolean _wasFocused;
+    private boolean _retainChildren;
     private MapWidget[] _children;
 
     public MapWidget() {
@@ -43,6 +44,7 @@ public class MapWidget implements MapDisplayEvents {
         this._boundsChanged = true;
         this._focusable = false;
         this._attached = false;
+        this._retainChildren = false;
         this._children = new MapWidget[0];
         this.display = null;
         this.layer = null;
@@ -392,7 +394,7 @@ public class MapWidget implements MapDisplayEvents {
      * widget.getParent().removeWidget(widget);
      * </pre>
      */
-    public final void remove() {
+    public final void removeWidget() {
         if (this.parent != null) {
             this.parent.removeWidget(this);
         }
@@ -560,6 +562,18 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final void invalidate() {
         this._invalidated = true;
+    }
+
+    /**
+     * Sets whether child widgets are retained when this widget is removed from a parent.
+     * When retained, the child widgets are re-added when this widget is re-attached to a parent.
+     * 
+     * @param retain whether to retain the widgets
+     * @return this map widget
+     */
+    public final MapWidget setRetainChildWidgets(boolean retain) {
+        this._retainChildren = retain;
+        return this;
     }
 
     /**
@@ -880,7 +894,14 @@ public class MapWidget implements MapDisplayEvents {
             this.deactivate();
 
             // Detach children first
-            this.clearWidgets();
+            if (this._retainChildren) {
+                // Retain them. Only fire onDetached() for the children.
+                for (MapWidget old_child : this._children) {
+                    old_child.handleDetach();
+                }
+            } else {
+                this.clearWidgets();
+            }
 
             // Fire onDetached
             this.onDetached();
