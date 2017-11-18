@@ -53,12 +53,12 @@ public class MapWidgetNavigator {
     private static int getWeightLeft(MapWidget current, MapWidget widget, MapPlayerInput.Key key) {
         // Widget to the left of the current widget?
         // If so, the weight is the distance between the widget's right bound and the current widget's left bound
-        int x = current.getX();
-        int y1 = current.getY();
-        int y2 = current.getY() + current.getHeight();
-        int weight = x - widget.getX();
-        int weight_a = (widget.getY() - y2);
-        int weight_b = (y1 - (widget.getY() + widget.getHeight()));
+        int x = current.getAbsoluteX();
+        int y1 = current.getAbsoluteY();
+        int y2 = current.getAbsoluteY() + current.getHeight();
+        int weight = x - widget.getAbsoluteX();
+        int weight_a = (widget.getAbsoluteY() - y2);
+        int weight_b = (y1 - (widget.getAbsoluteY() + widget.getHeight()));
         if (weight > 0) {
             return wab(weight, weight_a, weight_b);
         }
@@ -69,12 +69,12 @@ public class MapWidgetNavigator {
     private static int getWeightRight(MapWidget current, MapWidget widget, MapPlayerInput.Key key) {
         // Widget to the right of the current widget?
         // If so, the weight is the distance between the widget's left bound and the current widget's right bound
-        int x = current.getX() + current.getWidth();
-        int y1 = current.getY();
-        int y2 = current.getY() + current.getHeight();
-        int weight = (widget.getX() + widget.getWidth()) - x;
-        int weight_a = (widget.getY() - y2);
-        int weight_b = (y1 - (widget.getY() + widget.getHeight()));
+        int x = current.getAbsoluteX() + current.getWidth();
+        int y1 = current.getAbsoluteY();
+        int y2 = current.getAbsoluteY() + current.getHeight();
+        int weight = (widget.getAbsoluteX() + widget.getWidth()) - x;
+        int weight_a = (widget.getAbsoluteY() - y2);
+        int weight_b = (y1 - (widget.getAbsoluteY() + widget.getHeight()));
         if (weight > 0) {
             return wab(weight, weight_a, weight_b);
         }
@@ -85,12 +85,12 @@ public class MapWidgetNavigator {
     private static int getWeightUp(MapWidget current, MapWidget widget, MapPlayerInput.Key key) {
         // Widget above the current widget?
         // If so, the weight is the distance between the widget's lower bound and the current widget's upper bound
-        int y = current.getY();
-        int x1 = current.getX();
-        int x2 = current.getX() + current.getWidth();
-        int weight = y - widget.getY();
-        int weight_a = (widget.getX() - x2);
-        int weight_b = (x1 - (widget.getX() + widget.getWidth()));
+        int y = current.getAbsoluteY();
+        int x1 = current.getAbsoluteX();
+        int x2 = current.getAbsoluteX() + current.getWidth();
+        int weight = y - widget.getAbsoluteY();
+        int weight_a = (widget.getAbsoluteX() - x2);
+        int weight_b = (x1 - (widget.getAbsoluteX() + widget.getWidth()));
         if (weight > 0) {
             return wab(weight, weight_a, weight_b);
         }
@@ -101,12 +101,12 @@ public class MapWidgetNavigator {
     private static int getWeightDown(MapWidget current, MapWidget widget, MapPlayerInput.Key key) {
         // Widget below the current widget?
         // If so, the weight is the distance between the widget's upper bound and the current widget's lower bound
-        int y = current.getY() + current.getHeight();
-        int x1 = current.getX();
-        int x2 = current.getX() + current.getWidth();
-        int weight = (widget.getY() + widget.getHeight()) - y;
-        int weight_a = (widget.getX() - x2);
-        int weight_b = (x1 - (widget.getX() + widget.getWidth()));
+        int y = current.getAbsoluteY() + current.getHeight();
+        int x1 = current.getAbsoluteX();
+        int x2 = current.getAbsoluteX() + current.getWidth();
+        int weight = (widget.getAbsoluteY() + widget.getHeight()) - y;
+        int weight_a = (widget.getAbsoluteX() - x2);
+        int weight_b = (x1 - (widget.getAbsoluteX() + widget.getWidth()));
         if (weight > 0) {
             return wab(weight, weight_a, weight_b);
         }
