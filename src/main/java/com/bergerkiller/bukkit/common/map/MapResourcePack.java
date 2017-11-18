@@ -494,7 +494,7 @@ public class MapResourcePack {
         // Handle overrides first
         if (model.overrides != null && !model.overrides.isEmpty()) {
             for (Model.ModelOverride override : model.overrides) {
-                if (override.matches(options)) {
+                if (override.matches(options) && !override.model.equals(path)) {
                     //System.out.println("MATCH " + override.model + "  " + options);
                     return this.loadModel(override.model, options);
                 }
