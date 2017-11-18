@@ -488,7 +488,10 @@ public class ConfigurationNode implements Cloneable {
                 ConfigurationNode node = this.getNode(path);
                 ConfigurationSection section = (ConfigurationSection) value;
                 for (String key : section.getKeys(true)) {
-                    node.set(key, section.get(key));
+                    Object sub_value = section.get(key);
+                    if (!(sub_value instanceof ConfigurationSection)) {
+                        node.set(key, sub_value);
+                    }
                 }
                 return;
             }
