@@ -77,16 +77,34 @@ public final class MapTexture extends MapCanvas {
     }
 
     public static MapTexture loadPluginResource(JavaPlugin plugin, String filename) {
-        return fromStream(plugin.getResource(filename));
+        if (plugin == null) {
+            throw new IllegalArgumentException("plugin is null");
+        }
+        InputStream stream = plugin.getResource(filename);
+        if (stream == null) {
+            throw new RuntimeException("Resource not found in " + plugin.getName() + ": " + filename);
+        }
+        return fromStream(stream);
     }
 
     public static MapTexture loadResource(Class<?> ownerClass, String filename) {
-        return fromStream(ownerClass.getResourceAsStream(filename));
+        if (ownerClass == null) {
+            throw new IllegalArgumentException("ownerClass is null");
+        }
+        InputStream stream = ownerClass.getResourceAsStream(filename);
+        if (stream == null) {
+            throw new RuntimeException("Resource not found: " + filename);
+        }
+        return fromStream(stream);
     }
 
     public static MapTexture loadResource(URL imageResourceURL) {
         try {
-            return fromStream(imageResourceURL.openStream());
+            InputStream stream = imageResourceURL.openStream();
+            if (stream == null) {
+                throw new IOException("Resource not found: " + imageResourceURL.toString());
+            }
+            return fromStream(stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to open image resource stream", e);
         }
