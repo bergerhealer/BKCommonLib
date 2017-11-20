@@ -307,6 +307,19 @@ public class CommonPlugin extends PluginBase {
 
     @Override
     public void disable() {
+        // Erase all traces of BKCommonLib from this server
+        Collection<Entity> entities = new ArrayList<Entity>();
+        for (World world : WorldUtil.getWorlds()) {
+            // Unhook chunk providers
+            ChunkProviderServerHook.unhook(world);
+            // Unhook entities
+            entities.addAll(WorldUtil.getEntities(world));
+            for (Entity entity : entities) {
+                CommonEntity.clearControllers(entity);
+            }
+            entities.clear();
+        }
+
         // Shut down map display controller
         this.mapController.onDisable();
 
@@ -332,19 +345,6 @@ public class CommonPlugin extends PluginBase {
             t.printStackTrace();
         }
         packetHandler = null;
-
-        // Erase all traces of BKCommonLib from this server
-        Collection<Entity> entities = new ArrayList<Entity>();
-        for (World world : WorldUtil.getWorlds()) {
-            // Unhook chunk providers
-            ChunkProviderServerHook.unhook(world);
-            // Unhook entities
-            entities.addAll(WorldUtil.getEntities(world));
-            for (Entity entity : entities) {
-                CommonEntity.clearControllers(entity);
-            }
-            entities.clear();
-        }
 
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
