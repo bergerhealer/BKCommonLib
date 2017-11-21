@@ -82,6 +82,11 @@
         </repository>
         -->
 
+        <!-- Repository for aikar's timings library -->
+        <repository>
+            <id>aikar</id>
+            <url>http://repo.aikar.co/nexus/content/groups/aikar/</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -173,6 +178,15 @@
             <scope>test</scope>
         </dependency>
         -->
+
+        <!-- Aikar's minecraft timings library -->
+        <!-- https://github.com/aikar/minecraft-timings -->
+        <dependency>
+            <groupId>co.aikar</groupId>
+            <artifactId>minecraft-timings</artifactId>
+            <version>1.0.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <!-- Build -->
@@ -236,6 +250,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.0</version>
+                <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>co.aikar.timings.lib</pattern>
+                                    <shadedPattern>com.bergerkiller.bukkit.common.dep.timingslib</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -248,6 +270,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.bergerkiller.mountiplex</include>
+                                    <include>co.aikar</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
