@@ -235,6 +235,8 @@ class ChunkProviderServer {
 
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 
+    public (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
+
     // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
     public optional void saveChunk_old:saveChunk((ChunkHandle) Chunk chunk);
     public optional void saveChunk_new:saveChunk((ChunkHandle) Chunk chunk, boolean unloaded);
