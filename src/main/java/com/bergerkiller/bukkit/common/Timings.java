@@ -78,7 +78,7 @@ public class Timings implements AutoCloseable {
     }
 
     private static String getTimingName(Plugin plugin, String name) {
-        return String.format("Task: %s v%s Runnable: %s", 
+        return String.format("Plugin: %s v%s Event: %s", 
                 plugin.getName(),
                 plugin.getDescription().getVersion(),
                 name);
