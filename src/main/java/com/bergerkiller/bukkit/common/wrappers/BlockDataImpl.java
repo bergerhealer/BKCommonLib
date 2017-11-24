@@ -31,6 +31,8 @@ public class BlockDataImpl extends BlockData {
     private BlockHandle block;
     private IBlockDataHandle data;
     private MaterialData materialData;
+    private Material type;
+    private int rawData;
     private boolean hasRenderOptions;
 
     public static final int ID_BITS = 8;
@@ -125,32 +127,35 @@ public class BlockDataImpl extends BlockData {
     public BlockDataImpl(BlockHandle block, IBlockDataHandle data) {
         this.block = block;
         this.data = data;
-        this.materialData = null;
-        this.hasRenderOptions = true;
+        this.refreshBlock();
     }
 
     @Override
     public void loadBlock(Object block) {
         this.block = BlockHandle.createHandle(block);
         this.data = this.block.getBlockData();
-        this.materialData = null;
-        this.hasRenderOptions = true;
+        this.refreshBlock();
     }
 
     @Override
     public void loadBlockData(Object iBlockData) {
         this.data = IBlockDataHandle.createHandle(iBlockData);
         this.block = this.data.getBlock();
-        this.materialData = null;
-        this.hasRenderOptions = true;
+        this.refreshBlock();
     }
 
     @Override
     public void loadMaterialData(Material material, int data) {
         this.block = BlockHandle.getById(material.getId());
         this.data = this.block.fromLegacyData(data);
+        this.refreshBlock();
+    }
+
+    private final void refreshBlock() {
         this.materialData = null;
         this.hasRenderOptions = true;
+        this.type = Material.getMaterial(BlockHandle.getId(this.block));
+        this.rawData = this.block.toLegacyData(this.data);
     }
 
     @Override
@@ -161,6 +166,21 @@ public class BlockDataImpl extends BlockData {
     @Override
     public final Object getData() {
         return this.data.getRaw();
+    }
+
+    @Override
+    public final int getTypeId() {
+        return this.type.getId();
+    }
+
+    @Override
+    public final int getRawData() {
+        return this.rawData;
+    }
+
+    @Override
+    public final org.bukkit.Material getType() {
+        return this.type;
     }
 
     @Override
@@ -190,16 +210,6 @@ public class BlockDataImpl extends BlockData {
             }
         }
         return this.materialData;
-    }
-
-    @Override
-    public final int getTypeId() {
-        return BlockHandle.getId(this.block);
-    }
-
-    @Override
-    public final int getRawData() {
-        return this.block.toLegacyData(this.data);
     }
 
     @Override

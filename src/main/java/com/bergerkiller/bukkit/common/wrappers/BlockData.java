@@ -168,10 +168,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * 
      * @return Block Material Type
      */
-    @SuppressWarnings("deprecation")
-    public final org.bukkit.Material getType() {
-        return org.bukkit.Material.getMaterial(getTypeId());
-    }
+    public abstract org.bukkit.Material getType();
 
     /**
      * Creates a new MaterialData instance appropriate for this Block
