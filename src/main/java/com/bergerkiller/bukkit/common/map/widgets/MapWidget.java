@@ -376,12 +376,14 @@ public class MapWidget implements MapDisplayEvents {
      * enabled, then {@link #isEnabled()} will continue to return false.
      * 
      * @param enabled
+     * @return this widget
      */
-    public final void setEnabled(boolean enabled) {
+    public final MapWidget setEnabled(boolean enabled) {
         if (this._enabled != enabled) {
             this._enabled = enabled;
             this.invalidate();
         }
+        return this;
     }
 
     /**
@@ -767,7 +769,7 @@ public class MapWidget implements MapDisplayEvents {
         absoluteY += this._y;
 
         // Only do this when the widget has been drawn before
-        if (this._lastWidth != 0 && this._lastHeight != 0) {
+        if (this.layer != null && this._lastWidth != 0 && this._lastHeight != 0) {
 
             // Detect changes in bounds and invalidate when it happens
             if (this._lastWidth != this._width ||
