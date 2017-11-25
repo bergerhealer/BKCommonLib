@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 public class MapWidgetButton extends MapWidget {
     private String _text = "";
     private MapTexture _icon = null;
+    private boolean showBorder = true;
 
     public MapWidgetButton() {
         this.setFocusable(true);
@@ -60,6 +61,29 @@ public class MapWidgetButton extends MapWidget {
     }
 
     /**
+     * Sets whether a black border is displayed on the outside of the button
+     * 
+     * @param showBorder
+     * @return this menu button widget
+     */
+    public MapWidgetButton setShowBorder(boolean showBorder) {
+        if (this.showBorder != showBorder) {
+            this.showBorder = showBorder;
+            this.invalidate();
+        }
+        return this;
+    }
+
+    /**
+     * Gets whether a black border is displayed on the outside of the button
+     * 
+     * @return show border state
+     */
+    public boolean isShowBorder() {
+        return this.showBorder;
+    }
+
+    /**
      * Gets the icon displayed to the right in this button
      * 
      * @return displayed icon, null if no icon is set
@@ -71,7 +95,11 @@ public class MapWidgetButton extends MapWidget {
     @Override
     public void onDraw() {
         byte topEdgeColor, fillColor, btmEdgeColor, textColor, textShadowColor;
-        if (this.isFocused()) {
+        if (!this.isEnabled()) {
+            topEdgeColor = fillColor = btmEdgeColor = MapColorPalette.getColor(44, 44, 44);
+            textColor = MapColorPalette.getColor(160, 160, 160);
+            textShadowColor = MapColorPalette.COLOR_TRANSPARENT;
+        } else if (this.isFocused()) {
             topEdgeColor = MapColorPalette.getColor(190, 200, 255);
             fillColor = MapColorPalette.getColor(126, 136, 191);
             btmEdgeColor = MapColorPalette.getColor(92, 102, 157);
@@ -85,15 +113,29 @@ public class MapWidgetButton extends MapWidget {
             textShadowColor = MapColorPalette.getColor(56, 56, 56);
         }
 
+        int x1, y1, x2, y2;
+        if (this.showBorder) {
+            x1 = 1;
+            y1 = 1;
+            x2 = this.getWidth() - 2;
+            y2 = this.getHeight() - 2;
+            view.drawRectangle(0, 0, getWidth(), getHeight(), MapColorPalette.COLOR_BLACK);
+        } else {
+            x1 = 0;
+            y1 = 0;
+            x2 = this.getWidth() - 1;
+            y2 = this.getHeight() - 1;
+        }
+
         // This draws the button base graphic, supporting dynamic sizes
-        view.drawLine(0, 0, getWidth() - 2, 0, topEdgeColor);
-        view.drawLine(0, 1, 0, getHeight() - 3, topEdgeColor);
-        view.drawLine(0, view.getHeight() - 2, 0, view.getHeight() - 1, fillColor);
-        view.drawPixel(view.getWidth() - 1, 0, fillColor);
-        view.drawLine(1, view.getHeight() - 2, view.getWidth() - 1, view.getHeight() - 2, btmEdgeColor);
-        view.drawLine(1, view.getHeight() - 1, view.getWidth() - 1, view.getHeight() - 1, btmEdgeColor);
-        view.drawLine(view.getWidth() - 1, 1, view.getWidth() - 1, view.getHeight() - 3, btmEdgeColor);
-        view.fillRectangle(1, 1, getWidth() - 2, getHeight() - 3, fillColor);
+        view.drawLine(x1, y1, x2 - 1, y1, topEdgeColor);
+        view.drawLine(x1, y1 + 1, x1, y2 - 2, topEdgeColor);
+        view.drawLine(x1, y2 - 1, x1, y2, fillColor);
+        view.drawPixel(x2, y1, fillColor);
+        view.drawLine(x1 + 1, y2 - 1, x2, y2 - 1, btmEdgeColor);
+        view.drawLine(x1 + 1, y2, x2, y2, btmEdgeColor);
+        view.drawLine(x2, 1, x2, y2 - 2, btmEdgeColor);
+        view.fillRectangle(x1 + 1, y1 + 1, x2 - x1 - 1, y2 - x1 - 2, fillColor);
 
         // Draw the text inside the button
         if (!this._text.isEmpty()) {
@@ -101,7 +143,9 @@ public class MapWidgetButton extends MapWidget {
             int textX = (this.getWidth() - textSize.width) / 2;
             int textY = (this.getHeight() - textSize.height) / 2;
             view.setAlignment(MapFont.Alignment.LEFT);
-            view.draw(MapFont.MINECRAFT, textX + 1, textY + 1, textShadowColor, this._text);
+            if (textShadowColor != MapColorPalette.COLOR_TRANSPARENT) {
+                view.draw(MapFont.MINECRAFT, textX + 1, textY + 1, textShadowColor, this._text);
+            }
             view.draw(MapFont.MINECRAFT, textX, textY, textColor, this._text);
         }
 

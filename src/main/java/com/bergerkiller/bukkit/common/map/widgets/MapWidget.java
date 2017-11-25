@@ -295,10 +295,13 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
-     * Activates this widget. Equivalent to calling {@link #onActivate()} directly.
+     * Activates this widget, but only when the widget is enabled.
+     * Equivalent to calling {@link #onActivate()} directly.
      */
     public final void activate() {
-        this.onActivate();
+        if (this.isEnabled()) {
+            this.onActivate();
+        }
     }
 
     /**
@@ -375,8 +378,10 @@ public class MapWidget implements MapDisplayEvents {
      * @param enabled
      */
     public final void setEnabled(boolean enabled) {
-        this._enabled = enabled;
-        this.invalidate();
+        if (this._enabled != enabled) {
+            this._enabled = enabled;
+            this.invalidate();
+        }
     }
 
     /**
