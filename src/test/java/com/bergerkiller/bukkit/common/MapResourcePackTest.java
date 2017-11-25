@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
+import com.bergerkiller.bukkit.common.map.MapFont;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
@@ -73,6 +75,18 @@ public class MapResourcePackTest {
     protected void testDraw(MapTexture canvas, MapResourcePack pack, int x, int y, ItemStack item) {
         canvas.drawRectangle(x, y, 16, 16, MapColorPalette.COLOR_RED);
         canvas.draw(pack.getItemTexture(item, 16, 16), x, y);
+    }
+
+    @Ignore
+    @Test
+    public void testFontDrawing() {
+        MapTexture texture = MapTexture.createEmpty(128, 128);
+        texture.setSpacing(1);
+        String text = "Hello, World\nHave a nice day\nPlease come again";
+        Dimension size = texture.calcFontSize(MapFont.MINECRAFT, text);
+        texture.drawRectangle(5, 5, size.width, size.height, MapColorPalette.COLOR_GREEN);
+        texture.draw(MapFont.MINECRAFT, 5, 5, MapColorPalette.COLOR_RED, text);
+        MapDebugWindow.showMapForeverAutoScale(texture);
     }
 
     @Ignore

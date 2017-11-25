@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.map;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -1093,20 +1092,35 @@ public abstract class MapCanvas {
      * @return width and height of the drawn font bounding box
      */
     public final <T> Dimension calcFontSize(MapFont<T> font, Iterable<T> characters) {
-        int width = 0;
+        int maxWidth = 0;
         int height = 0;
+        int currWidth = 0;
+        int totalHeight = 0;
         boolean first = false;
         for (T character : characters) {
             MapTexture sprite = font.getSprite(character);
+
+            // Handle newlines
+            if (font.isNewline(character)) {
+                height = Math.max(height, sprite.getHeight());
+                totalHeight += height + this.fontSpacing;
+                currWidth = 0;
+                first = true;
+                height = 0;
+                continue;
+            }
+
             if (first) {
                 first = false;
             } else {
-                width += this.fontSpacing;
+                currWidth += this.fontSpacing;
             }
-            width += sprite.getWidth();
+            currWidth += sprite.getWidth();
+            maxWidth = Math.max(maxWidth, currWidth);
             height = Math.max(height, sprite.getHeight());
         }
-        return new Dimension(width, height);
+        totalHeight += height;
+        return new Dimension(maxWidth, totalHeight);
     }
 
     /**
@@ -1151,37 +1165,32 @@ public abstract class MapCanvas {
      * @return this canvas
      */
     public final <T> MapCanvas draw(MapFont<T> font, int x, int y, byte color, Iterable<T> characters) {
-        if (fontAlignment == MapFont.Alignment.LEFT) {
-            // Left-to-right is easy as it is the natural ordering of the iterable
-            for (T character : characters) {
-                MapTexture sprite = font.getSprite(character);
-                this.draw(sprite, x, y, color);
-                x += sprite.getWidth() + fontSpacing;
-            }
-            return this;
+        // Offset drawn text based on text alignment
+        if (fontAlignment == MapFont.Alignment.RIGHT) {
+            x -= this.calcFontSize(font, characters).width;
+        } else if (fontAlignment == MapFont.Alignment.MIDDLE) {
+            x -= (this.calcFontSize(font, characters).width / 2);
         }
 
-        // Other modes require knowing all the textures to draw up-front
-        ArrayList<MapTexture> sprites = new ArrayList<MapTexture>();
-        int total_width = 0;
+        // Draw the actual text
+        int height = 0;
+        int start_x = x;
         for (T character : characters) {
             MapTexture sprite = font.getSprite(character);
-            sprites.add(sprite);
-            total_width += sprite.getWidth();
-        }
-        if (sprites.isEmpty()) {
-            return this; // nothing to draw
-        }
-        total_width += fontSpacing * (sprites.size() - 1);
 
-        if (fontAlignment == MapFont.Alignment.RIGHT) {
-            x -= total_width;
-        } else if (fontAlignment == MapFont.Alignment.MIDDLE) {
-            x -= total_width / 2;
-        }
-        for (MapTexture sprite : sprites) {
+            // Handle newlines
+            if (font.isNewline(character)) {
+                height = Math.max(height, sprite.getHeight());
+                y += height + this.fontSpacing;
+                x = start_x;
+                height = 0;
+                continue;
+            }
+
+            // Draw characters and update character position
             this.draw(sprite, x, y, color);
-            x += sprite.getWidth() + fontSpacing;
+            x += sprite.getWidth() + this.fontSpacing;
+            height = Math.max(height, sprite.getHeight());
         }
         return this;
     }

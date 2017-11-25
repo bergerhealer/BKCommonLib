@@ -65,6 +65,18 @@ public abstract class MapFont<K> {
     }
 
     /**
+     * Gets whether a particular key acts as a newline character.
+     * Newline character are now drawn, and instead bump the y coordinate down by the height
+     * of the previous line.
+     * 
+     * @param key to check
+     * @return True if the key acts as a newline character
+     */
+    public boolean isNewline(K key) {
+        return false;
+    }
+
+    /**
      * Resets the sprite cache, requiring a reload of all sprites upon first use
      */
     public void reload() {
@@ -127,6 +139,10 @@ public abstract class MapFont<K> {
             return MapTexture.fromBukkitSprite(font.getChar(key));
         }
 
+        @Override
+        public boolean isNewline(Character key) {
+            return key != null && key.charValue() == '\n';
+        }
     }
 
     private static class JavaFont extends MapFont<Character> {
@@ -159,6 +175,10 @@ public abstract class MapFont<K> {
             return MapTexture.fromImage(image);
         }
 
+        @Override
+        public boolean isNewline(Character key) {
+            return key != null && key.charValue() == '\n';
+        }
     }
 
     /**
