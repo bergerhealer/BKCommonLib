@@ -8,6 +8,10 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.file.YamlConstructor;
+import org.bukkit.configuration.file.YamlRepresenter;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
 
@@ -632,5 +636,16 @@ public class ConfigurationNode implements Cloneable {
             }
             this.set(path, value);
         }
+    }
+
+    @Override
+    public String toString() {
+        DumperOptions yamlOptions = new DumperOptions();
+        YamlRepresenter yamlRepresenter = new YamlRepresenter();
+        Yaml yaml = new Yaml(new YamlConstructor(), yamlRepresenter, yamlOptions);
+        yamlOptions.setIndent(2);
+        yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        return yaml.dump(source.getValues(false));
     }
 }
