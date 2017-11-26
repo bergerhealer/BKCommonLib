@@ -1,6 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.plugin.Plugin;
+
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import co.aikar.timings.lib.MCTiming;
 import co.aikar.timings.lib.TimingManager;
@@ -82,5 +88,56 @@ public class Timings implements AutoCloseable {
                 plugin.getName(),
                 plugin.getDescription().getVersion(),
                 name);
+    }
+
+    /**
+     * Helper function for debugging that detects the plugin to use from a profiled class,
+     * then creates a timings object if one does not exist in cache. The profiled class name
+     * excluding path is prepended to the name. This function automatically
+     * starts the timings measurement. Best used inside a try-with-resources block.<br>
+     * <br>
+     * Not recommended for use in final releases, because the HashMap lookup is slow for high number of calls.
+     * Hence this method is <b>deprecated</b>.
+     * 
+     * @param profiledClass class where the timings are done
+     * @param name for the timings
+     * @return timings object
+     */
+    @Deprecated
+    public static Timings start(Class<?> profiledClass, String name) {
+        final TimingsKey key = new TimingsKey(profiledClass, name);
+        Timings t = cachedTimings.get(key);
+        if (t == null) {
+            Plugin plugin = CommonUtil.getPluginByClass(profiledClass);
+            if (plugin == null) {
+                plugin = CommonPlugin.getInstance();
+            }
+            t = new Timings(plugin, profiledClass.getSimpleName() + "::" + name);
+            cachedTimings.put(key, t);
+        }
+        return t.start();
+    }
+
+    private static final Map<TimingsKey, Timings> cachedTimings = new HashMap<TimingsKey, Timings>();
+
+    private static final class TimingsKey {
+        public final Class<?> profiledClass;
+        public final String name;
+
+        public TimingsKey(Class<?> profiledClass, String name) {
+            this.profiledClass = profiledClass;
+            this.name = name;
+        }
+
+        @Override
+        public int hashCode() {
+            return 203 + 29 * this.name.hashCode() + this.profiledClass.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            TimingsKey k = (TimingsKey) o;
+            return k.name.equals(this.name) && k.profiledClass.equals(this.profiledClass);
+        }
     }
 }
