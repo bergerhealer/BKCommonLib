@@ -31,5 +31,11 @@ public class MathUtilTest {
         assertEquals(-13.790, yawPitchRoll.getX(), 0.001);
         assertEquals(27.155, yawPitchRoll.getY(), 0.001);
         assertEquals(29.279, yawPitchRoll.getZ(), 0.001);
+
+        transform.scale(1.5, 2.5, 3.5);
+        yawPitchRoll = transform.getYawPitchRoll();
+        assertEquals(-18.963, yawPitchRoll.getX(), 0.001);
+        assertEquals(27.155, yawPitchRoll.getY(), 0.001);
+        assertEquals(47.190, yawPitchRoll.getZ(), 0.001);
     }
 }

@@ -200,15 +200,32 @@ public class Matrix4x4 implements Cloneable {
      */
     public final void rotateX(double angle)
     {
-        double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-        double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
+        if (angle != 0.0) {
+            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
+            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
 
-        Matrix4x4 tmp = new Matrix4x4();
-        tmp.m11 = cosAngle;
-        tmp.m12 = -sinAngle;
-        tmp.m21 = sinAngle;
-        tmp.m22 = cosAngle;
-        this.multiply(tmp);
+            double m01, m02;
+            double m11, m12;
+            double m21, m22;
+            double m31, m32;
+
+            m01 = this.m01*cosAngle    + this.m02*sinAngle;
+            m02 = this.m01*(-sinAngle) + this.m02*cosAngle;
+
+            m11 = this.m11*cosAngle    + this.m12*sinAngle;
+            m12 = this.m11*(-sinAngle) + this.m12*cosAngle;
+
+            m21 = this.m21*cosAngle    + this.m22*sinAngle;
+            m22 = this.m21*(-sinAngle) + this.m22*cosAngle;
+
+            m31 = this.m31*cosAngle    + this.m32*sinAngle;
+            m32 = this.m31*(-sinAngle) + this.m32*cosAngle;
+
+            this.m01 = m01; this.m02 = m02;
+            this.m11 = m11; this.m12 = m12;
+            this.m21 = m21; this.m22 = m22;
+            this.m31 = m31; this.m32 = m32;
+        }
     }
 
     /**
@@ -218,15 +235,32 @@ public class Matrix4x4 implements Cloneable {
      */
     public final void rotateY(double angle)
     {
-        double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-        double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
+        if (angle != 0.0) {
+            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
+            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
 
-        Matrix4x4 tmp = new Matrix4x4();
-        tmp.m00 = cosAngle;
-        tmp.m02 = sinAngle;
-        tmp.m20 = -sinAngle;
-        tmp.m22 = cosAngle;
-        this.multiply(tmp);
+            double m00, m02;
+            double m10, m12;
+            double m20, m22;
+            double m30, m32;
+
+            m00 = this.m00*cosAngle + this.m02*(-sinAngle);
+            m02 = this.m00*sinAngle + this.m02*cosAngle;
+
+            m10 = this.m10*cosAngle + this.m12*(-sinAngle);
+            m12 = this.m10*sinAngle + this.m12*cosAngle;
+
+            m20 = this.m20*cosAngle + this.m22*(-sinAngle);
+            m22 = this.m20*sinAngle + this.m22*cosAngle;
+
+            m30 = this.m30*cosAngle + this.m32*(-sinAngle);
+            m32 = this.m30*sinAngle + this.m32*cosAngle;
+
+            this.m00 = m00; this.m02 = m02;
+            this.m10 = m10; this.m12 = m12;
+            this.m20 = m20; this.m22 = m22;
+            this.m30 = m30; this.m32 = m32;
+        }
     }
 
     /**
@@ -236,15 +270,32 @@ public class Matrix4x4 implements Cloneable {
      */
     public final void rotateZ(double angle)
     {
-        double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-        double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
+        if (angle != 0.0) {
+            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
+            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
 
-        Matrix4x4 tmp = new Matrix4x4();
-        tmp.m00 = cosAngle;
-        tmp.m01 = -sinAngle;
-        tmp.m10 = sinAngle;
-        tmp.m11 = cosAngle;
-        this.multiply(tmp);
+            double m00, m01;
+            double m10, m11;
+            double m20, m21;
+            double m30, m31;
+
+            m00 = this.m00*cosAngle    + this.m01*sinAngle;
+            m01 = this.m00*(-sinAngle) + this.m01*cosAngle;
+
+            m10 = this.m10*cosAngle    + this.m11*sinAngle;
+            m11 = this.m10*(-sinAngle) + this.m11*cosAngle;
+
+            m20 = this.m20*cosAngle    + this.m21*sinAngle;
+            m21 = this.m20*(-sinAngle) + this.m21*cosAngle;
+
+            m30 = this.m30*cosAngle    + this.m31*sinAngle;
+            m31 = this.m30*(-sinAngle) + this.m31*cosAngle;
+
+            this.m00 = m00; this.m01 = m01;
+            this.m10 = m10; this.m11 = m11;
+            this.m20 = m20; this.m21 = m21;
+            this.m30 = m30; this.m31 = m31;
+        }
     }
 
     /**
@@ -278,9 +329,7 @@ public class Matrix4x4 implements Cloneable {
     public final void rotateYawPitchRoll(double yaw, double pitch, double roll) {
         this.rotateY(-yaw);
         this.rotateX(pitch);
-        if (roll != 0.0) {
-            this.rotateZ(roll);
-        }
+        this.rotateZ(roll);
     }
 
     /**
@@ -294,9 +343,7 @@ public class Matrix4x4 implements Cloneable {
     public final void rotateYawPitchRoll(float yaw, float pitch, float roll) {
         this.rotateY(-yaw);
         this.rotateX(pitch);
-        if (roll != 0.0) {
-            this.rotateZ(roll);
-        }
+        this.rotateZ(roll);
     }
 
     /**
@@ -328,11 +375,9 @@ public class Matrix4x4 implements Cloneable {
      * @param dz translation
      */
     public final void translate(double dx, double dy, double dz) {
-        Matrix4x4 tmp = new Matrix4x4();
-        tmp.m03 = dx;
-        tmp.m13 = dy;
-        tmp.m23 = dz;
-        this.multiply(tmp);
+        this.m03 += dx;
+        this.m13 += dy;
+        this.m23 += dz;
     }
 
     /**
@@ -361,11 +406,9 @@ public class Matrix4x4 implements Cloneable {
      * @param sz scale
      */
     public final void scale(double sx, double sy, double sz) {
-        Matrix4x4 tmp = new Matrix4x4();
-        tmp.m00 = sx;
-        tmp.m11 = sy;
-        tmp.m22 = sz;
-        this.multiply(tmp);
+        this.m00 *= sx; this.m10 *= sx; this.m20 *= sx; this.m30 *= sx;
+        this.m01 *= sy; this.m11 *= sy; this.m21 *= sy; this.m31 *= sy;
+        this.m02 *= sz; this.m12 *= sz; this.m22 *= sz; this.m32 *= sz;
     }
 
     /**
