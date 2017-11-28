@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 import org.bukkit.Bukkit;
@@ -410,6 +411,10 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize MapColorPalette (static initializer)
         MapColorPalette.getColor(Color.RED);
+
+        // Initialize NBTBase createHandle() - workaround for a reported error
+        // The error this potentially fixes is related to a linkageerror when generating the class
+        NBTBaseHandle.T.createHandle(null, true);
 
         // Initialize permissions
         permissionHandler = new PermissionHandler();
