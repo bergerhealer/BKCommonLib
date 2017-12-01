@@ -608,8 +608,11 @@ public class ConfigurationNode implements Cloneable {
             // This is needed, as it saves line-split Strings as such
             return (T) StringUtil.join("\n", (String[]) rawValue);
         }
-        T rval = ParseUtil.convert(this.get(path), type, def);
-        this.set(path, rval);
+        T rval = ParseUtil.convert(this.get(path), type, null);
+        if (rval == null) {
+            rval = def;
+            this.set(path, rval);
+        }
         return rval;
     }
 
