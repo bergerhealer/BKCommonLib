@@ -53,6 +53,12 @@ class Chunk {
 
     public boolean checkCanSave:a(boolean isNotAutosave);
 
+#if version >= 1.12
+    public void markDirty();
+#else
+    public void markDirty:e();
+#endif
+
     <code>
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
