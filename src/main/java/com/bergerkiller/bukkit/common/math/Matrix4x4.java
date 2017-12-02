@@ -375,9 +375,10 @@ public class Matrix4x4 implements Cloneable {
      * @param dz translation
      */
     public final void translate(double dx, double dy, double dz) {
-        this.m03 += dx;
-        this.m13 += dy;
-        this.m23 += dz;
+        this.m03 += this.m00*dx + this.m01*dy + this.m02*dz;
+        this.m13 += this.m10*dx + this.m11*dy + this.m12*dz;
+        this.m23 += this.m20*dx + this.m21*dy + this.m22*dz;
+        this.m33 += this.m30*dx + this.m31*dy + this.m32*dz;
     }
 
     /**
