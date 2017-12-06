@@ -1015,6 +1015,7 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public class ItemFrameInfo {
         public final ItemFrame itemFrame;
+        public final EntityItemFrameHandle itemFrameHandle;
         public final ArrayList<Player> viewers;
         public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
         public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
@@ -1025,6 +1026,7 @@ public class CommonMapController implements PacketListener, Listener {
 
         public ItemFrameInfo(ItemFrame itemFrame) {
             this.itemFrame = itemFrame;
+            this.itemFrameHandle = EntityItemFrameHandle.fromBukkit(itemFrame);
             this.viewers = new ArrayList<Player>();
             this.removed = false;
             this.lastMapUUID = null;
@@ -1036,7 +1038,7 @@ public class CommonMapController implements PacketListener, Listener {
 
         public void updateItem() {
             // Handle changes in map item shown in item frames
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.itemFrameHandle.getItem());
             if (mapUUID == null) {
                 // Map was removed
                 this.sentToPlayers = false;
@@ -1050,7 +1052,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         public void recalculateUUID() {
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.itemFrameHandle.getItem());
 
             // Find out the tile information of this item frame
             // This is a slow and lengthy procedure; hopefully it does not happen too often
@@ -1060,7 +1062,7 @@ public class CommonMapController implements PacketListener, Listener {
             MapUUID newMapUUID;
             boolean isTile;
             if (!neighbours.isEmpty()) {
-                IntVector3 selfPos = new IntVector3(itemFrame.getLocation());
+                IntVector3 selfPos = new IntVector3(itemFrameHandle.getLocX(), itemFrameHandle.getLocY(), itemFrameHandle.getLocZ());
                 BlockFace selfFacing = itemFrame.getFacing();
                 int tileX = 0;
                 int tileY = 0;
@@ -1242,18 +1244,19 @@ public class CommonMapController implements PacketListener, Listener {
                     continue;
                 }
 
-                EntityTrackerEntryHandle trackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
-                if (trackerEntry == null) {
-                    // Item Frame isn't tracked on the server, so no players can view it
-                    info.remove();
-                    continue;
-                }
-
                 // Refreshes cached information about this item frame's item
                 info.updateItem();
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
+                    EntityTrackerEntryHandle trackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+                    if (trackerEntry == null) {
+                        // Item Frame isn't tracked on the server, so no players can view it
+                        info.remove();
+                        itemFrames.remove(entry.getKey());
+                        continue;
+                    }
+
                     Collection<Player> liveViewers = trackerEntry.getViewers();
                     boolean changes = LogicUtil.synchronizeList(info.viewers, liveViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
                         @Override
@@ -1284,7 +1287,7 @@ public class CommonMapController implements PacketListener, Listener {
                 // This happens when a new item frame is placed left/above a display
                 if (info.needsItemRefresh) {
                     info.needsItemRefresh = false;
-                    setItemFrameItem(info.itemFrame, getItemFrameItem(info.itemFrame));
+                    info.itemFrameHandle.setItem(info.itemFrameHandle.getItem());
                 }
             }
 
