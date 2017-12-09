@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 public abstract class LocationAbstract extends VectorAbstract {
 
@@ -95,8 +96,21 @@ public abstract class LocationAbstract extends VectorAbstract {
         return setYaw(yaw).setPitch(pitch);
     }
 
+    /**
+     * Retrieves the Bukkit Location
+     * @return
+     */
     public Location toLocation() {
         return new Location(getWorld(), getX(), getY(), getZ(), getYaw(), getPitch());
+    }
+
+    /**
+     * Retrieves the Bukkit Block
+     * 
+     * @return Block
+     */
+    public Block toBlock() {
+        return getWorld().getBlockAt(x.block(), y.block(), z.block());
     }
 
     public LocationAbstract addYaw(float yaw) {
