@@ -194,6 +194,54 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Multiplies this matrix with a rotation transformation defined in a Quaternion
+     * 
+     * @param quat to rotate with
+     */
+    public final void rotate(Quaternion quat) {
+        double x = quat.getX();
+        double y = quat.getY();
+        double z = quat.getZ();
+        double w = quat.getW();
+
+        double q00 = 2.0 * (-y*y + -z*z);
+        double q01 = 2.0 * ( x*y + -z*w);
+        double q02 = 2.0 * ( x*z +  y*w);
+        double q10 = 2.0 * ( x*y +  z*w);
+        double q11 = 2.0 * (-x*x + -z*z);
+        double q12 = 2.0 * ( y*z + -x*w);
+        double q20 = 2.0 * ( x*z + -y*w);
+        double q21 = 2.0 * ( y*z +  x*w);
+        double q22 = 2.0 * (-x*x + -y*y);
+
+        double a00, a01, a02;
+        double a10, a11, a12;
+        double a20, a21, a22;
+        double a30, a31, a32;
+
+        a00 = this.m00*q00 + this.m01*q10 + this.m02*q20;
+        a01 = this.m00*q01 + this.m01*q11 + this.m02*q21;
+        a02 = this.m00*q02 + this.m01*q12 + this.m02*q22;
+
+        a10 = this.m10*q00 + this.m11*q10 + this.m12*q20;
+        a11 = this.m10*q01 + this.m11*q11 + this.m12*q21;
+        a12 = this.m10*q02 + this.m11*q12 + this.m12*q22;
+
+        a20 = this.m20*q00 + this.m21*q10 + this.m22*q20;
+        a21 = this.m20*q01 + this.m21*q11 + this.m22*q21;
+        a22 = this.m20*q02 + this.m21*q12 + this.m22*q22;
+
+        a30 = this.m30*q00 + this.m31*q10 + this.m32*q20;
+        a31 = this.m30*q01 + this.m31*q11 + this.m32*q21;
+        a32 = this.m30*q02 + this.m31*q12 + this.m32*q22;
+
+        this.m00 += a00; this.m01 += a01; this.m02 += a02;
+        this.m10 += a10; this.m11 += a11; this.m12 += a12;
+        this.m20 += a20; this.m21 += a21; this.m22 += a22;
+        this.m30 += a30; this.m31 += a31; this.m32 += a32;
+    }
+
+    /**
      * Multiplies this matrix with a rotation transformation about the X-axis
      * 
      * @param angle the angle to rotate about the X axis in degrees
@@ -347,7 +395,7 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
-     * Deduces the yaw/pitch/roll values that this matrix transforms objects with
+     * Deduces the yaw/pitch/roll values in degrees that this matrix transforms objects with
      * 
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
@@ -598,6 +646,15 @@ public class Matrix4x4 implements Cloneable {
     @Override
     public Matrix4x4 clone() {
         return new Matrix4x4(this);
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+            m00 + ", " + m01 + ", " + m02 + ", " + m03 + "\n " +
+            m10 + ", " + m11 + ", " + m12 + ", " + m13 + "\n " +
+            m20 + ", " + m21 + ", " + m22 + ", " + m23 + "\n " +
+            m30 + ", " + m31 + ", " + m32 + ", " + m33 + "}";
     }
 
     // From https://math.stackexchange.com/questions/296794
