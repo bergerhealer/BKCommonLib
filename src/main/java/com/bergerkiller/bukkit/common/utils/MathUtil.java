@@ -693,4 +693,59 @@ public class MathUtil {
         setVectorLengthSquared(clonedVelocity, dbefore);
         return dbefore > clonedVelocity.subtract(offset).lengthSquared();
     }
+
+    /**
+     * Calculates the normalization factor for a 4D vector.
+     * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param w
+     * @return normalization factor
+     */
+    public static double getNormalizationFactor(double x, double y, double z, double w) {
+        return getNormalizationFactorLS(x * x + y * y + z * z + w * w);
+    }
+
+    /**
+     * Calculates the normalization factor for a 3D vector.
+     * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return normalization factor
+     */
+    public static double getNormalizationFactor(double x, double y, double z) {
+        return getNormalizationFactorLS(x * x + y * y + z * z);
+    }
+
+    /**
+     * Calculates the normalization factor for a 2D vector.
+     * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * 
+     * @param x
+     * @param y
+     * @return normalization factor
+     */
+    public static double getNormalizationFactor(double x, double y) {
+        return getNormalizationFactorLS(x * x + y * y);
+    }
+
+    /**
+     * Calculates the normalization factor for a squared length.
+     * Multiplying the input values with this factor will turn it into a vector of unit length.
+     * 
+     * @param lengthSquared
+     * @return normalization factor
+     */
+    public static double getNormalizationFactorLS(double lengthSquared) {
+        // https://stackoverflow.com/a/12934750
+        if (Math.abs(1.0 - lengthSquared) < 2.107342e-08) {
+            return (2.0 / (1.0 + lengthSquared));
+        } else {
+            return 1.0 / Math.sqrt(lengthSquared);
+        }
+    }
 }

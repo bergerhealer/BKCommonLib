@@ -246,106 +246,145 @@ public class Matrix4x4 implements Cloneable {
      * 
      * @param angle the angle to rotate about the X axis in degrees
      */
-    public final void rotateX(double angle)
-    {
+    public final void rotateX(double angle) {
         if (angle != 0.0) {
-            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
-
-            double m01, m02;
-            double m11, m12;
-            double m21, m22;
-            double m31, m32;
-
-            m01 = this.m01*cosAngle    + this.m02*sinAngle;
-            m02 = this.m01*(-sinAngle) + this.m02*cosAngle;
-
-            m11 = this.m11*cosAngle    + this.m12*sinAngle;
-            m12 = this.m11*(-sinAngle) + this.m12*cosAngle;
-
-            m21 = this.m21*cosAngle    + this.m22*sinAngle;
-            m22 = this.m21*(-sinAngle) + this.m22*cosAngle;
-
-            m31 = this.m31*cosAngle    + this.m32*sinAngle;
-            m32 = this.m31*(-sinAngle) + this.m32*cosAngle;
-
-            this.m01 = m01; this.m02 = m02;
-            this.m11 = m11; this.m12 = m12;
-            this.m21 = m21; this.m22 = m22;
-            this.m31 = m31; this.m32 = m32;
+            double angleRad = Math.toRadians(angle);
+            rotateX_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
 
+    /**
+     * Multiplies this matrix with a rotation transformation about the X-axis.
+     * Instead of a single angle, the y and z of the rotated vector can be specified.
+     * 
+     * @param y
+     * @param z
+     */
+    public final void rotateX(double y, double z) {
+        double f = MathUtil.getNormalizationFactor(y, z);
+        rotateX_unsafe(y * f, z * f);
+    }
+
+    private final void rotateX_unsafe(double cos, double sin) {
+        double m01, m02;
+        double m11, m12;
+        double m21, m22;
+        double m31, m32;
+
+        m01 = this.m01*cos    + this.m02*sin;
+        m02 = this.m01*(-sin) + this.m02*cos;
+
+        m11 = this.m11*cos    + this.m12*sin;
+        m12 = this.m11*(-sin) + this.m12*cos;
+
+        m21 = this.m21*cos    + this.m22*sin;
+        m22 = this.m21*(-sin) + this.m22*cos;
+
+        m31 = this.m31*cos    + this.m32*sin;
+        m32 = this.m31*(-sin) + this.m32*cos;
+
+        this.m01 = m01; this.m02 = m02;
+        this.m11 = m11; this.m12 = m12;
+        this.m21 = m21; this.m22 = m22;
+        this.m31 = m31; this.m32 = m32;
+    }
+    
     /**
      * Multiplies this matrix with a rotation transformation about the Y-axis
      * 
      * @param angle the angle to rotate about the Y axis in degrees
      */
-    public final void rotateY(double angle)
-    {
+    public final void rotateY(double angle) {
         if (angle != 0.0) {
-            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
-
-            double m00, m02;
-            double m10, m12;
-            double m20, m22;
-            double m30, m32;
-
-            m00 = this.m00*cosAngle + this.m02*(-sinAngle);
-            m02 = this.m00*sinAngle + this.m02*cosAngle;
-
-            m10 = this.m10*cosAngle + this.m12*(-sinAngle);
-            m12 = this.m10*sinAngle + this.m12*cosAngle;
-
-            m20 = this.m20*cosAngle + this.m22*(-sinAngle);
-            m22 = this.m20*sinAngle + this.m22*cosAngle;
-
-            m30 = this.m30*cosAngle + this.m32*(-sinAngle);
-            m32 = this.m30*sinAngle + this.m32*cosAngle;
-
-            this.m00 = m00; this.m02 = m02;
-            this.m10 = m10; this.m12 = m12;
-            this.m20 = m20; this.m22 = m22;
-            this.m30 = m30; this.m32 = m32;
+            double angleRad = Math.toRadians(angle);
+            rotateY_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
 
+    /**
+     * Multiplies this matrix with a rotation transformation about the Y-axis.
+     * Instead of a single angle, the x and z of the rotated vector can be specified.
+     * 
+     * @param x
+     * @param z
+     */
+    public final void rotateY(double x, double z) {
+        double f = MathUtil.getNormalizationFactor(x, z);
+        rotateY_unsafe(x * f, z * f);
+    }
+
+    private final void rotateY_unsafe(double cos, double sin) {
+        double m00, m02;
+        double m10, m12;
+        double m20, m22;
+        double m30, m32;
+
+        m00 = this.m00*cos + this.m02*(-sin);
+        m02 = this.m00*sin + this.m02*cos;
+
+        m10 = this.m10*cos + this.m12*(-sin);
+        m12 = this.m10*sin + this.m12*cos;
+
+        m20 = this.m20*cos + this.m22*(-sin);
+        m22 = this.m20*sin + this.m22*cos;
+
+        m30 = this.m30*cos + this.m32*(-sin);
+        m32 = this.m30*sin + this.m32*cos;
+
+        this.m00 = m00; this.m02 = m02;
+        this.m10 = m10; this.m12 = m12;
+        this.m20 = m20; this.m22 = m22;
+        this.m30 = m30; this.m32 = m32;
+    }
+    
     /**
      * Multiplies this matrix with a rotation transformation about the Z-axis
      * 
      * @param angle the angle to rotate about the Z axis in degrees
      */
-    public final void rotateZ(double angle)
-    {
+    public final void rotateZ(double angle) {
         if (angle != 0.0) {
-            double sinAngle = Math.sin(angle * MathUtil.DEGTORAD);
-            double cosAngle = Math.cos(angle * MathUtil.DEGTORAD);
-
-            double m00, m01;
-            double m10, m11;
-            double m20, m21;
-            double m30, m31;
-
-            m00 = this.m00*cosAngle    + this.m01*sinAngle;
-            m01 = this.m00*(-sinAngle) + this.m01*cosAngle;
-
-            m10 = this.m10*cosAngle    + this.m11*sinAngle;
-            m11 = this.m10*(-sinAngle) + this.m11*cosAngle;
-
-            m20 = this.m20*cosAngle    + this.m21*sinAngle;
-            m21 = this.m20*(-sinAngle) + this.m21*cosAngle;
-
-            m30 = this.m30*cosAngle    + this.m31*sinAngle;
-            m31 = this.m30*(-sinAngle) + this.m31*cosAngle;
-
-            this.m00 = m00; this.m01 = m01;
-            this.m10 = m10; this.m11 = m11;
-            this.m20 = m20; this.m21 = m21;
-            this.m30 = m30; this.m31 = m31;
+            double angleRad = Math.toRadians(angle);
+            rotateZ_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
     }
 
+    /**
+     * Multiplies this matrix with a rotation transformation about the Z-axis.
+     * Instead of a single angle, the x and y of the rotated vector can be specified.
+     * 
+     * @param x
+     * @param y
+     */
+    public final void rotateZ(double x, double y) {
+        double f = MathUtil.getNormalizationFactor(x, y);
+        rotateZ_unsafe(x * f, y * f);
+    }
+
+    private final void rotateZ_unsafe(double cos, double sin) {
+        double m00, m01;
+        double m10, m11;
+        double m20, m21;
+        double m30, m31;
+
+        m00 = this.m00*cos    + this.m01*sin;
+        m01 = this.m00*(-sin) + this.m01*cos;
+
+        m10 = this.m10*cos    + this.m11*sin;
+        m11 = this.m10*(-sin) + this.m11*cos;
+
+        m20 = this.m20*cos    + this.m21*sin;
+        m21 = this.m20*(-sin) + this.m21*cos;
+
+        m30 = this.m30*cos    + this.m31*sin;
+        m31 = this.m30*(-sin) + this.m31*cos;
+
+        this.m00 = m00; this.m01 = m01;
+        this.m10 = m10; this.m11 = m11;
+        this.m20 = m20; this.m21 = m21;
+        this.m30 = m30; this.m31 = m31;
+    }
+    
     /**
      * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
      * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.

@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.math;
 
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.utils.MathUtil;
+
 /**
  * A quaternion for performing rotations in 3D space.
  * The quaternion is automatically normalized.
@@ -134,48 +136,72 @@ public class Quaternion implements Cloneable {
         return new Vector(Math.toDegrees(pitch), Math.toDegrees(-yaw), Math.toDegrees(roll));        
     }
 
-    public void rotateX(double angleDegrees) {
+    public final void rotateX(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
-            double s = Math.sin(r);
-            double c = Math.cos(r);
-            double x = this.x * c + this.w * s;
-            double y = this.y * c + this.z * s;
-            double z = this.z * c - this.y * s;
-            double w = this.w * c - this.x * s;
-            this.x = x; this.y = y; this.z = z; this.w = w;
-            this.normalize();
+            rotateX_unsafe(Math.cos(r), Math.sin(r));
         }
     }
 
-    public void rotateY(double angleDegrees) {
+    public final void rotateX(double y, double z) {
+        //TODO: Can this be optimized to avoid trigonometry?
+        double r = 0.5 * Math.atan2(z, y);
+        rotateX_unsafe(Math.cos(r), Math.sin(r));
+    }
+
+    private final void rotateX_unsafe(double fy, double fz) {
+        double x = this.x * fy + this.w * fz;
+        double y = this.y * fy + this.z * fz;
+        double z = this.z * fy - this.y * fz;
+        double w = this.w * fy - this.x * fz;
+        this.x = x; this.y = y; this.z = z; this.w = w;
+        this.normalize();
+    }
+
+    public final void rotateY(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
-            double s = Math.sin(r);
-            double c = Math.cos(r);
-            double x = this.x * c - this.z * s;
-            double y = this.y * c + this.w * s;
-            double z = this.z * c + this.x * s;
-            double w = this.w * c - this.y * s;
-            this.x = x; this.y = y; this.z = z; this.w = w;
-            this.normalize();
+            rotateY_unsafe(Math.cos(r), Math.sin(r));
         }
     }
 
-    public void rotateZ(double angleDegrees) {
+    public final void rotateY(double x, double z) {
+        //TODO: Can this be optimized to avoid trigonometry?
+        double r = 0.5 * Math.atan2(z, x);
+        rotateY_unsafe(Math.cos(r), Math.sin(r));
+    }
+
+    private final void rotateY_unsafe(double fx, double fz) {
+        double x = this.x * fx - this.z * fz;
+        double y = this.y * fx + this.w * fz;
+        double z = this.z * fx + this.x * fz;
+        double w = this.w * fx - this.y * fz;
+        this.x = x; this.y = y; this.z = z; this.w = w;
+        this.normalize();
+    }
+
+    public final void rotateZ(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
-            double s = Math.sin(r);
-            double c = Math.cos(r);
-            double x = this.x * c + this.y * s;
-            double y = this.y * c - this.x * s;
-            double z = this.z * c + this.w * s;
-            double w = this.w * c - this.z * s;
-            this.x = x; this.y = y; this.z = z; this.w = w;
-            this.normalize();
+            rotateZ_unsafe(Math.cos(r), Math.sin(r));
         }
     }
 
+    public final void rotateZ(double x, double y) {
+        //TODO: Can this be optimized to avoid trigonometry?
+        double r = 0.5 * Math.atan2(y, x);
+        rotateZ_unsafe(Math.cos(r), Math.sin(r));
+    }
+
+    private final void rotateZ_unsafe(double fx, double fy) {
+        double x = this.x * fx + this.y * fy;
+        double y = this.y * fx - this.x * fy;
+        double z = this.z * fx + this.w * fy;
+        double w = this.w * fx - this.z * fy;
+        this.x = x; this.y = y; this.z = z; this.w = w;
+        this.normalize();
+    }
+    
     /**
      * Converts the rotation transformations defined in this quaternion to a 
      * 4x4 transformation matrix. This is as if the unit matrix was multiplied
@@ -198,15 +224,8 @@ public class Quaternion implements Cloneable {
         this.z = -this.z;
     }
 
-    // https://stackoverflow.com/a/12934750
     private void normalize() {
-        double length_sq = (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-        double f;
-        if (Math.abs(1.0 - length_sq) < 2.107342e-08) {
-            f = (2.0 / (1.0 + length_sq));
-        } else {
-            f = 1.0 / Math.sqrt(length_sq);
-        }
+        double f = MathUtil.getNormalizationFactor(this.x, this.y, this.z, this.w);
         this.x *= f; this.y *= f; this.y *= f; this.w *= f;
     }
 

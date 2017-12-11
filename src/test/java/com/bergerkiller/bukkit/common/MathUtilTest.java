@@ -99,5 +99,22 @@ public class MathUtilTest {
         for (int i = 0; i < 16; i++) {
             assertEquals(a[i], b[i], 0.0001);
         }
+
+        // Verify that the 2D vector based rotateX/Y/Z functions for
+        // Quaternion and Matrix4x4 do the same thing.
+        transform = new Matrix4x4();
+        quaternion = new Quaternion();
+        transform.rotateX(2.0, 3.0);
+        quaternion.rotateX(2.0, 3.0);
+        transform.rotateY(-1.3, 2.5);
+        quaternion.rotateY(-1.3, 2.5);
+        transform.rotateZ(-0.6, 1.12);
+        quaternion.rotateZ(-0.6, 1.12);
+        quaternion_transform = quaternion.toMatrix4x4();
+        transform.toArray(a);
+        quaternion_transform.toArray(b);
+        for (int i = 0; i < 16; i++) {
+            assertEquals(a[i], b[i], 0.0001);
+        }
     }
 }
