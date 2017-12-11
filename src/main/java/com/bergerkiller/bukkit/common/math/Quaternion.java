@@ -69,6 +69,7 @@ public class Quaternion implements Cloneable {
         double z = this.w * quat.z + this.z * quat.w + this.x * quat.y - this.y * quat.x;
         double w = this.w * quat.w - this.x * quat.x - this.y * quat.y - this.z * quat.z;
         this.x = x; this.y = y; this.z = z; this.w = w;
+        this.normalize();
     }
 
     /**
@@ -143,6 +144,7 @@ public class Quaternion implements Cloneable {
             double z = this.z * c - this.y * s;
             double w = this.w * c - this.x * s;
             this.x = x; this.y = y; this.z = z; this.w = w;
+            this.normalize();
         }
     }
 
@@ -156,6 +158,7 @@ public class Quaternion implements Cloneable {
             double z = this.z * c + this.x * s;
             double w = this.w * c - this.y * s;
             this.x = x; this.y = y; this.z = z; this.w = w;
+            this.normalize();
         }
     }
 
@@ -169,6 +172,7 @@ public class Quaternion implements Cloneable {
             double z = this.z * c + this.w * s;
             double w = this.w * c - this.z * s;
             this.x = x; this.y = y; this.z = z; this.w = w;
+            this.normalize();
         }
     }
 
@@ -194,19 +198,16 @@ public class Quaternion implements Cloneable {
         this.z = -this.z;
     }
 
+    // https://stackoverflow.com/a/12934750
     private void normalize() {
-        double length = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-        if (length == 0.0) {
-            this.x = 0.0;
-            this.y = 0.0;
-            this.z = 0.0;
-            this.w = 1.0;
+        double length_sq = (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        double f;
+        if (Math.abs(1.0 - length_sq) < 2.107342e-08) {
+            f = (2.0 / (1.0 + length_sq));
         } else {
-            this.x /= length;
-            this.y /= length;
-            this.z /= length;
-            this.w /= length;
+            f = 1.0 / Math.sqrt(length_sq);
         }
+        this.x *= f; this.y *= f; this.y *= f; this.w *= f;
     }
 
     @Override
