@@ -91,18 +91,18 @@ public class Quaternion implements Cloneable {
      * @param rotation (x=pitch, y=yaw, z=roll)
      */
     public final void rotateYawPitchRoll(Vector rotation) {
-        rotateYawPitchRoll(rotation.getY(), rotation.getX(), rotation.getZ());
+        rotateYawPitchRoll(rotation.getX(), rotation.getY(), rotation.getZ());
     }
 
     /**
      * Multiplies this quaternion with a rotation transformation in yaw/pitch/roll, based on the Minecraft
      * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
      * 
-     * @param yaw rotation
-     * @param pitch rotation
-     * @param roll rotation
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
+     * @param roll rotation (Z)
      */
-    public final void rotateYawPitchRoll(double yaw, double pitch, double roll) {
+    public final void rotateYawPitchRoll(double pitch, double yaw, double roll) {
         this.rotateY(-yaw);
         this.rotateX(pitch);
         this.rotateZ(roll);

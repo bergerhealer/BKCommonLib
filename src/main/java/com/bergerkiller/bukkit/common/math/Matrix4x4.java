@@ -180,20 +180,6 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
-     * Multiplies this matrix with a rotation transformation around an origin
-     * 
-     * @param origin to rotate 'around'
-     * @param rotation x/y/z angles in degrees
-     */
-    public final void rotateOrigin(Vector3 origin, Vector3 rotation) {
-        this.translate(origin);
-        this.rotateY(rotation.y);
-        this.rotateX(rotation.x);
-        this.rotateZ(rotation.z);
-        this.translate(-origin.x, -origin.y, -origin.z);
-    }
-
-    /**
      * Multiplies this matrix with a rotation transformation defined in a Quaternion
      * 
      * @param quat to rotate with
@@ -392,7 +378,7 @@ public class Matrix4x4 implements Cloneable {
      * @param rotation (x=pitch, y=yaw, z=roll)
      */
     public final void rotateYawPitchRoll(Vector3 rotation) {
-        rotateYawPitchRoll(rotation.y, rotation.x, rotation.z);
+        rotateYawPitchRoll(rotation.x, rotation.y, rotation.z);
     }
 
     /**
@@ -402,18 +388,18 @@ public class Matrix4x4 implements Cloneable {
      * @param rotation (x=pitch, y=yaw, z=roll)
      */
     public final void rotateYawPitchRoll(Vector rotation) {
-        rotateYawPitchRoll(rotation.getY(), rotation.getX(), rotation.getZ());
+        rotateYawPitchRoll(rotation.getX(), rotation.getY(), rotation.getZ());
     }
 
     /**
      * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
      * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
      * 
-     * @param yaw rotation
-     * @param pitch rotation
-     * @param roll rotation
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
+     * @param roll rotation (Z)
      */
-    public final void rotateYawPitchRoll(double yaw, double pitch, double roll) {
+    public final void rotateYawPitchRoll(double pitch, double yaw, double roll) {
         this.rotateY(-yaw);
         this.rotateX(pitch);
         this.rotateZ(roll);
@@ -423,11 +409,11 @@ public class Matrix4x4 implements Cloneable {
      * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
      * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
      * 
-     * @param yaw rotation
-     * @param pitch rotation
-     * @param roll rotation
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
+     * @param roll rotation (Z)
      */
-    public final void rotateYawPitchRoll(float yaw, float pitch, float roll) {
+    public final void rotateYawPitchRoll(float pitch, float yaw, float roll) {
         this.rotateY(-yaw);
         this.rotateX(pitch);
         this.rotateZ(roll);
@@ -439,9 +425,9 @@ public class Matrix4x4 implements Cloneable {
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        float yaw = -MathUtil.atan2(-m20, m00);
-        float pitch = MathUtil.atan2(-m12, m11);
-        float roll = (float) (MathUtil.RADTODEG * Math.asin(m10));
+        float yaw = -MathUtil.atan2(m02, m22);
+        float pitch = MathUtil.atan2(-m12, Math.sqrt(m11 * m11 + m10 * m10));
+        float roll = MathUtil.atan2(m10, m11);
         return new Vector(pitch, yaw, roll);
     }
 
@@ -528,7 +514,7 @@ public class Matrix4x4 implements Cloneable {
      */
     public final void translateRotate(double x, double y, double z, float yaw, float pitch) {
         this.translate(x, y, z);
-        this.rotateYawPitchRoll(yaw, pitch, 0.0f);
+        this.rotateYawPitchRoll(pitch, yaw, 0.0f);
     }
 
     /**
