@@ -346,10 +346,22 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         this.handle.setDead(dead);
     }
 
+    /**
+     * Deprecated: gets/sets length instead
+     * 
+     * @return height
+     */
+    @Deprecated
     public float getHeight() {
         return this.handle.getLength();
     }
 
+    /**
+     * Deprecated: gets/sets length instead
+     * 
+     * @param height
+     */
+    @Deprecated
     public void setHeight(float height) {
         this.handle.setLength(height);
     }
@@ -358,8 +370,28 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.getLength();
     }
 
+    /**
+     * Deprecated: it is recommended to use {@link #setSize(float, float)} instead.
+     * 
+     * @param width
+     */
+    @Deprecated
     public void setLength(float length) {
         this.handle.setLength(length);
+    }
+
+    public float getWidth() {
+        return this.handle.getWidth();
+    }
+
+    /**
+     * Deprecated: it is recommended to use {@link #setSize(float, float)} instead.
+     * 
+     * @param width
+     */
+    @Deprecated
+    public void setWidth(float width) {
+        this.handle.setWidth(width);
     }
 
     public boolean isOnGround() {
@@ -536,6 +568,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
 
     public void setPosition(double x, double y, double z) {
         handle.setPosition(x, y, z);
+    }
+
+    public void setSize(float width, float length) {
+        handle.setSize(width, length);
     }
 
     public List<org.bukkit.entity.Entity> getNearbyEntities(double radius) {

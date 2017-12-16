@@ -63,6 +63,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract double calculateDistance(double x, double y, double z);
     public abstract boolean damageEntity(DamageSourceHandle damagesource, float damage);
     public abstract void setPosition(double x, double y, double z);
+    public abstract void setSize(float width, float length);
     public abstract void setPositionRotation(double x, double y, double z, float yaw, float pitch);
     public abstract void setLocation(double x, double y, double z, float yaw, float pitch);
     public abstract float getHeadRotation();
@@ -400,6 +401,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
         public final Template.Method.Converted<Boolean> damageEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Void> setPosition = new Template.Method<Void>();
+        public final Template.Method<Void> setSize = new Template.Method<Void>();
         public final Template.Method<Void> setPositionRotation = new Template.Method<Void>();
         public final Template.Method<Void> setLocation = new Template.Method<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();

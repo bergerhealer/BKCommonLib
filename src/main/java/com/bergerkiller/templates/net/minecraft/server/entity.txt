@@ -513,6 +513,8 @@ class Entity {
 
     public void setPosition(double x, double y, double z);
 
+    public void setSize(float width, float length);
+
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
 
     public void setLocation(double x, double y, double z, float yaw, float pitch);
