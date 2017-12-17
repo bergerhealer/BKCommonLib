@@ -500,7 +500,7 @@ public class Matrix4x4 implements Cloneable {
      * @param location to translate and rotate by
      */
     public final void translateRotate(Location location) {
-        this.translateRotate(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        this.translateRotate(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
     }
 
     /**
@@ -509,10 +509,10 @@ public class Matrix4x4 implements Cloneable {
      * @param x position
      * @param y position
      * @param z position
-     * @param yaw rotation
-     * @param pitch rotation
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
      */
-    public final void translateRotate(double x, double y, double z, float yaw, float pitch) {
+    public final void translateRotate(double x, double y, double z, float pitch, float yaw) {
         this.translate(x, y, z);
         this.rotateYawPitchRoll(pitch, yaw, 0.0f);
     }
@@ -523,13 +523,13 @@ public class Matrix4x4 implements Cloneable {
      * @param x position
      * @param y position
      * @param z position
-     * @param yaw rotation
-     * @param pitch rotation
-     * @param roll rotation
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
+     * @param roll rotation (Z)
      */
-    public final void translateRotate(double x, double y, double z, float yaw, float pitch, float roll) {
+    public final void translateRotate(double x, double y, double z, float pitch, float yaw, float roll) {
         this.translate(x, y, z);
-        this.rotateYawPitchRoll(yaw, pitch, roll);
+        this.rotateYawPitchRoll(pitch, yaw, roll);
     }
 
     /**
