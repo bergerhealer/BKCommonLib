@@ -16,7 +16,7 @@ public class MathUtilTest {
     @Test
     public void testMatrixRotation() {
         Matrix4x4 transform = new Matrix4x4();
-        transform.translateRotate(2.0, 3.0, 4.0, 34.0f, -12.0f);
+        transform.translateRotate(2.0, 3.0, 4.0, -12.0f, 34.0f);
 
         Vector3 vec = new Vector3();
         transform.transformPoint(vec);
