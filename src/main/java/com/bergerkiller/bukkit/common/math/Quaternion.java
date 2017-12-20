@@ -55,14 +55,12 @@ public class Quaternion implements Cloneable {
      * @param point to rotate using this quaternion
      */
     public void transformPoint(Vector point) {
-        //TODO: Optimize so it doesn't have to use a 4x4 matrix for this!
-        Matrix4x4 m = new Matrix4x4();
-        m.rotate(this);
-        m.translate(point);
-        Vector result = m.toVector();
-        point.setX(result.getX());
-        point.setY(result.getY());
-        point.setZ(result.getZ());
+        double px = point.getX();
+        double py = point.getY();
+        double pz = point.getZ();
+        point.setX( px + 2.0 * (px*(-y*y-z*z) + py*(x*y-z*w) + pz*(x*z+y*w)) );
+        point.setY( py + 2.0 * (px*(x*y+z*w) + py*(-x*x-z*z) + pz*(y*z-x*w)) );
+        point.setZ( pz + 2.0 * (px*(x*z-y*w) + py*(y*z+x*w) + pz*(-x*x-y*y)) );
     }
 
     public void multiply(Quaternion quat) {
