@@ -50,6 +50,16 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Calculates the dot product of this Quaternion with another
+     * 
+     * @param q other quaternion
+     * @return dot product
+     */
+    public double dot(Quaternion q) {
+        return this.x * q.x + this.y * q.y + this.z * q.z + this.w * q.w;
+    }
+
+    /**
      * Transforms a point, applying the rotation of this quaternion with 0,0,0 as origin.
      * 
      * @param point to rotate using this quaternion
@@ -63,6 +73,41 @@ public class Quaternion implements Cloneable {
         point.setZ( pz + 2.0 * (px*(x*z-y*w) + py*(y*z+x*w) + pz*(-x*x-y*y)) );
     }
 
+    /**
+     * Retrieves the right vector, which is the result of transforming a (1,0,0) point
+     * with this Quaternion.
+     * 
+     * @return right vector
+     */
+    public Vector rightVector() {
+        return new Vector(1.0 + 2.0 * (-y*y-z*z), 2.0 * (x*y+z*w), 2.0 * (x*z-y*w));
+    }
+
+    /**
+     * Retrieves the up vector, which is the result of transforming a (0,1,0) point
+     * with this Quaternion.
+     * 
+     * @return up vector
+     */
+    public Vector upVector() {
+        return new Vector(2.0 * (x*y-z*w), 1.0 + 2.0 * (-x*x-z*z), 2.0 * (y*z+x*w));
+    }
+
+    /**
+     * Retrieves the forward vector, which is the result of transforming a (0,0,1) point
+     * with this Quaternion.
+     * 
+     * @return forward vector
+     */
+    public Vector forwardVector() {
+        return new Vector(2.0 * (x*z+y*w), 2.0 * (y*z-x*w), 1.0 + 2.0 * (-x*x-y*y));
+    }
+
+    /**
+     * Multiplies this quaternion with another quaternion. The result is stored in this quaternion.
+     * 
+     * @param quat to multiply with
+     */
     public void multiply(Quaternion quat) {
         double x = this.w * quat.x + this.x * quat.w + this.y * quat.z - this.z * quat.y;
         double y = this.w * quat.y + this.y * quat.w + this.z * quat.x - this.x * quat.z;
@@ -319,6 +364,71 @@ public class Quaternion implements Cloneable {
         Quaternion r = Quaternion.fromToRotation(v, dir);
         r.multiply(fromForwardToRotation(v));
         return r;
+    }
+
+    /**
+     * Performs a linear interpolation between two quaternions.
+     * Separate theta values can be specified to set how much of each quaternion to keep
+     * For smoother interpolation, {@link #slerp(q0, q1, theta)} can be used instead.
+     * 
+     * @param q0 quaternion at theta=0
+     * @param q1 quaternion at theta=1
+     * @param t0 theta value for q0 amount (range 0 to 1)
+     * @param t1 theta value for q1 amount (range 0 to 1)
+     * @return lerp result
+     */
+    public static Quaternion lerp(Quaternion q0, Quaternion q1, double t0, double t1) {
+        return new Quaternion(t0 * q0.x + t1 * q1.x,
+                t0 * q0.y + t1 * q1.y,
+                t0 * q0.z + t1 * q1.z,
+                t0 * q0.w + t1 * q1.w);
+    }
+
+    /**
+     * Performs a linear interpolation between two quaternions.
+     * For smoother interpolation, {@link #slerp(q0, q1, theta)} can be used instead.
+     * 
+     * @param q0 quaternion at theta=0
+     * @param q1 quaternion at theta=1
+     * @param theta value (range 0 to 1)
+     * @return lerp result
+     */
+    public static Quaternion lerp(Quaternion q0, Quaternion q1, double theta) {
+        return lerp(q0, q1, 1.0 - theta, theta);
+    }
+
+    /**
+     * Performs a spherical interpolation between two quaternions.
+     * 
+     * @param q0 quaternion at theta=0
+     * @param q1 quaternion at theta=0
+     * @param theta value (range 0 to 1)
+     * @return slerp result
+     */
+    public static Quaternion slerp(Quaternion q0, Quaternion q1, double theta) {
+        Quaternion qs = q1.clone();
+        double dot = q0.dot(q1);
+
+        // Invert quaternion when dot < 0 to simplify maths
+        if (dot < 0.0) {
+            dot = -dot;
+            qs.x = -qs.x;
+            qs.y = -qs.y;
+            qs.z = -qs.z;
+            qs.w = -qs.w;
+        }
+
+        // Above this a lerp is adequate
+        if (dot >= 0.95) {
+            return lerp(q0, qs, theta);
+        }
+
+        // Linear interpolation using sines
+        double angle = Math.acos(dot);
+        double qd = 1.0 / Math.sin(angle);
+        double q0f = qd * Math.sin(angle*(1.0-theta));
+        double qsf = qd * Math.sin(angle*theta);
+        return lerp(q0, qs, q0f, qsf);
     }
 
     // This method is used often for the two-arg rotateX/Y/Z functions

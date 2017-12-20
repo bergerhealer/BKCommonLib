@@ -158,6 +158,21 @@ public class MathUtilTest {
         assertEquals(fwd_a.getZ(), fwd_b.getZ(), 0.0000001);
     }
 
+    @Test
+    public void testQuaternionSlerp() {
+        double a0 = 45.0;
+        double a1 = 135.0;
+        Quaternion q0 = Quaternion.fromAxisAngles(0.0, 1.0, 0.0, a0);
+        Quaternion q1 = Quaternion.fromAxisAngles(0.0, 1.0, 0.0, a1);
+        for (double t = 0.0; t <= 1.0; t += 0.001) {
+            Quaternion q = Quaternion.slerp(q0, q1, t);
+            Vector f = q.forwardVector();
+            double angle_expected = (1.0-t) * a0 + t * a1;
+            double angle_actual = Math.toDegrees(Math.atan2(f.getX(), f.getZ()));
+            assertEquals(angle_expected, angle_actual, 0.0000000000001);
+        }
+    }
+
     // random number between -1.0 and 1.0
     private static double randUnit() {
         return -2.0 * Math.random() + 1.0;
