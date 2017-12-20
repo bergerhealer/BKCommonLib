@@ -136,4 +136,35 @@ public class MathUtilTest {
         }
     }
 
+    @Test
+    public void testQuaternionFromToRotation() {
+        for (int i = 0; i < 100000; i++) {
+            Vector u = randUnitVec();
+            Vector v = randUnitVec();
+
+            Quaternion a = Quaternion.fromToRotation(u, v);
+            a.transformPoint(u);
+
+            assertEquals(u.getX(), v.getX(), 0.0000001);
+            assertEquals(u.getY(), v.getY(), 0.0000001);
+            assertEquals(u.getZ(), v.getZ(), 0.0000001);
+        }
+
+        Vector fwd_v = new Vector(0.5, 0.3, 1.2);
+        Quaternion fwd_a = Quaternion.fromToRotation(new Vector(0.0, 0.0, 1.0), fwd_v);
+        Quaternion fwd_b = Quaternion.fromForwardToRotation(fwd_v);
+        assertEquals(fwd_a.getX(), fwd_b.getX(), 0.0000001);
+        assertEquals(fwd_a.getY(), fwd_b.getY(), 0.0000001);
+        assertEquals(fwd_a.getZ(), fwd_b.getZ(), 0.0000001);
+    }
+
+    // random number between -1.0 and 1.0
+    private static double randUnit() {
+        return -2.0 * Math.random() + 1.0;
+    }
+
+    // random unit vector
+    private static Vector randUnitVec() {
+        return new Vector(randUnit(), randUnit(), randUnit()).normalize();
+    }
 }

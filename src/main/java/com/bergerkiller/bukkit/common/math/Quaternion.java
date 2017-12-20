@@ -144,9 +144,8 @@ public class Quaternion implements Cloneable {
     }
 
     public final void rotateX(double y, double z) {
-        //TODO: Can this be optimized to avoid trigonometry?
-        double r = 0.5 * Math.atan2(z, y);
-        rotateX_unsafe(Math.cos(r), Math.sin(r));
+        double r = halfcosatan2(z, y);
+        rotateX_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
     }
 
     private final void rotateX_unsafe(double fy, double fz) {
@@ -166,9 +165,8 @@ public class Quaternion implements Cloneable {
     }
 
     public final void rotateY(double x, double z) {
-        //TODO: Can this be optimized to avoid trigonometry?
-        double r = 0.5 * Math.atan2(z, x);
-        rotateY_unsafe(Math.cos(r), Math.sin(r));
+        double r = halfcosatan2(z, x);
+        rotateY_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
     }
 
     private final void rotateY_unsafe(double fx, double fz) {
@@ -188,9 +186,8 @@ public class Quaternion implements Cloneable {
     }
 
     public final void rotateZ(double x, double y) {
-        //TODO: Can this be optimized to avoid trigonometry?
-        double r = 0.5 * Math.atan2(y, x);
-        rotateZ_unsafe(Math.cos(r), Math.sin(r));
+        double r = halfcosatan2(y, x);
+        rotateZ_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
     }
 
     private final void rotateZ_unsafe(double fx, double fy) {
@@ -201,7 +198,7 @@ public class Quaternion implements Cloneable {
         this.x = x; this.y = y; this.z = z; this.w = w;
         this.normalize();
     }
-    
+
     /**
      * Converts the rotation transformations defined in this quaternion to a 
      * 4x4 transformation matrix. This is as if the unit matrix was multiplied
@@ -226,7 +223,7 @@ public class Quaternion implements Cloneable {
 
     private void normalize() {
         double f = MathUtil.getNormalizationFactor(this.x, this.y, this.z, this.w);
-        this.x *= f; this.y *= f; this.y *= f; this.w *= f;
+        this.x *= f; this.y *= f; this.z *= f; this.w *= f;
     }
 
     @Override
@@ -274,5 +271,64 @@ public class Quaternion implements Cloneable {
         double r = 0.5 * Math.toRadians(angleDegrees);
         double f = Math.sin(r);
         return new Quaternion(f*axisX, f*axisY, f*axisZ, Math.cos(r));
+    }
+
+    /**
+     * Creates a quaternion that transforms the input vector (u) into the output vector (v).
+     * The vectors do not have to be unit vectors for this function to work.
+     * 
+     * @param u input vector (from)
+     * @param v expected output vector (to)
+     * @return quaternion that rotates u to become v
+     */
+    public static Quaternion fromToRotation(Vector u, Vector v) {
+        // xyz = cross(u, v), w = dot(u, v)
+        // add magnitude of quaternion to w, then normalize it
+        Quaternion q = new Quaternion();
+        q.x = u.getY() * v.getZ() - v.getY() * u.getZ();
+        q.y = u.getZ() * v.getX() - v.getZ() * u.getX();
+        q.z = u.getX() * v.getY() - v.getX() * u.getY();
+        q.w = u.dot(v);
+        q.w += Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+        q.normalize();
+        return q;
+    }
+
+    /**
+     * Creates a quaternion that transforms a forward vector (0, 0, 1) into the output vector (v).
+     * The vector does not have to be a unit vector for this function to work.
+     * 
+     * @param v expected output vector (to)
+     * @return quaternion that rotates (0,0,1) to become v
+     */
+    public static Quaternion fromForwardToRotation(Vector v) {
+        return new Quaternion(-v.getY(), v.getX(), 0.0, v.getZ() + v.length());
+    }
+
+    /**
+     * Creates a quaternion that 'looks' into a given direction, with a known 'up' vector
+     * to dictate roll around that direction axis.
+     * 
+     * @param dir to look into
+     * @param up direction
+     * @return Quaternion with the look-direction transformation
+     */
+    public static Quaternion fromLookDirection(Vector dir, Vector up) {
+        Vector v = up.clone();
+        v.normalize();
+        v.multiply(-v.dot(dir));
+        v.add(dir);
+        Quaternion r = Quaternion.fromToRotation(v, dir);
+        r.multiply(fromForwardToRotation(v));
+        return r;
+    }
+
+    // This method is used often for the two-arg rotateX/Y/Z functions
+    // Optimized equivalent of 0.5 * Math.cos(Math.atan2(y, x))
+    private static final double halfcosatan2(double y, double x) {
+        double tmp = y / x;
+        tmp *= tmp;
+        tmp += 1.0;
+        return ((x < 0.0) ? -0.5 : 0.5) / Math.sqrt(tmp);
     }
 }
