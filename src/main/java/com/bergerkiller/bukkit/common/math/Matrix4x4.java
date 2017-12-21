@@ -420,15 +420,33 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Gets the rotation transformation performed as a Quaternion
+     * 
+     * @return rotation quaternion
+     */
+    public final Quaternion getRotation() {
+        double tr = m00 + m11 + m22;
+        if (tr > 0) {
+            return new Quaternion(m21-m12, m02-m20, m10-m01, 1.0 + tr);
+        } else if ((m00 > m11) & (m00 > m22)) {
+            return new Quaternion(1.0+m00-m11-m22, m01+m10, m02+m20, m21-m12);
+        } else if (m11 > m22) {
+            return new Quaternion(m01+m10, 1.0+m11-m00-m22, m12+m21, m02-m20);
+        } else {
+            return new Quaternion(m02+m20, m12+m21, 1.0+m22-m00-m11, m10-m01);
+        }
+    }
+
+    /**
      * Deduces the yaw/pitch/roll values in degrees that this matrix transforms objects with
      * 
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        float yaw = -MathUtil.atan2(m02, m22);
-        float pitch = MathUtil.atan2(-m12, Math.sqrt(m11 * m11 + m10 * m10));
-        float roll = MathUtil.atan2(m10, m11);
-        return new Vector(pitch, yaw, roll);
+        //TODO: Can we somehow eliminate the temporary quaternion?
+        // I'm using this method for now, because guarantees Quaternion and Matrix
+        // use the same kind of getYawPitchRoll() logic.
+        return this.getRotation().getYawPitchRoll();
     }
 
     /**

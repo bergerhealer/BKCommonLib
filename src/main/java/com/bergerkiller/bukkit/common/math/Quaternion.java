@@ -189,11 +189,11 @@ public class Quaternion implements Cloneable {
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        final double roll;
-        final double pitch;
+        double roll;
+        double pitch;
         double yaw;
         final double test = w * x - y * z;
-        if (Math.abs(test) < 0.4999) {
+        if (Math.abs(test) < (0.5 - 1E-20)) {
             roll = Math.atan2(2 * (w * z + x * y), 1 - 2 * (x * x + z * z));
             pitch = Math.asin(2 * test);
             yaw = Math.atan2(2 * (w * y + z * x), 1 - 2 * (x * x + y * y));
@@ -208,7 +208,23 @@ public class Quaternion implements Cloneable {
         } else if (yaw < -Math.PI) {
             yaw += 2.0 * Math.PI;
         }
-        return new Vector(Math.toDegrees(pitch), Math.toDegrees(-yaw), Math.toDegrees(roll));        
+
+        // Reduce roll if it is > 90.0 degrees
+        // This can be done thanks to the otherwise annoying 'gymbal lock' effect
+        // We can rotate yaw and roll with 180 degrees, and rotate pitch to adjust
+        // This results in the equivalent rotation
+        if (roll < (-0.5 * Math.PI) || roll > (0.5 * Math.PI)) {
+            pitch += Math.PI - 2.0 * pitch;
+            if (pitch < -Math.PI) {
+                pitch += 2.0 * Math.PI;
+            } else if (pitch > Math.PI) {
+                pitch -= 2.0 * Math.PI;
+            }
+            roll += (roll < 0.0) ? Math.PI : -Math.PI;
+            yaw += (yaw < 0.0) ? Math.PI : -Math.PI;
+        }
+
+        return new Vector(Math.toDegrees(pitch), Math.toDegrees(-yaw), Math.toDegrees(roll));
     }
 
     public final void rotateX(double angleDegrees) {

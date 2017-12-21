@@ -39,9 +39,9 @@ public class MathUtilTest {
 
         transform.scale(1.5, 2.5, 3.5);
         yawPitchRoll = transform.getYawPitchRoll();
-        assertEquals(-17.988, yawPitchRoll.getX(), 0.001);
-        assertEquals(34.0, yawPitchRoll.getY(), 0.001);
-        assertEquals(19.107, yawPitchRoll.getZ(), 0.001);
+        assertEquals(-16.729, yawPitchRoll.getX(), 0.001);
+        assertEquals(43.496, yawPitchRoll.getY(), 0.001);
+        assertEquals(30.787, yawPitchRoll.getZ(), 0.001);
 
         // Try a bunch of random yaw/pitch/roll values and see that they all work
         Random rand = new Random();
@@ -57,6 +57,23 @@ public class MathUtilTest {
             assertEquals(rotation.getX(), result.getX(), 0.001);
             assertEquals(rotation.getY(), result.getY(), 0.001);
             assertEquals(rotation.getZ(), result.getZ(), 0.001);
+        }
+    }
+
+    @Test
+    public void testQuaternionYPRRollSuppression() {
+        // Try many different kind of rotations, and verify that roll is always kept between -90 and 90
+        for (int i = 0; i < 10000; i++) {
+            Quaternion q = Quaternion.fromYawPitchRoll(360.0 * Math.random(),
+                                                       360.0 * Math.random(),
+                                                       360.0 * Math.random());
+
+            Vector ypr = q.getYawPitchRoll();
+            assertTrue("mynum is out of range: " + ypr.getZ(), ypr.getZ() >= -90.0 && ypr.getZ() <= 90.0);
+
+            // Also check that the yaw/pitch/roll is actually valid
+            Quaternion q_verify = Quaternion.fromYawPitchRoll(ypr);
+            testQuaternionsEqual(q, q_verify);
         }
     }
 
@@ -89,6 +106,18 @@ public class MathUtilTest {
         assertEquals(ypr_a.getX(), ypr_b.getX(), 0.001);
         assertEquals(ypr_a.getY(), ypr_b.getY(), 0.001);
         assertEquals(ypr_a.getZ(), ypr_b.getZ(), 0.001);
+
+        // Verify that the matrix turned into a Quaternion is the same
+        transform = new Matrix4x4();
+        quaternion = new Quaternion();
+        transform.translate(5.0, 23.3, -63.2);
+        transform.rotateYawPitchRoll(33.2, -53.2, 12.5);
+        quaternion.rotateYawPitchRoll(33.2, -53.2, 12.5);
+        Quaternion transform_to_quat = transform.getRotation();
+        assertEquals(quaternion.getX(), transform_to_quat.getX(), 0.00001);
+        assertEquals(quaternion.getY(), transform_to_quat.getY(), 0.00001);
+        assertEquals(quaternion.getZ(), transform_to_quat.getZ(), 0.00001);
+        assertEquals(quaternion.getW(), transform_to_quat.getW(), 0.00001);
 
         // Also test the optimized Quaternion rotateX/Y/Z functions
         quaternion = new Quaternion();
@@ -286,7 +315,7 @@ public class MathUtilTest {
         c.normalize();
         return c;
     }
-    
+
     // random number between -1.0 and 1.0
     private static double randUnit() {
         return -2.0 * Math.random() + 1.0;
@@ -295,5 +324,18 @@ public class MathUtilTest {
     // random unit vector
     private static Vector randUnitVec() {
         return new Vector(randUnit(), randUnit(), randUnit()).normalize();
+    }
+
+    // checks that two quaternions have the same forward/up vector
+    private static void testQuaternionsEqual(Quaternion expected, Quaternion actual) {
+        testVectorsEqual(expected.forwardVector(), actual.forwardVector());
+        testVectorsEqual(expected.upVector(), actual.upVector());
+    }
+
+    // checks that two vectors are equal
+    private static void testVectorsEqual(Vector expected, Vector actual) {
+        assertEquals(expected.getX(), actual.getX(), 1e-10);
+        assertEquals(expected.getY(), actual.getY(), 1e-10);
+        assertEquals(expected.getZ(), actual.getZ(), 1e-10);
     }
 }
