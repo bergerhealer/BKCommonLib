@@ -465,48 +465,19 @@ public class Quaternion implements Cloneable {
      * @return Quaternion with the look-direction transformation
      */
     public static Quaternion fromLookDirection(Vector dir, Vector up) {
-        /*
-        Vector k = look.upVector().clone();; //new Vector(0,1,0); //  look.upVector().clone();
-        look.invert();
-        
-        
-        
-        look.transformPoint(k);
-        double roll_a = Math.toDegrees(Math.atan2(-k.getX(), k.getY()));
-        
-        Vector m = up.clone();
-        look.transformPoint(m);
-        double roll = Math.toDegrees(Math.atan2(-m.getX(), m.getY()));
-        
-        look.invert();
-        look.rotateZ(roll - roll_a);
-        
-        return look;
-        */
-        
-        // Find the roll around dir needed to point towards up
-        //Vector v = dir.clone().crossProduct(up).crossProduct(dir);
-        //double angle = Math.toDegrees(Math.atan2(-v.getX(), -v.getZ()));
-
-        //return multiply(Quaternion.fromAxisAngles(dir, angle), fromLookDirection(dir));
-
+        // Use fromLookDirection without up vector to find the base rotation
         Quaternion lookAt_dir = fromLookDirection(dir);
         Vector look_up = lookAt_dir.upVector();
+
+        // Ensure up is orthogonal to dir
+        up = dir.getCrossProduct(up).crossProduct(dir);
+
+        // Find the rotation from the old up vector to the desired up vector
         Quaternion lookAt_up = fromToRotation(look_up, up);
         lookAt_up.multiply(lookAt_dir);
         return lookAt_up;
     }
 
-    public static Quaternion fromLookDirection2(Vector dir, Vector up) {
-        Vector v = up.clone();
-        v.normalize();
-        v.multiply(-v.dot(dir));
-        v.add(dir);
-        Quaternion r = Quaternion.fromToRotation(v, dir);
-        r.multiply(fromLookDirection(v));
-        return r;
-    }
-    
     /**
      * Performs a linear interpolation between two quaternions.
      * Separate theta values can be specified to set how much of each quaternion to keep

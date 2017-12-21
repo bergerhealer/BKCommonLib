@@ -217,6 +217,8 @@ public class MathUtilTest {
 
     @Test
     public void testQuaternionFromLookDirection() {
+        // Try many random vectors, find a random orthogonal vector to it, and verify fromLookDirection works
+        // The up and forward vectors of the produced quaternion should be the same as the input
         for (int i = 0; i < 10000; i++) {
             Vector dir = randUnitVec().multiply(0.2 + 2.0 * Math.random());
             Vector up = randOrtho(dir).multiply(0.2 + 2.0 * Math.random());
@@ -234,6 +236,21 @@ public class MathUtilTest {
             assertEquals(up.getX(), result_up.getX(), 0.01);
             assertEquals(up.getY(), result_up.getY(), 0.01);
             assertEquals(up.getZ(), result_up.getZ(), 0.01);
+        }
+
+        // Verify that up-vectors that aren't perfectly orthogonal also work
+        {
+            Vector dir = new Vector(0.0, 0.0, 1.0);
+            Vector up = new Vector(0.0, 3.0, -4.0);
+            Quaternion q = Quaternion.fromLookDirection(dir, up);
+            Vector result_dir = q.forwardVector();
+            Vector result_up = q.upVector();
+            assertEquals(dir.getX(), result_dir.getX(), 0.00001);
+            assertEquals(dir.getY(), result_dir.getY(), 0.00001);
+            assertEquals(dir.getZ(), result_dir.getZ(), 0.00001);
+            assertEquals(0.0, result_up.getX(), 0.01);
+            assertEquals(1.0, result_up.getY(), 0.01);
+            assertEquals(0.0, result_up.getZ(), 0.01);
         }
     }
 
