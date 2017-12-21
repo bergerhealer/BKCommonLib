@@ -697,6 +697,7 @@ public class MathUtil {
     /**
      * Calculates the normalization factor for a 4D vector.
      * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * If the input vector is (0,0,0,0), Infinity is returned.
      * 
      * @param x
      * @param y
@@ -711,6 +712,7 @@ public class MathUtil {
     /**
      * Calculates the normalization factor for a 3D vector.
      * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * If the input vector is (0,0,0), Infinity is returned.
      * 
      * @param x
      * @param y
@@ -724,6 +726,7 @@ public class MathUtil {
     /**
      * Calculates the normalization factor for a 2D vector.
      * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * If the input vector is (0,0), Infinity is returned.
      * 
      * @param x
      * @param y
@@ -736,6 +739,7 @@ public class MathUtil {
     /**
      * Calculates the normalization factor for a squared length.
      * Multiplying the input values with this factor will turn it into a vector of unit length.
+     * If the squared length is 0, Infinity is returned.
      * 
      * @param lengthSquared
      * @return normalization factor

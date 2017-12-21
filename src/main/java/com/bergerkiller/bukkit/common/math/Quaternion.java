@@ -50,6 +50,16 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Sets this Quaternion to the identity quaternion (0,0,0,1)
+     */
+    public void setIdentity() {
+        this.x = 0.0;
+        this.y = 0.0;
+        this.z = 0.0;
+        this.w = 1.0;
+    }
+
+    /**
      * Calculates the dot product of this Quaternion with another
      * 
      * @param q other quaternion
@@ -115,6 +125,28 @@ public class Quaternion implements Cloneable {
         double w = this.w * quat.w - this.x * quat.x - this.y * quat.y - this.z * quat.z;
         this.x = x; this.y = y; this.z = z; this.w = w;
         this.normalize();
+    }
+
+    /**
+     * Multiplies this Quaternion with a rotation around an axis
+     * 
+     * @param axis vector
+     * @param angleDegrees to rotate in degrees
+     */
+    public final void rotateAxis(Vector axis, double angleDegrees) {
+        rotateAxis(axis.getX(), axis.getY(), axis.getZ(), angleDegrees);
+    }
+
+    /**
+     * Multiplies this Quaternion with a rotation around an axis
+     * 
+     * @param axisX vector coordinate
+     * @param axisY vector coordinate
+     * @param axisZ vector coordinate
+     * @param angleDegrees to rotate in degrees
+     */
+    public final void rotateAxis(double axisX, double axisY, double axisZ, double angleDegrees) {
+        this.multiply(Quaternion.fromAxisAngles(axisX, axisY, axisZ, angleDegrees));
     }
 
     /**
@@ -280,6 +312,19 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Performs a multiplication between two quaternions
+     * 
+     * @param q1
+     * @param q2
+     * @return q1 x q2
+     */
+    public static Quaternion multiply(Quaternion q1, Quaternion q2) {
+        Quaternion result = q1.clone();
+        result.multiply(q2);
+        return result;
+    }
+
+    /**
      * Creates a quaternion for a rotation around an axis
      * 
      * @param axis
@@ -317,6 +362,31 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Creates a quaternion from yaw/pitch/roll rotations as performed by Minecraft
+     * 
+     * @param rotation (x=pitch, y=yaw, z=roll)
+     * @return quaternion for the yaw/pitch/roll rotation
+     */
+    public static Quaternion fromYawPitchRoll(Vector rotation) {
+        return fromYawPitchRoll(rotation.getX(), rotation.getY(), rotation.getZ());
+    }
+
+    /**
+     * Creates a quaternion from yaw/pitch/roll rotations as performed by Minecraft
+     * 
+     * @param pitch rotation (X)
+     * @param yaw rotation (Y)
+     * @param roll rotation (Z)
+     * @return quaternion for the yaw/pitch/roll rotation
+     */
+    public static Quaternion fromYawPitchRoll(double pitch, double yaw, double roll) {
+        //TODO: Can be optimized to reduce the number of multiplications
+        Quaternion quat = new Quaternion();
+        quat.rotateYawPitchRoll(pitch, yaw, roll);
+        return quat;
+    }
+
+    /**
      * Creates a quaternion that transforms the input vector (u) into the output vector (v).
      * The vectors do not have to be unit vectors for this function to work.
      * 
@@ -327,25 +397,63 @@ public class Quaternion implements Cloneable {
     public static Quaternion fromToRotation(Vector u, Vector v) {
         // xyz = cross(u, v), w = dot(u, v)
         // add magnitude of quaternion to w, then normalize it
+        double dot = u.dot(v);
         Quaternion q = new Quaternion();
         q.x = u.getY() * v.getZ() - v.getY() * u.getZ();
         q.y = u.getZ() * v.getX() - v.getZ() * u.getX();
         q.z = u.getX() * v.getY() - v.getX() * u.getY();
-        q.w = u.dot(v);
+        q.w = dot;
         q.w += Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
         q.normalize();
+
+        // there is a special case for opposite vectors
+        // here the quaternion ends up being 0,0,0,0
+        // after normalization the terms are NaN as a result (0xinf=NaN)
+        if (Double.isNaN(q.w)) {
+            if (dot > 0.0) {
+                // Identity Quaternion
+                q.setIdentity();
+            } else {
+                // Rotation of 180 degrees around a certain axis
+                // First try axis X, then try axis Y
+                // The cross product with either vector is used for the axis
+                double norm = MathUtil.getNormalizationFactor(u.getZ(), u.getY());
+                if (Double.isInfinite(norm)) {
+                    norm = MathUtil.getNormalizationFactor(u.getZ(), u.getX());
+                    q.x = norm * u.getZ();
+                    q.y = 0.0;
+                    q.z = norm * -u.getX();
+                    q.w = 0.0;
+                } else {
+                    q.x = 0.0;
+                    q.y = norm * -u.getZ();
+                    q.z = norm * u.getY();
+                    q.w = 0.0;
+                }
+            }
+        }
         return q;
     }
 
     /**
      * Creates a quaternion that transforms a forward vector (0, 0, 1) into the output vector (v).
      * The vector does not have to be a unit vector for this function to work.
+     * If the 'up' axis is important, use {@link #fromLookDirection(dir, up)} instead.
      * 
      * @param v expected output vector (to)
      * @return quaternion that rotates (0,0,1) to become v
      */
-    public static Quaternion fromForwardToRotation(Vector v) {
-        return new Quaternion(-v.getY(), v.getX(), 0.0, v.getZ() + v.length());
+    public static Quaternion fromLookDirection(Vector dir) {
+        Quaternion q = new Quaternion(-dir.getY(), dir.getX(), 0.0, dir.getZ() + dir.length());
+
+        // there is a special case when dir is (0, 0, -1)
+        if (Double.isNaN(q.w)) {
+            q.x = 0.0;
+            q.y = 1.0;
+            q.z = 0.0;
+            q.w = 0.0;
+        }
+        return q;
     }
 
     /**
@@ -357,15 +465,48 @@ public class Quaternion implements Cloneable {
      * @return Quaternion with the look-direction transformation
      */
     public static Quaternion fromLookDirection(Vector dir, Vector up) {
+        /*
+        Vector k = look.upVector().clone();; //new Vector(0,1,0); //  look.upVector().clone();
+        look.invert();
+        
+        
+        
+        look.transformPoint(k);
+        double roll_a = Math.toDegrees(Math.atan2(-k.getX(), k.getY()));
+        
+        Vector m = up.clone();
+        look.transformPoint(m);
+        double roll = Math.toDegrees(Math.atan2(-m.getX(), m.getY()));
+        
+        look.invert();
+        look.rotateZ(roll - roll_a);
+        
+        return look;
+        */
+        
+        // Find the roll around dir needed to point towards up
+        //Vector v = dir.clone().crossProduct(up).crossProduct(dir);
+        //double angle = Math.toDegrees(Math.atan2(-v.getX(), -v.getZ()));
+
+        //return multiply(Quaternion.fromAxisAngles(dir, angle), fromLookDirection(dir));
+
+        Quaternion lookAt_dir = fromLookDirection(dir);
+        Vector look_up = lookAt_dir.upVector();
+        Quaternion lookAt_up = fromToRotation(look_up, up);
+        lookAt_up.multiply(lookAt_dir);
+        return lookAt_up;
+    }
+
+    public static Quaternion fromLookDirection2(Vector dir, Vector up) {
         Vector v = up.clone();
         v.normalize();
         v.multiply(-v.dot(dir));
         v.add(dir);
         Quaternion r = Quaternion.fromToRotation(v, dir);
-        r.multiply(fromForwardToRotation(v));
+        r.multiply(fromLookDirection(v));
         return r;
     }
-
+    
     /**
      * Performs a linear interpolation between two quaternions.
      * Separate theta values can be specified to set how much of each quaternion to keep

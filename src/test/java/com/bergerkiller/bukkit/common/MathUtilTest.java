@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.util.Vector;
@@ -138,24 +140,101 @@ public class MathUtilTest {
 
     @Test
     public void testQuaternionFromToRotation() {
-        for (int i = 0; i < 100000; i++) {
+        // Test fromToRotation with random vectors
+        for (int i = 0; i < 10000; i++) {
             Vector u = randUnitVec();
             Vector v = randUnitVec();
+            u.multiply(0.2 + 2.0 * Math.random());
+            v.multiply(0.2 + 2.0 * Math.random());
 
             Quaternion a = Quaternion.fromToRotation(u, v);
-            a.transformPoint(u);
 
+            // Rotating the normalized vectors with this quaternion should work perfectly
+            u.normalize();
+            v.normalize();
+            a.transformPoint(u);
             assertEquals(u.getX(), v.getX(), 0.0000001);
             assertEquals(u.getY(), v.getY(), 0.0000001);
             assertEquals(u.getZ(), v.getZ(), 0.0000001);
         }
 
-        Vector fwd_v = new Vector(0.5, 0.3, 1.2);
-        Quaternion fwd_a = Quaternion.fromToRotation(new Vector(0.0, 0.0, 1.0), fwd_v);
-        Quaternion fwd_b = Quaternion.fromForwardToRotation(fwd_v);
-        assertEquals(fwd_a.getX(), fwd_b.getX(), 0.0000001);
-        assertEquals(fwd_a.getY(), fwd_b.getY(), 0.0000001);
-        assertEquals(fwd_a.getZ(), fwd_b.getZ(), 0.0000001);
+        // Test forward to rotation being the same as fromToRotation
+        for (int i = 0; i < 10000; i++) {
+            Vector fwd_v = randUnitVec().multiply(0.2 * Math.random() * 2.0);
+            Quaternion fwd_a = Quaternion.fromToRotation(new Vector(0.0, 0.0, 1.0), fwd_v);
+            Quaternion fwd_b = Quaternion.fromLookDirection(fwd_v);
+            assertEquals(fwd_a.getX(), fwd_b.getX(), 0.0000001);
+            assertEquals(fwd_a.getY(), fwd_b.getY(), 0.0000001);
+            assertEquals(fwd_a.getZ(), fwd_b.getZ(), 0.0000001);
+            assertEquals(fwd_a.getW(), fwd_b.getW(), 0.0000001);
+        }
+
+        // Test a rotation with opposite vectors
+        for (int i = 0; i < 10000; i++) {
+            Vector u = randUnitVec();
+            Vector v = u.clone().multiply(-1.0);
+
+            Quaternion a = Quaternion.fromToRotation(u, v);
+
+            // Rotating the vectors with this quaternion should work perfectly
+            a.transformPoint(u);
+            assertEquals(u.getX(), v.getX(), 0.0000001);
+            assertEquals(u.getY(), v.getY(), 0.0000001);
+            assertEquals(u.getZ(), v.getZ(), 0.0000001);
+        }
+
+        // Test forward rotation with its opposite vector
+        {
+            Vector fwd_v = new Vector(0.0, 0.0, -1.0);
+            Quaternion q = Quaternion.fromLookDirection(fwd_v);
+            Vector result = q.forwardVector();
+            assertEquals(fwd_v.getX(), result.getX(), 1e-20);
+            assertEquals(fwd_v.getY(), result.getY(), 1e-20);
+            assertEquals(fwd_v.getZ(), result.getZ(), 1e-20);
+        }
+
+        // Test some special cases of opposite vectors
+        List<Vector> specialOpposites = new ArrayList<Vector>();
+        specialOpposites.add(new Vector(0.0, 0.0, 1.0));
+        specialOpposites.add(new Vector(0.0, 0.0, -1.0));
+        specialOpposites.add(new Vector(0.0, 1.0, 0.0));
+        specialOpposites.add(new Vector(0.0, -1.0, 0.0));
+        specialOpposites.add(new Vector(1.0, 0.0, 0.0));
+        specialOpposites.add(new Vector(-1.0, 0.0, 0.0));
+        for (Vector specialOpposite : specialOpposites) {
+            Vector u = specialOpposite.clone();
+            Vector v = u.clone().multiply(-1.0);
+
+            Quaternion a = Quaternion.fromToRotation(u, v);
+
+            // Rotating the vectors with this quaternion should work perfectly
+            a.transformPoint(u);
+            assertEquals(u.getX(), v.getX(), 0.0000001);
+            assertEquals(u.getY(), v.getY(), 0.0000001);
+            assertEquals(u.getZ(), v.getZ(), 0.0000001);
+        }
+    }
+
+    @Test
+    public void testQuaternionFromLookDirection() {
+        for (int i = 0; i < 10000; i++) {
+            Vector dir = randUnitVec().multiply(0.2 + 2.0 * Math.random());
+            Vector up = randOrtho(dir).multiply(0.2 + 2.0 * Math.random());
+
+            Quaternion q = Quaternion.fromLookDirection(dir, up);
+
+            dir.normalize();
+            up.normalize();
+
+            Vector result_dir = q.forwardVector();
+            Vector result_up = q.upVector();
+            assertEquals(dir.getX(), result_dir.getX(), 0.00001);
+            assertEquals(dir.getY(), result_dir.getY(), 0.00001);
+            assertEquals(dir.getZ(), result_dir.getZ(), 0.00001);
+            assertEquals(up.getX(), result_up.getX(), 0.01);
+            assertEquals(up.getY(), result_up.getY(), 0.01);
+            assertEquals(up.getZ(), result_up.getZ(), 0.01);
+        }
     }
 
     @Test
@@ -173,6 +252,24 @@ public class MathUtilTest {
         }
     }
 
+    // creates a random vector orthogonal to another vector
+    private static Vector randOrtho(Vector dir) {
+        // Get a valid vector perpendicular to dir
+        Vector c;
+        if (dir.getY() != 0.0 || dir.getZ() != 0.0) {
+            c = new Vector(1.0, 0.0, 0.0);
+        } else {
+            c = new Vector(0.0, 1.0, 0.0);
+        }
+        c = dir.getCrossProduct(c);
+
+        // Rotate randomly between 0 ... 360 degrees
+        Quaternion q = Quaternion.fromAxisAngles(dir, Math.random() * 360.0);
+        q.transformPoint(c);
+        c.normalize();
+        return c;
+    }
+    
     // random number between -1.0 and 1.0
     private static double randUnit() {
         return -2.0 * Math.random() + 1.0;
