@@ -114,6 +114,21 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Divides this quaternion by another quaternion. This operation is equivalent to multiplying
+     * with the quaternion after calling {@link #invert()} on it.
+     * 
+     * @param quat to divide with
+     */
+    public void divide(Quaternion quat) {
+        double x = this.w * -quat.x + this.x * quat.w + this.y * -quat.z - this.z * -quat.y;
+        double y = this.w * -quat.y + this.y * quat.w + this.z * -quat.x - this.x * -quat.z;
+        double z = this.w * -quat.z + this.z * quat.w + this.x * -quat.y - this.y * -quat.x;
+        double w = this.w * quat.w - this.x * -quat.x - this.y * -quat.y - this.z * -quat.z;
+        this.x = x; this.y = y; this.z = z; this.w = w;
+        this.normalize();
+    }
+
+    /**
      * Multiplies this quaternion with another quaternion. The result is stored in this quaternion.
      * 
      * @param quat to multiply with
@@ -306,6 +321,9 @@ public class Quaternion implements Cloneable {
         );
     }
 
+    /**
+     * Inverts this Quaternion.
+     */
     public void invert() {
         this.x = -this.x;
         this.y = -this.y;
@@ -328,7 +346,8 @@ public class Quaternion implements Cloneable {
     }
 
     /**
-     * Performs a multiplication between two quaternions
+     * Performs a multiplication between two quaternions.
+     * A new quaternion instance is returned.
      * 
      * @param q1
      * @param q2
@@ -337,6 +356,20 @@ public class Quaternion implements Cloneable {
     public static Quaternion multiply(Quaternion q1, Quaternion q2) {
         Quaternion result = q1.clone();
         result.multiply(q2);
+        return result;
+    }
+
+    /**
+     * Performs a division between two quaternions.
+     * A new quaternion instance is returned.
+     * 
+     * @param q1
+     * @param q2
+     * @return q1 / q2
+     */
+    public static Quaternion divide(Quaternion q1, Quaternion q2) {
+        Quaternion result = q1.clone();
+        result.divide(q2);
         return result;
     }
 
