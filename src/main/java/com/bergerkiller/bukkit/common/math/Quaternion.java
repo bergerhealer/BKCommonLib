@@ -207,16 +207,19 @@ public class Quaternion implements Cloneable {
         double roll;
         double pitch;
         double yaw;
-        final double test = w * x - y * z;
-        if (Math.abs(test) < (0.5 - 1E-20)) {
-            roll = Math.atan2(2 * (w * z + x * y), 1 - 2 * (x * x + z * z));
-            pitch = Math.asin(2 * test);
-            yaw = Math.atan2(2 * (w * y + z * x), 1 - 2 * (x * x + y * y));
+        final double test = 2.0 * (w * x - y * z);
+        if (Math.abs(test) < (1.0 - 1E-15)) {
+            // Standard angle
+            roll = Math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (x * x + z * z));
+            pitch = Math.asin(test);
+            yaw = Math.atan2(2.0 * (w * y + z * x), 1.0 - 2.0 * (x * x + y * y));
         } else {
-            final int sign = (test < 0) ? -1 : 1;
-            roll = 0;
-            pitch = sign * Math.PI / 2;
-            yaw = -sign * 2 * Math.atan2(z, w);
+            // This is at the pitch=90.0 or pitch=-90.0 singularity
+            // All we can do is yaw (or roll) around the vertical axis
+            final double sign = (test < 0) ? -1.0 : 1.0;
+            roll = 0.0;
+            pitch = sign * Math.PI / 2.0;
+            yaw = -sign * 2.0 * Math.atan2(z, w);
         }
         if (yaw > Math.PI) {
             yaw -= 2.0 * Math.PI;

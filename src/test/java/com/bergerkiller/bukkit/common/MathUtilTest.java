@@ -78,6 +78,39 @@ public class MathUtilTest {
     }
 
     @Test
+    public void testQuaternionYPRSingularity() {
+        // Verify that, as the quaternion approaches a pitch of 90 degrees, the yaw/pitch/roll stays accurate
+        // If there is an error here, it can happen an angle is calculated that is completely out of whack
+        double exp = 1.0;
+        double angle;
+        do {
+            // Slowly approach 90.0 but never quite reach it
+            exp += 0.01;
+            angle = 90.0 * (1.0 - (1.0 / (double) (Math.exp(exp))));
+
+            Quaternion q = Quaternion.fromYawPitchRoll(angle, 90.0, 0.0);
+            Vector ypr = q.getYawPitchRoll();
+            assertEquals(angle, ypr.getX(), 0.00001);
+            assertEquals(90.0, ypr.getY(), 0.00001);
+            assertEquals(0.0, ypr.getZ(), 0.00001);
+        } while (angle != 90.0);
+
+        // Repeat for -90.0
+        exp = 1.0;
+        do {
+            // Slowly approach -90.0 but never quite reach it
+            exp += 0.01;
+            angle = -90.0 * (1.0 - (1.0 / (double) (Math.exp(exp))));
+
+            Quaternion q = Quaternion.fromYawPitchRoll(angle, 90.0, 0.0);
+            Vector ypr = q.getYawPitchRoll();
+            assertEquals(angle, ypr.getX(), 0.00001);
+            assertEquals(90.0, ypr.getY(), 0.00001);
+            assertEquals(0.0, ypr.getZ(), 0.00001);
+        } while (angle != -90.0);
+    }
+
+    @Test
     public void testQuaternionRotation() {
         // Perform the same rotations with a normal 4x4 transform matrix, and a quaternion
         Matrix4x4 transform = new Matrix4x4();
