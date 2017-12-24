@@ -314,6 +314,20 @@ public class MathUtilTest {
             assertEquals(1.0, result_up.getY(), 0.01);
             assertEquals(0.0, result_up.getZ(), 0.01);
         }
+
+        // Verify special cases where up is 180-degrees rotated
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                Vector dir = new Vector(dx, 0.0, dz);
+                Vector up = new Vector(0.0, -1.0, 0.0);
+                Quaternion q = Quaternion.fromLookDirection(dir, up);
+                dir.normalize();
+                up.normalize();
+                testVectorsEqual(dir, q.forwardVector());
+                testVectorsEqual(up, q.upVector());
+            }
+        }
     }
 
     @Test

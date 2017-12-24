@@ -441,6 +441,41 @@ public class Quaternion implements Cloneable {
     /**
      * Creates a quaternion that transforms the input vector (u) into the output vector (v).
      * The vectors do not have to be unit vectors for this function to work.
+     * The d vector specifies an axis to rotate around when a 180-degree rotation is encountered.
+     * 
+     * @param u input vector (from)
+     * @param v expected output vector (to)
+     * @param d direction axis around which to rotate for 180-degree angles
+     * @return quaternion that rotates u to become v
+     */
+    public static Quaternion fromToRotation(Vector u, Vector v, Vector d) {
+        // xyz = cross(u, v), w = dot(u, v)
+        // add magnitude of quaternion to w, then normalize it
+        double dot = u.dot(v);
+        Quaternion q = new Quaternion();
+        q.x = u.getY() * v.getZ() - v.getY() * u.getZ();
+        q.y = u.getZ() * v.getX() - v.getZ() * u.getX();
+        q.z = u.getX() * v.getY() - v.getX() * u.getY();
+        q.w = dot;
+        q.w += Math.sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
+        q.normalize();
+
+        // there is a special case for opposite vectors
+        // here the quaternion ends up being 0,0,0,0
+        // after normalization the terms are NaN as a result (0xinf=NaN)
+        if (Double.isNaN(q.w)) {
+            q.x = d.getX();
+            q.y = d.getY();
+            q.z = d.getZ();
+            q.w = 0.0;
+            q.normalize();
+        }
+        return q;
+    }
+
+    /**
+     * Creates a quaternion that transforms the input vector (u) into the output vector (v).
+     * The vectors do not have to be unit vectors for this function to work.
      * 
      * @param u input vector (from)
      * @param v expected output vector (to)
@@ -525,7 +560,7 @@ public class Quaternion implements Cloneable {
         up = dir.getCrossProduct(up).crossProduct(dir);
 
         // Find the rotation from the old up vector to the desired up vector
-        Quaternion lookAt_up = fromToRotation(look_up, up);
+        Quaternion lookAt_up = fromToRotation(look_up, up, dir);
         lookAt_up.multiply(lookAt_dir);
         return lookAt_up;
     }
