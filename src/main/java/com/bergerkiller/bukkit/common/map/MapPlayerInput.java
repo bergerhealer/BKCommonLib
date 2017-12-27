@@ -67,6 +67,15 @@ public class MapPlayerInput implements Tickable {
     }
 
     /**
+     * For how many ticks a key has been held down
+     * 
+     * @return repeat tick count
+     */
+    public int getRepeat() {
+        return this.key_repeat_timer;
+    }
+
+    /**
      * Gets whether the user pressed down a key long enough for it to start auto-repeating
      * 
      * @return True if repeating, False if not
@@ -363,13 +372,13 @@ public class MapPlayerInput implements Tickable {
                 boolean press_a = wasPressed(key);
                 boolean press_b = isPressed(key);
                 if (press_b) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKeyPressed(event); // Repeat!
                     display.onKey(event);
                     display.getRootWidget().onKeyPressed(event);
                     display.getRootWidget().onKey(event);
                 } else if (press_a) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKeyReleased(event);
                     display.getRootWidget().onKeyReleased(event);
                 }
@@ -379,16 +388,16 @@ public class MapPlayerInput implements Tickable {
                 boolean press_a = wasPressed(key);
                 boolean press_b = isPressed(key);
                 if (!press_a && press_b) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKeyPressed(event);
                     display.getRootWidget().onKeyPressed(event);
                 } else if (press_a && !press_b) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKeyReleased(event);
                     display.getRootWidget().onKeyReleased(event);
                 }
                 if (press_b) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKey(event);
                     display.getRootWidget().onKey(event);
                 }
@@ -396,7 +405,7 @@ public class MapPlayerInput implements Tickable {
         } else {
             for (MapPlayerInput.Key key : MapPlayerInput.Key.values()) {
                 if (isPressed(key)) {
-                    MapKeyEvent event = new MapKeyEvent(display, this.player, key);
+                    MapKeyEvent event = new MapKeyEvent(display, this, key);
                     display.onKey(event);
                     display.getRootWidget().onKey(event);
                 }

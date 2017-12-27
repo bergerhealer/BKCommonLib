@@ -12,12 +12,12 @@ import com.bergerkiller.bukkit.common.map.MapPlayerInput;
  */
 public class MapKeyEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
-    private final Player _player;
     private final MapDisplay _map;
     private final MapPlayerInput.Key _key;
+    private final MapPlayerInput _input;
 
-    public MapKeyEvent(MapDisplay map, Player player, MapPlayerInput.Key key) {
-        this._player = player;
+    public MapKeyEvent(MapDisplay map, MapPlayerInput input,  MapPlayerInput.Key key) {
+        this._input = input;
         this._key = key;
         this._map = map;
     }
@@ -28,7 +28,16 @@ public class MapKeyEvent extends Event {
      * @return player
      */
     public Player getPlayer() {
-        return this._player;
+        return this._input.player;
+    }
+
+    /**
+     * Gets the map player input manager responsible for this event
+     * 
+     * @return input
+     */
+    public MapPlayerInput getInput() {
+        return this._input;
     }
 
     /**
@@ -47,6 +56,15 @@ public class MapKeyEvent extends Event {
      */
     public MapPlayerInput.Key getKey() {
         return this._key;
+    }
+
+    /**
+     * Gets the amount of ticks the key has been held down
+     * 
+     * @return repeat counter
+     */
+    public int getRepeat() {
+        return this._input.getRepeat();
     }
 
     @Override
