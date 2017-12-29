@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -84,6 +85,16 @@ public class CommonUtil {
      */
     public static boolean isShuttingDown() {
         return !CommonNMS.getMCServer().isRunning();
+    }
+
+    /**
+     * Gets the amount of ticks that have expired since starting the server.
+     * Every tick this number is incremented by one.
+     * 
+     * @return server tick counter
+     */
+    public static int getServerTicks() {
+        return MinecraftServerHandle.instance().getTicks();
     }
 
     /**

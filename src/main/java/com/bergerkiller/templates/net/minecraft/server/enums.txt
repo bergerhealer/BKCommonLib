@@ -12,6 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 
 class EnumDifficulty {
     public int getId:a();
@@ -22,6 +23,8 @@ class EnumDifficulty {
 class EnumItemSlot {
     public int getIndex:c();
 
+    public String getName:d();
+
     <code>
     public static Object fromIndexRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {
@@ -30,18 +33,6 @@ class EnumItemSlot {
             }
         }
         return null;
-    }
-
-    public org.bukkit.inventory.EquipmentSlot toBukkit() {
-        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) getRaw()).ordinal()];
-    }
-
-    public static Object fromBukkitRaw(org.bukkit.inventory.EquipmentSlot slot) {
-        return T.getType().getEnumConstants()[slot.ordinal()];
-    }
-
-    public static EnumItemSlotHandle fromBukkit(org.bukkit.inventory.EquipmentSlot slot) {
-        return createHandle(T.getType().getEnumConstants()[slot.ordinal()]);
     }
     </code>
 }

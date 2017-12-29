@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,6 +34,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -592,6 +595,14 @@ public class CommonMapController implements PacketListener, Listener {
             for (MapSession session : map.sessions) {
                 session.updatePlayerOnline(player);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected synchronized void onPlayerQuit(PlayerQuitEvent event) {
+        MapPlayerInput input = this.playerInputs.remove(event.getPlayer());
+        if (input != null) {
+            input.onDisconnected();
         }
     }
 
@@ -1218,8 +1229,15 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
-            for (MapPlayerInput input : playerInputs.values()) {
-                input.onTick();
+            Iterator<Map.Entry<Player, MapPlayerInput>> iter = playerInputs.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Player, MapPlayerInput> entry = iter.next();
+                if (entry.getKey().isOnline()) {
+                    entry.getValue().onTick();
+                } else {
+                    entry.getValue().onDisconnected();
+                    iter.remove();
+                }
             }
         }
     }

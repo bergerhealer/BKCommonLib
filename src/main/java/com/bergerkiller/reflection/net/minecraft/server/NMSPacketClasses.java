@@ -1333,7 +1333,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutSpawnEntity extends NMSPacket {
         public final FieldAccessor<Integer> entityId = PacketPlayOutSpawnEntityHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<UUID> UUID = PacketPlayOutSpawnEntityHandle.T.entityUUID.toFieldAccessor();
+        public final FieldAccessor<UUID> UUID = PacketPlayOutSpawnEntityHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new java.util.UUID(0L, 0L));
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {

@@ -509,12 +509,17 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
-        return EnumItemSlotHandle.createHandle(enumItemSlotHandle).toBukkit();
+        return ItemSlotConversion.getEquipmentSlot(enumItemSlotHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static int enumItemSlotToIndex(Object nmsEnumItemSlot) {
         return EnumItemSlotHandle.T.getIndex.invoke(nmsEnumItemSlot);
+    }
+
+    @ConverterMethod
+    public static int equipmentSlotToIndex(EquipmentSlot equipmentSlot) {
+        return enumItemSlotToIndex(HandleConversion.toEnumItemSlotHandle(equipmentSlot));
     }
 
     @ConverterMethod(output="net.minecraft.server.EnumItemSlot")

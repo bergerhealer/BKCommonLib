@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.TickTracker;
 import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
@@ -32,10 +33,35 @@ public class MapPlayerInput implements Tickable {
     private boolean _fakeMountShown = false;
     private boolean _isIntercepting = false;
     private boolean _newInterceptState = false;
+    private final TickTracker _inputTickTracker = new TickTracker();
+    private int _resetInterceptTimeout = 0; // after this timeout expires, input interception is forcibly disabled
     public final Player player;
 
     public MapPlayerInput(Player player) {
         this.player = player;
+        this._inputTickTracker.setRunnable(new Runnable() {
+            @Override
+            public void run() {
+                _isIntercepting = _newInterceptState;
+                if (_resetInterceptTimeout < 4) {
+                    _resetInterceptTimeout++;
+                } else {
+                    _newInterceptState = false;
+                }
+
+                updateInterception(_isIntercepting);
+                if (!player.isInsideVehicle() && !_fakeMountShown) {
+                    receiveInput(0, 0, 0);
+                }
+
+                last_dx = curr_dx;
+                last_dy = curr_dy;
+                last_dz = curr_dz;
+                curr_dx = recv_dx;
+                curr_dy = recv_dy;
+                curr_dz = recv_dz;
+            }
+        });
         reset();
     }
 
@@ -326,29 +352,18 @@ public class MapPlayerInput implements Tickable {
     }
 
     /**
+     * Called when the player is no longer online
+     */
+    public void onDisconnected() {
+        reset();
+    }
+
+    /**
      * Updates the internal input state.
      */
     @Override
     public void onTick() {
-        this._isIntercepting = this._newInterceptState;
-        this._newInterceptState = false; // any displays intercepting will set it back True
-        if (this.player.isOnline()) {
-            updateInterception(this._isIntercepting);
-            if (!player.isInsideVehicle() && !_fakeMountShown) {
-                receiveInput(0, 0, 0);
-            }
-
-            // Every tick the state is updated
-            // We must make sure to do this only every tick!
-            last_dx = curr_dx;
-            last_dy = curr_dy;
-            last_dz = curr_dz;
-            curr_dx = recv_dx;
-            curr_dy = recv_dy;
-            curr_dz = recv_dz;
-        } else {
-            reset();
-        }
+        this._inputTickTracker.update();
     }
 
     /**
@@ -359,7 +374,9 @@ public class MapPlayerInput implements Tickable {
      * @param interceptInput whether input is intercepted
      */
     public void handleDisplayUpdate(MapDisplay display, boolean interceptInput) {
+        this._inputTickTracker.update();
         this._newInterceptState |= interceptInput;
+        this._resetInterceptTimeout = 0;
 
         // Check if there are any receiving displays at all
         if (!interceptInput) {

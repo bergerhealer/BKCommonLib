@@ -51,8 +51,8 @@ public class ModelInfoLookup {
         // Similarly, the liquid inside potion bottles have a color set
         if (
                 type == Material.POTION ||
-                type == Material.LINGERING_POTION ||
-                type == Material.SPLASH_POTION
+                type.name().equals("LINGERING_POTION") ||
+                type.name().equals("SPLASH_POTION")
         ) {
             int color = getPotionColor(item.getDurability());
 
@@ -241,15 +241,15 @@ public class ModelInfoLookup {
             // Perform renames needed to get the correct item model name
             if (type == Material.POTION) {
                 itemName = "bottle_drinkable";
-            } else if (type == Material.LINGERING_POTION) {
+            } else if (type.name().equals("LINGERING_POTION")) {
                 itemName = "bottle_lingering";
-            } else if (type == Material.SPLASH_POTION) {
+            } else if (type.name().equals("SPLASH_POTION")) {
                 itemName = "bottle_splash";
             } else if (type == Material.WOOD_DOOR) {
                 itemName = "oak_door";
             } else if (type == Material.BOAT) {
                 itemName = "oak_boat";
-            } else if (type == Material.TOTEM) {
+            } else if (type.name().equals("TOTEM")) {
                 itemName = "totem"; // totem_of_undying otherwise
             } else if (type == Material.COOKED_FISH || type == Material.RAW_FISH) {
                 itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);

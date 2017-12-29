@@ -16,6 +16,14 @@ class MinecraftServer {
 
     public String getResourcePackHash();
 
+#if version >= 1.11
+    public int getTicks:aq();
+#elseif version >= 1.9
+    public int getTicks:ap();
+#else
+    public int getTicks:at();
+#endif
+
     <code>
     public static MinecraftServerHandle instance() {
         return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();

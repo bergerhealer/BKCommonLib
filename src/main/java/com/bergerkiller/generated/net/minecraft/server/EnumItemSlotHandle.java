@@ -22,6 +22,7 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract int getIndex();
+    public abstract String getName();
 
     public static Object fromIndexRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {
@@ -31,24 +32,13 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
         }
         return null;
     }
-
-    public org.bukkit.inventory.EquipmentSlot toBukkit() {
-        return org.bukkit.inventory.EquipmentSlot.values()[((Enum<?>) getRaw()).ordinal()];
-    }
-
-    public static Object fromBukkitRaw(org.bukkit.inventory.EquipmentSlot slot) {
-        return T.getType().getEnumConstants()[slot.ordinal()];
-    }
-
-    public static EnumItemSlotHandle fromBukkit(org.bukkit.inventory.EquipmentSlot slot) {
-        return createHandle(T.getType().getEnumConstants()[slot.ordinal()]);
-    }
     /**
      * Stores class members for <b>net.minecraft.server.EnumItemSlot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumItemSlotClass extends Template.Class<EnumItemSlotHandle> {
         public final Template.Method<Integer> getIndex = new Template.Method<Integer>();
+        public final Template.Method<String> getName = new Template.Method<String>();
 
     }
 

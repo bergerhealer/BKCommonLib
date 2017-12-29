@@ -41,7 +41,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
@@ -339,7 +338,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
     public static Object toEnumItemSlotHandle(EquipmentSlot equipmentSlot) {
-        return EnumItemSlotHandle.fromBukkitRaw(equipmentSlot);
+        return ItemSlotConversion.getEnumItemSlot(equipmentSlot);
     }
 
     @ConverterMethod(input="net.minecraft.server.AttributeMapBase")
