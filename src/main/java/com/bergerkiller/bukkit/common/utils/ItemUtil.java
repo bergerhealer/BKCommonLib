@@ -762,7 +762,12 @@ public class ItemUtil {
      * @return item variants
      */
     public static List<ItemStack> getItemVariants(Material itemType) {
-        return ItemHandle.createHandle(HandleConversion.toItemHandle(itemType)).getItemVariants(CreativeModeTabHandle.SEARCH);
+        Object itemHandle = HandleConversion.toItemHandle(itemType);
+        if (itemHandle == null) {
+            return new ArrayList<ItemStack>(0);
+        } else {
+            return ItemHandle.createHandle(itemHandle).getItemVariants(CreativeModeTabHandle.SEARCH);
+        }
     }
 
     /**

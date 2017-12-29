@@ -130,13 +130,13 @@ public class TemplateTest {
     }
 
     @Test
-    public void testBlockStepSound() {
+    public void testBlockPlaceSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
         ResourceKey stepName = BlockData.fromMaterial(Material.WOOD).getPlaceSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.wood.place", stepName.getPath());
         } else {
-            assertEquals("step.wood", stepName.getPath());
+            assertEquals("minecraft:dig.wood", stepName.getPath());
         }
     }
 
@@ -148,7 +148,7 @@ public class TemplateTest {
         }
         throw new IllegalStateException("None of these optional template members could be found");
     }
-    
+
     private String trimAfter(String path, String prefix) {
         int idx = path.indexOf(prefix);
         if (idx != -1) {

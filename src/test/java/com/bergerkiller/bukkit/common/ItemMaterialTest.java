@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,9 +11,12 @@ import java.util.TreeMap;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
+import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -238,6 +242,54 @@ public class ItemMaterialTest {
         assertEquals("awesome!", tag.getValue("test"));
     }
 
+    // Only works on MC 1.12.1 - generate an item variants yaml configuration
+    // This configuration is used on MC < 1.12.1
+    @Ignore
+    @Test
+    public void generateVariantsConfig() {
+        FileConfiguration config = new FileConfiguration("test.yml");
+        for (Material m : Material.values()) {
+            List<ItemStack> items = ItemUtil.getItemVariants(m);
+            
+            if (items.size() == 0) {
+                // Material has no variants at all
+                continue;
+            }
+
+            if (items.size() != 1 || !items.get(0).equals(new ItemStack(m))) {
+                int dur_start = items.get(0).getDurability();
+                int dur_end = items.get(items.size() - 1).getDurability();
+                boolean validRange = true;
+                Iterator<ItemStack> it = items.iterator();
+                for (int dur = dur_start; dur <= dur_end; dur++) {
+                    ItemStack t = new ItemStack(m, 1, (short) dur);
+                    if (!it.hasNext() || !it.next().equals(t)) {
+                        validRange = false;
+                        break;
+                    }
+                }
+                if (validRange) {
+                    System.out.println("registerRange(\"" + m.name() + "\", " + dur_start + ", " + dur_end + ");");
+                } else {
+                    // 'Weird'
+                    ConfigurationNode node = config.getNode(m.toString());
+                    for (int i = 0; i < items.size(); i++) {
+                        node.set("item" + i, items.get(i));
+                    }
+                    //System.out.println(node.toString());
+                }
+                
+
+            }
+        }
+        config.save();
+    }
+
+    @Test
+    public void lol() {
+        
+    }
+    
     @Test
     public void testItemVariants() {
         // All 16 wool colors should be returned here

@@ -28,6 +28,8 @@ public abstract class CraftWorldHandle extends Template.Handle {
      */
     public static final class CraftWorldClass extends Template.Class<CraftWorldHandle> {
         public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
+        @Template.Optional
+        public final Template.Method<Void> playSound = new Template.Method<Void>();
 
     }
 

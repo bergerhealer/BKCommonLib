@@ -41,8 +41,6 @@ public abstract class PlayerChunkHandle extends Template.Handle {
             }
         }
     }
-    public abstract PlayerChunkMapHandle getPlayerChunkMap();
-    public abstract void setPlayerChunkMap(PlayerChunkMapHandle value);
     public abstract List<Player> getPlayers();
     public abstract void setPlayers(List<Player> value);
     public abstract IntVector2 getLocation();
@@ -53,12 +51,13 @@ public abstract class PlayerChunkHandle extends Template.Handle {
     public abstract void setDirtySectionMask(int value);
     public abstract boolean isDone();
     public abstract void setDone(boolean value);
+    public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract void setPlayerChunkMap(PlayerChunkMapHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerChunkClass extends Template.Class<PlayerChunkHandle> {
-        public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMap = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
         public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
         @Template.Optional
@@ -66,6 +65,7 @@ public abstract class PlayerChunkHandle extends Template.Handle {
         public final Template.Field.Integer dirtyCount = new Template.Field.Integer();
         public final Template.Field.Integer dirtySectionMask = new Template.Field.Integer();
         public final Template.Field.Boolean done = new Template.Field.Boolean();
+        public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMap = new Template.Field.Converted<PlayerChunkMapHandle>();
 
         public final Template.Method.Converted<Void> addPlayer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> removePlayer = new Template.Method.Converted<Void>();

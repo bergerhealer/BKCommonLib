@@ -26,6 +26,11 @@ public class ConfigTest {
 
     @Test
     public void testYAMLLoadSave() {
+        // Don't run <= 1.8.8
+        if (Common.evaluateMCVersion("<=", "1.8.8")) {
+            return;
+        }
+
         FileConfiguration config = new FileConfiguration("test.yml");
         ItemStack testItem = new ItemStack(Material.DIAMOND_SWORD, 1, (short) 100);
         config.load();

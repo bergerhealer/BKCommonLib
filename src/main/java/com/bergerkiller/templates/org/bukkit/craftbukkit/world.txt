@@ -2,4 +2,6 @@ package org.bukkit.craftbukkit;
 
 class CraftWorld {
     public (Object) net.minecraft.server.WorldServer getHandle();
+
+    public optional void playSound(Location loc, String sound, float volume, float pitch);
 }
