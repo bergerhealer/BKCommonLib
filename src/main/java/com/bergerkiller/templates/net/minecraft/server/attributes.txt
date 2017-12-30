@@ -17,8 +17,13 @@ class AttributeInstance {
 }
 
 class GenericAttributes {
+#if version >= 1.8.4
     public static final (Object) IAttribute FOLLOW_RANGE;
     public static final (Object) IAttribute MOVEMENT_SPEED;
+#else
+    public static final (Object) IAttribute FOLLOW_RANGE:b;
+    public static final (Object) IAttribute MOVEMENT_SPEED:d;
+#endif
 
     public static void loadFromNBT:a((AttributeMapServerHandle) AttributeMapBase attributemapbase, (CommonTagList) NBTTagList nbttaglist);
 

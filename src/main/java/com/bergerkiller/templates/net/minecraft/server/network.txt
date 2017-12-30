@@ -4,7 +4,12 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class NetworkManager {
     private final unknown EnumProtocolDirection h;
+
+#if version >= 1.8.4
     public io.netty.channel.Channel channel;
+#else
+    public io.netty.channel.Channel channel:k;
+#endif
 
 #if version >= 1.9
     public boolean isConnected();

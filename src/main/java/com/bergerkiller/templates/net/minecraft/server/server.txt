@@ -20,8 +20,10 @@ class MinecraftServer {
     public int getTicks:aq();
 #elseif version >= 1.9
     public int getTicks:ap();
-#else
+#elseif version >= 1.8.4
     public int getTicks:at();
+#else
+    public int getTicks:as();
 #endif
 
     <code>

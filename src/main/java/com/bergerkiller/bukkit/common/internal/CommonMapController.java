@@ -445,6 +445,7 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public synchronized void onPacketSend(PacketSendEvent event) {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {    
@@ -529,7 +530,7 @@ public class CommonMapController implements PacketListener, Listener {
                     newMapItem.setDurability(newMapId);
                     item = item.clone();
                     item.setValue(newMapItem, item.isChanged());
-                    itemsIter.set(CommonUtil.unsafeCast(item));
+                    itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);
                 }
             }
         }

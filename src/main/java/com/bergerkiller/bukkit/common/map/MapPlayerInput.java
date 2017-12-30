@@ -50,7 +50,7 @@ public class MapPlayerInput implements Tickable {
                 }
 
                 updateInterception(_isIntercepting);
-                if (!player.isInsideVehicle() && !_fakeMountShown) {
+                if (!MapPlayerInput.this.player.isInsideVehicle() && !_fakeMountShown) {
                     receiveInput(0, 0, 0);
                 }
 

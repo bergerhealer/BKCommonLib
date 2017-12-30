@@ -12,15 +12,15 @@ import com.google.gson.JsonParseException;
 public class VariantListDeserializer implements JsonDeserializer<BlockModelState.VariantList> {
 
     @Override
-    public BlockModelState.VariantList deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public BlockModelState.VariantList deserialize(JsonElement jsonElement, Type type, final JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         BlockModelState.VariantList list = new BlockModelState.VariantList();
         if (jsonElement.isJsonArray()) {
             JsonArray array = jsonElement.getAsJsonArray();
             for (JsonElement arrayElement : array) {
-                list.add(jsonDeserializationContext.deserialize(arrayElement, BlockModelState.Variant.class));
+                list.add((BlockModelState.Variant) jsonDeserializationContext.deserialize(arrayElement, BlockModelState.Variant.class));
             }
         } else {
-            list.add(jsonDeserializationContext.deserialize(jsonElement, BlockModelState.Variant.class));
+            list.add((BlockModelState.Variant) jsonDeserializationContext.deserialize(jsonElement, BlockModelState.Variant.class));
         }
         return list;
     }

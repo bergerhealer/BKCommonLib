@@ -30,7 +30,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
     public abstract List<Item<?>> unwatchAndReturnAllWatched();
     public abstract List<Item<?>> returnAllWatched();
-    public abstract Item<?> read(Key<?> key);
+    public abstract Item<Object> read(Key<?> key);
     public abstract boolean isChanged();
     public abstract boolean isEmpty();
 
@@ -71,7 +71,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         @Template.Optional
         public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Item<?>> read = new Template.Method.Converted<Item<?>>();
+        public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         @Template.Optional

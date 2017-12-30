@@ -15,6 +15,10 @@ class Item {
     public String getInternalName:a((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #elseif version >= 1.9
     public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#elseif version >= 1.8.6
+    public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#elseif version >= 1.8.5
+    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #else
     public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #endif

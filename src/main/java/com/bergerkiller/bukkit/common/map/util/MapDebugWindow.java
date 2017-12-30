@@ -27,7 +27,7 @@ public class MapDebugWindow {
     private final MapCanvas map;
     private final int scale;
 
-    private MapDebugWindow(JLabel label, MapCanvas map, int scale) {
+    private MapDebugWindow(final JLabel label, MapCanvas map, int scale) {
         this.map = map;
         this.scale = scale;
         this.label = label;

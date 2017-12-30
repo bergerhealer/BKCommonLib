@@ -211,6 +211,8 @@ public abstract class EntityHandle extends Template.Handle {
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
+    public abstract Entity getBukkitEntityField();
+    public abstract void setBukkitEntityField(Entity value);
     public abstract int getIdField();
     public abstract void setIdField(int value);
     public abstract EntityHandle getVehicle();
@@ -303,8 +305,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setDimension(int value);
     public abstract boolean isValid();
     public abstract void setValid(boolean value);
-    public abstract Entity getBukkitEntityField();
-    public abstract void setBukkitEntityField(Entity value);
     /**
      * Stores class members for <b>net.minecraft.server.Entity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -326,6 +326,7 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
+        public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Converted<List<EntityHandle>> opt_passengers = new Template.Field.Converted<List<EntityHandle>>();
@@ -382,7 +383,6 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
-        public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
 
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();

@@ -111,7 +111,7 @@ class PlayerChunkMap {
 #elseif version >= 1.9
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:b(int x, int z);
-#elseif version >= 1.8.8
+#else
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:???(int x, int z);
 #endif

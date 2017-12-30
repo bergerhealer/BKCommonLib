@@ -56,7 +56,11 @@ class ItemStack {
 
     public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 
+#if version >= 1.8.8
     public (ItemStackHandle) ItemStack cloneAndSubtract(int n);
+#else
+    public (ItemStackHandle) ItemStack cloneAndSubtract:a(int n);
+#endif
 
     public (ItemStackHandle) ItemStack cloneItemStack();
 

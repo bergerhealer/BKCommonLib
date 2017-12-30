@@ -197,6 +197,12 @@ public class BlockDataImpl extends BlockData {
             if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
                 // Bukkit bugfix.
                 this.materialData = new org.bukkit.material.PressurePlate(type, (byte) this.getRawData());
+            } else if (
+                    type == Material.JUNGLE_DOOR || type == Material.ACACIA_DOOR ||
+                    type == Material.DARK_OAK_DOOR || type == Material.SPRUCE_DOOR ||
+                    type == Material.BIRCH_DOOR) {
+                // Bukkit bugfix. (<= 1.8.3)
+                this.materialData = new org.bukkit.material.Door(type, (byte) this.getRawData());
             } else {
                 this.materialData = type.getNewData((byte) this.getRawData());
             }

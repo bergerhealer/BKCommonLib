@@ -354,7 +354,7 @@ public class MathUtilTest {
         } else {
             c = new Vector(0.0, 1.0, 0.0);
         }
-        c = dir.getCrossProduct(c);
+        c = dir.clone().crossProduct(c);
 
         // Rotate randomly between 0 ... 360 degrees
         Quaternion q = Quaternion.fromAxisAngles(dir, Math.random() * 360.0);

@@ -557,7 +557,7 @@ public class Quaternion implements Cloneable {
         Vector look_up = lookAt_dir.upVector();
 
         // Ensure up is orthogonal to dir
-        up = dir.getCrossProduct(up).crossProduct(dir);
+        up = dir.clone().crossProduct(up).crossProduct(dir);
 
         // Find the rotation from the old up vector to the desired up vector
         Quaternion lookAt_up = fromToRotation(look_up, up, dir);

@@ -190,40 +190,42 @@ public class Common {
         }
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
-        if (Common.MC_VERSION.equals("1.8.8")) {
+        if (Common.evaluateMCVersion("<=", "1.8.8")) {
+            final String nms_root = SERVER.getClassName("net.minecraft.server.Entity").replace(".Entity", "");
+
             Resolver.registerClassResolver(new ClassPathResolver() {
                 @Override
                 public String resolveClassPath(String classPath) {
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.MobSpawnerData")) {
-                        return "net.minecraft.server.v1_8_R3.MobSpawnerAbstract$a";
+                    if (classPath.equals(nms_root + ".MobSpawnerData")) {
+                        return nms_root + ".MobSpawnerAbstract$a";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.SoundEffectType")) {
-                        return "net.minecraft.server.v1_8_R3.Block$StepSound"; // workaround
+                    if (classPath.equals(nms_root + ".SoundEffectType")) {
+                        return nms_root + ".Block$StepSound"; // workaround
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcher$Item")) {
-                        return "net.minecraft.server.v1_8_R3.DataWatcher$WatchableObject";
+                    if (classPath.equals(nms_root + ".DataWatcher$Item")) {
+                        return nms_root + ".DataWatcher$WatchableObject";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.PlayerChunk")) {
-                        return "net.minecraft.server.v1_8_R3.PlayerChunkMap$PlayerChunk"; // nested on 1.8.8
+                    if (classPath.equals(nms_root + ".PlayerChunk")) {
+                        return nms_root + ".PlayerChunkMap$PlayerChunk"; // nested on 1.8.8
                     }
 
                     // We proxy a bunch of classes, because they don't exist in 1.8.8
                     // Writing custom wrappers with switches would be too tiresome
                     // This allows continued use of the same API without trouble
                     // Converters take care to convert between the Class and Id used internally
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.EnumItemSlot")) {
+                    if (classPath.equals(nms_root + ".EnumItemSlot")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataPaletteBlock")) {
+                    if (classPath.equals(nms_root + ".DataPaletteBlock")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.DataWatcherObject")) {
+                    if (classPath.equals(nms_root + ".DataWatcherObject")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.MobEffectList")) {
+                    if (classPath.equals(nms_root + ".MobEffectList")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList";
                     }
-                    if (classPath.equals("net.minecraft.server.v1_8_R3.SoundEffect")) {
+                    if (classPath.equals(nms_root + ".SoundEffect")) {
                         return "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect";
                     }
                     return classPath;
