@@ -1,0 +1,5 @@
+package org.bukkit;
+
+class World {
+    public optional void playSound(Location loc, String sound, float volume, float pitch);
+}

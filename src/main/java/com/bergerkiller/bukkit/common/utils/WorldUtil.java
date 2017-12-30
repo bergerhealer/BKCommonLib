@@ -912,7 +912,7 @@ public class WorldUtil extends ChunkUtil {
                     volume, pitch);
         } else {
             // MC >= 1.9: we can use Bukkit's API for this!
-            CraftWorldHandle.T.playSound.invoke(location.getWorld(),
+            com.bergerkiller.generated.org.bukkit.WorldHandle.T.playSound.invoke(location.getWorld(),
                     location, soundKey.toMinecraftKey().getName(), volume, pitch);
         }
     }

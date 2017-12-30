@@ -2,13 +2,14 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.org.bukkit.WorldHandle;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.CraftWorld</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public abstract class CraftWorldHandle extends Template.Handle {
+public abstract class CraftWorldHandle extends WorldHandle {
     /** @See {@link CraftWorldClass} */
     public static final CraftWorldClass T = new CraftWorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(CraftWorldHandle.class, "org.bukkit.craftbukkit.CraftWorld");
@@ -28,8 +29,6 @@ public abstract class CraftWorldHandle extends Template.Handle {
      */
     public static final class CraftWorldClass extends Template.Class<CraftWorldHandle> {
         public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
-        @Template.Optional
-        public final Template.Method<Void> playSound = new Template.Method<Void>();
 
     }
 

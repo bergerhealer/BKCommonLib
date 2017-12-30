@@ -4,6 +4,7 @@
 #include /org/bukkit/entity.txt
 #include /org/bukkit/inventory.txt
 #include /org/bukkit/blockstate.txt
+#include /org/bukkit/world.txt
 #include /org/bukkit/craftbukkit/entity.txt
 #include /org/bukkit/craftbukkit/world.txt
 #include /org/bukkit/craftbukkit/block.txt
