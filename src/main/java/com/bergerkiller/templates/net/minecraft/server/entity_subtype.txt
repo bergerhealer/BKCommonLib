@@ -112,11 +112,16 @@ class EntityLiving extends Entity {
     public float sideMovement:bd;
     public float forwardMovement:be;
     public unknown float bf;
-#else
+#elseif version >= 1.8.3
     protected unknown boolean aY;
     public float sideMovement:aZ;
     public float forwardMovement:ba;
     protected unknown float bb;
+#else
+    protected unknown boolean aW;
+    public float sideMovement:aX;
+    public float forwardMovement:aY;
+    protected unknown float aZ;
 #endif
 
     public boolean updateEffects;
@@ -129,7 +134,11 @@ class EntityLiving extends Entity {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
 #endif
 
+#if version >= 1.8.3
     protected void resetAttributes:initAttributes();
+#else
+    protected void resetAttributes:aW();
+#endif
 
     public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
 
@@ -160,8 +169,10 @@ class EntityHuman extends EntityLiving {
     public boolean sleeping;
 #if version >= 1.9
     public (IntVector3) BlockPosition bedPosition;
-#else
+#elseif version >= 1.8.3
     public (IntVector3) BlockPosition bedPosition:bx;
+#else
+    public (IntVector3) BlockPosition bedPosition:bv;
 #endif
     public int sleepTicks;
 
@@ -194,9 +205,15 @@ class EntityHuman extends EntityLiving {
     private (IntVector3) BlockPosition spawnCoord:e;
     private boolean spawnForced:f;
     private unknown BlockPosition g;
-#else
+#elseif version >= 1.8.3
     public unknown float by;
     public unknown float bz;
+    private (IntVector3) BlockPosition spawnCoord:c;
+    private boolean spawnForced:d;
+    private unknown BlockPosition e;
+#else
+    public unknown float bw;
+    public unknown float bx;
     private (IntVector3) BlockPosition spawnCoord:c;
     private boolean spawnForced:d;
     private unknown BlockPosition e;
@@ -235,7 +252,7 @@ class EntityHuman extends EntityLiving {
     protected unknown float bO;
     private unknown int bQ;
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bR;
-#else
+#elseif version >= 1.8.3
     private unknown int f;
     private unknown ItemStack g;
     private unknown int h;
@@ -243,6 +260,14 @@ class EntityHuman extends EntityLiving {
     protected unknown float bF;
     private unknown int i;
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bH;
+#else
+    private unknown int f;
+    private unknown ItemStack g;
+    private unknown int h;
+    protected unknown float bC;
+    protected unknown float bD;
+    private unknown int i;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bF;
 #endif
 
     public String spawnWorld;

@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,8 +30,8 @@ public abstract class EntitySliceHandle extends Template.Handle {
 
     public abstract boolean add(Object value);
     public abstract boolean remove(Object value);
-    public abstract List<Object> getListValues();
-    public abstract void setListValues(List<Object> value);
+    public abstract Iterator iterator();
+    public abstract int size();
     /**
      * Stores class members for <b>net.minecraft.server.EntitySlice</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -38,10 +39,13 @@ public abstract class EntitySliceHandle extends Template.Handle {
     public static final class EntitySliceClass extends Template.Class<EntitySliceHandle> {
         public final Template.Constructor.Converted<EntitySliceHandle> constr_oclass = new Template.Constructor.Converted<EntitySliceHandle>();
 
-        public final Template.Field<List<Object>> listValues = new Template.Field<List<Object>>();
+        @Template.Optional
+        public final Template.Field<List<Object>> listValues_1_8_3 = new Template.Field<List<Object>>();
 
         public final Template.Method<Boolean> add = new Template.Method<Boolean>();
         public final Template.Method<Boolean> remove = new Template.Method<Boolean>();
+        public final Template.Method<Iterator> iterator = new Template.Method<Iterator>();
+        public final Template.Method<Integer> size = new Template.Method<Integer>();
 
     }
 

@@ -167,12 +167,19 @@ class Entity {
     public float heightOffset:P;
     public boolean noclip;
     public unknown float R;
-#else
+#elseif version >= 1.8.3
     public unknown double P;
     public unknown double Q;
     public unknown double R;
     public float heightOffset:S;
     public boolean noclip;
+    public unknown float U;
+#else
+    public unknown double P;
+    public unknown double Q;
+    public unknown double R;
+    public float heightOffset:S;
+    public boolean noclip:T;
     public unknown float U;
 #endif
 
@@ -266,9 +273,18 @@ class Entity {
     public int chunkZ:ad;
     public unknown boolean ah;
     public boolean positionChanged:impulse;
-#else
+#elseif version >= 1.8.3
     private unknown double ar;
     private unknown double as;
+    public boolean isLoaded:ad;
+    public int chunkX:ae;
+    public int chunkY:af;
+    public int chunkZ:ag;
+    public unknown boolean ah;
+    public boolean positionChanged:ai;
+#else
+    private unknown double ap;
+    private unknown double aq;
     public boolean isLoaded:ad;
     public int chunkX:ae;
     public int chunkY:af;
@@ -450,8 +466,10 @@ class Entity {
      */
 #if version >= 1.9
     protected boolean hasMovementSound:playStepSound();
-#else
+#elseif version >= 1.8.3
     protected boolean hasMovementSound:s_();
+#else
+    protected boolean hasMovementSound:r_();
 #endif
 
     /*
@@ -513,7 +531,11 @@ class Entity {
 
     public void setPosition(double x, double y, double z);
 
+#if version >= 1.8.3
     public void setSize(float width, float length);
+#else
+    public void setSize:a(float width, float length);
+#endif
 
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
 
@@ -637,8 +659,10 @@ class Entity {
     public void onTick:A_();
 #elseif version >= 1.9
     public void onTick:m();
-#else
+#elseif version >= 1.8.3
     public void onTick:t_();
+#else
+    public void onTick:s_();
 #endif
 
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
@@ -694,8 +718,10 @@ class Entity {
     public int getPortalCooldownMaximum:aE();
 #elseif version >= 1.9
     public int getPortalCooldownMaximum:aC();
-#else
+#elseif version >= 1.8.3
     public int getPortalCooldownMaximum:aq();
+#else
+    public int getPortalCooldownMaximum:ar();
 #endif
 
     // Since MC 1.8.8

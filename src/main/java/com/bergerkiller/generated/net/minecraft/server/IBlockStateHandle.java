@@ -22,14 +22,14 @@ public abstract class IBlockStateHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract String getKeyToken();
-    public abstract String getValueToken(Object value);
+    public abstract String getValueToken(Comparable value);
     /**
      * Stores class members for <b>net.minecraft.server.IBlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IBlockStateClass extends Template.Class<IBlockStateHandle> {
         public final Template.Method<String> getKeyToken = new Template.Method<String>();
-        public final Template.Method<String> getValueToken = new Template.Method<String>();
+        public final Template.Method.Converted<String> getValueToken = new Template.Method.Converted<String>();
 
     }
 

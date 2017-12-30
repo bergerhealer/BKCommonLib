@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>1.12.2</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
-        <project.mountiplexversion>1.22</project.mountiplexversion>
+        <project.mountiplexversion>1.23</project.mountiplexversion>
         <junit.version>4.11</junit.version>
         <project.cibuild/>
     </properties>
@@ -187,6 +187,15 @@
             <version>1.0.4</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Google GSON is not available <= MC 1.8, shade it in -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- Build -->
@@ -251,13 +260,17 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>co.aikar.timings.lib</pattern>
-                                    <shadedPattern>com.bergerkiller.bukkit.common.dep.timingslib</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>co.aikar.timings.lib</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.timingslib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.gson</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.gson</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -271,6 +284,7 @@
                                 <includes>
                                     <include>com.bergerkiller.mountiplex</include>
                                     <include>co.aikar</include>
+                                    <include>com.google.code.gson</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

@@ -32,13 +32,27 @@ class Block {
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-#else
+#elseif version >= 1.8.3
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
         return instance.p();
     }
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
         return instance.r();
+    }
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.isOccluding();
+    }
+    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.isPowerSource();
+    }
+#else
+    // By IBlockData does not exist; proxy to the empty args version
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.n();
+    }
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.p();
     }
     public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isOccluding();
@@ -110,5 +124,9 @@ interface IBlockData {
 interface IBlockState {
     public abstract String getKeyToken:a();
 
-    public abstract String getValueToken:a(T value);
+#if version >= 1.8.3
+    public abstract String getValueToken:a((Comparable) T value);
+#else
+    public abstract String getValueToken:a((Comparable) Comparable value);
+#endif
 }

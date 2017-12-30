@@ -22,8 +22,10 @@ class MinecraftServer {
     public int getTicks:ap();
 #elseif version >= 1.8.4
     public int getTicks:at();
-#else
+#elseif version >= 1.8.3
     public int getTicks:as();
+#else
+    public int getTicks:ar();
 #endif
 
     <code>
@@ -35,6 +37,7 @@ class MinecraftServer {
 
 class PlayerList {
     public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
+
     public (IPlayerFileDataHandle) IPlayerFileData playerFileData;
     protected int maxPlayers;
 

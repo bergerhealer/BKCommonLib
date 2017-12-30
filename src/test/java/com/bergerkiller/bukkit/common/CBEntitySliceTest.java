@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy;
+import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -52,7 +52,7 @@ public class CBEntitySliceTest {
         assertNotNull(result);
         assertEquals(1, result.length);
         assertNotNull(result[0]);
-        assertEquals(EntitySliceProxy.class, result[0].getClass());
+        assertEquals(EntitySliceProxy_1_8_3.class, result[0].getClass());
 
         Converter<Object, Object> conv2 = Conversion.find(typeListArray, typeSliceArray);
         Object[] original = (Object[]) conv2.convert(result);

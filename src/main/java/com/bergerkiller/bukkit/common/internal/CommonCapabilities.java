@@ -57,4 +57,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.9 more than one passenger per vehicle are permitted
      */
     public static final boolean MULTIPLE_PASSENGERS = Common.evaluateMCVersion(">=", "1.9");
+
+    /**
+     * Since Minecraft 1.8.3 EntitySlice class layout was changed
+     */
+    public static final boolean REVISED_CHUNK_ENTITY_SLICE = Common.evaluateMCVersion(">=", "1.8.3");
 }

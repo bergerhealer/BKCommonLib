@@ -10,6 +10,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
+
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -143,8 +145,12 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
         return base.update(arg0, arg1);
     }
 
-    @Override
+    //@Override
     public boolean isPlaced() {
-        return base.isPlaced();
+        if (BlockStateHandle.T.isPlaced.isAvailable()) {
+            return BlockStateHandle.T.isPlaced.invoke(base);
+        } else {
+            return true;
+        }
     }
 }

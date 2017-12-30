@@ -118,8 +118,10 @@ class EnumProtocol {
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
 #elseif version >= 1.9
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:j;
-#else
+#elseif version >= 1.8.3
     private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:j;
+#else
+    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:h;
 #endif
 
     <code>

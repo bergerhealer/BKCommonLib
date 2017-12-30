@@ -17,7 +17,9 @@ import com.bergerkiller.templates.TemplateResolver;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class Common {
@@ -189,48 +191,63 @@ public class Common {
             });
         }
 
-        // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
-        if (Common.evaluateMCVersion("<=", "1.8.8")) {
+        // Register additional version-specific class remappings
+        if (IS_COMPATIBLE) {
             final String nms_root = SERVER.getClassName("net.minecraft.server.Entity").replace(".Entity", "");
+            final Map<String, String> remappings = new HashMap<String, String>();
 
-            Resolver.registerClassResolver(new ClassPathResolver() {
-                @Override
-                public String resolveClassPath(String classPath) {
-                    if (classPath.equals(nms_root + ".MobSpawnerData")) {
-                        return nms_root + ".MobSpawnerAbstract$a";
-                    }
-                    if (classPath.equals(nms_root + ".SoundEffectType")) {
-                        return nms_root + ".Block$StepSound"; // workaround
-                    }
-                    if (classPath.equals(nms_root + ".DataWatcher$Item")) {
-                        return nms_root + ".DataWatcher$WatchableObject";
-                    }
-                    if (classPath.equals(nms_root + ".PlayerChunk")) {
-                        return nms_root + ".PlayerChunkMap$PlayerChunk"; // nested on 1.8.8
-                    }
+            // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
+            if (Common.evaluateMCVersion("<=", "1.8.8")) {
+                remappings.put(nms_root + ".MobSpawnerData", nms_root + ".MobSpawnerAbstract$a");
+                remappings.put(nms_root + ".SoundEffectType", nms_root + ".Block$StepSound"); // workaround
+                remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".DataWatcher$WatchableObject");
+                remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
-                    // We proxy a bunch of classes, because they don't exist in 1.8.8
-                    // Writing custom wrappers with switches would be too tiresome
-                    // This allows continued use of the same API without trouble
-                    // Converters take care to convert between the Class and Id used internally
-                    if (classPath.equals(nms_root + ".EnumItemSlot")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot";
+                // We proxy a bunch of classes, because they don't exist in 1.8.8
+                // Writing custom wrappers with switches would be too tiresome
+                // This allows continued use of the same API without trouble
+                // Converters take care to convert between the Class and Id used internally
+                remappings.put(nms_root + ".EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
+                remappings.put(nms_root + ".DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
+                remappings.put(nms_root + ".DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
+                remappings.put(nms_root + ".MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
+                remappings.put(nms_root + ".SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect");
+            }
+
+            // Some classes were moved before around 1.8
+            if (Common.evaluateMCVersion("<=", "1.8")) {
+                remappings.put(nms_root + ".PacketPlayInUseEntity.EnumEntityUseAction", nms_root + ".EnumEntityUseAction");
+                remappings.put(nms_root + ".MobSpawnerData", nms_root + ".TileEntityMobSpawnerData");
+                remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".WatchableObject");
+                remappings.put(nms_root + ".DataWatcher$WatchableObject", nms_root + ".WatchableObject");
+                remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".EnumScoreboardAction");
+                remappings.put(nms_root + ".PacketPlayOutMapChunk$ChunkMap", nms_root + ".ChunkMap");
+                remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
+                remappings.put(nms_root + ".PacketPlayOutTitle$EnumTitleAction", nms_root + ".EnumTitleAction");
+                remappings.put(nms_root + ".PacketPlayOutCombatEvent$EnumCombatEventType", nms_root + ".EnumCombatEventType");
+                remappings.put(nms_root + ".PacketPlayOutWorldBorder$EnumWorldBorderAction", nms_root + ".EnumWorldBorderAction");
+                remappings.put(nms_root + ".PacketPlayInResourcePackStatus$EnumResourcePackStatus", nms_root + ".EnumResourcePackStatus");
+                remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
+                remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
+                remappings.put(nms_root + ".WeightedRandom$WeightedRandomChoice", nms_root + ".WeightedRandomChoice");
+                remappings.put(nms_root + ".BiomeBase$BiomeMeta", nms_root + ".BiomeMeta");
+                remappings.put(nms_root + ".IScoreboardCriteria$EnumScoreboardHealthDisplay", nms_root + ".EnumScoreboardHealthDisplay");
+                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", nms_root + ".IntHashMapEntry");
+                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
+                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMove", nms_root + ".PacketPlayOutRelEntityMove");
+                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
+            }
+
+            // If remappings exist, add a resolver for them
+            if (!remappings.isEmpty()) {
+                Resolver.registerClassResolver(new ClassPathResolver() {
+                    @Override
+                    public String resolveClassPath(String classPath) {
+                        String remapped = remappings.get(classPath);
+                        return (remapped != null) ? remapped : classPath;
                     }
-                    if (classPath.equals(nms_root + ".DataPaletteBlock")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock";
-                    }
-                    if (classPath.equals(nms_root + ".DataWatcherObject")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject";
-                    }
-                    if (classPath.equals(nms_root + ".MobEffectList")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList";
-                    }
-                    if (classPath.equals(nms_root + ".SoundEffect")) {
-                        return "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect";
-                    }
-                    return classPath;
-                }
-            });
+                });
+            }
         }
 
         // Only do these things when we are compatible

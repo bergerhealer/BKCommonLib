@@ -35,7 +35,7 @@ class PlayerChunk {
     private int dirtyCount;
     private int dirtySectionMask:h;
     private boolean done;
-#else
+#elseif version >= 1.8.3
     public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:???;
     private unknown short[] dirtyBlocks;
     private int dirtyCount;
@@ -44,6 +44,13 @@ class PlayerChunk {
 
     // Nested class is appended as a hidden field at the end of the class declaration
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap:this$0;
+#else
+    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:???;
+    private unknown short[] dirtyBlocks;
+    private int dirtyCount;
+    private int dirtySectionMask:f;
+    final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
+    private boolean done:loaded;
 #endif
 
     public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);

@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.internal.proxy;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
@@ -9,18 +11,26 @@ import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 /**
  * This is a special proxy class for CraftBukkit so that a single EntitySlice
  * can be accessed as if it is a List (like on Spigot). It may summon dark spirits
- * while attempting this dangerous conversion.
+ * while attempting this dangerous conversion.<br>
+ * <br>
+ * Only works pre-1.8
+ * 
+ * TODO!!!!!
  *
  * @param <E> type of element in the slice/list
  */
-public class EntitySliceProxy<E> extends AbstractList<E> {
+public class EntitySliceProxy_1_8<E> extends AbstractList<E> {
     private final EntitySliceHandle handle;
     private final List<E> listValues;
 
-    @SuppressWarnings("unchecked")
-    public EntitySliceProxy(EntitySliceHandle handle) {
+    public EntitySliceProxy_1_8(EntitySliceHandle handle) {
         this.handle = handle;
-        this.listValues = (List<E>) handle.getListValues();
+        this.listValues = new ArrayList<E>(handle.size());
+
+        Iterator<E> iter = handleIter();
+        while (iter.hasNext()) {
+            this.listValues.add(iter.next());
+        }
     }
 
     public EntitySliceHandle getHandle() {
@@ -29,12 +39,16 @@ public class EntitySliceProxy<E> extends AbstractList<E> {
 
     @Override
     public boolean add(E e) {
-        return this.handle.add(e);
+        if (!this.handle.add(e)) return false;
+        this.listValues.add(e);
+        return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        return this.handle.remove(o);
+        if (!this.handle.remove(o)) return false;
+        this.listValues.remove(o);
+        return true;
     }
 
     @Override
@@ -43,14 +57,7 @@ public class EntitySliceProxy<E> extends AbstractList<E> {
         if (!this.handle.add(element)) {
             throw new RuntimeException("Failed to insert new element to Entity Slice");
         }
-        int oldIndex = this.listValues.lastIndexOf(element);
-        if (oldIndex == -1) {
-            throw new RuntimeException("Attempted to insert element to Entity Slice but it is now gone");
-        }
-        if (oldIndex != index) {
-            this.listValues.remove(oldIndex);
-            this.listValues.add(index, element);
-        }
+        this.listValues.add(index, element);
     }
 
     /* ==== Standard implementations ==== */
@@ -80,17 +87,23 @@ public class EntitySliceProxy<E> extends AbstractList<E> {
 
     @Override
     public int size() {
-        return this.listValues.size();
+        return this.handle.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return this.listValues.isEmpty();
+        return this.handle.size() == 0;
     }
 
     @Override
     public boolean contains(Object o) {
-        return this.listValues.contains(o);
+        Iterator<E> iter = handleIter();
+        while (iter.hasNext()) {
+            if (iter.next().equals(o)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -105,7 +118,12 @@ public class EntitySliceProxy<E> extends AbstractList<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return this.listValues.containsAll(c);
+        for (Object o : c) {
+            if (!this.contains(o)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -121,5 +139,10 @@ public class EntitySliceProxy<E> extends AbstractList<E> {
     @Override
     public int lastIndexOf(Object o) {
         return this.listValues.lastIndexOf(o);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Iterator<E> handleIter() {
+        return this.handle.iterator();
     }
 }

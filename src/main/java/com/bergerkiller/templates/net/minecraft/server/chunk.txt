@@ -108,13 +108,21 @@ class ChunkSection {
 // This is only used on CraftBukkit servers
 // Spigot uses a simplified List<Entity>
 optional class EntitySlice {
-    private final List<T> listValues:e;
+#if version >= 1.8.3
+    private optional final List<T> listValues_1_8_3:e;
+#else
+    private optional final List<T> listValues_1_8_3:???;
+#endif
 
     public (EntitySliceHandle) EntitySlice((Class<?>) Class<T> oclass);
 
     public boolean add(T value);
 
     public boolean remove(Object value);
+
+    public Iterator iterator();
+
+    public int size();
 }
 
 class DataPaletteBlock {

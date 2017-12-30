@@ -10,10 +10,14 @@ class BaseBlockPosition {
     private final int x:a;
     private final int y:b;
     private final int z:c;
-#else
+#elseif version >= 1.8.3
     private final int x:a;
     private final int y:c;
     private final int z:d;
+#else
+    private final int x:a;
+    private final int y:b;
+    private final int z:c;
 #endif
 }
 

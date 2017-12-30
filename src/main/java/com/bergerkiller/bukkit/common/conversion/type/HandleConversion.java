@@ -14,7 +14,9 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
+import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -428,13 +430,20 @@ public class HandleConversion {
 
     @ConverterMethod(input="net.minecraft.server.EntitySlice<?>", optional=true)
     public static List<Object> cbEntitySliceToList(Object nmsEntitySliceHandle) {
-        return new EntitySliceProxy<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+        if (CommonCapabilities.REVISED_CHUNK_ENTITY_SLICE) {
+            return new EntitySliceProxy_1_8_3<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+        } else {
+            return new EntitySliceProxy_1_8<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
+        }
     }
 
     @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.server.Entity>", optional=true)
     public static Object cbListToEntitySlice(List<?> entitySliceList) {
-        if (entitySliceList instanceof EntitySliceProxy) {
-            return ((EntitySliceProxy<?>) entitySliceList).getHandle().getRaw();
+        if (entitySliceList instanceof EntitySliceProxy_1_8_3) {
+            return ((EntitySliceProxy_1_8_3<?>) entitySliceList).getHandle().getRaw();
+        }
+        if (entitySliceList instanceof EntitySliceProxy_1_8) {
+            return ((EntitySliceProxy_1_8<?>) entitySliceList).getHandle().getRaw();
         }
         EntitySliceHandle entitySlice = EntitySliceHandle.createNew(EntityHandle.T.getType());
         for (Object value : entitySliceList) {
