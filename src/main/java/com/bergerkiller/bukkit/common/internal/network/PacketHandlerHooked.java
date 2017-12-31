@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal.network;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
@@ -10,9 +10,9 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 
@@ -184,17 +184,17 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (method == null) {
         	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
         } else {
-            method.invoke(getPlayerConnection(player), packet);
+            Object connection = getPlayerConnection(player);
+            if (connection != null) {
+                method.invoke(connection, packet);
+            }
         }
     }
 
     @Override
     public void sendPacket(Player player, Object packet, boolean throughListeners) {
-        Object handle = Conversion.toEntityHandle.convert(player);
-        if (!handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"))) {
-            return;
-        }
-        if (!PacketType.DEFAULT.isInstance(packet) || PlayerUtil.isDisconnected(player)) {
+        Object connection = getPlayerConnection(player);
+        if (connection == null) {
             return;
         }
 
@@ -204,8 +204,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             }
         }
 
-        final Object connection = EntityPlayerHandle.T.playerConnection.get(handle);
-        NMSPlayerConnection.sendPacket(connection, packet);
+        PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
     }
 
     @Override
@@ -238,10 +237,6 @@ public abstract class PacketHandlerHooked implements PacketHandler {
                 to.addPacketMonitor(entry.getKey(), listener, getMonitorTypes(listener));
             }
         }
-    }
-
-    protected Object getPlayerConnection(Player player) {
-        return EntityPlayerHandle.T.playerConnection.get(Conversion.toEntityHandle.convert(player));
     }
 
     private PacketType[] getListenerTypes(PacketListener listener) {
@@ -363,6 +358,26 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             }
         }
         return true;
+    }
+
+    /**
+     * Gets the PlayerConnection NMS instance, which is used for sending packets to.
+     * If the player is an NPC, or is disconnected, this method returns null.
+     * 
+     * @param player
+     * @return player connection
+     */
+    public static Object getPlayerConnection(Player player) {
+        Object handle = HandleConversion.toEntityHandle(player);
+        if (!EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
+
+        final Object connection = EntityPlayerHandle.T.playerConnection.raw.get(handle);
+        if (connection == null) return null; // No PlayerConnection instance
+
+        final Object network = NMSPlayerConnection.networkManager.get(connection);
+        if (network == null) return null; // No NetworkManager instance
+        if (!NetworkManagerHandle.T.isConnected.invoke(network)) return null; // Not connected
+        return connection;
     }
 
     private static class SilentPacket {

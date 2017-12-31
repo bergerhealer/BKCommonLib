@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
@@ -10,7 +9,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
@@ -21,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -95,9 +93,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void receivePacket(Player player, Object packet) {
-        if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
-            return;
+        if (PacketHandlerHooked.getPlayerConnection(player) == null) {
+            return; // NPC player is not connected
         }
+
         PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
         try {
             ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
@@ -110,33 +109,26 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void sendPacket(Player player, Object packet, boolean throughListeners) {
-        if (isNPCPlayer(player) || PlayerUtil.isDisconnected(player)) {
+        Object connection = PacketHandlerHooked.getPlayerConnection(player);
+        if (connection == null) {
+            return; // Player is an NPC or isn't connected
+        }
+
+        // Simplified logic for sending normally
+        if (throughListeners) {
+            PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
             return;
         }
-        PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+
+        // Silent - do not send it through listeners, only through monitors
         try {
-            if (throughListeners) {
-                // Send it through the listeners
-                ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend);
-            } else {
-                // Silent - do not send it through listeners, only through monitors
-                sendSilentPacket(player, toSend);
-            }
+            PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
         } catch (PlayerLoggedOutException ex) {
             // Ignore
-        } catch (Exception e) {
-            throw new RuntimeException("Error while sending packet:", e);
+        } catch (Throwable t) {
+            throw new RuntimeException("Error while sending packet:", t);
         }
-    }
-
-    private boolean isNPCPlayer(Player player) {
-        // Is this check still needed?
-        Object handle = Conversion.toEntityHandle.convert(player);
-        return !handle.getClass().equals(CommonUtil.getNMSClass("EntityPlayer"));
-    }
-
-    private void sendSilentPacket(Player player, PacketContainer packet) throws InvocationTargetException {
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, null, false);
     }
 
     @Override

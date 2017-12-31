@@ -44,8 +44,9 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     }
 
 
-    public static double POSITION_STEP;
-    public static float ROTATION_STEP;
+    public static final double POSITION_STEP;
+    public static final float ROTATION_STEP;
+    public static final float ROTATION_STEP_INV;
     static {
         if (T.long_xLoc.isAvailable()) {
             POSITION_STEP = 1.0 / 4096.0;
@@ -53,10 +54,26 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
             POSITION_STEP = 1.0 / 32.0;
         }
         ROTATION_STEP = 360.0f / 256.0f;
+        ROTATION_STEP_INV = 256.0f / 360.0f;
+    }
+
+    public static final boolean hasProtocolRotationChanged(float angle1, float angle2) {
+        if (angle1 == angle2) {
+            return false;
+        }
+
+        int prot_diff = com.bergerkiller.bukkit.common.utils.MathUtil.floor((angle2-angle1)*ROTATION_STEP_INV) & 0xFF;
+        if (prot_diff > 0 && prot_diff < 255) {
+            return true;
+        }
+
+        int prot1 = com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle1*ROTATION_STEP_INV);
+        int prot2 = com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle2*ROTATION_STEP_INV);
+        return ((prot1 - prot2) & 0xFF) != 0;
     }
 
     public static final int getProtocolRotation(float angle) {
-        int protAngle = com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * 256.0F / 360.0F) & 0xFF;
+        int protAngle = com.bergerkiller.bukkit.common.utils.MathUtil.floor(angle * ROTATION_STEP_INV) & 0xFF;
         if (protAngle >= 128) {
             protAngle -= 256;
         }
@@ -68,7 +85,7 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         if (protAngle >= 128) {
             protAngle -= 256;
         }
-        return (float) protAngle * 360.0f / (256.0f);
+        return (float) protAngle * ROTATION_STEP;
     }
 
     public void setLocX(double x) {

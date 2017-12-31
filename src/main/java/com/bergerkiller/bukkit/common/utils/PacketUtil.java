@@ -104,7 +104,12 @@ public class PacketUtil {
     }
 
     public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
-        sendPacket(player, (Object) packet, throughListeners);
+        if (packet != null) {
+            Object rawPacket = packet.getHandle();
+            if (rawPacket != null) {
+                CommonPlugin.getInstance().getPacketHandler().sendPacket(player, rawPacket, throughListeners);
+            }
+        }
     }
 
     public static void sendPacket(Player player, PacketHandle packet) {
@@ -112,7 +117,9 @@ public class PacketUtil {
     }
 
     public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
-        sendPacket(player, (Object) packet, throughListeners);
+        if (packet != null) {
+            CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getRaw(), throughListeners);
+        }
     }
 
     /**
