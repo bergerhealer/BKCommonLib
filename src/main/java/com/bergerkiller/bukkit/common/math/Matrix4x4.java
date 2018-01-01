@@ -700,6 +700,22 @@ public class Matrix4x4 implements Cloneable {
             m30 + ", " + m31 + ", " + m32 + ", " + m33 + "}";
     }
 
+    /**
+     * Creates a 4x4 matrix from 3 columns of a 3x3 matrix
+     * 
+     * @param v0 column 0
+     * @param v1 column 1
+     * @param v2 column 2
+     * @return 4x4 matrix
+     */
+    public static Matrix4x4 fromColumns3x3(Vector v0, Vector v1, Vector v2) {
+        return new Matrix4x4(
+                v0.getX(), v1.getX(), v2.getX(), 0.0,
+                v0.getY(), v1.getY(), v2.getY(), 0.0,
+                v0.getZ(), v1.getZ(), v2.getZ(), 0.0,
+                0.0, 0.0, 0.0, 1.0);
+    }
+
     // From https://math.stackexchange.com/questions/296794
     public static Matrix4x4 computeProjectionMatrix(Vector3 p[])
     {

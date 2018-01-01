@@ -695,6 +695,18 @@ public class MathUtil {
     }
 
     /**
+     * Calculates the normalization factor for a 3D vector.
+     * Multiplying the input vector with this factor will turn it into a vector of unit length.
+     * If the input vector is (0,0,0), Infinity is returned.
+     * 
+     * @param v
+     * @return normalization factor
+     */
+    public static double getNormalizationFactor(Vector v) {
+        return getNormalizationFactorLS(v.lengthSquared());
+    }
+
+    /**
      * Calculates the normalization factor for a 4D vector.
      * Multiplying the input vector with this factor will turn it into a vector of unit length.
      * If the input vector is (0,0,0,0), Infinity is returned.

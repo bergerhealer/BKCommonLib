@@ -290,14 +290,8 @@ public class MathUtilTest {
             dir.normalize();
             up.normalize();
 
-            Vector result_dir = q.forwardVector();
-            Vector result_up = q.upVector();
-            assertEquals(dir.getX(), result_dir.getX(), 0.00001);
-            assertEquals(dir.getY(), result_dir.getY(), 0.00001);
-            assertEquals(dir.getZ(), result_dir.getZ(), 0.00001);
-            assertEquals(up.getX(), result_up.getX(), 0.01);
-            assertEquals(up.getY(), result_up.getY(), 0.01);
-            assertEquals(up.getZ(), result_up.getZ(), 0.01);
+            testVectorsEqual(dir, q.forwardVector(), 1e-8);
+            testVectorsEqual(up, q.upVector(), 1e-8);
         }
 
         // Verify that up-vectors that aren't perfectly orthogonal also work
@@ -327,6 +321,31 @@ public class MathUtilTest {
                 testVectorsEqual(dir, q.forwardVector());
                 testVectorsEqual(up, q.upVector());
             }
+        }
+
+        // This is a very specific test case that seems to fail
+        // x is exactly 0, y is small and z is fairly large and negative
+        // The direction vector ended up swapped because (unknown)
+        for (int i = 0; i < 10000; i++) {
+            Vector dir = new Vector(0.0001 * Math.random(), Math.random(), -Math.random());
+            Vector up = new Vector(0.0, 1.0, 0.0);
+            Quaternion q = Quaternion.fromLookDirection(dir, up);
+            dir.normalize();
+            testVectorsEqual(dir, q.forwardVector(), 1e-7);
+        }
+        {
+            Vector dir = new Vector(0.0, 0.0001, -0.4);
+            Vector up = new Vector(0.0, 1.0, 0.0);
+            Quaternion q = Quaternion.fromLookDirection(dir, up);
+            dir.normalize();
+            testVectorsEqual(dir, q.forwardVector());
+        }
+        {
+            Vector dir = new Vector(-0.4, 0.0001, 0.0);
+            Vector up = new Vector(0.0, 1.0, 0.0);
+            Quaternion q = Quaternion.fromLookDirection(dir, up);
+            dir.normalize();
+            testVectorsEqual(dir, q.forwardVector());
         }
     }
 
@@ -381,8 +400,22 @@ public class MathUtilTest {
 
     // checks that two vectors are equal
     private static void testVectorsEqual(Vector expected, Vector actual) {
-        assertEquals(expected.getX(), actual.getX(), 1e-10);
-        assertEquals(expected.getY(), actual.getY(), 1e-10);
-        assertEquals(expected.getZ(), actual.getZ(), 1e-10);
+        testVectorsEqual(expected, actual, 1e-10);
+    }
+
+    // checks that two vectors are equal
+    private static void testVectorsEqual(Vector expected, Vector actual, double delta) {
+        try {
+            assertEquals(expected.getX(), actual.getX(), delta);
+            assertEquals(expected.getY(), actual.getY(), delta);
+            assertEquals(expected.getZ(), actual.getZ(), delta);
+        } catch (AssertionError err) {
+            System.out.println("EXPECTED: " + expected);
+            System.out.println("WAS: " + actual);
+            fail("Vectors not equal. Expected " + 
+                 "{" + expected.getX() + "/" + expected.getY() + "/" + expected.getZ() + "}, but was " +
+                 "{" + actual.getX() + "/" + actual.getY() + "/" + actual.getZ() + "}");
+                   
+        }
     }
 }

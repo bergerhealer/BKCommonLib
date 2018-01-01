@@ -60,6 +60,18 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Sets this Quaternion to the values of another Quaternion
+     * 
+     * @param q to set to
+     */
+    public void setTo(Quaternion q) {
+        this.x = q.x;
+        this.y = q.y;
+        this.z = q.z;
+        this.w = q.w;
+    }
+
+    /**
      * Calculates the dot product of this Quaternion with another
      * 
      * @param q other quaternion
@@ -245,6 +257,18 @@ public class Quaternion implements Cloneable {
         return new Vector(Math.toDegrees(pitch), Math.toDegrees(-yaw), Math.toDegrees(roll));
     }
 
+    /**
+     * Rotates the Quaternion 180 degrees around the x-axis
+     */
+    public final void rotateXFlip() {
+        rotateX_unsafe(0.0, 1.0);
+    }
+
+    /**
+     * Rotates the Quaternion an angle around the x-axis
+     * 
+     * @param angleDegrees to rotate
+     */
     public final void rotateX(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -252,6 +276,13 @@ public class Quaternion implements Cloneable {
         }
     }
 
+    /**
+     * Rotates the Quaternion an angle around the X-axis, the angle defined by the y/z vector.
+     * This is equivalent to calling {@link #rotateX(angleDegrees)} using {@link Math#atan2(z,y)}.
+     * 
+     * @param y
+     * @param z
+     */
     public final void rotateX(double y, double z) {
         double r = halfcosatan2(z, y);
         rotateX_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
@@ -266,6 +297,18 @@ public class Quaternion implements Cloneable {
         this.normalize();
     }
 
+    /**
+     * Rotates the Quaternion 180 degrees around the y-axis
+     */
+    public final void rotateYFlip() {
+        rotateY_unsafe(0.0, 1.0);
+    }
+
+    /**
+     * Rotates the Quaternion an angle around the y-axis
+     * 
+     * @param angleDegrees to rotate
+     */
     public final void rotateY(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -273,6 +316,13 @@ public class Quaternion implements Cloneable {
         }
     }
 
+    /**
+     * Rotates the Quaternion an angle around the y-axis, the angle defined by the x/z vector.
+     * This is equivalent to calling {@link #rotateY(angleDegrees)} using {@link Math#atan2(z,x)}.
+     * 
+     * @param x
+     * @param z
+     */
     public final void rotateY(double x, double z) {
         double r = halfcosatan2(z, x);
         rotateY_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
@@ -287,6 +337,18 @@ public class Quaternion implements Cloneable {
         this.normalize();
     }
 
+    /**
+     * Rotates the Quaternion 180 degrees around the z-axis
+     */
+    public final void rotateZFlip() {
+        rotateZ_unsafe(0.0, 1.0);
+    }
+
+    /**
+     * Rotates the Quaternion an angle around the z-axis
+     * 
+     * @param angleDegrees to rotate
+     */
     public final void rotateZ(double angleDegrees) {
         if (angleDegrees != 0.0) {
             double r = 0.5 * Math.toRadians(angleDegrees);
@@ -294,6 +356,13 @@ public class Quaternion implements Cloneable {
         }
     }
 
+    /**
+     * Rotates the Quaternion an angle around the z-axis, the angle defined by the x/y vector.
+     * This is equivalent to calling {@link #rotateZ(angleDegrees)} using {@link Math#atan2(y,x)}.
+     * 
+     * @param x
+     * @param y
+     */
     public final void rotateZ(double x, double y) {
         double r = halfcosatan2(y, x);
         rotateZ_unsafe(Math.sqrt(0.5 + r), Math.sqrt(0.5 - r));
@@ -552,17 +621,13 @@ public class Quaternion implements Cloneable {
      * @return Quaternion with the look-direction transformation
      */
     public static Quaternion fromLookDirection(Vector dir, Vector up) {
-        // Use fromLookDirection without up vector to find the base rotation
-        Quaternion lookAt_dir = fromLookDirection(dir);
-        Vector look_up = lookAt_dir.upVector();
+        // Use the 3x3 rotation matrix solution found on SO, combined with a getRotation()
+        // https://stackoverflow.com/a/18574797
 
-        // Ensure up is orthogonal to dir
-        up = dir.clone().crossProduct(up).crossProduct(dir);
-
-        // Find the rotation from the old up vector to the desired up vector
-        Quaternion lookAt_up = fromToRotation(look_up, up, dir);
-        lookAt_up.multiply(lookAt_dir);
-        return lookAt_up;
+        Vector D = dir.clone().normalize();
+        Vector S = up.clone().crossProduct(dir).normalize();
+        Vector U = D.clone().crossProduct(S);
+        return Matrix4x4.fromColumns3x3(S, U, D).getRotation();
     }
 
     /**
