@@ -21,23 +21,22 @@ public abstract class WorldProviderHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract boolean int_skyLightProperty();
-
-    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
 
     public boolean hasSkyLight() {
-        return T.int_skyLightProperty.invoke(getRaw()).booleanValue() != _darkInverted;
+        return !isDarkWorld();
     }
 
     public boolean isDarkWorld() {
-        return !hasSkyLight();
+        return isDarkWorldField();
     }
+    public abstract boolean isDarkWorldField();
+    public abstract void setIsDarkWorldField(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.WorldProvider</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldProviderClass extends Template.Class<WorldProviderHandle> {
-        public final Template.Method<Boolean> int_skyLightProperty = new Template.Method<Boolean>();
+        public final Template.Field.Boolean isDarkWorldField = new Template.Field.Boolean();
 
     }
 

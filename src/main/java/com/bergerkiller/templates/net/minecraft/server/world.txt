@@ -267,21 +267,15 @@ class WorldType {
 }
 
 class WorldProvider {
-#if version >= 1.9
-    public boolean int_skyLightProperty:m();
-#else
-    public boolean int_skyLightProperty:o();
-#endif
+    protected boolean isDarkWorldField:e;
 
 <code>
-    private static final boolean _darkInverted = com.bergerkiller.bukkit.common.internal.CommonCapabilities.WORLD_LIGHT_DARK_INVERTED;
-
     public boolean hasSkyLight() {
-        return T.int_skyLightProperty.invoke(getRaw()).booleanValue() != _darkInverted;
+        return !isDarkWorld();
     }
 
     public boolean isDarkWorld() {
-        return !hasSkyLight();
+        return isDarkWorldField();
     }
 </code>
 }
