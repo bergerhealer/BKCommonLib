@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -293,6 +294,14 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
         startedTasks.add(new MapInputUpdater(plugin).start(1, 1));
+
+        // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
+        // This is only relevant during /reload, since at server start no world is loaded yet
+        for (World world : Bukkit.getWorlds()) {
+            for (ItemFrame itemFrame : world.getEntitiesByClass(ItemFrame.class)) {
+                onAddItemFrame(itemFrame);
+            }
+        }
     }
 
     /**
@@ -610,22 +619,36 @@ public class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
-            itemFrames.put(frame.getEntityId(), new ItemFrameInfo(frame));
+            onAddItemFrame((ItemFrame) event.getEntity());
+        }
+    }
 
-            // Load the chunk to the left/right of this item frame
-            // If the display crosses chunk boundaries, this ensures those are loaded
-            // TODO: Is onEntityAdded really the right place for this? Could cause recursive loading.
-            BlockFace left_right = FaceUtil.rotate(frame.getFacing(), 2);
-            IntVector3 pos = new IntVector3(frame.getLocation());
-            IntVector3 pos_left = pos.add(left_right);
-            IntVector3 pos_right = pos.subtract(left_right);
-            if (pos.getChunkX() != pos_left.getChunkX() || pos.getChunkZ() != pos_left.getChunkZ()) {
-                frame.getWorld().getChunkAt(pos_left.getChunkX(), pos_left.getChunkZ());
-            }
-            if (pos.getChunkX() != pos_right.getChunkX() || pos.getChunkZ() != pos_right.getChunkZ()) {
-                frame.getWorld().getChunkAt(pos_right.getChunkX(), pos_right.getChunkZ());
-            }
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected synchronized void onWorldLoad(WorldLoadEvent event) {
+        for (ItemFrame frame : event.getWorld().getEntitiesByClass(ItemFrame.class)) {
+            onAddItemFrame(frame);
+        }
+    }
+
+    private void onAddItemFrame(ItemFrame frame) {
+        if (itemFrames.contains(frame.getEntityId())) {
+            return;
+        }
+
+        itemFrames.put(frame.getEntityId(), new ItemFrameInfo(frame));
+
+        // Load the chunk to the left/right of this item frame
+        // If the display crosses chunk boundaries, this ensures those are loaded
+        // TODO: Is onEntityAdded really the right place for this? Could cause recursive loading.
+        BlockFace left_right = FaceUtil.rotate(frame.getFacing(), 2);
+        IntVector3 pos = new IntVector3(frame.getLocation());
+        IntVector3 pos_left = pos.add(left_right);
+        IntVector3 pos_right = pos.subtract(left_right);
+        if (pos.getChunkX() != pos_left.getChunkX() || pos.getChunkZ() != pos_left.getChunkZ()) {
+            frame.getWorld().getChunkAt(pos_left.getChunkX(), pos_left.getChunkZ());
+        }
+        if (pos.getChunkX() != pos_right.getChunkX() || pos.getChunkZ() != pos_right.getChunkZ()) {
+            frame.getWorld().getChunkAt(pos_right.getChunkX(), pos_right.getChunkZ());
         }
     }
 
