@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
@@ -28,6 +29,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
 /**
@@ -1241,6 +1243,19 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets the Map Display bound to a map item, viewed by the player. If the item is not
+     * a map item, or the map item has no displays bound to it for the player, null is returned.
+     * 
+     * @param viewer of the map
+     * @param item with map information
+     * @return map display for the item viewed by the player, null if none is available
+     */
+    public static MapDisplay getViewedDisplay(Player viewer, ItemStack item) {
+        MapDisplayInfo info = CommonPlugin.getInstance().getMapController().getInfo(item);
+        return (info != null) ? info.getViewing(viewer) : null;
+    }
+
+    /**
      * Restarts (detaches and re-attaches) all map displays bound to a particular item.
      * This effectively resets the display, forcing a complete re-render and re-initialization.
      * 
@@ -1297,4 +1312,51 @@ public class MapDisplay implements MapDisplayEvents {
         return CommonPlugin.getInstance().getMapController().getDisplays(displayClass);
     }
 
+    /**
+     * Gets the map display a player is viewing in a map held in his hand. When viewing a map display
+     * in both hands, the main hand display is returned. When the player is not viewing any display,
+     * null is returned instead.
+     * 
+     * @param viewer
+     * @return held map display, null if not holding any map with a display
+     */
+    public static MapDisplay getHeldDisplay(Player viewer) {
+        MapDisplay mainDisplay = getViewedDisplay(viewer, HumanHand.getItemInMainHand(viewer));
+        if (mainDisplay != null) {
+            return mainDisplay;
+        }
+        if (CommonCapabilities.PLAYER_OFF_HAND) {
+            MapDisplay offDisplay = getViewedDisplay(viewer, HumanHand.getItemInOffHand(viewer));
+            if (offDisplay != null) {
+                return offDisplay;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the map display a player is viewing in a map held in his hand. When viewing a map display
+     * in both hands, the main hand display is returned. When the player is not viewing any display,
+     * null is returned instead. This method allows specifying a restriction for what map displays
+     * to return. When viewing two maps in both hands, and the off hand is the display class type, this method
+     * allows returning that display.
+     * 
+     * @param viewer
+     * @param displayClass
+     * @return held map display, null if not holding any map with a display
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends MapDisplay> T getHeldDisplay(Player viewer, Class<T> displayClass) {
+        MapDisplay mainDisplay = getViewedDisplay(viewer, HumanHand.getItemInMainHand(viewer));
+        if (mainDisplay != null && displayClass.isAssignableFrom(mainDisplay.getClass())) {
+            return (T) mainDisplay;
+        }
+        if (CommonCapabilities.PLAYER_OFF_HAND) {
+            MapDisplay offDisplay = getViewedDisplay(viewer, HumanHand.getItemInOffHand(viewer));
+            if (offDisplay != null && displayClass.isAssignableFrom(offDisplay.getClass())) {
+                return (T) offDisplay;
+            }
+        }
+        return null;
+    }
 }
