@@ -63,6 +63,7 @@ public class MapDisplay implements MapDisplayEvents {
     private boolean _updateWhenNotViewing = true;
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
+    private float _masterVolume = 1.0f;
     private int updateTaskId = -1;
     private ItemStack _oldItem = null;
     private ItemStack _item = null;
@@ -658,6 +659,24 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Sets the master volume. All sounds played using {@link #playSound()} will be pre-multiplied with this factor.
+     * 
+     * @param masterVolume to set to, 1.0 for defaults
+     */
+    public void setMasterVolume(float masterVolume) {
+        this._masterVolume = masterVolume;
+    }
+
+    /**
+     * Gets the master volume currently applied using {@link #setMasterVolume(float)}.
+     * 
+     * @return master volume
+     */
+    public float getMasterVolume() {
+        return this._masterVolume;
+    }
+
+    /**
      * Convenience function for playing sounds to the viewers of this map display
      * 
      * @param soundKey of the sound to play
@@ -675,7 +694,7 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public void playSound(ResourceKey soundKey, float volume, float pitch) {
         for (Player viewer : this.getViewers()) {
-            PlayerUtil.playSound(viewer, soundKey, volume, pitch);
+            PlayerUtil.playSound(viewer, soundKey, this._masterVolume * volume, pitch);
         }
     }
 
