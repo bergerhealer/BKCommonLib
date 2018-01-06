@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
+import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.metrics.Metrics;
 import com.bergerkiller.bukkit.common.permissions.IPermissionDefault;
 import com.bergerkiller.bukkit.common.permissions.NoPermissionException;
@@ -154,6 +155,17 @@ public abstract class PluginBase extends JavaPlugin {
             return this.getDataFolder();
         }
         return new File(this.getDataFolder(), StringUtil.join(File.separator, path));
+    }
+
+    /**
+     * Loads a MapTexture from an image file stored as resource in this Plugin.
+     * Throws an exception if loading fails.
+     * 
+     * @param filename
+     * @return loaded texture
+     */
+    public MapTexture loadTexture(String filename) {
+        return MapTexture.loadPluginResource(this, filename);
     }
 
     /**

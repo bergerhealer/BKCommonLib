@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.map.util.MapTinyFont;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
@@ -21,7 +22,14 @@ public abstract class MapFont<K> {
     private final HashMap<K, MapTexture> sprites = new HashMap<K, MapTexture>();
 
     // Constants for some default font types
+    /**
+     * Standard Minecraft font (5x7), only supports standard ASCII characters
+     */
     public static final MapFont<Character> MINECRAFT = fromBukkitFont(org.bukkit.map.MinecraftFont.Font);
+    /**
+     * Tiny font (3x5), only supports standard ASCII characters
+     */
+    public static final MapFont<Character> TINY = new MapTinyFont();
 
     /**
      * Loads the sprite texture for a given key. Called only once upon the first time
