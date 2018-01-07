@@ -34,7 +34,6 @@ public class MapPlayerInput implements Tickable {
     private boolean _isIntercepting = false;
     private boolean _newInterceptState = false;
     private final TickTracker _inputTickTracker = new TickTracker();
-    private int _resetInterceptTimeout = 0; // after this timeout expires, input interception is forcibly disabled
     public final Player player;
 
     public MapPlayerInput(Player player) {
@@ -43,11 +42,7 @@ public class MapPlayerInput implements Tickable {
             @Override
             public void run() {
                 _isIntercepting = _newInterceptState;
-                if (_resetInterceptTimeout < 4) {
-                    _resetInterceptTimeout++;
-                } else {
-                    _newInterceptState = false;
-                }
+                _newInterceptState = false;
 
                 updateInterception(_isIntercepting);
                 if (!MapPlayerInput.this.player.isInsideVehicle() && !_fakeMountShown) {
@@ -376,7 +371,6 @@ public class MapPlayerInput implements Tickable {
     public void handleDisplayUpdate(MapDisplay display, boolean interceptInput) {
         this._inputTickTracker.update();
         this._newInterceptState |= interceptInput;
-        this._resetInterceptTimeout = 0;
 
         // Check if there are any receiving displays at all
         if (!interceptInput) {
