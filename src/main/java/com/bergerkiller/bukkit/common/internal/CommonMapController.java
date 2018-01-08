@@ -44,6 +44,9 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.ImplicitlySharedList;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -77,6 +80,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
 public class CommonMapController implements PacketListener, Listener {
+    // Temporary ItemFrame buffer to avoid memory allocations / list resizes
+    private World itemFrameCacheWorld = null;
+    private boolean itemFrameCacheDirty = true;
+    private final ImplicitlySharedList<ItemFrame> itemFrameCache = new ImplicitlySharedList<ItemFrame>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Short> mapIdByUUID = new HashMap<MapUUID, Short>();
@@ -619,13 +626,28 @@ public class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
-            onAddItemFrame((ItemFrame) event.getEntity());
+            ItemFrame frame = (ItemFrame) event.getEntity();
+            resetItemFrameCache(frame.getWorld());
+            onAddItemFrame(frame);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
+        if (event.getEntityType() == EntityType.ITEM_FRAME) {
+            ItemFrame frame = (ItemFrame) event.getEntity();
+            resetItemFrameCache(frame.getWorld());
+            ItemFrameInfo info = itemFrames.get(frame.getEntityId());
+            if (info != null) {
+                info.removed = true;
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
-        for (ItemFrame frame : event.getWorld().getEntitiesByClass(ItemFrame.class)) {
+        resetItemFrameCache(event.getWorld());
+        for (ItemFrame frame : iterateItemFrames(event.getWorld())) {
             onAddItemFrame(frame);
         }
     }
@@ -649,17 +671,6 @@ public class CommonMapController implements PacketListener, Listener {
         }
         if (pos.getChunkX() != pos_right.getChunkX() || pos.getChunkZ() != pos_right.getChunkZ()) {
             frame.getWorld().getChunkAt(pos_right.getChunkX(), pos_right.getChunkZ());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
-        if (event.getEntityType() == EntityType.ITEM_FRAME) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
-            ItemFrameInfo info = itemFrames.get(frame.getEntityId());
-            if (info != null) {
-                info.removed = true;
-            }
         }
     }
 
@@ -1185,12 +1196,10 @@ public class CommonMapController implements PacketListener, Listener {
                 // Find all map UUIDs that exist on the server
                 HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
                 for (World world : Bukkit.getWorlds()) {
-                    for (Entity entity : WorldUtil.getEntities(world)) {
-                        if (entity instanceof ItemFrame) {
-                            MapUUID mapUUID = getItemFrameMapUUID((ItemFrame) entity);
-                            if (mapUUID != null) {
-                                validUUIDs.add(mapUUID);
-                            }
+                    for (ItemFrame itemFrame : iterateItemFrames(world)) {
+                        MapUUID mapUUID = getItemFrameMapUUID(itemFrame);
+                        if (mapUUID != null) {
+                            validUUIDs.add(mapUUID);
                         }
                     }
                 }
@@ -1215,13 +1224,11 @@ public class CommonMapController implements PacketListener, Listener {
                 // Refresh all item frames that display this map
                 // This will result in a new EntityMetadata packets being sent, refreshing the map Id
                 for (World world : Bukkit.getWorlds()) {
-                    for (Entity entity : WorldUtil.getEntities(world)) {
-                        if (entity instanceof ItemFrame) {
-                            ItemStack item = getItemFrameItem((ItemFrame) entity);
-                            UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
-                            if (dirtyMaps.contains(mapUUID)) {
-                                ((ItemFrame) entity).setItem(item);
-                            }
+                    for (ItemFrame itemFrame : iterateItemFrames(world)) {
+                        ItemStack item = getItemFrameItem(itemFrame);
+                        UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
+                        if (dirtyMaps.contains(mapUUID)) {
+                            itemFrame.setItem(item);
                         }
                     }
                 }
@@ -1448,7 +1455,7 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame
      */
-    private static List<IntVector3> findNeighbours(ItemFrame itemFrame) {
+    private final List<IntVector3> findNeighbours(ItemFrame itemFrame) {
         HashSet<IntVector3> neighbours = new HashSet<IntVector3>();
         BlockFace facing = itemFrame.getFacing();
         IntVector3 itemFramePos = new IntVector3(itemFrame.getLocation());
@@ -1462,11 +1469,10 @@ public class CommonMapController implements PacketListener, Listener {
         // - Facing the same way
         // - Along the same x/z (facing)
         // - Same ItemStack map UUID
-        for (Entity entity : WorldUtil.getEntities(itemFrame.getWorld())) {
-            if (!(entity instanceof ItemFrame) || entity == itemFrame) {
+        for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
+            if (otherFrame == itemFrame) {
                 continue;
             }
-            ItemFrame otherFrame = (ItemFrame) entity;
             if (otherFrame.getFacing() != facing) {
                 continue;
             }
@@ -1509,6 +1515,37 @@ public class CommonMapController implements PacketListener, Listener {
         } while (!pendingList.isEmpty());
 
         return result;
+    }
+
+    private final void resetItemFrameCache(World world) {
+        if (!itemFrameCacheDirty && world == itemFrameCacheWorld) {
+            itemFrameCacheWorld = null;
+            itemFrameCacheDirty = true;
+            itemFrameCache.clear();
+        }
+    }
+
+    private final Iterable<ItemFrame> iterateItemFrames(World world) {
+        // Not using this, because it creates a nasty temporary List internally
+        // return world.getEntitiesByClass(ItemFrame.class);
+
+        // Reset cache when world differs
+        if (!itemFrameCacheDirty && itemFrameCacheWorld != world) {
+            resetItemFrameCache(itemFrameCacheWorld);
+        }
+
+        // Is regenerated here when empty
+        // Cache is cleared whenever an ItemFrame is added or removed on the server
+        if (itemFrameCacheDirty) {
+            itemFrameCacheDirty = false;
+            itemFrameCacheWorld = world;
+            for (Object entityHandle : (List<?>) WorldHandle.T.entityList.raw.get(HandleConversion.toWorldHandle(world))) {
+                if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
+                    itemFrameCache.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
+                }
+            }
+        }
+        return itemFrameCache.cloneAsIterable();
     }
 
     /**
@@ -1570,4 +1607,5 @@ public class CommonMapController implements PacketListener, Listener {
         ItemUtil.setMetaTag(item, newTag);
         return item;
     }
+
 }
