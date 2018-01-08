@@ -864,13 +864,29 @@ public abstract class PluginBase extends JavaPlugin {
         }
     }
 
+    /**
+     * Called when a command is postfixed with 'ver' or 'version'. By default displays
+     * the version information of the plugin and BKCommonLib.
+     * If those commands should be handled by {@link #command(sender, cmd, arg)}, override
+     * this method and return false.
+     * 
+     * @param sender to send version information to
+     * @return True if the version command was handled
+     */
+    public boolean onVersionCommand(String command, CommandSender sender) {
+        sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.getInstance().getVersion());
+        return true;
+    }
+
     @Override
     public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
         try {
             String[] fixedArgs = StringUtil.convertArgs(args);
             // Default commands for all plugins
             if (fixedArgs.length >= 1 && LogicUtil.contains(fixedArgs[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
-                sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getVersion() + " using BKCommonLib v" + CommonPlugin.getInstance().getVersion());
+                if (onVersionCommand(command, sender)) {
+                    return true;
+                }
             }
             // Handle regularly
             if (command(sender, command, fixedArgs)) {
