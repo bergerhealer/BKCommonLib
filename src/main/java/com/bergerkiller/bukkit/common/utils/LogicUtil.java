@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
+import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
 
 import org.bukkit.Material;
@@ -17,42 +18,9 @@ import java.util.Map.Entry;
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
-
     private static final MethodAccessor<Object> objectCloneMethod;
-    private static final Map<Class<?>, Class<?>> unboxedToBoxed = new HashMap<Class<?>, Class<?>>();
-    private static final Map<Class<?>, Class<?>> boxedToUnboxed = new HashMap<Class<?>, Class<?>>();
-    private static final Map<String, Class<?>> langBuiltinByName = new HashMap<String, Class<?>>();
 
     static {
-        unboxedToBoxed.put(boolean.class, Boolean.class);
-        unboxedToBoxed.put(char.class, Character.class);
-        unboxedToBoxed.put(byte.class, Byte.class);
-        unboxedToBoxed.put(short.class, Short.class);
-        unboxedToBoxed.put(int.class, Integer.class);
-        unboxedToBoxed.put(long.class, Long.class);
-        unboxedToBoxed.put(float.class, Float.class);
-        unboxedToBoxed.put(double.class, Double.class);
-        for (Entry<Class<?>, Class<?>> entry : unboxedToBoxed.entrySet()) {
-            boxedToUnboxed.put(entry.getValue(), entry.getKey());
-            
-            Class<?> prim = entry.getKey();
-            langBuiltinByName.put(prim.getSimpleName(), prim);
-        }
-
-        // Array types (TODO: generate these from above?)
-        langBuiltinByName.put("boolean[]", boolean[].class);
-        langBuiltinByName.put("char[]", char[].class);
-        langBuiltinByName.put("byte[]", byte[].class);
-        langBuiltinByName.put("short[]", short[].class);
-        langBuiltinByName.put("int[]", int[].class);
-        langBuiltinByName.put("long[]", long[].class);
-        langBuiltinByName.put("float[]", float[].class);
-        langBuiltinByName.put("double[]", double[].class);
-
-        // Special
-        langBuiltinByName.put("void", void.class);
-        langBuiltinByName.put("String", String.class);
-
         // Get the cloning method
         MethodAccessor<Object> objectCloneMethodAccessor;
         try {
@@ -84,16 +52,6 @@ public class LogicUtil {
     }
 
     /**
-     * Gets a primitive type by name
-     * 
-     * @param name of the primitive type
-     * @return class of the type, if found
-     */
-    public static Class<?> getBasicType(String name) {
-    	return langBuiltinByName.get(name);
-    }
-
-    /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
      * If the input type has no unboxed type, null is returned
      *
@@ -101,7 +59,7 @@ public class LogicUtil {
      * @return the unboxed type
      */
     public static Class<?> getUnboxedType(Class<?> boxedType) {
-        return boxedToUnboxed.get(boxedType);
+        return BoxedType.getUnboxedType(boxedType);
     }
 
     /**
@@ -112,7 +70,7 @@ public class LogicUtil {
      * @return the boxed type
      */
     public static Class<?> getBoxedType(Class<?> unboxedType) {
-        return unboxedToBoxed.get(unboxedType);
+        return BoxedType.getBoxedType(unboxedType);
     }
 
     /**
@@ -123,8 +81,7 @@ public class LogicUtil {
      * @return boxed type, or the type if it has no boxed type
      */
     public static Class<?> tryBoxType(Class<?> type) {
-        Class<?> boxed = unboxedToBoxed.get(type);
-        return boxed == null ? type : boxed;
+        return BoxedType.tryBoxType(type);
     }
 
     /**
