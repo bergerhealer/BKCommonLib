@@ -526,6 +526,9 @@ public class MapWidget implements MapDisplayEvents {
         child._attached = false;
         child._invalidated = true;
         child._boundsChanged = true;
+        for (MapWidget subChild : child.getWidgets()) {
+            child.handleWidgetAdded(subChild);
+        }
     }
 
     /**
