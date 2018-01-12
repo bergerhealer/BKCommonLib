@@ -100,6 +100,20 @@ public class Model {
             }
 
             if (result != null) {
+                // Rescale the texture to 16x16 before continueing
+                // We really cannot handle models like 600x600 - bad things really happen...
+                if (result.getWidth() > 16 || result.getHeight() > 16) {
+                    MapTexture newTexture = MapTexture.createEmpty(16, 16);
+                    for (int x = 0; x < 16; x++) {
+                        for (int y = 0; y < 16; y++) {
+                            int px = (x * result.getWidth()) / 16;
+                            int py = (y * result.getHeight()) / 16;
+                            newTexture.writePixel(x, y, result.readPixel(px, py));
+                        }
+                    }
+                    result = newTexture;
+                }
+
                 for (int y = 0; y < result.getHeight(); y++) {
                     for (int x = 0; x < result.getWidth(); x++) {
                         byte color = result.readPixel(x, y);
