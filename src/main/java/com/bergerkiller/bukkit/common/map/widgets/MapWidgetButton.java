@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map.widgets;
 
 import java.awt.Dimension;
 
+import com.bergerkiller.bukkit.common.map.MapCanvas;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapFont;
 import com.bergerkiller.bukkit.common.map.MapTexture;
@@ -94,48 +95,24 @@ public class MapWidgetButton extends MapWidget {
 
     @Override
     public void onDraw() {
-        byte topEdgeColor, fillColor, btmEdgeColor, textColor, textShadowColor;
+        byte textColor, textShadowColor;
         if (!this.isEnabled()) {
-            topEdgeColor = fillColor = btmEdgeColor = MapColorPalette.getColor(44, 44, 44);
             textColor = MapColorPalette.getColor(160, 160, 160);
             textShadowColor = MapColorPalette.COLOR_TRANSPARENT;
         } else if (this.isFocused()) {
-            topEdgeColor = MapColorPalette.getColor(190, 200, 255);
-            fillColor = MapColorPalette.getColor(126, 136, 191);
-            btmEdgeColor = MapColorPalette.getColor(92, 102, 157);
             textColor = MapColorPalette.getColor(255, 255, 160);
             textShadowColor = MapColorPalette.getColor(63, 63, 40);
         } else {
-            topEdgeColor = MapColorPalette.getColor(170, 170, 170);
-            fillColor = MapColorPalette.getColor(111, 111, 111);
-            btmEdgeColor = MapColorPalette.getColor(86, 86, 86);
             textColor = MapColorPalette.getColor(224, 224, 224);
             textShadowColor = MapColorPalette.getColor(56, 56, 56);
         }
 
-        int x1, y1, x2, y2;
         if (this.showBorder) {
-            x1 = 1;
-            y1 = 1;
-            x2 = this.getWidth() - 2;
-            y2 = this.getHeight() - 2;
+            fillBackground(this.view.getView(1, 1, getWidth() - 2, getHeight() - 2), this.isEnabled(), this.isFocused());
             view.drawRectangle(0, 0, getWidth(), getHeight(), MapColorPalette.COLOR_BLACK);
         } else {
-            x1 = 0;
-            y1 = 0;
-            x2 = this.getWidth() - 1;
-            y2 = this.getHeight() - 1;
+            fillBackground(this.view, this.isEnabled(), this.isFocused());
         }
-
-        // This draws the button base graphic, supporting dynamic sizes
-        view.drawLine(x1, y1, x2 - 1, y1, topEdgeColor);
-        view.drawLine(x1, y1 + 1, x1, y2 - 2, topEdgeColor);
-        view.drawLine(x1, y2 - 1, x1, y2, fillColor);
-        view.drawPixel(x2, y1, fillColor);
-        view.drawLine(x1 + 1, y2 - 1, x2, y2 - 1, btmEdgeColor);
-        view.drawLine(x1 + 1, y2, x2, y2, btmEdgeColor);
-        view.drawLine(x2, 1, x2, y2 - 2, btmEdgeColor);
-        view.fillRectangle(x1 + 1, y1 + 1, x2 - x1 - 1, y2 - x1 - 2, fillColor);
 
         // Draw the text inside the button
         if (!this._text.isEmpty()) {
@@ -155,5 +132,40 @@ public class MapWidgetButton extends MapWidget {
             int iconX = (this.getWidth() - iconY - this._icon.getWidth());
             view.draw(this._icon, iconX, iconY);
         }
-     }
+    }
+
+    /**
+     * Draws the background texture for a button onto a canvas, filling it entirely.
+     * For filling only a portion, use a view.
+     * 
+     * @param canvas to draw on
+     * @param enabled whether button is enabled
+     * @param focused whether button is focused
+     */
+    public static void fillBackground(MapCanvas canvas, boolean enabled, boolean focused) {
+        byte topEdgeColor, fillColor, btmEdgeColor;
+        if (!enabled) {
+            topEdgeColor = fillColor = btmEdgeColor = MapColorPalette.getColor(44, 44, 44);
+        } else if (focused) {
+            topEdgeColor = MapColorPalette.getColor(190, 200, 255);
+            fillColor = MapColorPalette.getColor(126, 136, 191);
+            btmEdgeColor = MapColorPalette.getColor(92, 102, 157);
+        } else {
+            topEdgeColor = MapColorPalette.getColor(170, 170, 170);
+            fillColor = MapColorPalette.getColor(111, 111, 111);
+            btmEdgeColor = MapColorPalette.getColor(86, 86, 86);
+        }
+
+        int x1 = 0, y1 = 0;
+        int x2 = canvas.getWidth() - 1, y2 = canvas.getHeight() - 1;
+
+        canvas.drawLine(x1, y1, x2 - 1, y1, topEdgeColor);
+        canvas.drawLine(x1, y1 + 1, x1, y2 - 2, topEdgeColor);
+        canvas.drawLine(x1, y2 - 1, x1, y2, fillColor);
+        canvas.drawPixel(x2, y1, fillColor);
+        canvas.drawLine(x1 + 1, y2 - 1, x2, y2 - 1, btmEdgeColor);
+        canvas.drawLine(x1 + 1, y2, x2, y2, btmEdgeColor);
+        canvas.drawLine(x2, 1, x2, y2 - 2, btmEdgeColor);
+        canvas.fillRectangle(x1 + 1, y1 + 1, x2 - x1 - 1, y2 - x1 - 2, fillColor);
+    }
 }
