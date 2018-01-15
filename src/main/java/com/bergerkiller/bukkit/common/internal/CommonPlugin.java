@@ -136,17 +136,17 @@ public class CommonPlugin extends PluginBase {
         TIMINGS.setActive(!this.timingsListeners.isEmpty());
     }
 
-    public void notifyAdded(org.bukkit.entity.Entity e) {
+    public void notifyAdded(org.bukkit.World world, org.bukkit.entity.Entity e) {
         // Remove from mapping
         this.entitiesToRemove.remove(e);
         // Event
-        CommonUtil.callEvent(new EntityAddEvent(e));
+        CommonUtil.callEvent(new EntityAddEvent(world, e));
     }
 
-    public void notifyRemoved(org.bukkit.entity.Entity e) {
+    public void notifyRemoved(org.bukkit.World world, org.bukkit.entity.Entity e) {
         this.entitiesToRemove.add(e);
         // Event
-        CommonUtil.callEvent(new EntityRemoveEvent(e));
+        CommonUtil.callEvent(new EntityRemoveEvent(world, e));
     }
 
     public void notifyWorldAdded(org.bukkit.World world) {

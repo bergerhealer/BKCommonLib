@@ -1,13 +1,16 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
@@ -17,17 +20,31 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
  * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
  */
 public class WorldListenerHook extends ClassHook<WorldListenerHook> {
-    public static final Object instance = new WorldListenerHook().createInstance(CommonUtil.getNMSClass("IWorldAccess"));
+    private final World world;
+
+    public WorldListenerHook(World world) {
+        this.world = world;
+    }
 
     public static void hook(World world) {
         List<Object> accessList = NMSWorld.accessList.get(Conversion.toWorldHandle.convert(world));
-        if (!accessList.contains(instance)) {
-            accessList.add(instance);
+        for (Object o : accessList) {
+            if (get(o, WorldListenerHook.class) != null) {
+                return; // Already hooked
+            }
         }
+
+        // Create a listener hook and add
+        accessList.add(new WorldListenerHook(world).createInstance(IWorldAccessHandle.T.getType()));
     }
 
     public static void unhook(World world) {
-        NMSWorld.accessList.get(Conversion.toWorldHandle.convert(world)).remove(instance);
+        Iterator<Object> iter = NMSWorld.accessList.get(Conversion.toWorldHandle.convert(world)).iterator();
+        while (iter.hasNext()) {
+            if (get(iter.next(), WorldListenerHook.class) != null) {
+                iter.remove();
+            }
+        }
     }
 
     @Override
@@ -49,11 +66,11 @@ public class WorldListenerHook extends ClassHook<WorldListenerHook> {
 
     @HookMethod("public void onEntityAdded:???(Entity entity)")
     public void onEntityAdded(Object entity) {
-        CommonPlugin.getInstance().notifyAdded(Conversion.toEntity.convert(entity));
+        CommonPlugin.getInstance().notifyAdded(world, WrapperConversion.toEntity(entity));
     }
 
     @HookMethod("public void onEntityRemoved:???(Entity entity)")
     public void onEntityRemoved(Object entity) {
-        CommonPlugin.getInstance().notifyRemoved(Conversion.toEntity.convert(entity));
+        CommonPlugin.getInstance().notifyRemoved(world, WrapperConversion.toEntity(entity));
     }
 }
