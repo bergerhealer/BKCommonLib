@@ -156,6 +156,8 @@ public class BlockStateConversion {
                     };
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
+                } else if (name.equals("getState0")) {
+                    return null; // Paperspigot: uses this method to abstract out state snapshotting
                 }
 
                 // All other method calls fail
