@@ -661,6 +661,18 @@ public class MathUtil {
         return (int) (key & 0xFFFFFFFF) + Integer.MIN_VALUE;
     }
 
+    /**
+     * Shorthand equivalent of:<br>
+     * longHashToLong(longHashMsw(a)+longHashMsw(b), longHashLsw(a)+longHashLsw(b))
+     * 
+     * @param key_a
+     * @param key_b
+     * @return key_a + key_b
+     */
+    public static long longHashAdd(long key_a, long key_b) {
+        return key_a + key_b + Integer.MIN_VALUE;
+    }
+
     public static void setVectorLength(Vector vector, double length) {
         setVectorLengthSquared(vector, Math.signum(length) * length * length);
     }
