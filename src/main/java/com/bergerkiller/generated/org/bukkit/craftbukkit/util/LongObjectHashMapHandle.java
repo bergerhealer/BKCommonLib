@@ -27,6 +27,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract void clear();
     public abstract int size();
     public abstract boolean containsKey(long key);
     public abstract Object get(long key);
@@ -41,6 +42,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
     public static final class LongObjectHashMapClass extends Template.Class<LongObjectHashMapHandle> {
         public final Template.Constructor.Converted<LongObjectHashMapHandle> constr = new Template.Constructor.Converted<LongObjectHashMapHandle>();
 
+        public final Template.Method<Void> clear = new Template.Method<Void>();
         public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method<Boolean> containsKey = new Template.Method<Boolean>();
         public final Template.Method<Object> get = new Template.Method<Object>();

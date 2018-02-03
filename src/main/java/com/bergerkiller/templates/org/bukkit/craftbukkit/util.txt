@@ -7,6 +7,8 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapH
 class LongObjectHashMap {
     public (LongObjectHashMapHandle) LongObjectHashMap();
 
+    public void clear();
+
     public int size();
 
     public boolean containsKey(long key);

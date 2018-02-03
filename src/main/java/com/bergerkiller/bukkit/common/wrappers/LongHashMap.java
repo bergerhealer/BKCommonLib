@@ -47,6 +47,13 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
     }
 
     /**
+     * Clears all stored entries from this long hash map
+     */
+    public void clear() {
+        handle.clear();
+    }
+
+    /**
      * Checks whether this Long HashMap contains the coordinates specified.<br>
      * <b>Warning: this method was added in v1.54 and is not compatible with MC
      * 1.5.2.</b>
