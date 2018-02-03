@@ -84,10 +84,15 @@ public class Timings implements AutoCloseable {
     }
 
     private static String getTimingName(Plugin plugin, String name) {
-        return String.format("Plugin: %s v%s Event: %s", 
-                plugin.getName(),
-                plugin.getDescription().getVersion(),
-                name);
+        if (hasTimingsV2) {
+            return name;
+        } else {
+            // Timings v1 requires this format or it won't work
+            return String.format("Plugin: %s v%s Event: %s", 
+                    plugin.getName(),
+                    plugin.getDescription().getVersion(),
+                    name);
+        }
     }
 
     /**
@@ -139,5 +144,15 @@ public class Timings implements AutoCloseable {
             TimingsKey k = (TimingsKey) o;
             return k.name.equals(this.name) && k.profiledClass.equals(this.profiledClass);
         }
+    }
+
+    private static final boolean hasTimingsV2;
+    static {
+        boolean tv2 = false;
+        try {
+            Class.forName("co.aikar.timings.Timing").getMethod("startTiming");
+            tv2 = true;
+        } catch (Throwable t) {}
+        hasTimingsV2 = tv2;
     }
 }
