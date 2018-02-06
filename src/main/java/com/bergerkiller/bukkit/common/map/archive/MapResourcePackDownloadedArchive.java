@@ -69,6 +69,9 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
                 log.log(Level.SEVERE, "Failed to read resource packs index", t);
             }
         }
+        if (index == null) {
+            index = new PackIndex();
+        }
 
         // Remove index entries linking to resource pack files that don't exist
         // At the same time, try to find the index entry that matches the URL
