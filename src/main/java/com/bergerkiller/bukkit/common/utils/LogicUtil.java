@@ -6,7 +6,6 @@ import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import java.lang.reflect.Array;
@@ -132,7 +131,7 @@ public class LogicUtil {
      * @return True if the item is null or empty
      */
     public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
-        return item == null || item.getType() == Material.AIR || item.getAmount() < 1;
+        return ItemUtil.isEmpty(item);
     }
 
     /**

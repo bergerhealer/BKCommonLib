@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
@@ -125,7 +126,7 @@ public class ItemUtil {
             tmptrans = transfer(item, to, amountToTransfer);
             if (tmptrans > 0) {
                 amountToTransfer -= tmptrans;
-                from.setItem(i, item);
+                from.setItem(i, LogicUtil.nullOrEmpty(item) ? null : item);
             }
         }
         return startAmount - amountToTransfer;
@@ -654,11 +655,14 @@ public class ItemUtil {
      * @param tag to set to
      */
     public static void setMetaTag(org.bukkit.inventory.ItemStack stack, CommonTagCompound tag) {
-        if (CBCraftItemStack.T.isInstance(stack)) {
-            NMSItemStack.tag.set(Conversion.toItemStackHandle.convert(stack), tag);
-        } else {
-            throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+        if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
+            Object handle = HandleConversion.toItemStackHandle(stack);
+            if (handle != null) {
+                ItemStackHandle.T.tagField.set(handle, tag);
+                return;
+            }
         }
+        throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
     }
 
     /**
@@ -680,12 +684,12 @@ public class ItemUtil {
      * @return Tag Compound, or null if none exist and create is false
      */
     public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack, boolean create) {
-        if (CBCraftItemStack.T.isInstance(stack)) {
-            Object handle = Conversion.toItemStackHandle.convert(stack);
-            CommonTagCompound tag = NMSItemStack.tag.get(handle);
+        if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
+            Object handle = HandleConversion.toItemStackHandle(stack);
+            CommonTagCompound tag = ItemStackHandle.T.tagField.get(handle);
             if (tag == null && create) {
                 tag = new CommonTagCompound();
-                NMSItemStack.tag.set(handle, tag);
+                ItemStackHandle.T.tagField.set(handle, tag);
             }
             return tag;
         } else if (create) {
