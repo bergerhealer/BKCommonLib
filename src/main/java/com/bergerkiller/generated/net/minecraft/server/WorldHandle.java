@@ -8,6 +8,7 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -74,6 +75,8 @@ public abstract class WorldHandle extends Template.Handle {
     }
     public abstract List<EntityHandle> getEntityList();
     public abstract void setEntityList(List<EntityHandle> value);
+    public abstract Collection<EntityHandle> getEntityRemoveQueue();
+    public abstract void setEntityRemoveQueue(Collection<EntityHandle> value);
     public abstract List<EntityHumanHandle> getPlayers();
     public abstract void setPlayers(List<EntityHumanHandle> value);
     public abstract Random getRandom();
@@ -94,6 +97,7 @@ public abstract class WorldHandle extends Template.Handle {
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
+        public final Template.Field.Converted<Collection<EntityHandle>> entityRemoveQueue = new Template.Field.Converted<Collection<EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<List<TileEntityHandle>> tileEntityList = new Template.Field.Converted<List<TileEntityHandle>>();
         public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();

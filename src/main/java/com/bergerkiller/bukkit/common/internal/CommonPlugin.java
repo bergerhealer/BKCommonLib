@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
+import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
@@ -65,7 +66,7 @@ public class CommonPlugin extends PluginBase {
     private final List<Runnable> nextTickSync = new ArrayList<>();
     private final List<TimingsListener> timingsListeners = new ArrayList<>(1);
     private final List<Task> startedTasks = new ArrayList<>();
-    private final HashSet<org.bukkit.entity.Entity> entitiesToRemove = new HashSet<>();
+    private final ImplicitlySharedSet<org.bukkit.entity.Entity> entitiesRemovedFromServer = new ImplicitlySharedSet<>();
     private final HashMap<String, TypedValue> debugVariables = new HashMap<>();
     private CommonEventFactory eventFactory;
     private boolean isServerStarted = false;
@@ -138,15 +139,44 @@ public class CommonPlugin extends PluginBase {
 
     public void notifyAdded(org.bukkit.World world, org.bukkit.entity.Entity e) {
         // Remove from mapping
-        this.entitiesToRemove.remove(e);
+        this.entitiesRemovedFromServer.remove(e);
         // Event
         CommonUtil.callEvent(new EntityAddEvent(world, e));
     }
 
     public void notifyRemoved(org.bukkit.World world, org.bukkit.entity.Entity e) {
-        this.entitiesToRemove.add(e);
+        this.entitiesRemovedFromServer.add(e);
         // Event
         CommonUtil.callEvent(new EntityRemoveEvent(world, e));
+    }
+
+    public void notifyRemovedFromServer(org.bukkit.World world, org.bukkit.entity.Entity e, boolean removeFromChangeSet) {
+        // Also remove from the set tracking these changes
+        if (removeFromChangeSet) {
+            this.entitiesRemovedFromServer.remove(e);
+        }
+
+        // Remove from maps
+        Iterator<SoftReference<EntityMap>> iter = this.maps.iterator();
+        while (iter.hasNext()) {
+            EntityMap map = iter.next().get();
+            if (map == null) {
+                iter.remove();
+            } else {
+                map.remove(e);
+            }
+        }
+
+        // Fire events
+        if (CommonUtil.hasHandlers(EntityRemoveFromServerEvent.getHandlerList())) {
+            CommonUtil.callEvent(new EntityRemoveFromServerEvent(e));
+        }
+
+        // Remove any entity controllers set for the entities that were removed
+        EntityHook hook = EntityHook.get(HandleConversion.toEntityHandle(e), EntityHook.class);
+        if (hook != null && hook.hasController()) {
+            hook.getController().getEntity().setController(null);
+        }
     }
 
     public void notifyWorldAdded(org.bukkit.World world) {
@@ -545,33 +575,28 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void run() {
-            Set<org.bukkit.entity.Entity> removed = getInstance().entitiesToRemove;
-            if (!removed.isEmpty()) {
-                // Remove from maps
-                Iterator<SoftReference<EntityMap>> iter = CommonPlugin.getInstance().maps.iterator();
-                while (iter.hasNext()) {
-                    EntityMap map = iter.next().get();
-                    if (map == null) {
-                        iter.remove();
-                    } else if (!map.isEmpty()) {
-                        map.keySet().removeAll(removed);
-                    }
+            CommonPlugin plugin = getInstance();
+            if (plugin.entitiesRemovedFromServer.isEmpty()) {
+                return;
+            }
+
+            // Iterate all entities pending for removal safely by creating an implicit copy
+            // If the set is modified while handling the removal, do a slow set removal one by one
+            boolean clearRemovedSet = false;
+            try (ImplicitlySharedSet<org.bukkit.entity.Entity> removedCopy = plugin.entitiesRemovedFromServer.clone()) {
+                for (org.bukkit.entity.Entity removedEntity : removedCopy) {
+                    plugin.notifyRemovedFromServer(removedEntity.getWorld(), removedEntity, false);
                 }
-                // Fire events
-                if (CommonUtil.hasHandlers(EntityRemoveFromServerEvent.getHandlerList())) {
-                    for (org.bukkit.entity.Entity e : removed) {
-                        CommonUtil.callEvent(new EntityRemoveFromServerEvent(e));
-                    }
+
+                // If the set is not modified, we can simply clear() the set (much faster)
+                if (plugin.entitiesRemovedFromServer.refEquals(removedCopy)) {
+                    clearRemovedSet = true; // Do outside try() so that the copy is closed
+                } else {
+                    plugin.entitiesRemovedFromServer.removeAll(removedCopy);
                 }
-                // Remove any entity controllers set for the entities that were removed
-                for (org.bukkit.entity.Entity e : removed) {
-                    EntityHook hook = EntityHook.get(HandleConversion.toEntityHandle(e), EntityHook.class);
-                    if (hook != null && hook.hasController()) {
-                        hook.getController().getEntity().setController(null);
-                    }
-                }
-                // Clear for next run
-                removed.clear();
+            }
+            if (clearRemovedSet) {
+                plugin.entitiesRemovedFromServer.clear();
             }
         }
     }

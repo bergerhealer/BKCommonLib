@@ -28,6 +28,13 @@ class World {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
     public final (List<EntityHandle>) List<Entity> entityList;
+
+#if version >= 1.9
+    protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:f;
+#else
+    protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:g;
+#endif
+
     public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;

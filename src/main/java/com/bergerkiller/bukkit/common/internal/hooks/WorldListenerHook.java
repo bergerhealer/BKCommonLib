@@ -1,16 +1,18 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
@@ -71,6 +73,13 @@ public class WorldListenerHook extends ClassHook<WorldListenerHook> {
 
     @HookMethod("public void onEntityRemoved:???(Entity entity)")
     public void onEntityRemoved(Object entity) {
-        CommonPlugin.getInstance().notifyRemoved(world, WrapperConversion.toEntity(entity));
+        org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
+        CommonPlugin.getInstance().notifyRemoved(world, bEntity);
+
+        // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
+        Collection<?> removeQueue = (Collection<?>) WorldHandle.T.entityRemoveQueue.raw.get(HandleConversion.toWorldHandle(world));
+        if (removeQueue != null && removeQueue.contains(entity)) {
+            CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
+        }
     }
 }
