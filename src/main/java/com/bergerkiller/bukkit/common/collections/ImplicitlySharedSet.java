@@ -68,6 +68,17 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
         this.ref.ctr++;
     }
 
+    /**
+     * Gets whether this shared set references the exact same backing set
+     * as another shared set.
+     * 
+     * @param sharedSet
+     * @return True if referencing the same set
+     */
+    public boolean refEquals(ImplicitlySharedSet<E> sharedSet) {
+        return sharedSet != null && sharedSet.ref == this.ref;
+    }
+
     @Override
     public int size() {
         return read().size();

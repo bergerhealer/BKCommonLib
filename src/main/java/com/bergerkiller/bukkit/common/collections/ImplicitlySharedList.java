@@ -68,6 +68,17 @@ public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>,
         this.ref.ctr++;
     }
 
+    /**
+     * Gets whether this shared list references the exact same backing list
+     * as another shared list.
+     * 
+     * @param sharedList
+     * @return True if referencing the same list
+     */
+    public boolean refEquals(ImplicitlySharedList<?> sharedList) {
+        return sharedList != null && sharedList.ref == this.ref;
+    }
+
     @Override
     public int size() {
         return read().size();

@@ -25,7 +25,9 @@ public class ImplicitSharingTest {
             try (ImplicitlySharedSet<String> copy = input.clone()) {
                 assertTrue(copy.contains("Hello"));
                 assertTrue(copy.contains("World"));
+                assertTrue(input.refEquals(copy));
                 copy.add("Wide");
+                assertFalse(input.refEquals(copy));
                 assertTrue(copy.contains("Hello"));
                 assertTrue(copy.contains("World"));
                 assertTrue(copy.contains("Wide"));
@@ -66,7 +68,9 @@ public class ImplicitSharingTest {
             try (ImplicitlySharedList<String> copy = input.clone()) {
                 assertTrue(copy.contains("Hello"));
                 assertTrue(copy.contains("World"));
+                assertTrue(input.refEquals(copy));
                 copy.add("Wide");
+                assertFalse(input.refEquals(copy));
                 assertTrue(copy.contains("Hello"));
                 assertTrue(copy.contains("World"));
                 assertTrue(copy.contains("Wide"));
