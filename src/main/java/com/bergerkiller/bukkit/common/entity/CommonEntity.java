@@ -354,8 +354,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // Reset entity state
+        newInstance.setDead(oldInstance.isDead());
         oldInstance.setDead(true);
-        newInstance.setDead(false);
         oldInstance.setValid(false);
         newInstance.setValid(true);
 
