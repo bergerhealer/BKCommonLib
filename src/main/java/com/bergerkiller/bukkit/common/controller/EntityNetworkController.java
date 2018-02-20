@@ -430,20 +430,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * @param viewer to update
      */
     public final void updateViewer(Player viewer) {
-        // Check if the viewer can see this entity, or one of this entity's passengers
-        boolean viewable = isViewable(viewer);
-        if (!viewable) {
-            for (Entity passenger : entity.getPassengers()) {
-                EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
-                if (network != null && network.getViewers().contains(viewer)) {
-                    viewable = true;
-                    break;
-                }
-            }
-        }
-
         // Add or remove the viewer depending on whether this entity is viewable by the viewer
-        if (viewable) {
+        if (isViewable(viewer)) {
             addViewer(viewer);
         } else {
             removeViewer(viewer);
@@ -451,6 +439,25 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     private boolean isViewable(Player viewer) {
+        if (isViewable_self(viewer)) {
+            return true;
+        }
+        for (Entity passenger : entity.getPassengers()) {
+            EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
+            if (network != null && network.isViewable(viewer)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isViewable_self(Player viewer) {
+        // Viewer is a passenger of this Entity
+        for (Entity passenger : entity.getPassengers()) {
+            if (viewer.equals(passenger)) {
+                return true;
+            }
+        }
         // View range check
         final int dx = MathUtil.floor(Math.abs(EntityUtil.getLocX(viewer) - this.locSynched.getX()));
         final int dz = MathUtil.floor(Math.abs(EntityUtil.getLocZ(viewer) - this.locSynched.getZ()));
