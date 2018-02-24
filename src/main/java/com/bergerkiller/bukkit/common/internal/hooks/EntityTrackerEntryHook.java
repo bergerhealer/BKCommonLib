@@ -56,7 +56,7 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
                 World world = entity.getWorld();
                 EntityTrackerEntryHandle eh = EntityTrackerEntryHandle.createHandle(instance());
                 if (world != null && !WorldUtil.getTracker(world).containsEntry(eh)) {
-                    controller.onDetached();
+                    controller.bind(null, null);
                 }
             }
         } catch (Throwable t) {

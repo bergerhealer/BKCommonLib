@@ -579,10 +579,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
         // Preparations prior to teleportation
         final Location oldLocation = entity.getLocation();
-        final EntityHandle entityHandle = EntityHandle.createHandle(this.getHandle());
         final List<org.bukkit.entity.Entity> passengers = getPassengers();
         final WorldHandle newworld = WorldHandle.fromBukkit(location.getWorld());
-        final boolean isWorldChange = !entityHandle.getWorld().equals(newworld);
+        final boolean isWorldChange = !this.handle.getWorld().equals(newworld);
         final EntityNetworkController<?> oldNetworkController = getNetworkController();
         final boolean hasNetworkController = !(oldNetworkController instanceof DefaultEntityNetworkController);
         WorldUtil.loadChunks(location, 3);
@@ -622,16 +621,43 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         } else {
             // Remove from one world and add to the other
-            entityHandle.getWorld().removeEntity(entityHandle);
-            entityHandle.setDead(false);
-            entityHandle.setWorld(newworld);
-            entityHandle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-            entityHandle.getWorld().addEntity(entityHandle);
+            this.handle.getWorld().removeEntity(this.handle);
+            this.handle.setDead(false);
+            this.handle.setWorld(newworld);
+            this.handle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
+            if (hasNetworkController) {
+                // Hook the entity tracker to cancel track() on this Entity
+                Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
+                Object nmsEntityTrackerHandle = WorldServerHandle.T.entityTracker.raw.get(nmsWorldHandle);
+                EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
+                if (hook == null) {
+                    hook = new EntityTrackerHook(nmsEntityTrackerHandle);
+                    WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+                }
+                hook.ignoredEntities.add(this.handle.getRaw());
+
+                try {
+                    // Spawn the entity. This will not create an entity tracker entry.
+                    EntityUtil.addEntity(entity);
+                } finally {
+                    // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
+                    hook.ignoredEntities.remove(this.handle.getRaw());
+                    if (hook.ignoredEntities.isEmpty()) {
+                        WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.original);
+                    }
+                }
+            } else {
+                // Simply add the entity, which will register a (default) network controller
+                EntityUtil.addEntity(entity);
+            }
             succ = true;
         }
+
         if (hasNetworkController) {
             this.setNetworkController(oldNetworkController);
         }
+
         if (!succ) {
             return false;
         }
@@ -640,7 +666,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (passengers.size() > 0) {
             // Teleport the passenger, but ignore the chunk send check so vehicle is properly spawned to all players
             List<org.bukkit.entity.Entity> teleportedPassengers = new ArrayList<org.bukkit.entity.Entity>();
-            entityHandle.setIgnoreChunkCheck(true);
+            this.handle.setIgnoreChunkCheck(true);
 
             float yawChange = location.getYaw() - oldLocation.getYaw();
             float pitchChange = location.getPitch() - oldLocation.getPitch();
@@ -658,12 +684,24 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 }
             };
 
-            entityHandle.setIgnoreChunkCheck(false);
+            this.handle.setIgnoreChunkCheck(false);
 
             if (teleportedPassengers.size() > 0) {
-                setPassengersSilent(teleportedPassengers);
+                if (hasNetworkController) {
+                    // network controller is used; simply set the passengers of the entity handle
+                    List<EntityHandle> passengerHandles = new ArrayList<EntityHandle>(teleportedPassengers.size());
+                    for (org.bukkit.entity.Entity passenger : teleportedPassengers) {
+                        EntityHandle phandle = EntityHandle.fromBukkit(passenger);
+                        passengerHandles.add(phandle);
+                        phandle.setVehicle(this.handle);
+                    }
+                    this.handle.setPassengers(passengerHandles);
+                } else {
+                    setPassengersSilent(teleportedPassengers);
+                }
             }
         }
+
         return true;
     }
 
