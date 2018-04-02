@@ -23,6 +23,12 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    public void setEntityUUID(UUID uuid) {
+        if (T.entityUUID.isAvailable()) {
+            T.entityUUID.set(getRaw(), uuid);
+        }
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }

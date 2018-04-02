@@ -31,6 +31,11 @@ public abstract class EntityArmorStandHandle extends EntityLivingHandle {
     public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_RIGHT, 14);
     public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_LEFT, 15);
     public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_RIGHT, 16);
+
+    public static final int DATA_FLAG_IS_SMALL = (1 << 0);
+    public static final int DATA_FLAG_HAS_ARMS = (1 << 2);
+    public static final int DATA_FLAG_NO_BASEPLATE = (1 << 3);
+    public static final int DATA_FLAG_SET_MARKER = (1 << 4);
     /**
      * Stores class members for <b>net.minecraft.server.EntityArmorStand</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

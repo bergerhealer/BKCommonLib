@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityItem</b>.
@@ -27,6 +28,8 @@ public abstract class EntityItemHandle extends EntityHandle {
 
     public abstract ItemStackHandle getItemStack();
     public abstract void setItemStack(ItemStackHandle itemstack);
+
+    public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 10);
     public abstract int getAge();
     public abstract void setAge(int value);
     public abstract int getPickupDelay();
@@ -37,6 +40,9 @@ public abstract class EntityItemHandle extends EntityHandle {
      */
     public static final class EntityItemClass extends Template.Class<EntityItemHandle> {
         public final Template.Constructor.Converted<EntityItemHandle> constr_world_x_y_z_itemstack = new Template.Constructor.Converted<EntityItemHandle>();
+
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<Object>> DATA_ITEM = new Template.StaticField.Converted<Key<Object>>();
 
         public final Template.Field.Integer age = new Template.Field.Integer();
         public final Template.Field.Integer pickupDelay = new Template.Field.Integer();

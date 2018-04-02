@@ -40,6 +40,12 @@ class PacketPlayOutSpawnEntity extends Packet {
 #endif
 
     <code>
+    public void setEntityUUID(UUID uuid) {
+        if (T.entityUUID.isAvailable()) {
+            T.entityUUID.set(getRaw(), uuid);
+        }
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
@@ -238,6 +244,12 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) EntityLiving entity);
 
     <code>
+    public void setEntityUUID(UUID uuid) {
+        if (T.entityUUID.isAvailable()) {
+            T.entityUUID.set(getRaw(), uuid);
+        }
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
@@ -372,6 +384,14 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
     private (BlockFace) EnumDirection facing:c;
     private String art:d;
 #endif
+
+    <code>
+    public void setEntityUUID(UUID uuid) {
+        if (T.entityUUID.isAvailable()) {
+            T.entityUUID.set(getRaw(), uuid);
+        }
+    }
+    </code>
 }
 
 class PacketPlayOutSpawnEntityWeather extends Packet {

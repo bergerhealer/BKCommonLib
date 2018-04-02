@@ -5,6 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityVelocityHandle
 
 // Only >= MC 1.9
 optional class PacketPlayInVehicleMove extends Packet {
@@ -108,6 +109,42 @@ class PacketPlayOutEntityTeleport extends Packet {
 optional class PacketPlayInBoatMove {
     private boolean rightPaddle:a;
     private boolean leftPaddle:b;
+}
+
+class PacketPlayOutEntityVelocity extends Packet {
+    private int entityId:a;
+    private int motX_raw:b;
+    private int motY_raw:c;
+    private int motZ_raw:d;
+
+    public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity(int entityId, double motX, double motY, double motZ);
+    public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity((org.bukkit.entity.Entity) Entity entity);
+
+    <code>
+    public double getMotX() {
+        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
+    }
+
+    public double getMotY() {
+        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
+    }
+
+    public double getMotZ() {
+        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
+    }
+
+    public void setMotX(double motX) {
+        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
+    }
+
+    public void setMotY(double motY) {
+        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
+    }
+
+    public void setMotZ(double motZ) {
+        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
+    }
+    </code>
 }
 
 class PacketPlayOutEntity extends Packet {

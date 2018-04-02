@@ -24,6 +24,12 @@ public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandl
 
     /* ============================================================================== */
 
+
+    public void setEntityUUID(UUID uuid) {
+        if (T.entityUUID.isAvailable()) {
+            T.entityUUID.set(getRaw(), uuid);
+        }
+    }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
     public abstract IntVector3 getPosition();
