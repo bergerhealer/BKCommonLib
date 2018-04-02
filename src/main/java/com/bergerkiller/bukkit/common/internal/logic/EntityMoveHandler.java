@@ -46,6 +46,8 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumA
 public class EntityMoveHandler {
     private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
     private static boolean loggedEntityCollisionUndoFailure = false;
+    private boolean blockCollisionEnabled = true;
+    private boolean entityCollisionEnabled = true;
 
     EntityController<?> controller;
     CommonEntity<?> entity;
@@ -53,6 +55,14 @@ public class EntityMoveHandler {
 
     public EntityMoveHandler(EntityController<?> theController) {
         controller = theController;
+    }
+
+    public void setBlockCollisionEnabled(boolean enabled) {
+        this.blockCollisionEnabled = enabled;
+    }
+
+    public void setEntityCollisionEnabled(boolean enabled) {
+        this.entityCollisionEnabled = enabled;
     }
 
     private void removeFromList(List<AxisAlignedBBHandle> bounds, AxisAlignedBBHandle toRemove) {
@@ -73,6 +83,11 @@ public class EntityMoveHandler {
     }
 
     private boolean world_getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle bounds, boolean flag) {
+        // When disabled, return right away and don't add any bounding boxes
+        if (!this.blockCollisionEnabled) {
+            return true;
+        }
+
         Object entityWorld_Raw = entity.getWorld().getRaw();
         if (WorldHandle.T.getBlockCollisions.isAvailable()) {
             if (!WorldHandle.T.getBlockCollisions.invoke(entityWorld_Raw, entity, bounds, flag, collisions_buffer)) {
@@ -161,7 +176,7 @@ public class EntityMoveHandler {
         world_getBlockCollisions(entity, axisalignedbb, false);
         // BKCommonLib end
 
-        if (entity != null) {
+        if (entity != null && this.entityCollisionEnabled) {
             List<EntityHandle> list = entity.getWorld().getEntities(entity, axisalignedbb.growUniform(0.25D));
 
             for (int i = 0; i < list.size(); i++) {

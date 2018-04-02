@@ -166,4 +166,26 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
         }
         hook.base.setInventoryItem(index, handle);
     }
+
+    /**
+     * Sets whether block collisions are handled during movement of the entity.
+     * Disabling block collisions causes entities to fall through the floor, but may
+     * result in a significant boost in performance.
+     * 
+     * @param enabled
+     */
+    public void setBlockCollisionEnabled(boolean enabled) {
+        this.moveHandler.setBlockCollisionEnabled(enabled);
+    }
+
+    /**
+     * Sets whether entity collisions are handled during movement of the entity.
+     * Disabling entity collisions causes entities to go right through other entities
+     * without being affected, and may result in a significant boost in performance.
+     * 
+     * @param enabled
+     */
+    public void setEntityCollisionEnabled(boolean enabled) {
+        this.moveHandler.setEntityCollisionEnabled(enabled);
+    }
 }
