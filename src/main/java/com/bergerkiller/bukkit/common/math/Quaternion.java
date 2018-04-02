@@ -413,6 +413,18 @@ public class Quaternion implements Cloneable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Quaternion) {
+            Quaternion q = (Quaternion) o;
+            return q.x == this.x && q.y == this.y && q.z == this.z && q.w == this.w;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
         return "{" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "}";
     }
@@ -627,7 +639,14 @@ public class Quaternion implements Cloneable {
         Vector D = dir.clone().normalize();
         Vector S = up.clone().crossProduct(dir).normalize();
         Vector U = D.clone().crossProduct(S);
-        return Matrix4x4.fromColumns3x3(S, U, D).getRotation();
+        Quaternion result = Matrix4x4.fromColumns3x3(S, U, D).getRotation();
+
+        // Fix NaN as a result of dir == up
+        if (Double.isNaN(result.x)) {
+            return fromLookDirection(dir);
+        } else {
+            return result;
+        }
     }
 
     /**
