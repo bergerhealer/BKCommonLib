@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.controller;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -187,5 +188,17 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      */
     public void setEntityCollisionEnabled(boolean enabled) {
         this.moveHandler.setEntityCollisionEnabled(enabled);
+    }
+
+    /**
+     * Sets custom axis-aligned bounding box x/y/z size dimensions when handling block
+     * collisions. If using a larger bounding box, changing the block collision bounding
+     * box helps fixing significant stress on the server handling a lot more block collision
+     * events than usual.
+     * 
+     * @param bounds size vector to set to, <i>null<i/> for defaults
+     */
+    public void setBlockCollisionBounds(Vector bounds) {
+        this.moveHandler.setCustomBlockCollisionBounds(bounds);
     }
 }

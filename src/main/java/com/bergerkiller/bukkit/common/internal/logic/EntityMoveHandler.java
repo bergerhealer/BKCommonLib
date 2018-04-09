@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -48,6 +49,7 @@ public class EntityMoveHandler {
     private static boolean loggedEntityCollisionUndoFailure = false;
     private boolean blockCollisionEnabled = true;
     private boolean entityCollisionEnabled = true;
+    private Vector customBlockCollisionBounds = null; // null = entity.getBoundingBox() unchanged
 
     EntityController<?> controller;
     CommonEntity<?> entity;
@@ -63,6 +65,14 @@ public class EntityMoveHandler {
 
     public void setEntityCollisionEnabled(boolean enabled) {
         this.entityCollisionEnabled = enabled;
+    }
+
+    public void setCustomBlockCollisionBounds(Vector bounds) {
+        if (bounds == null) {
+            this.customBlockCollisionBounds = null;
+        } else {
+            this.customBlockCollisionBounds = bounds.clone();
+        }
     }
 
     private void removeFromList(List<AxisAlignedBBHandle> bounds, AxisAlignedBBHandle toRemove) {
@@ -168,12 +178,32 @@ public class EntityMoveHandler {
         return true;
     }
 
-    private List<AxisAlignedBBHandle> world_getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
+    private List<AxisAlignedBBHandle> world_getCubes(EntityHandle entity, double mx, double my, double mz) {
+        AxisAlignedBBHandle axisalignedbb = entity.getBoundingBox().transformB(mx, my, mz);
+
         collisions_buffer.clear(); // BKCommonLib edit: use cached list
 
-        // BKCommonLib start: replace world_getBlockCollisions call; use cached list instead
+        // BKCommonLib start: replace world_getBlockCollisions call; use cached list instead + allow configurable bounds
         //world.a(entity, axisalignedbb, false, arraylist);
-        world_getBlockCollisions(entity, axisalignedbb, false);
+        if (this.blockCollisionEnabled && this.customBlockCollisionBounds != null) {
+            AxisAlignedBBHandle boundingBox = entity.getBoundingBox();
+            double x = 0.5 * (boundingBox.getMinX() + boundingBox.getMaxX());
+            double y = boundingBox.getMinY();
+            double z = 0.5 * (boundingBox.getMinZ() + boundingBox.getMaxZ());
+            AxisAlignedBBHandle newBoundingBox = AxisAlignedBBHandle.createNew(
+                    x - 0.5 * this.customBlockCollisionBounds.getX(),
+                    y,
+                    z - 0.5 * this.customBlockCollisionBounds.getZ(),
+                    x + 0.5 * this.customBlockCollisionBounds.getX(),
+                    y + this.customBlockCollisionBounds.getY(),
+                    z + 0.5 * this.customBlockCollisionBounds.getZ());
+
+            entity.setBoundingBoxField(newBoundingBox);
+            world_getBlockCollisions(entity, newBoundingBox.transformB(mx, my, mz), false);
+            entity.setBoundingBoxField(boundingBox);
+        } else {
+            world_getBlockCollisions(entity, axisalignedbb, false);
+        }
         // BKCommonLib end
 
         if (entity != null && this.entityCollisionEnabled) {
@@ -368,7 +398,7 @@ public class EntityMoveHandler {
             // BKCommonLib start
             // collision event handler
             //List<AxisAlignedBB> list = that.world.getCubes(that, that.getBoundingBox().b(d0, d1, d2));
-            List<AxisAlignedBBHandle> list = world_getCubes(that, that.getBoundingBox().transformB(d0, d1, d2));
+            List<AxisAlignedBBHandle> list = world_getCubes(that, d0, d1, d2);
             // BKCommonLib end
 
             AxisAlignedBBHandle axisalignedbb = that.getBoundingBox();
@@ -424,7 +454,7 @@ public class EntityMoveHandler {
                 // BKCommonLib start
                 // collision event handler
                 //List<AxisAlignedBB> list1 = that.world.getCubes(that, that.getBoundingBox().b(d7, d1, d9));
-                List<AxisAlignedBBHandle> list1 = world_getCubes(that, that.getBoundingBox().transformB(d7, d1, d9));
+                List<AxisAlignedBBHandle> list1 = world_getCubes(that, d7, d1, d9);
                 // BKCommonLib end
 
                 AxisAlignedBBHandle axisalignedbb2 = that.getBoundingBox();
