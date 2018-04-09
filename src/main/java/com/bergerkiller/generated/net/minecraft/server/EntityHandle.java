@@ -215,6 +215,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setBukkitEntityField(Entity value);
     public abstract int getIdField();
     public abstract void setIdField(int value);
+    public abstract boolean isPreventBlockPlace();
+    public abstract void setPreventBlockPlace(boolean value);
     public abstract EntityHandle getVehicle();
     public abstract void setVehicle(EntityHandle value);
     public abstract boolean isIgnoreChunkCheck();
@@ -328,6 +330,7 @@ public abstract class EntityHandle extends Template.Handle {
 
         public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
+        public final Template.Field.Boolean preventBlockPlace = new Template.Field.Boolean();
         @Template.Optional
         public final Template.Field.Converted<List<EntityHandle>> opt_passengers = new Template.Field.Converted<List<EntityHandle>>();
         @Template.Optional

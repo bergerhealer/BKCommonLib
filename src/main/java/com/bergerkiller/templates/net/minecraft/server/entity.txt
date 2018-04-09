@@ -23,6 +23,12 @@ class Entity {
     private static int entityCount;
     private int idField:id;
 
+#if version >= 1.9
+    public boolean preventBlockPlace:i;
+#else
+    public boolean preventBlockPlace:k;
+#endif
+
     /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
 #if version >= 1.9
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;

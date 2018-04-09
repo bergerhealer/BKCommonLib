@@ -347,6 +347,24 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
+     * Sets whether block placement nearby this entity's bounding box is prevented
+     * 
+     * @param prevent option
+     */
+    public void setPreventBlockPlace(boolean prevent) {
+        this.handle.setPreventBlockPlace(prevent);
+    }
+
+    /**
+     * Gets whether block placement nearby this entity's bounding box is prevented
+     * 
+     * @return True if prevented
+     */
+    public boolean isPreventBlockPlace() {
+        return this.handle.isPreventBlockPlace();
+    }
+
+    /**
      * Deprecated: gets/sets length instead
      * 
      * @return height
