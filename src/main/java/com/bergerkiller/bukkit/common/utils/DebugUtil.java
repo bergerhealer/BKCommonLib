@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 /**
  * Contains utilities to debug code, such as logging objects
@@ -166,6 +167,21 @@ public class DebugUtil {
      */
     public static float getShortValue(String name, int value) {
         return getVariableValue(name, Integer.valueOf(value)).shortValue();
+    }
+
+    /**
+     * Gets the value of a Vector debug variable that can be changed using the /debug command.
+     * The x/y/z values can be specified after name. If name is 'test', then 'testx', 'testy' and 'testz'
+     * are added as debug variables.
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static Vector getVectorValue(String name, Vector value) {
+        return new Vector(getDoubleValue(name + "x", value.getX()),
+                          getDoubleValue(name + "y", value.getY()),
+                          getDoubleValue(name + "z", value.getZ()));
     }
 
     /**

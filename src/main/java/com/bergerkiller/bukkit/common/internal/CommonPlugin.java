@@ -534,19 +534,38 @@ public class CommonPlugin extends PluginBase {
                     message.green(variable);
                 }
             } else {
-                final String varname = args[0];
-                final TypedValue value = debugVariables.get(varname);
-                if (value == null) {
-                    message.red("No debug variable of name '").yellow(varname).red("'!");
-                } else {
-                    message.green("Value of variable '").yellow(varname).green("' ");
-                    if (args.length == 1) {
-                        message.green("= ");
+                List<String> variableNames = new ArrayList<String>(args.length);
+                List<TypedValue> variables = new ArrayList<TypedValue>(args.length);
+                List<String> values = new ArrayList<String>(args.length);
+                for (String arg : args) {
+                    TypedValue variable = debugVariables.get(arg);
+                    if (variable != null) {
+                        variables.add(variable);
+                        variableNames.add(arg);
                     } else {
-                        message.green("set to ");
-                        value.parseSet(StringUtil.join(" ", StringUtil.remove(args, 0)));
+                        values.add(arg);
                     }
-                    message.white(value.toString());
+                }
+                if (variables.size() != values.size()) {
+                    if (variables.isEmpty()) {
+                        message.red("No debug variable of name '").yellow(values.get(0)).red("'!");
+                    } else {
+                        for (int i = 0; i < variables.size(); i++) {
+                            if (i > 0) message.newLine();
+                            message.green("Value of variable '").yellow(variableNames.get(i)).green("' ");
+                            message.green("= ");
+                            message.white(variables.get(i).toString());
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < variables.size(); i++) {
+                        TypedValue value = variables.get(i);
+                        if (i > 0) message.newLine();
+                        message.green("Value of variable '").yellow(variableNames.get(i)).green("' ");
+                        message.green("set to ");
+                        value.parseSet(values.get(i));
+                        message.white(value.toString());
+                    }
                 }
             }
             message.send(sender);
