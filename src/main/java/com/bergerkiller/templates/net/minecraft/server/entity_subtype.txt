@@ -294,6 +294,8 @@ class EntityInsentient extends EntityLiving {
 
     <code>
     public static final Key<Byte> DATA_INSENTIENT_FLAGS = Key.Type.BYTE.createKey(T.DATA_INSENTIENT_FLAGS, 11);
+    public static final int DATA_INSENTIENT_FLAG_NOAI = (1 << 0);
+    public static final int DATA_INSENTIENT_FLAG_LEFT_HANDED = (1 << 1);
     </code>
 }
 
@@ -492,5 +494,18 @@ class EntityArmorStand extends EntityLiving {
     public static final int DATA_FLAG_HAS_ARMS = (1 << 2);
     public static final int DATA_FLAG_NO_BASEPLATE = (1 << 3);
     public static final int DATA_FLAG_SET_MARKER = (1 << 4);
+    </code>
+}
+
+class EntityBat extends EntityInsentient {
+#if version >= 1.9
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:a;
+#else
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:???;
+#endif
+
+    <code>
+    public static final Key<Byte> DATA_BAT_FLAGS = Key.Type.BYTE.createKey(T.DATA_BAT_FLAGS, 16);
+    public static final int DATA_BAT_FLAG_HANGING = (1 << 0);
     </code>
 }
