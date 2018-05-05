@@ -75,6 +75,7 @@ public class CommonPlugin extends PluginBase {
     private CommonTabController tabController = null;
     private CommonMapController mapController = null;
     private CommonEntityBlacklist entityBlacklist = null;
+    private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -247,6 +248,15 @@ public class CommonPlugin extends PluginBase {
      */
     public CommonEventFactory getEventFactory() {
         return eventFactory;
+    }
+
+    /**
+     * Gets the immutable player set manager (as used by {@link ImmutablePlayerSet})
+     * 
+     * @return immutable player set manager
+     */
+    public CommonImmutablePlayerSetManager getImmutablePlayerSetManager() {
+        return this.immutablePlayerSetManager;
     }
 
     /**
@@ -445,6 +455,9 @@ public class CommonPlugin extends PluginBase {
         // Initialize NBTBase createHandle() - workaround for a reported error
         // The error this potentially fixes is related to a linkageerror when generating the class
         NBTBaseHandle.T.createHandle(null, true);
+
+        // Initialize immutable player set manager
+        immutablePlayerSetManager = new CommonImmutablePlayerSetManager();
 
         // Initialize permissions
         permissionHandler = new PermissionHandler();

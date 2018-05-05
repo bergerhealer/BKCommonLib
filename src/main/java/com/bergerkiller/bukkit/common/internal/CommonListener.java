@@ -85,6 +85,7 @@ class CommonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPlayerQuit(PlayerQuitEvent event) {
         CommonScoreboard.removePlayer(event.getPlayer());
+        CommonPlugin.getInstance().getImmutablePlayerSetManager().clearCache(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
