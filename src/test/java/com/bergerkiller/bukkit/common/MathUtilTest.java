@@ -364,6 +364,28 @@ public class MathUtilTest {
         }
     }
 
+    @Test
+    public void testQuaternionAngleDifference() {
+        assertEquals(0.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(22.0, 32.0, -50.0),
+                Quaternion.fromYawPitchRoll(22.0, 32.0, -50.0)), 1e-10);
+        assertEquals(180.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(0.0, 0.0, 0.0),
+                Quaternion.fromYawPitchRoll(0.0, 180.0, 0.0)), 1e-10);
+        assertEquals(90.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(-45, 0.0, 0.0),
+                Quaternion.fromYawPitchRoll(45, 0.0, 0.0)), 1e-10);
+        assertEquals(90.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(0.0, -45.0, 0.0),
+                Quaternion.fromYawPitchRoll(0.0, 45.0, 0.0)), 1e-10);
+        assertEquals(180.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(90.0, -45.0, 0.0),
+                Quaternion.fromYawPitchRoll(-90.0, 45.0, 0.0)), 1e-10);
+        assertEquals(44.0, Quaternion.getAngleDifference(
+                Quaternion.fromYawPitchRoll(22.0, -23.5, 0.0),
+                Quaternion.fromYawPitchRoll(-22.0, -23.5, 0.0)), 1e-10);
+    }
+
     // creates a random vector orthogonal to another vector
     private static Vector randOrtho(Vector dir) {
         // Get a valid vector perpendicular to dir
