@@ -776,4 +776,15 @@ public class MathUtil {
             return 1.0 / Math.sqrt(lengthSquared);
         }
     }
+
+    /**
+     * Calculates the angle difference between two vectors in degrees
+     * 
+     * @param v0 first vector
+     * @param v1 second vector
+     * @return absolute angle difference in degrees
+     */
+    public static double getAngleDifference(Vector v0, Vector v1) {
+        return Math.toDegrees(Math.acos(v0.dot(v1) / (v0.length() * v1.length())));
+    }
 }

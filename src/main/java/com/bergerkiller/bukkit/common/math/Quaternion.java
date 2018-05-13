@@ -720,17 +720,6 @@ public class Quaternion implements Cloneable {
         return lerp(q0, qs, q0f, qsf);
     }
 
-    /**
-     * Calculates the angle difference between two quaternions in degrees
-     * 
-     * @param q0 first quaternion
-     * @param q1 second quaternion
-     * @return absolute angle difference in degrees
-     */
-    public static double getAngleDifference(Quaternion q0, Quaternion q1) {
-        return Math.toDegrees(2.0 * Math.acos(divide(q0, q1).w));
-    }
-
     // This method is used often for the two-arg rotateX/Y/Z functions
     // Optimized equivalent of 0.5 * Math.cos(Math.atan2(y, x))
     private static final double halfcosatan2(double y, double x) {

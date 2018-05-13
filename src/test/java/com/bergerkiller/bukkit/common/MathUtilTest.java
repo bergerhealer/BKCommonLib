@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.math.Vector3;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 public class MathUtilTest {
 
@@ -365,25 +366,17 @@ public class MathUtilTest {
     }
 
     @Test
-    public void testQuaternionAngleDifference() {
-        assertEquals(0.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(22.0, 32.0, -50.0),
-                Quaternion.fromYawPitchRoll(22.0, 32.0, -50.0)), 1e-10);
-        assertEquals(180.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(0.0, 0.0, 0.0),
-                Quaternion.fromYawPitchRoll(0.0, 180.0, 0.0)), 1e-10);
-        assertEquals(90.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(-45, 0.0, 0.0),
-                Quaternion.fromYawPitchRoll(45, 0.0, 0.0)), 1e-10);
-        assertEquals(90.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(0.0, -45.0, 0.0),
-                Quaternion.fromYawPitchRoll(0.0, 45.0, 0.0)), 1e-10);
-        assertEquals(180.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(90.0, -45.0, 0.0),
-                Quaternion.fromYawPitchRoll(-90.0, 45.0, 0.0)), 1e-10);
-        assertEquals(44.0, Quaternion.getAngleDifference(
-                Quaternion.fromYawPitchRoll(22.0, -23.5, 0.0),
-                Quaternion.fromYawPitchRoll(-22.0, -23.5, 0.0)), 1e-10);
+    public void testVectorAngleDifference() {
+        testAngleDiff(0.0,     0.5, 0.7, 0.3,    0.5, 0.7, 0.3);
+        testAngleDiff(180.0,   0.5, 0.7, 0.3,    -0.5, -0.7, -0.3);
+        testAngleDiff(90.0,    1.0, 0.0, 0.0,    0.0, 1.0, 0.0);
+        testAngleDiff(90.0,    1.0, 0.0, 0.0,    0.0, -1.0, 0.0);
+        testAngleDiff(45.0,    1.0, 0.0, 0.0,    1.0, 1.0, 0.0);
+        testAngleDiff(47.97136094010452,    0.5, 1.0, 2.0,    3.0, -5.1, 12.2);
+    }
+
+    private static void testAngleDiff(double result, double x0, double y0, double z0, double x1, double y1, double z1) {
+        assertEquals(result, MathUtil.getAngleDifference(new Vector(x0, y0, z0), new Vector(x1, y1, z1)), 1e-6);
     }
 
     // creates a random vector orthogonal to another vector
