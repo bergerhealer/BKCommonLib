@@ -785,6 +785,9 @@ public class MathUtil {
      * @return absolute angle difference in degrees
      */
     public static double getAngleDifference(Vector v0, Vector v1) {
-        return Math.toDegrees(Math.acos(v0.dot(v1) / (v0.length() * v1.length())));
+        double dot = v0.dot(v1);
+        dot *= MathUtil.getNormalizationFactor(v0);
+        dot *= MathUtil.getNormalizationFactor(v1);
+        return Math.toDegrees(Math.acos(dot));
     }
 }
