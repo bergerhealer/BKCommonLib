@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 /**
@@ -22,6 +23,8 @@ public abstract class MovingObjectPositionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract BlockFace getDirection();
+    public abstract void setDirection(BlockFace value);
     public abstract Vector getPos();
     public abstract void setPos(Vector value);
     /**
@@ -29,6 +32,7 @@ public abstract class MovingObjectPositionHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MovingObjectPositionClass extends Template.Class<MovingObjectPositionHandle> {
+        public final Template.Field.Converted<BlockFace> direction = new Template.Field.Converted<BlockFace>();
         public final Template.Field.Converted<Vector> pos = new Template.Field.Converted<Vector>();
 
     }

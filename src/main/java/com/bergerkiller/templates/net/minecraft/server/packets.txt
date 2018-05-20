@@ -30,6 +30,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntity
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipmentHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 
 class Packet {
     <code>
@@ -111,6 +112,20 @@ class Packet {
     protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
         field.setByte(getRaw(), (byte) serializeRotation(rotation));
     }
+
+    protected final com.bergerkiller.bukkit.common.wrappers.HumanHand internalGetHand(Template.Field.Converted<Object> field, org.bukkit.entity.HumanEntity humanEntity) {
+        if (field.isAvailable()) {
+            return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, field.get(getRaw()));
+        } else {
+            return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
+        }
+    }
+
+    protected final void internalSetHand(Template.Field.Converted<Object> field, org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        if (field.isAvailable()) {
+            field.set(getRaw(), com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand));
+        }
+    }
     </code>
 }
 
@@ -177,6 +192,16 @@ class PacketPlayInUseEntity extends Packet {
     private optional (Object) EnumHand enumHand:???;
 #endif
 
+    <code>
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
+    </code>
+
     class PacketPlayInUseEntity.EnumEntityUseAction {
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT;
         enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction ATTACK;
@@ -186,16 +211,47 @@ class PacketPlayInUseEntity extends Packet {
 
 optional class PacketPlayInUseItem extends Packet {
     private (IntVector3) BlockPosition position:a;
-    private (Object) EnumDirection direction:b;
+    private (org.bukkit.block.BlockFace) EnumDirection direction:b;
     private (Object) EnumHand enumHand:c;
-    private float unknown1:d;
-    private float unknown2:e;
-    private float unknown3:f;
+    private float deltaX:d;
+    private float deltaY:e;
+    private float deltaZ:f;
 #if version >= 1.10.2
     public optional long timestamp;
 #else
     public optional long timestamp:???;
 #endif
+
+    <code>
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
+    </code>
+}
+
+class PacketPlayInBlockDig extends Packet {
+    private (IntVector3) BlockPosition position:a;
+    private (org.bukkit.block.BlockFace) EnumDirection direction:b;
+    private (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType digType:c;
+
+    class PacketPlayInBlockDig.EnumPlayerDigType {
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType START_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType ABORT_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType STOP_DESTROY_BLOCK;
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ALL_ITEMS;
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ITEM;
+        enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType RELEASE_USE_ITEM;
+    }
 }
 
 class PacketPlayOutTitle extends Packet {
@@ -246,6 +302,16 @@ class PacketPlayInArmAnimation extends Packet {
 #else
     private optional (Object) EnumHand enumHand:???;
 #endif
+
+    <code>
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
+    </code>
 }
 
 class PacketPlayInBlockPlace extends Packet {
@@ -257,6 +323,22 @@ class PacketPlayInBlockPlace extends Packet {
 
     // Spigot only
     public optional long timestamp;
+
+    <code>
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
+    </code>
 }
 
 class PacketPlayOutRemoveEntityEffect extends Packet {

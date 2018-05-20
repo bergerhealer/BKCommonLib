@@ -23,6 +23,14 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
     public abstract int getUsedEntityId();
     public abstract void setUsedEntityId(int value);
     public abstract UseAction getAction();

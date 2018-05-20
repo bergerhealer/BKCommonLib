@@ -395,11 +395,18 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayInUseItem extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = PacketPlayInUseItemHandle.T.position.toFieldAccessor();
-        public final FieldAccessor<Object> direction = PacketPlayInUseItemHandle.T.direction.toFieldAccessor();
-        public final FieldAccessor<Float> unknown1 = PacketPlayInUseItemHandle.T.unknown1.toFieldAccessor();
-        public final FieldAccessor<Float> unknown2 = PacketPlayInUseItemHandle.T.unknown2.toFieldAccessor();
-        public final FieldAccessor<Float> unknown3 = PacketPlayInUseItemHandle.T.unknown3.toFieldAccessor();
+        public final FieldAccessor<BlockFace> direction = PacketPlayInUseItemHandle.T.direction.toFieldAccessor();
+        public final FieldAccessor<Float> deltaX = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
+        public final FieldAccessor<Float> deltaY = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
+        public final FieldAccessor<Float> deltaZ = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
         public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
+
+        @Deprecated
+        public final FieldAccessor<Float> unknown1 = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
+        @Deprecated
+        public final FieldAccessor<Float> unknown2 = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
+        @Deprecated
+        public final FieldAccessor<Float> unknown3 = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
 
         /**
          * Sets the hand that used the item

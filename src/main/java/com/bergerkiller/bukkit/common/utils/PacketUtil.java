@@ -79,8 +79,10 @@ public class PacketUtil {
      * @param player to receive a packet for
      * @param packet to receive
      */
-    public static void receivePacket(Player player, CommonPacket packet) {
-        receivePacket(player, (Object) packet);
+    public static void receivePacket(Player player, PacketHandle packet) {
+        if (packet != null) {
+            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getRaw());
+        }
     }
 
     /**
@@ -89,9 +91,25 @@ public class PacketUtil {
      * @param player to receive a packet for
      * @param packet to receive
      */
+    public static void receivePacket(Player player, CommonPacket packet) {
+        if (packet != null) {
+            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getHandle());
+        }
+    }
+
+    /**
+     * Fakes a packet sent from the Client to the Server for a certain Player.<br>
+     * <b>Deprecated: Please avoid using raw packet types</b>
+     *
+     * @param player to receive a packet for
+     * @param packet to receive (raw, or a wrapper)
+     */
+    @Deprecated
     public static void receivePacket(Player player, Object packet) {
         if (packet instanceof CommonPacket) {
             packet = ((CommonPacket) packet).getHandle();
+        } else if (packet instanceof PacketHandle) {
+            packet = ((PacketHandle) packet).getRaw();
         }
         if (packet == null) {
             return;
@@ -127,7 +145,7 @@ public class PacketUtil {
      * <b>Deprecated: Please avoid using raw packet types</b>
      * 
      * @param player to send to
-     * @param packet to send
+     * @param packet to send (raw, or a wrapper)
      */
     @Deprecated
     public static void sendPacket(Player player, Object packet) {

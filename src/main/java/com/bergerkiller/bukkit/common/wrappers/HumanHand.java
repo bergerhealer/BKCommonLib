@@ -16,6 +16,15 @@ public enum HumanHand {
     LEFT, RIGHT;
 
     /**
+     * Gets the opposite hand (LEFT -> RIGHT, RIGHT->LEFT)
+     * 
+     * @return opposite hand
+     */
+    public final HumanHand opposite() {
+        return (this == LEFT) ? RIGHT : LEFT;
+    }
+
+    /**
      * Converts this HumanHand to Bukkit's MainHand. This method always returns null
      * on versions before and including 1.8.8.
      * 

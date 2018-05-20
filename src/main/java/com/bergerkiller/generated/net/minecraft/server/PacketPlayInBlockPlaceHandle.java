@@ -21,6 +21,20 @@ public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.enumHand, humanEntity, hand);
+    }
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInBlockPlace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.

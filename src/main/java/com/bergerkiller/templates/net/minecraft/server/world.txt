@@ -321,6 +321,7 @@ class WorldNBTStorage extends IDataManager {
 }
 
 class MovingObjectPosition {
+    public (org.bukkit.block.BlockFace) EnumDirection direction;
     public (org.bukkit.util.Vector) Vec3D pos;
 }
 
