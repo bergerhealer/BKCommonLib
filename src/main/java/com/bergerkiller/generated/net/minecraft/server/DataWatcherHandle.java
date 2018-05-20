@@ -52,7 +52,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
         if (T.get.isAvailable()) {
             rawValue = T.get.invoke(getRaw(), key);
         } else {
-            rawValue = this.read(key).getRawValue();
+            rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(this.read(key));
         }
         return key.getType().getConverter().convert(rawValue);
     }

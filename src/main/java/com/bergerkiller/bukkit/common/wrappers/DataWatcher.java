@@ -22,6 +22,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
@@ -282,10 +283,6 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             }
         }
 
-        public Object getRawValue() {
-            return this.handle.getValue();
-        }
-
         public void setChanged(boolean changed) {
             this.handle.setChanged(changed);
         }
@@ -311,6 +308,17 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             Key<V> key = getKey();
             return "{id=" + key.getId() + ",type=" + key.getType().getInternalType().getSimpleName() + 
                     ",changed=" + isChanged() + ",value=" + getValue() + "}";
+        }
+
+        /**
+         * Reads the raw, internally stored value of an Item. Internal use only, it is not recommended
+         * to use this in your own code because of constantly changing internal representations.
+         * 
+         * @param item to get the raw value of
+         * @return raw value
+         */
+        public static Object getRawValue(Item<?> item) {
+            return item.handle.getRaw();
         }
     }
 
@@ -496,11 +504,19 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     throw new RuntimeException("No token found for internal type " + internalType.getName());
                 }
 
-                this._converter = Conversion.findDuplex((Class<Object>) internalType, externalType);
-                if (this._converter == null) {
+                DuplexConverter<Object, T> converter = Conversion.findDuplex((Class<Object>) internalType, externalType);
+                if (converter == null) {
                     throw new RuntimeException("Failed to find converter from internal type " + 
                             internalType.getName() + " to " + externalType.getName());
                 }
+
+                // Some types used a Google Optional to wrap the value - this must be handled
+                if (DataSerializerRegistry.usesOptional(internalType)) {
+                    converter = new OptionalDuplexConverter<T>(converter);
+                }
+
+                // Set it
+                this._converter = converter;
             }
 
             /**
@@ -586,6 +602,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         private static final HashMap<Object, Class<?>> tokenRegistryRev = new HashMap<Object, Class<?>>();
         private static final HashMap<Class<?>, Object> tokenRegistry = new HashMap<Class<?>, Object>();
         private static final HashMap<Class<?>, Class<?>> typeMapping = new HashMap<Class<?>, Class<?>>();
+        private static final HashSet<Class<?>> usesOptional = new HashSet<Class<?>>();
 
         static {
             Class<?> registryClass = CommonUtil.getNMSClass("DataWatcherRegistry");
@@ -606,6 +623,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                                 // Sometimes google Optional is used to wrap null values. We aren't interested in that ourselves.
                                 if (dataType.type.equals(googleOptional) && dataType.genericTypes.length == 1) {
                                     dataType = dataType.genericTypes[0];
+                                    usesOptional.add(dataType.type);
                                 }
 
                                 // Store in map for future use, mapped to the serializer instance
@@ -669,6 +687,40 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         public static Class<?> getInternalTypeFromToken(Object token) {
             return tokenRegistryRev.get(token);
         }
+
+        public static boolean usesOptional(Class<?> internalType) {
+            return usesOptional.contains(internalType);
+        }
     }
 
+    private static final class OptionalDuplexConverter<T> extends DuplexConverter<Object, T> {
+        private final DuplexConverter<Object, T> _baseConverter;
+
+        public OptionalDuplexConverter(DuplexConverter<Object, T> baseConverter) {
+            super(makeOptional(baseConverter.input), baseConverter.output);
+            this._baseConverter = baseConverter;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T convertInput(Object value) {
+            if (value instanceof com.google.common.base.Optional) {
+                value = ((com.google.common.base.Optional<Object>) value).get();
+            }
+            return this._baseConverter.convertInput(value);
+        }
+
+        @Override
+        public Object convertOutput(T value) {
+            Object result = this._baseConverter.convertOutput(value);
+            if (!(result instanceof com.google.common.base.Optional)) {
+                result = (Object) com.google.common.base.Optional.of(result);
+            }
+            return result;
+        }
+
+        private static TypeDeclaration makeOptional(TypeDeclaration type) {
+            return TypeDeclaration.createGeneric(com.google.common.base.Optional.class, type);
+        }
+    }
 }
