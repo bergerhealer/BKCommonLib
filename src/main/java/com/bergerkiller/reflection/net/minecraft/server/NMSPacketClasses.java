@@ -108,6 +108,7 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 public class NMSPacketClasses {
 
     public static class NMSPacket extends PacketType {
+        private SafeConstructor<CommonPacket> _constructor0 = null;
 
         protected NMSPacket(Class<?> packetClass) {
             super(packetClass);
@@ -123,8 +124,10 @@ public class NMSPacketClasses {
 
         @Override
         public CommonPacket newInstance() {
-            SafeConstructor<CommonPacket> constructor0 = getPacketConstructor();
-            return constructor0.newInstance();
+            if (this._constructor0 == null) {
+                this._constructor0 = getPacketConstructor();
+            }
+            return this._constructor0.newInstance();
         }
     }
 
