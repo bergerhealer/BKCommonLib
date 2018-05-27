@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -89,6 +90,11 @@ public class CommonMapController implements PacketListener, Listener {
     private final HashMap<MapUUID, Short> mapIdByUUID = new HashMap<MapUUID, Short>();
     // Stores Map Displays, mapped by Map UUID
     private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
+    // Stores map items for a short time while a player is moving it around in creative mode
+    private final HashMap<UUID, CachedMapItem> cachedMapItems = new HashMap<UUID, CachedMapItem>();
+    // How long a cached item is kept around and tracked when in the creative player's control
+    private static final int CACHED_ITEM_MAX_LIFE = 20*60*10; // 10 minutes
+    private static final int CACHED_ITEM_CLEAN_INTERVAL = 60; //60 ticks
     // Stores Map Displays by their Type information
     private final OutputTypeMap<MapDisplay> displays = new OutputTypeMap<MapDisplay>();
     // Stores player map input (through Vehicle Steer packets)
@@ -301,6 +307,7 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
         startedTasks.add(new MapInputUpdater(plugin).start(1, 1));
+        startedTasks.add(new CachedMapItemCleaner(plugin).start(100, CACHED_ITEM_CLEAN_INTERVAL));
 
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
@@ -583,17 +590,26 @@ public class CommonMapController implements PacketListener, Listener {
             if (mapUUID != null && CommonMapUUIDStore.getStaticMapId(mapUUID) == -1) {
                 // Dynamic Id map. Since we do not refresh NBT data over the network, this packet contains incorrect data
                 // Find the original item the player took (by UUID). If it exists, merge its NBT data with this item.
+                // For this we also have the map item cache, which is filled with data the moment a player picks up an item
+                // This data is kept around for 10 minutes (unlikely a player will hold onto it for that long...)
                 ItemStack originalMapItem = null;
-                for (ItemStack oldItem : event.getPlayer().getInventory()) {
-                    if (mapUUID.equals(CommonMapUUIDStore.getMapUUID(oldItem))) {
-                        originalMapItem = oldItem.clone();
-                        break;
+                CachedMapItem cachedItem = this.cachedMapItems.get(mapUUID);
+                if (cachedItem != null) {
+                    cachedItem.life = CACHED_ITEM_MAX_LIFE;
+                    originalMapItem = cachedItem.item;
+                } else {
+                    for (ItemStack oldItem : event.getPlayer().getInventory()) {
+                        if (mapUUID.equals(CommonMapUUIDStore.getMapUUID(oldItem))) {
+                            originalMapItem = oldItem.clone();
+                            break;
+                        }
                     }
                 }
-
                 if (originalMapItem != null) {
                     // Original item was found. Restore all properties of that item.
-                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, originalMapItem);
+                    // Keep metadata the player can control, replace everything else
+                    ItemUtil.setMetaTag(item, ItemUtil.getMetaTag(originalMapItem));
+                    event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
                 } else {
                     // Dynamic Id. Force a durability value of 0 to prevent creation of new World Map instances
                     item = ItemUtil.cloneItem(item);
@@ -649,6 +665,18 @@ public class CommonMapController implements PacketListener, Listener {
         resetItemFrameCache(event.getWorld());
         for (ItemFrame frame : iterateItemFrames(event.getWorld())) {
             onAddItemFrame(frame);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    protected synchronized void onInventoryCreativeSlot(InventoryCreativeEvent event) {
+        // When taking items from the inventory in creative mode, store metadata of what is taken
+        // We apply this metadata again when receiving the item
+        if (event.getResult() != Result.DENY) {
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(event.getCurrentItem());
+            if (mapUUID != null) {
+                this.cachedMapItems.put(mapUUID, new CachedMapItem(event.getCurrentItem().clone()));
+            }
         }
     }
 
@@ -1447,6 +1475,44 @@ public class CommonMapController implements PacketListener, Listener {
                 UUID mapUUID2 = CommonMapUUIDStore.getMapUUID(item2);
                 return mapUUID1 != null && mapUUID2 != null && mapUUID1.equals(mapUUID2);
             }
+        }
+    }
+
+    /**
+     * Removes map items from the cache when they have been in there for too long
+     */
+    public class CachedMapItemCleaner extends Task {
+
+        public CachedMapItemCleaner(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            synchronized (CommonMapController.this) {
+                if (!CommonMapController.this.cachedMapItems.isEmpty()) {
+                    Iterator<CachedMapItem> iter = CommonMapController.this.cachedMapItems.values().iterator();
+                    while (iter.hasNext()) {
+                        if ((iter.next().life -= CACHED_ITEM_CLEAN_INTERVAL) <= 0) {
+                            iter.remove();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * An item that sits around in memory while players in creative mode are moving the item around.
+     * 
+     */
+    private static class CachedMapItem {
+        public int life;
+        public final ItemStack item;
+
+        public CachedMapItem(ItemStack item) {
+            this.item = item;
+            this.life = CACHED_ITEM_MAX_LIFE;
         }
     }
 
