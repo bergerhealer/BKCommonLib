@@ -291,7 +291,7 @@ public class BlockUtil extends MaterialUtil {
      */
     public static void setLeversAroundBlock(org.bukkit.block.Block block, boolean down) {
         org.bukkit.block.Block b;
-        for (BlockFace dir : FaceUtil.RADIAL) {
+        for (BlockFace dir : FaceUtil.BLOCK_SIDES) {
             // Attached lever at this direction?
             if (isType(b = block.getRelative(dir), Material.LEVER) && getAttachedFace(b) == dir.getOppositeFace()) {
                 setLever(b, down);
