@@ -561,6 +561,7 @@ public class MapDisplay implements MapDisplayEvents {
             if (!inputWhenHolding) {
                 // Release everyone we may have set as holding before
                 for (MapSession.Owner owner : this.session.onlineOwners) {
+                    owner.interceptInput = false;
                     owner.input.handleDisplayUpdate(this, false);
                 }
             }
