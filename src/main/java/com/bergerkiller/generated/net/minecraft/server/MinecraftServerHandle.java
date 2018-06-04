@@ -26,9 +26,14 @@ public abstract class MinecraftServerHandle extends Template.Handle {
     public abstract String getResourcePack();
     public abstract String getResourcePackHash();
     public abstract int getTicks();
+    public abstract boolean isMainThread();
 
+    private static MinecraftServerHandle _cached_instance = null;
     public static MinecraftServerHandle instance() {
-        return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
+        if (_cached_instance == null) {
+            _cached_instance = com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
+        }
+        return _cached_instance;
     }
     public abstract List<WorldServerHandle> getWorlds();
     public abstract void setWorlds(List<WorldServerHandle> value);
@@ -43,6 +48,7 @@ public abstract class MinecraftServerHandle extends Template.Handle {
         public final Template.Method<String> getResourcePack = new Template.Method<String>();
         public final Template.Method<String> getResourcePackHash = new Template.Method<String>();
         public final Template.Method<Integer> getTicks = new Template.Method<Integer>();
+        public final Template.Method<Boolean> isMainThread = new Template.Method<Boolean>();
 
     }
 

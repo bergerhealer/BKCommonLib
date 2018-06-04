@@ -1056,4 +1056,13 @@ public class CommonUtil {
         }
         return stream;
     }
+
+    /**
+     * Gets whether the currently executing thread calling this method is the main server thread.
+     * 
+     * @return True if this is the main thread
+     */
+    public static boolean isMainThread() {
+        return MinecraftServerHandle.instance().isMainThread();
+    }
 }

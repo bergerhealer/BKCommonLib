@@ -28,9 +28,15 @@ class MinecraftServer {
     public int getTicks:ar();
 #endif
 
+    public boolean isMainThread();
+
     <code>
+    private static MinecraftServerHandle _cached_instance = null;
     public static MinecraftServerHandle instance() {
-        return com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
+        if (_cached_instance == null) {
+            _cached_instance = com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle.instance().getServer();
+        }
+        return _cached_instance;
     }
     </code>
 }

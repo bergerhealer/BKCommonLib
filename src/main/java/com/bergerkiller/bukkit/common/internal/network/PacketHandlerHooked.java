@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
@@ -179,14 +180,29 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     }
 
     @Override
-    public void receivePacket(Player player, Object packet) {
+    public void receivePacket(final Player player, final Object packet) {
+        // If not main thread, schedule a next-tick task to run it
+        if (!CommonUtil.isMainThread()) {
+            CommonUtil.nextTick(new Runnable() {
+                @Override
+                public void run() {
+                    receivePacket(player, packet);
+                }
+            });
+            return;
+        }
+
+        // Handle receiving (main thread)
         SafeMethod<?> method = this.receiverMethods.get(packet);
         if (method == null) {
         	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
         } else {
             Object connection = getPlayerConnection(player);
             if (connection != null) {
-                method.invoke(connection, packet);
+                // We are bypassing the hook - make sure to handle receive packet listener
+                if (this.handlePacketReceive(player, packet, false)) {
+                    method.invoke(connection, packet);
+                }
             }
         }
     }
