@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
+import com.bergerkiller.bukkit.common.internal.resources.ResourceOverrides;
 import com.bergerkiller.bukkit.common.internal.resources.builtin.GeneratedModel;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackArchive;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackAutoArchive;
@@ -574,31 +575,37 @@ public class MapResourcePack {
      * @return InputStream to read the file from, null if not found
      */
     protected InputStream openFileStream(ResourceType type, String path) {
-        // =null: failed to load resource pack file
-        this.handleLoad(true, false);
-        if (this.archive != null) {
-            try {
-                InputStream stream = this.archive.openFileStream(type.makePath(path));
+        // Create full path
+        String fullPath = type.makePath(path);
+
+        // Check overrided
+        if (!ResourceOverrides.isResourceOverrided(fullPath)) {
+            // =null: failed to load resource pack file
+            this.handleLoad(true, false);
+            if (this.archive != null) {
+                try {
+                    InputStream stream = this.archive.openFileStream(fullPath);
+                    if (stream != null) {
+                        return stream;
+                    }
+                } catch (IOException ex) {
+                }
+            }
+
+            // Fallback: try the underlying resource pack (usually Vanilla)
+            if (this.baseResourcePack != null) {
+                InputStream stream =  this.baseResourcePack.openFileStream(type, path);
                 if (stream != null) {
                     return stream;
                 }
-            } catch (IOException ex) {
             }
-        }
 
-        // Fallback: try the underlying resource pack (usually Vanilla)
-        if (this.baseResourcePack != null) {
-            InputStream stream =  this.baseResourcePack.openFileStream(type, path);
-            if (stream != null) {
-                return stream;
-            }
-        }
-
-        // Fallback: ask provider (if available)
-        if (this.currProvider != null) {
-            try {
-                return this.currProvider.openResource(type, path);
-            } catch (IOException ex) {
+            // Fallback: ask provider (if available)
+            if (this.currProvider != null) {
+                try {
+                    return this.currProvider.openResource(type, path);
+                } catch (IOException ex) {
+                }
             }
         }
 
