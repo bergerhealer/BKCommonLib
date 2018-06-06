@@ -2,7 +2,7 @@
     "ambientocclusion": false,
     "elements": [
         {   "from": [ 0, 4, 0 ],
-            "to": [ 15, 15, 15 ],
+            "to": [ 16, 16, 16 ],
             "faces": {
                 "up": { "uv": [ 16, 0, 32, 16 ], "texture": "#shulker" },
                 "west":   { "uv": [ 0, 16, 16, 28 ], "texture": "#shulker" },
@@ -12,7 +12,7 @@
             }
         },
         {   "from": [ 0, 0, 0 ],
-            "to": [ 15, 8, 15 ],
+            "to": [ 16, 8, 16 ],
             "faces": {
                 "down": { "uv": [ 32, 28, 48, 44 ], "texture": "#shulker" },
                 "west":   { "uv": [ 0, 44, 16, 52 ], "texture": "#shulker" },
