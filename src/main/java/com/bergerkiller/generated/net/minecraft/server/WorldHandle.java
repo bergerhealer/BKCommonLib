@@ -17,7 +17,7 @@ import java.util.Random;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public abstract class WorldHandle extends Template.Handle {
+public abstract class WorldHandle extends IBlockAccessHandle {
     /** @See {@link WorldClass} */
     public static final WorldClass T = new WorldClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World");

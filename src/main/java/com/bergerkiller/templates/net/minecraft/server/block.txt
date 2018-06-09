@@ -6,9 +6,11 @@ import com.google.common.base.Function;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
@@ -91,6 +93,21 @@ class Block {
 #endif
 
     public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (Object) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+
+#if version >= 1.9
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+        instance.updateShape(iblockaccess, blockposition);
+        AxisAlignedBB bounds_abs = instance.a((World) iBlockAccess, blockposition, iblockdata);
+        if (bounds_abs == null) {
+            return null;
+        } else {
+            // c() = add(x,y,z)  ->  make block-relative coordinates
+            return bounds_abs.c((double) -blockposition.getX(), (double) -blockposition.getY(), (double) -blockposition.getZ());
+        }
+    }
+#endif
 
     public final (IBlockDataHandle) IBlockData getBlockData();
 

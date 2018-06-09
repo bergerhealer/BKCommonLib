@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
@@ -16,6 +17,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
@@ -25,6 +27,7 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 @SuppressWarnings("deprecation")
 public class BlockDataImpl extends BlockData {
@@ -334,6 +337,11 @@ public class BlockDataImpl extends BlockData {
     @Override
     public final boolean isPowerSource() {
         return this.block.isPowerSource(this.data);
+    }
+
+    @Override
+    public final AxisAlignedBBHandle getBoundingBox(Block block) {
+        return this.block.getBoundingBox(this.data, WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -24,6 +25,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -35,6 +37,16 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
  * information
  */
 public class BlockUtil extends MaterialUtil {
+
+    /**
+     * Gets the bounding box of a block
+     * 
+     * @param block
+     * @return bounding box, relative to block coordinates
+     */
+    public static AxisAlignedBBHandle getBoundingBox(Block block) {
+        return WorldUtil.getBlockData(block).getBoundingBox(block);
+    }
 
     /**
      * Performs an event asking other plugins whether a block can change to a

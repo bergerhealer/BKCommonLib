@@ -62,4 +62,5 @@ public class CommonCapabilities {
      * Since Minecraft 1.8.3 EntitySlice class layout was changed
      */
     public static final boolean REVISED_CHUNK_ENTITY_SLICE = Common.evaluateMCVersion(">=", "1.8.3");
+
 }

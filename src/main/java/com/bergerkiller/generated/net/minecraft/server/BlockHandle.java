@@ -54,6 +54,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);
     public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition);
+    public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();
     public abstract IBlockDataHandle fromLegacyData(int data);
     public abstract int toLegacyData(IBlockDataHandle iblockdata);
@@ -95,6 +96,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<IBlockDataHandle> updateState = new Template.Method.Converted<IBlockDataHandle>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<IBlockDataHandle> getBlockData = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<IBlockDataHandle> fromLegacyData = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<Integer> toLegacyData = new Template.Method.Converted<Integer>();

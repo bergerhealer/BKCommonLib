@@ -10,6 +10,7 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 
 /**
@@ -284,6 +285,15 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return resilience value
      */
     public abstract float getDamageResilience(Entity source);
+
+    /**
+     * Gets the bounding box of a block of this Block Data type/
+     * For convenience it is better to use {@link BlockUtil#getBoundingBox} instead.
+     * 
+     * @param block
+     * @return bounding box of the block (relative to block coordinates)
+     */
+    public abstract AxisAlignedBBHandle getBoundingBox(Block block);
 
     /**
      * Causes the block to drop items as if it was broken naturally

@@ -24,7 +24,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 
-class World {
+class World extends IBlockAccess {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
     public final (List<EntityHandle>) List<Entity> entityList;
@@ -310,6 +310,9 @@ interface IWorldAccess {
     public abstract void onEntityAdded:a((EntityHandle) Entity entity);
 
     public abstract void onEntityRemoved:b((EntityHandle) Entity entity);
+}
+
+interface IBlockAccess {
 }
 
 interface IDataManager {
