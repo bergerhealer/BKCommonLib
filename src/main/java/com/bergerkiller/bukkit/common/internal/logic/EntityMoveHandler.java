@@ -342,12 +342,14 @@ public class EntityMoveHandler {
 
             if (that.isJustLanded()) {
                 that.setJustLanded(false);
-                d0 *= 0.25D;
-                d1 *= 0.05000000074505806D;
-                d2 *= 0.25D;
-                that.setMotX(0.0);
-                that.setMotY(0.0);
-                that.setMotZ(0.0);
+                if (this.blockCollisionEnabled) {
+                    d0 *= 0.25D;
+                    d1 *= 0.05000000074505806D;
+                    d2 *= 0.25D;
+                    that.setMotX(0.0);
+                    that.setMotY(0.0);
+                    that.setMotZ(0.0);
+                }
             }
 
             double d7 = d0;
