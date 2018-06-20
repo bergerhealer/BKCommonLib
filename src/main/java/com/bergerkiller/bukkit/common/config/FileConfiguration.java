@@ -63,10 +63,22 @@ public class FileConfiguration extends BasicConfiguration {
      */
     public void save() {
         try {
-            boolean regen = !this.exists();
-            this.saveToStream(StreamUtil.createOutputStream(this.file));
-            if (regen) {
-            	Logging.LOGGER_CONFIG.log(Level.INFO, "File '" + this.file + "' has been generated");
+            // First save to a .tmp file
+            File tmp_file = new File(this.file.getAbsolutePath() + ".tmp");
+            this.saveToStream(StreamUtil.createOutputStream(tmp_file));
+            if (this.exists()) {
+                if (this.file.delete()) {
+                    // Rename tmp file to file
+                    tmp_file.renameTo(this.file);
+                } else {
+                    // Attempt stream copying from the tmp file to the new file
+                    // Then delete the tmp file
+                    StreamUtil.tryCopyFile(tmp_file, this.file);
+                    tmp_file.delete();
+                }
+            } else {
+                tmp_file.renameTo(this.file);
+                Logging.LOGGER_CONFIG.log(Level.INFO, "File '" + this.file + "' has been generated");
             }
         } catch (Exception ex) {
         	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while saving to file '" + this.file + "':");
