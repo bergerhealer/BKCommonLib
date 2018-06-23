@@ -48,6 +48,18 @@ import org.bukkit.entity.Player;
 public class CommonNMS {
     private static WorldServerHandle dummyTrackerWorld = null; // lazy-initialized once
     private static EntityTrackerHandle dummyTracker = null; // lazy-initialized once
+    public static Class<?> GOOGLE_OPTIONAL_CLASS = CommonUtil.getClass("com.google.common.base.Optional");
+
+    @SuppressWarnings("unchecked")
+    public static Object unwrapGoogleOptional(Object value) {
+        if (GOOGLE_OPTIONAL_CLASS != null) {
+            if (value instanceof com.google.common.base.Optional) {
+                com.google.common.base.Optional<Object> opt = (com.google.common.base.Optional<Object>) value;
+                return opt.isPresent() ? opt.get() : null;
+            }
+        }
+        return value;
+    }
 
     public static boolean isItemEmpty(Object rawItemStackHandle) {
         if (rawItemStackHandle == null) {

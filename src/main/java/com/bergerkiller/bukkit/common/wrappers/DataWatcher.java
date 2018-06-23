@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
@@ -318,7 +319,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @return raw value
          */
         public static Object getRawValue(Item<?> item) {
-            return item.handle.getRaw();
+            return item.handle.getValue();
         }
     }
 
@@ -607,7 +608,6 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         static {
             Class<?> registryClass = CommonUtil.getNMSClass("DataWatcherRegistry");
             Class<?> serializerClass = CommonUtil.getNMSClass("DataWatcherSerializer");
-            Class<?> googleOptional = CommonUtil.getClass("com.google.common.base.Optional");
             if (registryClass != null && serializerClass != null) {
                 // Use MC 1.10.2 serializer registry for this
                 for (Field f : registryClass.getDeclaredFields()) {
@@ -621,7 +621,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                                 TypeDeclaration dataType = typeDec.genericTypes[0];
 
                                 // Sometimes google Optional is used to wrap null values. We aren't interested in that ourselves.
-                                if (dataType.type.equals(googleOptional) && dataType.genericTypes.length == 1) {
+                                if (dataType.type.equals(CommonNMS.GOOGLE_OPTIONAL_CLASS) && dataType.genericTypes.length == 1) {
                                     dataType = dataType.genericTypes[0];
                                     usesOptional.add(dataType.type);
                                 }
@@ -702,11 +702,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public T convertInput(Object value) {
-            if (value instanceof com.google.common.base.Optional) {
-                value = ((com.google.common.base.Optional<Object>) value).get();
-            }
+            value = CommonNMS.unwrapGoogleOptional(value);
             return this._baseConverter.convertInput(value);
         }
 
