@@ -1090,6 +1090,7 @@ public class CommonMapController implements PacketListener, Listener {
     public class ItemFrameInfo {
         public final ItemFrame itemFrame;
         public final EntityItemFrameHandle itemFrameHandle;
+        public final DataWatcher.Item<?> itemFrame_dw_item;
         public final ArrayList<Player> viewers;
         public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
         public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
@@ -1098,9 +1099,15 @@ public class CommonMapController implements PacketListener, Listener {
         public boolean sentToPlayers; // players have received item information for this item frame
         public MapDisplayInfo displayInfo;
 
+        // These fields are used in updateItem() to speed up performance, due to how often it is called
+        private Object lastFrameRawItem = null; // performance optimization to avoid conversion
+        private ItemStack lastFrameItem = null; // performance optimization to simplify item change detection
+        private ItemStack lastFrameItemUpdate = null; // to detect a change in item in updateItem()
+
         public ItemFrameInfo(ItemFrame itemFrame) {
             this.itemFrame = itemFrame;
             this.itemFrameHandle = EntityItemFrameHandle.fromBukkit(itemFrame);
+            this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
             this.viewers = new ArrayList<Player>();
             this.removed = false;
             this.lastMapUUID = null;
@@ -1111,8 +1118,27 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         public void updateItem() {
+            // Avoid expensive conversion and creation of CraftItemStack by detecting changes
+            Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
+            raw_item = CommonNMS.unwrapGoogleOptional(raw_item); // May be needed
+            if (this.lastFrameRawItem != raw_item) {
+                this.lastFrameRawItem = raw_item;
+                this.lastFrameItem = WrapperConversion.toItemStack(this.lastFrameRawItem);
+            }
+
+            // Check item changed
+            if (LogicUtil.bothNullOrEqual(this.lastFrameItemUpdate, this.lastFrameItem)) {
+                return;
+            }
+
+            // Assign & clone so that changes can be detected
+            this.lastFrameItemUpdate = this.lastFrameItem;
+            if (this.lastFrameItemUpdate != null) {
+                this.lastFrameItemUpdate = this.lastFrameItemUpdate.clone();
+            }
+
             // Handle changes in map item shown in item frames
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.itemFrameHandle.getItem());
+            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.lastFrameItemUpdate);
             if (mapUUID == null) {
                 // Map was removed
                 this.sentToPlayers = false;
