@@ -319,6 +319,9 @@ public class CommonUtil {
      * @return Filtered stack trace
      */
     public static StackTraceElement[] filterStackTrace(StackTraceElement[] elements, String className, String methodName) {
+        if (elements == null || elements.length == 0) {
+            return new StackTraceElement[0];
+        }
         ArrayList<StackTraceElement> rval = new ArrayList<StackTraceElement>(elements.length - 1);
         for (StackTraceElement elem : elements) {
             if (elem.getClassName().equals(className) && elem.getMethodName().equals(methodName)) {
