@@ -55,7 +55,7 @@ public class IntVector3 implements Comparable<IntVector3> {
 
     @Override
     public int hashCode() {
-        return this.x + this.z << 8 + this.y << 16;
+        return this.x + (this.z << 8) + (this.y << 16);
     }
 
     @Override
