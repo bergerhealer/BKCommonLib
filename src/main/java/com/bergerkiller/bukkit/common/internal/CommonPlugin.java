@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
+import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
@@ -387,6 +388,13 @@ public class CommonPlugin extends PluginBase {
         }
         packetHandler = null;
 
+        // Disable LookupEntityClassMap hook
+        try {
+            LookupEntityClassMap.unhook();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
 
@@ -448,6 +456,13 @@ public class CommonPlugin extends PluginBase {
                 "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999");
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
+
+        // Initialize LookupEntityClassMap and hook it into the server
+        try {
+            LookupEntityClassMap.hook();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
 
         // Initialize MapColorPalette (static initializer)
         MapColorPalette.getColor(Color.RED);

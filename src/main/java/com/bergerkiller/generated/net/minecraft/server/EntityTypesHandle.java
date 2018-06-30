@@ -30,8 +30,8 @@ public abstract class EntityTypesHandle extends Template.Handle {
             return (mcKey == null) ? null : mcKey.toString();
         } else if (T.getName_old.isAvailable()) {
             return T.getName_old.invoke(type);
-        } else if (T.entityNamesMap_1_8_8.isAvailable()) {
-            return T.entityNamesMap_1_8_8.get().get(type);
+        } else if (T.entityNamesMap_1_10_2.isAvailable()) {
+            return T.entityNamesMap_1_10_2.get().get(type);
         } else {
             throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
         }
@@ -46,7 +46,7 @@ public abstract class EntityTypesHandle extends Template.Handle {
         @Template.Optional
         public final Template.StaticField.Converted<Map<String, Class<?>>> opt_entityMap = new Template.StaticField.Converted<Map<String, Class<?>>>();
         @Template.Optional
-        public final Template.StaticField.Converted<Map<Class<?>, String>> entityNamesMap_1_8_8 = new Template.StaticField.Converted<Map<Class<?>, String>>();
+        public final Template.StaticField.Converted<Map<Class<?>, String>> entityNamesMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
 
         @Template.Optional
         public final Template.StaticMethod.Converted<Void> register = new Template.StaticMethod.Converted<Void>();

@@ -27,10 +27,10 @@ class EntityTypes {
     public static optional String getName_old:getName((Class<?>) Class<? extends Entity> oclass);
 #endif
 
-#if version <= 1.8.8
-    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_8_8:d;
+#if version <= 1.10.2
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:d;
 #else
-    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_8_8:???;
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:???;
 #endif
 
     <code>
@@ -46,8 +46,8 @@ class EntityTypes {
             return (mcKey == null) ? null : mcKey.toString();
         } else if (T.getName_old.isAvailable()) {
             return T.getName_old.invoke(type);
-        } else if (T.entityNamesMap_1_8_8.isAvailable()) {
-            return T.entityNamesMap_1_8_8.get().get(type);
+        } else if (T.entityNamesMap_1_10_2.isAvailable()) {
+            return T.entityNamesMap_1_10_2.get().get(type);
         } else {
             throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
         }
