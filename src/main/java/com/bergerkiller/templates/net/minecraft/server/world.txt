@@ -31,11 +31,12 @@ class World extends IBlockAccess {
 
 #if version >= 1.9
     protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:f;
+    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
 #else
     protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:g;
+    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList:???;
 #endif
 
-    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
     public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;

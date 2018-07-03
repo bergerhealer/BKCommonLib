@@ -89,12 +89,14 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         return key;
     }
 
+    @SuppressWarnings("unchecked")
     public static void hook() {
         // <= 1.10.2 had a static Map instance
         if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
-            Map<Class<?>, String> base = EntityTypesHandle.T.entityNamesMap_1_10_2.get();
+            Map<Class<?>, String> base = (Map<Class<?>, String>) EntityTypesHandle.T.entityNamesMap_1_10_2.raw.get();
             Map<Class<?>, String> repl = new LookupEntityClassMap<Class<?>, String>(base);
-            EntityTypesHandle.T.entityNamesMap_1_10_2.set(repl);
+            EntityTypesHandle.T.entityNamesMap_1_10_2.raw.set(repl);
+            return;
         }
 
         // >= 1.11 uses RegistryMaterials BiMap
@@ -108,10 +110,10 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
     public static void unhook() {
         // <= 1.10.2 had a static Map instance
         if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
-            Map<Class<?>, String> orig = EntityTypesHandle.T.entityNamesMap_1_10_2.get();
+            Object orig = EntityTypesHandle.T.entityNamesMap_1_10_2.raw.get();
             if (orig instanceof LookupEntityClassMap) {
                 LookupEntityClassMap<Class<?>, String> repl = (LookupEntityClassMap<Class<?>, String>) orig;
-                EntityTypesHandle.T.entityNamesMap_1_10_2.set(repl._base);
+                EntityTypesHandle.T.entityNamesMap_1_10_2.raw.set(repl._base);
             }
             return;
         }
