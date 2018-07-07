@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import org.bukkit.entity.Entity;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityHuman</b>.
@@ -24,6 +25,7 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
 
     /* ============================================================================== */
 
+    public abstract void attack(Entity entity);
     public abstract Object getInventoryRaw();
     public abstract void setInventoryRaw(Object value);
     public abstract Object getEnderChestRaw();
@@ -74,6 +76,8 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
         public final Template.Field.Float exp = new Template.Field.Float();
         public final Template.Field.Converted<GameProfileHandle> gameProfile = new Template.Field.Converted<GameProfileHandle>();
         public final Template.Field<String> spawnWorld = new Template.Field<String>();
+
+        public final Template.Method.Converted<Void> attack = new Template.Method.Converted<Void>();
 
     }
 
