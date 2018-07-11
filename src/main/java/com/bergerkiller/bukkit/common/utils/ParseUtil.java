@@ -106,7 +106,7 @@ public class ParseUtil {
         }
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            if (!Character.isDigit(c) && c != '.' && c != ',') {
+            if (!Character.isDigit(c) && c != '.' && c != ',' && (c != '-' || i > 0)) {
                 return false;
             }
         }
