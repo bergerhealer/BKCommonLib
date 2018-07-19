@@ -32,10 +32,10 @@ class Entity {
     /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
 #if version >= 1.9
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
-    public optional (EntityHandle) Entity opt_passenger:???;
+    public optional (EntityHandle) Entity opt_passenger:###;
     protected unknown int j;
 #else
-    public optional final (List<EntityHandle>) List<Entity> opt_passengers:???;
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:###;
     public optional (EntityHandle) Entity opt_passenger:passenger;
 #endif
 
@@ -223,22 +223,22 @@ class Entity {
         private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
     #else
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:ay;
         private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:az;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
-        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
     #endif
 #else
     /* === MC 1.8.8: These constants do not exist == */
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:???;
-    private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:???;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:???;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:???;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:???;
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:###;
+    private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
 #endif
     <code>
     public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
@@ -321,8 +321,8 @@ class Entity {
     optional private double[] move_SomeArray:aI;
     optional private long move_SomeState:aJ;
 #else
-    optional private double[] move_SomeArray:???;
-    optional private long move_SomeState:???;
+    optional private double[] move_SomeArray:###;
+    optional private long move_SomeState:###;
 #endif
 
     public boolean valid;
@@ -570,8 +570,8 @@ class Entity {
     public optional boolean isPassenger();
     public void recalcPosition();
 #else
-    public optional boolean isVehicle:???();
-    public optional boolean isPassenger:???();
+    public optional boolean isVehicle:###();
+    public optional boolean isPassenger:###();
     private void recalcPosition();
 #endif
 
@@ -644,7 +644,7 @@ class Entity {
 #else
     public boolean isWet:U();
 
-    public optional (EntityHandle) Entity getDriverEntity:???();
+    public optional (EntityHandle) Entity getDriverEntity:###();
 
     public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #endif
@@ -682,7 +682,7 @@ class Entity {
 #if version >= 1.9
     public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
 #else
-    public optional boolean isInSameVehicle:???((EntityHandle) Entity entity);
+    public optional boolean isInSameVehicle:###((EntityHandle) Entity entity);
 #endif
     <code>
     public boolean isInSameVehicle(EntityHandle entity) {
@@ -739,6 +739,8 @@ class Entity {
     // Since MC 1.11.2
     public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
+    public boolean hasCustomName();
+    public String getCustomName();
 
     public void collide((EntityHandle) Entity entity);
 

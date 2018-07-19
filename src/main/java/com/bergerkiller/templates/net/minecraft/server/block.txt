@@ -20,7 +20,7 @@ class Block {
 
 #if version >= 1.9
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
-    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:???;
+    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:###;
 #else
     public static final rawtype (Iterable) RegistryID<IBlockData> REGISTRY_ID:d;
     public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:stepSound;
@@ -71,7 +71,7 @@ class Block {
 #elseif version >= 1.9
     public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:w();
 #else
-    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:???();
+    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:###();
 #endif
     <code>
     public SoundEffectTypeHandle getSoundType() {

@@ -189,7 +189,7 @@ class PacketPlayInUseEntity extends Packet {
 #if version >= 1.9
     private optional (Object) EnumHand enumHand:d;
 #else
-    private optional (Object) EnumHand enumHand:???;
+    private optional (Object) EnumHand enumHand:###;
 #endif
 
     <code>
@@ -219,7 +219,7 @@ optional class PacketPlayInUseItem extends Packet {
 #if version >= 1.10.2
     public optional long timestamp;
 #else
-    public optional long timestamp:???;
+    public optional long timestamp:###;
 #endif
 
     <code>
@@ -300,7 +300,7 @@ class PacketPlayInArmAnimation extends Packet {
 #if version >= 1.9
     private optional (Object) EnumHand enumHand:a;
 #else
-    private optional (Object) EnumHand enumHand:???;
+    private optional (Object) EnumHand enumHand:###;
 #endif
 
     <code>
@@ -318,7 +318,7 @@ class PacketPlayInBlockPlace extends Packet {
 #if version >= 1.9
     private optional (Object) EnumHand enumHand:a;
 #else
-    private optional (Object) EnumHand enumHand:???;
+    private optional (Object) EnumHand enumHand:###;
 #endif
 
     // Spigot only
@@ -385,7 +385,7 @@ class PacketPlayOutMap extends Packet {
     private int height:h;
     private byte[] pixels:i;
 #else
-    private optional boolean track:???;
+    private optional boolean track:###;
     private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
     private int xmin:d;
     private int ymin:e;
@@ -403,18 +403,18 @@ class PacketPlayOutMapChunk extends Packet {
     private optional int sectionsMask:c;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:???;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
     private boolean hasBiomeData:f;
 #elseif version >= 1.9
     private optional int sectionsMask:c;
     private optional byte[] data:d;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:???;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:???;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
     private boolean hasBiomeData:e;
 #else
-    private optional int sectionsMask:???;
-    private optional byte[] data:???;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:???;
+    private optional int sectionsMask:###;
+    private optional byte[] data:###;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:c;
     private boolean hasBiomeData:d;
 #endif
@@ -507,17 +507,17 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     private int y:d;
     private int z:e;
     private float volume:f;
-    private optional int pitch_1_8_8:???;
+    private optional int pitch_1_8_8:###;
     private optional float pitch_1_10_2:g;
 #else
     private (ResourceKey) String sound:a;
-    private optional (String) SoundCategory category_1_10_2:???;
+    private optional (String) SoundCategory category_1_10_2:###;
     private int x:b;
     private int y:c;
     private int z:d;
     private float volume:e;
     private optional int pitch_1_8_8:f;
-    private optional float pitch_1_10_2:???;
+    private optional float pitch_1_10_2:###;
 #endif
 
     // Accessor functions for pitch
@@ -615,7 +615,7 @@ optional class PacketPlayOutBoss extends Packet {
 
 class PacketPlayOutAttachEntity extends Packet {
 #if version >= 1.9
-    private optional int leashId:???;
+    private optional int leashId:###;
     private int passengerId:a;
     private int vehicleId:b;
 #else
@@ -719,7 +719,7 @@ class PacketPlayOutScoreboardTeam extends Packet {
     private int mode:i;
     private int friendlyFire:j;
 #else
-    private optional String collisionRule:???;
+    private optional String collisionRule:###;
     private int chatFormat:f;
     private final Collection<String> players:g;
     private int mode:h;
@@ -774,7 +774,7 @@ class PacketPlayInTabComplete extends Packet {
     private optional boolean assumeCommand:b;
     private (IntVector3) BlockPosition position:c;
 #else
-    private optional boolean assumeCommand:???;
+    private optional boolean assumeCommand:###;
     private (IntVector3) BlockPosition position:b;
 #endif
 }

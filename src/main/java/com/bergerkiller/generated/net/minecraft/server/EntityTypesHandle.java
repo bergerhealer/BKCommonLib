@@ -55,6 +55,8 @@ public abstract class EntityTypesHandle extends Template.Handle {
         @Template.Optional
         public final Template.StaticMethod.Converted<Object> getName = new Template.StaticMethod.Converted<Object>();
         @Template.Optional
+        public final Template.StaticMethod.Converted<String> keyToInternalName = new Template.StaticMethod.Converted<String>();
+        @Template.Optional
         public final Template.StaticMethod.Converted<String> getName_old = new Template.StaticMethod.Converted<String>();
 
     }

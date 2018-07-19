@@ -8,9 +8,9 @@ class PacketPlayOutSpawnEntity extends Packet {
 #if version >= 1.9
     private int entityId:a;
     private optional UUID entityUUID:b;
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:c;
     private optional double posY_1_10_2:d;
     private optional double posZ_1_10_2:e;
@@ -23,13 +23,13 @@ class PacketPlayOutSpawnEntity extends Packet {
     private int extraData:l;
 #else
     private int entityId:a;
-    private optional UUID entityUUID:???;
+    private optional UUID entityUUID:###;
     private optional int posX_1_8_8:b;
     private optional int posY_1_8_8:c;
     private optional int posZ_1_8_8:d;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
     private optional int motX_raw:e;
     private optional int motY_raw:f;
     private optional int motZ_raw:g;
@@ -116,9 +116,9 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private int entityId:a;
     private UUID entityUUID:b;
 #if version >= 1.9
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:c;
     private optional double posY_1_10_2:d;
     private optional double posZ_1_10_2:e;
@@ -126,15 +126,15 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private optional int posX_1_8_8:c;
     private optional int posY_1_8_8:d;
     private optional int posZ_1_8_8:e;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
 #endif
     private optional byte yaw_raw:f;
     private optional byte pitch_raw:g;
 
 #if version >= 1.9
-    private optional (org.bukkit.Material) int heldItem:???;
+    private optional (org.bukkit.Material) int heldItem:###;
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:h;
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> dataWatcherItems:i;
 #else
@@ -206,9 +206,9 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 #if version >= 1.9
     private optional UUID entityUUID:b;
     private int entityTypeId:c;
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:d;
     private optional double posY_1_10_2:e;
     private optional double posZ_1_10_2:f;
@@ -221,14 +221,14 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:m;
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> dataWatcherItems:n;
 #else
-    private optional UUID entityUUID:???;
+    private optional UUID entityUUID:###;
     private int entityTypeId:b;
     private optional int posX_1_8_8:c;
     private optional int posY_1_8_8:d;
     private optional int posZ_1_8_8:e;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
     private optional int motX_raw:f;
     private optional int motY_raw:g;
     private optional int motZ_raw:h;
@@ -327,9 +327,9 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
     private int entityId:a;
 #if version >= 1.9
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:b;
     private optional double posY_1_10_2:c;
     private optional double posZ_1_10_2:d;
@@ -337,9 +337,9 @@ class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
     private optional int posX_1_8_8:b;
     private optional int posY_1_8_8:c;
     private optional int posZ_1_8_8:d;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
 #endif
     private int experience:e;
 
@@ -379,7 +379,7 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
     private (BlockFace) EnumDirection facing:d;
     private String art:e;
 #else
-    private optional UUID entityUUID:entityUUID:???;
+    private optional UUID entityUUID:entityUUID:###;
     private (IntVector3) BlockPosition position:b;
     private (BlockFace) EnumDirection facing:c;
     private String art:d;
@@ -398,9 +398,9 @@ class PacketPlayOutSpawnEntityWeather extends Packet {
     private int entityId:a;
 
 #if version >= 1.9
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:b;
     private optional double posY_1_10_2:c;
     private optional double posZ_1_10_2:d;
@@ -408,9 +408,9 @@ class PacketPlayOutSpawnEntityWeather extends Packet {
     private optional int posX_1_8_8:b;
     private optional int posY_1_8_8:c;
     private optional int posZ_1_8_8:d;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
 #endif
 
     private int type:e;

@@ -8,7 +8,7 @@ class ItemStack {
 #if version >= 1.11
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:a;
 #else
-    public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:???;
+    public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:###;
 #endif
 
     private int amountField:count;

@@ -4,33 +4,37 @@ class EntityTypes {
 #if version >= 1.11
     public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:b;
 
-    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:???;
+    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:###;
 
     private static optional void register:a(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
 
-    private static optional void register_old:???((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
+    private static optional void register_old:###((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
 
     public static optional (Object) MinecraftKey getName((Class<?>) Class<? extends Entity> paramClass);
 
-    public static optional String getName_old:???((Class<?>) Class<? extends Entity> oclass);
+    public static optional String keyToInternalName:a((Object) MinecraftKey minecraftkey);
+
+    public static optional String getName_old:###((Class<?>) Class<? extends Entity> oclass);
 #else
-    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:???;
+    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:###;
 
     private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:c;
 
-    private static optional void register:???(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
+    private static optional void register:###(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
 
     private static optional void register_old:a((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
 
-    public static optional (Object) MinecraftKey getName:???((Class<?>) Class<? extends Entity> paramClass);
-    
+    public static optional (Object) MinecraftKey getName:###((Class<?>) Class<? extends Entity> paramClass);
+
+    public static optional String keyToInternalName:###((Object) MinecraftKey minecraftkey);
+
     public static optional String getName_old:getName((Class<?>) Class<? extends Entity> oclass);
 #endif
 
 #if version <= 1.10.2
     private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:d;
 #else
-    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:???;
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:###;
 #endif
 
     <code>

@@ -28,9 +28,9 @@ optional class PacketPlayOutVehicleMove extends Packet {
 class PacketPlayOutEntityTeleport extends Packet {
     private int entityId:a;
 #if version >= 1.9
-    private optional int posX_1_8_8:???;
-    private optional int posY_1_8_8:???;
-    private optional int posZ_1_8_8:???;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
     private optional double posX_1_10_2:b;
     private optional double posY_1_10_2:c;
     private optional double posZ_1_10_2:d;
@@ -38,9 +38,9 @@ class PacketPlayOutEntityTeleport extends Packet {
     private optional int posX_1_8_8:b;
     private optional int posY_1_8_8:c;
     private optional int posZ_1_8_8:d;
-    private optional double posX_1_10_2:???;
-    private optional double posY_1_10_2:???;
-    private optional double posZ_1_10_2:???;
+    private optional double posX_1_10_2:###;
+    private optional double posY_1_10_2:###;
+    private optional double posZ_1_10_2:###;
 #endif
     private optional byte yaw_raw:e;
     private optional byte pitch_raw:f;
@@ -150,9 +150,9 @@ class PacketPlayOutEntityVelocity extends Packet {
 class PacketPlayOutEntity extends Packet {
     protected int entityId:a;
 #if version >= 1.9
-    protected optional byte dx_1_8_8:???;
-    protected optional byte dy_1_8_8:???;
-    protected optional byte dz_1_8_8:???;
+    protected optional byte dx_1_8_8:###;
+    protected optional byte dy_1_8_8:###;
+    protected optional byte dz_1_8_8:###;
     protected optional int dx_1_10_2:b;
     protected optional int dy_1_10_2:c;
     protected optional int dz_1_10_2:d;
@@ -160,9 +160,9 @@ class PacketPlayOutEntity extends Packet {
     protected optional byte dx_1_8_8:b;
     protected optional byte dy_1_8_8:c;
     protected optional byte dz_1_8_8:d;
-    protected optional int dx_1_10_2:???;
-    protected optional int dy_1_10_2:???;
-    protected optional int dz_1_10_2:???;
+    protected optional int dx_1_10_2:###;
+    protected optional int dy_1_10_2:###;
+    protected optional int dz_1_10_2:###;
 #endif
     protected optional byte dyaw_raw:e;
     protected optional byte dpitch_raw:f;

@@ -82,7 +82,7 @@ class EnumParticle {
 #if version >= 1.9
     public static optional (EnumParticleHandle) EnumParticle byName:a(String name);
 #else
-    public static optional (EnumParticleHandle) EnumParticle byName:???(String name);
+    public static optional (EnumParticleHandle) EnumParticle byName:###(String name);
 #endif
 
     public String getName:b();

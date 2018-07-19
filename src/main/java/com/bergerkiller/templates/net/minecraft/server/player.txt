@@ -36,7 +36,7 @@ class PlayerChunk {
     private int dirtySectionMask:h;
     private boolean done;
 #elseif version >= 1.8.3
-    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:???;
+    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:###;
     private unknown short[] dirtyBlocks;
     private int dirtyCount;
     private int dirtySectionMask:f;
@@ -45,7 +45,7 @@ class PlayerChunk {
     // Nested class is appended as a hidden field at the end of the class declaration
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap:this$0;
 #else
-    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:???;
+    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:###;
     private unknown short[] dirtyBlocks;
     private int dirtyCount;
     private int dirtySectionMask:f;
@@ -83,7 +83,7 @@ class PlayerChunkMap {
     private final (List<org.bukkit.entity.Player>) List<EntityPlayer> managedPlayers;
 
 #if version >= 1.9
-    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:???;
+    private final optional (Queue<PlayerChunkHandle>) Queue<PlayerChunk> updateQueue_1_8_8:###;
     private final unknown Set<PlayerChunk> dirtyBlockChunks:f;
     private final unknown List<PlayerChunk> g;
     private final unknown List<PlayerChunk> h;
@@ -98,7 +98,7 @@ class PlayerChunkMap {
 #if version >= 1.9
     public optional void markForUpdate_1_10_2:a((PlayerChunkHandle) PlayerChunk playerchunk);
 #else
-    public optional void markForUpdate_1_10_2:???((PlayerChunkHandle) PlayerChunk playerchunk);
+    public optional void markForUpdate_1_10_2:###((PlayerChunkHandle) PlayerChunk playerchunk);
 #endif
     <code>
     public void markForUpdate(PlayerChunkHandle playerChunk) {
@@ -113,14 +113,14 @@ class PlayerChunkMap {
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
 #if version >= 1.9.4
-    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
+    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:###(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:getChunk(int x, int z);
 #elseif version >= 1.9
-    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:???(int x, int z, boolean create);
+    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:###(int x, int z, boolean create);
     public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:b(int x, int z);
 #else
     private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:???(int x, int z);
+    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:###(int x, int z);
 #endif
     <code>
     public PlayerChunkHandle getChunk(int x, int z) {

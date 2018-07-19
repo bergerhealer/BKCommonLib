@@ -34,9 +34,9 @@ class EntityTrackerEntry {
     private optional long long_xLoc:xLoc;
     private optional long long_yLoc:yLoc;
     private optional long long_zLoc:zLoc;
-    private optional int int_xLoc:???;
-    private optional int int_yLoc:???;
-    private optional int int_zLoc:???;
+    private optional int int_xLoc:###;
+    private optional int int_yLoc:###;
+    private optional int int_zLoc:###;
 
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
@@ -51,12 +51,12 @@ class EntityTrackerEntry {
     public final (EntityHandle) Entity tracker;
 
     public int viewDistance:b;
-    public optional int playerViewDistance:???;
+    public optional int playerViewDistance:###;
     public int updateInterval:c;
 
-    public optional long long_xLoc:???;
-    public optional long long_yLoc:???;
-    public optional long long_zLoc:???;
+    public optional long long_xLoc:###;
+    public optional long long_yLoc:###;
+    public optional long long_zLoc:###;
     public optional int int_xLoc:xLoc;
     public optional int int_yLoc:yLoc;
     public optional int int_zLoc:zLoc;
@@ -230,9 +230,9 @@ class EntityTrackerEntry {
 
 #if version >= 1.9
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:w;
-    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:???;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;
 #else
-    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:???;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:###;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:w;
 #endif
 

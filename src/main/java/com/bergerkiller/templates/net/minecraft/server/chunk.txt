@@ -111,7 +111,7 @@ optional class EntitySlice {
 #if version >= 1.8.3
     private optional final List<T> listValues_1_8_3:e;
 #else
-    private optional final List<T> listValues_1_8_3:???;
+    private optional final List<T> listValues_1_8_3:###;
 #endif
 
     public (EntitySliceHandle) EntitySlice((Class<?>) Class<T> oclass);

@@ -68,3 +68,7 @@ interface IPlayerFileData {
 
     public String[] getSeenPlayers();
 }
+
+class LocaleI18n {
+    public static String get(String key);
+}

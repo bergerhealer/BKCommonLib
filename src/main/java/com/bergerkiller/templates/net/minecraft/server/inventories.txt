@@ -42,7 +42,7 @@ interface IInventory {
 #elseif version >= 1.11
     public optional abstract boolean someFunction2:w_();
 #else
-    public optional abstract boolean someFunction2:???();
+    public optional abstract boolean someFunction2:###();
 #endif
 }
 

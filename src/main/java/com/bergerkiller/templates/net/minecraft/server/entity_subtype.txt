@@ -50,11 +50,11 @@ class EntityLiving extends Entity {
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
 #else
-    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:???;
-    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:???;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:???;
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:###;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:###;
 #endif
 
     <code>
@@ -291,7 +291,7 @@ class EntityInsentient extends EntityLiving {
 #if version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:a;
 #else
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:???;
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:###;
 #endif
 
     <code>
@@ -305,7 +305,7 @@ class EntityItem extends Entity {
 #if version >= 1.9
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
 #else
-    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:???;
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
 #endif
 
     <code>
@@ -335,12 +335,12 @@ class EntityMinecartAbstract extends Entity {
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:e;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:f;
 #else
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:???;
-    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:???;
-    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:???;
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:???;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:###;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:###;
 #endif
 
     <code>
@@ -366,7 +366,7 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 #if version >= 1.9
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
 #else
-    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:???;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:###;
 #endif
 
     <code>
@@ -429,8 +429,8 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:b;
 #else
     // Int keys are used on MC 1.8.8
-    public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:???;
-    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:???;
+    public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:###;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:###;
 #endif
     <code>
     public static final Key<String> DATA_COMMAND = Key.Type.STRING.createKey(T.DATA_COMMAND, 23);
@@ -446,7 +446,7 @@ class EntityItemFrame extends Entity {
 #if version >= 1.9
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
 #else
-    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:???;
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
 #endif
 
     <code>
@@ -474,13 +474,13 @@ class EntityArmorStand extends EntityLiving {
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:f;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:g;
 #else
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:???;
-    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:???;
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:###;
 #endif
 
     <code>
@@ -503,7 +503,7 @@ class EntityBat extends EntityInsentient {
 #if version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:a;
 #else
-    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:???;
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:###;
 #endif
 
     <code>

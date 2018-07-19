@@ -32,7 +32,7 @@ class SoundEffect {
 
     public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
 #else
-    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:???;
+    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> REGISTRY:###;
     private final (MinecraftKeyHandle) MinecraftKeyHandle name;
 
     public (SoundEffectHandle) SoundEffect(MinecraftKeyHandle minecraftkey);

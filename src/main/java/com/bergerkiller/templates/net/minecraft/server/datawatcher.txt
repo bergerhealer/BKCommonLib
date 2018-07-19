@@ -56,7 +56,7 @@ class DataWatcher {
 
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 
-    public optional T get:???((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
+    public optional T get:###((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
     public optional void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
 #endif
     <code>
@@ -84,15 +84,15 @@ class DataWatcher {
 
     class DataWatcher.Item {
 #if version >= 1.9
-        private optional final int typeId:???;
-        private optional final int keyId:???;
+        private optional final int typeId:###;
+        private optional final int keyId:###;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
         private T value:b;
         private boolean changed:c;
 #else
         private optional final int typeId:a;
         private optional final int keyId:b;
-        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:???;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:###;
         private Object value:c;
         private boolean changed:d;
 #endif

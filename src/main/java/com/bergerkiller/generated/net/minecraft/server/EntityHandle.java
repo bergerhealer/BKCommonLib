@@ -87,6 +87,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract DataWatcher getDataWatcher();
     public abstract void onPush(double d0, double d1, double d2);
     public abstract int getPortalCooldownMaximum();
+    public abstract boolean hasCustomName();
+    public abstract String getCustomName();
     public abstract void collide(EntityHandle entity);
     public abstract Entity getBukkitEntity();
 
@@ -444,6 +446,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> onInteractBy_1_9 = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();
+        public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
+        public final Template.Method<String> getCustomName = new Template.Method<String>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 
