@@ -14,7 +14,10 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.server.LocaleI18nHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 public class EntityHook extends ClassHook<EntityHook> {
@@ -192,12 +195,45 @@ public class EntityHook extends ClassHook<EntityHook> {
             if (checkController()) {
                 return controller.getLocalizedName();
             } else {
-                return base.getName();
+                return getName_base();
             }
         } catch (Throwable t) {
             t.printStackTrace();
             return "ERROR";
         }
+    }
+
+    /**
+     * Because the entity type is not registered, there are some issues with the base getName().
+     * These issues are fixed here.
+     * 
+     * @return base name
+     */
+    public String getName_base() {
+        // <= 1.10.2 we already take care of this issue with the class translating map of entity names
+        if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
+            return base.getName();
+        }
+
+        // Special handling for some entity types and when a custom name is set
+        Object instance = this.instance();
+        if (EntityHumanHandle.T.isAssignableFrom(instance) || EntityItemHandle.T.isAssignableFrom(instance)) {
+            return base.getName();
+        }
+        if (EntityHandle.T.hasCustomName.invoke(instance)) {
+            return EntityHandle.T.getCustomName.invoke(instance);
+        }
+
+        // Retrieve MinecraftKey of this entity class, and the String internal name from that
+        String name = null;
+        Object key = EntityTypesHandle.T.getName.invoke(this.instanceBaseType());
+        if (key != null) {
+            name = EntityTypesHandle.T.keyToInternalName.invoke(key);
+        }
+        if (name == null) {
+            name = "generic";
+        }
+        return LocaleI18nHandle.get("entity." + name + ".name");
     }
 
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
