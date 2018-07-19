@@ -130,6 +130,9 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
                     case TNT:
                     case EXPLOSIVE_MINECART:
                         return EntityType.MINECART_TNT;
+                    case COMMAND:
+                    case COMMAND_MINECART:
+                        return EntityType.MINECART_COMMAND;
                     case MINECART:
                         return EntityType.MINECART;
                     default:
