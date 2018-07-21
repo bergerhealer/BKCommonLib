@@ -14,9 +14,11 @@ import org.bukkit.material.MaterialData;
 import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -38,8 +40,8 @@ public class ItemMaterialTest {
     public void testBlockDataLookup() {
         for (Material material : Material.values()) {
             if (!material.isBlock()) continue;
-            
-            BlockData data = BlockData.fromTypeId(material.getId());
+
+            BlockData data = BlockData.fromMaterial(material);
             assertEquals(material, data.getType());
         }
     }
@@ -51,16 +53,16 @@ public class ItemMaterialTest {
             .check(Material.AIR, false)
             .check(Material.GLASS, false)
             .check(Material.APPLE, false)
-            .check(Material.RAILS, false)
-            .check(Material.WOOD, true)
+            .check(MaterialEx.RAIL, false)
+            .check(MaterialEx.OAK_WOOD, true)
             .check(Material.IRON_SWORD, false)
-            .check(Material.RED_ROSE, false)
-            .check(Material.STONE_PLATE, false)
-            .check(Material.LEAVES, false)
+            .check(getFirst("ROSE_RED", "RED_ROSE"), false)
+            .check(getFirst("STONE_PRESSURE_PLATE", "STONE_PLATE"), false)
+            .check(getFirst("OAK_LEAVES", "LEAVES"), false)
             .check(Material.SPRUCE_DOOR, false)
             .check(Material.CHEST, false)
             .check(Material.FURNACE, true)
-            .check(Material.PISTON_BASE, false)
+            .check(getFirst("PISTON_BASE", "PISTON"), false)
             .done();
 
         // Note: SUFFOCATES is the same as ISSOLID right now
@@ -73,22 +75,20 @@ public class ItemMaterialTest {
         testProperty(MaterialUtil.EMISSION, "EMISSION")
             .check(Material.STONE, 0)
             .check(Material.APPLE, 0)
-            .check(Material.REDSTONE_LAMP_ON, 15)
             .check(Material.TORCH, 14)
             .check(Material.GLOWSTONE, 15)
             .check(Material.LAVA, 15)
             .check(Material.AIR, 0)
             .check(Material.BROWN_MUSHROOM, 1)
-            .check(Material.REDSTONE_TORCH_ON, 7)
             .done();
 
         testProperty(MaterialUtil.OPACITY, "OPACITY")
             .check(Material.AIR, 0)
             .check(Material.APPLE, 0)
-            .check(Material.WOODEN_DOOR, 0)
-            .check(Material.RAILS, 0)
-            .check(Material.LEAVES, 1)
-            .check(Material.WEB, 1)
+            .check(getFirst("OAK_DOOR", "WOODEN_DOOR"), 0)
+            .check(MaterialEx.RAIL, 0)
+            .check(getFirst("OAK_LEAVES", "LEAVES"), 1)
+            .check(getFirst("COBWEB", "WEB"), 1)
             .check(Material.ICE, 3)
             .check(Material.WATER, 3)
             .check(Material.STONE, 255)
@@ -163,30 +163,38 @@ public class ItemMaterialTest {
             .checkOthers(false)
             .done();
 
-        testProperty(MaterialUtil.ISPOWERSOURCE, "ISPOWERSOURCE")
-            .check(Material.ACTIVATOR_RAIL, false) // these read power, not write
-            .check(Material.POWERED_RAIL, false) // these read power, not write
-            .check(Material.HOPPER, false) // these read power, not write
-            .checkData(org.bukkit.material.Command.class, false) // these read power, not write
-            .checkData(org.bukkit.material.PistonBaseMaterial.class, false) // these read power, not write
-            .checkProperty(MaterialUtil.ISPRESSUREPLATE, true)
-            .check(Material.DAYLIGHT_DETECTOR, true)
-            .check(Material.DAYLIGHT_DETECTOR_INVERTED, true)
-            .check(Material.DETECTOR_RAIL, true)
-            .check(Material.TRAPPED_CHEST, true)
-            .check(Material.REDSTONE_BLOCK, true)
-            .check(Material.DIODE_BLOCK_OFF, true)
-            .check(Material.DIODE_BLOCK_ON, true)
-            .check(Material.REDSTONE_COMPARATOR_ON, true)
-            .check(Material.REDSTONE_COMPARATOR_OFF, true)
-            .check(ParseUtil.parseMaterial("OBSERVER", null), true)
-            .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
-            .checkOthers(false)
-            .done();
+        {
+            PropertyTest<Boolean> test = testProperty(MaterialUtil.ISPOWERSOURCE, "ISPOWERSOURCE");
+            test.check(Material.ACTIVATOR_RAIL, false) // these read power, not write
+                .check(Material.POWERED_RAIL, false) // these read power, not write
+                .check(Material.HOPPER, false) // these read power, not write
+                .checkData(org.bukkit.material.Command.class, false) // these read power, not write
+                .checkData(org.bukkit.material.PistonBaseMaterial.class, false) // these read power, not write
+                .checkProperty(MaterialUtil.ISPRESSUREPLATE, true)
+                .check(Material.DAYLIGHT_DETECTOR, true)
+                .check(Material.DETECTOR_RAIL, true)
+                .check(Material.TRAPPED_CHEST, true)
+                .check(Material.REDSTONE_BLOCK, true);
+
+            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+                // TODO!
+            } else {
+                test.check(Material.getMaterial("DAYLIGHT_DETECTOR_INVERTED"), true)
+                    .check(Material.getMaterial("DIODE_BLOCK_OFF"), true)
+                    .check(Material.getMaterial("DIODE_BLOCK_ON"), true)
+                    .check(Material.getMaterial("REDSTONE_COMPARATOR_ON"), true)
+                    .check(Material.getMaterial("REDSTONE_COMPARATOR_OFF"), true);
+            }
+
+            test.check(ParseUtil.parseMaterial("OBSERVER", null), true)
+                .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
+                .checkOthers(false)
+                .done();
+        }
 
         testProperty(MaterialUtil.ISFUEL, "ISFUEL")
             .check(Material.COAL, true)
-            .check(Material.WOOD, true)
+            .check(MaterialEx.OAK_WOOD, true)
             .check(Material.STICK, true)
             .check(Material.STONE, false)
             .check(Material.GLASS, false)
@@ -199,8 +207,6 @@ public class ItemMaterialTest {
             .check(Material.SAND, true)
             .check(Material.GLASS, false)
             .check(Material.DIRT, false)
-            .check(Material.RAW_BEEF, true)
-            .check(Material.RAW_FISH, true)
             .check(Material.BAKED_POTATO, false)
             .done();
     }
@@ -221,7 +227,7 @@ public class ItemMaterialTest {
 
     @Test
     public void testDisplayName() {
-        ItemStack item = ItemUtil.createItem(Material.WOOD, 1);
+        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOOD, 1);
         String old_name = ItemUtil.getDisplayName(item);
         ItemUtil.setDisplayName(item, "COOLNAME");
         assertEquals("COOLNAME", ItemUtil.getDisplayName(item));
@@ -231,7 +237,7 @@ public class ItemMaterialTest {
 
     @Test
     public void testItemTag() {
-        ItemStack item = ItemUtil.createItem(Material.WOOD, 1);
+        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOOD, 1);
         assertNull(ItemUtil.getMetaTag(item));
         CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
         assertNotNull(tag);
@@ -295,11 +301,11 @@ public class ItemMaterialTest {
         // All 16 wool colors should be returned here
         List<ItemStack> expected = new ArrayList<ItemStack>();
         for (int dur = 0; dur < 16; dur++) {
-            expected.add(new ItemStack(Material.WOOL, 1, (short) dur));
+            expected.add(new ItemStack(MaterialEx.WHITE_WOOL, 1, (short) dur));
         }
 
         // Retrieve from listing
-        List<ItemStack> actual = ItemUtil.getItemVariants(Material.WOOL);
+        List<ItemStack> actual = ItemUtil.getItemVariants(MaterialEx.WHITE_WOOL);
 
         // Check all are contained, order does not matter
         assertEquals(expected.size(), actual.size());
@@ -327,15 +333,13 @@ public class ItemMaterialTest {
         List<Material> itemTypes = ItemUtil.getItemTypes();
 
         // Perform some basic tests on the list to validate correctness
-        assertTrue(itemTypes.contains(Material.WOOD));
+        assertTrue(itemTypes.contains(MaterialEx.OAK_WOOD));
         assertTrue(itemTypes.contains(Material.DIAMOND));
         assertTrue(itemTypes.contains(Material.DIAMOND_PICKAXE));
         assertTrue(itemTypes.contains(Material.POTION));
         assertTrue(itemTypes.contains(Material.ARMOR_STAND));
-        assertFalse(itemTypes.contains(Material.PORTAL));
-        assertFalse(itemTypes.contains(Material.ENDER_PORTAL));
-        assertFalse(itemTypes.contains(Material.DIODE_BLOCK_ON));
-        assertFalse(itemTypes.contains(Material.PISTON_EXTENSION));
+        assertFalse(itemTypes.contains(MaterialEx.NETHER_PORTAL));
+        assertFalse(itemTypes.contains(MaterialEx.END_PORTAL));
     }
 
     private static void testEQIgnoreAmount(ItemStack item) {

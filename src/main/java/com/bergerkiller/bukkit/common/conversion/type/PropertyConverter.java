@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -20,6 +21,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
+import java.util.EnumMap;
 import java.util.UUID;
 
 /**
@@ -100,6 +102,34 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
             return null;
         }
     };
+
+    // ======================= Material -> EntityType for Minecarts =============================
+    private static final EnumMap<Material, EntityType> matToMinecartType = new EnumMap<Material, EntityType>(Material.class);
+    private static void storeMinecartTypes(EntityType type, String... materialNames) {
+        for (String materialName : materialNames) {
+            Material mat = Material.getMaterial(materialName);
+            if (mat != null) {
+                matToMinecartType.put(mat, type);
+            }
+        }
+    }
+    static {
+        storeMinecartTypes(EntityType.MINECART, "MINECART");
+        storeMinecartTypes(EntityType.MINECART_HOPPER, "HOPPER", "HOPPER_MINECART");
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "CHEST_MINECART");
+            storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART");
+            storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "FURNACE_MINECART");
+            storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "TNT_MINECART");
+        } else {
+            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "STORAGE_MINECART");
+            storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND", "COMMAND_MINECART");
+            storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "POWERED_MINECART");
+            storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "EXPLOSIVE_MINECART");
+        }
+    }
+    // ============================================================================================
+
     public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
         @Override
         public EntityType convertInput(Object value) {
@@ -115,29 +145,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
                 if (material == null) {
                     return null;
                 }
-                switch (material) {
-                    case FURNACE:
-                    case POWERED_MINECART:
-                        return EntityType.MINECART_FURNACE;
-                    case CHEST:
-                    case STORAGE_MINECART:
-                        return EntityType.MINECART_CHEST;
-                    case HOPPER:
-                    case HOPPER_MINECART:
-                        return EntityType.MINECART_HOPPER;
-                    //case MOB_SPAWNER :
-                    //case MOB_SPAWNER_MINECART : return EntityType.MINECART_MOB_SPAWNER; (TODO: missing!)
-                    case TNT:
-                    case EXPLOSIVE_MINECART:
-                        return EntityType.MINECART_TNT;
-                    case COMMAND:
-                    case COMMAND_MINECART:
-                        return EntityType.MINECART_COMMAND;
-                    case MINECART:
-                        return EntityType.MINECART;
-                    default:
-                        return null;
-                }
+                return matToMinecartType.get(material);
             }
         }
     };

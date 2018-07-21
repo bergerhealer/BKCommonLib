@@ -13,11 +13,6 @@ public class NMSItemStack {
     public static final FieldAccessor<Integer> amount = ItemStackHandle.T.amountField.toFieldAccessor();
     public static final FieldAccessor<CommonTagCompound> tag = ItemStackHandle.T.tagField.toFieldAccessor();
 
-    @Deprecated
-    public static Object newInstance(int typeId, int data, int amount) {
-        return newInstance(Material.getMaterial(typeId), data, amount);
-    }
-
     public static Object newInstance(Material type, int data, int amount) {
         // Why is Bukkit unable to create proper constructors? Really? -,-
         ItemStackHandle instance;

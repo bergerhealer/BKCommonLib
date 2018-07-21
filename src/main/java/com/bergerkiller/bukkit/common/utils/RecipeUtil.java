@@ -60,22 +60,12 @@ public class RecipeUtil {
         return item != null && isFuelItem(item.getType());
     }
 
-    @Deprecated
-    public static boolean isHeatableItem(int itemid) {
-        return getFurnaceResult(itemid) != null;
-    }
-
     public static boolean isHeatableItem(Material material) {
         return !ItemUtil.isEmpty(getFurnaceResult(material));
     }
 
     public static boolean isHeatableItem(org.bukkit.inventory.ItemStack item) {
         return !ItemUtil.isEmpty(getFurnaceResult(item));
-    }
-
-    @Deprecated
-    public static org.bukkit.inventory.ItemStack getFurnaceResult(int itemid) {
-        return getFurnaceResult(new ItemStack(itemid, 1));
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.Material cookedType) {

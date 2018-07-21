@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
 
 import java.util.Arrays;
@@ -13,6 +14,8 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a TNT Block (explosive)
  */
 public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
+    private static final Material _COMBINED_ITEM = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            Material.getMaterial("TNT_MINECART") : Material.getMaterial("EXPLOSIVE_MINECART");
 
     /**
      * The velocity (squared) at which the Minecart is considered 'fast moving'.
@@ -30,7 +33,7 @@ public class CommonMinecartTNT extends CommonMinecart<ExplosiveMinecart> {
 
     @Override
     public Material getCombinedItem() {
-        return Material.EXPLOSIVE_MINECART;
+        return _COMBINED_ITEM;
     }
 
     /**

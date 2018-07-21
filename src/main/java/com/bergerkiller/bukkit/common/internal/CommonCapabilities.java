@@ -63,4 +63,8 @@ public class CommonCapabilities {
      */
     public static final boolean REVISED_CHUNK_ENTITY_SLICE = Common.evaluateMCVersion(">=", "1.8.3");
 
+    /**
+     * Since Minecraft 1.13 the Material enum was entirely overhauled
+     */
+    public static final boolean MATERIAL_ENUM_CHANGES = Common.evaluateMCVersion(">=", "1.13");
 }

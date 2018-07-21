@@ -132,11 +132,11 @@ public class TemplateTest {
     @Test
     public void testBlockPlaceSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey stepName = BlockData.fromMaterial(Material.WOOD).getPlaceSound();
+        ResourceKey stepName = BlockData.fromMaterial(Material.GRASS).getPlaceSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
-            assertEquals("minecraft:block.wood.place", stepName.getPath());
+            assertEquals("minecraft:block.grass.place", stepName.getPath());
         } else {
-            assertEquals("minecraft:dig.wood", stepName.getPath());
+            assertEquals("minecraft:dig.grass", stepName.getPath());
         }
     }
 

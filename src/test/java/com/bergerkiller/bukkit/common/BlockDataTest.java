@@ -28,7 +28,6 @@ public class BlockDataTest {
         assertEquals(0, BlockData.fromMaterial(Material.AIR).getEmission());
         assertEquals(0, BlockData.fromMaterial(Material.AIR).getOpacity());
         assertEquals(15, BlockData.fromMaterial(Material.GLOWSTONE).getEmission());
-        assertEquals(7, BlockData.fromMaterial(Material.REDSTONE_TORCH_ON).getEmission());
         assertEquals(14, BlockData.fromMaterial(Material.TORCH).getEmission());
     }
 

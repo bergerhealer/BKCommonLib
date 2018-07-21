@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -170,10 +171,10 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher(nmsDataWatcherHandle);
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @ConverterMethod
     public static org.bukkit.Material getMaterialFromId(Number materialId) {
-        return Material.getMaterial(materialId.intValue());
+        return CommonMethods.getMaterialFromId(materialId.intValue());
     }
 
     @ConverterMethod

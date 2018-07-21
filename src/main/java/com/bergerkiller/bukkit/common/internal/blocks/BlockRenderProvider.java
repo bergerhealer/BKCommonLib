@@ -27,8 +27,8 @@ public abstract class BlockRenderProvider {
     private static final Map<Material, BlockRenderProvider> providers = new HashMap<Material, BlockRenderProvider>();
 
     static {
-        register(new FluidRenderingProvider("blocks/water_overlay", "blocks/water_still", Material.WATER, Material.STATIONARY_WATER));
-        register(new FluidRenderingProvider("blocks/lava_still", "blocks/lava_still", Material.LAVA, Material.STATIONARY_LAVA));
+        register(new FluidRenderingProvider("blocks/water_overlay", "blocks/water_still", Material.WATER, Material.getMaterial("STATIONARY_WATER")));
+        register(new FluidRenderingProvider("blocks/lava_still", "blocks/lava_still", Material.LAVA, Material.getMaterial("STATIONARY_LAVA")));
         register(new GrassRenderingProvider());
         register(new RedstoneWireRenderingProvider());
     }

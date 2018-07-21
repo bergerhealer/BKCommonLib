@@ -4,6 +4,8 @@ import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
@@ -12,6 +14,8 @@ import org.bukkit.TreeSpecies;
 import org.bukkit.material.*;
 
 import java.util.Locale;
+
+import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
 public class ParseUtil {
 
@@ -32,20 +36,19 @@ public class ParseUtil {
         for (Material material : Material.values()) {
             MAT_NAME_MAP.putUpper(material.toString(), material);
         }
-        MAT_NAME_MAP.put("CROP", Material.CROPS);
-        MAT_NAME_MAP.put("REDSTONETORCH", Material.REDSTONE_TORCH_ON);
+        MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"));
         MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
-        MAT_NAME_MAP.put("PISTON", Material.PISTON_BASE);
-        MAT_NAME_MAP.put("STICKPISTON", Material.PISTON_STICKY_BASE);
+        MAT_NAME_MAP.put("PISTON", getFirst("PISTON_BASE", "PISTON"));
+        MAT_NAME_MAP.put("STICKPISTON", getFirst("PISTON_STICKY_BASE", "STICKY_PISTON"));
         MAT_NAME_MAP.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
         MAT_NAME_MAP.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
         MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
         MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
         MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
-        MAT_NAME_MAP.put("COBBLEFENCE", Material.COBBLE_WALL);
-        MAT_NAME_MAP.put("STONEFENCE", Material.COBBLE_WALL);
-        MAT_NAME_MAP.put("COBBLEWALL", Material.COBBLE_WALL);
-        MAT_NAME_MAP.put("STONEWALL", Material.COBBLE_WALL);
+        MAT_NAME_MAP.put("COBBLEFENCE", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
+        MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
+        MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
+        MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
 
         // Material by name aliases
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
@@ -401,9 +404,11 @@ public class ParseUtil {
         }
 
         // From ID
-        try {
-            return LogicUtil.fixNull(MaterialUtil.getType(Integer.parseInt(text)), def);
-        } catch (Exception ex) {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            try {
+                return LogicUtil.fixNull(CommonMethods.getMaterialFromId(Integer.parseInt(text)), def);
+            } catch (Exception ex) {
+            }
         }
         // Replace aliases and find the corresponding Material
         String matName = MAT_ALIASES.replace(text.trim().toUpperCase(Locale.ENGLISH));
@@ -455,7 +460,7 @@ public class ParseUtil {
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException ex) {
-            if (material == Material.WOOD) {
+            if (material != null && material.name().equals("WOOD")) { //TODO: BROKEN on 1.13
                 TreeSpecies ts = parseTreeSpecies(text, null);
                 if (ts != null) {
                     return MaterialUtil.getRawData(ts);

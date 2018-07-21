@@ -508,11 +508,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         this.handle.playStepSound(new IntVector3(blockX, blockY, blockZ), BlockData.fromMaterial(type));
     }
 
-    @Deprecated
-    public void makeStepSound(int blockX, int blockY, int blockZ, int typeId) {
-        makeStepSound(blockX, blockY, blockZ, Material.getMaterial(typeId));
-    }
-
     public List<MetadataValue> getMetadata(String arg0) {
         return entity.getMetadata(arg0);
     }

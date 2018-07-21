@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.blocks.type;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,7 +25,12 @@ public class FluidRenderingProvider extends BlockRenderProvider {
     public FluidRenderingProvider(String texture1, String texture2, Material... fluidMaterials) {
         this.fluidTexture1 = texture1;
         this.fluidTexture2 = texture2;
-        this.fluidMaterials = Arrays.asList(fluidMaterials);
+        this.fluidMaterials = new ArrayList<Material>(fluidMaterials.length);
+        for (Material m : fluidMaterials) {
+            if (m != null) {
+                this.fluidMaterials.add(m);
+            }
+        }
     }
 
     @Override

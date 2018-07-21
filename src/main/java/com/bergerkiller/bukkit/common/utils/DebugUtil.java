@@ -36,7 +36,7 @@ public class DebugUtil {
      * @param block to randomize
      */
     public static void randomizeBlock(Block block) {
-        randomizeBlock(block, Material.STONE, Material.DIRT, Material.GRASS, Material.WOOD, Material.LOG,
+        randomizeBlock(block, Material.STONE, Material.DIRT, Material.GRASS,
                 Material.IRON_ORE, Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK);
     }
 
@@ -74,21 +74,18 @@ public class DebugUtil {
      * <b>#y</b> = <i>Block Y</i><br>
      * <b>#z</b> = <i>Block Z</i><br>
      * <b>#world</b> = <i>World name<i/><br>
-     * <b>#typeid</b> = <i>Block Type Id</i><br>
      * <b>#type</b> = <i>Block Type</i>
      *
      * @param block to format
      * @param format to use
      * @return Formatted String
      */
-    @SuppressWarnings("deprecation")
     public static String formatBlock(Block block, String format) {
         StringBuilder buffer = new StringBuilder(format);
         StringUtil.replaceAll(buffer, "#x", Integer.toString(block.getX()));
         StringUtil.replaceAll(buffer, "#y", Integer.toString(block.getY()));
         StringUtil.replaceAll(buffer, "#z", Integer.toString(block.getZ()));
         StringUtil.replaceAll(buffer, "#world", block.getWorld().getName());
-        StringUtil.replaceAll(buffer, "#typeid", Integer.toString(MaterialUtil.getTypeId(block)));
         StringUtil.replaceAll(buffer, "#type", block.getType().toString());
         return buffer.toString();
     }

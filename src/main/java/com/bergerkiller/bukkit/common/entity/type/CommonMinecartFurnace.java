@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
 
@@ -14,6 +15,8 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a Furnace
  */
 public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
+    private static final Material _COMBINED_ITEM = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            Material.getMaterial("FURNACE_MINECART") : Material.getMaterial("POWERED_MINECART");
 
     /**
      * The amount of fuel ticks a single item of coal gives to a furnace
@@ -74,6 +77,6 @@ public class CommonMinecartFurnace extends CommonMinecart<PoweredMinecart> {
 
     @Override
     public Material getCombinedItem() {
-        return Material.POWERED_MINECART;
+        return _COMBINED_ITEM;
     }
 }

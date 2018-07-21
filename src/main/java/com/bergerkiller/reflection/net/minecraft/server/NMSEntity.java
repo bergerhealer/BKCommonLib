@@ -2,14 +2,12 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import java.util.Random;
 
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
@@ -273,12 +271,6 @@ public class NMSEntity {
 
     public static void updateBlockCollision(Object entityHandle) {
         updateBlockCollision.invoke(entityHandle);
-    }
-
-    @Deprecated
-    public static void playStepSound(Object entityHandle, int x, int y, int z, int typeId) {
-        Material mat = Material.getMaterial(typeId);
-        playStepSound(entityHandle, x, y, z, mat == null ? null : HandleConversion.toBlockHandle(mat));
     }
 
     public static void playStepSound(Object entityHandle, int x, int y, int z, Object blockStepped) {

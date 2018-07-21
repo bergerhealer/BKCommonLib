@@ -273,10 +273,9 @@ public class ItemUtil {
      * @param from which Item Stack to read the info
      * @param to which Item Stack to transfer the info to
      */
-    @SuppressWarnings("deprecation")
     public static void transferInfo(org.bukkit.inventory.ItemStack from, org.bukkit.inventory.ItemStack to) {
         // Transfer type, durability and any other remaining metadata information
-        to.setTypeId(from.getTypeId());
+        to.setType(from.getType());
         to.setDurability(from.getDurability());
         setMetaTag(to, LogicUtil.clone(getMetaTag(from)));
     }

@@ -15,7 +15,9 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
@@ -157,7 +159,9 @@ public class BlockDataImpl extends BlockData {
     private final void refreshBlock() {
         this.materialData = null;
         this.hasRenderOptions = true;
-        this.type = Material.getMaterial(BlockHandle.getId(this.block));
+
+        //TODO: Broken on MC 1.13!
+        this.type = CommonMethods.getMaterialFromId(BlockHandle.getId(this.block));
         this.rawData = this.block.toLegacyData(this.data);
     }
 
@@ -193,11 +197,11 @@ public class BlockDataImpl extends BlockData {
 
             // Null: return AIR
             if (type == null) {
-                return new MaterialData(0, (byte) 0);
+                return new MaterialData(Material.AIR, (byte) 0);
             }
 
             // Create new MaterialData + some fixes.
-            if (type == Material.GOLD_PLATE || type == Material.IRON_PLATE) {
+            if (LogicUtil.contains(type.name(), "GOLD_PLATE", "IRON_PLATE", "HEAVY_WEIGHTED_PRESSURE_PLATE", "LIGHT_WEIGHTED_PRESSURE_PLATE")) {
                 // Bukkit bugfix.
                 this.materialData = new org.bukkit.material.PressurePlate(type, (byte) this.getRawData());
             } else if (

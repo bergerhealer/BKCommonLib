@@ -13,9 +13,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class EntityPropertyUtil extends EntityGroupingUtil {
-
-    private static final Material[] minecartTypes = {Material.MINECART, Material.STORAGE_MINECART, Material.POWERED_MINECART,
-        Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART};
+    private static final Material[] minecartTypes = MaterialUtil.ISMINECART.getMaterials().toArray(new Material[0]);
 
     /**
      * Gets all available types of Minecarts as item materials

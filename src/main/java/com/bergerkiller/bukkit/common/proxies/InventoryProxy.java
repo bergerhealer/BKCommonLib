@@ -8,13 +8,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-@SuppressWarnings("deprecation")
 public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     static {
@@ -82,9 +82,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         base.setItem(index, item);
     }
 
-    @Override
+    @Deprecated
     public boolean contains(int materialId) {
-        return base.contains(materialId);
+        return base.contains(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -97,9 +97,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         return base.contains(item);
     }
 
-    @Override
+    @Deprecated
     public boolean contains(int materialId, int amount) {
-        return base.contains(materialId, amount);
+        return base.contains(CommonMethods.getMaterialFromId(materialId), amount);
     }
 
     @Override
@@ -117,9 +117,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         return base.containsAtLeast(item, amount);
     }
 
-    @Override
+    @Deprecated
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        return base.all(materialId);
+        return base.all(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -132,9 +132,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         return base.all(item);
     }
 
-    @Override
+    @Deprecated
     public int first(int materialId) {
-        return base.first(materialId);
+        return base.first(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -162,9 +162,9 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         return base.removeItem(items);
     }
 
-    @Override
+    @Deprecated
     public void remove(int materialId) {
-        base.remove(materialId);
+        base.remove(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override

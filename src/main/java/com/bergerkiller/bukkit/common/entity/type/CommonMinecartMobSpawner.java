@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartMobSpawnerHandle;
 
@@ -14,14 +15,16 @@ import java.util.List;
  * A Common Entity implementation for Minecarts with a Mob Spawner
  */
 public class CommonMinecartMobSpawner extends CommonMinecart<SpawnerMinecart> {
-
+    private static final Material _SPAWNER_TYPE = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            Material.getMaterial("SPAWNER") : Material.getMaterial("MOB_SPAWNER");
+ 
     public CommonMinecartMobSpawner(SpawnerMinecart base) {
         super(base);
     }
 
     @Override
     public List<ItemStack> getBrokenDrops() {
-        return Arrays.asList(new ItemStack(Material.MINECART, 1), new ItemStack(Material.MOB_SPAWNER, 1));
+        return Arrays.asList(new ItemStack(Material.MINECART, 1), new ItemStack(_SPAWNER_TYPE, 1));
     }
 
     @Override

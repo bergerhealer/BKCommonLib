@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
@@ -16,38 +17,6 @@ import org.bukkit.material.MaterialData;
  * Contains material properties and helper functions
  */
 public class MaterialUtil {
-
-    /*
-     * The below methods may have to be manually re-designed when
-     * material IDs/Data officially become 'erased'.
-     * But we know how Minecraft is addicted to them, so I bet they
-     * still end up somewhere. Since they are valuable for fast equality
-     * checks and thus mapping values to item materials/data, these methods
-     * will stay, unless the default implementation has an equivalent such as
-     * a UUID. Name mapping is NOT an option!
-     * 
-     * That said, for future compatibility, redirect all method calls to these
-     * methods.
-     */
-    @Deprecated
-    public static Material getType(int typeId) {
-        return Material.getMaterial(typeId);
-    }
-
-    @Deprecated
-    public static int getTypeId(ItemStack item) {
-        return item.getTypeId();
-    }
-
-    @Deprecated
-    public static int getTypeId(org.bukkit.block.Block block) {
-        return block.getTypeId();
-    }
-
-    @Deprecated
-    public static int getTypeId(Material material) {
-        return material == null ? 0 : material.getId();
-    }
 
     @Deprecated
     public static int getRawData(TreeSpecies treeSpecies) {
@@ -70,38 +39,6 @@ public class MaterialUtil {
 
     /**
      * Obtains the Material Data using the material type Id and data value
-     * specified.
-     * <b>Please use the int data version instead, as Block data is expected to
-     * become more than a byte!</b><br><br>
-     * 
-     * <b>DEPRECATED</b>: Use {@link #getData(Material, rawData)} instead
-     * 
-     * @param typeId of the material
-     * @param data for the material
-     * @return new MaterialData instance for this type of material and data
-     */
-    @Deprecated
-    public static MaterialData getData(int typeId, byte data) {
-        return getData(typeId, (int) data);
-    }
-
-    /**
-     * Obtains the Material Data using the material type Id and data value
-     * specified<br><br>
-     * 
-     * <b>DEPRECATED</b>: Use {@link #getData(Material, rawData)} instead
-     *
-     * @param typeId of the material
-     * @param rawData for the material
-     * @return new MaterialData instance for this type of material and data
-     */
-    @Deprecated
-    public static MaterialData getData(int typeId, int rawData) {
-        return getData(Material.getMaterial(typeId), rawData);
-    }
-
-    /**
-     * Obtains the Material Data using the material type Id and data value
      * specified
      *
      * @param type of the material
@@ -114,17 +51,6 @@ public class MaterialUtil {
     }
 
     /**
-     * Checks whether the material Id is contained in the types
-     *
-     * @param material to check
-     * @param types to look in
-     * @return True if the material is contained
-     */
-    public static boolean isType(int material, int... types) {
-        return LogicUtil.containsInt(material, types);
-    }
-
-    /**
      * Checks whether the material of the item is contained in the types
      *
      * @param itemStack containing the material type to check
@@ -132,7 +58,7 @@ public class MaterialUtil {
      * @return True if the material is contained
      */
     public static boolean isType(ItemStack itemStack, Material... types) {
-        return isType(getTypeId(itemStack), types);
+        return itemStack != null && isType(itemStack.getType(), types);
     }
 
     /**
@@ -147,22 +73,6 @@ public class MaterialUtil {
     }
 
     /**
-     * Checks whether the material Id is contained in the types
-     *
-     * @param material to check
-     * @param types to look in
-     * @return True if the material is contained
-     */
-    public static boolean isType(int material, Material... types) {
-        for (Material type : types) {
-            if (getTypeId(type) == material) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Checks whether the material of a block is contained in the types
      *
      * @param block to compare the types with
@@ -170,51 +80,85 @@ public class MaterialUtil {
      * @return True if the material is contained
      */
     public static boolean isType(org.bukkit.block.Block block, Material... types) {
-        return isType(getTypeId(block), types);
+        return block != null && isType(block.getType(), types);
     }
 
     /**
-     * Checks whether the material of a block is contained in the types
-     *
-     * @param block to compare the types with
-     * @param types to look in
-     * @return True if the material is contained
+     * Gets the very first material name in the list that matches a valid material
+     * 
+     * @param names
+     * @return first name in the list
      */
-    public static boolean isType(org.bukkit.block.Block block, int... types) {
-        return isType(getTypeId(block), types);
+    public static Material getFirst(String... names) {
+        for (String name : names) {
+            Material m = Material.getMaterial(name);
+            if (m != null) {
+                return m;
+            }
+        }
+        throw new RuntimeException("None of the materials '" + String.join(", ", names) + "' could be found");
+    }
+
+    /**
+     * Gets an array of materials from material enum names.
+     * Any names missing will cause an exception.
+     * 
+     * @param names
+     * @return materials
+     */
+    public static Material[] getAllByName(String... names) {
+        Material[] result = new Material[names.length];
+        for (int i = 0; i < names.length; i++) {
+            Material m = Material.getMaterial(names[i]);
+            if (m == null) {
+                throw new RuntimeException("Material not found: " + names[i]);
+            }
+            result[i] = m;
+        }
+        return result;
     }
 
     /**
      * The material is a type of door block.
      * Materials of this type are guaranteed to have a Door MaterialData.
      */
-    public static final MaterialTypeProperty ISDOOR = new MaterialTypeProperty(Material.IRON_DOOR_BLOCK,
-            Material.WOODEN_DOOR, Material.SPRUCE_DOOR, Material.BIRCH_DOOR, Material.JUNGLE_DOOR, Material.ACACIA_DOOR, Material.DARK_OAK_DOOR);
+    public static final MaterialTypeProperty ISDOOR = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("ACACIA_DOOR", "BIRCH_DOOR", "IRON_DOOR", "JUNGLE_DOOR", "OAK_DOOR", "SPRUCE_DOOR", "DARK_OAK_DOOR")) :
+            new MaterialTypeProperty(getAllByName("IRON_DOOR_BLOCK", "WOODEN_DOOR", "SPRUCE_DOOR", "BIRCH_DOOR", "JUNGLE_DOOR", "ACACIA_DOOR", "DARK_OAK_DOOR"));
 
     /**
      * The material is a type of piston base
      */
-    public static final MaterialTypeProperty ISPISTONBASE = new MaterialTypeProperty(Material.PISTON_BASE, Material.PISTON_STICKY_BASE);
+    public static final MaterialTypeProperty ISPISTONBASE = new MaterialTypeProperty(
+            getFirst("PISTON_BASE", "PISTON"), getFirst("PISTON_STICKY_BASE", "STICKY_PISTON"));
 
     /**
      * The material is a type of redstone torch
      */
-    public static final MaterialTypeProperty ISREDSTONETORCH = new MaterialTypeProperty(Material.REDSTONE_TORCH_OFF, Material.REDSTONE_TORCH_ON);
+    public static final MaterialTypeProperty ISREDSTONETORCH = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(Material.getMaterial("REDSTONE_TORCH"), Material.getMaterial("REDSTONE_WALL_TORCH")) :
+            new MaterialTypeProperty(Material.getMaterial("REDSTONE_TORCH_OFF"), Material.getMaterial("REDSTONE_TORCH_ON"));
 
     /**
      * The material is a type of diode (item type excluded)
      */
-    public static final MaterialTypeProperty ISDIODE = new MaterialTypeProperty(Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON);
+    public static final MaterialTypeProperty ISDIODE = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(Material.getMaterial("REPEATER")) :
+            new MaterialTypeProperty(Material.getMaterial("DIODE_BLOCK_OFF"), Material.getMaterial("DIODE_BLOCK_ON"));
 
     /**
      * The material is a type of button (item type excluded)
      */
-    public static final MaterialTypeProperty ISBUTTON = new MaterialTypeProperty(Material.STONE_BUTTON, Material.WOOD_BUTTON);
+    public static final MaterialTypeProperty ISBUTTON = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("STONE_BUTTON", "ACACIA_BUTTON", "BIRCH_BUTTON", "DARK_OAK_BUTTON", "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON")) :
+            new MaterialTypeProperty(getAllByName("STONE_BUTTON", "WOOD_BUTTON"));
 
     /**
      * The material is a type of comparator (item type excluded)
      */
-    public static final MaterialTypeProperty ISCOMPARATOR = new MaterialTypeProperty(Material.REDSTONE_COMPARATOR_OFF, Material.REDSTONE_COMPARATOR_ON);
+    public static final MaterialTypeProperty ISCOMPARATOR = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("COMPARATOR")) :
+            new MaterialTypeProperty(getAllByName("REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR_ON"));  
 
     /**
      * The material is a type of bucket (milk bucket is excluded)
@@ -224,53 +168,62 @@ public class MaterialUtil {
     /**
      * The material is a type of rails
      */
-    public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(Material.RAILS, Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL);
+    public static final MaterialTypeProperty ISRAILS = new MaterialTypeProperty(getFirst("RAILS", "RAIL"), Material.POWERED_RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL);
 
     /**
      * The material is a type of sign (item type is excluded)
      */
-    public static final MaterialTypeProperty ISSIGN = new MaterialTypeProperty(Material.WALL_SIGN, Material.SIGN_POST);
+    public static final MaterialTypeProperty ISSIGN = new MaterialTypeProperty(Material.WALL_SIGN, getFirst("SIGN_POST", "SIGN"));
 
     /**
      * The material is a type of pressure plate
      */
-    public static final MaterialTypeProperty ISPRESSUREPLATE = new MaterialTypeProperty(Material.WOOD_PLATE, Material.STONE_PLATE, Material.IRON_PLATE, Material.GOLD_PLATE);
+    public static final MaterialTypeProperty ISPRESSUREPLATE = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("ACACIA_PRESSURE_PLATE", "BIRCH_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE",
+                    "HEAVY_WEIGHTED_PRESSURE_PLATE", "JUNGLE_PRESSURE_PLATE", "LIGHT_WEIGHTED_PRESSURE_PLATE",
+                    "OAK_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "STONE_PRESSURE_PLATE")) :
+
+            new MaterialTypeProperty(getAllByName("WOOD_PLATE", "STONE_PLATE", "IRON_PLATE", "GOLD_PLATE"));
 
     /**
      * The material is a type of Minecart item
      */
-    public static final MaterialTypeProperty ISMINECART = new MaterialTypeProperty(Material.MINECART, Material.POWERED_MINECART,
-            Material.STORAGE_MINECART, Material.EXPLOSIVE_MINECART, Material.HOPPER_MINECART, Material.COMMAND_MINECART);
+    public static final MaterialTypeProperty ISMINECART = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("MINECART", "FURNACE_MINECART", "CHEST_MINECART",
+                    "TNT_MINECART", "HOPPER_MINECART", "COMMAND_BLOCK_MINECART")) :
+
+            new MaterialTypeProperty(getAllByName("MINECART", "POWERED_MINECART", "STORAGE_MINECART",
+                    "EXPLOSIVE_MINECART", "HOPPER_MINECART", "COMMAND_MINECART"));
 
     /**
      * The material is a type of wieldable sword
      */
-    public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(Material.WOOD_SWORD, Material.STONE_SWORD, Material.IRON_SWORD,
-            Material.GOLD_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD);
+    public static final MaterialTypeProperty ISSWORD = new MaterialTypeProperty(getFirst("WOODEN_SWORD", "WOOD_SWORD"), Material.STONE_SWORD, Material.IRON_SWORD,
+            getFirst("GOLDEN_SWORD", "GOLD_SWORD"), Material.IRON_SWORD, Material.DIAMOND_SWORD);
 
     /**
      * The material is a type of wearable boots
      */
     public static final MaterialTypeProperty ISBOOTS = new MaterialTypeProperty(Material.LEATHER_BOOTS, Material.IRON_BOOTS,
-            Material.GOLD_BOOTS, Material.DIAMOND_BOOTS, Material.CHAINMAIL_BOOTS);
+            getFirst("GOLDEN_BOOTS", "GOLD_BOOTS"), Material.DIAMOND_BOOTS, Material.CHAINMAIL_BOOTS);
 
     /**
      * The material is a type of wearable leggings
      */
     public static final MaterialTypeProperty ISLEGGINGS = new MaterialTypeProperty(Material.LEATHER_LEGGINGS, Material.IRON_LEGGINGS,
-            Material.GOLD_LEGGINGS, Material.DIAMOND_LEGGINGS, Material.CHAINMAIL_LEGGINGS);
+            getFirst("GOLDEN_LEGGINGS", "GOLD_LEGGINGS"), Material.DIAMOND_LEGGINGS, Material.CHAINMAIL_LEGGINGS);
 
     /**
      * The material is a type of wearable chestplate
      */
     public static final MaterialTypeProperty ISCHESTPLATE = new MaterialTypeProperty(Material.LEATHER_CHESTPLATE, Material.IRON_CHESTPLATE,
-            Material.GOLD_CHESTPLATE, Material.DIAMOND_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE);
+            getFirst("GOLDEN_CHESTPLATE", "GOLD_CHESTPLATE"), Material.DIAMOND_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE);
 
     /**
      * The material is a type of wearable helmet
      */
     public static final MaterialTypeProperty ISHELMET = new MaterialTypeProperty(Material.LEATHER_HELMET, Material.IRON_HELMET,
-            Material.GOLD_HELMET, Material.DIAMOND_HELMET, Material.CHAINMAIL_HELMET);
+            getFirst("GOLDEN_HELMET", "GOLD_HELMET"), Material.DIAMOND_HELMET, Material.CHAINMAIL_HELMET);
 
     /**
      * The material is a type of armor
@@ -281,11 +234,31 @@ public class MaterialUtil {
      * The material can be interacted with, such as buttons and levers.
      * Materials of this type suppress block placement upon interaction.
      */
-    public static final MaterialTypeProperty ISINTERACTABLE = new MaterialTypeProperty(Material.LEVER, Material.WOOD_DOOR, Material.IRON_DOOR,
-            Material.TRAP_DOOR, Material.CHEST, Material.HOPPER, Material.DROPPER, Material.ENDER_CHEST, Material.FURNACE, Material.BURNING_FURNACE,
-            Material.DISPENSER, Material.WORKBENCH, Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF, Material.BED, Material.CAKE,
-            Material.NOTE_BLOCK, Material.JUKEBOX, Material.WOOD_BUTTON, Material.STONE_BUTTON, Material.REDSTONE_COMPARATOR_OFF,
-            Material.REDSTONE_COMPARATOR_ON, Material.ANVIL, Material.FENCE_GATE);
+    public static final MaterialTypeProperty ISINTERACTABLE = CommonCapabilities.MATERIAL_ENUM_CHANGES ?
+            new MaterialTypeProperty(getAllByName("LEVER", "NOTE_BLOCK", "JUKEBOX", "ANVIL",
+                    "CHEST", "HOPPER", "DROPPER", "ENDER_CHEST", "FURNACE",
+                    "DISPENSER", "CRAFTING_TABLE", "REPEATER", "COMPARATOR", "CAKE",
+                    /* Doors */
+                    "ACACIA_DOOR", "BIRCH_DOOR", "IRON_DOOR", "JUNGLE_DOOR", "OAK_DOOR", "SPRUCE_DOOR", "DARK_OAK_DOOR",
+                    /* Trap doors */
+                    "ACACIA_TRAPDOOR", "BIRCH_TRAPDOOR", "DARK_OAK_TRAPDOOR", "IRON_TRAPDOOR",
+                    "JUNGLE_TRAPDOOR", "OAK_TRAPDOOR", "SPRUCE_TRAPDOOR",
+                    /* Buttons */
+                    "ACACIA_BUTTON", "BIRCH_BUTTON", "DARK_OAK_BUTTON", "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON",
+                    "STONE_BUTTON",
+                    /* Fence gates */
+                    "ACACIA_FENCE_GATE", "BIRCH_FENCE_GATE", "DARK_OAK_FENCE_GATE", "JUNGLE_FENCE_GATE",
+                    "OAK_FENCE_GATE", "SPRUCE_FENCE_GATE",
+                    /* Beds */
+                    "BLACK_BED", "BLUE_BED", "BROWN_BED", "CYAN_BED", "GRAY_BED", "GREEN_BED", "LIME_BED",
+                    "MAGENTA_BED", "ORANGE_BED", "PINK_BED", "PURPLE_BED", "RED_BED", "WHITE_BED", "YELLOW_BED",
+                    "LIGHT_BLUE_BED", "LIGHT_GRAY_BED")) :
+
+            new MaterialTypeProperty(getAllByName("LEVER", "WOOD_DOOR", "IRON_DOOR",
+                    "TRAP_DOOR", "CHEST", "HOPPER", "DROPPER", "ENDER_CHEST", "FURNACE", "BURNING_FURNACE",
+                    "DISPENSER", "WORKBENCH", "DIODE_BLOCK_ON", "DIODE_BLOCK_OFF", "BED", "CAKE",
+                    "NOTE_BLOCK", "JUKEBOX", "WOOD_BUTTON", "STONE_BUTTON", "REDSTONE_COMPARATOR_OFF",
+                    "REDSTONE_COMPARATOR_ON", "ANVIL", "FENCE_GATE"));
 
     /**
      * The material causes suffocation to entities inside

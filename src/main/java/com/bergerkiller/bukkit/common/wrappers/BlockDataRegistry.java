@@ -90,6 +90,18 @@ public class BlockDataRegistry {
     }
 
     /**
+     * Obtains immutable BlockData information for a Material type and MaterialData instance
+     * 
+     * @param type Material
+     * @param materialData input MaterialData
+     * @return Immutable BlockData
+     */
+    @SuppressWarnings("deprecation")
+    public static BlockData fromMaterialData(Material type, MaterialData materialData) {
+        return fromTypeIdAndData(type.getId(), (int) materialData.getData());
+    }
+
+    /**
      * Obtains immutable BlockData information for a Material and its data
      * 
      * @param material input material

@@ -245,13 +245,13 @@ public class ModelInfoLookup {
                 itemName = "bottle_lingering";
             } else if (type.name().equals("SPLASH_POTION")) {
                 itemName = "bottle_splash";
-            } else if (type == Material.WOOD_DOOR) {
+            } else if (type.name().equals("WOOD_DOOR")) {
                 itemName = "oak_door";
-            } else if (type == Material.BOAT) {
+            } else if (type.name().equals("BOAT")) {
                 itemName = "oak_boat";
             } else if (type.name().equals("TOTEM")) {
                 itemName = "totem"; // totem_of_undying otherwise
-            } else if (type == Material.COOKED_FISH || type == Material.RAW_FISH) {
+            } else if (type.name().equals("COOKED_FISH") || type.name().equals("RAW_FISH")) {
                 itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
 
                 if (itemName.startsWith("item.fish.")) {
@@ -261,7 +261,7 @@ public class ModelInfoLookup {
                         itemName = "cooked_" + itemName.substring(10, itemName.length() - 7);
                     }
                 }
-            } else if (type == Material.INK_SACK) {
+            } else if (type.name().equals("INK_SACK")) {
                 // For dyes we must parse the color from the internal name, then stick dye_ in front of it
                 itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
                 int lastIdx = itemName.lastIndexOf('.');

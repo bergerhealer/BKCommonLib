@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
@@ -141,10 +142,9 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.addItem(items);
     }
 
-    @Override
     @Deprecated
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        return cbProxy.all(materialId);
+        return cbProxy.all(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -167,10 +167,9 @@ public abstract class InventoryBase implements Inventory {
         cbProxy.clear(index);
     }
 
-    @Override
     @Deprecated
     public boolean contains(int materialId) {
-        return cbProxy.contains(materialId);
+        return cbProxy.contains(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -183,10 +182,9 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.contains(item);
     }
 
-    @Override
     @Deprecated
     public boolean contains(int materialId, int amount) {
-        return cbProxy.contains(materialId, amount);
+        return cbProxy.contains(CommonMethods.getMaterialFromId(materialId), amount);
     }
 
     @Override
@@ -204,10 +202,9 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.containsAtLeast(item, amount);
     }
 
-    @Override
     @Deprecated
     public int first(int materialId) {
-        return cbProxy.first(materialId);
+        return cbProxy.first(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override
@@ -235,10 +232,9 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.iterator(index);
     }
 
-    @Override
     @Deprecated
     public void remove(int materialId) {
-        cbProxy.remove(materialId);
+        remove(CommonMethods.getMaterialFromId(materialId));
     }
 
     @Override

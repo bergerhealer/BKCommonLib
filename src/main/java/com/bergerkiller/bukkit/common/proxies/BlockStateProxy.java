@@ -6,10 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 import java.util.List;
@@ -65,9 +67,10 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
         base.setType(type);
     }
 
-    @Override
-    public boolean setTypeId(final int type) {
-        return base.setTypeId(type);
+    @Deprecated
+    public boolean setTypeId(int type) {
+        base.setType(CommonMethods.getMaterialFromId(type));
+        return true;
     }
 
     @Override
@@ -75,9 +78,9 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
         return base.getType();
     }
 
-    @Override
+    @Deprecated
     public int getTypeId() {
-        return base.getTypeId();
+        return CommonMethods.getIdFromMaterial(getType());
     }
 
     @Override
@@ -152,5 +155,15 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
         } else {
             return true;
         }
+    }
+
+    @Override
+    public BlockData getBlockData() {
+        return base.getBlockData();
+    }
+
+    @Override
+    public void setBlockData(BlockData arg0) {
+        base.setBlockData(arg0);
     }
 }

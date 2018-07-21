@@ -11,7 +11,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.Directional;
@@ -19,6 +18,7 @@ import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 
+import com.bergerkiller.bukkit.common.MaterialEx;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -49,32 +49,6 @@ public class BlockUtil extends MaterialUtil {
     }
 
     /**
-     * Performs an event asking other plugins whether a block can change to a
-     * different Material
-     *
-     * @param block to check
-     * @param type that the block is about to be set to (built)
-     * @return True if permitted, False if not
-     */
-    public static boolean canBuildBlock(org.bukkit.block.Block block, Material type) {
-        return canBuildBlock(block, type, true);
-    }
-
-    /**
-     * Performs an event asking other plugins whether a block can change to a
-     * different Material
-     *
-     * @param block to check
-     * @param type that the block is about to be set to (built)
-     * @param isBuildable - Initial allow state
-     * @return True if permitted, False if not
-     */
-    @SuppressWarnings("deprecation")
-    public static boolean canBuildBlock(org.bukkit.block.Block block, Material type, boolean isBuildable) {
-        return CommonUtil.callEvent(new BlockCanBuildEvent(block, type.getId(), true)).isBuildable();
-    }
-
-    /**
      * Sets the Block type and data at once, then performs physics
      *
      * @param block to set the type and data of
@@ -95,7 +69,12 @@ public class BlockUtil extends MaterialUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setTypeAndData(org.bukkit.block.Block block, Material type, MaterialData data, boolean update) {
-        block.setTypeIdAndData(type.getId(), data.getData(), update);
+        BlockData blockData = BlockData.fromMaterialData(type, data);
+        if (update) {
+            WorldUtil.setBlockData(block, blockData);
+        } else {
+            WorldUtil.setBlockDataFast(block, blockData);
+        }
     }
 
     /**
@@ -119,7 +98,12 @@ public class BlockUtil extends MaterialUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setTypeAndRawData(org.bukkit.block.Block block, Material type, int data, boolean update) {
-        block.setTypeIdAndData(type.getId(), (byte) data, update);
+        BlockData blockData = BlockData.fromMaterialData(type, data);
+        if (update) {
+            WorldUtil.setBlockData(block, blockData);
+        } else {
+            WorldUtil.setBlockDataFast(block, blockData);
+        }
     }
 
     /**
@@ -130,7 +114,7 @@ public class BlockUtil extends MaterialUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData) {
-        block.setData(materialData.getData());
+        setData(block, materialData, true);
     }
 
     /**
@@ -142,7 +126,12 @@ public class BlockUtil extends MaterialUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setData(org.bukkit.block.Block block, MaterialData materialData, boolean doPhysics) {
-        block.setData(materialData.getData(), doPhysics);
+        BlockData data = BlockData.fromMaterialData(materialData);
+        if (doPhysics) {
+            WorldUtil.setBlockData(block, data);
+        } else {
+            WorldUtil.setBlockDataFast(block, data);
+        }
     }
 
     /**
@@ -352,18 +341,6 @@ public class BlockUtil extends MaterialUtil {
     }
 
     /**
-     * Performs Physics at the block specified
-     *
-     * @param block to apply physics to
-     * @param callertypeid of the Material, the source of these physics (use 0
-     * if there is no caller)
-     */
-    @Deprecated
-    public static void applyPhysics(org.bukkit.block.Block block, int callertypeid) {
-        applyPhysics(block, getType(callertypeid));
-    }
-
-    /**
      * Performs Physics at the block specified.
      * The block itself is also updated.
      *
@@ -422,7 +399,7 @@ public class BlockUtil extends MaterialUtil {
     @SuppressWarnings("deprecation")
     public static void setRails(org.bukkit.block.Block rails, BlockFace direction) {
         Material type = rails.getType();
-        if (type == Material.RAILS) {
+        if (type == MaterialEx.RAIL) {
             int olddata = getRawData(rails);
             Rails r = (Rails) MaterialUtil.getData(type, olddata);
             r.setDirection(FaceUtil.toRailsDirection(direction), r.isOnSlope());

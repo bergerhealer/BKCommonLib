@@ -117,12 +117,13 @@ public class ItemParser {
         if (!this.hasData() || data == this.getData()) {
             return true;
         }
-        // Take in account certain items/blocks with bit fields
-        if (this.getType() == Material.LEAVES) {
+
+        // Take in account certain items/blocks with bit fields (<= 1.12.2)
+        if (this.getType() != null && this.getType().name().equals("LEAVES")) {
             return (data & 0x3) == this.getData();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

@@ -1,10 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -20,17 +18,6 @@ import org.bukkit.inventory.ItemStack;
  * thrown upon construction.
  */
 public abstract class MaterialProperty<T> {
-
-    private static final SafeMethod<Object> getMethodA = new SafeMethod<Object>(MaterialProperty.class, "get", int.class);
-    private static final SafeMethod<Object> getMethodB = new SafeMethod<Object>(MaterialProperty.class, "get", Material.class);
-
-    public MaterialProperty() {
-        // Check whether the get(int) or get(Material) is overrided
-        // If not, throw a runtime exception
-        if (!getMethodA.isOverridedIn(this.getClass()) && !getMethodB.isOverridedIn(this.getClass())) {
-            throw new RuntimeException("Either get(int typeId) or get(Material type) needs to be implemented!");
-        }
-    }
 
     /**
      * Gets this property for the Block Data specified
@@ -94,19 +81,6 @@ public abstract class MaterialProperty<T> {
      * @param material to get this property of
      * @return The property of the material
      */
-    @SuppressWarnings("deprecation")
-	public T get(Material material) {
-        return material == null ? get(0) : get(MaterialUtil.getTypeId(material));
-    }
+	public abstract T get(Material material);
 
-    /**
-     * Gets this property for the material type Id specified
-     *
-     * @param typeId of the material to get this property of
-     * @return The property of the material
-     */
-    @Deprecated
-    public T get(int typeId) {
-        return get(MaterialUtil.getType(typeId));
-    }
 }
