@@ -23,14 +23,20 @@ class Entity {
     private static int entityCount;
     private int idField:id;
 
-#if version >= 1.9
+#if version >= 1.13
+    public boolean preventBlockPlace:j;
+#elseif version >= 1.9
     public boolean preventBlockPlace:i;
 #else
     public boolean preventBlockPlace:k;
 #endif
 
     /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
-#if version >= 1.9
+#if version >= 1.13
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:###;
+    protected unknown int k;
+#elseif version >= 1.9
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
     public optional (EntityHandle) Entity opt_passenger:###;
     protected unknown int j;
@@ -39,7 +45,9 @@ class Entity {
     public optional (EntityHandle) Entity opt_passenger:passenger;
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.13
+    private (EntityHandle) Entity vehicle:ax;
+#elseif version >= 1.10.2
     private (EntityHandle) Entity vehicle:au;
 #elseif version >= 1.9.4
     private (EntityHandle) Entity vehicle:at;
@@ -114,7 +122,12 @@ class Entity {
     public boolean onGround;
     public boolean horizontalMovementImpaired:positionChanged;
 
-#if version >= 1.9
+#if version >= 1.13
+    public boolean verticalMovementImpaired:C;
+    public boolean movementImpaired:D;
+    public boolean velocityChanged;
+    protected boolean justLanded:F;
+#elseif version >= 1.9
     public boolean verticalMovementImpaired:B;
     public boolean movementImpaired:C;
     public boolean velocityChanged;
@@ -126,7 +139,9 @@ class Entity {
     protected boolean justLanded:H;
 #endif
 
-#if version >= 1.10.2
+#if version >= 1.13
+    private unknown boolean az;
+#elseif version >= 1.10.2
     private unknown boolean aw;
 #elseif version >= 1.9.4
     private unknown boolean av;
@@ -140,7 +155,11 @@ class Entity {
     public float width;
     public float length;
 
-#if version >= 1.9
+#if version >= 1.13
+    public unknown float J;
+    public float walkedDistanceXZ:K;
+    public float walkedDistanceXYZ:L;
+#elseif version >= 1.9
     public unknown float I;
     public float walkedDistanceXZ:J;
     public float walkedDistanceXYZ:K;
@@ -152,21 +171,54 @@ class Entity {
 
     public float fallDistance;
 
-#if version >= 1.10.2
-    private int stepCounter:ax;
+#if version >= 1.13
+    private optional float stepCounter_float:aB;
+    private optional int stepCounter_int:###;
+#elseif version >= 1.10.2
+    private optional float stepCounter_float:###;
+    private optional int stepCounter_int:ax;
 #elseif version >= 1.9.4
-    private int stepCounter:aw;
+    private optional float stepCounter_float:###;
+    private optional int stepCounter_int:aw;
 #elseif version >= 1.9
-    private int stepCounter:av;
+    private optional float stepCounter_float:###;
+    private optional int stepCounter_int:av;
 #else
-    private int stepCounter:h;
+    private optional float stepCounter_float:###;
+    private optional int stepCounter_int:h;
 #endif
+    <code>
+    public void setStepCounter(float value) {
+        if (T.stepCounter_float.isAvailable()) {
+            T.stepCounter_float.setFloat(getRaw(), value);
+        } else {
+            T.stepCounter_int.setInteger(getRaw(), (int) value);
+        }
+    }
 
-#if version >= 1.12
+    public float getStepCounter() {
+        if (T.stepCounter_float.isAvailable()) {
+            return T.stepCounter_float.getFloat(getRaw());
+        } else {
+            return (float) T.stepCounter_int.getInteger(getRaw());
+        }
+    }
+    </code>
+
+#if version >= 1.13
+    private unknown float aB;
+#elseif version >= 1.12
     private unknown float ay;
 #endif
 
-#if version >= 1.9
+#if version >= 1.13
+    public unknown double N;
+    public unknown double O;
+    public unknown double P;
+    public float heightOffset:Q;
+    public boolean noclip;
+    public unknown float S;
+#elseif version >= 1.9
     public unknown double M;
     public unknown double N;
     public unknown double O;
@@ -197,7 +249,9 @@ class Entity {
 
 #if version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
-    #if version >= 1.11
+    #if version >= 1.13
+        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;
+    #elseif version >= 1.11
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
     #elseif version >= 1.10.2
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
@@ -206,7 +260,16 @@ class Entity {
     #else
         private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
     #endif
-    #if version >= 1.12
+    #if version >= 1.13
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aD;
+
+        //TODO: Is now Optional<IChatBaseComponent>
+        private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aE;
+
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aF;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aG;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aH;
+    #elseif version >= 1.12
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
         private static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
@@ -258,7 +321,14 @@ class Entity {
     public static final int DATA_FLAG_FLYING = (1 << 7);
     </code>
 
-#if version >= 1.11
+#if version >= 1.13
+    public boolean isLoaded:inChunk;
+    public int chunkX:ae;
+    public int chunkY:af;
+    public int chunkZ:ag;
+    public unknown boolean ak;
+    public boolean positionChanged:impulse;
+#elseif version >= 1.11
     public boolean isLoaded:aa;
     public int chunkX:ab;
     public int chunkY:ac;
@@ -301,7 +371,10 @@ class Entity {
 
     public int portalCooldown;
 
-#if version >= 1.11
+#if version >= 1.13
+    protected boolean allowTeleportation:an;
+    protected unknown int ao;
+#elseif version >= 1.11
     protected boolean allowTeleportation:ak;
     protected unknown int al;
 #elseif version >= 1.10.2
@@ -314,7 +387,10 @@ class Entity {
 
     public int dimension;
 
-#if version >= 1.12
+#if version >= 1.13
+    optional private final double[] move_SomeArray:aL;
+    optional private long move_SomeState:aM;
+#elseif version >= 1.12
     optional private final double[] move_SomeArray:aJ;
     optional private long move_SomeState:aK;
 #elseif version >= 1.11.2

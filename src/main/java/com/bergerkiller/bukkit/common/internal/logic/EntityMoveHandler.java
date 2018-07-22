@@ -103,8 +103,8 @@ public class EntityMoveHandler {
             if (!WorldHandle.T.getBlockCollisions.invoke(entityWorld_Raw, entity, bounds, flag, collisions_buffer)) {
                 return false;
             }
-        } else if (WorldHandle.T.getBlockAndEntityCollisions.isAvailable()) {
-            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getBlockAndEntityCollisions.invoke(entityWorld_Raw, entity, bounds);
+        } else {
+            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getCubes.invoke(entityWorld_Raw, entity, bounds);
             if (foundBounds.isEmpty()) {
                 return false;
             }

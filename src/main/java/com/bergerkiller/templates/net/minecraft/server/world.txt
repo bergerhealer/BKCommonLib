@@ -29,7 +29,10 @@ class World extends IBlockAccess {
 
     public final (List<EntityHandle>) List<Entity> entityList;
 
-#if version >= 1.9
+#if version >= 1.13
+    protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:g;
+    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
+#elseif version >= 1.9
     protected final (Collection<EntityHandle>) Collection<Entity> entityRemoveQueue:f;
     public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
 #else
@@ -44,7 +47,12 @@ class World extends IBlockAccess {
     // Only available >= MC 1.9
     protected optional (Object) NavigationListener navigationListener:t;
 
+#if version >= 1.13
+    protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:v;
+#else
     protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:u;
+#endif
+
     protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
     public final (MethodProfilerHandle) MethodProfiler methodProfiler;
 
@@ -84,14 +92,25 @@ class World extends IBlockAccess {
 
     public optional (Object) IChunkProvider getChunkProvider();
 
-    // >= 1.11.2
+#if version >= 1.13
+    // MISSING! TODO FIX
+    private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#elseif version >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
-    // <= 1.1
-    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getBlockAndEntityCollisions:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#else
+    private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#endif
+
+#if version >= 1.13
+    //TODO: MISSING!!!!
+    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb) {
+        return new java.util.ArrayList();
+    }
+#else
+    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#endif
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
-
-    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (List<EntityHandle>) List<Entity> getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
@@ -106,7 +125,9 @@ class World extends IBlockAccess {
     public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
 #endif
 
-#if version >= 1.11.2
+#if version >= 1.13
+    public boolean isBurnArea:b((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.11.2
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #elseif version >= 1.9
     public boolean isBurnArea:f((AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -128,6 +149,7 @@ class World extends IBlockAccess {
 
     public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
+    // Note: moved to IWorldReader interface on MC 1.13
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
 
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);

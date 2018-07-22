@@ -38,7 +38,74 @@ class AxisAlignedBB {
     public boolean bbTransformA:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
 #endif
 
+#if version >= 1.13
+    // These methods were removed in MC 1.13
+    public double calcSomeX((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.e > instance.b && axisalignedbb.b < instance.e && axisalignedbb.f > instance.c && axisalignedbb.c < instance.f) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.d <= instance.a) {
+                d1 = instance.a - axisalignedbb.d;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.a >= instance.d) {
+                d1 = instance.d - axisalignedbb.a;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+    public double calcSomeY((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.d > instance.a && axisalignedbb.a < instance.d && axisalignedbb.f > instance.c && axisalignedbb.c < instance.f) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.e <= instance.b) {
+                d1 = instance.b - axisalignedbb.e;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.b >= instance.e) {
+                d1 = instance.e - axisalignedbb.b;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+    public double calcSomeZ((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.d > instance.a && axisalignedbb.a < instance.d && axisalignedbb.e > instance.b && axisalignedbb.b < instance.e) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.f <= instance.c) {
+                d1 = instance.c - axisalignedbb.f;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.c >= instance.f) {
+                d1 = instance.f - axisalignedbb.c;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+#else
     public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
     public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
     public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
+#endif
 }

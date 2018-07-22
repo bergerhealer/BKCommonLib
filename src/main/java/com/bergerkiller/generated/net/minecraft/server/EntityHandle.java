@@ -136,6 +136,23 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
 
+    public void setStepCounter(float value) {
+        if (T.stepCounter_float.isAvailable()) {
+            T.stepCounter_float.setFloat(getRaw(), value);
+        } else {
+            T.stepCounter_int.setInteger(getRaw(), (int) value);
+        }
+    }
+
+    public float getStepCounter() {
+        if (T.stepCounter_float.isAvailable()) {
+            return T.stepCounter_float.getFloat(getRaw());
+        } else {
+            return (float) T.stepCounter_int.getInteger(getRaw());
+        }
+    }
+
+
     public static DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
     public static DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.Type.INTEGER.createKey(T.DATA_AIR_TICKS, 1);
     public static DataWatcher.Key<String> DATA_CUSTOM_NAME = DataWatcher.Key.Type.STRING.createKey(T.DATA_CUSTOM_NAME, 2);
@@ -277,8 +294,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setWalkedDistanceXYZ(float value);
     public abstract float getFallDistance();
     public abstract void setFallDistance(float value);
-    public abstract int getStepCounter();
-    public abstract void setStepCounter(int value);
     public abstract float getHeightOffset();
     public abstract void setHeightOffset(float value);
     public abstract boolean isNoclip();
@@ -366,7 +381,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
         public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
-        public final Template.Field.Integer stepCounter = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Float stepCounter_float = new Template.Field.Float();
+        @Template.Optional
+        public final Template.Field.Integer stepCounter_int = new Template.Field.Integer();
         public final Template.Field.Float heightOffset = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field<Random> random = new Template.Field<Random>();

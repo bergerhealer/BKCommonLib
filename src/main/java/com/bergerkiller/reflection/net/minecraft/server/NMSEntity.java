@@ -16,6 +16,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
+import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 @Deprecated
@@ -53,7 +54,20 @@ public class NMSEntity {
     public static final FieldAccessor<Float> width = EntityHandle.T.width.toFieldAccessor();
     public static final FieldAccessor<Float> length = EntityHandle.T.length.toFieldAccessor();
     public static final FieldAccessor<Float> fallDistance = EntityHandle.T.fallDistance.toFieldAccessor();
-    public static final FieldAccessor<Integer> stepCounter = EntityHandle.T.stepCounter.toFieldAccessor();
+
+    @Deprecated
+    public static final FieldAccessor<Float> stepCounter = new SafeDirectField<Float>() {
+        @Override
+        public Float get(Object instance) {
+            return EntityHandle.createHandle(instance).getStepCounter();
+        }
+        @Override
+        public boolean set(Object instance, Float value) {
+            EntityHandle.createHandle(instance).setStepCounter(value.floatValue());
+            return true;
+        }
+    };
+
     public static final FieldAccessor<Boolean> noclip = EntityHandle.T.noclip.toFieldAccessor();
     public static final FieldAccessor<Random>  random = EntityHandle.T.random.toFieldAccessor();
     public static final TranslatorFieldAccessor<DataWatcher> datawatcher = EntityHandle.T.datawatcherField.toFieldAccessor();

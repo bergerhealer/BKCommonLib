@@ -26,9 +26,20 @@ class Block {
     public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:stepSound;
 #endif
 
+#if version >= 1.13
+    public void entityHitVertical:a((WorldHandle) IBlockAccess world, (EntityHandle) Entity entity);
+#else
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
+#endif
 
-#if version >= 1.9
+#if version >= 1.13
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
+        return 1; //TODO: FIX
+    }
+    public int getEmission:l((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+#elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);

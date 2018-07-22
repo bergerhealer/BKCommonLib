@@ -29,9 +29,9 @@ public abstract class AxisAlignedBBHandle extends Template.Handle {
     public abstract AxisAlignedBBHandle transformB(double lx, double ly, double lz);
     public abstract AxisAlignedBBHandle translate(double dx, double dy, double dz);
     public abstract boolean bbTransformA(AxisAlignedBBHandle paramAxisAlignedBB);
-    public abstract double calcSomeX(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
-    public abstract double calcSomeY(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
-    public abstract double calcSomeZ(AxisAlignedBBHandle paramAxisAlignedBB, double paramDouble);
+    public abstract double calcSomeX(AxisAlignedBBHandle axisalignedbb, double d0);
+    public abstract double calcSomeY(AxisAlignedBBHandle axisalignedbb, double d0);
+    public abstract double calcSomeZ(AxisAlignedBBHandle axisalignedbb, double d0);
 
     public AxisAlignedBBHandle growUniform(double size) {
         return grow(size, size, size);
