@@ -36,14 +36,6 @@ public abstract class BlockHandle extends Template.Handle {
         return T.getCombinedId.invoke(iblockdata);
     }
 
-    public static BlockHandle getById(int id) {
-        return T.getById.invoke(id);
-    }
-
-    public static int getId(BlockHandle block) {
-        return T.getId.invoke(block);
-    }
-
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
     public abstract int getOpacity(IBlockDataHandle iblockdata);
     public abstract int getEmission(IBlockDataHandle iblockdata);
@@ -56,8 +48,6 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();
-    public abstract IBlockDataHandle fromLegacyData(int data);
-    public abstract int toLegacyData(IBlockDataHandle iblockdata);
 
     public SoundEffectTypeHandle getSoundType() {
         if (T.getSoundType.isAvailable()) {
@@ -81,8 +71,6 @@ public abstract class BlockHandle extends Template.Handle {
 
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
-        public final Template.StaticMethod.Converted<BlockHandle> getById = new Template.StaticMethod.Converted<BlockHandle>();
-        public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();
@@ -98,8 +86,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<IBlockDataHandle> updateState = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<IBlockDataHandle> getBlockData = new Template.Method.Converted<IBlockDataHandle>();
-        public final Template.Method.Converted<IBlockDataHandle> fromLegacyData = new Template.Method.Converted<IBlockDataHandle>();
-        public final Template.Method.Converted<Integer> toLegacyData = new Template.Method.Converted<Integer>();
 
     }
 

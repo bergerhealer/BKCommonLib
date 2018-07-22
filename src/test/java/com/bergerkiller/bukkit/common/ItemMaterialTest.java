@@ -40,6 +40,7 @@ public class ItemMaterialTest {
     public void testBlockDataLookup() {
         for (Material material : Material.values()) {
             if (!material.isBlock()) continue;
+            if (material.name().startsWith("LEGACY_")) continue;
 
             BlockData data = BlockData.fromMaterial(material);
             assertEquals(material, data.getType());

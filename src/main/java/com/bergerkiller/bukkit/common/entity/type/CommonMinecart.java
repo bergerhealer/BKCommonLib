@@ -144,31 +144,6 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     /**
-     * Sets the Block displayed in this Minecart<br>
-     * <br>
-     * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
-     *
-     * @param blockId of the Block
-     */
-    @Deprecated
-    public void setBlock(int blockId) {
-        setBlock(BlockData.fromTypeIdAndData(blockId, 0));
-    }
-
-    /**
-     * Sets the Block displayed in this Minecart<br>
-     * <br>
-     * <b>Deprecated: </b>use {@link #setBlock(BlockData)} instead
-     *
-     * @param blockId of the Block
-     * @param blockData of the Block
-     */
-    @Deprecated
-    public void setBlock(int blockId, int blockData) {
-        setBlock(BlockData.fromTypeIdAndData(blockId, blockData));
-    }
-
-    /**
      * Gets the block type for this Minecart<br>
      * <br>
      * <b>Deprecated: </b>use {@link #getBlock()} instead

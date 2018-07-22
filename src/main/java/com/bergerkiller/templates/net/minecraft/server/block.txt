@@ -34,7 +34,7 @@ class Block {
 
 #if version >= 1.13
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
-        return 1; //TODO: FIX
+        return 0; //TODO: FIX
     }
     public int getEmission:l((IBlockDataHandle) IBlockData iblockdata);
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
@@ -122,20 +122,8 @@ class Block {
 
     public final (IBlockDataHandle) IBlockData getBlockData();
 
-    public (IBlockDataHandle) IBlockData fromLegacyData(int data);
-    public int toLegacyData((IBlockDataHandle) IBlockData iblockdata);
-
     public static (IBlockDataHandle) IBlockData getByCombinedId(int combinedId);
     public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
-
-    public static (BlockHandle) Block getById(int id);
-#if version >= 1.13
-    public static int getId((BlockHandle) Block block) {
-        return Block.REGISTRY.a(block);
-    }
-#else
-    public static int getId((BlockHandle) Block block);
-#endif
 }
 
 class Blocks {

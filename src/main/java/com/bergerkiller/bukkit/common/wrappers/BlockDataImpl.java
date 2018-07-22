@@ -15,7 +15,6 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -30,6 +29,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 @SuppressWarnings("deprecation")
 public class BlockDataImpl extends BlockData {
@@ -43,36 +43,36 @@ public class BlockDataImpl extends BlockData {
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
 
-    public static final int ID_SIZE = (1 << ID_BITS);
-    public static final int ID_MASK = (ID_SIZE - 1);
-    public static final int DATA_SIZE = (1 << DATA_BITS);
-    public static final int DATA_MASK = (DATA_SIZE - 1);
-
-    public static final int REGISTRY_SIZE = (1 << (ID_BITS + DATA_BITS));
+    public static final int REGISTRY_SIZE = (1 << 16); // 65536
     public static final int REGISTRY_MASK = (REGISTRY_SIZE - 1);
 
-    public static final BlockDataConstant AIR = new BlockDataConstant(BlockHandle.getById(0));
+    public static final BlockDataConstant AIR;
     public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
-    public static final BlockDataConstant[] BY_ID = new BlockDataConstant[ID_SIZE];
     public static final BlockDataConstant[] BY_ID_AND_DATA = new BlockDataConstant[REGISTRY_SIZE];
+    public static final Map<Object, BlockDataConstant> BY_BLOCK = new IdentityHashMap<Object, BlockDataConstant>();
     public static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
 
+    // Legacy: array of all possible Material values with all possible legacy data values
+    // Index into it by taking data x 1024 | mat.ordinal()
+    public static final int BY_LEGACY_MAT_DATA_SHIFT = 10; // (1<<10 == 1024)
+    public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
+
     static {
-        // Cache all possible Block Ids (0 - 255) and combined Id+Data (0 - 4096)
-        Arrays.fill(BY_ID, AIR);
-        Arrays.fill(BY_ID_AND_DATA, AIR);
+        // Fill BY_MATERIAL and BY_BLOCK mapping with all existing Block types
+        AIR = new BlockDataConstant(BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(Material.AIR)));
         for (Object rawBlock : BlockHandle.REGISTRY) {
             BlockHandle block = BlockHandle.createHandle(rawBlock);
-            int id = BlockHandle.getId(block);
-            BlockDataConstant blockConst = (id == 0) ? AIR : new BlockDataConstant(block);
-            BY_ID[id] = blockConst;
-            Arrays.fill(BY_ID_AND_DATA, id << DATA_BITS, (id + 1) << DATA_BITS, blockConst);
+            Material material = CraftMagicNumbersHandle.getMaterialFromBlock(rawBlock);
+            BlockDataConstant blockConst = (material == Material.AIR) ? AIR : new BlockDataConstant(block);
+            BY_BLOCK.put(rawBlock, blockConst);
+            BY_MATERIAL.put(material, blockConst);
         }
 
         // Cache a mapping of all possible IBlockData instances
+        Arrays.fill(BY_ID_AND_DATA, AIR);
         for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
             IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
-            BlockDataConstant block_const = BY_ID[BlockHandle.getId(blockData.getBlock())];
+            BlockDataConstant block_const = BY_BLOCK.get(blockData.getBlock().getRaw());
             if (block_const.getData() != rawIBlockData) {
                 block_const = new BlockDataConstant(blockData);
             }
@@ -81,9 +81,42 @@ public class BlockDataImpl extends BlockData {
         }
         BY_BLOCK_DATA.put(null, AIR);
 
-        // Cache all Material types in the Bukkit enum. Non-block types are stored as AIR.
-        for (Material material : Material.values()) {
-            BY_MATERIAL.put(material, material.isBlock() ? BY_ID[material.getId()] : AIR);
+        // Check for any missing Material enum values - store those also in the BY_MATERIAL mapping
+        // This mainly applies to the legacy 1.13 enum values
+        // Also store all possible values of BY_LEGACY_MAT_DATA
+        Arrays.fill(BY_LEGACY_MAT_DATA, AIR);
+        for (Material mat : Material.values()) {
+            if (!mat.isBlock()) {
+                BY_MATERIAL.put(mat, AIR);
+                continue;
+            }
+
+            BlockDataConstant blockConst = BY_MATERIAL.get(mat);
+            if (blockConst == null) {
+                Object rawBlock = CraftMagicNumbersHandle.getBlockFromMaterial(mat);
+                blockConst = BY_BLOCK.get(rawBlock);
+                if (blockConst == null) {
+                    blockConst = new BlockDataConstant(BlockHandle.createHandle(rawBlock));
+                    BY_BLOCK.put(rawBlock, blockConst);
+                }
+                BY_MATERIAL.put(mat, blockConst);
+            }
+
+            for (byte data = 0; data < 16; data++) {
+                // Find IBlockData from Material + Data and cache it if needed
+                Object rawBlockData = CraftMagicNumbersHandle.fromLegacyData(mat, data);
+                BlockDataConstant dataBlockConst = blockConst;
+                if (rawBlockData != blockConst.getData()) {
+                    dataBlockConst = BY_BLOCK_DATA.get(rawBlockData);
+                    if (dataBlockConst == null) {
+                        dataBlockConst = new BlockDataConstant(IBlockDataHandle.createHandle(rawBlockData));
+                        BY_BLOCK_DATA.put(rawBlockData, dataBlockConst);
+                    }
+                }
+
+                // Store in lookup table
+                BY_LEGACY_MAT_DATA[mat.ordinal() | ((int) data << BY_LEGACY_MAT_DATA_SHIFT)] = dataBlockConst;
+            }
         }
     }
 
@@ -118,7 +151,7 @@ public class BlockDataImpl extends BlockData {
     }
 
     public BlockDataImpl() {
-        this(BlockHandle.getById(0));
+        this(AIR.getBlock());
     }
 
     public BlockDataImpl(IBlockDataHandle data) {
@@ -151,26 +184,16 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public void loadMaterialData(Material material, int data) {
-        this.block = BlockHandle.getById(material.getId());
-        this.data = this.block.fromLegacyData(data);
+        this.block = BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(material));
+        this.data = IBlockDataHandle.createHandle(CraftMagicNumbersHandle.fromLegacyData(material, (byte) data));
         this.refreshBlock();
     }
 
     private final void refreshBlock() {
         this.materialData = null;
         this.hasRenderOptions = true;
-
-        this.type = null;
-        int id = BlockHandle.getId(this.block);
-        for (Material m : Material.values()) {
-            if (m.getId() == id) {
-                this.type = m;
-            }
-        }
-        if (this.type == null) {
-            throw new RuntimeException("Failed to find Bukkit Material of type " + id);
-        }
-        this.rawData = this.block.toLegacyData(this.data);
+        this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
+        this.rawData = CraftMagicNumbersHandle.toLegacyData(this.data.getRaw());
     }
 
     @Override

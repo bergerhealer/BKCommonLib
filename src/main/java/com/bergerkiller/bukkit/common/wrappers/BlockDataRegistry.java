@@ -86,7 +86,7 @@ public class BlockDataRegistry {
      */
     @SuppressWarnings("deprecation")
     public static BlockData fromMaterialData(MaterialData materialData) {
-        return fromTypeIdAndData(materialData.getItemType().getId(), (int) materialData.getData());
+        return fromMaterialData(materialData.getItemType(), materialData.getData());
     }
 
     /**
@@ -98,7 +98,7 @@ public class BlockDataRegistry {
      */
     @SuppressWarnings("deprecation")
     public static BlockData fromMaterialData(Material type, MaterialData materialData) {
-        return fromTypeIdAndData(type.getId(), (int) materialData.getData());
+        return fromMaterialData(type, materialData.getData());
     }
 
     /**
@@ -110,17 +110,7 @@ public class BlockDataRegistry {
      */
     @Deprecated
     public static BlockData fromMaterialData(Material material, int data) {
-        return fromTypeIdAndData(material.getId(), data);
-    }
-
-    /**
-     * Obtains immutable BlockData information by Block type Id
-     * 
-     * @param typeId input
-     * @return Immutable BlockData
-     */
-    public static BlockData fromTypeId(int typeId) {
-        return BlockDataImpl.BY_ID[typeId & BlockDataImpl.ID_MASK];
+        return BlockDataImpl.BY_LEGACY_MAT_DATA[material.ordinal() | (data << BlockDataImpl.BY_LEGACY_MAT_DATA_SHIFT)];
     }
 
     /**
@@ -132,18 +122,6 @@ public class BlockDataRegistry {
     @Deprecated
     public static BlockData fromCombinedId_1_8_8(int combinedId) {
         return BlockDataImpl.BY_ID_AND_DATA[combinedId & BlockDataImpl.REGISTRY_MASK];
-    }
-
-    /**
-     * Obtains immutable BlockData information by Block type Id and its data
-     * 
-     * @param typeId input
-     * @param data input
-     * @return Immutable BlockData
-     */
-    @Deprecated
-    public static BlockData fromTypeIdAndData(int typeId, int data) {
-        return BlockDataImpl.BY_ID_AND_DATA[((typeId << BlockDataImpl.DATA_BITS) | (data & BlockDataImpl.DATA_MASK)) & BlockDataImpl.REGISTRY_MASK];
     }
 
     /**

@@ -38,6 +38,14 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         return T.getBlockFromMaterial.invoke(material);
     }
 
+    public static Object fromLegacyData(Material material, byte data) {
+        return T.fromLegacyData.invoke(material, data);
+    }
+
+    public static byte toLegacyData(Object iblockdata) {
+        return T.toLegacyData.invoke(iblockdata);
+    }
+
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.CraftMagicNumbers</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -47,6 +55,8 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Material> getMaterialFromItem = new Template.StaticMethod.Converted<Material>();
         public final Template.StaticMethod.Converted<Object> getItemFromMaterial = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<Object> getBlockFromMaterial = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod.Converted<Object> fromLegacyData = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod.Converted<Byte> toLegacyData = new Template.StaticMethod.Converted<Byte>();
 
     }
 

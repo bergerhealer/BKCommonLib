@@ -63,6 +63,21 @@ class CraftMagicNumbers {
     public static (Object) net.minecraft.server.Item getItemFromMaterial:getItem(org.bukkit.Material material);
 
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
+
+#if version >= 1.13
+    public static (Object) net.minecraft.server.IBlockData fromLegacyData:getBlock(org.bukkit.Material material, byte data);
+    public static byte toLegacyData((Object) net.minecraft.server.IBlockData iblockdata) {
+        return org.bukkit.craftbukkit.util.CraftLegacy.toLegacyData(iblockdata);
+    }
+#else
+    public static (Object) net.minecraft.server.IBlockData fromLegacyData(org.bukkit.Material material, byte data) {
+        return getBlock(material).fromLegacyData((int) data);
+    }
+
+    public static byte toLegacyData((Object) net.minecraft.server.IBlockData iblockdata) {
+        return (byte) iblockdata.getBlock().toLegacyData(iblockdata);
+    }
+#endif
 }
 
 class CraftChatMessage {

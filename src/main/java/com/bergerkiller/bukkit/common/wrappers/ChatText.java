@@ -57,18 +57,27 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
     }
 
     public static ChatText fromJson(String jsonText) {
+        if (jsonText == null) {
+            return null;
+        }
         ChatText text = new ChatText();
         text.setJson(jsonText);
         return text;
     }
 
     public static ChatText fromMessage(String message) {
+        if (message == null) {
+            return null;
+        }
         ChatText text = new ChatText();
         text.setMessage(message);
         return text;
     }
 
     public static ChatText fromComponent(Object iChatBaseComponentHandle) {
+        if (iChatBaseComponentHandle == null) {
+            return null;
+        }
         ChatText text = new ChatText();
         text.setHandle(IChatBaseComponentHandle.createHandle(iChatBaseComponentHandle));
         return text;
