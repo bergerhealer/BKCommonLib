@@ -634,7 +634,7 @@ public class EntityMoveHandler {
 
                         that.makeSound(that.getSwimSound(), f1, 1.0F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
                     } else {
-                        that.doStepSoundUpdate(blockposition, iblockdata);
+                        that.playStepSound(blockposition, iblockdata);
                     }
                 }
             }

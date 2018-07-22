@@ -14,7 +14,33 @@ class PlayerAbilities {
     public boolean canFly;
     public boolean canInstantlyBuild;
     public boolean mayBuild;
-    public float flySpeed;
+
+    // Changed from float to double in MC 1.13
+#if version >= 1.13
+    public optional float flySpeed_float:###;
+    public optional double flySpeed_double:flySpeed;
+#else
+    public optional float flySpeed_float:flySpeed;
+    public optional double flySpeed_double:###;
+#endif
+    <code>
+    public void setFlySpeed(double flySpeed) {
+        if (T.flySpeed_double.isAvailable()) {
+            T.flySpeed_double.setDouble(getRaw(), flySpeed);
+        } else {
+            T.flySpeed_float.setFloat(getRaw(), (float) flySpeed);
+        }
+    }
+
+    public double getFlySpeed() {
+        if (T.flySpeed_double.isAvailable()) {
+            return T.flySpeed_double.getDouble(getRaw());
+        } else {
+            return (double) T.flySpeed_float.getFloat(getRaw());
+        }
+    }
+    </code>
+
     public float walkSpeed;
 
     public (PlayerAbilitiesHandle) PlayerAbilities();

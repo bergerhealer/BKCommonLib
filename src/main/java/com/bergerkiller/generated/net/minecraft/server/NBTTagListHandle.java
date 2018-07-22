@@ -22,7 +22,7 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
 
     /* ============================================================================== */
 
-    public abstract void add(NBTBaseHandle value);
+    public abstract boolean add(NBTBaseHandle value);
     public abstract int size();
     public abstract NBTBaseHandle get(int index);
     public abstract List<NBTBaseHandle> getList();
@@ -37,7 +37,7 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
         public final Template.Field.Converted<List<NBTBaseHandle>> list = new Template.Field.Converted<List<NBTBaseHandle>>();
         public final Template.Field.Byte type = new Template.Field.Byte();
 
-        public final Template.Method.Converted<Void> add = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> add = new Template.Method.Converted<Boolean>();
         public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method.Converted<NBTBaseHandle> get = new Template.Method.Converted<NBTBaseHandle>();
 

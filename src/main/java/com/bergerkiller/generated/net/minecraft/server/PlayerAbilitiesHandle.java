@@ -25,6 +25,22 @@ public abstract class PlayerAbilitiesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+
+    public void setFlySpeed(double flySpeed) {
+        if (T.flySpeed_double.isAvailable()) {
+            T.flySpeed_double.setDouble(getRaw(), flySpeed);
+        } else {
+            T.flySpeed_float.setFloat(getRaw(), (float) flySpeed);
+        }
+    }
+
+    public double getFlySpeed() {
+        if (T.flySpeed_double.isAvailable()) {
+            return T.flySpeed_double.getDouble(getRaw());
+        } else {
+            return (double) T.flySpeed_float.getFloat(getRaw());
+        }
+    }
     public abstract boolean isInvulnerable();
     public abstract void setIsInvulnerable(boolean value);
     public abstract boolean isFlying();
@@ -35,8 +51,6 @@ public abstract class PlayerAbilitiesHandle extends Template.Handle {
     public abstract void setCanInstantlyBuild(boolean value);
     public abstract boolean isMayBuild();
     public abstract void setMayBuild(boolean value);
-    public abstract float getFlySpeed();
-    public abstract void setFlySpeed(float value);
     public abstract float getWalkSpeed();
     public abstract void setWalkSpeed(float value);
     /**
@@ -51,7 +65,10 @@ public abstract class PlayerAbilitiesHandle extends Template.Handle {
         public final Template.Field.Boolean canFly = new Template.Field.Boolean();
         public final Template.Field.Boolean canInstantlyBuild = new Template.Field.Boolean();
         public final Template.Field.Boolean mayBuild = new Template.Field.Boolean();
-        public final Template.Field.Float flySpeed = new Template.Field.Float();
+        @Template.Optional
+        public final Template.Field.Float flySpeed_float = new Template.Field.Float();
+        @Template.Optional
+        public final Template.Field.Double flySpeed_double = new Template.Field.Double();
         public final Template.Field.Float walkSpeed = new Template.Field.Float();
 
     }

@@ -11,9 +11,20 @@ class NBTTagList extends NBTBase {
     private (List<NBTBaseHandle>) List<NBTBase> list;
     private byte type;
 
-    public void add((NBTBaseHandle) NBTBase value);
+#if version >= 1.13
+    public boolean add((NBTBaseHandle) NBTBase value);
+#else
+    public boolean add((NBTBaseHandle) NBTBase value) {
+        instance.add(value);
+        return true; // Normally false when value is not compatible
+    }
+#endif
+
     public int size();
-#if version >= 1.12
+
+#if version >= 1.13
+    public (NBTBaseHandle) NBTBase get:c(int index);
+#elseif version >= 1.12
     public (NBTBaseHandle) NBTBase get:i(int index);
 #elseif version >= 1.9
     public (NBTBaseHandle) NBTBase get:h(int index);
@@ -25,7 +36,12 @@ class NBTTagList extends NBTBase {
 class NBTTagCompound extends NBTBase {
     private final (Map<String, NBTBaseHandle>) Map<String, NBTBase> map;
 
+#if version >= 1.13
+    public Set<String> getKeys();
+#else
     public Set<String> getKeys:c();
+#endif
+
     public void remove(String key);
     public void set(String key, (NBTBaseHandle) NBTBase value);
     public (NBTBaseHandle) NBTBase get(String key);

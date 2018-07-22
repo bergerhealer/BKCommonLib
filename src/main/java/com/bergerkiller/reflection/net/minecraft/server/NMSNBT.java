@@ -73,6 +73,8 @@ public class NMSNBT {
     public static class Type {
         private static final ClassMap<Type> dataTags = new ClassMap<Type>();
         private static final Map<Class<?>, Type> nbtTags = new HashMap<Class<?>, Type>();
+        private static final String NBTTagLongArray_datafield = Common.evaluateMCVersion(">=", "1.13") ? "f" : "b";
+
         public final Class<?> nbtType;
         public final Constructor<?> constructor;
         public final Field dataField;
@@ -95,7 +97,8 @@ public class NMSNBT {
                 // Simple NBT Data type tags
                 String dataFieldName = "data";
                 if (nbtClass.getSimpleName().equals("NBTTagLongArray")) {
-                    dataFieldName = "b"; // not yet translated. May become more complicated in the future.
+                    // not yet translated. May become more complicated in the future.
+                    dataFieldName = NBTTagLongArray_datafield;
                 }
                 this.dataField = nbtClass.getDeclaredField(Common.SERVER.getFieldName(nbtClass, dataFieldName));
                 final Class<?> dataType = this.dataField.getType();

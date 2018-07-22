@@ -160,8 +160,16 @@ public class BlockDataImpl extends BlockData {
         this.materialData = null;
         this.hasRenderOptions = true;
 
-        //TODO: Broken on MC 1.13!
-        this.type = CommonMethods.getMaterialFromId(BlockHandle.getId(this.block));
+        this.type = null;
+        int id = BlockHandle.getId(this.block);
+        for (Material m : Material.values()) {
+            if (m.getId() == id) {
+                this.type = m;
+            }
+        }
+        if (this.type == null) {
+            throw new RuntimeException("Failed to find Bukkit Material of type " + id);
+        }
         this.rawData = this.block.toLegacyData(this.data);
     }
 

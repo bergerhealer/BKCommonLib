@@ -125,10 +125,17 @@ class Block {
     public (IBlockDataHandle) IBlockData fromLegacyData(int data);
     public int toLegacyData((IBlockDataHandle) IBlockData iblockdata);
 
-    public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
-    public static int getId((BlockHandle) Block block);
-    public static (BlockHandle) Block getById(int id);
     public static (IBlockDataHandle) IBlockData getByCombinedId(int combinedId);
+    public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
+
+    public static (BlockHandle) Block getById(int id);
+#if version >= 1.13
+    public static int getId((BlockHandle) Block block) {
+        return Block.REGISTRY.a(block);
+    }
+#else
+    public static int getId((BlockHandle) Block block);
+#endif
 }
 
 class Blocks {

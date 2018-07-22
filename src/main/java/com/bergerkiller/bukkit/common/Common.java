@@ -238,6 +238,11 @@ public class Common {
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
             }
 
+            // Some classes were moved after 1.13
+            if (Common.evaluateMCVersion(">=", "1.13")) {
+                remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");
+            }
+
             // If remappings exist, add a resolver for them
             if (!remappings.isEmpty()) {
                 Resolver.registerClassResolver(new ClassPathResolver() {

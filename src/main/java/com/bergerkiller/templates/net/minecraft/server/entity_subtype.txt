@@ -19,7 +19,13 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 
 class EntityLiving extends Entity {
 
-#if version >= 1.12
+#if version >= 1.13
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:aw;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bx;
+#elseif version >= 1.12
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
@@ -86,7 +92,13 @@ class EntityLiving extends Entity {
 
     public float lastDamage;
 
-#if version >= 1.12
+#if version >= 1.13
+    protected unknown boolean bg;
+    public float sideMovement:bh;
+    public unknown float bi;
+    public float forwardMovement:bj;
+    public unknown float bk;
+#elseif version >= 1.12
     protected unknown boolean bd;
     public float sideMovement:be;
     public unknown float bf;
@@ -176,7 +188,14 @@ class EntityHuman extends EntityLiving {
 #endif
     public int sleepTicks;
 
-#if version >= 1.12
+#if version >= 1.13
+    public unknown float bS;
+    public unknown float bT;
+    private unknown boolean d;
+    protected unknown boolean bU;
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+#elseif version >= 1.12
     public unknown float bM;
     public unknown float bN;
     private (IntVector3) BlockPosition spawnCoord:d;
@@ -223,7 +242,13 @@ class EntityHuman extends EntityLiving {
     public int expLevel;
     public int expTotal;
     public float exp;
-#if version >= 1.12
+
+#if version >= 1.13
+    protected unknown int bZ;
+    protected unknown float ca = 0.02F;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:h;
+#elseif version >= 1.12
     protected unknown int bS;
     protected unknown float bT = 0.02F;
     private unknown int f;
@@ -384,9 +409,15 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 }
 
 class EntityMinecartHopper extends EntityMinecartAbstract {
+#if version >= 1.13
+    private int suckingCooldown:e;
+#else
     private int suckingCooldown:b;
+#endif
 
-#if version >= 1.12
+#if version >= 1.13
+    public boolean suckItems:J();
+#elseif version >= 1.12
     public boolean suckItems:H();
 #elseif version >= 1.9
     public boolean suckItems:I();
@@ -415,7 +446,11 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
+#if version >= 1.13
+    public void prime:f();
+#else
     public void prime:j();
+#endif
 }
 
 class EntityMinecartCommandBlock extends EntityMinecartAbstract {

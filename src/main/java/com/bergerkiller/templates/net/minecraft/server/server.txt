@@ -16,7 +16,9 @@ class MinecraftServer {
 
     public String getResourcePackHash();
 
-#if version >= 1.11
+#if version >= 1.13
+    public int getTicks:aj();
+#elseif version >= 1.11
     public int getTicks:aq();
 #elseif version >= 1.9
     public int getTicks:ap();

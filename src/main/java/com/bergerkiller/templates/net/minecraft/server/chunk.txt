@@ -26,9 +26,15 @@ class Chunk {
 #endif
     public org.bukkit.Chunk bukkitChunk;
 
+#if version >= 1.13
+    public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
+#else
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
+#endif
 
-#if version >= 1.9
+#if version >= 1.13
+    public (BlockData) IBlockData getBlockDataAtCoord:getBlockData(int x, int y, int z);
+#elseif version >= 1.9
     public (BlockData) IBlockData getBlockDataAtCoord:a(int x, int y, int z);
 #else
     // Fallback on 1.8.8: generated code
@@ -37,7 +43,14 @@ class Chunk {
     }
 #endif
 
-    public (BlockData) IBlockData setBlockData:a((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata);
+    // Since MC 1.13 updateFlags are used (See World.java setTypeAndData)
+    public (BlockData) IBlockData setBlockData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags) {
+#if version >= 1.13
+        return instance.a(blockposition, iblockdata, (updateFlags & 64) != 0);
+#else
+        return instance.a(blockposition, iblockdata);
+#endif
+    }
 
     public void addEntity:a((EntityHandle) Entity entity);
 

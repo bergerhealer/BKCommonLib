@@ -12,7 +12,9 @@ class MobSpawnerAbstract {
     private int maxSpawnDelay;
     private int spawnCount;
 
-#if version >= 1.9
+#if version >= 1.13
+    private (org.bukkit.entity.Entity) Entity entity:j;
+#elseif version >= 1.9
     private (org.bukkit.entity.Entity) Entity entity:i;
 #else
     private (org.bukkit.entity.Entity) Entity entity:j;

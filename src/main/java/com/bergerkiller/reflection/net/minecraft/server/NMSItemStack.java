@@ -14,15 +14,9 @@ public class NMSItemStack {
     public static final FieldAccessor<CommonTagCompound> tag = ItemStackHandle.T.tagField.toFieldAccessor();
 
     public static Object newInstance(Material type, int data, int amount) {
-        // Why is Bukkit unable to create proper constructors? Really? -,-
-        ItemStackHandle instance;
-        if (ItemStackHandle.T.constr_type_amount_durability_convert.isAvailable()) {
-            instance = ItemStackHandle.T.constr_type_amount_durability_convert.newInstance(Material.STONE, 1, 0, false);
-        } else {
-            instance = ItemStackHandle.createNew(Material.STONE, 1, 0);
-        }
+        ItemStackHandle instance = ItemStackHandle.newInstance();
         instance.setTypeField(type);
-        instance.setDurabilityField(data);
+        instance.setDurability(data);
         instance.setAmountField(amount);
         return instance.getRaw();
     }

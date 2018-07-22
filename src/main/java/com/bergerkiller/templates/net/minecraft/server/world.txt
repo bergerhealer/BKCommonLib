@@ -291,8 +291,12 @@ class WorldData {
 class WorldType {
     private final String name;
 
+#if version >= 1.13
+    public int getDimension:h();
+#else
     public int getDimension:g();
-    
+#endif
+
     public static (WorldTypeHandle) WorldType getType(String name)
 }
 

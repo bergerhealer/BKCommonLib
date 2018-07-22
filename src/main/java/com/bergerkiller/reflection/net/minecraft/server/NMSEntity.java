@@ -234,20 +234,6 @@ public class NMSEntity {
     public static final MethodAccessor<Void> doFallUpdate = EntityHandle.T.updateFalling.raw.toMethodAccessor();
 
     /*
-     * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
-     *     SoundEffectType soundeffecttype = block.getStepSound();
-     *
-     *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
-     *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
-     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
-     *     } else if (!block.getBlockData().getMaterial().isLiquid()) {
-     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
-     *     }
-     * }
-     */
-    public static final MethodAccessor<Void> doStepSoundUpdate = EntityHandle.T.doStepSoundUpdate.raw.toMethodAccessor();
-
-    /*
      * protected void checkBlockCollisions() {
      *     AxisAlignedBB axisalignedbb = getBoundingBox();
      *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);

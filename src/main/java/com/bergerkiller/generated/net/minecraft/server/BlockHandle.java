@@ -28,20 +28,20 @@ public abstract class BlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static int getCombinedId(IBlockDataHandle iblockdata) {
-        return T.getCombinedId.invoke(iblockdata);
+    public static IBlockDataHandle getByCombinedId(int combinedId) {
+        return T.getByCombinedId.invoke(combinedId);
     }
 
-    public static int getId(BlockHandle block) {
-        return T.getId.invoke(block);
+    public static int getCombinedId(IBlockDataHandle iblockdata) {
+        return T.getCombinedId.invoke(iblockdata);
     }
 
     public static BlockHandle getById(int id) {
         return T.getById.invoke(id);
     }
 
-    public static IBlockDataHandle getByCombinedId(int combinedId) {
-        return T.getByCombinedId.invoke(combinedId);
+    public static int getId(BlockHandle block) {
+        return T.getId.invoke(block);
     }
 
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
@@ -79,10 +79,10 @@ public abstract class BlockHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_soundType = new Template.Field.Converted<SoundEffectTypeHandle>();
 
-        public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
-        public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
-        public final Template.StaticMethod.Converted<BlockHandle> getById = new Template.StaticMethod.Converted<BlockHandle>();
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
+        public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
+        public final Template.StaticMethod.Converted<BlockHandle> getById = new Template.StaticMethod.Converted<BlockHandle>();
+        public final Template.StaticMethod.Converted<Integer> getId = new Template.StaticMethod.Converted<Integer>();
 
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();

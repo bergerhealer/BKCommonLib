@@ -29,7 +29,7 @@ public abstract class ChunkHandle extends Template.Handle {
 
     public abstract BlockData getBlockData(IntVector3 blockposition);
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
-    public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata);
+    public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract void addEntity(EntityHandle entity);
     public abstract int getHeight(int x, int z);
     public abstract int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position);

@@ -172,7 +172,7 @@ class Entity {
     public float fallDistance;
 
 #if version >= 1.13
-    private optional float stepCounter_float:aB;
+    private optional float stepCounter_float:aA;
     private optional int stepCounter_int:###;
 #elseif version >= 1.10.2
     private optional float stepCounter_float:###;
@@ -432,7 +432,11 @@ class Entity {
      *     }
      * }
      */
+#if version >= 1.13
+    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+#else
     protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) Block blockData);
+#endif
 
     /*
      # protected void ##METHODNAME##(float f, float f1) {
@@ -574,20 +578,6 @@ class Entity {
 #endif
 
     /*
-     * protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
-     *     SoundEffectType soundeffecttype = block.getStepSound();
-     *
-     *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
-     *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
-     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
-     *     } else if (!block.getBlockData().getMaterial().isLiquid()) {
-     *         a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
-     *     }
-     * }
-     */
-    protected void doStepSoundUpdate:a((IntVector3) BlockPosition blockposition, (BlockData) Block blockData);
-
-    /*
      * protected void checkBlockCollisions() {
      *     AxisAlignedBB axisalignedbb = getBoundingBox();
      *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
@@ -687,7 +677,12 @@ class Entity {
     }
     </code>
 
-#if version >= 1.12
+#if version >= 1.13
+    public boolean isWet:ap();
+    public optional (EntityHandle) Entity getDriverEntity:bO();
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+#elseif version >= 1.12
     public boolean isWet:an();
 
     #if pre
@@ -735,7 +730,9 @@ class Entity {
     }
     </code>
 
-#if version >= 1.12
+#if version >= 1.13
+    public void onTick:tick();
+#elseif version >= 1.12
     public void onTick:B_();
 #else if version >= 1.11
     public void onTick:A_();
@@ -794,7 +791,9 @@ class Entity {
      *     return 300;
      * }
      */
-#if version >= 1.12
+#if version >= 1.13
+    public int getPortalCooldownMaximum:aQ();
+#elseif version >= 1.12
     public int getPortalCooldownMaximum:aM();
 #elseif version >= 1.10.2
     public int getPortalCooldownMaximum:aE();

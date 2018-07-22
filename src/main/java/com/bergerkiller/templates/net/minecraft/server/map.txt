@@ -10,7 +10,13 @@ class MapIcon {
     public (MapIconHandle) MapIcon(byte type, byte x, byte y, byte direction);
 #endif
 
+#if version >= 1.13
+    public byte getTypeId() {
+        return instance.getType().a();
+    }
+#else
     public byte getTypeId:getType();
+#endif
 
     public byte getX();
 

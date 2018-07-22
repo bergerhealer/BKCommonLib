@@ -8,7 +8,11 @@ class DamageSource {
 
     public boolean isExplosion();
 
+#if version >= 1.13
+    public boolean isFireDamage:p();
+#else
     public boolean isFireDamage:o();
+#endif
 
     public (org.bukkit.entity.Entity) Entity getEntity();
 
@@ -22,7 +26,11 @@ class DamageSource {
 
     public static (DamageSourceHandle) DamageSource thrownHit:projectile((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
 
+#if version >= 1.13
+    public static (DamageSourceHandle) DamageSource magicHit:c((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
+#else
     public static (DamageSourceHandle) DamageSource magicHit:b((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
+#endif
 
     public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
 

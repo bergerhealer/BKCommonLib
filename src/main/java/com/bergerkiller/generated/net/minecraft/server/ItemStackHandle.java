@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Material;
 
 /**
@@ -21,15 +22,15 @@ public abstract class ItemStackHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final ItemStackHandle createNew(Material type, int amount, int durability) {
-        return T.constr_type_amount_durability.newInstance(type, amount, durability);
-    }
-
     /* ============================================================================== */
 
+    public static ItemStackHandle newInstance() {
+        return T.newInstance.invoke();
+    }
+
     public abstract Object getItem();
-    public abstract String getName();
-    public abstract ItemStackHandle setName(String s);
+    public abstract ChatText getName();
+    public abstract void setName(ChatText name);
     public abstract int getRepairCost();
     public abstract void setRepairCost(int cost);
     public abstract boolean hasName();
@@ -49,6 +50,17 @@ public abstract class ItemStackHandle extends Template.Handle {
     }
 
 
+    public void setDurability(int durability) {
+        if (T.setDamage_1_13.isAvailable()) {
+            if (durability > 0 || getTag() != null) {
+                T.setDamage_1_13.invoke(getRaw(), durability);
+            }
+        } else {
+            T.durabilityField.setInteger(getRaw(), durability);
+        }
+    }
+
+
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {
         if (itemStack == null) {
             return null;
@@ -62,30 +74,29 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract void setTypeField(Material value);
     public abstract CommonTagCompound getTagField();
     public abstract void setTagField(CommonTagCompound value);
-    public abstract int getDurabilityField();
-    public abstract void setDurabilityField(int value);
     /**
      * Stores class members for <b>net.minecraft.server.ItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {
-        public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability = new Template.Constructor.Converted<ItemStackHandle>();
-        @Template.Optional
-        public final Template.Constructor.Converted<ItemStackHandle> constr_type_amount_durability_convert = new Template.Constructor.Converted<ItemStackHandle>();
-
         @Template.Optional
         public final Template.StaticField.Converted<ItemStackHandle> OPT_EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();
 
         public final Template.Field.Integer amountField = new Template.Field.Integer();
         public final Template.Field.Converted<Material> typeField = new Template.Field.Converted<Material>();
         public final Template.Field.Converted<CommonTagCompound> tagField = new Template.Field.Converted<CommonTagCompound>();
+        @Template.Optional
         public final Template.Field.Integer durabilityField = new Template.Field.Integer();
+
+        public final Template.StaticMethod.Converted<ItemStackHandle> newInstance = new Template.StaticMethod.Converted<ItemStackHandle>();
 
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> getItem = new Template.Method.Converted<Object>();
-        public final Template.Method<String> getName = new Template.Method<String>();
-        public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();
+        public final Template.Method.Converted<ChatText> getName = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<Void> setName = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method<Void> setDamage_1_13 = new Template.Method<Void>();
         public final Template.Method<Integer> getRepairCost = new Template.Method<Integer>();
         public final Template.Method<Void> setRepairCost = new Template.Method<Void>();
         public final Template.Method<Boolean> hasName = new Template.Method<Boolean>();

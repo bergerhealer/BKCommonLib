@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
@@ -736,6 +737,17 @@ public class ItemUtil {
      * @return display name
      */
     public static String getDisplayName(org.bukkit.inventory.ItemStack stack) {
+        return getDisplayChatText(stack).getMessage();
+    }
+
+    /**
+     * Gets the current display name of an Item as a {@link ChatText} object. If no name is set, the default
+     * Material name is returned instead.
+     *
+     * @param stack to get the display name of
+     * @return display name ChatText
+     */
+    public static ChatText getDisplayChatText(org.bukkit.inventory.ItemStack stack) {
         return CommonNMS.getHandle(stack).getName();
     }
 
@@ -746,6 +758,16 @@ public class ItemUtil {
      * @param displayName to set to, null to reset to the default
      */
     public static void setDisplayName(org.bukkit.inventory.ItemStack stack, String displayName) {
+        setDisplayChatText(stack, ChatText.fromMessage(displayName));
+    }
+
+    /**
+     * Sets the current display name of an Item as a {@link ChatText} object.
+     *
+     * @param stack to set the display name of
+     * @param displayName to set to, null to reset to the default
+     */
+    public static void setDisplayChatText(org.bukkit.inventory.ItemStack stack, ChatText displayName) {
         if (displayName != null) {
             if (CBCraftItemStack.T.isInstance(stack)) {
                 CommonNMS.getHandle(stack).setName(displayName);

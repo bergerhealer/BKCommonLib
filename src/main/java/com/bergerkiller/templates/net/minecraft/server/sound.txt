@@ -10,7 +10,18 @@ import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 optional class SoundCategory {
     public String getName:a();
 
+#if version >= 1.13
+    public static (SoundCategoryHandle) SoundCategory byName(String name) {
+        for (SoundCategory cat : SoundCategory.values()) {
+            if (cat.a().equals(name)) {
+                return cat;
+            }
+        }
+        return null;
+    }
+#else
     public static (SoundCategoryHandle) SoundCategory byName:a(String name);
+#endif
 }
 
 class SoundEffectType {

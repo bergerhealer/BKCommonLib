@@ -3,6 +3,7 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 class ItemStack {
 #if version >= 1.11
@@ -14,7 +15,12 @@ class ItemStack {
     private int amountField:count;
     private (org.bukkit.Material) Item typeField:item;
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
-    private int durabilityField:damage;
+
+#if version >= 1.13
+    private optional int durabilityField:###;
+#else
+    private optional int durabilityField:damage;
+#endif
 
     <code>
     public static final ItemStackHandle EMPTY_ITEM;
@@ -31,18 +37,53 @@ class ItemStack {
     // available since MC 1.11
     public optional boolean isEmpty();
 
-    public (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability);
-    public optional (ItemStackHandle) ItemStack((org.bukkit.Material) Item type, int amount, int durability, boolean convert);
+    // Create a default ItemStack with type STONE amount 1
+    public static (ItemStackHandle) ItemStack newInstance() {
+#if version >= 1.13
+        return new ItemStack(Blocks.STONE, 1);
+#elseif version >= 1.11.2
+        return new ItemStack(Item.getItemOf(Blocks.STONE), 1, 0, false);
+#else
+        return new ItemStack(Blocks.STONE, 1, 0);
+#endif
+    }
 
     public (Object) Item getItem();
 
-    public String getName();
-
-#if version >= 1.11
-    public (ItemStackHandle) ItemStack setName:g(String s);
+#if version >= 1.13
+    public (ChatText) IChatBaseComponent getName();
+    public (void) ItemStack setName:a((ChatText) IChatBaseComponent name);
 #else
-    public (ItemStackHandle) ItemStack setName:c(String s);
+    public (ChatText) String getName();
+
+    #if version >= 1.11
+        public (ItemStackHandle) ItemStack setName:g((ChatText) String s);
+    #else
+        public (ItemStackHandle) ItemStack setName:c((ChatText) String s);
+    #endif
 #endif
+
+
+#if version >= 1.13
+    public optional void setDamage_1_13:setDamage(int durability);
+#else
+    public optional void setDamage_1_13:###(int durability);
+#endif
+
+    <code>
+    public void setDurability(int durability) {
+        if (T.setDamage_1_13.isAvailable()) {
+            // Only set when durability > 0 or a tag exists
+            // This prevents creating a NBT tag for storing durability 0
+            if (durability > 0 || getTag() != null) {
+                T.setDamage_1_13.invoke(getRaw(), durability);
+            }
+        } else {
+            T.durabilityField.setInteger(getRaw(), durability);
+        }
+    }
+    </code>
+
 
     public int getRepairCost();
 

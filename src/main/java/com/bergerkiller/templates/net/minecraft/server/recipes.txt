@@ -11,7 +11,11 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 #if version >= 1.12
 
 class IRecipe {
+#if version >= 1.13
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:d();
+#else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
+#endif
 }
 
 class ShapedRecipes extends IRecipe {

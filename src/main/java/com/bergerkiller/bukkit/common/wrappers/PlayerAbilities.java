@@ -61,11 +61,11 @@ public class PlayerAbilities extends BasicWrapper<PlayerAbilitiesHandle> {
         handle.setMayBuild(canBuild);
     }
 
-    public float getFlySpeed() {
+    public double getFlySpeed() {
         return handle.getFlySpeed();
     }
 
-    public void setFlySpeed(float speed) {
+    public void setFlySpeed(double speed) {
         handle.setFlySpeed(speed);
     }
 
