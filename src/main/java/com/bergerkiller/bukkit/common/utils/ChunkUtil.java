@@ -268,7 +268,16 @@ public class ChunkUtil {
      * @param runnable to execute once the chunk is loaded or obtained
      */
     public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
-        CommonNMS.getHandle(world).getChunkProviderServer().getChunkAtAsync(x, z, runnable);
+        // Gone after MC 1.13
+        if (ChunkProviderServerHandle.T.getChunkAtAsync.isAvailable()) {
+            Object cps = CommonNMS.getHandle(world).getChunkProviderServer().getRaw();
+            ChunkProviderServerHandle.T.getChunkAtAsync.invoke(cps, x, z, runnable);
+            return;
+        }
+
+        // Fallback.
+        world.getChunkAt(x, z);
+        runnable.run();
     }
 
     /**

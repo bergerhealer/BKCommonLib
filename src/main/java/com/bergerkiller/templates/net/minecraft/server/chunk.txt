@@ -58,7 +58,11 @@ class Chunk {
 
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
 
+#if version >= 1.13
+    public int getTopSliceY:b();
+#else
     public int getTopSliceY:g();
+#endif
 
     public byte[] getBiomeIndex();
 

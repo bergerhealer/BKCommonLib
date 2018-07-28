@@ -72,7 +72,6 @@ public class ReflectionTest {
             loadClass(NMSEntityTracker.class);
             loadClass(NMSEntityTrackerEntry.class);
             loadClass(NMSPlayerAbilities.class);
-            loadClass(NMSCommandBlockListenerAbstract.class);
             loadClass(NMSIChatBaseComponent.class);
             loadClass(NMSDamageSource.class);
             loadClass(NMSDataWatcher.class);
@@ -111,7 +110,6 @@ public class ReflectionTest {
             loadClass(CBChunkIOExecutor.class);
             loadClass(CBCraftEntity.class);
             loadClass(CBCraftPlayer.class);
-            loadClass(CBCraftMagicNumbers.class);
             loadClass(CBCraftItemStack.class);
             loadClass(CBCraftBlockState.class);
             loadClass(CBCraftServer.class);

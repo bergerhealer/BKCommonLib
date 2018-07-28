@@ -152,7 +152,16 @@ class World extends IBlockAccess {
     // Note: moved to IWorldReader interface on MC 1.13
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
 
+#if version >= 1.13
+    // Fallback...
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag) {
+        return instance.rayTrace(point1, point2);
+    }
+#else
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
+#endif
+
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace2:rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2);
 
     // >= 1.11 (has 'self' option)
     public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
@@ -275,18 +284,25 @@ class ChunkProviderServer {
 
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 
-    public (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
+    // Removed (no longer supported?) since MC 1.13
+    // There is an async method for generating, but it is not interesting at all.
+    public optional (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
 
     // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
     public optional void saveChunk_old:saveChunk((ChunkHandle) Chunk chunk);
+
+#if version >= 1.13
+    public optional void saveChunk_new:saveChunk((ChunkHandle) IChunkAccess chunk, boolean unloaded);
+#else
     public optional void saveChunk_new:saveChunk((ChunkHandle) Chunk chunk, boolean unloaded);
+#endif
 
     <code>
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
-            T.saveChunk_new.invoke(getRaw(), chunk);
+            T.saveChunk_new.invoke(getRaw(), chunk, false);
         } else {
-            T.saveChunk_old.invoke(getRaw(), chunk, false);
+            T.saveChunk_old.invoke(getRaw(), chunk);
         }
     }
     </code>

@@ -74,13 +74,38 @@ public class RecipeTest {
 
     public void assertRequirements(Material outputType, ItemStack... inputs) {
         CraftRecipe[] recipes = RecipeUtil.getCraftingRequirements(outputType, 0);
-        assertEquals(1, recipes.length);
+        assertTrue(recipes.length > 0);
+        for (CraftRecipe recipe : recipes) {
+            if (inputs.length != recipe.getInputSlots().length) {
+                continue;
+            }
+
+            boolean allMatches = true;
+            for (int i = 0; i < inputs.length; i++) {
+                ItemStack item2 = recipe.getInputSlots()[i].match(inputs[i]);
+                if (item2 == null) {
+                    item2 = recipe.getInputSlots()[i].getDefaultChoice();
+                }
+                if (item2.getType() != inputs[i].getType() || item2.getAmount() != inputs[i].getAmount()) {
+                    // fail("Item at [" +  i + "] expected " + inputs[i] + ", but was " + item2);
+                    allMatches = false;
+                }
+            }
+            if (allMatches) {
+                return;
+            }
+        }
         assertEquals(inputs.length, recipes[0].getInputSlots().length);
         for (int i = 0; i < inputs.length; i++) {
-            ItemStack item2 = recipes[0].getInputSlots()[i].getDefaultChoice();
+            ItemStack item2 = recipes[0].getInputSlots()[i].match(inputs[i]);
+            if (item2 == null) {
+                item2 = recipes[0].getInputSlots()[i].getDefaultChoice();
+            }
             if (item2.getType() != inputs[i].getType() || item2.getAmount() != inputs[i].getAmount()) {
                 fail("Item at [" +  i + "] expected " + inputs[i] + ", but was " + item2);
             }
         }
+        fail("Could not find recipe for some reason");
     }
+
 }
