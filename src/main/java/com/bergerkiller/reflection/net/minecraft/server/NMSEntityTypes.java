@@ -1,7 +1,5 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import java.util.Map;
-
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
@@ -17,35 +15,7 @@ public class NMSEntityTypes {
      * @return Entity Class for the Entity registered to this name
      */
     public static Class<?> getEntityClass(String entityName) {
-        if (EntityTypesHandle.T.opt_entityRegistry.isAvailable()) {
-            Object entityRegistry = EntityTypesHandle.T.opt_entityRegistry.get();
-            if (entityRegistry == null) {
-                throw new UnsupportedOperationException("Entity Registry is unavailable (null)");
-            }
-            Object mcKey = NMSMinecraftKey.newInstance(entityName);
-            return (Class<?>) NMSRegistryMaterials.getValue.invoke(entityRegistry, mcKey);
-        } else if (EntityTypesHandle.T.opt_entityMap.isAvailable()) {
-            Map<String, Class<?>> entityMap = EntityTypesHandle.T.opt_entityMap.get();
-            if (entityMap == null) {
-                throw new UnsupportedOperationException("Entity Map is unavailable (null)");
-            }
-            return entityMap.get(entityName);
-        } else {
-            throw new UnsupportedOperationException("No Entity Mapping registry fields could be detected");
-        }
-    }
-
-    /**
-     * Registers a new entity
-     */
-    public static void register(int entityId, String entityKey, Class<?> entityClass, String entityName) {
-        if (EntityTypesHandle.T.register.isAvailable()) {
-            EntityTypesHandle.T.register.invoke(entityId, entityKey, entityClass, entityName);
-        } else if (EntityTypesHandle.T.register_old.isAvailable()) {
-            EntityTypesHandle.T.register_old.invoke(entityClass, entityName, entityId);
-        } else {
-            throw new UnsupportedOperationException("Entity Registration is not supported on this server");
-        }
+        return EntityTypesHandle.getEntityClass(entityName);
     }
 
     /**
@@ -55,7 +25,7 @@ public class NMSEntityTypes {
      * @return Minecraft key
      */
     public static String getName(Class<?> type) {
-        return EntityTypesHandle.getName(type);
+        return EntityTypesHandle.getEntityInternalName(type);
     }
 
     /**

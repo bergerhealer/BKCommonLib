@@ -11,7 +11,6 @@ import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
@@ -78,6 +77,26 @@ public class CommonEntityType {
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
                 nmsName = "EntityPotion";
 
+                // Added in >= 1.13 (Bukkit might add type ids for these at some point!)
+            } else if (entityTypeEnumName.equals("TURTLE")) {
+                nmsName = "EntityTurtle";
+            } else if (entityTypeEnumName.equals("PHANTOM")) {
+                nmsName = "EntityPhantom";
+            } else if (entityTypeEnumName.equals("TRIDENT")) {
+                nmsName = "EntityTrident";
+            } else if (entityTypeEnumName.equals("COD")) {
+                nmsName = "EntityCod";
+            } else if (entityTypeEnumName.equals("SALMON")) {
+                nmsName = "EntitySalmon";
+            } else if (entityTypeEnumName.equals("PUFFERFISH")) {
+                nmsName = "EntityPufferFish";
+            } else if (entityTypeEnumName.equals("TROPICAL_FISH")) {
+                nmsName = "EntityTropicalFish";
+            } else if (entityTypeEnumName.equals("DOLPHIN")) {
+                nmsName = "EntityDolphin";
+            } else if (entityTypeEnumName.equals("DROWNED")) {
+                nmsName = "EntityDrowned";
+
                 // Standard types
             } else {
                 switch (entityType) {
@@ -103,17 +122,17 @@ public class CommonEntityType {
             String entityTypeName = entityType.getName();
             if (entityType == EntityType.MINECART_FURNACE) {
                 // New naming system had a bug, DAMMIT BUKKIT
-                if (EntityTypesHandle.T.getName.isAvailable()) {
+                if (Common.evaluateMCVersion(">=", "1.11")) {
                     entityTypeName = "furnace_minecart";
                 }
             } else if (entityType == EntityType.MINECART_MOB_SPAWNER) {
                 // Old naming system had a bug, DAMMIT BUKKIT
-                if (!EntityTypesHandle.T.getName.isAvailable()) {
+                if (Common.evaluateMCVersion("<", "1.11")) {
                     entityTypeName = "MinecartSpawner";
                 }
             } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
                 // Old naming system had a bug, DAMMIT BUKKIT
-                if (!EntityTypesHandle.T.getName.isAvailable()) {
+                if (Common.evaluateMCVersion("<", "1.11")) {
                     entityTypeName = "Arrow";
                 }
             }

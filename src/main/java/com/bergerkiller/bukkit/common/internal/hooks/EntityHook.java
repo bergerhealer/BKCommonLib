@@ -211,7 +211,7 @@ public class EntityHook extends ClassHook<EntityHook> {
      */
     public String getName_base() {
         // <= 1.10.2 we already take care of this issue with the class translating map of entity names
-        if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
+        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
             return base.getName();
         }
 
@@ -225,11 +225,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
 
         // Retrieve MinecraftKey of this entity class, and the String internal name from that
-        String name = null;
-        Object key = EntityTypesHandle.T.getName.invoke(this.instanceBaseType());
-        if (key != null) {
-            name = EntityTypesHandle.T.keyToInternalName.invoke(key);
-        }
+        String name = this.getSavedName();
         if (name == null) {
             name = "generic";
         }
@@ -272,7 +268,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     /* This key is used for later de-serializing the entity */
     private final String getSavedName() {
-        return EntityTypesHandle.getName(this.instanceBaseType());
+        return EntityTypesHandle.getEntityInternalName(this.instanceBaseType());
     }
 
     @HookMethod("public void collide(Entity entity)")

@@ -92,10 +92,10 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
     @SuppressWarnings("unchecked")
     public static void hook() {
         // <= 1.10.2 had a static Map instance
-        if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
-            Map<Class<?>, String> base = (Map<Class<?>, String>) EntityTypesHandle.T.entityNamesMap_1_10_2.raw.get();
+        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
+            Map<Class<?>, String> base = (Map<Class<?>, String>) EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.get();
             Map<Class<?>, String> repl = new LookupEntityClassMap<Class<?>, String>(base);
-            EntityTypesHandle.T.entityNamesMap_1_10_2.raw.set(repl);
+            EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.set(repl);
             return;
         }
 
@@ -109,11 +109,11 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
     @SuppressWarnings("unchecked")
     public static void unhook() {
         // <= 1.10.2 had a static Map instance
-        if (EntityTypesHandle.T.entityNamesMap_1_10_2.isAvailable()) {
-            Object orig = EntityTypesHandle.T.entityNamesMap_1_10_2.raw.get();
+        if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
+            Object orig = EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.get();
             if (orig instanceof LookupEntityClassMap) {
                 LookupEntityClassMap<Class<?>, String> repl = (LookupEntityClassMap<Class<?>, String>) orig;
-                EntityTypesHandle.T.entityNamesMap_1_10_2.raw.set(repl._base);
+                EntityTypesHandle.T.opt_typeNameMap_1_10_2.raw.set(repl._base);
             }
             return;
         }

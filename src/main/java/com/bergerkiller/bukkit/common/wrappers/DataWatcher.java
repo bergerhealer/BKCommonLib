@@ -258,8 +258,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         public Key<V> getKey() {
             if (this.key != null) {
                 return this.key;
-            } else if (DataWatcherHandle.ItemHandle.T.key.isAvailable())  {
-                // This is for MC >= 1.10.2
+            } else if (CommonCapabilities.DATAWATCHER_OBJECTS) {
+                // This is for MC >= 1.9
                 return (Key<V>) DataWatcherHandle.ItemHandle.T.key.get(this.handle.getRaw());
             } else {
                 // This is for MC 1.8.8, where we use a proxy object storing typeId (serializer token) and keyId
@@ -528,15 +528,19 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
              * @return Key for accessing the item in the DataWatcher
              */
             public Key<T> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
-                Object handle;
-                if (tokenField.isAvailable()) {
-                    handle = tokenField.raw.get();
+                if (CommonCapabilities.DATAWATCHER_OBJECTS) {
+                    if (!tokenField.isAvailable()) {
+                        return null;
+                    } else {
+                        return new Key<T>(tokenField.raw.get(), this);
+                    }
                 } else if (alternativeId != -1) {
+                    Object handle;
                     handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<T>(alternativeId, this._token);
+                    return new Key<T>(handle, this);
                 } else {
                     return null;
                 }
-                return new Key<T>(handle, this);
             }
 
             /**

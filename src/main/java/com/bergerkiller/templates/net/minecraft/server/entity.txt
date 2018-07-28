@@ -408,8 +408,6 @@ class Entity {
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
 
-    public (EntityHandle) Entity((WorldHandle) World world);
-
     /*
      # protected void ##METHODNAME##() {
      *     AxisAlignedBB axisalignedbb = this.getBoundingBox();

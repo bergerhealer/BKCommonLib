@@ -22,42 +22,26 @@ public abstract class EntityTypesHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
-
-    public static String getName(Class<?> type) {
-        if (T.getName.isAvailable()) {
-            Object mcKey = T.getName.invoke(type);
-            return (mcKey == null) ? null : mcKey.toString();
-        } else if (T.getName_old.isAvailable()) {
-            return T.getName_old.invoke(type);
-        } else if (T.entityNamesMap_1_10_2.isAvailable()) {
-            return T.entityNamesMap_1_10_2.get().get(type);
-        } else {
-            throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
-        }
+    public static Class<?> getEntityClass(String internalEntityName) {
+        return T.getEntityClass.invoke(internalEntityName);
     }
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        return T.getEntityInternalName.invoke(entityType);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.EntityTypes</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTypesClass extends Template.Class<EntityTypesHandle> {
         @Template.Optional
-        public final Template.StaticField.Converted<Object> opt_entityRegistry = new Template.StaticField.Converted<Object>();
+        public final Template.StaticField.Converted<Map<String, Class<?>>> opt_nameTypeMap_1_10_2 = new Template.StaticField.Converted<Map<String, Class<?>>>();
         @Template.Optional
-        public final Template.StaticField.Converted<Map<String, Class<?>>> opt_entityMap = new Template.StaticField.Converted<Map<String, Class<?>>>();
-        @Template.Optional
-        public final Template.StaticField.Converted<Map<Class<?>, String>> entityNamesMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
+        public final Template.StaticField.Converted<Map<Class<?>, String>> opt_typeNameMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
 
-        @Template.Optional
-        public final Template.StaticMethod.Converted<Void> register = new Template.StaticMethod.Converted<Void>();
-        @Template.Optional
-        public final Template.StaticMethod.Converted<Void> register_old = new Template.StaticMethod.Converted<Void>();
-        @Template.Optional
-        public final Template.StaticMethod.Converted<Object> getName = new Template.StaticMethod.Converted<Object>();
-        @Template.Optional
-        public final Template.StaticMethod.Converted<String> keyToInternalName = new Template.StaticMethod.Converted<String>();
-        @Template.Optional
-        public final Template.StaticMethod.Converted<String> getName_old = new Template.StaticMethod.Converted<String>();
+        public final Template.StaticMethod<Class<?>> getEntityClass = new Template.StaticMethod<Class<?>>();
+        public final Template.StaticMethod<String> getEntityInternalName = new Template.StaticMethod<String>();
 
     }
 

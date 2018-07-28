@@ -32,10 +32,6 @@ public abstract class EntityHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final EntityHandle createNew(WorldHandle world) {
-        return T.constr_world.newInstance(world);
-    }
-
     /* ============================================================================== */
 
     public static int entityCount() {
@@ -328,8 +324,6 @@ public abstract class EntityHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityClass extends Template.Class<EntityHandle> {
-        public final Template.Constructor.Converted<EntityHandle> constr_world = new Template.Constructor.Converted<EntityHandle>();
-
         public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();

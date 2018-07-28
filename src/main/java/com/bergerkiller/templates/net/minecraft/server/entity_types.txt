@@ -1,60 +1,62 @@
 package net.minecraft.server;
 
 class EntityTypes {
+    // 1.10.2 and before used a Map<String, Class> and Map<Class, String> to store name to entity class information
 #if version >= 1.11
-    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:b;
-
-    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:###;
-
-    private static optional void register:a(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
-
-    private static optional void register_old:###((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
-
-    public static optional (Object) MinecraftKey getName((Class<?>) Class<? extends Entity> paramClass);
-
-    public static optional String keyToInternalName:a((Object) MinecraftKey minecraftkey);
-
-    public static optional String getName_old:###((Class<?>) Class<? extends Entity> oclass);
+    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_nameTypeMap_1_10_2:###;
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> opt_typeNameMap_1_10_2:###;
 #else
-    public static optional final (Object) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_entityRegistry:###;
-
-    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_entityMap:c;
-
-    private static optional void register:###(int entityId, String name1, (Class<?>) Class<? extends Entity> entityClass, String name2);
-
-    private static optional void register_old:a((Class<?>) Class<? extends Entity> oclass, String entityName, int entityId);
-
-    public static optional (Object) MinecraftKey getName:###((Class<?>) Class<? extends Entity> paramClass);
-
-    public static optional String keyToInternalName:###((Object) MinecraftKey minecraftkey);
-
-    public static optional String getName_old:getName((Class<?>) Class<? extends Entity> oclass);
+    private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_nameTypeMap_1_10_2:c;
+    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> opt_typeNameMap_1_10_2:d;
 #endif
 
-#if version <= 1.10.2
-    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:d;
-#else
-    private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> entityNamesMap_1_10_2:###;
-#endif
-
-    <code>
-    /**
-     * Gets the Minecraft key associated with an Entity Class Type
-     * 
-     * @param type of Entity
-     * @return Minecraft key
-     */
-    public static String getName(Class<?> type) {
-        if (T.getName.isAvailable()) {
-            Object mcKey = T.getName.invoke(type);
-            return (mcKey == null) ? null : mcKey.toString();
-        } else if (T.getName_old.isAvailable()) {
-            return T.getName_old.invoke(type);
-        } else if (T.entityNamesMap_1_10_2.isAvailable()) {
-            return T.entityNamesMap_1_10_2.get().get(type);
+#if version >= 1.13
+    public static Class<?> getEntityClass(String internalEntityName) {
+        EntityTypes type = EntityTypes.a(internalEntityName);
+        if (type == null) {
+            return null;
         } else {
-            throw new UnsupportedOperationException("Entity Name by Class lookup is not supported on this server");
+            return type.c();
         }
     }
-    </code>
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        MinecraftKey key = EntityTypes.getName(entityType);
+        if (key == null) {
+            return null;
+        } else {
+            return key.getKey();
+        }
+    }
+#elseif version >= 1.11
+    public static Class<?> getEntityClass(String internalEntityName) {
+        return EntityTypes.b.get(name);
+    }
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        MinecraftKey key = EntityTypes.getName(entityType);
+        if (key == null) {
+            return null;
+        } else {
+            return EntityTypes.a(key);
+        }
+    }
+#elseif version >= 1.9
+    public static Class<?> getEntityClass(String internalEntityName) {
+        return com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap.get().get(name);
+    }
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        return EntityTypes.getName(entityType);
+    }
+#else
+    public static Class<?> getEntityClass(String internalEntityName) {
+        return com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap.get().get(name);
+    }
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        return com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeNameMap.get().get(entityType);
+    }
+#endif
+
 }
