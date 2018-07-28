@@ -186,7 +186,11 @@ class World extends IBlockAccess {
 #endif
     }
 
+#if version >= 1.13
+    public abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
+#else
     protected abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
+#endif
 
     <code>
     public org.bukkit.World toBukkit() {
@@ -213,7 +217,13 @@ class WorldServer extends World {
     // For MC 1.8.8, we use field access
     public optional (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
 
+#if version >= 1.13
+    public void saveLevel() {
+        instance.getDataManager().a();
+    }
+#else
     public void saveLevel();
+#endif
 
     <code>
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {

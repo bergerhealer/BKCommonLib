@@ -14,6 +14,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
@@ -112,7 +113,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="T extends net.minecraft.server.TileEntity")
     public static Object toTileEntityHandle(org.bukkit.block.BlockState blockState) {
-        return BlockStateConversion.blockStateToTileEntity(blockState);
+        return BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState);
     }
 
     @ConverterMethod(output="T extends net.minecraft.server.TileEntity")

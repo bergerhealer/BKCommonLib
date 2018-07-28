@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.conversion.type;
+package com.bergerkiller.bukkit.common.conversion.blockstate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,13 +12,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -26,18 +29,14 @@ import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 
 /**
- * Specialized utility class that deals with conversion from TileEntity to its respective
- * BlockState. This is done in such a way that no calls to the server state are made, guaranteeing
- * no internal modifications occur. This is required when querying TileEntities not yet added to a world.<br>
- * <br>
- * All of this is done by creating a virtual proxy environment in which to perform CraftBlockState construction.
+ * BlockState conversion used on MC 1.12.2 and before
  */
-public class BlockStateConversion {
-    private static TileState input_state;
-    private static final World proxy_world;
-    private static final Chunk proxy_chunk;
-    private static final Block proxy_block;
-    private static final Invokable non_instrumented_invokable = new Invokable() {
+public class BlockStateConversion_1_12_2 extends BlockStateConversion {
+    private TileState input_state;
+    private final World proxy_world;
+    private final Chunk proxy_chunk;
+    private final Block proxy_block;
+    private final Invokable non_instrumented_invokable = new Invokable() {
         @Override
         public Object invoke(Object instance, Object... args) {
             String name = instance.getClass().getSuperclass().getSimpleName();
@@ -45,7 +44,12 @@ public class BlockStateConversion {
         }
     };
 
-    static {
+    public BlockStateConversion_1_12_2() throws Throwable {
+        // Find CraftBlock class
+        final Class<?> craftBlock_type = CommonUtil.getCBClass("block.CraftBlock");
+        final java.lang.reflect.Field chunkField = craftBlock_type.getDeclaredField("chunk");
+        chunkField.setAccessible(true);
+
         // Create a CraftChunk proxy that only supports the following calls:
         // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
         proxy_chunk = (Chunk) new ClassInterceptor() {
@@ -116,7 +120,7 @@ public class BlockStateConversion {
                         @Override
                         @SuppressWarnings("deprecation")
                         public Object invoke(Object instance, Object... args) {
-                            return input_state.type.getId();
+                            return CommonMethods.getIdFromMaterial(input_state.type);
                         }
                     };
                 } else if (name.equals("getData")) {
@@ -163,11 +167,12 @@ public class BlockStateConversion {
                 // All other method calls fail
                 return non_instrumented_invokable;
             }
-        }.createInstance(CraftBlockHandle.T.getType());
-        CraftBlockHandle.T.chunk.set(proxy_block, proxy_chunk);
+        }.createInstance(craftBlock_type);
+        chunkField.set(proxy_block, proxy_chunk);
     }
 
-    public static Object blockStateToTileEntity(BlockState state) {
+    @Override
+    public Object blockStateToTileEntity(BlockState state) {
         BlockStateCache cache = BlockStateCache.get(state.getClass());
         Object nmsTileEntity = null;
         if (cache.tileEntityField != null) {
@@ -179,7 +184,8 @@ public class BlockStateConversion {
         return nmsTileEntity;
     }
 
-    public static BlockState blockToBlockState(Block block) {
+    @Override
+    public BlockState blockToBlockState(Block block) {
         return block.getState();
 
         // I'm not sure why we ever want to do this, because it introduces a nasty overhead for no reason!
@@ -194,7 +200,8 @@ public class BlockStateConversion {
         */
     }
 
-    public static BlockState tileEntityToBlockState(Object nmsTileEntity) {
+    @Override
+    public BlockState tileEntityToBlockState(Object nmsTileEntity) {
         if (nmsTileEntity == null) {
             throw new IllegalArgumentException("Tile Entity is null");
         }
@@ -207,7 +214,7 @@ public class BlockStateConversion {
         return tileEntityToBlockState(block, nmsTileEntity);
     }
 
-    public static BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
+    public BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
         // Store and restore old state in case of recursive calls to this function
         // This could happen if inside BlockState construction a chunk is loaded anyway
         // Would be bad, but its best to assume the worst
@@ -236,11 +243,11 @@ public class BlockStateConversion {
         }
     }
 
-    public static Object getTileEntityFromWorld(Block block) {
+    public Object getTileEntityFromWorld(Block block) {
         return getTileEntityFromWorld(block.getWorld(), HandleConversion.toBlockPositionHandle(block));
     }
 
-    public static Object getTileEntityFromWorld(World world, Object blockPosition) {
+    public Object getTileEntityFromWorld(World world, Object blockPosition) {
         return WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
     }
 
@@ -254,7 +261,7 @@ public class BlockStateConversion {
             this.block = block;
             this.tileEntity = nmsTileEntity;
             this.type = TileEntityHandle.T.getType.invoke(nmsTileEntity);
-            this.rawData = (byte) (TileEntityHandle.T.getRawData.invoke(nmsTileEntity) & 0xF);
+            this.rawData = (byte) (TileEntityHandle.T.getLegacyData.invoke(nmsTileEntity) & 0xF);
         }
     }
 

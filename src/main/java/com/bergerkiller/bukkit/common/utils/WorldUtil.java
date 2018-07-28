@@ -58,6 +58,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
+        
         return ChunkUtil.getBlockData(block.getChunk(), block.getX(), block.getY(), block.getZ());
     }
 

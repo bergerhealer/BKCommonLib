@@ -6,7 +6,6 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.material.MaterialData;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.block.CraftBlockState</b>.
@@ -40,10 +39,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
     public abstract void setY(int value);
     public abstract int getZ();
     public abstract void setZ(int value);
-    public abstract int getTypeId();
-    public abstract void setTypeId(int value);
-    public abstract MaterialData getData();
-    public abstract void setData(MaterialData value);
     public abstract int getFlag();
     public abstract void setFlag(int value);
     /**
@@ -58,8 +53,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
         public final Template.Field.Integer x = new Template.Field.Integer();
         public final Template.Field.Integer y = new Template.Field.Integer();
         public final Template.Field.Integer z = new Template.Field.Integer();
-        public final Template.Field.Integer typeId = new Template.Field.Integer();
-        public final Template.Field<MaterialData> data = new Template.Field<MaterialData>();
         public final Template.Field.Integer flag = new Template.Field.Integer();
 
     }

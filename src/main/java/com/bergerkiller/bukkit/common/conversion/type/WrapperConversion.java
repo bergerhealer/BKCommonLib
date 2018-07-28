@@ -17,6 +17,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
@@ -158,12 +159,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.TileEntity")
     public static org.bukkit.block.BlockState toBlockState(Object nmsTileEntityHandle) {
-        return BlockStateConversion.tileEntityToBlockState(nmsTileEntityHandle);
+        return BlockStateConversion.INSTANCE.tileEntityToBlockState(nmsTileEntityHandle);
     }
 
     @ConverterMethod
     public static org.bukkit.block.BlockState getBlockState(org.bukkit.block.Block block) {
-        return BlockStateConversion.blockToBlockState(block);
+        return BlockStateConversion.INSTANCE.blockToBlockState(block);
     }
 
     @ConverterMethod(input="net.minecraft.server.DataWatcher")

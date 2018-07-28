@@ -4,9 +4,8 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.material.MaterialData;
 
-import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
+import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -24,19 +23,17 @@ public class CBCraftBlockState {
     @Deprecated public static final FieldAccessor<Integer> x         = CraftBlockStateHandle.T.x.toFieldAccessor();
     @Deprecated public static final FieldAccessor<Integer> y         = CraftBlockStateHandle.T.y.toFieldAccessor();
     @Deprecated public static final FieldAccessor<Integer> z         = CraftBlockStateHandle.T.z.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<Integer> type      = CraftBlockStateHandle.T.typeId.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<MaterialData> data = CraftBlockStateHandle.T.data.toFieldAccessor();
 
     public static Object toTileEntity(BlockState state) {
-        return BlockStateConversion.blockStateToTileEntity(state);
+        return BlockStateConversion.INSTANCE.blockStateToTileEntity(state);
     }
 
     public static BlockState toBlockState(Block block) {
-        return BlockStateConversion.blockToBlockState(block);
+        return BlockStateConversion.INSTANCE.blockToBlockState(block);
     }
 
     public static BlockState toBlockState(Object tileEntity) {
-        return BlockStateConversion.tileEntityToBlockState(tileEntity);
+        return BlockStateConversion.INSTANCE.tileEntityToBlockState(tileEntity);
     }
 
     // Down below is an old implementation of BlockStateConversion.

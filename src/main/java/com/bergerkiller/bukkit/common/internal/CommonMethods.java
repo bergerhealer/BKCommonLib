@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.util.EnumMap;
 
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,7 +17,6 @@ import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
 public class CommonMethods {
@@ -42,10 +40,6 @@ public class CommonMethods {
                 t.printStackTrace();
             }
         }
-    }
-
-    public static Block CraftBlock_new(Chunk chunk, int x, int y, int z) {
-        return CraftBlockHandle.createNew(chunk, x, y, z);
     }
 
     public static BlockState CraftBlockState_new(Block block) {

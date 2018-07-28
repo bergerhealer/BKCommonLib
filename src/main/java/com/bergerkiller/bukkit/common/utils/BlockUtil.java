@@ -20,7 +20,7 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.MaterialEx;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.type.BlockStateConversion;
+import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -417,7 +417,7 @@ public class BlockUtil extends MaterialUtil {
      * @return the Block State
      */
     public static BlockState getState(org.bukkit.block.Block block) {
-        return BlockStateConversion.blockToBlockState(block);
+        return BlockStateConversion.INSTANCE.blockToBlockState(block);
     }
 
     /**

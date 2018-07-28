@@ -64,7 +64,11 @@ class Chunk {
 
     public void addEntities();
 
+#if version >= 1.13
+    public boolean checkCanSave:c(boolean isNotAutosave);
+#else
     public boolean checkCanSave:a(boolean isNotAutosave);
+#endif
 
 #if version >= 1.12
     public void markDirty();
@@ -94,7 +98,9 @@ class ChunkSection {
     public (NibbleArrayHandle) NibbleArray getBlockLightArray:getEmittedLightArray();
     public (NibbleArrayHandle) NibbleArray getSkyLightArray:getSkyLightArray();
 
-#if version >= 1.9
+#if version >= 1.13
+    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
+#elseif version >= 1.9
     public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
 #else
     // For MC 1.8.8 we do some conversion magic to expose the same API
@@ -108,7 +114,10 @@ class ChunkSection {
     public void setSkyLight:a(int x, int y, int z, int level);
     public void setBlockLight:b(int x, int y, int z, int level);
 
-#if version >= 1.9
+#if version >= 1.13
+    public int getSkyLight:c(int x, int y, int z);
+    public int getBlockLight:d(int x, int y, int z);
+#elseif version >= 1.9
     public int getSkyLight:b(int x, int y, int z);
     public int getBlockLight:c(int x, int y, int z);
 #else
@@ -139,7 +148,14 @@ optional class EntitySlice {
 }
 
 class DataPaletteBlock {
-#if version >= 1.9
+#if version >= 1.13
+    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
+        return (IBlockData) instance.a(x, y, z);
+    }
+    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
+        instance.setBlock(x, y, z, data);
+    }
+#elseif version >= 1.9
     public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
     public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
 #else
