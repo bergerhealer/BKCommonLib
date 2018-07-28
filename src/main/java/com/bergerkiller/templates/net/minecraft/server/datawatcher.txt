@@ -44,21 +44,26 @@ class DataWatcher {
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();
 #endif
 
+#if version >= 1.13
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:b((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+#elseif version >= 1.9
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+#else
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
+#endif
+
 #if version >= 1.9
     private optional void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
-
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 
     public optional T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
     public optional void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
 #else
     public optional void register:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
 
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
-
     public optional T get:###((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
     public optional void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
 #endif
+
     <code>
     public <T> void register(Key<T> key, T defaultValue) {
         T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));

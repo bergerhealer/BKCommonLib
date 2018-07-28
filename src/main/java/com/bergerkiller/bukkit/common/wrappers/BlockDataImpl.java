@@ -380,13 +380,13 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final float getDamageResilience(org.bukkit.entity.Entity source) {
-        return this.block.getDamageResillience(source);
+    public final float getDamageResilience() {
+        return this.block.getDamageResillience();
     }
 
     @Override
     public final void dropNaturally(org.bukkit.World world, int x, int y, int z, float yield, int chance) {
-        this.block.dropNaturally(world, new IntVector3(x, y, z), this.data, yield, chance);
+        this.block.dropNaturally(this.data, world, new IntVector3(x, y, z), yield, chance);
     }
 
     @Override

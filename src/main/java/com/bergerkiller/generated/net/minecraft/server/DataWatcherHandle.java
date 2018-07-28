@@ -69,9 +69,9 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         public final Template.Method.Converted<List<Item<?>>> unwatchAndReturnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
+        public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         @Template.Optional
         public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         @Template.Optional
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         @Template.Optional

@@ -75,7 +75,13 @@ class Block {
     }
 #endif
 
-    public float getDamageResillience:a((org.bukkit.entity.Entity) Entity entity);
+#if version >= 1.13
+    public float getDamageResillience:j();
+#else
+    public float getDamageResillience() {
+        return instance.a(null);
+    }
+#endif
 
 #if version >= 1.11
     public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound();
@@ -94,7 +100,17 @@ class Block {
     }
     </code>
 
-    public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
+#if version >= 1.13
+    public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, float yield, int chance);
+#else
+
+    // In 1.13 they changed parameter order for some stupid reason. Just proxy it.
+    // public void dropNaturally((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, float yield, int chance);
+    public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
+        instance.dropNaturally(world, blockposition, iblockdata, yield, chance);
+    }
+#endif
+
     public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);
 
 #if version >= 1.9
@@ -133,7 +149,9 @@ class Blocks {
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
 
-#if version >= 1.12
+#if version >= 1.13
+    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+#elseif version >= 1.12
     public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
 #elseif version >= 1.11
     public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();

@@ -465,7 +465,13 @@ class Entity {
      */
     protected void burn(float dmg);
 
+#if version >= 1.13
+    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+        return instance.a(new ItemStack(material, amount), force);
+    }
+#else
     public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
+#endif
 
     public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
 

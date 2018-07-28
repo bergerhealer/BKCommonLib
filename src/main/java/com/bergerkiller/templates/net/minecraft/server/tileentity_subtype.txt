@@ -3,7 +3,11 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 class TileEntityFurnace extends TileEntity {
+#if version >= 1.13
+    private static int fuelTime((ItemStackHandle) ItemStack itemstack);
+#else
     public static int fuelTime((ItemStackHandle) ItemStack itemstack);
+#endif
 }
 
 class TileEntityHopper extends TileEntity {

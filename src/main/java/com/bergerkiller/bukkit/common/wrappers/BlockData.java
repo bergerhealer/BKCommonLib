@@ -279,12 +279,11 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract boolean isPowerSource();
 
     /**
-     * Gets the damage resilience of a block to damage dealt by a certain entity
+     * Gets the damage resilience of a block to damage dealt
      *
-     * @param source of the damage
      * @return resilience value
      */
-    public abstract float getDamageResilience(Entity source);
+    public abstract float getDamageResilience();
 
     /**
      * Gets the bounding box of a block of this Block Data type/

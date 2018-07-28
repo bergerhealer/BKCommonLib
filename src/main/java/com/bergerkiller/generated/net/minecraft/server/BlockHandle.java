@@ -41,8 +41,8 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract int getEmission(IBlockDataHandle iblockdata);
     public abstract boolean isOccluding(IBlockDataHandle iblockdata);
     public abstract boolean isPowerSource(IBlockDataHandle iblockdata);
-    public abstract float getDamageResillience(Entity entity);
-    public abstract void dropNaturally(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, float yield, int chance);
+    public abstract float getDamageResillience();
+    public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
     public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);
     public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition);
@@ -77,7 +77,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Integer> getEmission = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Boolean> isOccluding = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Float> getDamageResillience = new Template.Method.Converted<Float>();
+        public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
         @Template.Optional
         public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
