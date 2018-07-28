@@ -9,7 +9,7 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
  */
 public class MaterialEx {
     public static final Material RAIL = getFirst("RAIL", "RAILS");
-    public static final Material OAK_WOOD = getFirst("OAK_WOOD", "WOOD");
+    public static final Material OAK_WOODEN_PLANKS = getFirst("OAK_PLANKS", "WOOD");
     public static final Material OAK_LOG = getFirst("OAK_LOG", "LOG");
     public static final Material WHITE_WOOL = getFirst("WHITE_WOOL", "WOOL");
     public static final Material NETHER_PORTAL = getFirst("NETHER_PORTAL", "PORTAL");

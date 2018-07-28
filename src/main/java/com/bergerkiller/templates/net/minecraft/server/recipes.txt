@@ -42,11 +42,28 @@ class ShapelessRecipes extends IRecipe {
 
 #endif
 
+// >= MC 1.12
 optional class RecipeItemStack {
-    public final (List<org.bukkit.inventory.ItemStack>) ItemStack[] choices;
+    public final optional (List<org.bukkit.inventory.ItemStack>) ItemStack[] choices;
+
+    public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices() {
+#if version >= 1.13
+        instance.buildChoices();
+#endif
+        return instance.choices;
+    }
+
+    <code>
+    public static Object createRawRecipeItemStack(List<org.bukkit.inventory.ItemStack> choices) {
+        Object raw = T.newInstanceNull();
+        T.choices.set(raw, choices);
+        return raw;
+    }
+    </code>
 }
 
-class RecipesFurnace {
+// <= MC 1.12.2
+optional class RecipesFurnace {
     public (Map<org.bukkit.inventory.ItemStack, org.bukkit.inventory.ItemStack>) Map<ItemStack, ItemStack> recipes;
 
     public static (RecipesFurnaceHandle) RecipesFurnace getInstance();
@@ -55,25 +72,40 @@ class RecipesFurnace {
 
 }
 
-class CraftingManager {
-    // >= 1.12
-    optional public static rawtype (Iterable) RegistryMaterials<MinecraftKey, IRecipe> opt_recipesField:recipes;
+// >= MC 1.13
+optional class FurnaceRecipe extends IRecipe {
+    private final (CraftInputSlot) RecipeItemStack ingredient;
 
-    // <= 1.11.2
-    optional public (List<IRecipeHandle>) List<IRecipe> opt_getRecipes:getRecipes();
-    optional public static (CraftingManagerHandle) CraftingManager opt_getInstance:getInstance();
-
-    <code>
-    public static Iterable<com.bergerkiller.generated.net.minecraft.server.IRecipeHandle> getRecipes() {
-        if (T.opt_recipesField.isAvailable()) {
-            Iterable<?> irecipeIter = T.opt_recipesField.get();
-            return new com.bergerkiller.mountiplex.conversion.util.ConvertingIterable<IRecipeHandle>(irecipeIter,
-                com.bergerkiller.generated.net.minecraft.server.IRecipeHandle.T.getHandleConverter());
-        } else if (T.opt_getRecipes.isAvailable() && T.opt_getInstance.isAvailable()) {
-            return T.opt_getRecipes.invoke(T.opt_getInstance.raw.invoke());
-        } else {
-            throw new RuntimeException("Recipes listing information not resolved");
+    public static (Iterable<com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
+        java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
+        java.util.List filteredResult = new java.util.ArrayList();
+        while (allRecipes.hasNext()) {
+            Object recipe = allRecipes.next();
+            if (recipe instanceof FurnaceRecipe) {
+                filteredResult.add(recipe);
+            }
         }
+        return filteredResult;
     }
-    </code>
+}
+
+class CraftingManager {
+    public static (Iterable<com.bergerkiller.generated.net.minecraft.server.IRecipeHandle>) Iterable<IRecipe> getRecipes() {
+#if version >= 1.13
+        java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
+        java.util.List filteredResult = new java.util.ArrayList();
+        while (allRecipes.hasNext()) {
+            Object recipe = allRecipes.next();
+            if (recipe instanceof FurnaceRecipe) {
+                continue;
+            }
+            filteredResult.add(recipe);
+        }
+        return filteredResult;
+#elseif version >= 1.12
+        return CraftingManager.recipes;
+#else
+        return CraftingManager.getInstance().recipes;
+#endif
+    }
 }

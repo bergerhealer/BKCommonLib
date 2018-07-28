@@ -83,7 +83,7 @@ public class CommonEntityType {
             } else if (entityTypeEnumName.equals("PHANTOM")) {
                 nmsName = "EntityPhantom";
             } else if (entityTypeEnumName.equals("TRIDENT")) {
-                nmsName = "EntityTrident";
+                nmsName = "EntityThrownTrident";
             } else if (entityTypeEnumName.equals("COD")) {
                 nmsName = "EntityCod";
             } else if (entityTypeEnumName.equals("SALMON")) {

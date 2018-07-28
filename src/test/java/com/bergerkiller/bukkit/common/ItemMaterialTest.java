@@ -55,7 +55,7 @@ public class ItemMaterialTest {
             .check(Material.GLASS, false)
             .check(Material.APPLE, false)
             .check(MaterialEx.RAIL, false)
-            .check(MaterialEx.OAK_WOOD, true)
+            .check(MaterialEx.OAK_WOODEN_PLANKS, true)
             .check(Material.IRON_SWORD, false)
             .check(getFirst("ROSE_RED", "RED_ROSE"), false)
             .check(getFirst("STONE_PRESSURE_PLATE", "STONE_PLATE"), false)
@@ -195,7 +195,7 @@ public class ItemMaterialTest {
 
         testProperty(MaterialUtil.ISFUEL, "ISFUEL")
             .check(Material.COAL, true)
-            .check(MaterialEx.OAK_WOOD, true)
+            .check(MaterialEx.OAK_WOODEN_PLANKS, true)
             .check(Material.STICK, true)
             .check(Material.STONE, false)
             .check(Material.GLASS, false)
@@ -228,7 +228,7 @@ public class ItemMaterialTest {
 
     @Test
     public void testDisplayName() {
-        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOOD, 1);
+        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOODEN_PLANKS, 1);
         String old_name = ItemUtil.getDisplayName(item);
         ItemUtil.setDisplayName(item, "COOLNAME");
         assertEquals("COOLNAME", ItemUtil.getDisplayName(item));
@@ -238,7 +238,7 @@ public class ItemMaterialTest {
 
     @Test
     public void testItemTag() {
-        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOOD, 1);
+        ItemStack item = ItemUtil.createItem(MaterialEx.OAK_WOODEN_PLANKS, 1);
         assertNull(ItemUtil.getMetaTag(item));
         CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
         assertNotNull(tag);
@@ -334,7 +334,7 @@ public class ItemMaterialTest {
         List<Material> itemTypes = ItemUtil.getItemTypes();
 
         // Perform some basic tests on the list to validate correctness
-        assertTrue(itemTypes.contains(MaterialEx.OAK_WOOD));
+        assertTrue(itemTypes.contains(MaterialEx.OAK_WOODEN_PLANKS));
         assertTrue(itemTypes.contains(Material.DIAMOND));
         assertTrue(itemTypes.contains(Material.DIAMOND_PICKAXE));
         assertTrue(itemTypes.contains(Material.POTION));

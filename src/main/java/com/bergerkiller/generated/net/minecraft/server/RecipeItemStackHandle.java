@@ -25,13 +25,21 @@ public abstract class RecipeItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract List<ItemStack> getChoices();
-    public abstract void setChoices(List<ItemStack> value);
+
+    public static Object createRawRecipeItemStack(List<org.bukkit.inventory.ItemStack> choices) {
+        Object raw = T.newInstanceNull();
+        T.choices.set(raw, choices);
+        return raw;
+    }
     /**
      * Stores class members for <b>net.minecraft.server.RecipeItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RecipeItemStackClass extends Template.Class<RecipeItemStackHandle> {
+        @Template.Optional
         public final Template.Field.Converted<List<ItemStack>> choices = new Template.Field.Converted<List<ItemStack>>();
+
+        public final Template.Method.Converted<List<ItemStack>> getChoices = new Template.Method.Converted<List<ItemStack>>();
 
     }
 

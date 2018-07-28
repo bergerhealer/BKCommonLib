@@ -24,9 +24,9 @@ public class RecipeTest {
         assertEquals(16000, RecipeUtil.getFuelTime(Material.COAL_BLOCK));
         assertEquals(1600, RecipeUtil.getFuelTime(Material.COAL));
         assertEquals(0, RecipeUtil.getFuelTime(Material.STONE));
-        assertEquals(300, RecipeUtil.getFuelTime(MaterialEx.OAK_WOOD));
+        assertEquals(300, RecipeUtil.getFuelTime(MaterialEx.OAK_WOODEN_PLANKS));
         assertTrue(RecipeUtil.isFuelItem(Material.COAL));
-        assertTrue(RecipeUtil.isFuelItem(MaterialEx.OAK_WOOD));
+        assertTrue(RecipeUtil.isFuelItem(MaterialEx.OAK_WOODEN_PLANKS));
         assertTrue(RecipeUtil.isFuelItem(MaterialEx.OAK_LOG));
         assertFalse(RecipeUtil.isFuelItem(Material.GLASS));
         assertTrue(RecipeUtil.isHeatableItem(getFirst("PORKCHOP", "PORK")));
@@ -42,7 +42,7 @@ public class RecipeTest {
                 new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 2),
                 new ItemStack(Material.REDSTONE, 1),
                 new ItemStack(Material.STONE, 3));
-        assertRequirements(MaterialEx.OAK_WOOD, new ItemStack(MaterialEx.OAK_LOG, 1));
+        assertRequirements(MaterialEx.OAK_WOODEN_PLANKS, new ItemStack(MaterialEx.OAK_LOG, 1));
         assertRequirements(Material.GLOWSTONE, new ItemStack(Material.GLOWSTONE_DUST, 4));
         assertRequirements(Material.IRON_BLOCK, new ItemStack(Material.IRON_INGOT, 9));
     }
@@ -58,7 +58,7 @@ public class RecipeTest {
         testInventory.addItem(new ItemStack(Material.COBBLESTONE, 64));
         testInventory.addItem(new ItemStack(Material.STONE, 8));
         testInventory.addItem(new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 5));
-        testInventory.addItem(new ItemStack(MaterialEx.OAK_WOOD, 12));
+        testInventory.addItem(new ItemStack(MaterialEx.OAK_WOODEN_PLANKS, 12));
         assertTrue(recipe.craft(testInventory));
         assertTrue(recipe.craft(testInventory));
         assertFalse(recipe.craft(testInventory));
@@ -68,7 +68,7 @@ public class RecipeTest {
         assertEquals(testInventory.getItem(1), new ItemStack(Material.COBBLESTONE, 64));
         assertEquals(testInventory.getItem(2), new ItemStack(Material.STONE, 2));
         assertEquals(testInventory.getItem(3), new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 1));
-        assertEquals(testInventory.getItem(4), new ItemStack(MaterialEx.OAK_WOOD, 12));
+        assertEquals(testInventory.getItem(4), new ItemStack(MaterialEx.OAK_WOODEN_PLANKS, 12));
         assertEquals(testInventory.getItem(5), new ItemStack(getFirst("REPEATER", "DIODE"), 2));
     }
 

@@ -556,7 +556,11 @@ public class WrapperConversion {
     // 1.12 =>
     @ConverterMethod(input="net.minecraft.server.RecipeItemStack", optional=true)
     public static CraftInputSlot toCraftInputSlot(Object recipeItemStackHandle) {
-        return new CraftInputSlot(RecipeItemStackHandle.T.choices.get(recipeItemStackHandle));
+        List<org.bukkit.inventory.ItemStack> choices = RecipeItemStackHandle.T.getChoices.invoke(recipeItemStackHandle);
+        if (choices == null) {
+            throw new RuntimeException("Choices result field is null");
+        }
+        return new CraftInputSlot(choices);
     }
 
     @ConverterMethod(input="net.minecraft.server.SoundEffect")

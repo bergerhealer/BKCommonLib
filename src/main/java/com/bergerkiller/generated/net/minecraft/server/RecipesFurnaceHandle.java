@@ -10,6 +10,7 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 public abstract class RecipesFurnaceHandle extends Template.Handle {
     /** @See {@link RecipesFurnaceClass} */
     public static final RecipesFurnaceClass T = new RecipesFurnaceClass();

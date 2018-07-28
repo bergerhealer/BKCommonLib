@@ -380,9 +380,7 @@ public class HandleConversion {
     // 1.12 =>
     @ConverterMethod(output="net.minecraft.server.RecipeItemStack", optional=true)
     public static Object toRecipeItemStackHandle(CraftInputSlot slot) {
-        Object recipe = RecipeItemStackHandle.T.newInstanceNull();
-        RecipeItemStackHandle.T.choices.set(recipe, Arrays.asList(slot.getChoices()));
-        return recipe;
+        return RecipeItemStackHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
     }
 
     @ConverterMethod(output="net.minecraft.server.MinecraftKey")

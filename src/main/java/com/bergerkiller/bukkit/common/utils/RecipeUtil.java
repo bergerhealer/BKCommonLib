@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
@@ -73,7 +74,18 @@ public class RecipeUtil {
     }
 
     public static org.bukkit.inventory.ItemStack getFurnaceResult(org.bukkit.inventory.ItemStack cooked) {
-        return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getHandle(cooked)));
+        if (FurnaceRecipeHandle.T.isAvailable()) {
+            // >= 1.13
+            for (FurnaceRecipeHandle recipe : FurnaceRecipeHandle.getRecipes()) {
+                if (recipe.getIngredient().match(cooked) != null) {
+                    return recipe.getOutput();
+                }
+            }
+            return null;
+        } else {
+            // <= 1.12.2
+            return Conversion.toItemStack.convert(RecipesFurnaceHandle.getInstance().getResult(CommonNMS.getHandle(cooked)));
+        }
     }
 
     public static Collection<ItemStack> getHeatableItemStacks() {
