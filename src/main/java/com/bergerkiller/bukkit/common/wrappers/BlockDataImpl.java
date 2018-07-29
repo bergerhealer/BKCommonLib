@@ -228,8 +228,11 @@ public class BlockDataImpl extends BlockData {
 
             // Null: return AIR
             if (type == null) {
-                return new MaterialData(Material.AIR, (byte) 0);
+                return new MaterialData(CraftMagicNumbersHandle.toLegacy(Material.AIR), (byte) 0);
             }
+
+            // Switch to legacy type on >= MC 1.13
+            type = CraftMagicNumbersHandle.toLegacy(type);
 
             // Create new MaterialData + some fixes.
             if (LogicUtil.contains(type.name(), "GOLD_PLATE", "IRON_PLATE", "HEAVY_WEIGHTED_PRESSURE_PLATE", "LIGHT_WEIGHTED_PRESSURE_PLATE")) {

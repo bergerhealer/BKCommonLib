@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 
 class MinecraftServer {
     public (List<WorldServerHandle>) List<WorldServer> worlds;
@@ -71,6 +72,10 @@ interface IPlayerFileData {
     public String[] getSeenPlayers();
 }
 
-class LocaleI18n {
-    public static String get(String key);
+class LocaleLanguage {
+    private static unknown final Logger a;
+    private static unknown final Pattern b;
+    private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
+
+    public synchronized String get:a(String s);
 }

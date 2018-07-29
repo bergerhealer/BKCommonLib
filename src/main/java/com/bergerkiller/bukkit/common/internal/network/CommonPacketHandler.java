@@ -3,19 +3,15 @@ package com.bergerkiller.bukkit.common.internal.network;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -31,7 +27,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
      * Known plugins that malfunction with the default packet handler
      */
     private static final String[] incompatibilities = {"Spout"};
-    private SafeConstructor<?> queuedPacketConstructor;
 
     @Override
     public String getName() {
@@ -59,9 +54,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
                 qp = p;
             }
         }
-        ClassTemplate<?> queuedPacketTemplate = ClassTemplate.create(qp);
-        this.queuedPacketConstructor = queuedPacketTemplate.getConstructor(PacketType.DEFAULT.getType(), GenericFutureListener[].class);
-        if (!this.queuedPacketConstructor.isValid()) {
+        if (qp == null) {
             return false;
         }
 

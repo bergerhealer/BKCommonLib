@@ -14,6 +14,7 @@ public abstract class EntityTypesHandle extends Template.Handle {
     public static final EntityTypesClass T = new EntityTypesClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes");
 
+    public static final RegistryMaterialsHandle opt_registry = T.opt_registry.getSafe();
     /* ============================================================================== */
 
     public static EntityTypesHandle createHandle(Object handleInstance) {
@@ -39,6 +40,7 @@ public abstract class EntityTypesHandle extends Template.Handle {
         public final Template.StaticField.Converted<Map<String, Class<?>>> opt_nameTypeMap_1_10_2 = new Template.StaticField.Converted<Map<String, Class<?>>>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<Class<?>, String>> opt_typeNameMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
+        public final Template.StaticField.Converted<RegistryMaterialsHandle> opt_registry = new Template.StaticField.Converted<RegistryMaterialsHandle>();
 
         public final Template.StaticMethod<Class<?>> getEntityClass = new Template.StaticMethod<Class<?>>();
         public final Template.StaticMethod<String> getEntityInternalName = new Template.StaticMethod<String>();

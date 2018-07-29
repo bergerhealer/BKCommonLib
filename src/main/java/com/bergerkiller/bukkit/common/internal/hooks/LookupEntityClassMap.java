@@ -7,7 +7,6 @@ import java.util.Set;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
-import com.bergerkiller.mountiplex.reflection.SafeField;
 
 /**
  * Map proxy for a mapping from Entity Class to entity name.
@@ -100,7 +99,7 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         }
 
         // >= 1.11 uses RegistryMaterials BiMap
-        RegistryMaterialsHandle reg = findNameRegistry();
+        RegistryMaterialsHandle reg = EntityTypesHandle.T.opt_registry.get();
         Map<?, ?> base = reg.getInverseLookupField();
         Map<Object, Object> repl = new LookupEntityClassMap<Object, Object>(base);
         reg.setInverseLookupField(repl);
@@ -119,7 +118,7 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         }
 
         // >= 1.11 uses RegistryMaterials BiMap
-        RegistryMaterialsHandle reg = findNameRegistry();
+        RegistryMaterialsHandle reg = EntityTypesHandle.T.opt_registry.get();
         Map<?, ?> orig = reg.getInverseLookupField();
         if (orig instanceof LookupEntityClassMap) {
             LookupEntityClassMap<Object, Object> repl = (LookupEntityClassMap<Object, Object>) orig;
@@ -127,8 +126,4 @@ public class LookupEntityClassMap<K, V> implements Map<K, V> {
         }
     }
 
-    private static RegistryMaterialsHandle findNameRegistry() {
-        Object raw = SafeField.get(EntityTypesHandle.T.getType(), "b", RegistryMaterialsHandle.T.getType());
-        return RegistryMaterialsHandle.createHandle(raw);
-    }
 }

@@ -38,6 +38,10 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         return T.getBlockFromMaterial.invoke(material);
     }
 
+    public static Material toLegacy(Material type) {
+        return T.toLegacy.invoke(type);
+    }
+
     public static Object fromLegacyData(Material material, byte data) {
         return T.fromLegacyData.invoke(material, data);
     }
@@ -55,6 +59,7 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Material> getMaterialFromItem = new Template.StaticMethod.Converted<Material>();
         public final Template.StaticMethod.Converted<Object> getItemFromMaterial = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<Object> getBlockFromMaterial = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Material> toLegacy = new Template.StaticMethod<Material>();
         public final Template.StaticMethod.Converted<Object> fromLegacyData = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<Byte> toLegacyData = new Template.StaticMethod.Converted<Byte>();
 

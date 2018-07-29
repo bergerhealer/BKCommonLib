@@ -17,7 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.server.LocaleI18nHandle;
+import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 public class EntityHook extends ClassHook<EntityHook> {
@@ -229,7 +229,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         if (name == null) {
             name = "generic";
         }
-        return LocaleI18nHandle.get("entity." + name + ".name");
+        return LocaleLanguageHandle.INSTANCE.get("entity." + name + ".name");
     }
 
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")

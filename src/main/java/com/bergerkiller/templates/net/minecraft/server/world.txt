@@ -93,7 +93,19 @@ class World extends IBlockAccess {
     public optional (Object) IChunkProvider getChunkProvider();
 
 #if version >= 1.13
-    // MISSING! TODO FIX
+    public optional boolean getBlockCollisions2((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB entityBounds, (AxisAlignedBBHandle) AxisAlignedBB movedBounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list) {
+        VoxelShape entityBoundsVoxelShape = VoxelShapes.a(entityBounds);
+        VoxelShape movedBoundsVoxelShape = VoxelShapes.a(movedBounds);
+        VoxelShape result = instance.a(entityBoundsVoxelShape, movedBoundsVoxelShape, false, false);
+        java.util.List resultAABB = result.d();
+        list.addAll(resultAABB);
+        return !resultAABB.isEmpty();
+    }
+#else
+    public optional boolean getBlockCollisions2:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#endif
+
+#if version >= 1.13
     private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
 #elseif version >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
@@ -318,7 +330,11 @@ class WorldType {
     private final String name;
 
 #if version >= 1.13
-    public int getDimension:h();
+    #if pre == 7
+        public int getDimension:h();
+    #else
+        public int getDimension:i();
+    #endif
 #else
     public int getDimension:g();
 #endif

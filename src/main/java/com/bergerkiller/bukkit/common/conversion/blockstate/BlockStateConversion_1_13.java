@@ -51,7 +51,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         worldField.setAccessible(true);
 
         // Create a NMS World proxy for handling the getTileEntity call
-        proxy_nms_world = (Chunk) new ClassInterceptor() {
+        proxy_nms_world = new ClassInterceptor() {
             @Override
             protected Invokable getCallback(Method method) {
                 // Gets the proxy world
@@ -167,6 +167,20 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                         @Override
                         public Object invoke(Object instance, Object... args) {
                             return input_state.block.getZ();
+                        }
+                    };
+                } else if (name.equals("getNMS")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return input_state.blockData.getData();
+                        }
+                    };
+                } else if (name.equals("getNMSBlock")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return input_state.blockData.getBlockRaw();
                         }
                     };
                 } else if (name.equals("getState")) {
