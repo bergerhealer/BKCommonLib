@@ -54,7 +54,19 @@ class Chunk {
 
     public void addEntity:a((EntityHandle) Entity entity);
 
-    public int getHeight:b(int x, int z)
+#if version >= 1.13
+    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getHeightMap:b((com.bergerkiller.bukkit.common.wrappers.HeightMap.Type) HeightMap.Type type);
+
+    public int getHeight:a((com.bergerkiller.bukkit.common.wrappers.HeightMap.Type) HeightMap.Type type, int x, int z);
+#else
+    public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getHeightMap(com.bergerkiller.bukkit.common.wrappers.HeightMap.Type type) {
+        return new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
+    }
+
+    public int getHeight((com.bergerkiller.bukkit.common.wrappers.HeightMap.Type) HeightMap.Type type, int x, int z) {
+        return instance.b(x, z);
+    }
+#endif
 
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
 
@@ -96,6 +108,8 @@ class ChunkSection {
     private (NibbleArrayHandle) NibbleArray skyLight;
 
     public boolean isEmpty:a();
+
+    public int getYPosition();
 
     public (ChunkSectionHandle) ChunkSection(int y, boolean hasSkyLight);
 
@@ -180,4 +194,12 @@ class EnumSkyBlock {
         return ((Enum<?>) getRaw()).ordinal();
     }
     </code>
+}
+
+class HeightMap {
+
+    public void initialize:a();
+
+    public int getHeight:a(int x, int z);
+
 }

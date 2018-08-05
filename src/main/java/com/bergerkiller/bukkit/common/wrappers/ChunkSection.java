@@ -14,6 +14,16 @@ public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
     }
 
     /**
+     * Gets the base y-position of this Chunk Section. This is the lowest world coordinate
+     * a block is at in the World stored in this section.
+     * 
+     * @return bottom y position
+     */
+    public int getYPosition() {
+        return handle.getYPosition();
+    }
+
+    /**
      * Gets whether this Chunk Section stored sky light information.
      * If no sky exists (e.g. The Nether), this function returns false.
      * 
@@ -70,5 +80,21 @@ public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {
      */
     public void setBlockData(int x, int y, int z, BlockData data) {
         blockIds.setBlockData(x, y, z, data);
+    }
+
+    public NibbleArrayHandle getSkyLightNibbleArray() {
+        return handle.getSkyLight();
+    }
+
+    public void setSkyLightNibbleArray(NibbleArrayHandle nibbleArray) {
+        handle.setSkyLight(nibbleArray);
+    }
+
+    public NibbleArrayHandle getBlockLightNibbleArray() {
+        return handle.getBlockLight();
+    }
+
+    public void setBlockLightNibbleArray(NibbleArrayHandle nibbleArray) {
+        handle.setBlockLight(nibbleArray);
     }
 }

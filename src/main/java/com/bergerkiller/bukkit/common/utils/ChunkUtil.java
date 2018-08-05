@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle;
@@ -51,15 +52,41 @@ public class ChunkUtil {
     }
 
     /**
-     * Gets the height of a given column in a chunk
+     * Gets the height map of a chunk.
+     * 
+     * @param chunk to get a heightmap for
+     * @param type of heightmap to get
+     * @return heightmap
+     */
+    public static HeightMap getHeightMap(org.bukkit.Chunk chunk, HeightMap.Type type) {
+        return ChunkHandle.fromBukkit(chunk).getHeightMap(type);
+    }
+
+    /**
+     * Gets the height to the nearest non-transparent Block of a given column in a chunk.<br>
+     * <b>Deprecated: use {@link #getHeight(chunk, HeightMap.Type.LIGHT_BLOCKING, x, z)} instead.</b>
      *
      * @param chunk the column is in
      * @param x - coordinate of the block column
      * @param z - coordinate of the block column
      * @return column height
      */
+    @Deprecated
     public static int getHeight(org.bukkit.Chunk chunk, int x, int z) {
-        return ChunkHandle.fromBukkit(chunk).getHeight(x & 0xf, z & 0xf);
+        return getHeight(chunk, HeightMap.Type.LIGHT_BLOCKING, x, z);
+    }
+
+    /**
+     * Gets the height of a given column in a chunk, using a specified {@link HeightMap#Type}.
+     *
+     * @param chunk the column is in
+     * @param type of HeightMap
+     * @param x - coordinate of the block column
+     * @param z - coordinate of the block column
+     * @return column height
+     */
+    public static int getHeight(org.bukkit.Chunk chunk, HeightMap.Type type, int x, int z) {
+        return ChunkHandle.fromBukkit(chunk).getHeight(type, x & 0xf, z & 0xf);
     }
 
     /**
@@ -100,20 +127,6 @@ public class ChunkUtil {
             return ChunkHandle.fromBukkit(chunk).getBrightness(EnumSkyBlockHandle.SKY,
                     new IntVector3(x & 0xf, y, z & 0xf));
         }
-    }
-
-    /**
-     * Gets the block type Id
-     *
-     * @param chunk the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     * @return block type Id
-     */
-    @Deprecated
-    public static int getBlockTypeId(org.bukkit.Chunk chunk, int x, int y, int z) {
-        return getBlockData(chunk, x, y, z).getTypeId();
     }
 
     /**

@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapFont;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
@@ -54,7 +55,7 @@ public class MapResourcePackTest {
         /*
         for (int x = 0; x < 128-16; x += 18) {
             for (int y = 0; y < 128-16; y += 18) {
-                testDraw(map, pack, x, y, Material.values()[rand.nextInt(Material.values().length)]);
+                testDraw(map, pack, x, y, CommonMethods.getAllMaterials()[rand.nextInt(Material.values().length)]);
             }
         }
         */

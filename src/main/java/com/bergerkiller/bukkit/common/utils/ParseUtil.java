@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
@@ -406,7 +406,7 @@ public class ParseUtil {
         // From ID
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             try {
-                return LogicUtil.fixNull(CommonMethods.getMaterialFromId(Integer.parseInt(text)), def);
+                return LogicUtil.fixNull(CommonLegacyMaterials.getMaterialFromId(Integer.parseInt(text)), def);
             } catch (Exception ex) {
             }
         }

@@ -4,6 +4,8 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap.Type;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
 import java.util.List;
@@ -31,7 +33,8 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract void addEntity(EntityHandle entity);
-    public abstract int getHeight(int x, int z);
+    public abstract HeightMap getHeightMap(Type type);
+    public abstract int getHeight(Type type, int x, int z);
     public abstract int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position);
     public abstract int getTopSliceY();
     public abstract byte[] getBiomeIndex();
@@ -77,7 +80,8 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method.Converted<BlockData> getBlockDataAtCoord = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> setBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> addEntity = new Template.Method.Converted<Void>();
-        public final Template.Method<Integer> getHeight = new Template.Method<Integer>();
+        public final Template.Method.Converted<HeightMap> getHeightMap = new Template.Method.Converted<HeightMap>();
+        public final Template.Method.Converted<Integer> getHeight = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Integer> getBrightness = new Template.Method.Converted<Integer>();
         public final Template.Method<Integer> getTopSliceY = new Template.Method<Integer>();
         public final Template.Method<byte[]> getBiomeIndex = new Template.Method<byte[]>();

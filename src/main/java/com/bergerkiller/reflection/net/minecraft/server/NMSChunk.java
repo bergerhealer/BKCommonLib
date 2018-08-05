@@ -104,8 +104,4 @@ public class NMSChunk {
         return ChunkHandle.T.getBlockData.invoke(chunkHandle, new IntVector3(x & XZ_MASK, y, z & XZ_MASK));
     }
 
-    @Deprecated
-    public static int getTypeId(Object chunkHandle, int x, int y, int z) {
-        return ChunkHandle.T.getBlockData.invoke(chunkHandle, x, y, z).getTypeId();
-    }
 }

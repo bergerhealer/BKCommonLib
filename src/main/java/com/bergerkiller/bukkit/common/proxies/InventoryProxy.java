@@ -8,7 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     @Deprecated
     public boolean contains(int materialId) {
-        return base.contains(CommonMethods.getMaterialFromId(materialId));
+        return base.contains(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -99,7 +99,7 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     @Deprecated
     public boolean contains(int materialId, int amount) {
-        return base.contains(CommonMethods.getMaterialFromId(materialId), amount);
+        return base.contains(CommonLegacyMaterials.getMaterialFromId(materialId), amount);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     @Deprecated
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        return base.all(CommonMethods.getMaterialFromId(materialId));
+        return base.all(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     @Deprecated
     public int first(int materialId) {
-        return base.first(CommonMethods.getMaterialFromId(materialId));
+        return base.first(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -164,7 +164,7 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
 
     @Deprecated
     public void remove(int materialId) {
-        base.remove(CommonMethods.getMaterialFromId(materialId));
+        base.remove(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override

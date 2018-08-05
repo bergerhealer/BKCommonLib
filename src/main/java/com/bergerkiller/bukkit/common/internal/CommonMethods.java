@@ -1,9 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.EnumMap;
-
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.HumanEntity;
@@ -11,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -20,27 +16,6 @@ import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
 public class CommonMethods {
-    private static final IntHashMap<Material> idToMaterial = new IntHashMap<Material>();
-    private static final EnumMap<Material, Integer> materialToId = new EnumMap<Material, Integer>(Material.class);
-
-    static {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            // On MC 1.13 can we store anything at all? No.
-            
-        } else {
-            // Stores all material mapping on 1.12.2 as is
-            try {
-                java.lang.reflect.Method m = Material.class.getDeclaredMethod("getId");
-                for (Material mat : Material.values()) {
-                    int id = ((Integer) m.invoke(mat)).intValue();
-                    idToMaterial.put(id, mat);
-                    materialToId.put(mat, id);
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
 
     public static BlockState CraftBlockState_new(Block block) {
         return CraftBlockStateHandle.createNew(block);
@@ -134,33 +109,4 @@ public class CommonMethods {
         }
     }
 
-    /**
-     * Converts (old) legacy material ids to the Material types. On MC 1.13 and onwards, this
-     * method will fail with a runtime exception. DO NOT USE. Backwards compatibility only!
-     * 
-     * @param id
-     * @return material, null if not matched
-     */
-    @Deprecated
-    public static Material getMaterialFromId(int id) {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            throw new UnsupportedOperationException("Material Ids are no longer supported on Minecraft 1.13 and onwards");
-        }
-        return idToMaterial.get(id);
-    }
-
-    /**
-     * Converts material enum values to their respective legacy material type Ids. On MC 1.13 and onwards, this
-     * method will fail with a runtime exception. DO NOT USE. Backwards compatibility only!
-     * 
-     * @param type
-     * @return material type id, -1 for null
-     */
-    @Deprecated
-    public static int getIdFromMaterial(Material type) {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            throw new UnsupportedOperationException("Material Ids are no longer supported on Minecraft 1.13 and onwards");
-        }
-        return materialToId.get(type);
-    }
 }

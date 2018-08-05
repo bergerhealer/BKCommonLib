@@ -12,6 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
@@ -33,21 +34,30 @@ class Block {
 #endif
 
 #if version >= 1.13
-    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
-        return 0; //TODO: FIX
+    // Since 1.13 getOpacity has a BlockPosition argument
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return iblockdata.b(world, new BlockPosition(x, y, z));
     }
-    public int getEmission:l((IBlockDataHandle) IBlockData iblockdata);
+
+    #if pre <= 7
+        public int getEmission:l((IBlockDataHandle) IBlockData iblockdata);
+    #else
+        public int getEmission:m((IBlockDataHandle) IBlockData iblockdata);
+    #endif
+
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
-    public int getOpacity:m((IBlockDataHandle) IBlockData iblockdata);
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return instance.m(iblockdata);
+    }
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.8.3
     // By IBlockData does not exist; proxy to the empty args version
-    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.p();
     }
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
@@ -61,7 +71,7 @@ class Block {
     }
 #else
     // By IBlockData does not exist; proxy to the empty args version
-    public int getOpacity((IBlockDataHandle) IBlockData iblockdata) {
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.n();
     }
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
@@ -76,7 +86,11 @@ class Block {
 #endif
 
 #if version >= 1.13
-    public float getDamageResillience:j();
+    #if pre <= 7
+        public float getDamageResillience:j();
+    #else
+        public float getDamageResillience:k();
+    #endif
 #else
     public float getDamageResillience() {
         return instance.a(null);
@@ -149,16 +163,63 @@ class Blocks {
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
 
+    <code>
+    public void logStates() {
+        for (java.util.Map.Entry<IBlockStateHandle, Comparable<?>> entry : getStates().entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue());
+        }
+    }
+
+    public IBlockStateHandle findState(String key) {
+        for (IBlockStateHandle blockState : getStates().keySet()) {
+            if (blockState.getKeyToken().equals(key)) {
+                return blockState;
+            }
+        }
+        return null;
+    }
+
+    public IBlockDataHandle set(String key, Object value) {
+        return set(findState(key), value);
+    }
+
+    public <T> T get(String key, Class<T> type) {
+        return get(findState(key), type);
+    }
+
+    public <T> T get(IBlockStateHandle state, Class<T> type) {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.convert(get(state), type, null);
+    }
+    </code>
+
+    public Object get((IBlockStateHandle) IBlockState state) {
+        if (state != null) {
+            return instance.get(state);
+        } else {
+            return null;
+        }
+    }
+
+    public (IBlockDataHandle) IBlockData set((IBlockStateHandle) IBlockState state, Object value) {
+        if (state != null) {
+            Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, state.b(), null);
+            if (converted != null) {
+                return (IBlockData) instance.set(state, (Comparable) converted);
+            }
+        }
+        return instance;
+    }
+
 #if version >= 1.13
-    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
 #elseif version >= 1.12
-    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
 #elseif version >= 1.11
-    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();
 #elseif version >= 1.9
-    public abstract (Map<Object, Object>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:s();
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:s();
 #else
-    public abstract (Map<Object, Object>) ImmutableMap<IBlockState, Comparable> getStates:b();
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState, Comparable> getStates:b();
 #endif
 }
 

@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>1.13-pre7</project.mcversion>
+        <project.mcversion>1.13</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
         <project.mountiplexversion>1.34</project.mountiplexversion>
         <junit.version>4.11</junit.version>

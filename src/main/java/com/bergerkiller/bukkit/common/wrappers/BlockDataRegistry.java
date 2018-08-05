@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
@@ -110,7 +111,9 @@ public class BlockDataRegistry {
      */
     @Deprecated
     public static BlockData fromMaterialData(Material material, int data) {
-        return BlockDataImpl.BY_LEGACY_MAT_DATA[material.ordinal() | (data << BlockDataImpl.BY_LEGACY_MAT_DATA_SHIFT)];
+        int index = CommonLegacyMaterials.getOrdinal(material);
+        index |= (data << BlockDataImpl.BY_LEGACY_MAT_DATA_SHIFT);
+        return BlockDataImpl.BY_LEGACY_MAT_DATA[index];
     }
 
     /**

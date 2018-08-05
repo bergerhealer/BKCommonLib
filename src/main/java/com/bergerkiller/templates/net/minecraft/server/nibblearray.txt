@@ -3,11 +3,23 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 
 class NibbleArray {
-    private final byte[] data:a;
+    private final byte[] dataField:a;
 
     public (NibbleArrayHandle) NibbleArray();
     public (NibbleArrayHandle) NibbleArray(byte[] data);
 
     public int get:a(int x, int y, int z);
     public void set:a(int x, int y, int z, int nibbleValue);
+
+#if version >= 1.9
+    public byte[] getData:asBytes();
+#else
+    public byte[] getData:a();
+#endif
+
+    <code>
+    public boolean dataEquals(NibbleArrayHandle other) {
+        return java.util.Arrays.equals(this.getData(), other.getData());
+    }
+    </code>
 }

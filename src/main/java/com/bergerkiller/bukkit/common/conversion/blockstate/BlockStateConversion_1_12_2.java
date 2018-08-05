@@ -14,7 +14,7 @@ import org.bukkit.block.BlockState;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
@@ -120,7 +120,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                         @Override
                         @SuppressWarnings("deprecation")
                         public Object invoke(Object instance, Object... args) {
-                            return CommonMethods.getIdFromMaterial(input_state.type);
+                            return CommonLegacyMaterials.getIdFromMaterial(input_state.type);
                         }
                     };
                 } else if (name.equals("getData")) {

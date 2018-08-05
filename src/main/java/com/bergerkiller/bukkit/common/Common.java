@@ -238,6 +238,12 @@ public class Common {
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
             }
 
+            // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
+            if (Common.evaluateMCVersion("<", "1.13")) {
+                remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
+                remappings.put(nms_root + ".HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
+            }
+
             // Some classes were moved after 1.13
             if (Common.evaluateMCVersion(">=", "1.13")) {
                 remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");

@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -29,6 +29,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
@@ -49,6 +50,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
+import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
@@ -175,7 +177,7 @@ public class WrapperConversion {
     @Deprecated
     @ConverterMethod
     public static org.bukkit.Material getMaterialFromId(Number materialId) {
-        return CommonMethods.getMaterialFromId(materialId.intValue());
+        return CommonLegacyMaterials.getMaterialFromId(materialId.intValue());
     }
 
     @ConverterMethod
@@ -627,5 +629,15 @@ public class WrapperConversion {
             return values[2]; // default NORTH
         }
         return null;
+    }
+
+    @ConverterMethod(input="net.minecraft.server.HeightMap")
+    public static HeightMap heightMapFromHandle(Object handle) {
+        return new HeightMap(HeightMapHandle.createHandle(handle));
+    }
+
+    @ConverterMethod(input="net.minecraft.server.HeightMap$Type", optional=true)
+    public static HeightMap.Type heightMapTypeFromHandle(Object handle) {
+        return HeightMap.Type.fromHandle(handle);
     }
 }

@@ -27,6 +27,7 @@ public abstract class ChunkSectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean isEmpty();
+    public abstract int getYPosition();
     public abstract NibbleArrayHandle getBlockLightArray();
     public abstract NibbleArrayHandle getSkyLightArray();
     public abstract DataPaletteBlockHandle getBlockPalette();
@@ -51,6 +52,7 @@ public abstract class ChunkSectionHandle extends Template.Handle {
         public final Template.Field.Converted<NibbleArrayHandle> skyLight = new Template.Field.Converted<NibbleArrayHandle>();
 
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getYPosition = new Template.Method<Integer>();
         public final Template.Method.Converted<NibbleArrayHandle> getBlockLightArray = new Template.Method.Converted<NibbleArrayHandle>();
         public final Template.Method.Converted<NibbleArrayHandle> getSkyLightArray = new Template.Method.Converted<NibbleArrayHandle>();
         public final Template.Method.Converted<DataPaletteBlockHandle> getBlockPalette = new Template.Method.Converted<DataPaletteBlockHandle>();

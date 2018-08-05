@@ -23,14 +23,45 @@ public abstract class IBlockDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract BlockHandle getBlock();
-    public abstract Map<Object, Object> getStates();
+    public abstract Object get(IBlockStateHandle state);
+    public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
+    public abstract Map<IBlockStateHandle, Comparable<?>> getStates();
+
+    public void logStates() {
+        for (java.util.Map.Entry<IBlockStateHandle, Comparable<?>> entry : getStates().entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue());
+        }
+    }
+
+    public IBlockStateHandle findState(String key) {
+        for (IBlockStateHandle blockState : getStates().keySet()) {
+            if (blockState.getKeyToken().equals(key)) {
+                return blockState;
+            }
+        }
+        return null;
+    }
+
+    public IBlockDataHandle set(String key, Object value) {
+        return set(findState(key), value);
+    }
+
+    public <T> T get(String key, Class<T> type) {
+        return get(findState(key), type);
+    }
+
+    public <T> T get(IBlockStateHandle state, Class<T> type) {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.convert(get(state), type, null);
+    }
     /**
      * Stores class members for <b>net.minecraft.server.IBlockData</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IBlockDataClass extends Template.Class<IBlockDataHandle> {
         public final Template.Method.Converted<BlockHandle> getBlock = new Template.Method.Converted<BlockHandle>();
-        public final Template.Method.Converted<Map<Object, Object>> getStates = new Template.Method.Converted<Map<Object, Object>>();
+        public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();
+        public final Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>> getStates = new Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>>();
 
     }
 

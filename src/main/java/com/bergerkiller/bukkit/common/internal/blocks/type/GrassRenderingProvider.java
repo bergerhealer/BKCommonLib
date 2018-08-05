@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
@@ -16,15 +17,15 @@ public class GrassRenderingProvider extends BlockRenderProvider {
     public GrassRenderingProvider() {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             this.materials.add(Material.getMaterial("GRASS"));
-            for (Material m : Material.values()) {
+            for (Material m : CommonLegacyMaterials.getAllMaterials()) {
                 if (m.name().endsWith("_LEAVES")) {
                     this.materials.add(m);
                 }
             }
         } else {
-            this.materials.add(Material.getMaterial("GRASS"));
-            this.materials.add(Material.getMaterial("LEAVES"));
-            this.materials.add(Material.getMaterial("LEAVES_2"));
+            this.materials.add(CommonLegacyMaterials.getLegacyMaterial("GRASS"));
+            this.materials.add(CommonLegacyMaterials.getLegacyMaterial("LEAVES"));
+            this.materials.add(CommonLegacyMaterials.getLegacyMaterial("LEAVES_2"));
         }
     }
 

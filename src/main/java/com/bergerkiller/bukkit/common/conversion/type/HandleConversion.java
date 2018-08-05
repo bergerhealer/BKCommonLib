@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
@@ -449,5 +450,15 @@ public class HandleConversion {
             entitySlice.add(value);
         }
         return entitySlice.getRaw();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.HeightMap")
+    public static Object toHeightMapHandle(HeightMap heightmap) {
+        return heightmap.getRawHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.HeightMap$Type", optional=true)
+    public static Object toHeightMapTypeHandle(HeightMap.Type type) {
+        return type.getHandle();
     }
 }

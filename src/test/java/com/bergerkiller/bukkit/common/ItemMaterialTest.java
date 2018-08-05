@@ -10,10 +10,13 @@ import java.util.TreeMap;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.DetectorRail;
 import org.bukkit.material.MaterialData;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.*;
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
@@ -34,17 +37,6 @@ public class ItemMaterialTest {
 
     static {
         CommonUtil.bootstrap();
-    }
-
-    @Test
-    public void testBlockDataLookup() {
-        for (Material material : Material.values()) {
-            if (!material.isBlock()) continue;
-            if (material.name().startsWith("LEGACY_")) continue;
-
-            BlockData data = BlockData.fromMaterial(material);
-            assertEquals(material, data.getType());
-        }
     }
 
     @Test
@@ -83,6 +75,8 @@ public class ItemMaterialTest {
             .check(Material.BROWN_MUSHROOM, 1)
             .done();
 
+        // No longer exists, and can not test on MC >= 1.13 because it now requires a world access
+        /*
         testProperty(MaterialUtil.OPACITY, "OPACITY")
             .check(Material.AIR, 0)
             .check(Material.APPLE, 0)
@@ -95,6 +89,7 @@ public class ItemMaterialTest {
             .check(Material.STONE, 255)
             .check(Material.FURNACE, 255)
             .done();
+        */
 
         testProperty(MaterialUtil.ISDOOR, "ISDOOR")
             .checkData(org.bukkit.material.Door.class, true)
@@ -166,16 +161,17 @@ public class ItemMaterialTest {
 
         {
             PropertyTest<Boolean> test = testProperty(MaterialUtil.ISPOWERSOURCE, "ISPOWERSOURCE");
-            test.check(Material.ACTIVATOR_RAIL, false) // these read power, not write
-                .check(Material.POWERED_RAIL, false) // these read power, not write
-                .check(Material.HOPPER, false) // these read power, not write
+            test.checkNewAndLegacy("ACTIVATOR_RAIL", false) // these read power, not write
+                .checkNewAndLegacy("POWERED_RAIL", false) // these read power, not write
+                .checkNewAndLegacy("HOPPER", false) // these read power, not write
                 .checkData(org.bukkit.material.Command.class, false) // these read power, not write
                 .checkData(org.bukkit.material.PistonBaseMaterial.class, false) // these read power, not write
+                .checkData(DetectorRail.class, true)
                 .checkProperty(MaterialUtil.ISPRESSUREPLATE, true)
-                .check(Material.DAYLIGHT_DETECTOR, true)
-                .check(Material.DETECTOR_RAIL, true)
-                .check(Material.TRAPPED_CHEST, true)
-                .check(Material.REDSTONE_BLOCK, true);
+                .checkNewAndLegacy("DAYLIGHT_DETECTOR", true)
+                .checkLegacy("DAYLIGHT_DETECTOR_INVERTED", true)
+                .checkNewAndLegacy("TRAPPED_CHEST", true)
+                .checkNewAndLegacy("REDSTONE_BLOCK", true);
 
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 // TODO!
@@ -255,9 +251,9 @@ public class ItemMaterialTest {
     @Test
     public void generateVariantsConfig() {
         FileConfiguration config = new FileConfiguration("test.yml");
-        for (Material m : Material.values()) {
+        for (Material m : getAllMaterials()) {
             List<ItemStack> items = ItemUtil.getItemVariants(m);
-            
+
             if (items.size() == 0) {
                 // Material has no variants at all
                 continue;
@@ -299,31 +295,55 @@ public class ItemMaterialTest {
     
     @Test
     public void testItemVariants() {
-        // All 16 wool colors should be returned here
-        List<ItemStack> expected = new ArrayList<ItemStack>();
-        for (int dur = 0; dur < 16; dur++) {
-            expected.add(new ItemStack(MaterialEx.WHITE_WOOL, 1, (short) dur));
-        }
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // Most variants were removed in 1.13. Only a few remain.
+            // These are mostly items like bottles and arrows
+            // But I guess it is worth testing anyway
 
-        // Retrieve from listing
-        List<ItemStack> actual = ItemUtil.getItemVariants(MaterialEx.WHITE_WOOL);
+            // Retrieve from listing
+            Material tippedArrowMat = getMaterial("TIPPED_ARROW");
+            List<ItemStack> actual = ItemUtil.getItemVariants(tippedArrowMat);
 
-        // Check all are contained, order does not matter
-        assertEquals(expected.size(), actual.size());
-        for (ItemStack expectedItem : expected) {
-            boolean contained = false;
-            for (ItemStack actualItem : actual) {
-                if (actualItem.getType() == expectedItem.getType() && actualItem.getDurability() == expectedItem.getDurability()) {
-                    contained = true;
-                    break;
-                }
+            // Verify all ItemStacks are actually TIPPED_ARROW types
+            for (ItemStack item : actual) {
+                assertEquals(tippedArrowMat, item.getType());
             }
-            if (!contained) {
-                System.out.println("Actual: ");
+
+            // Check all are contained, order does not matter
+            assertEquals(38, actual.size());
+            
+            // Add all items to a set. Each item should be unique.
+            HashSet<ItemStack> set = new HashSet<ItemStack>(actual);
+            assertEquals(actual.size(), set.size());
+        } else {
+            // Test using White Whool
+            // All 16 wool colors should be returned here
+            Material woolMat = getLegacyMaterial("WOOL");
+            List<ItemStack> expected = new ArrayList<ItemStack>();
+            for (int dur = 0; dur < 16; dur++) {
+                expected.add(new ItemStack(woolMat, 1, (short) dur));
+            }
+
+            // Retrieve from listing
+            List<ItemStack> actual = ItemUtil.getItemVariants(woolMat);
+
+            // Check all are contained, order does not matter
+            assertEquals(expected.size(), actual.size());
+            for (ItemStack expectedItem : expected) {
+                boolean contained = false;
                 for (ItemStack actualItem : actual) {
-                    System.out.println("- " + actualItem.toString());
+                    if (actualItem.getType() == expectedItem.getType() && actualItem.getDurability() == expectedItem.getDurability()) {
+                        contained = true;
+                        break;
+                    }
                 }
-                fail("Item was not found: " + expectedItem);
+                if (!contained) {
+                    System.out.println("Actual: ");
+                    for (ItemStack actualItem : actual) {
+                        System.out.println("- " + actualItem.toString());
+                    }
+                    fail("Item was not found: " + expectedItem);
+                }
             }
         }
     }
@@ -365,7 +385,7 @@ public class ItemMaterialTest {
             this.prop = prop;
             this.name = name;
             this.has_error = false;
-            this.not_handled.addAll(Arrays.asList(Material.values()));
+            this.not_handled.addAll(Arrays.asList(getAllMaterials()));
         }
 
         public PropertyTest<T> checkProperty(MaterialProperty<Boolean> match, T value) {
@@ -407,6 +427,20 @@ public class ItemMaterialTest {
             return new HashSet<Material>(not_handled);
         }
 
+        public PropertyTest<T> checkNewAndLegacy(String name, T value) {
+            check(name, value);
+            checkLegacy(name, value);
+            return this;
+        }
+
+        public PropertyTest<T> checkLegacy(String name, T value) {
+            return check(getLegacyMaterial(name), value);
+        }
+
+        public PropertyTest<T> check(String name, T value) {
+            return check(getMaterial(name), value);
+        }
+
         public PropertyTest<T> check(Material m, T value) {
             if (m == null) {
                 return this; // ignore
@@ -428,7 +462,7 @@ public class ItemMaterialTest {
                 Logging.LOGGER.severe("Property " + name + " is invalid. It has the following mapping:");
 
                 TreeMap<Object, ArrayList<String>> mapping = new TreeMap<Object, ArrayList<String>>();
-                for (Material m : Material.values()) {
+                for (Material m : getAllMaterials()) {
                     Object val = prop.get(m);
                     ArrayList<String> list = mapping.get(val);
                     if (list == null) {

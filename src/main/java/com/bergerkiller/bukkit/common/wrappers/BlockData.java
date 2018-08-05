@@ -40,7 +40,18 @@ public abstract class BlockData extends BlockDataRegistry {
      * @param data for the material to apply
      */
     @Deprecated
-    public abstract void loadMaterialData(Material material, int data);
+    public final void loadMaterialData(Material material, int data) {
+        loadMaterialData(new MaterialData(material, (byte) data));
+    }
+
+    /**
+     * Applies legacy Material and data to this BlockData
+     * 
+     * @param material to apply
+     * @param data for the material to apply
+     */
+    @Deprecated
+    public abstract void loadMaterialData(MaterialData materialdata);
 
     /**
      * Obtains the RAW internal Block handle this BlockData represents.
@@ -133,14 +144,6 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract BlockRenderOptions getRenderOptions(World world, int x, int y, int z);
 
     /**
-     * Gets the ID of the Block, ranging 0 - 255
-     * 
-     * @return Raw Block Type Id
-     */
-    @Deprecated
-    public abstract int getTypeId();
-
-    /**
      * Gets the Raw Data valueof the Block, ranging 0 - 15
      * 
      * @return Raw Block Data
@@ -170,6 +173,15 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return Block Material Type
      */
     public abstract org.bukkit.Material getType();
+
+    /**
+     * Gets the legacy Material type of the Block.
+     * If your plugin uses an older pre-1.13 API, use this method instead of
+     * {@link #getType()}.
+     * 
+     * @return Block Material Type
+     */
+    public abstract org.bukkit.Material getLegacyType();
 
     /**
      * Creates a new MaterialData instance appropriate for this Block
@@ -246,9 +258,24 @@ public abstract class BlockData extends BlockDataRegistry {
      * Gets the opacity of the Block, a value between 0 and 15.
      * A value of 255 indicates full opaque-ness. A value of 0 is fully transparent.
      *
+     * @param world the Block is in
+     * @param x world coordinate of the Block
+     * @param y world coordinate of the Block
+     * @param z world coordinate of the Block
      * @return the opacity
      */
-    public abstract int getOpacity();
+    public abstract int getOpacity(World world, int x, int y, int z);
+
+    /**
+     * Gets the opacity of the Block, a value between 0 and 15.
+     * A value of 255 indicates full opaque-ness. A value of 0 is fully transparent.
+     *
+     * @param block
+     * @return the opacity
+     */
+    public int getOpacity(Block block) {
+        return getOpacity(block.getWorld(), block.getX(), block.getY(), block.getZ());
+    }
 
     /**
      * Gets the amount of light the Block radiates, value between 0 and 15.

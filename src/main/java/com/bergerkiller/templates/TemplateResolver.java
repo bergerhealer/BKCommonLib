@@ -13,6 +13,8 @@ import com.bergerkiller.mountiplex.reflection.resolver.ClassDeclarationResolver;
 public class TemplateResolver implements ClassDeclarationResolver {
     private HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
     private boolean classes_loaded = false;
+    private String version = "UNKNOWN";
+    private String pre_version = null;
 
     private final String[] supported_mc_versions = new String[] {
             "1.8", "1.8.3", "1.8.4", "1.8.5", "1.8.6", "1.8.7", "1.8.8",
@@ -51,13 +53,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
     public void load() {
         if (!classes_loaded) {
             classes_loaded = true;
+            this.version = cleanVersion(Common.MC_VERSION);
+            this.pre_version = preVersion(Common.MC_VERSION);
 
             String templatePath = "com/bergerkiller/templates/init.txt";
             Map<String, String> variables = new HashMap<String, String>();
-            variables.put("version", cleanVersion(Common.MC_VERSION));
-            String pre_version = preVersion(Common.MC_VERSION);
-            if (pre_version != null) {
-                variables.put("pre", pre_version);
+            variables.put("version", this.version);
+            if (this.pre_version != null) {
+                variables.put("pre", this.pre_version);
             }
             if (Common.IS_SPIGOT_SERVER) {
                 variables.put("spigot", "true");
@@ -95,6 +98,15 @@ public class TemplateResolver implements ClassDeclarationResolver {
      */
     public String[] getSupportedVersions() {
         return supported_mc_versions;
+    }
+
+    /**
+     * Gets the current server version, excluding -pre information
+     * 
+     * @return version number
+     */
+    public String getVersion() {
+        return this.version;
     }
 
     private static String cleanVersion(String mc_version) {

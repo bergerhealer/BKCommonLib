@@ -32,7 +32,12 @@ public abstract class NibbleArrayHandle extends Template.Handle {
     public abstract int get(int x, int y, int z);
     public abstract void set(int x, int y, int z, int nibbleValue);
     public abstract byte[] getData();
-    public abstract void setData(byte[] value);
+
+    public boolean dataEquals(NibbleArrayHandle other) {
+        return java.util.Arrays.equals(this.getData(), other.getData());
+    }
+    public abstract byte[] getDataField();
+    public abstract void setDataField(byte[] value);
     /**
      * Stores class members for <b>net.minecraft.server.NibbleArray</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -41,10 +46,11 @@ public abstract class NibbleArrayHandle extends Template.Handle {
         public final Template.Constructor.Converted<NibbleArrayHandle> constr = new Template.Constructor.Converted<NibbleArrayHandle>();
         public final Template.Constructor.Converted<NibbleArrayHandle> constr_data = new Template.Constructor.Converted<NibbleArrayHandle>();
 
-        public final Template.Field<byte[]> data = new Template.Field<byte[]>();
+        public final Template.Field<byte[]> dataField = new Template.Field<byte[]>();
 
         public final Template.Method<Integer> get = new Template.Method<Integer>();
         public final Template.Method<Void> set = new Template.Method<Void>();
+        public final Template.Method<byte[]> getData = new Template.Method<byte[]>();
 
     }
 

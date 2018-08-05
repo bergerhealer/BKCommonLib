@@ -9,14 +9,15 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
@@ -37,7 +38,6 @@ public class BlockDataImpl extends BlockData {
     private IBlockDataHandle data;
     private MaterialData materialData;
     private Material type;
-    private int rawData;
     private boolean hasRenderOptions;
 
     public static final int ID_BITS = 8;
@@ -54,7 +54,7 @@ public class BlockDataImpl extends BlockData {
 
     // Legacy: array of all possible Material values with all possible legacy data values
     // Index into it by taking data x 1024 | mat.ordinal()
-    public static final int BY_LEGACY_MAT_DATA_SHIFT = 10; // (1<<10 == 1024)
+    public static final int BY_LEGACY_MAT_DATA_SHIFT = 11; // (1<<11 == 2048)
     public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
 
     static {
@@ -81,11 +81,17 @@ public class BlockDataImpl extends BlockData {
         }
         BY_BLOCK_DATA.put(null, AIR);
 
+        // Sanity check
+        if (CommonLegacyMaterials.getAllMaterials().length >= (1<<BY_LEGACY_MAT_DATA_SHIFT)) {
+            throw new IllegalStateException("BY_LEGACY_MAT_DATA_SHIFT is too low, can't store " +
+                    CommonLegacyMaterials.getAllMaterials().length + " materials");
+        }
+
         // Check for any missing Material enum values - store those also in the BY_MATERIAL mapping
         // This mainly applies to the legacy 1.13 enum values
         // Also store all possible values of BY_LEGACY_MAT_DATA
         Arrays.fill(BY_LEGACY_MAT_DATA, AIR);
-        for (Material mat : Material.values()) {
+        for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
             if (!mat.isBlock()) {
                 BY_MATERIAL.put(mat, AIR);
                 continue;
@@ -93,31 +99,72 @@ public class BlockDataImpl extends BlockData {
 
             BlockDataConstant blockConst = BY_MATERIAL.get(mat);
             if (blockConst == null) {
-                Object rawBlock = CraftMagicNumbersHandle.getBlockFromMaterial(mat);
-                blockConst = BY_BLOCK.get(rawBlock);
-                if (blockConst == null) {
-                    blockConst = new BlockDataConstant(BlockHandle.createHandle(rawBlock));
-                    BY_BLOCK.put(rawBlock, blockConst);
+                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && CraftMagicNumbersHandle.isLegacy(mat)) {
+                    // Legacy Material -> IBlockData logic
+                    MaterialData materialData = IBlockDataToMaterialData.createMaterialData(mat);
+                    blockConst = findConstant(MaterialDataToIBlockData.getIBlockData(materialData));
+                } else {
+                    // Normal Material -> Block -> IBlockData logic
+                    Object rawBlock = CraftMagicNumbersHandle.getBlockFromMaterial(mat);
+                    blockConst = BY_BLOCK.get(rawBlock);
+                    if (blockConst == null) {
+                        blockConst = new BlockDataConstant(BlockHandle.createHandle(rawBlock));
+                        BY_BLOCK.put(rawBlock, blockConst);
+                    }
                 }
                 BY_MATERIAL.put(mat, blockConst);
             }
 
-            for (byte data = 0; data < 16; data++) {
+            // Only store by MaterialData information for Legacy Materials
+            if (!CraftMagicNumbersHandle.isLegacy(mat)) {
+                continue;
+            }
+
+            MaterialData materialdata = new MaterialData(mat);
+            for (int data = 0; data < 16; data++) {
                 // Find IBlockData from Material + Data and cache it if needed
-                Object rawBlockData = CraftMagicNumbersHandle.fromLegacyData(mat, data);
+                materialdata.setData((byte) data);
+                IBlockDataHandle blockData = MaterialDataToIBlockData.getIBlockData(materialdata);
                 BlockDataConstant dataBlockConst = blockConst;
-                if (rawBlockData != blockConst.getData()) {
-                    dataBlockConst = BY_BLOCK_DATA.get(rawBlockData);
-                    if (dataBlockConst == null) {
-                        dataBlockConst = new BlockDataConstant(IBlockDataHandle.createHandle(rawBlockData));
-                        BY_BLOCK_DATA.put(rawBlockData, dataBlockConst);
-                    }
+                if (blockData.getRaw() != blockConst.getData()) {
+                    dataBlockConst = findConstant(blockData);
                 }
 
                 // Store in lookup table
-                BY_LEGACY_MAT_DATA[mat.ordinal() | ((int) data << BY_LEGACY_MAT_DATA_SHIFT)] = dataBlockConst;
+                int index = CommonLegacyMaterials.getOrdinal(mat);
+                index |= (data << BY_LEGACY_MAT_DATA_SHIFT);
+                BY_LEGACY_MAT_DATA[index] = dataBlockConst;
             }
         }
+
+        // Dangerous and unpredictable: fill BY_LEGACY_MAT_DATA with Material taken using toLegacy
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
+                // Skip legacy materials
+                if (CraftMagicNumbersHandle.isLegacy(mat)) {
+                    continue;
+                }
+
+                // Find legacy Material, then copy all 16 data values from Legacy to New Material
+                Material legacyType = BY_MATERIAL.get(mat).getLegacyType();
+                for (int data = 0; data < 16; data++) {
+                    int index_a = CommonLegacyMaterials.getOrdinal(mat);
+                    index_a |= (data << BY_LEGACY_MAT_DATA_SHIFT);
+                    int index_b = CommonLegacyMaterials.getOrdinal(legacyType);
+                    index_b |= (data << BY_LEGACY_MAT_DATA_SHIFT);
+                    BY_LEGACY_MAT_DATA[index_a] = BY_LEGACY_MAT_DATA[index_b];
+                }
+            }
+        }
+    }
+
+    private static BlockDataConstant findConstant(IBlockDataHandle iblockdata) {
+        BlockDataConstant dataBlockConst = BY_BLOCK_DATA.get(iblockdata.getRaw());
+        if (dataBlockConst == null) {
+            dataBlockConst = new BlockDataConstant(iblockdata);
+            BY_BLOCK_DATA.put(iblockdata.getRaw(), dataBlockConst);
+        }
+        return dataBlockConst;
     }
 
     /**
@@ -145,7 +192,7 @@ public class BlockDataImpl extends BlockData {
         }
 
         @Override
-        public void loadMaterialData(Material material, int data) {
+        public void loadMaterialData(MaterialData materialdata) {
             throw new UnsupportedOperationException("Immutable Block Data objects can not be changed");
         }
     }
@@ -183,17 +230,16 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public void loadMaterialData(Material material, int data) {
-        this.block = BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(material));
-        this.data = IBlockDataHandle.createHandle(CraftMagicNumbersHandle.fromLegacyData(material, (byte) data));
+    public void loadMaterialData(MaterialData materialdata) {
+        this.data = MaterialDataToIBlockData.getIBlockData(materialdata);
+        this.block = this.data.getBlock();
         this.refreshBlock();
     }
 
     private final void refreshBlock() {
-        this.materialData = null;
         this.hasRenderOptions = true;
         this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
-        this.rawData = CraftMagicNumbersHandle.toLegacyData(this.data.getRaw());
+        this.materialData = IBlockDataToMaterialData.getMaterialData(this.data);
     }
 
     @Override
@@ -207,13 +253,8 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final int getTypeId() {
-        return this.type.getId();
-    }
-
-    @Override
     public final int getRawData() {
-        return this.rawData;
+        return this.materialData.getData();
     }
 
     @Override
@@ -222,40 +263,12 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public final org.bukkit.Material getLegacyType() {
+        return this.materialData.getItemType();
+    }
+
+    @Override
     public final MaterialData getMaterialData() {
-        if (this.materialData == null) {
-            Material type = this.getType();
-
-            // Null: return AIR
-            if (type == null) {
-                return new MaterialData(CraftMagicNumbersHandle.toLegacy(Material.AIR), (byte) 0);
-            }
-
-            // Switch to legacy type on >= MC 1.13
-            type = CraftMagicNumbersHandle.toLegacy(type);
-
-            // Create new MaterialData + some fixes.
-            if (LogicUtil.contains(type.name(), "GOLD_PLATE", "IRON_PLATE", "HEAVY_WEIGHTED_PRESSURE_PLATE", "LIGHT_WEIGHTED_PRESSURE_PLATE")) {
-                // Bukkit bugfix.
-                this.materialData = new org.bukkit.material.PressurePlate(type, (byte) this.getRawData());
-            } else if (
-                    type == Material.JUNGLE_DOOR || type == Material.ACACIA_DOOR ||
-                    type == Material.DARK_OAK_DOOR || type == Material.SPRUCE_DOOR ||
-                    type == Material.BIRCH_DOOR) {
-                // Bukkit bugfix. (<= 1.8.3)
-                this.materialData = new org.bukkit.material.Door(type, (byte) this.getRawData());
-            } else {
-                this.materialData = type.getNewData((byte) this.getRawData());
-            }
-
-            // Fix attachable face returning NULL sometimes
-            if (this.materialData instanceof Attachable) {
-                Attachable att = (Attachable) this.materialData;
-                if (att.getAttachedFace() == null) {
-                    att.setFacingDirection(BlockFace.NORTH);
-                }
-            }
-        }
         return this.materialData;
     }
 
@@ -308,11 +321,11 @@ public class BlockDataImpl extends BlockData {
         }
 
         // Serialize all tokens into String key-value pairs
-        Map<Object, Object> states = IBlockDataHandle.T.getStates.invoke(stateData);
+        Map<IBlockStateHandle, Comparable<?>> states = IBlockDataHandle.T.getStates.invoke(stateData);
         Map<String, String> statesStr = new HashMap<String, String>(states.size());
-        for (Map.Entry<Object, Object> state : states.entrySet()) {
-            String key = IBlockStateHandle.T.getKeyToken.invoke(state.getKey());
-            String value = IBlockStateHandle.T.getValueToken.invoke(state.getKey(), state.getValue());
+        for (Map.Entry<IBlockStateHandle, Comparable<?>> state : states.entrySet()) {
+            String key = state.getKey().getKeyToken();
+            String value = state.getKey().getValueToken(state.getValue());
             statesStr.put(key, value);
         }
         BlockRenderOptions options = new BlockRenderOptions(this, statesStr);
@@ -353,8 +366,8 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final int getOpacity() {
-        return this.block.getOpacity(this.data);
+    public final int getOpacity(World world, int x, int y, int z) {
+        return this.block.getOpacity(this.data, world, x, y, z);
     }
 
     @Override

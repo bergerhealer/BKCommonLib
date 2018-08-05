@@ -37,7 +37,7 @@ public abstract class BlockHandle extends Template.Handle {
     }
 
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
-    public abstract int getOpacity(IBlockDataHandle iblockdata);
+    public abstract int getOpacity(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract int getEmission(IBlockDataHandle iblockdata);
     public abstract boolean isOccluding(IBlockDataHandle iblockdata);
     public abstract boolean isPowerSource(IBlockDataHandle iblockdata);

@@ -404,7 +404,16 @@ class RegionFile {
     public (RegionFileHandle) RegionFile(java.io.File file);
 
     public void close:c();
+
+#if version >= 1.13
+    #if pre <= 7
+        public boolean chunkExists:c(int cx, int cz);
+    #else
+        public boolean chunkExists:d(int cx, int cz);
+    #endif
+#else
     public boolean chunkExists:c(int cx, int cz);
+#endif
 }
 
 class RegionFileCache {

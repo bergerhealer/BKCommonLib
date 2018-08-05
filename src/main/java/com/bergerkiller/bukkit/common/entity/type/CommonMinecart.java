@@ -132,18 +132,6 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     }
 
     /**
-     * Gets the block type id for this Minecart<br>
-     * <br>
-     * <b>Deprecated: </b>use {@link #getBlock()} instead
-     *
-     * @return block type id
-     */
-    @Deprecated
-    public int getBlockId() {
-        return getBlock().getTypeId();
-    }
-
-    /**
      * Gets the block type for this Minecart<br>
      * <br>
      * <b>Deprecated: </b>use {@link #getBlock()} instead

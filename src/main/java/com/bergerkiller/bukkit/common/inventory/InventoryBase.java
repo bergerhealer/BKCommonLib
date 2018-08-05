@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.inventory;
 
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
@@ -144,7 +144,7 @@ public abstract class InventoryBase implements Inventory {
 
     @Deprecated
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        return cbProxy.all(CommonMethods.getMaterialFromId(materialId));
+        return cbProxy.all(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -169,7 +169,7 @@ public abstract class InventoryBase implements Inventory {
 
     @Deprecated
     public boolean contains(int materialId) {
-        return cbProxy.contains(CommonMethods.getMaterialFromId(materialId));
+        return cbProxy.contains(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -184,7 +184,7 @@ public abstract class InventoryBase implements Inventory {
 
     @Deprecated
     public boolean contains(int materialId, int amount) {
-        return cbProxy.contains(CommonMethods.getMaterialFromId(materialId), amount);
+        return cbProxy.contains(CommonLegacyMaterials.getMaterialFromId(materialId), amount);
     }
 
     @Override
@@ -204,7 +204,7 @@ public abstract class InventoryBase implements Inventory {
 
     @Deprecated
     public int first(int materialId) {
-        return cbProxy.first(CommonMethods.getMaterialFromId(materialId));
+        return cbProxy.first(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
@@ -234,7 +234,7 @@ public abstract class InventoryBase implements Inventory {
 
     @Deprecated
     public void remove(int materialId) {
-        remove(CommonMethods.getMaterialFromId(materialId));
+        remove(CommonLegacyMaterials.getMaterialFromId(materialId));
     }
 
     @Override
