@@ -27,11 +27,11 @@ public class MapDisplayTile {
     }
 
     public void addUpdatePackets(List<CommonPacket> packets, MapClip clip) {
-        short mapId = CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
+        int mapId = CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
 
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
         mapUpdate.write(PacketType.OUT_MAP.cursors, new MapCursor[0]);
-        mapUpdate.write(PacketType.OUT_MAP.itemId, (int) mapId);
+        mapUpdate.write(PacketType.OUT_MAP.itemId, mapId);
         mapUpdate.write(PacketType.OUT_MAP.scale, (byte) 1);
         mapUpdate.write(PacketType.OUT_MAP.track, false);
 

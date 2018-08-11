@@ -67,4 +67,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.13 the Material enum was entirely overhauled
      */
     public static final boolean MATERIAL_ENUM_CHANGES = Common.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.13 the Map Id is stored in the NBT tag, instead of as a durability value
+     */
+    public static final boolean MAP_ID_IN_NBT = Common.evaluateMCVersion(">=", "1.13");
 }

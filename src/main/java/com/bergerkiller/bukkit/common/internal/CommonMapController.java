@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -87,7 +86,7 @@ public class CommonMapController implements PacketListener, Listener {
     private final ImplicitlySharedList<ItemFrame> itemFrameCache = new ImplicitlySharedList<ItemFrame>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
-    private final HashMap<MapUUID, Short> mapIdByUUID = new HashMap<MapUUID, Short>();
+    private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
     // Stores Map Displays, mapped by Map UUID
     private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
     // Stores map items for a short time while a player is moving it around in creative mode
@@ -358,7 +357,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @return True if the item was changed and needs to be updated in the packet
      */
     public ItemStack handleItemSync(ItemStack item, int tileX, int tileY) {
-        if (item == null || item.getType() != Material.MAP) {
+        if (!CommonMapUUIDStore.isMap(item)) {
             return null;
         }
 
@@ -368,13 +367,13 @@ public class CommonMapController implements PacketListener, Listener {
             UUID mapUUID = tag.getUUID("mapDisplay");
             if (mapUUID != null) {
                 item = trimExtraData(item);
-                item.setDurability(getMapId(new MapUUID(mapUUID, tileX, tileY)));
+                CommonMapUUIDStore.setItemMapId(item, getMapId(new MapUUID(mapUUID, tileX, tileY)));
                 return item;
             }
         }
 
         // Static map Id MUST be enforced
-        storeStaticMapId(item.getDurability());
+        storeStaticMapId(CommonMapUUIDStore.getItemMapId(item));
         return null;
     }
 
@@ -384,16 +383,16 @@ public class CommonMapController implements PacketListener, Listener {
      * @param mapUUID to be displayed
      * @return map Id
      */
-    public synchronized short getMapId(MapUUID mapUUID) {
+    public synchronized int getMapId(MapUUID mapUUID) {
         // Obtain from cache
-        Short storedMapId = mapIdByUUID.get(mapUUID);
+        Integer storedMapId = mapIdByUUID.get(mapUUID);
         if (storedMapId != null) {
-            return storedMapId.shortValue();
+            return storedMapId.intValue();
         }
 
         // If the UUID is that of a static UUID, we must make sure to store it as such
         // We may have to remap the old Map Id to free up the Id slot we need
-        short mapId = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
+        int mapId = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
         if (mapId != -1) {
             storeStaticMapId(mapId);
             return mapId;
@@ -409,7 +408,7 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param mapId
      */
-    private synchronized void storeStaticMapId(short mapId) {
+    private synchronized void storeStaticMapId(int mapId) {
         if (storeDynamicMapId(mapUUIDById.get(mapId)) != mapId) {
             MapUUID mapUUID = new MapUUID(CommonMapUUIDStore.getStaticMapUUID(mapId), 0, 0);
             mapUUIDById.put(mapId, mapUUID);
@@ -424,14 +423,14 @@ public class CommonMapController implements PacketListener, Listener {
      * @param mapUUID to store
      * @return map Id that was assigned
      */
-    private synchronized short storeDynamicMapId(MapUUID mapUUID) {
+    private synchronized int storeDynamicMapId(MapUUID mapUUID) {
         // Null safety check
         if (mapUUID == null) {
             return -1;
         }
 
         // If the UUID is static, do not store anything and return the static Id instead
-        short staticMapid = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
+        int staticMapid = CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID());
         if (staticMapid != -1) {
             return staticMapid;
         }
@@ -440,14 +439,15 @@ public class CommonMapController implements PacketListener, Listener {
         idGenerationCounter++;
 
         // Figure out a free Map Id we can use
-        for (int mapidValue = 0; mapidValue < Short.MAX_VALUE; mapidValue++) {
+        final int MAX_IDS = CommonCapabilities.MAP_ID_IN_NBT ? Integer.MAX_VALUE : Short.MAX_VALUE;
+        for (int mapidValue = 0; mapidValue < MAX_IDS; mapidValue++) {
             if (!mapUUIDById.contains(mapidValue)) {
                 // Check if the Map Id was changed compared to before
                 boolean idChanged = mapIdByUUID.containsKey(mapUUID);
 
                 // Store in mapping
                 mapUUIDById.put(mapidValue, mapUUID);
-                mapIdByUUID.put(mapUUID, Short.valueOf((short) mapidValue));
+                mapIdByUUID.put(mapUUID, Integer.valueOf(mapidValue));
 
                 // Invalidate display if it exists
                 MapDisplayInfo mapInfo = maps.get(mapUUID.getUUID());
@@ -461,7 +461,7 @@ public class CommonMapController implements PacketListener, Listener {
                     dirtyMapUUIDSet.add(mapUUID.getUUID());
                 }
 
-                return (short) mapidValue;
+                return mapidValue;
             }
         }
         return -1;
@@ -475,7 +475,7 @@ public class CommonMapController implements PacketListener, Listener {
             int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
             MapUUID mapUUID = mapUUIDById.get(itemid);
             if (mapUUID == null) {
-                this.storeStaticMapId((short) itemid);
+                this.storeStaticMapId(itemid);
             } else if (CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID()) == -1) {
                 event.setCancelled(true);
             }
@@ -526,7 +526,7 @@ public class CommonMapController implements PacketListener, Listener {
                 event.setCancelled(true);
                 return; // map changes are suppressed
             }
-            short staticMapId = CommonMapUUIDStore.getStaticMapId(frameInfo.lastMapUUID.getUUID());
+            int staticMapId = CommonMapUUIDStore.getStaticMapId(frameInfo.lastMapUUID.getUUID());
             if (staticMapId != -1) {
                 this.storeStaticMapId(staticMapId);
                 return; // static Id, not dynamic, no re-assignment
@@ -534,7 +534,7 @@ public class CommonMapController implements PacketListener, Listener {
 
             // Map Id is dynamically assigned, adjust metadata items to use this new Id
             // Avoid using any Bukkit or Wrapper types here for performance reasons
-            short newMapId = this.getMapId(frameInfo.lastMapUUID);
+            int newMapId = this.getMapId(frameInfo.lastMapUUID);
             List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
             if (items != null) {
                 ListIterator<DataWatcher.Item<Object>> itemsIter = items.listIterator();
@@ -545,12 +545,12 @@ public class CommonMapController implements PacketListener, Listener {
                     }
 
                     ItemStack metaItem = item.getValue();
-                    if (metaItem == null || metaItem.getDurability() == newMapId) {
+                    if (metaItem == null || CommonMapUUIDStore.getItemMapId(metaItem) == newMapId) {
                         continue;
                     }
 
                     ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
-                    newMapItem.setDurability(newMapId);
+                    CommonMapUUIDStore.setItemMapId(newMapItem, newMapId);
                     item = item.clone();
                     item.setValue(newMapItem, item.isChanged());
                     itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);
@@ -611,9 +611,9 @@ public class CommonMapController implements PacketListener, Listener {
                     ItemUtil.setMetaTag(item, ItemUtil.getMetaTag(originalMapItem));
                     event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
                 } else {
-                    // Dynamic Id. Force a durability value of 0 to prevent creation of new World Map instances
+                    // Dynamic Id. Force a map id value of 0 to prevent creation of new World Map instances
                     item = ItemUtil.cloneItem(item);
-                    item.setDurability((short) 0);
+                    CommonMapUUIDStore.setItemMapId(item, 0);
                     event.getPacket().write(PacketType.IN_SET_CREATIVE_SLOT.item, item);
                 }
             }
@@ -893,7 +893,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Clean up from bi-directional mapping
-            Short mapId = mapIdByUUID.remove(toRemove);
+            Integer mapId = mapIdByUUID.remove(toRemove);
             if (mapId != null) {
                 mapUUIDById.remove(mapId.intValue());
             }
@@ -1475,13 +1475,13 @@ public class CommonMapController implements PacketListener, Listener {
                 ItemStack currLeftHand = PlayerUtil.getItemInHand(this.player, HumanHand.LEFT);
                 ItemStack currRightHand = PlayerUtil.getItemInHand(this.player, HumanHand.RIGHT);
 
-                if (isMap(currLeftHand) 
+                if (CommonMapUUIDStore.isMap(currLeftHand) 
                         && !mapEquals(currLeftHand, lastLeftHand) 
                         && !mapEquals(currLeftHand, lastRightHand)) {
                     // Left hand now has a map! We did not swap hands, either.
                     handleMapShowEvent(new MapShowEvent(player, HumanHand.LEFT, currLeftHand));
                 }
-                if (isMap(currRightHand) 
+                if (CommonMapUUIDStore.isMap(currRightHand) 
                         && !mapEquals(currRightHand, lastRightHand) 
                         && !mapEquals(currRightHand, lastLeftHand)) {
                     // Right hand now has a map! We did not swap hands, either.
@@ -1490,10 +1490,6 @@ public class CommonMapController implements PacketListener, Listener {
 
                 lastLeftHand = currLeftHand;
                 lastRightHand = currRightHand;
-            }
-
-            private final boolean isMap(ItemStack item) {
-                return item != null && item.getType() == Material.MAP;
             }
 
             private final boolean mapEquals(ItemStack item1, ItemStack item2) {

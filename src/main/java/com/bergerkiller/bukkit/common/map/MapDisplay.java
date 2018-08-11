@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -1225,7 +1224,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @return map item
      */
     public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
-        ItemStack mapItem = ItemUtil.createItem(Material.MAP, 0, 1);
+        ItemStack mapItem = ItemUtil.createItem(CommonMapUUIDStore.FILLED_MAP_TYPE, 0, 1);
         CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);
         tag.putValue("mapDisplayPlugin", plugin.getName());
         tag.putValue("mapDisplayClass", mapDisplayClass.getName());
