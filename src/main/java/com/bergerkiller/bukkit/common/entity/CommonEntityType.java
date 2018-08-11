@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
@@ -42,6 +43,7 @@ public class CommonEntityType {
     public final ClassTemplate<?> bukkitType;
     private final SafeConstructor<?> commonConstructor;
     public final EntityType entityType;
+    public final int entityTypeId;
 
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
         // Properties first
@@ -53,6 +55,7 @@ public class CommonEntityType {
             this.commonType = ClassTemplate.create(CommonEntity.class);
             this.bukkitType = ClassTemplate.create(Entity.class);
             this.commonConstructor = this.commonType.getConstructor(Entity.class);
+            this.entityTypeId = -1;
             return;
         }
 
@@ -189,6 +192,7 @@ public class CommonEntityType {
         this.nmsType = ClassTemplate.create(nmsType);
         this.commonType = ClassTemplate.create(commonType);
         this.commonConstructor = this.commonType.getConstructor(entityClass);
+        this.entityTypeId = EntityTypesHandle.getEntityTypeId(this.nmsType.getType());
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntity(T entity) {

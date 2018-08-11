@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
 /**
  * Input controller for virtual map navigation and UI.
@@ -474,7 +475,6 @@ public class MapPlayerInput implements Tickable {
         this.updateInputInterception(true);
     }
 
-    @SuppressWarnings("deprecation")
     private void updateInputInterception(boolean intercept) {
         if (!intercept && _fakeMountShown) {
             _fakeMountShown = false;
@@ -499,14 +499,14 @@ public class MapPlayerInput implements Tickable {
                 data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
                 data.set(EntityLivingHandle.DATA_HEALTH, 10.0F);
 
-                CommonPacket packet = PacketType.OUT_ENTITY_SPAWN_LIVING.newInstance();
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId, this._fakeMountId);
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityUUID, UUID.randomUUID());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.entityType, (int) EntityType.CHICKEN.getTypeId());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posX, loc.getX());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posY, loc.getY() - 0.15);
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.posZ, loc.getZ());
-                packet.write(PacketType.OUT_ENTITY_SPAWN_LIVING.dataWatcher, data);
+                PacketPlayOutSpawnEntityLivingHandle packet = PacketPlayOutSpawnEntityLivingHandle.createNew();
+                packet.setEntityId(this._fakeMountId);
+                packet.setEntityUUID(UUID.randomUUID());
+                packet.setEntityType(EntityType.CHICKEN);
+                packet.setPosX(loc.getX());
+                packet.setPosY(loc.getY() - 0.15);
+                packet.setPosZ(loc.getZ());
+                packet.setDataWatcher(data);
                 PacketUtil.sendPacket(player, packet);
             }
             {

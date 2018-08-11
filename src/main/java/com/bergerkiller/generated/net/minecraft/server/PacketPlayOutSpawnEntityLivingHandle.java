@@ -41,6 +41,10 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         }
     }
 
+    public void setEntityType(org.bukkit.entity.EntityType type) {
+        setEntityTypeId(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId);
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }

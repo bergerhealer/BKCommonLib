@@ -13,6 +13,14 @@ class EntityTypes {
     private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> opt_typeNameMap_1_10_2:d;
 #endif
 
+#if version >= 1.11
+    private static optional final (Map<Class<?>, Integer>) Map<Class<? extends Entity>, Integer> opt_typeIdMap_1_8:###;
+#elseif version >= 1.8.3
+    private static optional final (Map<Class<?>, Integer>) Map<Class<? extends Entity>, Integer> opt_typeIdMap_1_8:f;
+#else
+    private static optional final (Map<Class<?>, Integer>) Map opt_typeIdMap_1_8:f;
+#endif
+
 #if version >= 1.13
     public static final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_registry:REGISTRY;
 #elseif version >= 1.11
@@ -63,6 +71,17 @@ class EntityTypes {
         }
         return null;
     }
+
+    public static int getEntityTypeId(Class<?> entityType) {
+        java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
+        while (iter.hasNext()) {
+            EntityTypes type = (EntityTypes) iter.next();
+            if (type.c() == entityType) {
+                return EntityTypes.REGISTRY.a((Object) type);
+            }
+        }
+        return -1;
+    }
 #elseif version >= 1.11
     public static Class<?> getEntityClass(String internalEntityName) {
         return EntityTypes.b.get(name);
@@ -76,13 +95,22 @@ class EntityTypes {
             return EntityTypes.a(key);
         }
     }
+
+    public static int getEntityTypeId(Class<?> entityType) {
+        return EntityTypes.b.a((Object) entityType);
+    }
 #elseif version >= 1.9
     public static Class<?> getEntityClass(String internalEntityName) {
         return com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap.get().get(name);
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        return EntityTypes.getName(entityType);
+        Integer id = (Integer) com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeIdMap_1_8.get().get(entityType);
+        if (id != null) {
+            return id.intValue();
+        } else {
+            return -1;
+        }
     }
 #else
     public static Class<?> getEntityClass(String internalEntityName) {
@@ -91,6 +119,15 @@ class EntityTypes {
 
     public static String getEntityInternalName(Class<?> entityType) {
         return com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeNameMap.get().get(entityType);
+    }
+
+    public static String getEntityInternalName(Class<?> entityType) {
+        Integer id = (Integer) com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeIdMap_1_8.get().get(entityType);
+        if (id != null) {
+            return id.intValue();
+        } else {
+            return -1;
+        }
     }
 #endif
 

@@ -31,6 +31,10 @@ public abstract class EntityTypesHandle extends Template.Handle {
         return T.getEntityInternalName.invoke(entityType);
     }
 
+    public static int getEntityTypeId(Class<?> entityType) {
+        return T.getEntityTypeId.invoke(entityType);
+    }
+
     /**
      * Stores class members for <b>net.minecraft.server.EntityTypes</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -40,12 +44,15 @@ public abstract class EntityTypesHandle extends Template.Handle {
         public final Template.StaticField.Converted<Map<String, Class<?>>> opt_nameTypeMap_1_10_2 = new Template.StaticField.Converted<Map<String, Class<?>>>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<Class<?>, String>> opt_typeNameMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Map<Class<?>, Integer>> opt_typeIdMap_1_8 = new Template.StaticField.Converted<Map<Class<?>, Integer>>();
         public final Template.StaticField.Converted<RegistryMaterialsHandle> opt_registry = new Template.StaticField.Converted<RegistryMaterialsHandle>();
 
         @Template.Optional
         public final Template.StaticMethod.Converted<EntityTypesHandle> fromEntityClass = new Template.StaticMethod.Converted<EntityTypesHandle>();
         public final Template.StaticMethod<Class<?>> getEntityClass = new Template.StaticMethod<Class<?>>();
         public final Template.StaticMethod<String> getEntityInternalName = new Template.StaticMethod<String>();
+        public final Template.StaticMethod<Integer> getEntityTypeId = new Template.StaticMethod<Integer>();
 
         @Template.Optional
         public final Template.Method.Converted<Class<?>> getEntityClassInst = new Template.Method.Converted<Class<?>>();
