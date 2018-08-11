@@ -61,6 +61,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @param value Value to set to
      */
     public <V> void set(Key<V> key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        }
+
         if (isWatched(key)) {
             handle.set(key, value);
         } else {
@@ -75,6 +79,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return Object value at the key
      */
     public <V> V get(Key<V> key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        }
+
         Object rawItem;
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {
             rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
@@ -96,6 +104,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return Object item at the key, <i>null</i> if not registered
      */
     public <V> Item<V> getItem(Key<V> key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        }
+
         Object rawItem;
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {
             rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
@@ -136,7 +148,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @return True if watched, False if not
      */
     public boolean isWatched(Key<?> key) {
-        return handle.read(key) != null;
+        return key != null && handle.read(key) != null;
     }
 
     /**
