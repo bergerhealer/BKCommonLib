@@ -62,6 +62,7 @@ import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
@@ -641,5 +642,15 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.EntityTypes", optional=true)
     public static Class<?> entityClassFromEntityTypes(Object nmsEntityTypesHandle) {
         return EntityTypesHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);
+    }
+
+    @ConverterMethod(input="org.bukkit.block.data.BlockData", optional=true)
+    public static BlockData blockDataFromBukkit(Object bukkitBlockData) {
+        return CraftBlockDataHandle.T.getState.invoke(bukkitBlockData);
+    }
+
+    @ConverterMethod(input="org.bukkit.block.data.BlockData", output="net.minecraft.server.IBlockData", optional=true)
+    public static Object iblockdataHandleFromBukkit(Object bukkitBlockData) {
+        return CraftBlockDataHandle.T.getState.raw.invoke(bukkitBlockData);
     }
 }

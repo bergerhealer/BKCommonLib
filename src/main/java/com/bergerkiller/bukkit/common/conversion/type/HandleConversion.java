@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -59,6 +60,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
@@ -464,4 +466,15 @@ public class HandleConversion {
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
         return Template.Handle.getRaw(EntityTypesHandle.T.fromEntityClass.invoke(entityClass));
     }
+
+    @ConverterMethod(input="net.minecraft.server.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)
+    public static Object bukkitBlockDataFromIBlockData(Object nmsIBlockdataHandle) {
+        return CraftBlockDataHandle.T.fromData.raw.invoke(nmsIBlockdataHandle);
+    }
+
+    @ConverterMethod(output="org.bukkit.block.data.BlockData", optional=true)
+    public static Object bukkitBlockDataFromBlockData(BlockData blockData) {
+        return CraftBlockDataHandle.T.fromData.invoke(blockData);
+    }
+
 }

@@ -29,6 +29,7 @@ import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.org.bukkit.event.block.BlockCanBuildEventHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
@@ -46,6 +47,56 @@ public class BlockUtil extends MaterialUtil {
      */
     public static AxisAlignedBBHandle getBoundingBox(Block block) {
         return WorldUtil.getBlockData(block).getBoundingBox(block);
+    }
+
+    /**
+     * Performs an event asking other plugins whether a block can change to a
+     * different Material
+     *
+     * @param block to check
+     * @param type that the block is about to be set to (built)
+     * @return True if permitted, False if not
+     */
+    public static boolean canBuildBlock(org.bukkit.block.Block block, Material type) {
+        return canBuildBlock(block, type, true);
+    }
+
+    /**
+     * Performs an event asking other plugins whether a block can change to a
+     * different Material
+     *
+     * @param block to check
+     * @param type that the block is about to be set to (built)
+     * @return True if permitted, False if not
+     */
+    public static boolean canBuildBlock(org.bukkit.block.Block block, BlockData type) {
+        return canBuildBlock(block, type, true);
+    }
+
+    /**
+     * Performs an event asking other plugins whether a block can change to a
+     * different Material
+     *
+     * @param block to check
+     * @param type that the block is about to be set to (built)
+     * @param isBuildable - Initial allow state
+     * @return True if permitted, False if not
+     */
+    public static boolean canBuildBlock(org.bukkit.block.Block block, Material type, boolean isBuildable) {
+        return canBuildBlock(block, BlockData.fromMaterial(type), isBuildable);
+    }
+
+    /**
+     * Performs an event asking other plugins whether a block can change to a
+     * different Material
+     *
+     * @param block to check
+     * @param type that the block is about to be set to (built)
+     * @param isBuildable - Initial allow state
+     * @return True if permitted, False if not
+     */
+    public static boolean canBuildBlock(org.bukkit.block.Block block, BlockData type, boolean isBuildable) {
+        return CommonUtil.callEvent(BlockCanBuildEventHandle.create(block, type, isBuildable)).isBuildable();
     }
 
     /**

@@ -1,0 +1,15 @@
+package org.bukkit.event.block;
+
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
+class BlockCanBuildEvent {
+
+    public static org.bukkit.event.block.BlockCanBuildEvent create(org.bukkit.block.Block block, (BlockData) org.bukkit.block.data.BlockData data, boolean canBuild) {
+#if version >= 1.13
+        return new BlockCanBuildEvent(block, data, canBuild);
+#else
+        return new BlockCanBuildEvent(block, data.getType(), canBuild);
+#endif
+    }
+
+}
