@@ -65,6 +65,9 @@ public class TemplateResolver implements ClassDeclarationResolver {
             if (Common.IS_SPIGOT_SERVER) {
                 variables.put("spigot", "true");
             }
+            if (Common.IS_PAPERSPIGOT_SERVER) {
+                variables.put("paperspigot", "true");
+            }
 
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);
