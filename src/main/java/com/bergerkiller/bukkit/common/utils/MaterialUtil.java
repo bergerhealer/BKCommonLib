@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.MaterialBlockProperty;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
@@ -268,10 +269,10 @@ public class MaterialUtil {
     /**
      * The material causes suffocation to entities inside
      */
-    public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBooleanProperty() {
+    public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBlockProperty<Boolean>() {
         @Override
-        public Boolean get(Material type) {
-            return BlockData.fromMaterial(type).isSuffocating();
+        public Boolean get(BlockData blockData) {
+            return blockData.isSuffocating();
         }
     };
 
@@ -310,10 +311,10 @@ public class MaterialUtil {
     /**
      * The material can supply redstone power and redstone wire connects to it
      */
-    public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBooleanProperty() {
+    public static final MaterialProperty<Boolean> ISPOWERSOURCE = new MaterialBlockProperty<Boolean>() {
         @Override
-        public Boolean get(Material type) {
-            return BlockData.fromMaterial(type).isPowerSource();
+        public Boolean get(BlockData blockData) {
+            return blockData.isPowerSource();
         }
     };
 
@@ -333,10 +334,10 @@ public class MaterialUtil {
     /**
      * Gets the amount of light a block material emits
      */
-    public static final MaterialProperty<Integer> EMISSION = new MaterialProperty<Integer>() {
+    public static final MaterialProperty<Integer> EMISSION = new MaterialBlockProperty<Integer>() {
         @Override
-        public Integer get(Material type) {
-            return BlockData.fromMaterial(type).getEmission();
+        public Integer get(BlockData blockData) {
+            return blockData.getEmission();
         }
     };
 

@@ -13,9 +13,8 @@ import org.bukkit.inventory.ItemStack;
  * Represents a property for a given material<br>
  * If a material container is null, air (0) is used<br><br>
  * <p/>
- * It is <b>required</b> to either implement {@link #get(int)} or
- * {@link #get(Material)}. Not doing so will result in a Runtime exception being
- * thrown upon construction.
+ * It is <b>required</b> to implement {@link #get(Material)}.
+ * To better handle Block materials, {@link #get(BlockData)} should also be implemented.
  */
 public abstract class MaterialProperty<T> {
 
@@ -46,7 +45,7 @@ public abstract class MaterialProperty<T> {
      * @return The property of the material
      */
     public T get(Block block) {
-        return block == null ? get(Material.AIR) : get(block.getType());
+        return block == null ? get(Material.AIR) : get(WorldUtil.getBlockData(block));
     }
 
     /**
@@ -59,7 +58,7 @@ public abstract class MaterialProperty<T> {
      * @return The property of the material
      */
     public T get(Chunk chunk, int x, int y, int z) {
-        return get(ChunkUtil.getBlockType(chunk, x, y, z));
+        return get(ChunkUtil.getBlockData(chunk, x, y, z));
     }
 
     /**
@@ -72,7 +71,7 @@ public abstract class MaterialProperty<T> {
      * @return The property of the material
      */
     public T get(org.bukkit.World world, int x, int y, int z) {
-        return get(WorldUtil.getBlockData(world, x, y, z).getType());
+        return get(WorldUtil.getBlockData(world, x, y, z));
     }
 
     /**

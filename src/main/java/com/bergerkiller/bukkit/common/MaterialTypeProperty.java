@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -44,6 +47,15 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
     @Override
     public Boolean get(Material type) {
         return MaterialUtil.isType(type, this.allowedTypes);
+    }
+
+    @Override
+    public Boolean get(BlockData blockData) {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            return get(blockData.getLegacyType()) || get(blockData.getType());
+        } else {
+            return super.get(blockData);
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 
@@ -182,6 +183,21 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return Block Material Type
      */
     public abstract org.bukkit.Material getLegacyType();
+
+    /**
+     * Gets whether this BlockData is of a certain Material type.
+     * This method keeps legacy and non-legacy materials into account.
+     * 
+     * @param type to check
+     * @return True if matches
+     */
+    public final boolean isType(org.bukkit.Material type) {
+        if (MaterialUtil.isLegacyType(type)) {
+            return getLegacyType() == type;
+        } else {
+            return getType() == type;
+        }
+    }
 
     /**
      * Creates a new MaterialData instance appropriate for this Block
