@@ -18,3 +18,11 @@ class CraftBlockState {
 
     public (org.bukkit.block.BlockState) CraftBlockState(org.bukkit.block.Block block);
 }
+
+class CraftBlock {
+#if version >= 1.13
+    private optional (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getData0();
+#else
+    private optional (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:###();
+#endif
+}

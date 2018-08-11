@@ -24,6 +24,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
@@ -58,8 +59,11 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        
-        return ChunkUtil.getBlockData(block.getChunk(), block.getX(), block.getY(), block.getZ());
+        if (CraftBlockHandle.T.getBlockData.isAvailable()) {
+            return CraftBlockHandle.T.getBlockData.invoke(block);
+        } else {
+            return ChunkUtil.getBlockData(block.getChunk(), block.getX(), block.getY(), block.getZ());
+        }
     }
 
     /**
@@ -100,7 +104,7 @@ public class WorldUtil extends ChunkUtil {
      * @return Block Material Type
      */
     public static org.bukkit.Material getBlockType(org.bukkit.block.Block block) {
-        return getBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ()).getType();
+        return getBlockData(block).getType();
     }
 
     /**
