@@ -8,7 +8,6 @@ import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
@@ -76,33 +75,6 @@ optional class EnumMoveType {
     enum (EnumMoveTypeHandle) EnumMoveType PISTON;
     enum (EnumMoveTypeHandle) EnumMoveType SHULKER_BOX;
     enum (EnumMoveTypeHandle) EnumMoveType SHULKER;
-}
-
-class EnumParticle {
-#if version >= 1.9
-    public static optional (EnumParticleHandle) EnumParticle byName:a(String name);
-#else
-    public static optional (EnumParticleHandle) EnumParticle byName:###(String name);
-#endif
-
-    public String getName:b();
-
-    public int getId:c();
-
-    <code>
-    public static EnumParticleHandle getByName(String name) {
-        if (T.byName.isAvailable()) {
-            return T.byName.invoke(name);
-        } else {
-            for (Object enumValue : T.getType().getEnumConstants()) {
-                if (T.getName.invoke(enumValue).equals(name)) {
-                    return createHandle(enumValue);
-                }
-            }
-            return null;
-        }
-    }
-    </code>
 }
 
 class EnumGamemode {

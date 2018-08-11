@@ -366,11 +366,20 @@ class WeightedRandom {
 class BiomeBase {
 
     class BiomeBase.BiomeMeta extends WeightedRandom.WeightedRandomChoice {
+#if version >= 1.13
+        public (java.lang.Class<?>) EntityTypes entityClass:b;
+#else
         public (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass:b;
+#endif
         public int minSpawnCount:c;
         public int maxSpawnCount:d;
 
+#if version >= 1.13
+        public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) EntityTypes entityClass, int x, int y, int z);
+#else
         public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
+#endif
+
     }
 
 }

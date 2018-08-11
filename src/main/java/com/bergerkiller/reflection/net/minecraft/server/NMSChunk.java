@@ -25,7 +25,6 @@ public class NMSChunk {
     public static final FieldAccessor<Integer> z = ChunkHandle.T.locZ.toFieldAccessor();
     public static final TranslatorFieldAccessor<ChunkSection[]> sections = ChunkHandle.T.sections.raw.toFieldAccessor().translate(DuplexConversion.chunkSectionArray);
 
-    public static final MethodAccessor<byte[]> biomeData = ChunkHandle.T.getBiomeIndex.toMethodAccessor();
     private static final MethodAccessor<Void> addEntities = ChunkHandle.T.addEntities.toMethodAccessor();
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();
 

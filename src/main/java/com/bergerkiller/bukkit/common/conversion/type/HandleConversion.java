@@ -43,6 +43,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
@@ -64,6 +65,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 
@@ -316,13 +318,9 @@ public class HandleConversion {
         return itemWrapper.getRawHandle();
     }
 
-    @SuppressWarnings("deprecation")
     @ConverterMethod(output="net.minecraft.server.MapIcon")
     public static Object toMapIconHandle(MapCursor cursor) {
-        // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
-        // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
-        return MapIconHandle.T.constr_type_x_y_direction.raw.newInstance(cursor.getRawType(),
-                cursor.getX(), cursor.getY(), cursor.getDirection());
+        return MapIconHandle.fromCursor(cursor).getRaw();
     }
 
     @ConverterMethod
@@ -460,5 +458,10 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.HeightMap$Type", optional=true)
     public static Object toHeightMapTypeHandle(HeightMap.Type type) {
         return type.getHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EntityTypes", optional=true)
+    public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
+        return Template.Handle.getRaw(EntityTypesHandle.T.fromEntityClass.invoke(entityClass));
     }
 }

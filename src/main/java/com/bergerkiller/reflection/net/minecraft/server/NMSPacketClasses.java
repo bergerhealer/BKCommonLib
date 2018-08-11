@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldType;
@@ -47,7 +45,6 @@ import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumParticleHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
@@ -58,7 +55,6 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayInKeepAliveHand
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSettingsHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayInTabCompleteHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInTeleportAcceptHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle;
@@ -87,6 +83,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntityS
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardObjectiveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetCooldownHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrbHandle;
@@ -98,6 +95,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -248,8 +246,8 @@ public class NMSPacketClasses {
     
     public static class NMSPacketPlayInCustomPayload extends NMSPacket {
 
-        public final FieldAccessor<String> tag = nextField("private String a");
-        public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
+        // public final FieldAccessor<String> tag = nextField("private String a");
+        // public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
     }
 
     public static class NMSPacketPlayInEnchantItem extends NMSPacket {
@@ -328,9 +326,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInTabComplete extends NMSPacket {
 
-        public final FieldAccessor<String> text = PacketPlayInTabCompleteHandle.T.text.toFieldAccessor();
-        public final FieldAccessor<Boolean> assumeCommand = PacketPlayInTabCompleteHandle.T.assumeCommand.toFieldAccessor().ignoreInvalid(false);
-        public final FieldAccessor<IntVector3> position = PacketPlayInTabCompleteHandle.T.position.toFieldAccessor();
+        // public final FieldAccessor<String> text = PacketPlayInTabCompleteHandle.T.text.toFieldAccessor();
+        // public final FieldAccessor<Boolean> assumeCommand = PacketPlayInTabCompleteHandle.T.assumeCommand.toFieldAccessor().ignoreInvalid(false);
+        // public final FieldAccessor<IntVector3> position = PacketPlayInTabCompleteHandle.T.position.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInTeleportAccept extends NMSPacket {
@@ -595,8 +593,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCustomPayload extends NMSPacket {
 
-        public final FieldAccessor<String> tag = nextField("private String a");
-        public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
+        // public final FieldAccessor<String> tag = nextField("private String a");
+        // public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
     }
 
     public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {
@@ -1294,10 +1292,10 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutScoreboardObjective extends NMSPacket {
 
-        public final FieldAccessor<String> name = nextField("private String a");
-        public final FieldAccessor<String> displayName = nextFieldSignature("private String b");
-        public final FieldAccessor<Object> criteria = nextFieldSignature("private IScoreboardCriteria.EnumScoreboardHealthDisplay c");
-        public final FieldAccessor<Integer> action = nextFieldSignature("private int d");
+        public final FieldAccessor<String> name = PacketPlayOutScoreboardObjectiveHandle.T.name.toFieldAccessor();
+        public final FieldAccessor<ChatText> displayName = PacketPlayOutScoreboardObjectiveHandle.T.displayName.toFieldAccessor();
+        public final FieldAccessor<Object> criteria = PacketPlayOutScoreboardObjectiveHandle.T.criteria.toFieldAccessor();
+        public final FieldAccessor<Integer> action = PacketPlayOutScoreboardObjectiveHandle.T.action.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutScoreboardScore extends NMSPacket {
@@ -1666,12 +1664,14 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutStatistic extends NMSPacket {
 
-        public final FieldAccessor<Map<Object, Integer>> statsMap = nextField("private Map<Statistic, Integer> a");
+        // Changed to Object2IntMap<Statistic> on MC 1.13
+        // public final FieldAccessor<Map<Object, Integer>> statsMap = nextField("private Map<Statistic, Integer> a");
     }    
 
     public static class NMSPacketPlayOutTabComplete extends NMSPacket {
 
-        public final FieldAccessor<String[]> response = nextField("private String[] a");
+        // Changed format on MC 1.13
+        // public final FieldAccessor<String[]> response = nextField("private String[] a");
     }
 
     public static class NMSPacketPlayOutTileEntityData extends NMSPacket {
@@ -1802,18 +1802,17 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutWorldParticles extends NMSPacket {
 
-        public final FieldAccessor<Object> particle = nextField("private EnumParticle a");
-        public final FieldAccessor<Float> x = nextFieldSignature("private float b");
-        public final FieldAccessor<Float> y = nextFieldSignature("private float c");
-        public final FieldAccessor<Float> z = nextFieldSignature("private float d");
-        public final FieldAccessor<Float> randomX = nextFieldSignature("private float e");
-        public final FieldAccessor<Float> randomY = nextFieldSignature("private float f");
-        public final FieldAccessor<Float> randomZ = nextFieldSignature("private float g");
-        public final FieldAccessor<Float> speed = nextFieldSignature("private float h");
-        public final FieldAccessor<Integer> particleCount = nextFieldSignature("private int i");
-        public final FieldAccessor<Boolean> unknown1 = nextFieldSignature("private boolean j");
-        public final FieldAccessor<int[]> unknown2 = nextFieldSignature("private int[] k");
+        public final FieldAccessor<Float> x = PacketPlayOutWorldParticlesHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Float> y = PacketPlayOutWorldParticlesHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Float> z = PacketPlayOutWorldParticlesHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> randomX = PacketPlayOutWorldParticlesHandle.T.randomX.toFieldAccessor();
+        public final FieldAccessor<Float> randomY = PacketPlayOutWorldParticlesHandle.T.randomY.toFieldAccessor();
+        public final FieldAccessor<Float> randomZ = PacketPlayOutWorldParticlesHandle.T.randomZ.toFieldAccessor();
+        public final FieldAccessor<Float> speed = PacketPlayOutWorldParticlesHandle.T.speed.toFieldAccessor();
+        public final FieldAccessor<Integer> particleCount = PacketPlayOutWorldParticlesHandle.T.count.toFieldAccessor();
+        public final FieldAccessor<Boolean> longDistance = PacketPlayOutWorldParticlesHandle.T.longDistance.toFieldAccessor();
 
+        /*
         public CommonPacket newInstance(String name, int count, Location location, double randomness, double speed) {
             return newInstance(name, count, location.getX(), location.getY(), location.getZ(), randomness, randomness, randomness, speed);
         }
@@ -1831,6 +1830,7 @@ public class NMSPacketClasses {
             packet.write(this.speed, (float) speed);
             return packet;
         }
+        */
     }
 
     //////////////////////////////////////////////////////////////////////

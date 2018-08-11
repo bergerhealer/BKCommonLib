@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 
 class EntityTypes {
     // 1.10.2 and before used a Map<String, Class> and Map<Class, String> to store name to entity class information
@@ -21,6 +22,25 @@ class EntityTypes {
 #endif
 
 #if version >= 1.13
+    public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
+
+    public static optional (EntityTypesHandle) EntityTypes fromEntityClass(Class<?> entityType) {
+        java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
+        while (iter.hasNext()) {
+            EntityTypes type = (EntityTypes) iter.next();
+            if (type.c() == entityType) {
+                return type;
+            }
+        }
+        return null;
+    }
+#else
+    public optional (Class<?>) Class<? extends Entity> getEntityClassInst:###();
+
+    public static optional (EntityTypesHandle) EntityTypes fromEntityClass:###(Class<?> entityType);
+#endif
+
+#if version >= 1.13
     public static Class<?> getEntityClass(String internalEntityName) {
         EntityTypes type = EntityTypes.a(internalEntityName);
         if (type == null) {
@@ -33,7 +53,7 @@ class EntityTypes {
     public static String getEntityInternalName(Class<?> entityType) {
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
         while (iter.hasNext()) {
-            EntityTypes type = iter.next();
+            EntityTypes type = (EntityTypes) iter.next();
             if (type.c() == entityType) {
                 MinecraftKey key = EntityTypes.getName(type);
                 if (key != null) {

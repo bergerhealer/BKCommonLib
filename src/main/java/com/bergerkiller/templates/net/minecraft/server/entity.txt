@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
@@ -819,7 +820,12 @@ class Entity {
     public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 
     public boolean hasCustomName();
-    public String getCustomName();
+
+#if version >= 1.13
+    public (ChatText) IChatBaseComponent getCustomName();
+#else
+    public (ChatText) String getCustomName();
+#endif
 
     public void collide((EntityHandle) Entity entity);
 

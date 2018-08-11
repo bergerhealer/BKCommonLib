@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
@@ -83,7 +84,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void onPush(double d0, double d1, double d2);
     public abstract int getPortalCooldownMaximum();
     public abstract boolean hasCustomName();
-    public abstract String getCustomName();
+    public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
     public abstract Entity getBukkitEntity();
 
@@ -457,7 +458,7 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();
         public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
-        public final Template.Method<String> getCustomName = new Template.Method<String>();
+        public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
 

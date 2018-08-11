@@ -71,6 +71,13 @@ public class TemplateTest {
                 }
             }
 
+            // MC 1.13 class translation fixed
+            {
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ScoreboardServerHandle.ActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
+                }
+            }
+
             Class<?> genClass = CommonUtil.getClass(genClassPath, true);
             if (genClass == null) {
                 System.out.println("Error occurred testing handle for " + dec.type.typePath);

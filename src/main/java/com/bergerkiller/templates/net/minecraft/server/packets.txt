@@ -768,16 +768,17 @@ class PacketPlayInSettings extends Packet {
     </code>
 }
 
-class PacketPlayInTabComplete extends Packet {
-    private String text:a;
-#if version >= 1.9
-    private optional boolean assumeCommand:b;
-    private (IntVector3) BlockPosition position:c;
-#else
-    private optional boolean assumeCommand:###;
-    private (IntVector3) BlockPosition position:b;
-#endif
-}
+// Changed completely on MC 1.13
+// class PacketPlayInTabComplete extends Packet {
+//     private String text:a;
+// #if version >= 1.9
+//     private optional boolean assumeCommand:b;
+//     private (IntVector3) BlockPosition position:c;
+// #else
+//     private optional boolean assumeCommand:###;
+//     private (IntVector3) BlockPosition position:b;
+// #endif
+// }
 
 class PacketPlayInResourcePackStatus extends Packet {
     private optional String message:a;
@@ -836,4 +837,48 @@ optional class PacketPlayOutUpdateSign {
     private (org.bukkit.World) World world:a;
     private (IntVector3) BlockPosition position:b;
     private (ChatText[]) IChatBaseComponent[] lines:c;
+}
+
+class PacketPlayOutWorldParticles {
+    // TODO: Create a common interface for particle + data
+    // Since 1.13 there is a ParticleParam with many different types
+    // Best option would be coming up with a proxy similar to this for <= 1.12.2
+#if version >= 1.13
+    private float x:a;
+    private float y:b;
+    private float z:c;
+    private float randomX:d;
+    private float randomY:e;
+    private float randomZ:f;
+    private float speed:g;
+    private int count:h;
+    private boolean longDistance:i;
+    private unknown ParticleParam j;
+#else
+    private unknown EnumParticle a;
+    private float x:b;
+    private float y:c;
+    private float z:d;
+    private float randomX:e;
+    private float randomY:f;
+    private float randomZ:g;
+    private float speed:h;
+    private int count:i;
+    private boolean longDistance:j;
+    private unknown int[] k;
+#endif
+}
+
+class PacketPlayOutScoreboardObjective {
+#if version >= 1.13
+    private String name:a;
+    private (ChatText) IChatBaseComponent displayName:b;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
+    private int action:d;
+#else
+    private String name:a;
+    private (ChatText) String displayName:b;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
+    private int action:d;
+#endif
 }

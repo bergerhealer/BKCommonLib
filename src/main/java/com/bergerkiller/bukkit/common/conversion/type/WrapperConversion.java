@@ -46,6 +46,7 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
@@ -483,13 +484,9 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
     }
 
-    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.MapIcon")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
-        // public MapCursor(byte x, byte y, byte direction, byte type, boolean visible)
-        // public MapIcon(Type paramType, byte paramByte1, byte paramByte2, byte paramByte3)
-        MapIconHandle icon = MapIconHandle.createHandle(nmsMapCursorHandle);
-        return new MapCursor(icon.getX(), icon.getY(), icon.getDirection(), icon.getTypeId(), true);
+        return MapIconHandle.createHandle(nmsMapCursorHandle).toCursor();
     }
 
     @ConverterMethod(output="net.minecraft.server.MapIcon.Type", optional=true)
@@ -639,5 +636,10 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.HeightMap$Type", optional=true)
     public static HeightMap.Type heightMapTypeFromHandle(Object handle) {
         return HeightMap.Type.fromHandle(handle);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.EntityTypes", optional=true)
+    public static Class<?> entityClassFromEntityTypes(Object nmsEntityTypesHandle) {
+        return EntityTypesHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);
     }
 }

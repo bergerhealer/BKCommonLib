@@ -26,7 +26,12 @@ class MobSpawnerAbstract {
 
     public void onTick:c();
 
-#if version >= 1.11
+#if version >= 1.13
+    public (MinecraftKeyHandle) MinecraftKey getMobName();
+    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
+        instance.setMobName((EntityTypes) EntityTypes.REGISTRY.get(nameKey));
+    }
+#elseif version >= 1.11
     public (MinecraftKeyHandle) MinecraftKey getMobName();
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey);
 #else

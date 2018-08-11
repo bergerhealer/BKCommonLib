@@ -45,7 +45,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
     public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);
     public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
-    public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, Object iblockaccess, IntVector3 blockposition);
+    public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, World world, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();
 

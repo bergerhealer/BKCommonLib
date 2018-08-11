@@ -2,6 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import org.bukkit.map.MapCursor;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.MapIcon</b>.
@@ -19,23 +21,34 @@ public abstract class MapIconHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
-        return T.constr_type_x_y_direction.newInstance(type, x, y, direction);
-    }
-
     /* ============================================================================== */
 
+    public static MapIconHandle createNew(byte type, byte x, byte y, byte direction, ChatText title) {
+        return T.createNew.invoke(type, x, y, direction, title);
+    }
+
+    public static MapIconHandle fromCursor(MapCursor cursor) {
+        return T.fromCursor.invoke(cursor);
+    }
+
+    public abstract MapCursor toCursor();
     public abstract byte getTypeId();
     public abstract byte getX();
     public abstract byte getY();
     public abstract byte getDirection();
+
+    public static MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
+        return createNew(type, x, y, direction, null);
+    }
     /**
      * Stores class members for <b>net.minecraft.server.MapIcon</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MapIconClass extends Template.Class<MapIconHandle> {
-        public final Template.Constructor.Converted<MapIconHandle> constr_type_x_y_direction = new Template.Constructor.Converted<MapIconHandle>();
+        public final Template.StaticMethod.Converted<MapIconHandle> createNew = new Template.StaticMethod.Converted<MapIconHandle>();
+        public final Template.StaticMethod.Converted<MapIconHandle> fromCursor = new Template.StaticMethod.Converted<MapIconHandle>();
 
+        public final Template.Method<MapCursor> toCursor = new Template.Method<MapCursor>();
         public final Template.Method<Byte> getTypeId = new Template.Method<Byte>();
         public final Template.Method<Byte> getX = new Template.Method<Byte>();
         public final Template.Method<Byte> getY = new Template.Method<Byte>();

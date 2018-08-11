@@ -37,7 +37,6 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract int getHeight(Type type, int x, int z);
     public abstract int getBrightness(EnumSkyBlockHandle enumskyblock, IntVector3 position);
     public abstract int getTopSliceY();
-    public abstract byte[] getBiomeIndex();
     public abstract void addEntities();
     public abstract boolean checkCanSave(boolean isNotAutosave);
     public abstract void markDirty();
@@ -84,7 +83,6 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method.Converted<Integer> getHeight = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Integer> getBrightness = new Template.Method.Converted<Integer>();
         public final Template.Method<Integer> getTopSliceY = new Template.Method<Integer>();
-        public final Template.Method<byte[]> getBiomeIndex = new Template.Method<byte[]>();
         public final Template.Method<Void> addEntities = new Template.Method<Void>();
         public final Template.Method<Boolean> checkCanSave = new Template.Method<Boolean>();
         public final Template.Method<Void> markDirty = new Template.Method<Void>();

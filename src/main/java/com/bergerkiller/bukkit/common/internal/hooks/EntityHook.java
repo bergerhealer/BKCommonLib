@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.HumanEntity;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -210,6 +211,12 @@ public class EntityHook extends ClassHook<EntityHook> {
      * @return base name
      */
     public String getName_base() {
+        // >= 1.13 it is a simple lookup of the name of the EntityTypes field value
+        // This is safe, so no special logic is warranted here
+        if (Common.evaluateMCVersion(">=", "1.13")) {
+            return base.getName();
+        }
+
         // <= 1.10.2 we already take care of this issue with the class translating map of entity names
         if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
             return base.getName();
@@ -221,7 +228,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             return base.getName();
         }
         if (EntityHandle.T.hasCustomName.invoke(instance)) {
-            return EntityHandle.T.getCustomName.invoke(instance);
+            return EntityHandle.T.getCustomName.invoke(instance).getMessage();
         }
 
         // Retrieve MinecraftKey of this entity class, and the String internal name from that

@@ -76,7 +76,8 @@ class Chunk {
     public int getTopSliceY:g();
 #endif
 
-    public byte[] getBiomeIndex();
+    // MC 1.13: byte[] -> BiomeBase[]
+    // public byte[] getBiomeIndex();
 
     public void addEntities();
 

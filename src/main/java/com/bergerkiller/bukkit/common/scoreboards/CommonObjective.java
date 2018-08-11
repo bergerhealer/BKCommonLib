@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard.Display;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -173,7 +174,7 @@ public class CommonObjective {
     private void handle(int type) {
         CommonPacket packet = new CommonPacket(PacketType.OUT_SCOREBOARD_OBJECTIVE);
         packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.name, this.name);
-        packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.displayName, this.displayName);
+        packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.displayName, ChatText.fromMessage(this.displayName));
         packet.write(PacketType.OUT_SCOREBOARD_OBJECTIVE.action, type);
         PacketUtil.sendPacket(this.scoreboard.getPlayer(), packet);
     }

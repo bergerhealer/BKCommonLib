@@ -1,18 +1,85 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle.TypeHandle;
 
 class MapIcon {
-#if version >= 1.11
-    public (MapIconHandle) MapIcon((byte) MapIcon.Type type, byte x, byte y, byte direction);
+
+    <code>
+    public static MapIconHandle createNew(byte type, byte x, byte y, byte direction) {
+        return createNew(type, x, y, direction, null);
+    }
+    </code>
+
+#if version >= 1.13
+    public static (MapIconHandle) MapIcon createNew((byte) MapIcon.Type type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+        return new MapIcon(type, x, y, direction, title);
+    }
+
+    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
+        IChatBaseComponent title = null;
+        if (cursor.getCaption() != null) {
+            title = (IChatBaseComponent) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
+        }
+        return new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+    }
+
+    public org.bukkit.map.MapCursor toCursor() {
+        IChatBaseComponent title = instance.g();
+        if (title != null) {
+            return new org.bukkit.map.MapCursor(
+                instance.getX(), instance.getY(), instance.getRotation(),
+                instance.b().a(),
+                true,
+                com.bergerkiller.bukkit.common.wrappers.ChatText.fromComponent(title).getMessage()
+            );
+        } else {
+            return new org.bukkit.map.MapCursor(
+                instance.getX(), instance.getY(), instance.getRotation(),
+                instance.b().a(),
+                true
+            );
+        }
+    }
+#elseif version >= 1.11
+    public static (MapIconHandle) MapIcon createNew((byte) MapIcon.Type type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+        return new MapIcon(type, x, y, direction);
+    }
+
+    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
+        return new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
+    }
+
+    public org.bukkit.map.MapCursor toCursor() {
+        return new org.bukkit.map.MapCursor(
+            instance.getX(), instance.getY(), instance.getRotation(),
+            instance.getType(),
+            true
+        );
+    }
 #else
-    public (MapIconHandle) MapIcon(byte type, byte x, byte y, byte direction);
+    public static (MapIconHandle) MapIcon createNew(byte type, byte x, byte y, byte direction, (ChatText) IChatBaseComponent title) {
+         return new MapIcon(type, x, y, direction);
+    }
+
+    public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
+        return new MapIcon(cursor.getRawType(), cursor.getX(), cursor.getY(), cursor.getDirection());
+    }
+
+    public org.bukkit.map.MapCursor toCursor() {
+        return new org.bukkit.map.MapCursor(
+            instance.getX(), instance.getY(), instance.getRotation(),
+            instance.getType(),
+            true
+        );
+    }
 #endif
 
 #if version >= 1.13
     public byte getTypeId() {
-        return instance.getType().a();
+        return instance.b().a();
     }
 #else
     public byte getTypeId:getType();

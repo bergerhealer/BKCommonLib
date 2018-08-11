@@ -133,9 +133,24 @@ class Block {
     public void stepOn:a((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
 #endif
 
-    public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (Object) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
+    public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition) {
+#if version >= 1.13
+        return Block.b(iblockdata, world, blockposition);
+#else
+        return instance.updateState(iblockdata, world, blockposition);
+#endif
+    }
 
-#if version >= 1.9
+#if version >= 1.13
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+        VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition);
+        if (shape.b()) {
+            return null;
+        } else {
+            return shape.a();
+        }
+    }
+#elseif version >= 1.9
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
 #else
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
