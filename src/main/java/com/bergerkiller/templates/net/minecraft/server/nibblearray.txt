@@ -18,6 +18,10 @@ class NibbleArray {
 #endif
 
     <code>
+    public void fill(int nibbleValue) {
+        java.util.Arrays.fill(getData(), (byte) (nibbleValue & 0xF));
+    }
+
     public boolean dataEquals(NibbleArrayHandle other) {
         return java.util.Arrays.equals(this.getData(), other.getData());
     }

@@ -10,6 +10,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
@@ -18,6 +19,8 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.conversion.Conversion;
+import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -145,6 +148,20 @@ public class TemplateTest {
         } else {
             assertEquals("minecraft:dig.grass", stepName.getPath());
         }
+    }
+
+    @Test
+    public void testHeightMapTypeConversion() {
+        HeightMap.Type input = HeightMap.Type.LIGHT_BLOCKING;
+        Class<?> nmstype = CommonUtil.getNMSClass("HeightMap.Type");
+        assertNotNull(nmstype);
+        Converter<?, ?> converter = Conversion.find(HeightMap.Type.class, nmstype);
+        assertNotNull(converter);
+
+        Enum<?> output = (Enum<?>) converter.convert(input);
+        assertNotNull(output);
+        assertEquals(nmstype, output.getClass());
+        assertEquals("LIGHT_BLOCKING", output.name());
     }
 
     private void assertAvailable(Template.TemplateElement<?>... elements) {

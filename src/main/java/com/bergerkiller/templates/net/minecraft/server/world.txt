@@ -343,7 +343,11 @@ class WorldType {
 }
 
 class WorldProvider {
+#if version >= 1.13
+    protected boolean isDarkWorldField:d;
+#else
     protected boolean isDarkWorldField:e;
+#endif
 
 <code>
     public boolean hasSkyLight() {

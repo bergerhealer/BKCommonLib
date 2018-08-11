@@ -457,7 +457,7 @@ public class HandleConversion {
         return heightmap.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.HeightMap$Type", optional=true)
+    @ConverterMethod(output="net.minecraft.server.HeightMap$Type")
     public static Object toHeightMapTypeHandle(HeightMap.Type type) {
         return type.getHandle();
     }

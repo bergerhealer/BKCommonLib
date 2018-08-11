@@ -33,6 +33,10 @@ public abstract class NibbleArrayHandle extends Template.Handle {
     public abstract void set(int x, int y, int z, int nibbleValue);
     public abstract byte[] getData();
 
+    public void fill(int nibbleValue) {
+        java.util.Arrays.fill(getData(), (byte) (nibbleValue & 0xF));
+    }
+
     public boolean dataEquals(NibbleArrayHandle other) {
         return java.util.Arrays.equals(this.getData(), other.getData());
     }

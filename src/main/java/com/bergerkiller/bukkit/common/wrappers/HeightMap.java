@@ -76,18 +76,15 @@ public class HeightMap extends BasicWrapper<HeightMapHandle> {
         private final Object _handle;
 
         private Type() {
-            Class<?> nmsType = CommonUtil.getNMSClass("Heightmap$Type");
+            Enum<?>[] values = (Enum<?>[]) CommonUtil.getNMSClass("HeightMap.Type").getEnumConstants();
             Object handle = null;
-            if (nmsType != null) {
-                try {
-                    handle = nmsType.getDeclaredField(this.name()).get(null);
-                } catch (Throwable t) {
+            for (Enum<?> value : values) {
+                if (value.name().equals("LIGHT_BLOCKING")) {
+                    handle = value;
                 }
-            }
-            if (handle == null) {
-                try {
-                    handle = nmsType.getDeclaredField("LIGHT_BLOCKING").get(null);
-                } catch (Throwable t) {
+                if (value.name().equals(this.name())) {
+                    handle = value;
+                    break;
                 }
             }
             this._handle = handle;
