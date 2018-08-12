@@ -1,11 +1,13 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import org.bukkit.Material;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +44,26 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
     public MaterialTypeProperty(Material... allowedMaterials) {
         this.allowedTypes = new Material[allowedMaterials.length];
         System.arraycopy(allowedMaterials, 0, this.allowedTypes, 0, allowedMaterials.length);
+    }
+
+    /**
+     * Initializes a new material type property from an array of material names.<br>
+     * <br>
+     * This assumes the 1.13 API, which means old legacy materials
+     * can be obtained by prefixing LEGACY_. The LEGACY_ prefix is also required on older
+     * versions of Minecraft.
+     *
+     * @param allowedMaterials names to set
+     */
+    public MaterialTypeProperty(String... allowedMaterials) {
+        ArrayList<Material> mats = new ArrayList<Material>(allowedMaterials.length);
+        for (String name : allowedMaterials) {
+            Material mat = MaterialUtil.getMaterial(name);
+            if (mat != null) {
+                mats.add(mat);
+            }
+        }
+        this.allowedTypes = LogicUtil.toArray(mats, Material.class);
     }
 
     @Override

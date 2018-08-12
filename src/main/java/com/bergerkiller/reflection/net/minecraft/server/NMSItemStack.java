@@ -7,6 +7,7 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 import org.bukkit.Material;
 
+@Deprecated
 public class NMSItemStack {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("ItemStack");
     public static final FieldAccessor<Integer> data   = ItemStackHandle.T.durabilityField.toFieldAccessor();

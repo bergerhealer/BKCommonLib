@@ -22,7 +22,6 @@ import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -68,7 +67,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilH
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 
 public class HandleConversion {
@@ -110,7 +108,12 @@ public class HandleConversion {
             org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) itemStack;
             Object rval = Common.IS_TEST_MODE ? null : CraftItemStackHandle.asNMSCopy(stack);
             if (rval == null) {
-                rval = NMSItemStack.newInstance(stack.getType(), MaterialUtil.getRawData(stack), stack.getAmount());
+                // Fallback under test - does not go into production!
+                ItemStackHandle handle = ItemStackHandle.newInstance();
+                handle.setTypeField(stack.getType());
+                handle.setAmountField(stack.getAmount());
+                handle.setDurability(stack.getDurability());
+                rval = handle.getRaw();
             }
             return rval;
         }

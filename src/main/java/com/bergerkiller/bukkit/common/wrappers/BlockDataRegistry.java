@@ -10,6 +10,8 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 public class BlockDataRegistry {
 
@@ -54,19 +56,31 @@ public class BlockDataRegistry {
     }
 
     /**
+     * Obtains immutable BlockData information about the Block represented by a BlockState
+     * 
+     * @param state
+     * @return BlockData of the state
+     */
+    public static BlockData fromBlockState(org.bukkit.block.BlockState state) {
+        if (BlockStateHandle.T.getBlockData.isAvailable()) {
+            return BlockStateHandle.T.getBlockData.invoke(state);
+        } else {
+            return fromMaterialData(state.getType(), state.getRawData());
+        }
+    }
+
+    /**
      * Obtains immutable BlockData information for the Material and Data of an ItemStack
      * 
      * @param itemStack input
      * @return Immutable BlockData
      */
     public static BlockData fromItemStack(ItemStack itemStack) {
-        if (itemStack != null) {
-            Material type = itemStack.getType();
-            if (type.isBlock()) {
-                return fromMaterialData(type, itemStack.getDurability());
-            }
+        if (CraftMagicNumbersHandle.isLegacy(itemStack.getType())) {
+            return fromMaterialData(itemStack.getType(), itemStack.getDurability());
+        } else {
+            return fromMaterial(itemStack.getType());
         }
-        return AIR;
     }
 
     /**

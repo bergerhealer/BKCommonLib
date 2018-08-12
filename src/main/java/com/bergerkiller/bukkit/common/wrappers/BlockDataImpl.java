@@ -25,6 +25,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryBlockIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
@@ -420,5 +421,29 @@ public class BlockDataImpl extends BlockData {
     @Override
     public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
         this.block.stepOn(world, blockPosition, entity);
+    }
+
+    @Override
+    public BlockData setState(String key, Object value) {
+        IBlockDataHandle updated_data = this.data.set(key, value);
+        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(updated_data.getRaw());
+        if (data != null) {
+            return data;
+        }
+
+        // Store in map (should only rarely happen)
+        BlockDataConstant c = new BlockDataImpl.BlockDataConstant(updated_data);
+        BY_BLOCK_DATA.put(updated_data.getRaw(), c);
+        return c;
+    }
+
+    @Override
+    public <T> T getState(String key, Class<T> type) {
+        return this.data.get(key, type);
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack createItem(int amount) {
+        return ItemStackHandle.fromBlockData(this.data, amount).toBukkit();
     }
 }

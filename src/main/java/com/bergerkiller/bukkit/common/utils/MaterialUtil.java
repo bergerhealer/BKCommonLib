@@ -68,7 +68,7 @@ public class MaterialUtil {
                     key = line.substring(0, line.length()-1);
                     values.clear();
                 } else {
-                    Material mat = CommonLegacyMaterials.getMaterial(line);
+                    Material mat = getMaterial(line);
                     if (mat == null) {
                         throw new RuntimeException("Material type not found: " + line);
                     } else {
@@ -80,17 +80,6 @@ public class MaterialUtil {
                 TYPE_PROPERTIES.put(key, new MaterialTypeProperty(values.toArray(new Material[values.size()])));
             }
         }
-    }
-
-    /**
-     * Gets whether a particular Material type is legacy. When run on versions of Minecraft
-     * before 1.13, this method always returns true.
-     * 
-     * @param type
-     * @return True if the type is legacy
-     */
-    public static boolean isLegacyType(Material type) {
-        return CraftMagicNumbersHandle.isLegacy(type);
     }
 
     @Deprecated
@@ -155,23 +144,53 @@ public class MaterialUtil {
      * @return True if the material is contained
      */
     public static boolean isType(org.bukkit.block.Block block, Material... types) {
-        return block != null && isType(block.getType(), types);
+        return block != null && WorldUtil.getBlockData(block).isType(types);
     }
 
     /**
-     * Gets the very first material name in the list that matches a valid material
+     * Gets whether a particular Material type is legacy. When run on versions of Minecraft
+     * before 1.13, this method always returns true.
+     * 
+     * @param type
+     * @return True if the type is legacy
+     */
+    public static boolean isLegacyType(Material type) {
+        return CraftMagicNumbersHandle.isLegacy(type);
+    }
+
+    /**
+     * Gets the very first material name in the list that matches a valid material.
+     * Throws a runtime exception when none of the names could be found.<br>
+     * <br>
+     * This assumes the 1.13 API, which means old legacy materials
+     * can be obtained by prefixing LEGACY_. The LEGACY_ prefix is also required on older
+     * versions of Minecraft.
      * 
      * @param names
      * @return first name in the list
      */
     public static Material getFirst(String... names) {
         for (String name : names) {
-            Material m = Material.getMaterial(name);
+            Material m = getMaterial(name);
             if (m != null) {
                 return m;
             }
         }
         throw new RuntimeException("None of the materials '" + String.join(", ", names) + "' could be found");
+    }
+
+    /**
+     * Gets a Material by name.<br>
+     * <br>
+     * This assumes the 1.13 API, which means old legacy materials
+     * can be obtained by prefixing LEGACY_. The LEGACY_ prefix is also required on older
+     * versions of Minecraft.
+     * 
+     * @param name
+     * @return Material
+     */
+    public static Material getMaterial(String name) {
+        return CommonLegacyMaterials.getMaterial(name);
     }
 
     /**
@@ -265,6 +284,26 @@ public class MaterialUtil {
      * Materials of this type suppress block placement upon interaction.
      */
     public static final MaterialTypeProperty ISINTERACTABLE = TYPE_PROPERTIES.get("ISINTERACTABLE");
+
+    /**
+     * The material is water
+     */
+    public static final MaterialTypeProperty ISWATER = TYPE_PROPERTIES.get("ISWATER");
+
+    /**
+     * The material is lava
+     */
+    public static final MaterialTypeProperty ISLAVA = TYPE_PROPERTIES.get("ISLAVA");
+
+    /**
+     * The material is a liquid like water or lava
+     */
+    public static final MaterialTypeProperty ISLIQUID = new MaterialTypeProperty(ISWATER, ISLAVA);
+
+    /**
+     * The material is a type of Leaves
+     */
+    public static final MaterialTypeProperty ISLEAVES = TYPE_PROPERTIES.get("ISLEAVES");
 
     /**
      * The material causes suffocation to entities inside

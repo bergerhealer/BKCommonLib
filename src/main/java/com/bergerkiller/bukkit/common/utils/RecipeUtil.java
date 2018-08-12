@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
@@ -25,8 +26,10 @@ public class RecipeUtil {
 
     static {
         for (Material material : Material.values()) {
-            Object item = NMSItemStack.newInstance(material, 0, 1);
-            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item)).intValue();
+            ItemStackHandle item = ItemStackHandle.newInstance();
+            item.setTypeField(material);
+            item.setAmountField(1);
+            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);
             }

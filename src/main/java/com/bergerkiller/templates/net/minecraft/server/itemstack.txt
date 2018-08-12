@@ -2,6 +2,7 @@ package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
@@ -45,6 +46,14 @@ class ItemStack {
         return new ItemStack(Item.getItemOf(Blocks.STONE), 1, 0, false);
 #else
         return new ItemStack(Blocks.STONE, 1, 0);
+#endif
+    }
+
+    public static (ItemStackHandle) ItemStack fromBlockData((IBlockDataHandle) IBlockData data, int amount) {
+#if version >= 1.13
+        return new ItemStack(data.getBlock(), amount);
+#else
+        return new ItemStack(data.getBlock(), amount, data.getBlock().getDropData(data));
 #endif
     }
 
@@ -104,6 +113,10 @@ class ItemStack {
 #endif
 
     public (ItemStackHandle) ItemStack cloneItemStack();
+
+    public org.bukkit.inventory.ItemStack toBukkit() {
+        return org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
+    }
 
     <code>
     public static ItemStackHandle fromBukkit(org.bukkit.inventory.ItemStack itemStack) {

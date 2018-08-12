@@ -9,6 +9,7 @@ import java.util.Map;
 import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.*;
 
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 import org.junit.Test;
 
@@ -105,6 +106,21 @@ public class BlockDataTest {
         //assertEquals(0, BlockData.fromMaterial(Material.AIR).getOpacity());
         assertEquals(15, BlockData.fromMaterial(Material.GLOWSTONE).getEmission());
         assertEquals(14, BlockData.fromMaterial(Material.TORCH).getEmission());
+    }
+
+    @Test
+    public void testBlockDataStates() {
+        // Get Block Data of stairs
+        Material mat = MaterialUtil.getFirst("OAK_STAIRS", "LEGACY_WOOD_STAIRS");
+        BlockData data = BlockData.fromMaterial(mat);
+
+        data = data.setState("facing", BlockFace.EAST);
+        assertEquals(BlockFace.EAST, data.getState("facing", BlockFace.class));
+        assertTrue(data.isType(mat));
+
+        data = data.setState("facing", BlockFace.SOUTH);
+        assertEquals(BlockFace.SOUTH, data.getState("facing", BlockFace.class));
+        assertTrue(data.isType(mat));
     }
 
     @SuppressWarnings("deprecation")

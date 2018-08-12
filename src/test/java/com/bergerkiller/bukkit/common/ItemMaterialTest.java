@@ -245,6 +245,30 @@ public class ItemMaterialTest {
         assertEquals("awesome!", tag.getValue("test"));
     }
 
+    @Test
+    public void testItemFromBlockData() {
+        BlockData data;
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // Get BlockData of stained glass the new way
+            data = BlockData.fromMaterial(MaterialUtil.getMaterial("PURPLE_STAINED_GLASS"));
+        } else {
+            // Get BlockData of stained glass the old way
+            data = BlockData.fromMaterialData(MaterialUtil.getMaterial("LEGACY_STAINED_GLASS"), 2);
+        }
+
+        ItemStack item = data.createItem(12);
+        assertNotNull(item);
+        assertEquals(12, item.getAmount());
+        assertEquals(data, BlockData.fromItemStack(item));
+
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            assertEquals(MaterialUtil.getMaterial("PURPLE_STAINED_GLASS"), item.getType());
+        } else {
+            assertEquals(MaterialUtil.getMaterial("LEGACY_STAINED_GLASS"), item.getType());
+            assertEquals(2, item.getDurability());
+        }
+    }
+
     // Only works on MC 1.12.1 - generate an item variants yaml configuration
     // This configuration is used on MC < 1.12.1
     @Ignore

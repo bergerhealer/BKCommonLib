@@ -2,6 +2,7 @@ package com.bergerkiller.generated.org.bukkit.block;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.block.BlockState</b>.
@@ -28,6 +29,8 @@ public abstract class BlockStateHandle extends Template.Handle {
     public static final class BlockStateClass extends Template.Class<BlockStateHandle> {
         @Template.Optional
         public final Template.Method<Boolean> isPlaced = new Template.Method<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
     }
 

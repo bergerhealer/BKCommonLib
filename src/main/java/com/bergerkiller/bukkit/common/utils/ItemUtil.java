@@ -3,19 +3,19 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -391,19 +391,32 @@ public class ItemUtil {
      * @return ItemStack
      */
     public static org.bukkit.inventory.ItemStack createItem(Material type, int amount) {
-        return createItem(type, 0, amount);
+        ItemStackHandle stack = ItemStackHandle.newInstance();
+        stack.setTypeField(type);
+        stack.setAmountField(amount);
+        return stack.toBukkit();
     }
 
     /**
-     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle
+     * Creates a new ItemStack that is guaranteed to be a CraftItemStack with a valid NMS ItemStack handle.<br>
+     * <b>Deprecated: Uses outdated MaterialData</b>
      * 
      * @param type of item
      * @param data of the item
      * @param amount of the item
      * @return ItemStack
      */
+    @Deprecated
     public static org.bukkit.inventory.ItemStack createItem(Material type, int data, int amount) {
-        return CBCraftItemStack.newInstanceFromHandle(NMSItemStack.newInstance(type, data, amount));
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES && type.isBlock()) {
+            return BlockData.fromMaterialData(type, data).createItem(amount);
+        }
+
+        ItemStackHandle stack = ItemStackHandle.newInstance();
+        stack.setTypeField(type);
+        stack.setAmountField(amount);
+        stack.setDurability(data);
+        return stack.toBukkit();
     }
 
     /**
@@ -769,7 +782,7 @@ public class ItemUtil {
      */
     public static void setDisplayChatText(org.bukkit.inventory.ItemStack stack, ChatText displayName) {
         if (displayName != null) {
-            if (CBCraftItemStack.T.isInstance(stack)) {
+            if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
                 CommonNMS.getHandle(stack).setName(displayName);
             } else {
                 throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");

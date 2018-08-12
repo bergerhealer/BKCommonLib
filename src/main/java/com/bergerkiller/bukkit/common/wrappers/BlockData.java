@@ -185,6 +185,32 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract org.bukkit.Material getLegacyType();
 
     /**
+     * Creates an ItemStack holding a stack of blocks of this type of BlockData.
+     * 
+     * @param amount of blocks
+     * @return Item
+     */
+    public abstract org.bukkit.inventory.ItemStack createItem(int amount);
+
+    /**
+     * Changes a state of this BlockData, returning the BlockData with the state updated.
+     * 
+     * @param key of the state
+     * @param value to set the state to
+     * @return updated state
+     */
+    public abstract BlockData setState(String key, Object value);
+
+    /**
+     * Reads a state from this BlockData
+     * 
+     * @param key of the state
+     * @param type to turn the state value into (auto conversion)
+     * @return state value
+     */
+    public abstract <T> T getState(String key, Class<T> type);
+
+    /**
      * Gets whether this BlockData is of a certain Material type.
      * This method keeps legacy and non-legacy materials into account.
      * 
@@ -197,6 +223,22 @@ public abstract class BlockData extends BlockDataRegistry {
         } else {
             return getType() == type;
         }
+    }
+
+    /**
+     * Gets whether this BlockData is one of the provided Material types.
+     * This method keeps legacy and non-legacy materials into account.
+     * 
+     * @param type to check
+     * @return True if matches
+     */
+    public final boolean isType(org.bukkit.Material... types) {
+        for (org.bukkit.Material type : types) {
+            if (isType(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

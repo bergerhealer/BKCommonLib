@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ItemStack</b>.
@@ -28,6 +29,10 @@ public abstract class ItemStackHandle extends Template.Handle {
         return T.newInstance.invoke();
     }
 
+    public static ItemStackHandle fromBlockData(IBlockDataHandle data, int amount) {
+        return T.fromBlockData.invoke(data, amount);
+    }
+
     public abstract Object getItem();
     public abstract ChatText getName();
     public abstract void setName(ChatText name);
@@ -39,6 +44,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract CommonTagCompound saveToNBT(CommonTagCompound compound);
     public abstract ItemStackHandle cloneAndSubtract(int n);
     public abstract ItemStackHandle cloneItemStack();
+    public abstract ItemStack toBukkit();
 
     public static final ItemStackHandle EMPTY_ITEM;
     static {
@@ -89,6 +95,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Field.Integer durabilityField = new Template.Field.Integer();
 
         public final Template.StaticMethod.Converted<ItemStackHandle> newInstance = new Template.StaticMethod.Converted<ItemStackHandle>();
+        public final Template.StaticMethod.Converted<ItemStackHandle> fromBlockData = new Template.StaticMethod.Converted<ItemStackHandle>();
 
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
@@ -105,6 +112,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<ItemStackHandle> cloneItemStack = new Template.Method.Converted<ItemStackHandle>();
+        public final Template.Method<ItemStack> toBukkit = new Template.Method<ItemStack>();
 
     }
 
