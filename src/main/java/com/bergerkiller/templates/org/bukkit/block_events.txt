@@ -4,11 +4,12 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 class BlockCanBuildEvent {
 
-    public static org.bukkit.event.block.BlockCanBuildEvent create(org.bukkit.block.Block block, (BlockData) org.bukkit.block.data.BlockData data, boolean canBuild) {
+    public static org.bukkit.event.block.BlockCanBuildEvent create(org.bukkit.block.Block block, BlockData data, boolean canBuild) {
 #if version >= 1.13
-        return new BlockCanBuildEvent(block, data, canBuild);
+        Object bukkitBlockData = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.bukkitBlockDataFromBlockData(data);
+        return new BlockCanBuildEvent(block, (org.bukkit.block.data.BlockData) bukkitBlockData, canBuild);
 #else
-        return new BlockCanBuildEvent(block, data.getType(), canBuild);
+        return new BlockCanBuildEvent(block, data.getType().getId(), canBuild);
 #endif
     }
 

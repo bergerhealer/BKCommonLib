@@ -50,6 +50,7 @@ public class BlockDataTest {
         legacyDataRanges.put(getLegacyMaterial("STEP"), createRange(0, 15));
         legacyDataRanges.put(getLegacyMaterial("DOUBLE_STEP"), createRange(0, 7));
         legacyDataRanges.put(getLegacyMaterial("WALL_BANNER"), createRange(2, 5));
+        legacyDataRanges.put(getLegacyMaterial("PORTAL"), createRange(1, 2));
         // ==================================================================================
 
         for (Material material : getAllLegacyMaterials()) {

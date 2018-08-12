@@ -33,7 +33,7 @@ public abstract class BlockCanBuildEventHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class BlockCanBuildEventClass extends Template.Class<BlockCanBuildEventHandle> {
-        public final Template.StaticMethod.Converted<BlockCanBuildEvent> create = new Template.StaticMethod.Converted<BlockCanBuildEvent>();
+        public final Template.StaticMethod<BlockCanBuildEvent> create = new Template.StaticMethod<BlockCanBuildEvent>();
 
     }
 

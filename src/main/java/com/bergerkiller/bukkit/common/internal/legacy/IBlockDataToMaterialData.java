@@ -142,6 +142,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         }
         storeMaterialDataGen("LEGACY_REDSTONE_COMPARATOR_OFF", 0, 7);
         storeMaterialDataGen("LEGACY_REDSTONE_COMPARATOR_ON", 0, 7);
+        storeMaterialDataGen("LEGACY_PORTAL", 1, 2);
 
         // Store 5 unique kinds of wood types for some materials that don't exist on MC 1.12.2, and thus have no legacy type
         // A littly hacky, because MaterialData should only use legacy materials, but in this instance it can work

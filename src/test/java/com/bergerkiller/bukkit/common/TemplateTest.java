@@ -48,6 +48,61 @@ public class TemplateTest {
             genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
             genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
 
+            // MC 1.8 class translation fixes
+            {
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumAxisHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.TileEntityMobSpawnerDataHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WatchableObjectHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.StepSoundHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.BiomeMetaHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WeightedRandomChoiceHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ChatSerializerHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle.ChatSerializerHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumScoreboardActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityLookHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRelEntityMoveLookHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRelEntityMoveHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumTitleActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ChunkMapHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle.ChunkMapHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumPlayerDigTypeHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumEntityUseActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PlayerInfoDataHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumPlayerInfoActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle";
+                }
+            }
+
             // <= MC 1.9 class translation fixes
             {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WorldSettingsHandle.EnumGamemodeHandle")) {
@@ -71,6 +126,16 @@ public class TemplateTest {
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.BlockHandle.StepSoundHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
+                }
+            }
+
+            // MC <= 1.12.2 uses HeightMap proxy
+            {
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.HeightMapProxy_1_12_2Handle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.HeightMapHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.HeightMapProxy_1_12_2Handle.TypeHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.TypeHandle";
                 }
             }
 

@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
-import com.bergerkiller.reflection.net.minecraft.server.NMSEntityTypes;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 import org.bukkit.Location;
@@ -156,7 +155,7 @@ public class CommonEntityType {
             }
             if (entityTypeName != null) {
                 // Lookup by name
-                nmsType = NMSEntityTypes.getEntityClass(entityTypeName);
+                nmsType = EntityTypesHandle.getEntityClass(entityTypeName);
                 if (nmsType == null) {
                     Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
                 }

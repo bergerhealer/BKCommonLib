@@ -36,19 +36,19 @@ public class ParseUtil {
         for (Material material : Material.values()) {
             MAT_NAME_MAP.putUpper(material.toString(), material);
         }
-        MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"));
+        MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"));
         MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
-        MAT_NAME_MAP.put("PISTON", getFirst("PISTON_BASE", "PISTON"));
-        MAT_NAME_MAP.put("STICKPISTON", getFirst("PISTON_STICKY_BASE", "STICKY_PISTON"));
+        MAT_NAME_MAP.put("PISTON", getFirst("PISTON", "LEGACY_PISTON_BASE"));
+        MAT_NAME_MAP.put("STICKPISTON", getFirst("STICKY_PISTON", "LEGACY_PISTON_STICKY_BASE"));
         MAT_NAME_MAP.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
         MAT_NAME_MAP.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
         MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
         MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
         MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
-        MAT_NAME_MAP.put("COBBLEFENCE", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
-        MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
-        MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
-        MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "COBBLE_WALL"));
+        MAT_NAME_MAP.put("COBBLEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
 
         // Material by name aliases
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");

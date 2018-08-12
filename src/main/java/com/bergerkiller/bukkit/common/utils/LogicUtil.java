@@ -409,6 +409,42 @@ public class LogicUtil {
     }
 
     /**
+     * Removes a single item from an array, returning a new array of size length-1
+     * with the element removed. If the element could not be found in the input array,
+     * the input array is returned unchanged and no copy is created.
+     * 
+     * @param input array
+     * @param value in the array to remove
+     * @return new array copy with the value removed, same as input if unchanged
+     */
+    public static <T> T[] removeArrayElement(T[] input, T value) {
+        for (int index = 0; index < input.length; index++) {
+            if (bothNullOrEqual(input[index], value)) {
+                return removeArrayElement(input, index);
+            }
+        }
+        return input;
+    }
+
+    /**
+     * Removes a single item from an array, returning a new array of size length-1.
+     * 
+     * @param input array
+     * @param index of the element to remove
+     * @return new array copy of input array, with the element at the index removed
+     */
+    public static <T> T[] removeArrayElement(T[] input, int index) {
+        if (index < 0 || index >= input.length) {
+            return input;
+        }
+        T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
+        System.arraycopy(input, 0, rval, 0, index);
+        System.arraycopy(input, 0, rval, 0, index);
+        System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
+        return rval;
+    }
+
+    /**
      * Removes or adds an element from/to a Collection, and returns whether
      * something has changed.
      *

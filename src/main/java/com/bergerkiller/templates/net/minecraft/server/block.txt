@@ -93,7 +93,7 @@ class Block {
     #endif
 #else
     public float getDamageResillience() {
-        return instance.a(null);
+        return instance.a((net.minecraft.server.Entity) null);
     }
 #endif
 
@@ -155,7 +155,7 @@ class Block {
 #else
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
         instance.updateShape(iblockaccess, blockposition);
-        AxisAlignedBB bounds_abs = instance.a((World) iBlockAccess, blockposition, iblockdata);
+        AxisAlignedBB bounds_abs = instance.a((World) iblockaccess, blockposition, iblockdata);
         if (bounds_abs == null) {
             return null;
         } else {

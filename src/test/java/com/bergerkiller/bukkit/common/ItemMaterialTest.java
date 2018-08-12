@@ -51,13 +51,13 @@ public class ItemMaterialTest {
             .check("OAK_PLANKS", true)
             .checkLegacy("WOOD", true)
             .check(Material.IRON_SWORD, false)
-            .check(getFirst("ROSE_RED", "RED_ROSE"), false)
-            .check(getFirst("STONE_PRESSURE_PLATE", "STONE_PLATE"), false)
-            .check(getFirst("OAK_LEAVES", "LEAVES"), false)
+            .check(getFirst("ROSE_RED", "LEGACY_RED_ROSE"), false)
+            .check(getFirst("STONE_PRESSURE_PLATE", "LEGACY_STONE_PLATE"), false)
+            .check(getFirst("OAK_LEAVES", "LEGACY_LEAVES"), false)
             .check(Material.SPRUCE_DOOR, false)
             .check(Material.CHEST, false)
             .check(Material.FURNACE, true)
-            .check(getFirst("PISTON_BASE", "PISTON"), false)
+            .check(getFirst("PISTON", "LEGACY_PISTON_BASE"), false)
             .done();
 
         // Note: SUFFOCATES is the same as ISSOLID right now

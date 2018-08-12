@@ -333,20 +333,15 @@ public class StringUtil {
     }
 
     /**
-     * Removes a single elements from an array
+     * Removes a single element from a String array.<br>
+     * See also: {@link LogicUtil#removeArrayElement(Object[], int)}
      *
      * @param input array
      * @param index in the array to remove
      * @return modified array
      */
     public static String[] remove(String[] input, int index) {
-        if (index < 0 || index >= input.length) {
-            return input;
-        }
-        String[] rval = new String[input.length - 1];
-        System.arraycopy(input, 0, rval, 0, index);
-        System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
-        return rval;
+        return LogicUtil.removeArrayElement(input, index);
     }
 
     /**

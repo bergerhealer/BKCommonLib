@@ -38,7 +38,12 @@ public class MaterialDataToIBlockData {
             } else {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, 
                         "public static net.minecraft.server.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
-                        "    return CraftMagicNumbers.getBlock(materialdata.getItemType()).fromLegacyData((int) materialdata.getData());\n" +
+                        "    net.minecraft.server.Block block = CraftMagicNumbers.getBlock(materialdata.getItemType());\n" +
+                        "    try {\n" +
+                        "        return block.fromLegacyData((int) materialdata.getData());\n" +
+                        "    } catch (IllegalArgumentException ex) {\n" +
+                        "        return block.getBlockData();\n" +
+                        "    }\n" +
                         "}"
                 ));
             }
@@ -52,24 +57,29 @@ public class MaterialDataToIBlockData {
 
     // Only called on MC 1.13, before that everything was fine!
     private static void initBuilders() {
-        iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
-                iblockdata = iblockdata.set("powered", false);
-                iblockdata = iblockdata.set("facing", comparator.getFacing());
-                iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
-                return iblockdata;
-            }
-        });
-        iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
-                iblockdata = iblockdata.set("powered", true);
-                iblockdata = iblockdata.set("facing", comparator.getFacing());
-                iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
-                return iblockdata;
-            }
-        });
+        if (getLegacyMaterial("REDSTONE_COMPARATOR_OFF") != null) {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
+                @Override
+                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
+                    iblockdata = iblockdata.set("powered", false);
+                    iblockdata = iblockdata.set("facing", comparator.getFacing());
+                    iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
+                    return iblockdata;
+                }
+            });
+        }
+        if (getLegacyMaterial("REDSTONE_COMPARATOR_ON") != null) {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
+                @Override
+                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
+                    iblockdata = iblockdata.set("powered", true);
+                    iblockdata = iblockdata.set("facing", comparator.getFacing());
+                    iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
+                    return iblockdata;
+                }
+            });
+        }
+
         iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), new IBlockDataBuilder<org.bukkit.material.Step>() {
             @Override
             public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Step step) {

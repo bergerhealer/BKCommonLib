@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -32,6 +33,19 @@ public class CommonLegacyMaterials {
                 t.printStackTrace();
                 values = Material.values();
             }
+
+            // On MC 1.8 there is a LOCKED_CHEST Material that does not actually exist
+            // It throws tests off the rails because of the Type Id clash it causes
+            // By removing this rogue element from the array we can avoid these problems.
+            if (values != null && Common.evaluateMCVersion("==", "1.8")) {
+                for (int index = 0; index < values.length; index++) {
+                    if (getMaterialName(values[index]).equals("LEGACY_LOCKED_CHEST")) {
+                        values = LogicUtil.removeArrayElement(values, index);
+                        break;
+                    }
+                }
+            }
+
             allMaterialValues = values;
         }
 

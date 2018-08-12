@@ -29,7 +29,7 @@ public class RecipeTest {
         assertTrue(RecipeUtil.isFuelItem(getFirst("OAK_PLANKS", "LEGACY_WOOD")));
         assertTrue(RecipeUtil.isFuelItem(getFirst("OAK_LOG", "LEGACY_LOG")));
         assertFalse(RecipeUtil.isFuelItem(Material.GLASS));
-        assertTrue(RecipeUtil.isHeatableItem(getFirst("PORKCHOP", "PORK")));
+        assertTrue(RecipeUtil.isHeatableItem(getFirst("PORKCHOP", "LEGACY_PORK")));
         assertFalse(RecipeUtil.isHeatableItem(Material.LEATHER));
         assertTrue(RecipeUtil.isHeatableItem(getFirst("OAK_LOG", "LEGACY_LOG")));
         assertEquals(Material.GLASS, RecipeUtil.getFurnaceResult(Material.SAND).getType());
@@ -38,8 +38,8 @@ public class RecipeTest {
     @Test
     public void testCraftRecipes() {
         assertRequirements(Material.IRON_DOOR, new ItemStack(Material.IRON_INGOT, 6));
-        assertRequirements(getFirst("REPEATER", "DIODE"),
-                new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 2),
+        assertRequirements(getFirst("REPEATER", "LEGACY_DIODE"),
+                new ItemStack(getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"), 2),
                 new ItemStack(Material.REDSTONE, 1),
                 new ItemStack(Material.STONE, 3));
         assertRequirements(getFirst("OAK_PLANKS", "LEGACY_WOOD"), new ItemStack(getFirst("OAK_LOG", "LEGACY_LOG"), 1));
@@ -50,14 +50,14 @@ public class RecipeTest {
     @Test
     public void testCrafting() {
         Inventory testInventory = new InventoryBaseImpl(64);
-        CraftRecipe recipe = RecipeUtil.getCraftingRequirements(getFirst("REPEATER", "DIODE"), 0)[0];
+        CraftRecipe recipe = RecipeUtil.getCraftingRequirements(getFirst("REPEATER", "LEGACY_DIODE"), 0)[0];
 
         // Add enough resources to craft 2 diodes, and a little more but not enough for a third
         // Also add some garbage items
         testInventory.addItem(new ItemStack(Material.REDSTONE, 64));
         testInventory.addItem(new ItemStack(Material.COBBLESTONE, 64));
         testInventory.addItem(new ItemStack(Material.STONE, 8));
-        testInventory.addItem(new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 5));
+        testInventory.addItem(new ItemStack(getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"), 5));
         testInventory.addItem(new ItemStack(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 12));
         assertTrue(recipe.craft(testInventory));
         assertTrue(recipe.craft(testInventory));
@@ -67,9 +67,9 @@ public class RecipeTest {
         assertEquals(testInventory.getItem(0), new ItemStack(Material.REDSTONE, 62));
         assertEquals(testInventory.getItem(1), new ItemStack(Material.COBBLESTONE, 64));
         assertEquals(testInventory.getItem(2), new ItemStack(Material.STONE, 2));
-        assertEquals(testInventory.getItem(3), new ItemStack(getFirst("REDSTONE_TORCH", "REDSTONE_TORCH_ON"), 1));
+        assertEquals(testInventory.getItem(3), new ItemStack(getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"), 1));
         assertEquals(testInventory.getItem(4), new ItemStack(getFirst("OAK_PLANKS", "LEGACY_WOOD"), 12));
-        assertEquals(testInventory.getItem(5), new ItemStack(getFirst("REPEATER", "DIODE"), 2));
+        assertEquals(testInventory.getItem(5), new ItemStack(getFirst("REPEATER", "LEGACY_DIODE"), 2));
     }
 
     public void assertRequirements(Material outputType, ItemStack... inputs) {

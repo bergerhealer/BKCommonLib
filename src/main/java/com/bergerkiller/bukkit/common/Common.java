@@ -216,7 +216,11 @@ public class Common {
 
             // Some classes were moved before around 1.8
             if (Common.evaluateMCVersion("<=", "1.8")) {
-                remappings.put(nms_root + ".PacketPlayInUseEntity.EnumEntityUseAction", nms_root + ".EnumEntityUseAction");
+                remappings.put(nms_root + ".SoundEffectType", nms_root + ".StepSound");
+                remappings.put(nms_root + ".Block$StepSound", nms_root + ".StepSound");
+                remappings.put(nms_root + ".EnumDirection$EnumAxis", nms_root + ".EnumAxis");
+                remappings.put(nms_root + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction", nms_root + ".EnumPlayerInfoAction");
+                remappings.put(nms_root + ".PacketPlayInUseEntity$EnumEntityUseAction", nms_root + ".EnumEntityUseAction");
                 remappings.put(nms_root + ".MobSpawnerData", nms_root + ".TileEntityMobSpawnerData");
                 remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".WatchableObject");
                 remappings.put(nms_root + ".DataWatcher$WatchableObject", nms_root + ".WatchableObject");
@@ -226,7 +230,9 @@ public class Common {
                 remappings.put(nms_root + ".PacketPlayOutTitle$EnumTitleAction", nms_root + ".EnumTitleAction");
                 remappings.put(nms_root + ".PacketPlayOutCombatEvent$EnumCombatEventType", nms_root + ".EnumCombatEventType");
                 remappings.put(nms_root + ".PacketPlayOutWorldBorder$EnumWorldBorderAction", nms_root + ".EnumWorldBorderAction");
+                remappings.put(nms_root + ".PacketPlayOutPlayerInfo$PlayerInfoData", nms_root + ".PlayerInfoData");
                 remappings.put(nms_root + ".PacketPlayInResourcePackStatus$EnumResourcePackStatus", nms_root + ".EnumResourcePackStatus");
+                remappings.put(nms_root + ".PacketPlayInBlockDig$EnumPlayerDigType", nms_root + ".EnumPlayerDigType");
                 remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
                 remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
                 remappings.put(nms_root + ".WeightedRandom$WeightedRandomChoice", nms_root + ".WeightedRandomChoice");
@@ -236,6 +242,7 @@ public class Common {
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMove", nms_root + ".PacketPlayOutRelEntityMove");
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
+                remappings.put(nms_root + ".IChatBaseComponent$ChatSerializer", nms_root + ".ChatSerializer");
             }
 
             // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
