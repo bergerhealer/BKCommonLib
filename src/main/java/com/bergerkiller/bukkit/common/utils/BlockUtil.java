@@ -18,7 +18,6 @@ import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Rails;
 
-import com.bergerkiller.bukkit.common.MaterialEx;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -449,11 +448,12 @@ public class BlockUtil extends MaterialUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setRails(org.bukkit.block.Block rails, BlockFace direction) {
-        Material type = rails.getType();
-        if (type == MaterialEx.RAIL) {
-            int olddata = getRawData(rails);
-            Rails r = (Rails) MaterialUtil.getData(type, olddata);
+        BlockData data = WorldUtil.getBlockData(rails);
+        if (MaterialUtil.ISRAILS.get(data)) {
+            int olddata = data.getRawData();
+            Rails r = data.newMaterialData(Rails.class);
             r.setDirection(FaceUtil.toRailsDirection(direction), r.isOnSlope());
+
             // If changed, update the data
             if (MaterialUtil.getRawData(r) != olddata) {
                 setData(rails, r);
