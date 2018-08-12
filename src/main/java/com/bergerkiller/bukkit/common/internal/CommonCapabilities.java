@@ -72,4 +72,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.13 the Map Id is stored in the NBT tag, instead of as a durability value
      */
     public static final boolean MAP_ID_IN_NBT = Common.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.13 particle effects have options data attached, such as DustOptions for Redstone
+     */
+    public static final boolean PARTICLE_OPTIONS = Common.evaluateMCVersion(">=", "1.13");
 }
