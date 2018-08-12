@@ -104,8 +104,8 @@ class AxisAlignedBB {
         }
     }
 #else
-    public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
-    public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
-    public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB, double paramDouble);
+    public double calcSomeX:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
+    public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
+    public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
 #endif
 }

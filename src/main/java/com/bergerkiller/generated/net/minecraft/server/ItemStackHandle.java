@@ -35,7 +35,7 @@ public abstract class ItemStackHandle extends Template.Handle {
 
     public abstract Object getItem();
     public abstract ChatText getName();
-    public abstract ItemStackHandle setName(ChatText s);
+    public abstract void setName(ChatText name);
     public abstract int getRepairCost();
     public abstract void setRepairCost(int cost);
     public abstract boolean hasName();
@@ -101,7 +101,7 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> getItem = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<ChatText> getName = new Template.Method.Converted<ChatText>();
-        public final Template.Method.Converted<ItemStackHandle> setName = new Template.Method.Converted<ItemStackHandle>();
+        public final Template.Method.Converted<Void> setName = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Void> setDamage_1_13 = new Template.Method<Void>();
         public final Template.Method<Integer> getRepairCost = new Template.Method<Integer>();

@@ -66,9 +66,9 @@ class ItemStack {
     public (ChatText) String getName();
 
     #if version >= 1.11
-        public (ItemStackHandle) ItemStack setName:g((ChatText) String s);
+        public (void) ItemStack setName:g((ChatText) String s);
     #else
-        public (ItemStackHandle) ItemStack setName:c((ChatText) String s);
+        public (void) ItemStack setName:c((ChatText) String s);
     #endif
 #endif
 

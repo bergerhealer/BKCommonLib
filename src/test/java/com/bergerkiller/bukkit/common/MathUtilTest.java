@@ -415,7 +415,7 @@ public class MathUtilTest {
 
     // checks that two vectors are equal
     private static void testVectorsEqual(Vector expected, Vector actual) {
-        testVectorsEqual(expected, actual, 1e-10);
+        testVectorsEqual(expected, actual, 1e-8);
     }
 
     // checks that two vectors are equal

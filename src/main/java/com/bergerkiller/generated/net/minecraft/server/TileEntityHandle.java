@@ -57,9 +57,9 @@ public abstract class TileEntityHandle extends Template.Handle {
         public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method.Converted<BlockPositionHandle> getPosition = new Template.Method.Converted<BlockPositionHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method.Converted<Material> getType = new Template.Method.Converted<Material>();
         @Template.Optional
         public final Template.Method<Integer> getLegacyData = new Template.Method<Integer>();
-        public final Template.Method.Converted<Material> getType = new Template.Method.Converted<Material>();
         public final Template.Method.Converted<CommonPacket> getUpdatePacket = new Template.Method.Converted<CommonPacket>();
         public final Template.Method.Converted<Void> load = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> save = new Template.Method.Converted<Void>();
