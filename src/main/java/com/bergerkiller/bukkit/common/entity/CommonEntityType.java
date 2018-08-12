@@ -26,6 +26,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -33,10 +35,11 @@ import java.util.logging.Level;
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CommonEntityType {
-    public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
+    private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
     private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
+    public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
 
     public final ClassTemplate<?> nmsType;
     public final ClassTemplate<?> commonType;
@@ -44,10 +47,22 @@ public class CommonEntityType {
     private final SafeConstructor<?> commonConstructor;
     public final EntityType entityType;
     public final int entityTypeId;
+    public final int objectTypeId;
+    public final int objectExtraData;
 
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
         // Properties first
         this.entityType = entityType;
+
+        // Retrieve objectTypeId from internal mapping
+        ObjectTypeInfo objectInfo = objectTypes.get((entityType == null) ? "" : entityType.name());
+        if (objectInfo != null) {
+            this.objectTypeId = objectInfo.typeId;
+            this.objectExtraData = objectInfo.extraData;
+        } else {
+            this.objectTypeId = -1;
+            this.objectExtraData = -1;
+        }
 
         // A type that is not supported for construction
         if (nullInitialize) {
@@ -263,6 +278,18 @@ public class CommonEntityType {
         return LogicUtil.fixNull(byNMS.get(entityHandle), UNKNOWN);
     }
 
+    private static void registerObjectType(String entityTypeName, int objectId, int extraData) {
+        ObjectTypeInfo info = new ObjectTypeInfo();
+        info.typeId = objectId;
+        info.extraData = extraData;
+        objectTypes.put(entityTypeName, info);
+    }
+
+    private static class ObjectTypeInfo {
+        public int typeId;
+        public int extraData;
+    }
+
     @SuppressWarnings("rawtypes")
     private static class CommonPair {
         public final Class<? extends Entity> bukkitType;
@@ -275,6 +302,43 @@ public class CommonEntityType {
     }
 
     static {
+        // There does not appear to be a registry for this yet. This is a workaround until one exists.
+        registerObjectType("BOAT", 1, -1);
+        registerObjectType("DROPPED_ITEM", 2, 1);
+        registerObjectType("AREA_EFFECT_CLOUD", 3, -1);
+        registerObjectType("MINECART", 10, 0);
+        registerObjectType("MINECART_CHEST", 10, 1);
+        registerObjectType("MINECART_FURNACE", 10, 2);
+        registerObjectType("MINECART_TNT", 10, 3);
+        registerObjectType("MINECART_MOB_SPAWNER", 10, 4);
+        registerObjectType("MINECART_HOPPER", 10, 5);
+        registerObjectType("MINECART_COMMAND", 10, 6);
+        registerObjectType("PRIMED_TNT", 50, -1);
+        registerObjectType("ENDER_CRYSTAL", 51, -1);
+        registerObjectType("ARROW", 60, -1);
+        registerObjectType("TIPPED_ARROW", 60, -1);
+        registerObjectType("SNOWBALL", 61, -1);
+        registerObjectType("EGG", 62, -1);
+        registerObjectType("FIREBALL", 63, -1);
+        registerObjectType("SMALL_FIREBALL", 64, -1);
+        registerObjectType("ENDER_PEARL", 65, -1);
+        registerObjectType("WITHER_SKULL", 66, -1);
+        registerObjectType("SHULKER_BULLET", 67, 0);
+        registerObjectType("LLAMA_SPIT", 68, 0);
+        registerObjectType("FALLING_BLOCK", 70, -1);
+        registerObjectType("ITEM_FRAME", 71, -1);
+        registerObjectType("ENDER_SIGNAL", 72, -1);
+        registerObjectType("LINGERING_POTION", 73, 0);
+        registerObjectType("SPLASH_POTION", 73, 0);
+        registerObjectType("THROWN_EXP_BOTTLE", 75, 0);
+        registerObjectType("FIREWORK", 76, -1);
+        registerObjectType("LEASH_HITCH", 77, -1);
+        registerObjectType("ARMOR_STAND", 78, -1);
+        registerObjectType("EVOKER_FANGS", 79, -1);
+        registerObjectType("FISHING_HOOK", 90, -1);
+        registerObjectType("SPECTRAL_ARROW", 91, -1);
+        registerObjectType("DRAGON_FIREBALL", 92, -1);
+
         // Remappings between some Bukkit entity types and Common entity types
         // Order is important, the first pair that can be used is selected
         // Since humans are living entities, they must be put before living entities

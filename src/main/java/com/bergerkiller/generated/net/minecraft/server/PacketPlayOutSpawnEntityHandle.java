@@ -29,6 +29,21 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         }
     }
 
+    public void setEntityType(org.bukkit.entity.EntityType type) {
+        com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType;
+        commonEntityType = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type);
+        if (commonEntityType.objectTypeId != -1) {
+            setEntityTypeId(commonEntityType.objectTypeId);
+        }
+        if (commonEntityType.objectExtraData != -1) {
+            setExtraData(commonEntityType.objectExtraData);
+        }
+    }
+
+    public void setFallingBlockData(com.bergerkiller.bukkit.common.wrappers.BlockData blockData) {
+        setExtraData(blockData.getCombinedId());
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
