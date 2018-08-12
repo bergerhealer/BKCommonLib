@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -158,12 +157,12 @@ public class BlockStateProxy extends ProxyBase<BlockState> implements BlockState
     }
 
     @Override
-    public BlockData getBlockData() {
+    public org.bukkit.block.data.BlockData getBlockData() {
         return base.getBlockData();
     }
 
     @Override
-    public void setBlockData(BlockData arg0) {
+    public void setBlockData(org.bukkit.block.data.BlockData arg0) {
         base.setBlockData(arg0);
     }
 }
