@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
+import com.bergerkiller.bukkit.common.io.ClassRewriter;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
@@ -31,6 +32,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -343,6 +345,20 @@ public class CommonPlugin extends PluginBase {
         if (!Common.IS_COMPATIBLE) {
             return;
         }
+
+        // Modify the BlockStateProxy class on MC <= 1.12.2, because BlockData does not exist there.
+        if (Common.evaluateMCVersion("<=", "1.12.2")) {
+            this.rewriteClass("com.bergerkiller.bukkit.common.proxies.BlockStateProxy", new ClassRewriter() {
+                @Override
+                public byte[] rewrite(JavaPlugin plugin, String name, byte[] classBytes) {
+                    return ASMUtil.removeClassMethods(classBytes, new HashSet<String>(Arrays.asList(
+                            "getBlockData()Lorg/bukkit/block/data/BlockData;",
+                            "setBlockData(Lorg/bukkit/block/data/BlockData;)V"
+                    )));
+                }
+            });
+        }
+
         // Load the classes contained in this library
         CommonClasses.init();
     }

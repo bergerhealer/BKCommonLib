@@ -3,7 +3,9 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.internal.CommonClassManipulation;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.io.ClassRewriter;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.metrics.Metrics;
@@ -928,6 +930,19 @@ public abstract class PluginBase extends JavaPlugin {
      * @return True if handled, False if not
      */
     public abstract boolean command(CommandSender sender, String command, String[] args);
+
+    /**
+     * Rewrites a single Class from this plugin using a Class Rewriter. This will modify the Class
+     * at runtime.
+     * 
+     * @param name of the Class to rewrite.
+     * @param rewriter to use
+     */
+    public void rewriteClass(String name, ClassRewriter rewriter) {
+        byte[] classBytes = CommonClassManipulation.readClassData(this.getClassLoader(), name);
+        classBytes = rewriter.rewrite(this, name, classBytes);
+        CommonClassManipulation.writeClassData(this.getClassLoader(), name, classBytes);
+    }
 
     public final void loadLocalization() {
         this.localizationconfig.load();
