@@ -12,7 +12,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.material.Attachable;
 import org.bukkit.material.Directional;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
@@ -295,8 +294,7 @@ public class BlockUtil extends MaterialUtil {
      * @return Attached face
      */
     public static BlockFace getAttachedFace(org.bukkit.block.Block attachable) {
-        Attachable data = getData(attachable, Attachable.class);
-        return data == null ? BlockFace.DOWN : data.getAttachedFace();
+        return WorldUtil.getBlockData(attachable).getAttachedFace();
     }
 
     /**

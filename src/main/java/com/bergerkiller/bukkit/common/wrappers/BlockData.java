@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.material.Attachable;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
@@ -272,6 +273,22 @@ public abstract class BlockData extends BlockDataRegistry {
             return ((Directional) data).getFacing();
         } else {
             return BlockFace.NORTH;
+        }
+    }
+
+    /**
+     * Gets the attached face for this BlockData.
+     * If this Block is attachable, the result of {@link Attachable#getFacing()} is returned.
+     * If it is not, by default {@link BlockFace#DOWN} is returned.
+     * 
+     * @return attached face
+     */
+    public BlockFace getAttachedFace() {
+        MaterialData data = this.getMaterialData();
+        if (data instanceof Attachable) {
+            return ((Attachable) data).getAttachedFace();
+        } else {
+            return BlockFace.DOWN;
         }
     }
 
