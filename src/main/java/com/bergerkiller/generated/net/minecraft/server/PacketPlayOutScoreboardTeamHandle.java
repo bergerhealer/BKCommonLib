@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import java.util.Collection;
 
 /**
@@ -38,12 +39,12 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     }
     public abstract String getName();
     public abstract void setName(String value);
-    public abstract String getDisplayName();
-    public abstract void setDisplayName(String value);
-    public abstract String getPrefix();
-    public abstract void setPrefix(String value);
-    public abstract String getSuffix();
-    public abstract void setSuffix(String value);
+    public abstract ChatText getDisplayName();
+    public abstract void setDisplayName(ChatText value);
+    public abstract ChatText getPrefix();
+    public abstract void setPrefix(ChatText value);
+    public abstract ChatText getSuffix();
+    public abstract void setSuffix(ChatText value);
     public abstract String getVisibility();
     public abstract void setVisibility(String value);
     public abstract int getChatFormat();
@@ -60,9 +61,9 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
      */
     public static final class PacketPlayOutScoreboardTeamClass extends Template.Class<PacketPlayOutScoreboardTeamHandle> {
         public final Template.Field<String> name = new Template.Field<String>();
-        public final Template.Field<String> displayName = new Template.Field<String>();
-        public final Template.Field<String> prefix = new Template.Field<String>();
-        public final Template.Field<String> suffix = new Template.Field<String>();
+        public final Template.Field.Converted<ChatText> displayName = new Template.Field.Converted<ChatText>();
+        public final Template.Field.Converted<ChatText> prefix = new Template.Field.Converted<ChatText>();
+        public final Template.Field.Converted<ChatText> suffix = new Template.Field.Converted<ChatText>();
         public final Template.Field<String> visibility = new Template.Field<String>();
         @Template.Optional
         public final Template.Field<String> collisionRule = new Template.Field<String>();

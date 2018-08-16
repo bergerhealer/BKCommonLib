@@ -1309,9 +1309,9 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutScoreboardTeam extends NMSPacket {
 
         public final FieldAccessor<String> name = PacketPlayOutScoreboardTeamHandle.T.name.toFieldAccessor();
-        public final FieldAccessor<String> displayName = PacketPlayOutScoreboardTeamHandle.T.displayName.toFieldAccessor();
-        public final FieldAccessor<String> prefix = PacketPlayOutScoreboardTeamHandle.T.prefix.toFieldAccessor();
-        public final FieldAccessor<String> suffix = PacketPlayOutScoreboardTeamHandle.T.suffix.toFieldAccessor();
+        public final FieldAccessor<ChatText> displayName = PacketPlayOutScoreboardTeamHandle.T.displayName.toFieldAccessor();
+        public final FieldAccessor<ChatText> prefix = PacketPlayOutScoreboardTeamHandle.T.prefix.toFieldAccessor();
+        public final FieldAccessor<ChatText> suffix = PacketPlayOutScoreboardTeamHandle.T.suffix.toFieldAccessor();
         public final FieldAccessor<String> visibility = PacketPlayOutScoreboardTeamHandle.T.visibility.toFieldAccessor();
         public final FieldAccessor<String> collisionRule = PacketPlayOutScoreboardTeamHandle.T.collisionRule.toFieldAccessor().ignoreInvalid("");
         public final FieldAccessor<Integer> chatFormat = PacketPlayOutScoreboardTeamHandle.T.chatFormat.toFieldAccessor();

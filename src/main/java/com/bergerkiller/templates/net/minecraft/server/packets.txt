@@ -708,9 +708,15 @@ optional class PacketPlayOutSetCooldown extends Packet {
 
 class PacketPlayOutScoreboardTeam extends Packet {
     private String name:a;
-    private String displayName:b;
-    private String prefix:c;
-    private String suffix:d;
+#if version >= 1.13
+    private (ChatText) IChatBaseComponent displayName:b;
+    private (ChatText) IChatBaseComponent prefix:c;
+    private (ChatText) IChatBaseComponent suffix:d;
+#else
+    private (ChatText) String displayName:b;
+    private (ChatText) String prefix:c;
+    private (ChatText) String suffix:d;
+#endif
     private String visibility:e;
 #if version >= 1.9
     private optional String collisionRule:f;
