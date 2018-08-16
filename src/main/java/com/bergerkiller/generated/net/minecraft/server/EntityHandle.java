@@ -55,6 +55,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean isInWater();
     public abstract boolean hasMovementSound();
     public abstract void updateFalling(double d0, boolean flag, BlockData blockData, IntVector3 position);
+    public abstract boolean isOutsideWorldBorder();
+    public abstract void setOutsideWorldBorder(boolean outside);
     public abstract void checkBlockCollisions();
     public abstract double calculateDistance(double x, double y, double z);
     public abstract boolean damageEntity(DamageSourceHandle damagesource, float damage);
@@ -413,6 +415,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasMovementSound = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isOutsideWorldBorder = new Template.Method<Boolean>();
+        public final Template.Method<Void> setOutsideWorldBorder = new Template.Method<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistance = new Template.Method<Double>();
         public final Template.Method.Converted<Boolean> damageEntity = new Template.Method.Converted<Boolean>();

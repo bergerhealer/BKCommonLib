@@ -37,7 +37,7 @@ public class MaterialUtil {
         try {
             String mat_cat_path = "/com/bergerkiller/bukkit/common/internal/resources/material_categories.txt";
             try (InputStream input = MaterialUtil.class.getResourceAsStream(mat_cat_path)) {
-                try (Scanner scanner = new Scanner(MaterialUtil.class.getResourceAsStream(mat_cat_path), "UTF-8")) {
+                try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");
                     material_categories_str = "#set version " + Common.TEMPLATE_RESOLVER.getVersion() + "\n" +
                                               scanner.next();

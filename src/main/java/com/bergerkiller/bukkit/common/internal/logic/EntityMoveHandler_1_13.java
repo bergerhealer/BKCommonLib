@@ -1,15 +1,55 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Scanner;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Logic for MC 1.13 and onwards
  */
 public class EntityMoveHandler_1_13 extends EntityMoveHandler {
+    private static FastMethod<Object> getBlockCollisions_method = new FastMethod<Object>();
+    private static final boolean getBlockCollisions_method_init;
+
+    static {
+        boolean success = true;
+        ClassResolver resolver = new ClassResolver();
+        resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
+        try {
+            String method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_13_getBlockCollisions.txt";
+            try (InputStream input = EntityMoveHandler_1_13.class.getResourceAsStream(method_path)) {
+                try (Scanner scanner = new Scanner(input, "UTF-8")) {
+                    scanner.useDelimiter("\\A");
+                    String method_body = scanner.next();
+                    method_body = SourceDeclaration.preprocess(method_body);
+                    method_body = method_body.replaceAll("this", "instance");
+                    method_body = method_body.replaceAll("BlockPosition\\.b", "BlockPosition\\$b");
+                    method_body = method_body.trim();
+                    getBlockCollisions_method.init(new MethodDeclaration(resolver, method_body));
+                    getBlockCollisions_method.forceInitialization();
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            success = false;
+        }
+        getBlockCollisions_method_init = success;
+    }
+
+    // For under test
+    public static boolean isBlockCollisionsMethodInitialized() {
+        return getBlockCollisions_method_init;
+    }
 
     @Override
     protected VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double mx, double my, double mz) {
@@ -25,7 +65,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
     }
 
     private VoxelShapeHandle world_getBlockCollisionShape(EntityHandle entity, double mx, double my, double mz) {
-        if (!this.blockCollisionEnabled) {
+        if (!this.blockCollisionEnabled || !isBlockCollisionsMethodInitialized()) {
             return VoxelShapeHandle.empty();
         }
 
@@ -40,17 +80,14 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             return VoxelShapeHandle.empty();
         }
 
-        /*
-        boolean flag2 = world.i(entity);
-
-        if (entity.bG() == flag2) {
-            entity.n(!flag2);
+        // Check and update that the entity is within the world border
+        WorldHandle world = entity.getWorld();
+        boolean inWorldBorder = world.isWithinWorldBorder(entity);
+        if (inWorldBorder == entity.isOutsideWorldBorder()) {
+            entity.setOutsideWorldBorder(!inWorldBorder);
         }
 
-        return world.getBlockCollisions:a(voxelshapeBounds, voxelshapeAABB, false, flag2);
-         */
-
-        return VoxelShapeHandle.empty();
+        return VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
     }
 
     private VoxelShapeHandle world_getEntityCollisionShape(EntityHandle entity, double mx, double my, double mz) {

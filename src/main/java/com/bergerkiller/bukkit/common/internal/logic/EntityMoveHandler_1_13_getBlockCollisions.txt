@@ -1,0 +1,109 @@
+// package: net.minecraft.server.World;
+
+// If the entity is not inside the World Border, call the normal Block Collision handler
+// This bypasses our custom collision handler
+// This is done so that all this World Border collision logic does not have to be in BKCommonLib
+// return instance.a(voxelshape, voxelshape1, flag, flag1);
+
+// Notes:
+// flag = always false
+// flag1 = inWorldBorder
+
+public VoxelShape getBlockCollisions(VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag, boolean flag1) {
+    int i = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.X)) - 1;
+    int j = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.X)) + 1;
+    int k = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.Y)) - 1;
+    int l = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.Y)) + 1;
+    int i1 = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.Z)) - 1;
+    int j1 = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.Z)) + 1;
+    WorldBorder worldborder = this.getWorldBorder();
+    VoxelShape voxelshape2 = VoxelShapes.a();
+    VoxelShapeBitSet voxelshapebitset = new VoxelShapeBitSet(j - i, l - k, j1 - i1);
+    BlockPosition.b blockposition_b = BlockPosition.b.r();
+    Throwable throwable = null;
+
+    try {
+        for (int k1 = i; k1 < j; ++k1) {
+            VoxelShape voxelshape3 = VoxelShapes.a();
+
+            for (int l1 = i1; l1 < j1; ++l1) {
+                boolean flag2 = k1 == i || k1 == j - 1;
+                boolean flag3 = l1 == i1 || l1 == j1 - 1;
+
+                if ((!flag2 || !flag3) && this.isLoaded(blockposition_b.f(k1, 64, l1))) {
+                    VoxelShape voxelshape4 = VoxelShapes.a();
+
+                    for (int i2 = k; i2 < l; ++i2) {
+                        if (!flag2 && !flag3 || i2 != l - 1) {
+                            blockposition_b.f(k1, i2, l1);
+                            VoxelShape voxelshape5;
+
+                            if (!worldborder.a((BlockPosition) blockposition_b) && flag1) {
+                                voxelshape5 = VoxelShapes.b();
+                            } else {
+                                voxelshape5 = this.getType(blockposition_b).h(this, blockposition_b);
+                            }
+
+                            if (!voxelshape5.b()) {
+                                VoxelShape voxelshape6;
+                                VoxelShape voxelshape7;
+
+                                if (voxelshape5 == VoxelShapes.b()) {
+                                    if (flag) {
+                                        voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                        if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                                            voxelshape7 = VoxelShapes.b();
+                                            return voxelshape7;
+                                        }
+                                    } else {
+                                        voxelshapebitset.a(k1 - i, i2 - k, l1 - i1, true, true);
+                                    }
+                                } else {
+                                    voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                    if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                                        if (flag) {
+                                            voxelshape7 = VoxelShapes.b();
+                                            return voxelshape7;
+                                        }
+
+                                        voxelshape4 = VoxelShapes.b(voxelshape4, voxelshape6, OperatorBoolean.OR);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    voxelshape3 = VoxelShapes.b(voxelshape3, voxelshape4, OperatorBoolean.OR);
+                }
+            }
+
+            voxelshape2 = VoxelShapes.b(voxelshape2, voxelshape3, OperatorBoolean.OR);
+        }
+    } catch (Throwable throwable1) {
+        throwable = throwable1;
+        throw throwable1;
+    } finally {
+        if (blockposition_b != null) {
+            if (throwable != null) {
+                try {
+                    blockposition_b.close();
+                } catch (Throwable throwable2) {
+                    throwable.addSuppressed(throwable2);
+                }
+            } else {
+                blockposition_b.close();
+            }
+        }
+
+    }
+
+    if (flag) {
+        return VoxelShapes.a();
+    } else {
+        voxelshape2 = voxelshape2.c();
+        VoxelShapeWorldRegion voxelshapeworldregion = new VoxelShapeWorldRegion(voxelshapebitset, i, k, i1);
+
+        voxelshape2 = VoxelShapes.b(voxelshape2, voxelshapeworldregion, OperatorBoolean.OR);
+        return voxelshape2;
+    }
+}

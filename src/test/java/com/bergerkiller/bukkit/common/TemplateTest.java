@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
@@ -232,6 +233,13 @@ public class TemplateTest {
         assertNotNull(output);
         assertEquals(nmstype, output.getClass());
         assertEquals("LIGHT_BLOCKING", output.name());
+    }
+
+    @Test
+    public void testEntityMoveHandlerInitialization() {
+        if (Common.evaluateMCVersion(">=", "1.13")) {
+            assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_13.isBlockCollisionsMethodInitialized());
+        }
     }
 
     private void assertAvailable(Template.TemplateElement<?>... elements) {

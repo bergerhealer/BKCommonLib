@@ -36,6 +36,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract long getTime();
+    public abstract boolean isWithinWorldBorder(EntityHandle entity);
     public abstract VoxelShapeHandle getCollisionShape(EntityHandle entity, AxisAlignedBBHandle boundingBox, double dx, double dy, double dz);
     public abstract List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
@@ -122,6 +123,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional
         public final Template.Method.Converted<Object> getChunkProvider = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<VoxelShapeHandle> getCollisionShape = new Template.Method.Converted<VoxelShapeHandle>();

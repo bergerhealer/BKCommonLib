@@ -94,6 +94,20 @@ class World extends IBlockAccess {
     public optional (Object) IChunkProvider getChunkProvider();
 
 #if version >= 1.13
+    public boolean isWithinWorldBorder:i((EntityHandle) Entity entity);
+#elseif version >= 1.11.2
+    public boolean isWithinWorldBorder:g((EntityHandle) Entity entity);
+#elseif version >= 1.8.3
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.a(instance.getWorldBorder(), entity);
+    }
+#else
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.a(instance.af(), entity);
+    }
+#endif
+
+#if version >= 1.13
     private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
 #elseif version >= 1.11.2
     private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);

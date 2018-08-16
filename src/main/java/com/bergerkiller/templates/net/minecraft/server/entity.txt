@@ -141,15 +141,15 @@ class Entity {
 #endif
 
 #if version >= 1.13
-    private unknown boolean az;
+    private unknown boolean outsideWorldBorderField:az;
 #elseif version >= 1.10.2
-    private unknown boolean aw;
+    private unknown boolean outsideWorldBorderField:aw;
 #elseif version >= 1.9.4
-    private unknown boolean av;
+    private unknown boolean outsideWorldBorderField:av;
 #elseif version >= 1.9
-    private unknown boolean au;
+    private unknown boolean outsideWorldBorderField:au;
 #else
-    private unknown boolean g;
+    private unknown boolean outsideWorldBorderField:g;
 #endif
 
     public boolean dead;
@@ -580,6 +580,27 @@ class Entity {
     protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
 #else
     protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
+#endif
+
+    // See outsideWorldBorderField - is set and returned by these methods
+#if version >= 1.13
+    public boolean isOutsideWorldBorder:bG();
+    public void setOutsideWorldBorder:n(boolean outside);
+#elseif version >= 1.12
+    public boolean isOutsideWorldBorder:bz();
+    public void setOutsideWorldBorder:k(boolean outside);
+#elseif version >= 1.10.2
+    public boolean isOutsideWorldBorder:br();
+    public void setOutsideWorldBorder:k(boolean outside);
+#elseif version >= 1.9
+    public boolean isOutsideWorldBorder:bo();
+    public void setOutsideWorldBorder:j(boolean outside);
+#elseif version >= 1.8.3
+    public boolean isOutsideWorldBorder:aT();
+    public void setOutsideWorldBorder:h(boolean outside);
+#else
+    public boolean isOutsideWorldBorder:aS();
+    public void setOutsideWorldBorder:h(boolean outside);
 #endif
 
     /*
