@@ -55,6 +55,7 @@ import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
@@ -480,4 +481,8 @@ public class HandleConversion {
         return CraftBlockDataHandle.T.fromData.invoke(blockData);
     }
 
+    @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>", output="net.minecraft.server.VoxelShape", optional=true)
+    public static Object voxelShapeFromAxisAlignedBBList(List<?> axisAlignedBBHandles) {
+        return VoxelShapeHandle.createRawFromAABB(axisAlignedBBHandles);
+    }
 }

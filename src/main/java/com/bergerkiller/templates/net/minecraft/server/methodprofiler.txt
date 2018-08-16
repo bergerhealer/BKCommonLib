@@ -8,7 +8,11 @@ class MethodProfiler {
 
     public void begin:a(String label);
 
+#if version >= 1.13
+    public void end:e();
+#else
     public void end:b();
+#endif
 }
 
 class CrashReport {

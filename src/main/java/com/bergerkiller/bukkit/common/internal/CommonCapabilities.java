@@ -77,4 +77,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.13 particle effects have options data attached, such as DustOptions for Redstone
      */
     public static final boolean PARTICLE_OPTIONS = Common.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.13 lists of AxisAlignedBB objects were replaced with VoxelShape
+     */
+    public static final boolean HAS_VOXELSHAPE_LOGIC = Common.evaluateMCVersion(">=", "1.13");
 }

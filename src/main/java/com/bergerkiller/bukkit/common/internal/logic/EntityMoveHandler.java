@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy;
 import com.bergerkiller.bukkit.common.resources.CommonSounds;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -35,6 +36,7 @@ import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsH
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
+import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 
@@ -92,7 +94,7 @@ public class EntityMoveHandler {
         }
     }
 
-    private boolean world_getBlockCollisions(EntityHandle entity, AxisAlignedBBHandle entityBounds, AxisAlignedBBHandle movedBounds, boolean flag) {
+    private boolean world_getBlockCollisions_pre_1_12_2(EntityHandle entity, AxisAlignedBBHandle entityBounds, AxisAlignedBBHandle movedBounds, boolean flag) {
         // When disabled, return right away and don't add any bounding boxes
         if (!this.blockCollisionEnabled) {
             return true;
@@ -182,7 +184,8 @@ public class EntityMoveHandler {
         return true;
     }
 
-    private List<AxisAlignedBBHandle> world_getCubes(EntityHandle entity, double mx, double my, double mz) {
+    // This logic is/was used on MC 1.12.2 and prior to handle Entity and Block Collisions
+    private List<AxisAlignedBBHandle> world_getCubes_pre_1_12_2(EntityHandle entity, double mx, double my, double mz) {
         AxisAlignedBBHandle axisalignedbb_old = entity.getBoundingBox();
         AxisAlignedBBHandle axisalignedbb = axisalignedbb_old.transformB(mx, my, mz);
 
@@ -204,10 +207,10 @@ public class EntityMoveHandler {
                     z + 0.5 * this.customBlockCollisionBounds.getZ());
 
             entity.setBoundingBoxField(newBoundingBox);
-            world_getBlockCollisions(entity, newBoundingBox, newBoundingBox.transformB(mx, my, mz), false);
+            world_getBlockCollisions_pre_1_12_2(entity, newBoundingBox, newBoundingBox.transformB(mx, my, mz), false);
             entity.setBoundingBoxField(boundingBox);
         } else {
-            world_getBlockCollisions(entity, axisalignedbb_old, axisalignedbb, false);
+            world_getBlockCollisions_pre_1_12_2(entity, axisalignedbb_old, axisalignedbb, false);
         }
         // BKCommonLib end
 
@@ -249,6 +252,23 @@ public class EntityMoveHandler {
             }
         }
         return collisions_buffer;
+    }
+
+    private VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double mx, double my, double mz) {
+        // If all collision is disabled, simply return an empty shape
+        if (!this.blockCollisionEnabled && !this.entityCollisionEnabled) {
+            return VoxelShapeHandle.empty();
+        }
+
+        // Use legacy logic on 1.12.2 and earlier
+        if (!CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
+            List<AxisAlignedBBHandle> cubes = world_getCubes_pre_1_12_2(entity, mx, my, mz);
+            return VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes));
+        }
+
+        //TODO: Event handler!
+        //List<AxisAlignedBB> list = that.world.getCubes(that, that.getBoundingBox().b(d0, d1, d2));
+        return entity.getWorld().getCollisionShape(entity, entity.getBoundingBox(), mx, my, mz);
     }
 
     /**
@@ -402,52 +422,36 @@ public class EntityMoveHandler {
                 }
             }
 
-            // BKCommonLib start
-            // collision event handler
-            //List<AxisAlignedBB> list = that.world.getCubes(that, that.getBoundingBox().b(d0, d1, d2));
-            List<AxisAlignedBBHandle> list = world_getCubes(that, d0, d1, d2);
-            // BKCommonLib end
-
+            // Store old bounding box before changes to it are made
             AxisAlignedBBHandle axisalignedbb = that.getBoundingBox();
-            int k;
-            int l;
 
-            if (d1 != 0.0D) {
-                k = 0;
+            if (d0 != 0.0D || d1 != 0.0D || d2 != 0.0D) {
+                // BKCommonLib start
+                // collision event handler
+                VoxelShapeHandle shape = world_getCollisionShape(that, d0, d1, d2);
+                // BKCommonLib end
 
-                for (l = list.size(); k < l; ++k) {
-                    d1 = list.get(k).calcSomeY(that.getBoundingBox(), d1);
-                }
-
-                that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
-            }
-
-            if (d0 != 0.0D) {
-                k = 0;
-
-                for (l = list.size(); k < l; ++k) {
-                    d0 = list.get(k).calcSomeX(that.getBoundingBox(), d0);
+                if (d1 != 0.0D) {
+                    d1 = shape.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), d1);
+                    that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 }
 
                 if (d0 != 0.0D) {
-                    that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
-                }
-            }
-
-            if (d2 != 0.0D) {
-                k = 0;
-
-                for (l = list.size(); k < l; ++k) {
-                    d2 = list.get(k).calcSomeZ(that.getBoundingBox(), d2);
+                    d2 = shape.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), d2);
+                    if (d0 != 0.0D) {
+                        that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
+                    }
                 }
 
                 if (d2 != 0.0D) {
-                    that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
+                    d2 = shape.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), d2);
+                    if (d2 != 0.0D) {
+                        that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
+                    }
                 }
             }
 
             boolean flag = that.isOnGround() || d1 != d8 && d1 < 0.0D; // CraftBukkit - decompile error
-            double d11;
 
             if (that.getHeightOffset() > 0.0F && flag && (d7 != d0 || d9 != d2)) {
                 double d12 = d0;
@@ -460,62 +464,50 @@ public class EntityMoveHandler {
 
                 // BKCommonLib start
                 // collision event handler
-                //List<AxisAlignedBB> list1 = that.world.getCubes(that, that.getBoundingBox().b(d7, d1, d9));
-                List<AxisAlignedBBHandle> list1 = world_getCubes(that, d7, d1, d9);
+                VoxelShapeHandle shape = world_getCollisionShape(that, d7, d1, d9);
                 // BKCommonLib end
 
                 AxisAlignedBBHandle axisalignedbb2 = that.getBoundingBox();
                 AxisAlignedBBHandle axisalignedbb3 = axisalignedbb2.transformB(d7, 0.0D, d9);
 
-                d11 = d1;
-                int i1 = 0;
-
-                for (int j1 = list1.size(); i1 < j1; ++i1) {
-                    d11 = list1.get(i1).calcSomeY(axisalignedbb3, d11);
+                double d11 = d1;
+                d11 = shape.traceAxis(EnumAxisHandle.Y, axisalignedbb3, d11);
+                if (d11 != 0.0D) {
+                    axisalignedbb2 = axisalignedbb2.translate(0.0D, d11, 0.0D);
                 }
 
-                axisalignedbb2 = axisalignedbb2.translate(0.0D, d11, 0.0D);
                 double d15 = d7;
-                int k1 = 0;
-
-                for (int l1 = list1.size(); k1 < l1; ++k1) {
-                    d15 = list1.get(k1).calcSomeX(axisalignedbb2, d15);
+                d15 = shape.traceAxis(EnumAxisHandle.X, axisalignedbb2, d15);
+                if (d15 != 0.0D) {
+                    axisalignedbb2 = axisalignedbb2.translate(d15, 0.0D, 0.0D);
                 }
 
-                axisalignedbb2 = axisalignedbb2.translate(d15, 0.0D, 0.0D);
                 double d16 = d9;
-                int i2 = 0;
-
-                for (int j2 = list1.size(); i2 < j2; ++i2) {
-                    d16 = list1.get(i2).calcSomeZ(axisalignedbb2, d16);
+                d16 = shape.traceAxis(EnumAxisHandle.Z, axisalignedbb2, d16);
+                if (d16 != 0.0D) {
+                    axisalignedbb2 = axisalignedbb2.translate(0.0D, 0.0D, d16);
                 }
 
-                axisalignedbb2 = axisalignedbb2.translate(0.0D, 0.0D, d16);
                 AxisAlignedBBHandle axisalignedbb4 = that.getBoundingBox();
+
                 double d17 = d1;
-                int k2 = 0;
-
-                for (int l2 = list1.size(); k2 < l2; ++k2) {
-                    d17 = list1.get(k2).calcSomeY(axisalignedbb4, d17);
+                d17 = shape.traceAxis(EnumAxisHandle.Y, axisalignedbb4, d17);
+                if (d17 != 0.0D) {
+                    axisalignedbb4 = axisalignedbb4.translate(0.0D, d17, 0.0D);
                 }
 
-                axisalignedbb4 = axisalignedbb4.translate(0.0D, d17, 0.0D);
                 double d18 = d7;
-                int i3 = 0;
-
-                for (int j3 = list1.size(); i3 < j3; ++i3) {
-                    d18 = list1.get(i3).calcSomeX(axisalignedbb4, d18);
+                d18 = shape.traceAxis(EnumAxisHandle.X, axisalignedbb4, d18);
+                if (d18 != 0.0D) {
+                    axisalignedbb4 = axisalignedbb4.translate(d18, 0.0D, 0.0D);
                 }
 
-                axisalignedbb4 = axisalignedbb4.translate(d18, 0.0D, 0.0D);
                 double d19 = d9;
-                int k3 = 0;
-
-                for (int l3 = list1.size(); k3 < l3; ++k3) {
-                    d19 = list1.get(k3).calcSomeZ(axisalignedbb4, d19);
+                d19 = shape.traceAxis(EnumAxisHandle.Z, axisalignedbb4, d19);
+                if (d19 != 0.0D) {
+                    axisalignedbb4 = axisalignedbb4.translate(0.0D, 0.0D, d19);
                 }
 
-                axisalignedbb4 = axisalignedbb4.translate(0.0D, 0.0D, d19);
                 double d20 = d15 * d15 + d16 * d16;
                 double d21 = d18 * d18 + d19 * d19;
 
@@ -531,13 +523,11 @@ public class EntityMoveHandler {
                     that.setBoundingBox(axisalignedbb4);
                 }
 
-                int i4 = 0;
-
-                for (int j4 = list1.size(); i4 < j4; ++i4) {
-                    d1 = list1.get(i4).calcSomeY(that.getBoundingBox(), d1);
+                d1 = shape.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), d1);
+                if (d1 != 0.0D) {
+                    that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 }
 
-                that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 if (d12 * d12 + d14 * d14 >= d0 * d0 + d2 * d2) {
                     d0 = d12;
                     d1 = d13;
@@ -554,7 +544,7 @@ public class EntityMoveHandler {
             that.setVerticalMovementImpaired(d1 != d8); // CraftBukkit - decompile error
             that.setOnGround(that.isVerticalMovementImpaired() && d8 < 0.0);
             that.setMovementImpaired(that.isHorizontalMovementImpaired() || that.isVerticalMovementImpaired());
-            l = MathUtil.floor(that.getLocX());
+            int l = MathUtil.floor(that.getLocX());
             int k4 = MathUtil.floor(that.getLocY() - 0.2);
             int l4 = MathUtil.floor(that.getLocZ());
             IntVector3 blockposition = new IntVector3(l, k4, l4);
@@ -614,7 +604,7 @@ public class EntityMoveHandler {
                 double d22 = that.getLocX() - d4;
                 double d23 = that.getLocY() - d5;
 
-                d11 = that.getLocZ() - d6;
+                double d11 = that.getLocZ() - d6;
                 if (block1.getRaw() != BlocksHandle.LADDER) {
                     d23 = 0.0D;
                 }
@@ -625,7 +615,7 @@ public class EntityMoveHandler {
 
                 that.setWalkedDistanceXZ((float) ((double) that.getWalkedDistanceXZ() + Math.sqrt(d22 * d22 + d11 * d11) * 0.6D));
                 that.setWalkedDistanceXYZ((float) ((double) that.getWalkedDistanceXYZ() + Math.sqrt(d22 * d22 + d23 * d23 + d11 * d11) * 0.6D));
-                if (that.getWalkedDistanceXYZ() > (float) that.getStepCounter() && iblockdata.getType() != org.bukkit.Material.AIR) {
+                if (that.getWalkedDistanceXYZ() > (float) that.getStepCounter() && !iblockdata.isType(org.bukkit.Material.AIR)) {
                     that.setStepCounter((int) that.getWalkedDistanceXYZ() + 1);
                     if (that.isInWater()) {
                         EntityHandle entity = that.isVehicle() ? that.getDriverEntity() : null;

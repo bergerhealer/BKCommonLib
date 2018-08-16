@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 
 class AxisAlignedBB {
     public final double minX:a;
@@ -108,4 +110,60 @@ class AxisAlignedBB {
     public double calcSomeY:b((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
     public double calcSomeZ:c((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0);
 #endif
+}
+
+class VoxelShape {
+
+#if version >= 1.13
+    public static (VoxelShapeHandle) VoxelShape empty() {
+        return VoxelShapes.a();
+    }
+
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+        if (handles.isEmpty()) {
+            return VoxelShapes.a();
+        } else {
+            VoxelShape shape = null;
+            java.util.Iterator iter = handles.iterator();
+            while (iter.hasNext()) {
+                AxisAlignedBB aabb = (AxisAlignedBB) iter.next();
+                VoxelShape aabb_shape = VoxelShapes.a(aabb);
+                if (shape == null) {
+                    shape = aabb_shape;
+                } else {
+                    shape = VoxelShapes.a(shape, aabb_shape); // OR
+                }
+            }
+            return shape;
+        }
+    }
+
+    public double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double coordinate) {
+        return VoxelShapes.a(axis, boundingBox, instance, coordinate);
+    }
+
+    public boolean isEmpty:b();
+#else
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape empty() {
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.EMPTY;
+    }
+
+    public static (Object) net.minecraft.server.VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromNMSAABB(handles);
+    }
+
+    public double traceAxis((EnumAxisHandle) net.minecraft.server.EnumDirection.EnumAxis axis, AxisAlignedBBHandle boundingBox, double coordinate) {
+        if (axis == net.minecraft.server.EnumDirection.EnumAxis.X) {
+            return instance.traceXAxis(boundingBox, coordinate);
+        } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Y) {
+            return instance.traceYAxis(boundingBox, coordinate);
+        } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Z) {
+            return instance.traceZAxis(boundingBox, coordinate);
+        }
+        return coordinate;
+    }
+
+    public boolean isEmpty();
+#endif
+
 }

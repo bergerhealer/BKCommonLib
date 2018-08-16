@@ -110,11 +110,13 @@ public class TemplateTest {
                 }
             }
 
+            // Internal proxy classes that are named <NMSType>Proxy
+            if (genClassPath.startsWith("com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.proxy")) {
+                genClassPath = "com.bergerkiller.generated.net.minecraft.server." + genClassPath.substring(73);
+            }
+
             // MC 1.8.8 class translation fixes
             {
-                if (genClassPath.startsWith("com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.proxy")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server." + genClassPath.substring(73);
-                }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle.a")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";
                 }
@@ -136,6 +138,9 @@ public class TemplateTest {
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.HeightMapProxy_1_12_2Handle.TypeHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.TypeHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.VoxelShapeProxyHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle";
                 }
             }
 

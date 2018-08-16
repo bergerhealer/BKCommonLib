@@ -249,6 +249,7 @@ public class Common {
             if (Common.evaluateMCVersion("<", "1.13")) {
                 remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
                 remappings.put(nms_root + ".HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
+                remappings.put(nms_root + ".VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
             }
 
             // Some classes were moved after 1.13
