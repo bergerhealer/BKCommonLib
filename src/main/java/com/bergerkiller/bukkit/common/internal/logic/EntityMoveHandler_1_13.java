@@ -4,7 +4,11 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
 
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
@@ -64,6 +68,24 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         return VoxelShapeHandle.merge(shape_blockCollisions, shape_entityCollisions);
     }
 
+    // Called from getBlockCollisions_method
+    public boolean onBlockCollided(Block block) {
+        // Find out what direction the block is hit
+        BlockFace hitFace;
+        AxisAlignedBBHandle entityBounds = this.that.getBoundingBox();
+        if (entityBounds.getMaxY() > (block.getY() + 1.0)) {
+            hitFace = BlockFace.UP;
+        } else if (entityBounds.getMinY() < (double) block.getY()) {
+            hitFace = BlockFace.DOWN;
+        } else {
+            double dx = this.that.getLocX() - block.getX() - 0.5;
+            double dz = this.that.getLocZ() - block.getZ() - 0.5;
+            hitFace = FaceUtil.getDirection(dx, dz, false);
+        }
+        // Block collision event
+        return controller.onBlockCollision(block, hitFace);
+    }
+
     private VoxelShapeHandle world_getBlockCollisionShape(EntityHandle entity, double mx, double my, double mz) {
         if (!this.blockCollisionEnabled || !isBlockCollisionsMethodInitialized()) {
             return VoxelShapeHandle.empty();
@@ -87,7 +109,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             entity.setOutsideWorldBorder(!inWorldBorder);
         }
 
-        return VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
+        return VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
     }
 
     private VoxelShapeHandle world_getEntityCollisionShape(EntityHandle entity, double mx, double my, double mz) {

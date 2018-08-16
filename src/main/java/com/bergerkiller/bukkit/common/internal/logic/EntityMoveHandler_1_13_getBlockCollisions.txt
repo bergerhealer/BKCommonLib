@@ -9,7 +9,7 @@
 // flag = always false
 // flag1 = inWorldBorder
 
-public VoxelShape getBlockCollisions(VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag, boolean flag1) {
+public VoxelShape getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag, boolean flag1) {
     int i = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.X)) - 1;
     int j = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.X)) + 1;
     int k = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.Y)) - 1;
@@ -38,7 +38,7 @@ public VoxelShape getBlockCollisions(VoxelShape voxelshape, VoxelShape voxelshap
                             blockposition_b.f(k1, i2, l1);
                             VoxelShape voxelshape5;
 
-                            if (!worldborder.a((BlockPosition) blockposition_b) && flag1) {
+                            if (flag1 && !worldborder.a((BlockPosition) blockposition_b)) {
                                 voxelshape5 = VoxelShapes.b();
                             } else {
                                 voxelshape5 = this.getType(blockposition_b).h(this, blockposition_b);
@@ -48,9 +48,20 @@ public VoxelShape getBlockCollisions(VoxelShape voxelshape, VoxelShape voxelshap
                                 VoxelShape voxelshape6;
                                 VoxelShape voxelshape7;
 
+                                // BKCommonLib start: check actually colliding + Block Collision event handler
+                                voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                if (!VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                                    continue;
+                                }
+                                org.bukkit.craftbukkit.block.CraftBlock cb_block = new org.bukkit.craftbukkit.block.CraftBlock(instance, blockposition_b.h());
+                                if (!handler.onBlockCollided(cb_block)) {
+                                    continue;
+                                }
+                                // BKCommonLib end
+
                                 if (voxelshape5 == VoxelShapes.b()) {
                                     if (flag) {
-                                        voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                        // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
                                         if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
                                             voxelshape7 = VoxelShapes.b();
                                             return voxelshape7;
@@ -59,7 +70,7 @@ public VoxelShape getBlockCollisions(VoxelShape voxelshape, VoxelShape voxelshap
                                         voxelshapebitset.a(k1 - i, i2 - k, l1 - i1, true, true);
                                     }
                                 } else {
-                                    voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                    // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
                                     if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
                                         if (flag) {
                                             voxelshape7 = VoxelShapes.b();

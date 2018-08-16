@@ -44,9 +44,8 @@ public abstract class EntityMoveHandler {
     protected boolean entityCollisionEnabled = true;
     protected Vector customBlockCollisionBounds = null; // null = entity.getBoundingBox() unchanged
     protected EntityController<?> controller;
-
+    protected EntityHandle that;
     private CommonEntity<?> entity;
-    private EntityHandle that;
 
     protected EntityMoveHandler() {
     }
