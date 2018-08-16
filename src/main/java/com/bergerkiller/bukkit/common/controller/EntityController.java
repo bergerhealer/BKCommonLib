@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.wrappers.MoveType;
 
 public abstract class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
     private EntityHook hook = null;
-    private final EntityMoveHandler moveHandler = new EntityMoveHandler(this);
+    private final EntityMoveHandler moveHandler = EntityMoveHandler.create(this);
 
     /**
      * Binds this Entity Controller to an Entity. This is called from elsewhere,

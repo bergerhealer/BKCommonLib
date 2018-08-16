@@ -123,8 +123,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Method.Converted<Object> getChunkProvider = new Template.Method.Converted<Object>();
         @Template.Optional
-        public final Template.Method.Converted<Boolean> getBlockCollisions2 = new Template.Method.Converted<Boolean>();
-        @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<VoxelShapeHandle> getCollisionShape = new Template.Method.Converted<VoxelShapeHandle>();
         public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();

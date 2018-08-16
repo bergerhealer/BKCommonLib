@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.proxy;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -57,5 +58,40 @@ public class VoxelShapeProxy {
 
     public boolean isEmpty() {
         return this._aabb.isEmpty();
+    }
+
+    public List<AxisAlignedBBHandle> getCubes() {
+        return this._aabb;
+    }
+
+    public AxisAlignedBBHandle getBoundingBox() {
+        if (this._aabb.isEmpty()) {
+            throw new UnsupportedOperationException("No bounds for empty shape.");
+        } else if (this._aabb.size() == 1) {
+            return this._aabb.get(0);
+        }
+
+        // Find minimum and maximum z/y/z coordinates of all bounding boxes
+        Iterator<AxisAlignedBBHandle> iter = this._aabb.iterator();
+        double minX, minY, minZ, maxX, maxY, maxZ;
+        {
+            AxisAlignedBBHandle first = iter.next();
+            minX = first.getMinX();
+            minY = first.getMinY();
+            minZ = first.getMinZ();
+            maxX = first.getMaxX();
+            maxY = first.getMaxY();
+            maxZ = first.getMaxZ();
+        }
+        while (iter.hasNext()) {
+            AxisAlignedBBHandle other = iter.next();
+            minX = Math.min(minX, other.getMinX());
+            minY = Math.min(minY, other.getMinY());
+            minZ = Math.min(minZ, other.getMinZ());
+            maxX = Math.max(maxX, other.getMaxX());
+            maxY = Math.max(maxY, other.getMaxY());
+            maxZ = Math.max(maxZ, other.getMaxZ());
+        }
+        return AxisAlignedBBHandle.createNew(minX, minY, minZ, maxX, maxY, maxZ);
     }
 }

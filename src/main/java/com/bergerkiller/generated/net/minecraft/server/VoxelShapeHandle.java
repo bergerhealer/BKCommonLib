@@ -30,7 +30,20 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         return T.createRawFromAABB.invoke(handles);
     }
 
+    public static VoxelShapeHandle fromAABB(AxisAlignedBBHandle aabb) {
+        return T.fromAABB.invoke(aabb);
+    }
+
+    public static VoxelShapeHandle mergeOnlyFirst(VoxelShapeHandle a, VoxelShapeHandle b) {
+        return T.mergeOnlyFirst.invoke(a, b);
+    }
+
+    public static VoxelShapeHandle merge(VoxelShapeHandle a, VoxelShapeHandle b) {
+        return T.merge.invoke(a, b);
+    }
+
     public abstract double traceAxis(EnumAxisHandle axis, AxisAlignedBBHandle boundingBox, double coordinate);
+    public abstract AxisAlignedBBHandle getBoundingBox();
     public abstract boolean isEmpty();
     /**
      * Stores class members for <b>net.minecraft.server.VoxelShape</b>.
@@ -39,8 +52,12 @@ public abstract class VoxelShapeHandle extends Template.Handle {
     public static final class VoxelShapeClass extends Template.Class<VoxelShapeHandle> {
         public final Template.StaticMethod.Converted<VoxelShapeHandle> empty = new Template.StaticMethod.Converted<VoxelShapeHandle>();
         public final Template.StaticMethod.Converted<Object> createRawFromAABB = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod.Converted<VoxelShapeHandle> fromAABB = new Template.StaticMethod.Converted<VoxelShapeHandle>();
+        public final Template.StaticMethod.Converted<VoxelShapeHandle> mergeOnlyFirst = new Template.StaticMethod.Converted<VoxelShapeHandle>();
+        public final Template.StaticMethod.Converted<VoxelShapeHandle> merge = new Template.StaticMethod.Converted<VoxelShapeHandle>();
 
         public final Template.Method.Converted<Double> traceAxis = new Template.Method.Converted<Double>();
+        public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
 
     }

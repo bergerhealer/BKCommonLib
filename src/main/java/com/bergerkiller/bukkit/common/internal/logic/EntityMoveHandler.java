@@ -1,10 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -14,14 +10,11 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy;
 import com.bergerkiller.bukkit.common.resources.CommonSounds;
-import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
@@ -46,19 +39,29 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumA
  * 
  * These collisions are to be handled by the controller attached to the Entity
  */
-public class EntityMoveHandler {
-    private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
-    private static boolean loggedEntityCollisionUndoFailure = false;
-    private boolean blockCollisionEnabled = true;
-    private boolean entityCollisionEnabled = true;
-    private Vector customBlockCollisionBounds = null; // null = entity.getBoundingBox() unchanged
+public abstract class EntityMoveHandler {
+    protected boolean blockCollisionEnabled = true;
+    protected boolean entityCollisionEnabled = true;
+    protected Vector customBlockCollisionBounds = null; // null = entity.getBoundingBox() unchanged
+    protected EntityController<?> controller;
 
-    EntityController<?> controller;
-    CommonEntity<?> entity;
-    EntityHandle that;
+    private CommonEntity<?> entity;
+    private EntityHandle that;
 
-    public EntityMoveHandler(EntityController<?> theController) {
-        controller = theController;
+    protected EntityMoveHandler() {
+    }
+
+    public static EntityMoveHandler create(EntityController<?> controller) {
+        EntityMoveHandler handler;
+        if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
+            handler = new EntityMoveHandler_1_13();
+        } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
+            handler = new EntityMoveHandler_1_11_2();
+        } else {
+            handler = new EntityMoveHandler_1_8();
+        }
+        handler.controller = controller;
+        return handler;
     }
 
     public void setBlockCollisionEnabled(boolean enabled) {
@@ -77,199 +80,34 @@ public class EntityMoveHandler {
         }
     }
 
-    private void removeFromList(List<AxisAlignedBBHandle> bounds, AxisAlignedBBHandle toRemove) {
-        ListIterator<AxisAlignedBBHandle> iter = bounds.listIterator(bounds.size());
-        while (iter.hasPrevious()) {
-            AxisAlignedBBHandle b = iter.previous();
-            if (b.getMinX() == toRemove.getMinX() && b.getMinY() == toRemove.getMinY() && b.getMinZ() == toRemove.getMinZ() &&
-                    b.getMaxX() == toRemove.getMaxX() && b.getMaxY() == toRemove.getMaxY() && b.getMaxZ() == toRemove.getMaxZ())
-            {
-                iter.remove();
-                return; // success
-            }
-        }
-        if (!loggedEntityCollisionUndoFailure) {
-            loggedEntityCollisionUndoFailure = true;
-            Logging.LOGGER_DEBUG.severe("EntityMoveHandler failed to undo Entity Collision");
-        }
-    }
-
-    private boolean world_getBlockCollisions_pre_1_12_2(EntityHandle entity, AxisAlignedBBHandle entityBounds, AxisAlignedBBHandle movedBounds, boolean flag) {
-        // When disabled, return right away and don't add any bounding boxes
-        if (!this.blockCollisionEnabled) {
-            return true;
-        }
-
-        Object entityWorld_Raw = entity.getWorld().getRaw();
-        if (WorldHandle.T.getBlockCollisions2.isAvailable()) {
-            if (!WorldHandle.T.getBlockCollisions2.invoke(entityWorld_Raw, entity, entityBounds, movedBounds, flag, collisions_buffer)) {
-                return false;
-            }
-        } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
-            if (!WorldHandle.T.getBlockCollisions.invoke(entityWorld_Raw, entity, movedBounds, flag, collisions_buffer)) {
-                return false;
-            }
-        } else {
-            List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getCubes.invoke(entityWorld_Raw, entity, movedBounds);
-            if (foundBounds.isEmpty()) {
-                return false;
-            }
-
-            // Remove all collisions that have to do with Entities; not Blocks.
-            // This is a bit of a hacked in way for backwards <= 1.10.2 support
-            // Basically, we repeat getCubes() and ignore all found bounding boxes in here
-            List<EntityHandle> list = entity.getWorld().getEntities(entity, movedBounds.growUniform(0.25D));
-            for (int i = 0; i < list.size(); i++) {
-                EntityHandle entity1 = list.get(i);
-                if (CommonCapabilities.VEHICLES_COLLIDE_WITH_PASSENGERS || !entity.isInSameVehicle(entity1)) {
-                    // BKCommonLib start: block collision event handler
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
-                        removeFromList(foundBounds, axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.getEntityBoundingBox(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(movedBounds)) {
-                        removeFromList(foundBounds, axisalignedbb1);
-                    }
-
-                    /*
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.j(entity1);
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-                    */
-
-                    // BKCommonLib end
-                }
-            }
-
-            collisions_buffer.addAll(foundBounds);
-        }
-
-        org.bukkit.World bWorld = entity.getWorld().getWorld();
-
-        // Send all found bounds in the list through a filter calling onBlockCollision
-        // Handle block collisions
-        BlockFace hitFace;
-        Iterator<AxisAlignedBBHandle> iter = collisions_buffer.iterator();
-        AxisAlignedBBHandle blockBounds;
-        double dx, dz;
-        while (iter.hasNext()) {
-            blockBounds = iter.next();
-            // Convert to block and block coordinates
-            org.bukkit.block.Block block = bWorld.getBlockAt(MathUtil.floor(blockBounds.getMinX()),
-                    MathUtil.floor(blockBounds.getMinY()), MathUtil.floor(blockBounds.getMinZ()));
-
-            // Find out what direction the block is hit
-            if (movedBounds.getMaxY() > blockBounds.getMaxY()) {
-                hitFace = BlockFace.UP;
-            } else if (movedBounds.getMinY() < blockBounds.getMinY()) {
-                hitFace = BlockFace.DOWN;
-            } else {
-                dx = entity.getLocX() - block.getX() - 0.5;
-                dz = entity.getLocZ() - block.getZ() - 0.5;
-                hitFace = FaceUtil.getDirection(dx, dz, false);
-            }
-            // Block collision event
-            if (!controller.onBlockCollision(block, hitFace)) {
-                iter.remove();
-            }
-        }
-
-        return true;
-    }
-
-    // This logic is/was used on MC 1.12.2 and prior to handle Entity and Block Collisions
-    private List<AxisAlignedBBHandle> world_getCubes_pre_1_12_2(EntityHandle entity, double mx, double my, double mz) {
-        AxisAlignedBBHandle axisalignedbb_old = entity.getBoundingBox();
-        AxisAlignedBBHandle axisalignedbb = axisalignedbb_old.transformB(mx, my, mz);
-
-        collisions_buffer.clear(); // BKCommonLib edit: use cached list
-
-        // BKCommonLib start: replace world_getBlockCollisions call; use cached list instead + allow configurable bounds
-        //world.a(entity, axisalignedbb, false, arraylist);
+    // Gets the AxisAlignedBB bounding box to use for computing Block Collisions
+    protected AxisAlignedBBHandle getBlockBoundingBox(EntityHandle entity) {
+        AxisAlignedBBHandle boundingBox = entity.getBoundingBox();
         if (this.blockCollisionEnabled && this.customBlockCollisionBounds != null) {
-            AxisAlignedBBHandle boundingBox = entity.getBoundingBox();
             double x = 0.5 * (boundingBox.getMinX() + boundingBox.getMaxX());
             double y = boundingBox.getMinY();
             double z = 0.5 * (boundingBox.getMinZ() + boundingBox.getMaxZ());
-            AxisAlignedBBHandle newBoundingBox = AxisAlignedBBHandle.createNew(
+            return AxisAlignedBBHandle.createNew(
                     x - 0.5 * this.customBlockCollisionBounds.getX(),
                     y,
                     z - 0.5 * this.customBlockCollisionBounds.getZ(),
                     x + 0.5 * this.customBlockCollisionBounds.getX(),
                     y + this.customBlockCollisionBounds.getY(),
                     z + 0.5 * this.customBlockCollisionBounds.getZ());
-
-            entity.setBoundingBoxField(newBoundingBox);
-            world_getBlockCollisions_pre_1_12_2(entity, newBoundingBox, newBoundingBox.transformB(mx, my, mz), false);
-            entity.setBoundingBoxField(boundingBox);
-        } else {
-            world_getBlockCollisions_pre_1_12_2(entity, axisalignedbb_old, axisalignedbb, false);
         }
-        // BKCommonLib end
-
-        if (entity != null && this.entityCollisionEnabled) {
-            List<EntityHandle> list = entity.getWorld().getEntities(entity, axisalignedbb.growUniform(0.25D));
-
-            for (int i = 0; i < list.size(); i++) {
-                EntityHandle entity1 = list.get(i);
-
-                if (!entity.isInSameVehicle(entity1)) {
-                    // BKCommonLib start: block collision event handler
-                    AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        collisions_buffer.add(axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.getEntityBoundingBox(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.bbTransformA(axisalignedbb)
-                            && controller.onEntityCollision(entity1.getBukkitEntity())) {
-
-                        collisions_buffer.add(axisalignedbb1);
-                    }
-
-                    /*
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-
-                    axisalignedbb1 = entity.j(entity1);
-                    if ((axisalignedbb1 != null) && (axisalignedbb1.c(axisalignedbb))) {
-                        list.add(axisalignedbb1);
-                    }
-                    */
-
-                    // BKCommonLib end
-                }
-            }
-        }
-        return collisions_buffer;
+        return boundingBox;
     }
 
-    private VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double mx, double my, double mz) {
-        // If all collision is disabled, simply return an empty shape
-        if (!this.blockCollisionEnabled && !this.entityCollisionEnabled) {
-            return VoxelShapeHandle.empty();
-        }
-
-        // Use legacy logic on 1.12.2 and earlier
-        if (!CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
-            List<AxisAlignedBBHandle> cubes = world_getCubes_pre_1_12_2(entity, mx, my, mz);
-            return VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes));
-        }
-
-        //TODO: Event handler!
-        //List<AxisAlignedBB> list = that.world.getCubes(that, that.getBoundingBox().b(d0, d1, d2));
-        return entity.getWorld().getCollisionShape(entity, entity.getBoundingBox(), mx, my, mz);
-    }
+    /**
+     * Creates a VoxelShape combining all the shaped collided with moving the entity with an offset
+     * 
+     * @param entity
+     * @param dx movement
+     * @param dy movement
+     * @param dz movement
+     * @return collision shape
+     */
+    protected abstract VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double dx, double dy, double dz);
 
     /**
      * This is the move function based on the original move function in the nms.Entity class.

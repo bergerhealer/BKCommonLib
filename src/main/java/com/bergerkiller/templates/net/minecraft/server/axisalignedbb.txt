@@ -138,9 +138,23 @@ class VoxelShape {
         }
     }
 
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape fromAABB((AxisAlignedBBHandle) AxisAlignedBB aabb) {
+        return VoxelShapes.a(aabb);
+    }
+
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape mergeOnlyFirst((VoxelShapeHandle) net.minecraft.server.VoxelShape a, (VoxelShapeHandle) net.minecraft.server.VoxelShape b) {
+        return VoxelShapes.b(a, b, OperatorBoolean.ONLY_FIRST);
+    }
+
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape merge((VoxelShapeHandle) net.minecraft.server.VoxelShape a, (VoxelShapeHandle) net.minecraft.server.VoxelShape b) {
+        return VoxelShapes.a(a, b);
+    }
+
     public double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double coordinate) {
         return VoxelShapes.a(axis, boundingBox, instance, coordinate);
     }
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
 
     public boolean isEmpty:b();
 #else
@@ -150,6 +164,36 @@ class VoxelShape {
 
     public static (Object) net.minecraft.server.VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromNMSAABB(handles);
+    }
+
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape fromAABB(AxisAlignedBBHandle aabb) {
+        java.util.List list = java.util.Collections.singletonList(aabb);
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(list);
+    }
+
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape mergeOnlyFirst((VoxelShapeHandle) net.minecraft.server.VoxelShape a, (VoxelShapeHandle) net.minecraft.server.VoxelShape b) {
+        // Unsure what this really does?
+        return a;
+    }
+
+    public static (VoxelShapeHandle) net.minecraft.server.VoxelShape merge((VoxelShapeHandle) net.minecraft.server.VoxelShape a, (VoxelShapeHandle) net.minecraft.server.VoxelShape b) {
+        java.util.List a_cubes = a.getCubes();
+        java.util.List b_cubes = b.getCubes();
+        if (a_cubes.isEmpty()) {
+            return b;
+        } else if (b_cubes.isEmpty()) {
+            return a;
+        }
+        int i = 0;
+        java.util.Iterator iter;
+        Object[] arr = new Object[a_cubes.size() + b_cubes.size()];
+        for (iter = a_cubes.iterator(); iter.hasNext(); ) {
+            arr[i++] = iter.next();
+        }
+        for (iter = b_cubes.iterator(); iter.hasNext(); ) {
+            arr[i++] = iter.next();
+        }
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(java.util.Arrays.asList(arr));
     }
 
     public double traceAxis((EnumAxisHandle) net.minecraft.server.EnumDirection.EnumAxis axis, AxisAlignedBBHandle boundingBox, double coordinate) {
@@ -162,6 +206,8 @@ class VoxelShape {
         }
         return coordinate;
     }
+
+    public (AxisAlignedBBHandle) AxisAlignedBBHandle getBoundingBox();
 
     public boolean isEmpty();
 #endif
